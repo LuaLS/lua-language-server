@@ -906,6 +906,8 @@ function m.countStates()
     return n
 end
 
+local addonsPath
+
 ---Resolve path variables/placeholders like ${3rd} and ${addons}
 ---@param path string
 ---@return string resolvedPath
@@ -914,22 +916,32 @@ function m.resolvePathPlaceholders(path)
         if key == "3rd" then
             return (ROOT / "meta" / "3rd"):string()
         elseif key == "addons" then
-            -- Common path across OSes
-            local dataPath = "User/globalStorage/sumneko.lua/addonManager/addons"
-
-            if platform.os == "windows" then
-                return "$APPDATA/Code/" .. dataPath
-            elseif platform.os == "linux" then
-                local serverPath = util.expandPath(fs.path("~/.vscode-server/data"):string())
-                if fs.exists(serverPath) then
-                    -- addons are installed via SSH remote
-                    return serverPath .."/" .. dataPath
-                else
-                    return "~/.config/Code/" .. dataPath
-                end
-            elseif platform.os == "macos" then
-                return "~/Library/Application Support/Code/" .. dataPath
+            if addonsPath then
+                return addonsPath
             end
+            local client = require 'client'
+            local storagePath = client.getOption('storagePath')
+            if storagePath then
+                addonsPath = storagePath .. "/addonManager/addons"
+            else
+                -- Common path across OSes
+                local dataPath = "User/globalStorage/sumneko.lua/addonManager/addons"
+
+                if platform.os == "windows" then
+                    addonsPath = "$APPDATA/Code/" .. dataPath
+                elseif platform.os == "linux" then
+                    local serverPath = util.expandPath(fs.path("~/.vscode-server/data"):string())
+                    if fs.exists(serverPath) then
+                        -- addons are installed via SSH remote
+                        addonsPath = serverPath .."/" .. dataPath
+                    else
+                        addonsPath = "~/.config/Code/" .. dataPath
+                    end
+                elseif platform.os == "macos" then
+                    addonsPath = "~/Library/Application Support/Code/" .. dataPath
+                end
+            end
+            return addonsPath
         elseif key:sub(1, 4) == "env:" then
             local env = os.getenv(key:sub(5))
             return env

@@ -336,7 +336,7 @@ local function tryDocFieldComment(source)
     end
 end
 
-local function getFunctionComment(source, raw)
+local function getFunctionCommentMarkdown(source, raw)
     local docGroup = source.bindDocs
     if not docGroup then
         return
@@ -393,11 +393,7 @@ local function getFunctionComment(source, raw)
     local enums = getBindEnums(source, docGroup)
     md:add('lua', enums)
 
-    local comment = md:string()
-    if comment == '' then
-        return nil
-    end
-    return comment
+    return md
 end
 
 ---@async
@@ -407,8 +403,7 @@ local function tryDocComment(source, raw)
         source = source.value
     end
     if source.type == 'function' then
-        local comment = getFunctionComment(source, raw)
-        md:add('md', comment)
+        md:add('md', getFunctionCommentMarkdown(source, raw))
         source = source.parent
     end
     local comment = lookUpDocComments(source)

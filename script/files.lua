@@ -931,7 +931,7 @@ function m.resolvePathPlaceholders(path)
                     addonsPath = "$APPDATA/Code/" .. dataPath
                 elseif platform.os == "linux" then
                     local serverPath = util.expandPath(fs.path("~/.vscode-server/data"):string())
-                    if fs.exists(serverPath) then
+                    if fs.exists(fs.path(serverPath)) then
                         -- addons are installed via SSH remote
                         addonsPath = serverPath .."/" .. dataPath
                     else

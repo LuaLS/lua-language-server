@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `CHG` Change the default TokenModifier from global variables from 'global' to 'readonly'.
 
 ## 3.11.1
 `2024-10-9`

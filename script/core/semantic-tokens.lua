@@ -36,7 +36,7 @@ local Care = util.switch()
         local isFunc = vm.getInfer(source):hasFunction(guide.getUri(source))
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
-        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.global
+        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.readonly
 
         results[#results+1] = {
             start      = source.start,

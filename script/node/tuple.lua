@@ -112,6 +112,19 @@ function M:onCanCast(other)
     return false
 end
 
+---@param self Node.Tuple
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    for _, v in ipairs(self.values) do
+        if v.hasGeneric then
+            return true, true
+        end
+    end
+    return false, true
+end
+
+
 ---@param values? Node[]
 ---@return Node.Tuple
 function ls.node.tuple(values)

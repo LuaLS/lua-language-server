@@ -20,8 +20,15 @@ end
 ---@return true
 M.__getter.value = function (self)
     self.value = self.baseNode
-    local value = self.onResolve(self)
+    local value = self:onResolve()
     return value, true
+end
+
+---@param self Node.Unsolve
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    return self.value.hasGeneric, true
 end
 
 function ls.node.unsolve(baseNode, onResolve)

@@ -174,6 +174,18 @@ function M:narrowByField(key, value)
     end)
 end
 
+---@param self Node.Union
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    for _, v in ipairs(self.values) do
+        if v.hasGeneric then
+            return true, true
+        end
+    end
+    return false, true
+end
+
 ---@param nodes? Node[]
 ---@return Node.Union
 function ls.node.union(nodes)

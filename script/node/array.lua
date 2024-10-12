@@ -73,6 +73,13 @@ function M:view(skipLevel)
     return self.head:view(skipLevel) .. '[]'
 end
 
+---@param self Node.Array
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    return self.head.hasGeneric, true
+end
+
 ---@param value Node
 ---@param len? integer
 ---@return Node.Array

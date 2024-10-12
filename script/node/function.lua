@@ -185,6 +185,23 @@ function M:view()
     end
 end
 
+---@param self Node.Function
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    for _, v in ipairs(self.params) do
+        if v.value.hasGeneric then
+            return true, true
+        end
+    end
+    for _, v in ipairs(self.returns) do
+        if v.value.hasGeneric then
+            return true, true
+        end
+    end
+    return false, true
+end
+
 function ls.node.func()
     return New 'Node.Function' ()
 end

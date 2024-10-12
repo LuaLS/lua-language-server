@@ -47,6 +47,7 @@ function M:flushCache()
     self.sortedFields = nil
     self.literals = nil
     self.types = nil
+    self.hasGeneric = nil
 end
 
 function M:isEmpty()
@@ -332,6 +333,18 @@ function M:extends(others)
             value = v,
         }
     end
+end
+
+---@param self Node.Table
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    for field in self.fields:pairsFast() do
+        if field.key.hasGeneric or field.value.hasGeneric then
+            return true, true
+        end
+    end
+    return false, true
 end
 
 ---@param fields? table

@@ -175,6 +175,9 @@ function M:narrowByField(key, value)
     return ls.node.NEVER, self
 end
 
+---@type boolean
+M.hasGeneric = false
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

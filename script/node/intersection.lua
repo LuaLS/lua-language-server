@@ -267,6 +267,22 @@ function M:view(skipLevel)
     return table.concat(elements, ' & ')
 end
 
+---@param self Node.Intersection
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    if self.value == self then
+        for _, v in ipairs(self.values) do
+            if v.hasGeneric then
+                return true, true
+            end
+        end
+        return false, true
+    else
+        return self.value.hasGeneric, true
+    end
+end
+
 ---@param a Node
 ---@param b Node
 ---@return Node.Intersection

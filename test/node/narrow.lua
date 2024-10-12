@@ -63,3 +63,16 @@ do
     assert(r5:view() == '{ y: 2 }')
     assert(r6:view() == '{ z: 3 }')
 end
+
+do
+    local t = ls.node.func()
+        : addParam('x', ls.node.NUMBER)
+    | ls.node.func()
+        : addParam('x', ls.node.STRING)
+
+    local r = t:narrow(ls.node.func()
+        : addParam('x', ls.node.NUMBER)
+    )
+
+    assert(r:view() == 'fun(x: number)')
+end

@@ -8,7 +8,7 @@ local M = ls.node.register 'Node.Array'
 M.kind = 'array'
 
 ---@param value Node
----@param len? integer
+---@param len? number
 function M:__init(value, len)
     self.head = value
     self.len = len or math.huge
@@ -80,8 +80,19 @@ M.__getter.hasGeneric = function (self)
     return self.head.hasGeneric, true
 end
 
+function M:resolveGeneric(pack, keepGeneric)
+    if not self.hasGeneric then
+        return self
+    end
+    local newHead = self.head:resolveGeneric(pack, keepGeneric)
+    if newHead == self.head then
+        return self
+    end
+    return ls.node.array(newHead, self.len)
+end
+
 ---@param value Node
----@param len? integer
+---@param len? number
 ---@return Node.Array
 function ls.node.array(value, len)
     return New 'Node.Array' (value, len)

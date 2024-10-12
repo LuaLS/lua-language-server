@@ -351,6 +351,19 @@ function M:onCanCast(other)
     return false
 end
 
+---@param self Node.Type
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    if self.value == self then
+        if self.genericPack then
+            return true, true
+        end
+        return false, true
+    end
+    return self.value.hasGeneric, true
+end
+
 ---@type { [string]: Node.Type}
 ls.node.TYPE_POOL = setmetatable({}, {
     __mode = 'v',

@@ -7,7 +7,7 @@
 ---@operator shr(Node): boolean
 local M = Class 'Node'
 
----@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic'
 
 ---基础分类
 ---@type Node.Kind
@@ -176,7 +176,32 @@ function M:narrowByField(key, value)
 end
 
 ---@type boolean
-M.hasGeneric = false
+M.hasGeneric = nil
+
+---@param self Node
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    if self.value == self then
+        return false, true
+    end
+    return self.value.hasGeneric, true
+end
+
+---@param pack Node.GenericPack
+function M:bindGenericPack(pack)
+    self.genericPack = pack
+end
+
+---@param pack Node.GenericPack
+---@param keepGeneric? boolean
+---@return Node
+function M:resolveGeneric(pack, keepGeneric)
+    if self.value == self then
+        return self
+    end
+    return self.value:resolveGeneric(pack, keepGeneric)
+end
 
 ---@generic T: Node
 ---@param nodeType `T`

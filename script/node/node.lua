@@ -84,9 +84,13 @@ function M:refreshCastCache()
 end
 
 ---是否能转换为另一个节点(双向检查)
----@param other Node
+---@param other string | number | boolean | Node
 ---@return boolean
 function M:canCast(other)
+    if type(other) ~= 'table' then
+        ---@cast other -Node
+        other = ls.node.value(other)
+    end
     if not self._castCache then
         self._castCache = setmetatable({}, ls.util.MODE_K)
     end
@@ -146,23 +150,25 @@ end
 M.literal = nil
 
 ---@param other Node
----@return Node
+---@return Node narrowed
+---@return Node otherHand
 function M:narrow(other)
     if self:canCast(other) then
-        return self
+        return self, ls.node.NEVER
     end
-    return ls.node.NEVER
+    return ls.node.NEVER, self
 end
 
 ---@param key string | number | boolean | Node
----@param value Node
----@return Node
+---@param value string | number | boolean | Node
+---@return Node narrowed
+---@return Node otherHand
 function M:narrowByField(key, value)
     local myValue = self:get(key)
     if myValue:canCast(value) then
-        return self
+        return self, ls.node.NEVER
     end
-    return ls.node.NEVER
+    return ls.node.NEVER, self
 end
 
 ---@generic T: Node

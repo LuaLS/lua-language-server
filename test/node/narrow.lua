@@ -33,3 +33,33 @@ do
     assert(r2:view() == '"x"')
     assert(r3:view() == 'true')
 end
+
+do
+    local t = ls.node.table {
+        x = 1,
+    } | ls.node.table {
+        y = 2,
+    } | ls.node.table {
+        z = 3,
+    }
+
+    local r1 = t:narrow(ls.node.table {
+        x = 1,
+    })
+    local r2 = t:narrow(ls.node.table {
+        y = 2,
+    })
+    local r3 = t:narrow(ls.node.table {
+        z = 3,
+    })
+    local r4 = t:narrowByField('x', 1)
+    local r5 = t:narrowByField('y', 2)
+    local r6 = t:narrowByField('z', 3)
+
+    assert(r1:view() == '{ x: 1 }')
+    assert(r2:view() == '{ y: 2 }')
+    assert(r3:view() == '{ z: 3 }')
+    assert(r4:view() == '{ x: 1 }')
+    assert(r5:view() == '{ y: 2 }')
+    assert(r6:view() == '{ z: 3 }')
+end

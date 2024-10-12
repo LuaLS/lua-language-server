@@ -29,11 +29,13 @@ function M:getGeneric(name, keepGeneric)
 end
 
 ---@param resolved table<string, Node>
+---@param keepGeneric? boolean
 ---@return Node.GenericPack
-function M:resolve(resolved)
+function M:resolve(resolved, keepGeneric)
     local new = ls.node.genericPack(self.generics)
     for k in pairs(self.nodeMap) do
         new.nodeMap[k] = resolved[k]
+                      or (not keepGeneric and ls.node.UNKNOWN)
     end
     return new
 end
@@ -43,8 +45,25 @@ end
 function M:view(skipLevel)
     local views = {}
     for i, generic in ipairs(self.generics) do
-        local node = self.nodeMap[generic.name] or ls.node.UNKNOWN
-        views[i] = node:view(skipLevel)
+        local node = self.nodeMap[generic.name]
+        if node == nil then
+            views[i] = generic.name
+        elseif node.kind == 'generic' then
+            ---@cast node Node.Generic
+            if node.extends then
+                views[i] = string.format('%s: %s'
+                    , generic.name
+                    , node.extends:view(skipLevel)
+                )
+            else
+                views[i] = generic.name
+            end
+        else
+            views[i] = string.format('%s = %s'
+                , generic.name
+                , node:view(skipLevel)
+            )
+        end
     end
     return string.format('<%s>', table.concat(views, ', '))
 end

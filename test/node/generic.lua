@@ -6,12 +6,12 @@ do
 
     assert(N:view() == 'N:number')
     assert(array:view() == 'N:number[]')
-    assert(pack:view() == '<N:number, U>')
+    assert(pack:view() == '<N: number, U>')
 
     local newPack = pack:resolve {
         N = ls.node.type 'integer'
     }
-    assert(newPack:view() == '<integer, unknown>')
+    assert(newPack:view() == '<N = integer, U = unknown>')
 
     local newArray = array:resolveGeneric(newPack)
     assert(newArray:view() == 'integer[]')

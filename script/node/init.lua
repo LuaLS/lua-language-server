@@ -10,5 +10,6 @@ require 'node.tuple'
 require 'node.array'
 require 'node.function'
 require 'node.intersection'
+require 'node.unsolve'
 
 require 'node.preset'

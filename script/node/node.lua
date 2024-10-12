@@ -7,7 +7,7 @@
 ---@operator shr(Node): boolean
 local M = Class 'Node'
 
----@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve'
 
 ---基础分类
 ---@type Node.Kind
@@ -59,7 +59,11 @@ end
 ---@param skipLevel? integer
 ---@return string?
 function M:view(skipLevel)
-    error('Not implemented')
+    local value = self.value
+    if value == self then
+        error('Not implemented')
+    end
+    return value:view(skipLevel)
 end
 
 function M:viewAsKey(skipLevel)

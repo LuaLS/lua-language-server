@@ -119,6 +119,15 @@ do
 end
 
 do
+    local t = ls.node.table {
+        'x', 'y', 'z',
+        x = 1, y = 2, z = 3,
+    }
+
+    assert(t:view() == [[{ [1]: "x", [2]: "y", [3]: "z", x: 1, y: 2, z: 3 }]])
+end
+
+do
     local t = ls.node.tuple({ls.node.value(1), ls.node.value(2), ls.node.value(3)})
 
     assert(t:view() == '[1, 2, 3]')

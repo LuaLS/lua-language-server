@@ -2,7 +2,7 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(): Node.Table
+---@overload fun(fields?: table): Node.Table
 local M = ls.node.register 'Node.Table'
 
 M.kind = 'table'
@@ -11,8 +11,20 @@ M.kind = 'table'
 ---@field key Node
 ---@field value Node
 
-function M:__init()
+---@param fields? table
+function M:__init(fields)
     self.fields = ls.linkedTable.create()
+    if fields then
+        for k, v in pairs(fields) do
+            if type(k) ~= 'table' then
+                k = ls.node.value(k)
+            end
+            if type(v) ~= 'table' then
+                v = ls.node.value(v)
+            end
+            self.fields:pushTail { key = k, value = v }
+        end
+    end
 end
 
 ---@param field Node.Field
@@ -322,7 +334,8 @@ function M:extends(others)
     end
 end
 
+---@param fields? table
 ---@return Node.Table
-function ls.node.table()
-    return New 'Node.Table' ()
+function ls.node.table(fields)
+    return New 'Node.Table' (fields)
 end

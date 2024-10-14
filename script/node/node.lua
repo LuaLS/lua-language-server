@@ -48,7 +48,7 @@ end
 
 function M.__band(a, b)
     return makeIntersection(a, b)
-        or ls.node.intersection(a, b)
+        or ls.node.intersection {a, b}
 end
 
 function M:__shr(other)

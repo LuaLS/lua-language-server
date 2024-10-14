@@ -24,13 +24,6 @@ M.__getter.value = function (self)
     return value, true
 end
 
----@param self Node.Unsolve
----@return boolean
----@return true
-M.__getter.hasGeneric = function (self)
-    return self.value.hasGeneric, true
-end
-
 function ls.node.unsolve(baseNode, onResolve)
     return New 'Node.Unsolve' (baseNode, onResolve)
 end

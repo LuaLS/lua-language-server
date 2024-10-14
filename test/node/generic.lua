@@ -9,6 +9,8 @@ do
         : addParam('a', N)
         : addVarargParam(U)
         : addReturn(nil, tuple)
+    local union = N | U
+    local intersection = N & U
 
     assert(N:view() == '<N:number>')
     assert(U:view() == '<U>')
@@ -16,6 +18,8 @@ do
     assert(array:view() == '<N:number>[]')
     assert(tuple:view() == '[<N:number>, <U>]')
     assert(func:view() == 'fun(a: <N:number>, ...: <U>):[<N:number>, <U>]')
+    assert(union:view() == '<N:number> | <U>')
+    assert(intersection:view() == '<N:number> & <U>')
 
     local newPack = pack:resolve {
         N = ls.node.type 'integer'
@@ -33,4 +37,10 @@ do
 
     local newFunc = func:resolveGeneric(newPack)
     assert(newFunc:view() == 'fun(a: integer, ...: unknown):[integer, unknown]')
+
+    local newUnion = union:resolveGeneric(newPack)
+    assert(newUnion:view() == 'integer | unknown')
+
+    local newIntersection = intersection:resolveGeneric(newPack)
+    assert(newIntersection:view() == 'integer')
 end

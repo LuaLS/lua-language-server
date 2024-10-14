@@ -178,12 +178,26 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    for _, v in ipairs(self.values) do
+    for _, v in ipairs(self.rawNodes) do
         if v.hasGeneric then
             return true, true
         end
     end
     return false, true
+end
+
+function M:resolveGeneric(pack, keepGeneric)
+    if self.value ~= self then
+        return self.value:resolveGeneric(pack, keepGeneric)
+    end
+    if not self.hasGeneric then
+        return self
+    end
+    local newValues = {}
+    for _, v in ipairs(self.rawNodes) do
+        newValues[#newValues+1] = v:resolveGeneric(pack, keepGeneric)
+    end
+    return ls.node.union(newValues)
 end
 
 ---@param nodes? Node[]

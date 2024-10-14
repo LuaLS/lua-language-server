@@ -130,11 +130,7 @@ function M:resolveGeneric(pack, keepGeneric)
     end
     local values = {}
     for i, value in ipairs(self.values) do
-        if value.hasGeneric then
-            values[i] = value:resolveGeneric(pack, keepGeneric)
-        else
-            values[i] = value
-        end
+        values[i] = value:resolveGeneric(pack, keepGeneric)
     end
     return ls.node.tuple(values)
 end

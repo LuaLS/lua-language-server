@@ -2,31 +2,28 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(a: Node, b: Node): Node.Intersection
+---@overload fun(nodes?: Node[]): Node.Intersection
 local M = ls.node.register 'Node.Intersection'
 
 M.kind = 'intersection'
 
----@param a Node
----@param b Node
-function M:__init(a, b)
+---@param nodes? Node[]
+function M:__init(nodes)
     ---@type Node[]
     local values = {}
 
-    if a.kind == 'intersection' then
-        ---@cast a Node.Intersection
-        ls.util.arrayMerge(values, a.rawNodes)
-    else
-        values[#values+1] = a
-    end
-    if b.kind == 'intersection' then
-        ---@cast b Node.Intersection
-        ls.util.arrayMerge(values, b.rawNodes)
-    else
-        values[#values+1] = b
-    end
+    if nodes then
+        for _, v in ipairs(nodes) do
+            if v.kind == 'intersection' then
+                ---@cast v Node.Intersection
+                ls.util.arrayMerge(values, v.rawNodes)
+            else
+                values[#values+1] = v
+            end
+        end
 
-    ls.util.arrayRemoveDuplicate(values)
+        ls.util.arrayRemoveDuplicate(values)
+    end
 
     self.rawNodes = values
 end
@@ -116,9 +113,11 @@ M.__getter.values = function (self)
         if x.kind == 'table'
         or x.kind == 'type'
         or x.kind == 'union'
+        or x.kind == 'generic'
         or y.kind == 'table'
         or y.kind == 'type'
-        or y.kind == 'union' then
+        or y.kind == 'union'
+        or y.kind == 'generic' then
             return false
         end
 
@@ -160,6 +159,12 @@ M.__getter.value = function (self)
     end
     if #values == 1 then
         return values[1], true
+    end
+
+    for _, value in ipairs(values) do
+        if value.kind == 'generic' then
+            return self, true
+        end
     end
 
     local mergedLiterals = {}
@@ -272,7 +277,7 @@ end
 ---@return true
 M.__getter.hasGeneric = function (self)
     if self.value == self then
-        for _, v in ipairs(self.values) do
+        for _, v in ipairs(self.rawNodes) do
             if v.hasGeneric then
                 return true, true
             end
@@ -283,9 +288,22 @@ M.__getter.hasGeneric = function (self)
     end
 end
 
----@param a Node
----@param b Node
+function M:resolveGeneric(pack, keepGeneric)
+    if self.value ~= self then
+        return self.value:resolveGeneric(pack, keepGeneric)
+    end
+    if not self.hasGeneric then
+        return self
+    end
+    local newValues = {}
+    for _, v in ipairs(self.rawNodes) do
+        newValues[#newValues+1] = v:resolveGeneric(pack, keepGeneric)
+    end
+    return ls.node.intersection(newValues)
+end
+
+---@param nodes? Node[]
 ---@return Node.Intersection
-function ls.node.intersection(a, b)
-    return New 'Node.Intersection' (a, b)
+function ls.node.intersection(nodes)
+    return New 'Node.Intersection' (nodes)
 end

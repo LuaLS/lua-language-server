@@ -27,7 +27,7 @@ function M:view(skipLevel)
 end
 
 function M:resolveGeneric(pack, keepGeneric)
-    return pack:getGeneric(self.name, keepGeneric)
+    return pack:getGeneric(self, keepGeneric)
         or self.extends
         or ls.node.UNKNOWN
 end

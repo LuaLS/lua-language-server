@@ -18,11 +18,13 @@ do
     assert(array:view() == '<N:number>[]')
     assert(tuple:view() == '[<N:number>, <U>]')
     assert(func:view() == 'fun(a: <N:number>, ...: <U>):[<N:number>, <U>]')
+    func:bindGenericPack(pack)
+    assert(func:view() == 'fun<N:number, U>(a: <N:number>, ...: <U>):[<N:number>, <U>]')
     assert(union:view() == '<N:number> | <U>')
     assert(intersection:view() == '<N:number> & <U>')
 
     local newPack = pack:resolve {
-        N = ls.node.type 'integer'
+        [N] = ls.node.type 'integer'
     }
     assert(newPack:view() == '<integer, unknown>')
 
@@ -36,7 +38,7 @@ do
     assert(newTable:view() == '{ [integer]: unknown }')
 
     local newFunc = func:resolveGeneric(newPack)
-    assert(newFunc:view() == 'fun(a: integer, ...: unknown):[integer, unknown]')
+    assert(newFunc:view() == 'fun<integer, unknown>(a: integer, ...: unknown):[integer, unknown]')
 
     local newUnion = union:resolveGeneric(newPack)
     assert(newUnion:view() == 'integer | unknown')

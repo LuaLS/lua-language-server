@@ -257,8 +257,15 @@ M.__getter.falsy = function (self)
     return ls.node.NEVER, true
 end
 
-function M:view()
-    return self.typeName
+---@type Node.GenericPack?
+M.genericPack = nil
+
+function M:view(skipLevel)
+    if self.genericPack then
+        return self.typeName .. self.genericPack:view(skipLevel)
+    else
+        return self.typeName
+    end
 end
 
 ---@type fun(self: Node.Type, other: Node): boolean?
@@ -362,6 +369,10 @@ M.__getter.hasGeneric = function (self)
         return false, true
     end
     return self.value.hasGeneric, true
+end
+
+function M:resolveGeneric(pack, keepGeneric)
+    
 end
 
 ---@type { [string]: Node.Type}

@@ -159,7 +159,7 @@ function M:getReturn(index)
     return nil
 end
 
-function M:view()
+function M:view(skipLevel)
     local params = {}
     for i, v in ipairs(self.params) do
         params[i] = string.format('%s: %s'
@@ -180,12 +180,14 @@ function M:view()
     end
 
     if #returns > 0 then
-        return string.format('fun(%s):%s'
+        return string.format('fun%s(%s):%s'
+            , self.genericPack and self.genericPack:view(skipLevel) or ''
             , table.concat(params, ', ')
             , table.concat(returns, ', ')
         )
     else
-        return string.format('fun(%s)'
+        return string.format('fun%s(%s)'
+            , self.genericPack and self.genericPack:view(skipLevel) or ''
             , table.concat(params, ', ')
         )
     end
@@ -214,11 +216,21 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
+---@param pack Node.GenericPack
+---@return Node.Function
+function M:bindGenericPack(pack)
+    self.genericPack = pack
+    return self
+end
+
 function M:resolveGeneric(pack, keepGeneric)
     if not self.hasGeneric then
         return self
     end
     local newFunc = ls.node.func()
+    if self.genericPack then
+        newFunc.genericPack = self.genericPack:resolve(pack)
+    end
     for i, param in ipairs(self.params) do
         if param.value.hasGeneric then
             local newValue = param.value:resolveGeneric(pack, keepGeneric)

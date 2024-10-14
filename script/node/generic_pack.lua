@@ -1,23 +1,23 @@
----@class Node.GenericPack
+---@class Node.GenericPack: Class.Base
 ---@overload fun(generics?: Node.Generic[]): Node.GenericPack
 local M = Class 'Node.GenericPack'
 
 ---@param generics? Node.Generic[]
 function M:__init(generics)
     self.generics = generics or {}
-    ---@type table<string, Node>
-    self.nodeMap = {}
+    ---@type table<Node.Generic, Node>
+    self.refMap = {}
 
     for _, generic in ipairs(self.generics) do
-        self.nodeMap[generic.name] = generic
+        self.refMap[generic] = generic
     end
 end
 
----@param name string
+---@param generic Node.Generic
 ---@param keepGeneric? boolean
 ---@return Node?
-function M:getGeneric(name, keepGeneric)
-    local v = self.nodeMap[name]
+function M:getGeneric(generic, keepGeneric)
+    local v = self.refMap[generic]
     if not v then
         return nil
     end
@@ -28,16 +28,36 @@ function M:getGeneric(name, keepGeneric)
     return v
 end
 
----@param resolved table<string, Node>
+---@type Node.GenericPack?
+M.basePack = nil
+
+---@param pack Node.GenericPack | table<Node.Generic, Node>
 ---@param keepGeneric? boolean
 ---@return Node.GenericPack
-function M:resolve(resolved, keepGeneric)
+function M:resolve(pack, keepGeneric)
+    if pack.basePack == self then
+        return pack
+    end
     local new = ls.node.genericPack(self.generics)
-    for k in pairs(self.nodeMap) do
-        new.nodeMap[k] = resolved[k]
+    for k in pairs(self.refMap) do
+        new.refMap[k] = pack[k]
                       or (not keepGeneric and ls.node.UNKNOWN)
     end
+    new.basePack = self
     return new
+end
+
+---@param self Node.GenericPack
+---@return boolean
+---@return true
+M.__getter.allResolved = function (self)
+    for _, generic in ipairs(self.generics) do
+        local value = self.refMap[generic]
+        if not value or value.kind == 'generic' then
+            return false, true
+        end
+    end
+    return true, true
 end
 
 ---@param skipLevel? integer
@@ -45,7 +65,7 @@ end
 function M:view(skipLevel)
     local views = {}
     for i, generic in ipairs(self.generics) do
-        local node = self.nodeMap[generic.name]
+        local node = self.refMap[generic]
         if not node then
             views[i] = generic.name
             goto continue

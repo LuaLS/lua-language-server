@@ -124,6 +124,21 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
+function M:resolveGeneric(pack, keepGeneric)
+    if not self.hasGeneric then
+        return self
+    end
+    local values = {}
+    for i, value in ipairs(self.values) do
+        if value.hasGeneric then
+            values[i] = value:resolveGeneric(pack, keepGeneric)
+        else
+            values[i] = value
+        end
+    end
+    return ls.node.tuple(values)
+end
+
 
 ---@param values? Node[]
 ---@return Node.Tuple

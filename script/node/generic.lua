@@ -20,9 +20,9 @@ end
 ---@return string
 function M:view(skipLevel)
     if self.extends then
-        return string.format('%s:%s', self.name, self.extends:view(skipLevel))
+        return string.format('<%s:%s>', self.name, self.extends:view(skipLevel))
     else
-        return self.name
+        return string.format('<%s>', self.name)
     end
 end
 

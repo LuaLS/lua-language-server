@@ -167,10 +167,16 @@ function M:view()
             , v.value:view()
         )
     end
+    if self.varargParam then
+        params[#params+1] = string.format('...: %s', self.varargParam:view())
+    end
 
     local returns = {}
     for i, v in ipairs(self.returns) do
         returns[i] = v.value:view()
+    end
+    if self.varargReturn then
+        returns[#returns+1] = string.format('(...: %s)', self.varargReturn:view())
     end
 
     if #returns > 0 then
@@ -199,7 +205,59 @@ M.__getter.hasGeneric = function (self)
             return true, true
         end
     end
+    if self.varargParam and self.varargParam.hasGeneric then
+        return true, true
+    end
+    if self.varargReturn and self.varargReturn.hasGeneric then
+        return true, true
+    end
     return false, true
+end
+
+function M:resolveGeneric(pack, keepGeneric)
+    if not self.hasGeneric then
+        return self
+    end
+    local newFunc = ls.node.func()
+    for i, param in ipairs(self.params) do
+        if param.value.hasGeneric then
+            local newValue = param.value:resolveGeneric(pack, keepGeneric)
+            newFunc.params[i] = { key = param.key, value = newValue }
+            newFunc.paramMap[param.key] = newValue
+        else
+            newFunc.params[i] = param
+            newFunc.paramMap[param.key] = param.value
+        end
+    end
+    for i, ret in ipairs(self.returns) do
+        if ret.value.hasGeneric then
+            local newValue = ret.value:resolveGeneric(pack, keepGeneric)
+            newFunc.returns[i] = { key = ret.key, value = newValue }
+            if ret.key then
+                newFunc.returnMap[ret.key] = newValue
+            end
+        else
+            newFunc.returns[i] = ret
+            if ret.key then
+                newFunc.returnMap[ret.key] = ret.value
+            end
+        end
+    end
+    if self.varargParam then
+        if self.varargParam.hasGeneric then
+            newFunc.varargParam = self.varargParam:resolveGeneric(pack, keepGeneric)
+        else
+            newFunc.varargParam = self.varargParam
+        end
+    end
+    if self.varargReturn then
+        if self.varargReturn.hasGeneric then
+            newFunc.varargReturn = self.varargReturn:resolveGeneric(pack, keepGeneric)
+        else
+            newFunc.varargReturn = self.varargReturn
+        end
+    end
+    return newFunc
 end
 
 function ls.node.func()

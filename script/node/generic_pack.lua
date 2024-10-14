@@ -46,21 +46,21 @@ function M:view(skipLevel)
     local views = {}
     for i, generic in ipairs(self.generics) do
         local node = self.nodeMap[generic.name]
-        if node == nil then
+        if not node then
             views[i] = generic.name
-        elseif node.kind == 'generic' then
-            ---@cast node Node.Generic
-            if node.extends then
-                views[i] = string.format('%s: %s'
-                    , generic.name
-                    , node.extends:view(skipLevel)
-                )
-            else
-                views[i] = generic.name
-            end
-        else
-            views[i] = node:view(skipLevel)
+            goto continue
         end
+        if node.kind ~= 'generic' then
+            views[i] = node:view(skipLevel)
+            goto continue
+        end
+        ---@cast node Node.Generic
+        if node.extends then
+            views[i] = string.format('%s:%s', node.name, node.extends:view(skipLevel))
+        else
+            views[i] = node.name
+        end
+        ::continue::
     end
     return string.format('<%s>', table.concat(views, ', '))
 end

@@ -347,6 +347,26 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
+function M:resolveGeneric(pack, keepGeneric)
+    if not self.hasGeneric then
+        return self
+    end
+    local newTable = ls.node.table()
+    ---@param field Node.Field
+    for field in self.fields:pairsFast() do
+        if field.key.hasGeneric
+        or field.value.hasGeneric then
+            newTable:addField {
+                key   = field.key:resolveGeneric(pack, keepGeneric),
+                value = field.value:resolveGeneric(pack, keepGeneric),
+            }
+        else
+            newTable:addField(field)
+        end
+    end
+    return newTable
+end
+
 ---@param fields? table
 ---@return Node.Table
 function ls.node.table(fields)

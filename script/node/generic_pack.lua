@@ -2,11 +2,14 @@
 ---@overload fun(generics?: Node.Generic[]): Node.GenericPack
 local M = Class 'Node.GenericPack'
 
+M.kind = 'genericPack'
+
 ---@param generics? Node.Generic[]
 function M:__init(generics)
     self.generics = generics or {}
     ---@type table<Node.Generic, Node>
     self.refMap = {}
+    self.basePack = self
 
     for _, generic in ipairs(self.generics) do
         self.refMap[generic] = generic
@@ -35,17 +38,21 @@ M.basePack = nil
 ---@param keepGeneric? boolean
 ---@return Node.GenericPack
 function M:resolve(pack, keepGeneric)
-    if pack.basePack == self then
+    if pack.basePack == self and (pack.allResolved or keepGeneric) then
         return pack
     end
+    local refMap = pack.kind == 'genericPack' and pack.refMap or pack
     local new = ls.node.genericPack(self.generics)
     for k in pairs(self.refMap) do
-        new.refMap[k] = pack[k]
+        new.refMap[k] = refMap[k]
                       or (not keepGeneric and ls.node.UNKNOWN)
     end
-    new.basePack = self
+    new.basePack = self.basePack
     return new
 end
+
+---@type boolean
+M.allResolved = nil
 
 ---@param self Node.GenericPack
 ---@return boolean

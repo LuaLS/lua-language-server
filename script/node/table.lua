@@ -47,6 +47,7 @@ function M:flushCache()
     self.sortedFields = nil
     self.literals = nil
     self.types = nil
+    self.others = nil
     self.hasGeneric = nil
 end
 
@@ -56,12 +57,19 @@ end
 
 ---@type table<string|number|boolean, Node>
 M.literals = nil
+---@type table<string, Node>
+M.types = nil
+---@type Node.Field[]
+M.others = nil
 
----@param self Node.Table
----@return table<string|number|boolean, Node>
----@return true
-M.__getter.literals = function (self)
+---@package
+function M:classifyFields()
     local literals = {}
+    local types = {}
+    local others = {}
+    self.literal = literals
+    self.types = types
+    self.others = others
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
@@ -70,6 +78,10 @@ M.__getter.literals = function (self)
             ---@cast key Node.Value
             local k = key.literal
             literals[k] = literals[k] | field.value
+        elseif key.typeName then
+            types[key.typeName] = types[key.typeName] | field.value
+        else
+            others[#others+1] = field
         end
         if key.kind == 'union' then
             ---@cast key Node.Union
@@ -78,40 +90,37 @@ M.__getter.literals = function (self)
                     ---@cast v Node.Value
                     local k = v.literal
                     literals[k] = literals[k] | field.value
+                elseif v.typeName then
+                    types[v.typeName] = types[v.typeName] | field.value
+                else
+                    others[#others+1] = field
                 end
             end
         end
     end
-
-    return literals, true
 end
 
----@type table<string, Node>
-M.types = nil
+---@param self Node.Table
+---@return table<string|number|boolean, Node>
+M.__getter.literals = function (self)
+    self:classifyFields()
+    return self.literal
+end
+
 
 ---@param self Node.Table
 ---@return table<string, Node>
----@return true
 M.__getter.types = function (self)
-    local types = {}
+    self:classifyFields()
+    return self.types
+end
 
-    ---@param field Node.Field
-    for field in self.fields:pairsFast() do
-        local key = field.key
-        if key.kind ~= 'value' and key.typeName then
-            types[key.typeName] = types[key.typeName] | field.value
-        end
-        if key.kind == 'union' then
-            ---@cast key Node.Union
-            for _, v in ipairs(key.values) do
-                if v.kind ~= 'value' and v.typeName then
-                    types[v.typeName] = types[v.typeName] | field.value
-                end
-            end
-        end
-    end
 
-    return types, true
+---@param self Node.Table
+---@return table<Node, Node>
+M.__getter.others = function (self)
+    self:classifyFields()
+    return self.others
 end
 
 ---获取所有的键。
@@ -184,6 +193,9 @@ M.__getter.sortedFields = function (self)
 
     for k, v in ls.util.sortPairs(self.types) do
         values[#values+1] = { key = ls.node.type(k), value = v }
+    end
+    for _, field in ipairs(self.others) do
+        values[#values+1] = field
     end
 
     return values, true

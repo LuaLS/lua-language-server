@@ -2,6 +2,8 @@ do
     local N = ls.node.generic('N', ls.node.NUMBER)
     local U = ls.node.generic 'U'
     local pack = ls.node.genericPack { N, U }
+    local map = ls.node.type 'Map'
+    map:bindGenericPack(pack)
     local array = ls.node.array(N)
     local tuple = ls.node.tuple { N, U }
     local table = ls.node.table { [N] = U }
@@ -14,19 +16,32 @@ do
 
     assert(N:view() == '<N:number>')
     assert(U:view() == '<U>')
+
     assert(pack:view() == '<N:number, U>')
+
+    assert(map:view() == 'Map<N:number, U>')
+
     assert(array:view() == '<N:number>[]')
+
     assert(tuple:view() == '[<N:number>, <U>]')
+
+    assert(table:view() == '{ [<N:number>]: <U> }')
+
     assert(func:view() == 'fun(a: <N:number>, ...: <U>):[<N:number>, <U>]')
     func:bindGenericPack(pack)
     assert(func:view() == 'fun<N:number, U>(a: <N:number>, ...: <U>):[<N:number>, <U>]')
+
     assert(union:view() == '<N:number> | <U>')
+
     assert(intersection:view() == '<N:number> & <U>')
 
     local newPack = pack:resolve {
         [N] = ls.node.type 'integer'
     }
     assert(newPack:view() == '<integer, unknown>')
+
+    local newMap = map:resolveGeneric(newPack)
+    assert(newMap:view() == 'Map<integer, unknown>')
 
     local newArray = array:resolveGeneric(newPack)
     assert(newArray:view() == 'integer[]')

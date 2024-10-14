@@ -2,14 +2,16 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(name: string): Node.Type
+---@overload fun(name: string, pack?: Node.GenericPack): Node.Type
 local M = ls.node.register 'Node.Type'
 
 M.kind = 'type'
 
 ---@param name string
-function M:__init(name)
+---@param pack? Node.GenericPack
+function M:__init(name, pack)
     self.typeName = name
+    self.genericPack = pack
 end
 
 ---@param field Node.Field
@@ -257,9 +259,6 @@ M.__getter.falsy = function (self)
     return ls.node.NEVER, true
 end
 
----@type Node.GenericPack?
-M.genericPack = nil
-
 function M:view(skipLevel)
     if self.genericPack then
         return self.typeName .. self.genericPack:view(skipLevel)
@@ -362,17 +361,22 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    if self.value == self then
-        if self.genericPack then
-            return true, true
-        end
-        return false, true
-    end
-    return self.value.hasGeneric, true
+    return self.genericPack ~= nil, true
+end
+
+---@type Node.GenericPack?
+M.genericPack = nil
+
+---@param pack Node.GenericPack
+---@return Node.Type
+function M:bindGenericPack(pack)
+    self.genericPack = pack
+    return self
 end
 
 function M:resolveGeneric(pack, keepGeneric)
-    
+    local newPack = pack:resolve(pack, keepGeneric)
+    return ls.node.type(self.typeName, newPack)
 end
 
 ---@type { [string]: Node.Type}
@@ -385,7 +389,11 @@ ls.node.TYPE_POOL = setmetatable({}, {
     end,
 })
 
----@overload fun(name: string): Node.Type
-function ls.node.type(name)
-    return ls.node.TYPE_POOL[name]
+---@overload fun(name: string, pack?: Node.GenericPack): Node.Type
+function ls.node.type(name, pack)
+    if pack then
+        return New 'Node.Type' (name, pack)
+    else
+        return ls.node.TYPE_POOL[name]
+    end
 end

@@ -11,7 +11,7 @@ do
     local newPack = pack:resolve {
         N = ls.node.type 'integer'
     }
-    assert(newPack:view() == '<N = integer, U = unknown>')
+    assert(newPack:view() == '<integer, unknown>')
 
     local newArray = array:resolveGeneric(newPack)
     assert(newArray:view() == 'integer[]')

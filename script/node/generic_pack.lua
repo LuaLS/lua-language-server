@@ -59,10 +59,7 @@ function M:view(skipLevel)
                 views[i] = generic.name
             end
         else
-            views[i] = string.format('%s = %s'
-                , generic.name
-                , node:view(skipLevel)
-            )
+            views[i] = node:view(skipLevel)
         end
     end
     return string.format('<%s>', table.concat(views, ', '))

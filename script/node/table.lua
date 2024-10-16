@@ -359,7 +359,7 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
-function M:resolveGeneric(pack, keepGeneric)
+function M:resolveGeneric(pack)
     if not self.hasGeneric then
         return self
     end
@@ -369,8 +369,8 @@ function M:resolveGeneric(pack, keepGeneric)
         if field.key.hasGeneric
         or field.value.hasGeneric then
             newTable:addField {
-                key   = field.key:resolveGeneric(pack, keepGeneric),
-                value = field.value:resolveGeneric(pack, keepGeneric),
+                key   = field.key:resolveGeneric(pack),
+                value = field.value:resolveGeneric(pack),
             }
         else
             newTable:addField(field)

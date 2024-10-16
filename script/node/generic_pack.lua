@@ -17,14 +17,13 @@ function M:__init(generics)
 end
 
 ---@param generic Node.Generic
----@param keepGeneric? boolean
 ---@return Node?
-function M:getGeneric(generic, keepGeneric)
+function M:getGeneric(generic)
     local v = self.refMap[generic]
     if not v then
         return nil
     end
-    if not keepGeneric and v.kind == 'generic' then
+    if v.kind == 'generic' then
         ---@cast v Node.Generic
         return v.extends
     end

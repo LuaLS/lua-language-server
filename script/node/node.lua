@@ -189,13 +189,12 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param pack Node.GenericPack
----@param keepGeneric? boolean
 ---@return Node
-function M:resolveGeneric(pack, keepGeneric)
+function M:resolveGeneric(pack)
     if self.value == self then
         return self
     end
-    return self.value:resolveGeneric(pack, keepGeneric)
+    return self.value:resolveGeneric(pack)
 end
 
 ---@generic T: Node

@@ -374,8 +374,8 @@ function M:bindGenericPack(pack)
     return self
 end
 
-function M:resolveGeneric(pack, keepGeneric)
-    local newPack = pack:resolve(pack, keepGeneric)
+function M:resolveGeneric(pack)
+    local newPack = pack:resolve(pack)
     return ls.node.type(self.typeName, newPack)
 end
 

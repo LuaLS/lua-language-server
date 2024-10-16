@@ -223,7 +223,7 @@ function M:bindGenericPack(pack)
     return self
 end
 
-function M:resolveGeneric(pack, keepGeneric)
+function M:resolveGeneric(pack)
     if not self.hasGeneric then
         return self
     end
@@ -233,7 +233,7 @@ function M:resolveGeneric(pack, keepGeneric)
     end
     for i, param in ipairs(self.params) do
         if param.value.hasGeneric then
-            local newValue = param.value:resolveGeneric(pack, keepGeneric)
+            local newValue = param.value:resolveGeneric(pack)
             newFunc.params[i] = { key = param.key, value = newValue }
             newFunc.paramMap[param.key] = newValue
         else
@@ -243,7 +243,7 @@ function M:resolveGeneric(pack, keepGeneric)
     end
     for i, ret in ipairs(self.returns) do
         if ret.value.hasGeneric then
-            local newValue = ret.value:resolveGeneric(pack, keepGeneric)
+            local newValue = ret.value:resolveGeneric(pack)
             newFunc.returns[i] = { key = ret.key, value = newValue }
             if ret.key then
                 newFunc.returnMap[ret.key] = newValue
@@ -257,14 +257,14 @@ function M:resolveGeneric(pack, keepGeneric)
     end
     if self.varargParam then
         if self.varargParam.hasGeneric then
-            newFunc.varargParam = self.varargParam:resolveGeneric(pack, keepGeneric)
+            newFunc.varargParam = self.varargParam:resolveGeneric(pack)
         else
             newFunc.varargParam = self.varargParam
         end
     end
     if self.varargReturn then
         if self.varargReturn.hasGeneric then
-            newFunc.varargReturn = self.varargReturn:resolveGeneric(pack, keepGeneric)
+            newFunc.varargReturn = self.varargReturn:resolveGeneric(pack)
         else
             newFunc.varargReturn = self.varargReturn
         end

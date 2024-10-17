@@ -372,6 +372,21 @@ function M:bindParams(pack)
     return self
 end
 
+---@param args Node[]
+---@return Node
+function M:getValueWithArgs(args)
+    if not self.params then
+        return self.value
+    end
+    local map = {}
+    for i, param in ipairs(self.params.generics) do
+        map[param] = args[i] or param.extends
+    end
+    local resolvedPack = self.params:resolve(map)
+    local resolvedValue = self.value:resolveGeneric(resolvedPack)
+    return resolvedValue
+end
+
 ---@param pack Node.GenericPack
 ---@return Node.Type | Node.Typecall
 function M:resolveGeneric(pack)
@@ -386,23 +401,40 @@ function M:resolveGeneric(pack)
     return self:call(nodes)
 end
 
----@param nodes Node[]
+---@param nodes? Node[]
 ---@return Node.Type | Node.Typecall
 function M:call(nodes)
     if not self.params then
         return self
     end
-    local typecall = self.typecallPool:get(nodes)
+    if not nodes then
+        nodes = {}
+    end
+    local typecall
+    if #nodes == 0 then 
+        typecall = self.typecallWithNoArgs
+    else
+        typecall = self.typecallPool:get(nodes)
+    end
     if not typecall then
         typecall = ls.node.typecall(self.typeName, nodes)
-        self.typecallPool:set(nodes, typecall)
+        if #nodes == 0 then
+            self.typecallWithNoArgs = typecall
+        else
+            self.typecallPool:set(nodes, typecall)
+        end
     end
     return typecall
 end
 
 ---@private
+---@type Node.Typecall?
+M.typecallWithNoArgs = nil
+
+---@private
 ---@type PathTable
 M.typecallPool = nil
+
 
 ---@param self Node.Type
 ---@return PathTable

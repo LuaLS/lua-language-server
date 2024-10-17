@@ -44,7 +44,7 @@ function M:resolve(pack, keepGeneric)
     local new = ls.node.genericPack(self.generics)
     for k in pairs(self.refMap) do
         new.refMap[k] = refMap[k]
-                      or (not keepGeneric and ls.node.UNKNOWN)
+                      or (not keepGeneric and ls.node.ANY)
     end
     new.basePack = self.basePack
     return new
@@ -81,10 +81,10 @@ function M:view(skipLevel)
             goto continue
         end
         ---@cast node Node.Generic
-        if node.extends then
-            views[i] = string.format('%s:%s', node.name, node.extends:view(skipLevel))
-        else
+        if node.extends == ls.node.ANY then
             views[i] = node.name
+        else
+            views[i] = string.format('%s:%s', node.name, node.extends:view(skipLevel))
         end
         ::continue::
     end

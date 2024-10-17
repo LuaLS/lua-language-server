@@ -13,23 +13,21 @@ M.hasGeneric = true
 ---@param extends? Node
 function M:__init(name, extends)
     self.name = name
-    self.extends = extends
+    self.extends = extends or ls.node.ANY
 end
 
 ---@param skipLevel? integer
 ---@return string
 function M:view(skipLevel)
-    if self.extends then
-        return string.format('<%s:%s>', self.name, self.extends:view(skipLevel))
-    else
+    if self.extends == ls.node.ANY then
         return string.format('<%s>', self.name)
+    else
+        return string.format('<%s:%s>', self.name, self.extends:view(skipLevel))
     end
 end
 
 function M:resolveGeneric(pack)
-    return pack:getGeneric(self)
-        or self.extends
-        or ls.node.UNKNOWN
+    return pack:getGeneric(self) or self.extends
 end
 
 ---@param name string

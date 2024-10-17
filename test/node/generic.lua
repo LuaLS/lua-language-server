@@ -3,7 +3,7 @@ do
     local U = ls.node.generic 'U'
     local pack = ls.node.genericPack { N, U }
     local map = ls.node.type 'Map'
-    map:bindGenericPack(pack)
+    map:bindParams(pack)
     local array = ls.node.array(N)
     local tuple = ls.node.tuple { N, U }
     local table = ls.node.table { [N] = U }

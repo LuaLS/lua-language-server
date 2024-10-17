@@ -7,7 +7,7 @@
 ---@operator shr(Node): boolean
 local M = Class 'Node'
 
----@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'typecall'
 
 ---基础分类
 ---@type Node.Kind

@@ -2,16 +2,14 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(name: string, pack?: Node.GenericPack): Node.Type
+---@overload fun(name: string): Node.Type
 local M = ls.node.register 'Node.Type'
 
 M.kind = 'type'
 
 ---@param name string
----@param pack? Node.GenericPack
-function M:__init(name, pack)
+function M:__init(name)
     self.typeName = name
-    self.genericPack = pack
 end
 
 ---@param field Node.Field
@@ -260,8 +258,8 @@ M.__getter.falsy = function (self)
 end
 
 function M:view(skipLevel)
-    if self.genericPack then
-        return self.typeName .. self.genericPack:view(skipLevel)
+    if self.params then
+        return self.typeName .. self.params:view(skipLevel)
     else
         return self.typeName
     end
@@ -361,22 +359,56 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    return self.genericPack ~= nil, true
+    return self.params ~= nil, true
 end
 
 ---@type Node.GenericPack?
-M.genericPack = nil
+M.params = nil
 
 ---@param pack Node.GenericPack
 ---@return Node.Type
-function M:bindGenericPack(pack)
-    self.genericPack = pack
+function M:bindParams(pack)
+    self.params = pack
     return self
 end
 
+---@param pack Node.GenericPack
+---@return Node.Type | Node.Typecall
 function M:resolveGeneric(pack)
-    local newPack = pack:resolve(pack)
-    return ls.node.type(self.typeName, newPack)
+    if not self.params then
+        return self
+    end
+    local nodes = {}
+    for _, param in ipairs(self.params.generics) do
+        local value = pack:getGeneric(param) or param
+        nodes[#nodes+1] = value
+    end
+    return self:call(nodes)
+end
+
+---@param nodes Node[]
+---@return Node.Type | Node.Typecall
+function M:call(nodes)
+    if not self.params then
+        return self
+    end
+    local typecall = self.typecallPool:get(nodes)
+    if not typecall then
+        typecall = ls.node.typecall(self.typeName, nodes)
+        self.typecallPool:set(nodes, typecall)
+    end
+    return typecall
+end
+
+---@private
+---@type PathTable
+M.typecallPool = nil
+
+---@param self Node.Type
+---@return PathTable
+---@return true
+M.__getter.typecallPool = function (self)
+    return ls.pathTable.create(true, true), true
 end
 
 ---@type { [string]: Node.Type}
@@ -389,11 +421,7 @@ ls.node.TYPE_POOL = setmetatable({}, {
     end,
 })
 
----@overload fun(name: string, pack?: Node.GenericPack): Node.Type
+---@overload fun(name: string): Node.Type
 function ls.node.type(name, pack)
-    if pack then
-        return New 'Node.Type' (name, pack)
-    else
-        return ls.node.TYPE_POOL[name]
-    end
+    return ls.node.TYPE_POOL[name]
 end

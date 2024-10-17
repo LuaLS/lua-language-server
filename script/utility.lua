@@ -1004,4 +1004,16 @@ function m.arrayRemoveDuplicate(arr)
     end
 end
 
+---@generic V, R
+---@param t V[]
+---@param callback fun(v: V, k: integer): R
+---@return R[]
+function m.map(t, callback)
+    local nt = {}
+    for k, v in ipairs(t) do
+        nt[k] = callback(v, k)
+    end
+    return nt
+end
+
 return m

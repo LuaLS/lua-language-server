@@ -50,6 +50,7 @@ ls.node.FUNCTION = ls.node.type 'function'
     : setConfig('basicType', true)
 ls.node.TABLE = ls.node.type 'table'
     : setConfig('basicType', true)
+    : setConfig('hideEmptyArgs', true)
 ls.node.USERDATA = ls.node.type 'userdata'
     : setConfig('basicType', true)
 ls.node.THREAD = ls.node.type 'thread'
@@ -83,9 +84,12 @@ ls.node.BOOLEAN.falsy = ls.node.FALSE
 ls.node.FALSE.truly = ls.node.NEVER
 ls.node.FALSE.falsy = ls.node.FALSE
 
+local tableK = ls.node.generic('K', ls.node.ANY, ls.node.ANY)
+local tableV = ls.node.generic('V', ls.node.ANY, ls.node.ANY)
+ls.node.TABLE:bindParams(ls.node.genericPack { tableK, tableV })
 ls.node.TABLE:addField {
-    key   = ls.node.ANY,
-    value = ls.node.ANY,
+    key   = tableK,
+    value = tableV,
 }
 
 ls.node.USERDATA:addField {

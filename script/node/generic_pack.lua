@@ -25,7 +25,7 @@ function M:getGeneric(generic)
     end
     if v.kind == 'generic' then
         ---@cast v Node.Generic
-        return v.extends
+        return v.default or v.extends
     end
     return v
 end
@@ -81,11 +81,7 @@ function M:view(skipLevel)
             goto continue
         end
         ---@cast node Node.Generic
-        if node.extends == ls.node.ANY then
-            views[i] = node.name
-        else
-            views[i] = string.format('%s:%s', node.name, node.extends:view(skipLevel))
-        end
+        views[i] = generic:view(skipLevel):sub(2, -2)
         ::continue::
     end
     return string.format('<%s>', table.concat(views, ', '))

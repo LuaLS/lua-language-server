@@ -258,7 +258,7 @@ M.__getter.falsy = function (self)
 end
 
 function M:view(skipLevel)
-    if self.params then
+    if self.params and not self._hideEmptyArgs then
         return self.typeName .. self.params:view(skipLevel)
     else
         return self.typeName
@@ -275,9 +275,14 @@ M._onCanBeCast = nil
 ---@type boolean
 M._basicType = false
 
+---@package
+---@type boolean
+M._hideEmptyArgs = false
+
 ---@overload fun(self, key: 'onCanCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
 ---@overload fun(self, key: 'onCanBeCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
 ---@overload fun(self, key: 'basicType', value: boolean): Node.Type
+---@overload fun(self, key: 'hideEmptyArgs', value: boolean): Node.Type
 function M:setConfig(key, value)
     self['_' .. key] = value
     return self
@@ -355,6 +360,16 @@ function M:onCanCast(other)
     return false
 end
 
+function M:get(key)
+    if self.params then
+        return self:call():get(key)
+    end
+    if self.value == self then
+        return ls.node.NEVER
+    end
+    return self.value:get(key)
+end
+
 ---@param self Node.Type
 ---@return boolean
 ---@return true
@@ -380,7 +395,7 @@ function M:getValueWithArgs(args)
     end
     local map = {}
     for i, param in ipairs(self.params.generics) do
-        map[param] = args[i] or param.extends
+        map[param] = args[i] or param.default or param.extends
     end
     local resolvedPack = self.params:resolve(map)
     local resolvedValue = self.value:resolveGeneric(resolvedPack)
@@ -411,7 +426,7 @@ function M:call(nodes)
         nodes = {}
     end
     local typecall
-    if #nodes == 0 then 
+    if #nodes == 0 then
         typecall = self.typecallWithNoArgs
     else
         typecall = self.typecallPool:get(nodes)

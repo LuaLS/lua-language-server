@@ -87,6 +87,10 @@ end
 do
     ls.node.TYPE_POOL['Alias'] = nil
 
+    --[[
+    ---@alias Alias<K, V:number> K | V | boolean
+    ]]
+
     local K = ls.node.generic 'K'
     local V = ls.node.generic('V', ls.node.NUMBER)
     local pack = ls.node.genericPack { K, V }
@@ -120,6 +124,10 @@ end
 do
     ls.node.TYPE_POOL['Alias'] = nil
 
+    --[[
+    ---@alias Alias<K, V:number> { [K]: V }
+    ]]
+
     local K = ls.node.generic 'K'
     local V = ls.node.generic('V', ls.node.NUMBER)
     local pack = ls.node.genericPack { K, V }
@@ -150,4 +158,71 @@ do
     assert(alias2.value:view() == '{ [string]: integer }')
     assert(alias2:get(1):view() == 'nil')
     assert(alias2:get('x'):view() == 'integer')
+end
+
+do
+    ls.node.TYPE_POOL['Map'] = nil
+
+    --[[
+    ---@class Map<K, V:number>
+    ---@field [K] V
+    ]]
+
+    local K = ls.node.generic 'K'
+    local V = ls.node.generic('V', ls.node.NUMBER)
+    local pack = ls.node.genericPack { K, V }
+    local map = ls.node.type 'Map'
+    map:bindParams(pack)
+
+    map:addField {
+        key   = K,
+        value = V,
+    }
+
+    assert(map:view() == 'Map<K, V:number>')
+    assert(map.value:view() == '{ [<K>]: <V:number> }')
+
+    local map2 = map:call { ls.node.STRING, ls.node.INTEGER }
+    assert(map2:view() == 'Map<string, integer>')
+    assert(map2.value:view() == '{ [string]: integer }')
+    assert(map2:get(1):view() == 'nil')
+    assert(map2:get('x'):view() == 'integer')
+end
+
+do
+    ls.node.TYPE_POOL['Map'] = nil
+
+    --[[
+    ---@class Map<K, V:number>
+    ---@field set fun(key: K, value: V)
+    ---@field get fun(key: K): V
+    ]]
+
+    local K = ls.node.generic 'K'
+    local V = ls.node.generic('V', ls.node.NUMBER)
+    local pack = ls.node.genericPack { K, V }
+    local map = ls.node.type 'Map'
+    map:bindParams(pack)
+
+    map:addField {
+        key   = ls.node.value 'set',
+        value = ls.node.func()
+            : addParam('key', K)
+            : addParam('value', V),
+    }
+    map:addField {
+        key   = ls.node.value 'get',
+        value = ls.node.func()
+            : addParam('key', K)
+            : addReturn(nil, V),
+    }
+
+    assert(map.value:view() == '{ get: fun(key: <K>):<V:number>, set: fun(key: <K>, value: <V:number>) }')
+    assert(map.value:get('set'):view() == 'fun(key: <K>, value: <V:number>)')
+    assert(map:get('set'):view() == 'fun(key: any, value: number)')
+
+    local map2 = map:call { ls.node.STRING, ls.node.INTEGER }
+    assert(map2.value:view() == '{ get: fun(key: string):integer, set: fun(key: string, value: integer) }')
+    assert(map2:get('set'):view() == 'fun(key: string, value: integer)')
+    assert(map2.value:get('set'):view() == 'fun(key: string, value: integer)')
 end

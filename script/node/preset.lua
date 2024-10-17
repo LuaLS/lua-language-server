@@ -84,13 +84,15 @@ ls.node.BOOLEAN.falsy = ls.node.FALSE
 ls.node.FALSE.truly = ls.node.NEVER
 ls.node.FALSE.falsy = ls.node.FALSE
 
-local tableK = ls.node.generic('K', ls.node.ANY, ls.node.ANY)
-local tableV = ls.node.generic('V', ls.node.ANY, ls.node.ANY)
-ls.node.TABLE:bindParams(ls.node.genericPack { tableK, tableV })
-ls.node.TABLE:addField {
-    key   = tableK,
-    value = tableV,
-}
+do
+    local K = ls.node.generic('K', ls.node.ANY, ls.node.ANY)
+    local V = ls.node.generic('V', ls.node.ANY, ls.node.ANY)
+    ls.node.TABLE:bindParams(ls.node.genericPack { K, V })
+    ls.node.TABLE:addField {
+        key   = K,
+        value = V,
+    }
+end
 
 ls.node.USERDATA:addField {
     key   = ls.node.ANY,

@@ -95,7 +95,7 @@ do
 
     local aliasValue = K | V | ls.node.BOOLEAN
     alias:addAlias(aliasValue)
-    assert(aliasValue.value:view() == '<K> | <V:number> | boolean')
+    assert(aliasValue:view() == '<K> | <V:number> | boolean')
 
     assert(alias:view() == 'Alias<K, V:number>')
     assert(alias.value:view() == '<K> | <V:number> | boolean')
@@ -115,4 +115,39 @@ do
     local alias3 = alias:call { ls.node.STRING, ls.node.INTEGER, ls.node.TABLE }
     assert(alias3:view() == 'Alias<string, integer>')
     assert(alias3.value:view() == 'string | integer | boolean')
+end
+
+do
+    ls.node.TYPE_POOL['Alias'] = nil
+
+    local K = ls.node.generic 'K'
+    local V = ls.node.generic('V', ls.node.NUMBER)
+    local pack = ls.node.genericPack { K, V }
+    local alias = ls.node.type 'Alias'
+    alias:bindParams(pack)
+
+    local aliasValue = ls.node.table { [K] = V }
+    alias:addAlias(aliasValue)
+    assert(aliasValue:view() == '{ [<K>]: <V:number> }')
+
+    assert(alias:view() == 'Alias<K, V:number>')
+    assert(alias.value:view() == '{ [<K>]: <V:number> }')
+
+    local alias0 = alias:call()
+    assert(alias0:view() == 'Alias<any, number>')
+    assert(alias0.value:view() == '{ [any]: number }')
+    assert(alias0:get(1):view() == 'number')
+    assert(alias0:get('x'):view() == 'number')
+
+    local alias1 = alias:call { ls.node.STRING }
+    assert(alias1:view() == 'Alias<string, number>')
+    assert(alias1.value:view() == '{ [string]: number }')
+    assert(alias1:get(1):view() == 'nil')
+    assert(alias1:get('x'):view() == 'number')
+
+    local alias2 = alias:call { ls.node.STRING, ls.node.INTEGER }
+    assert(alias2:view() == 'Alias<string, integer>')
+    assert(alias2.value:view() == '{ [string]: integer }')
+    assert(alias2:get(1):view() == 'nil')
+    assert(alias2:get('x'):view() == 'integer')
 end

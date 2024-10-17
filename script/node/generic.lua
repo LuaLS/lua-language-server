@@ -36,8 +36,15 @@ function M:view(skipLevel)
     return table.concat(buf)
 end
 
+---@param self Node.Generic
+---@return Node
+---@return true
+M.__getter.value = function (self)
+    return self.default or self.extends, true
+end
+
 function M:resolveGeneric(pack)
-    return pack:getGeneric(self) or self.default or self.extends
+    return pack:getGeneric(self) or self
 end
 
 ---@param name string

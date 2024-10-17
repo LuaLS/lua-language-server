@@ -230,6 +230,7 @@ function M:resolveGeneric(pack)
     local newFunc = ls.node.func()
     if self.genericPack then
         newFunc.genericPack = self.genericPack:resolve(pack)
+        pack = pack:merge(newFunc.genericPack)
     end
     for i, param in ipairs(self.params) do
         if param.value.hasGeneric then

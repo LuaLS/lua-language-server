@@ -32,7 +32,7 @@ function M:view(skipLevel)
             if arg then
                 return arg:view(skipLevel)
             end
-            return (generic.default or generic.extends):view(skipLevel)
+            return generic.value:view(skipLevel)
         end), ', ')
     )
 end

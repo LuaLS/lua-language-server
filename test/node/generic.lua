@@ -34,22 +34,22 @@ do
     local newPack = pack:resolve {
         [N] = ls.node.type 'integer'
     }
-    assert(newPack:view() == '<integer, any>')
+    assert(newPack:view() == '<integer, U>')
 
     local newArray = array:resolveGeneric(newPack)
     assert(newArray:view() == 'integer[]')
 
     local newTuple = tuple:resolveGeneric(newPack)
-    assert(newTuple:view() == '[integer, any]')
+    assert(newTuple:view() == '[integer, <U>]')
 
     local newTable = table:resolveGeneric(newPack)
-    assert(newTable:view() == '{ [integer]: any }')
+    assert(newTable:view() == '{ [integer]: <U> }')
 
     local newFunc = func:resolveGeneric(newPack)
-    assert(newFunc:view() == 'fun<integer, any>(a: integer, ...: any):[integer, any]')
+    assert(newFunc:view() == 'fun<integer, U>(a: integer, ...: <U>):[integer, <U>]')
 
     local newUnion = union:resolveGeneric(newPack)
-    assert(newUnion:view() == 'integer | any')
+    assert(newUnion:view() == 'integer | <U>')
 
     local newIntersection = intersection:resolveGeneric(newPack)
     assert(newIntersection:view() == 'integer')
@@ -225,4 +225,44 @@ do
     assert(map2.value:view() == '{ get: fun(key: string):integer, set: fun(key: string, value: integer) }')
     assert(map2:get('set'):view() == 'fun(key: string, value: integer)')
     assert(map2.value:get('set'):view() == 'fun(key: string, value: integer)')
+end
+
+do
+    ls.node.TYPE_POOL['Map'] = nil
+
+    --[[
+    ---@class Map<K>
+    ---@field set fun<V>(key: K, value: V)
+    ]]
+
+    local K = ls.node.generic 'K'
+    local V = ls.node.generic 'V'
+    local map = ls.node.type 'Map'
+    map:bindParams(ls.node.genericPack { K })
+
+    map:addField {
+        key   = ls.node.value 'set',
+        value = ls.node.func()
+            : bindGenericPack(ls.node.genericPack { V })
+            : addParam('key', K)
+            : addParam('value', V),
+    }
+
+    assert(map.value:view() == '{ set: fun<V>(key: <K>, value: <V>) }')
+    assert(map.value:get('set'):view() == 'fun<V>(key: <K>, value: <V>)')
+    assert(map:get('set'):view() == 'fun<V>(key: any, value: <V>)')
+
+    local map1 = map:call { ls.node.STRING }
+    assert(map1.value:view() == '{ set: fun<V>(key: string, value: <V>) }')
+    assert(map1:get('set'):view() == 'fun<V>(key: string, value: <V>)')
+    assert(map1.value:get('set'):view() == 'fun<V>(key: string, value: <V>)')
+
+    local func = map1:get('set')
+    ---@cast func Node.Function
+    assert(func:view() == 'fun<V>(key: string, value: <V>)')
+    local fpack = func.genericPack
+    local fV = fpack.generics[1]
+    local rpack = fpack:resolve { [fV] = ls.node.INTEGER }
+    local rfunc = func:resolveGeneric(rpack)
+    assert(rfunc:view() == 'fun<integer>(key: string, value: integer)')
 end

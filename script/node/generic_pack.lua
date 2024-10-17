@@ -9,7 +9,6 @@ function M:__init(generics)
     self.generics = generics or {}
     ---@type table<Node.Generic, Node>
     self.refMap = {}
-    self.basePack = self
 
     for _, generic in ipairs(self.generics) do
         self.refMap[generic] = generic
@@ -19,34 +18,30 @@ end
 ---@param generic Node.Generic
 ---@return Node?
 function M:getGeneric(generic)
-    local v = self.refMap[generic]
-    if not v then
-        return nil
-    end
-    if v.kind == 'generic' then
-        ---@cast v Node.Generic
-        return v.default or v.extends
-    end
-    return v
+    return self.refMap[generic]
 end
 
----@type Node.GenericPack?
-M.basePack = nil
-
 ---@param pack Node.GenericPack | table<Node.Generic, Node>
----@param keepGeneric? boolean
 ---@return Node.GenericPack
-function M:resolve(pack, keepGeneric)
-    if pack.basePack == self and (pack.allResolved or keepGeneric) then
-        return pack
-    end
+function M:resolve(pack)
     local refMap = pack.kind == 'genericPack' and pack.refMap or pack
     local new = ls.node.genericPack(self.generics)
     for k in pairs(self.refMap) do
         new.refMap[k] = refMap[k]
-                      or (not keepGeneric and ls.node.ANY)
     end
-    new.basePack = self.basePack
+    return new
+end
+
+---@param pack Node.GenericPack
+---@return Node.GenericPack
+function M:merge(pack)
+    local new = ls.node.genericPack()
+    for k, v in pairs(self.refMap) do
+        new.refMap[k] = v
+    end
+    for k, v in pairs(pack.refMap) do
+        new.refMap[k] = v
+    end
     return new
 end
 

@@ -395,7 +395,7 @@ function M:getValueWithArgs(args)
     end
     local map = {}
     for i, param in ipairs(self.params.generics) do
-        map[param] = args[i] or param.default or param.extends
+        map[param] = args[i] or param.value
     end
     local resolvedPack = self.params:resolve(map)
     local resolvedValue = self.value:resolveGeneric(resolvedPack)

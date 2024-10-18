@@ -48,6 +48,9 @@ function M:resolveGeneric(map)
 end
 
 function M:guessGeneric(other, map)
+    if map[self] then
+        return
+    end
     map[self] = other
 end
 

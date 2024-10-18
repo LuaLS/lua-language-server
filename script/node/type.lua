@@ -81,7 +81,7 @@ function M:isAliasLike()
     return false
 end
 
----@param extends Node.Type | Node.Table
+---@param extends Node.Type | Node.Typecall | Node.Table
 ---@return Node.Type
 function M:addExtends(extends)
     if not self.extends then

@@ -21,6 +21,13 @@ M.__getter.value = function (self)
     return self.head:getValueWithArgs(self.args), true
 end
 
+function M:resolveGeneric(map)
+    local args = ls.util.map(self.args, function (arg)
+        return arg:resolveGeneric(map)
+    end)
+    return ls.node.typecall(self.head.typeName, args)
+end
+
 function M:view(skipLevel)
     if not self.head.params then
         return self.head.typeName

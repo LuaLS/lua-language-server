@@ -224,3 +224,84 @@ do
     assert(map[T1]:view() == 'number')
     assert(map[T2]:view() == 'string')
 end
+
+do
+    --[[
+    [T1, T2] @ [number, string]
+    T1 -> number
+    T2 -> string
+    ]]
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local map = {}
+    local tupleG = ls.node.tuple { T1, T2 }
+    local target = ls.node.tuple { ls.node.NUMBER, ls.node.STRING }
+    tupleG:inferGeneric(target, map)
+
+    assert(map[T1]:view() == 'number')
+    assert(map[T2]:view() == 'string')
+end
+
+do
+    --[[
+    [T1, T2] @ string[]
+    T1 -> string
+    T2 -> string
+    ]]
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local map = {}
+    local tupleG = ls.node.tuple { T1, T2 }
+    local target = ls.node.array(ls.node.STRING)
+    tupleG:inferGeneric(target, map)
+
+    assert(map[T1]:view() == 'string')
+    assert(map[T2]:view() == 'string')
+end
+
+do
+    --[[
+    [T1, T2] @ { [integer]: string, [2]: boolean }
+    T1 -> string
+    T2 -> boolean
+    ]]
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local map = {}
+    local tupleG = ls.node.tuple { T1, T2 }
+    local target = ls.node.table {
+        [ls.node.INTEGER] = ls.node.STRING,
+        [2] = ls.node.BOOLEAN,
+    }
+    tupleG:inferGeneric(target, map)
+
+    assert(map[T1]:view() == 'string')
+    assert(map[T2]:view() == 'boolean')
+end
+
+do
+    --[[
+    ---@class Map<K, V>
+    ---@field [K] V
+    
+    Map<T1, T2> @ { [number]: string }
+    T1 -> number
+    T2 -> string
+    ]]
+    ls.node.TYPE_POOL['Map'] = nil
+
+    local map = ls.node.type 'Map'
+    local K = ls.node.generic 'K'
+    local V = ls.node.generic 'V'
+    map:bindParams(ls.node.genericPack { K, V })
+    map:addField { key = K, value = V }
+
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local result = {}
+    map:call { T1, T2 } :inferGeneric(ls.node.table {
+        [ls.node.NUMBER] = ls.node.STRING
+    }, result)
+    assert(result[T1]:view() == 'number')
+    assert(result[T2]:view() == 'string')
+end

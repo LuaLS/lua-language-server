@@ -467,7 +467,8 @@ ls.node.TYPE_POOL = setmetatable({}, {
     end,
 })
 
----@overload fun(name: string): Node.Type
-function ls.node.type(name, pack)
+---@param name string
+---@return Node.Type
+function ls.node.type(name)
     return ls.node.TYPE_POOL[name]
 end

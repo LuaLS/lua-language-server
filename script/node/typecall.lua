@@ -44,8 +44,6 @@ function M:view(skipLevel)
     )
 end
 
-ls.node.TYPE_CALL_POOL = ls.pathTable.create(true, true)
-
 ---@param name string
 ---@param args Node[]
 ---@return Node.Typecall

@@ -201,12 +201,12 @@ function M:resolveGeneric(map)
 end
 
 ---@param other Node
----@param map table<Node.Generic, Node>
-function M:inferGeneric(other, map)
+---@param result table<Node.Generic, Node>
+function M:inferGeneric(other, result)
     if not self.hasGeneric or self.value == self then
         return
     end
-    self.value:inferGeneric(other, map)
+    self.value:inferGeneric(other, result)
 end
 
 ---@generic T: Node

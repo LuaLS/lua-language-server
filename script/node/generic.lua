@@ -47,11 +47,11 @@ function M:resolveGeneric(map)
     return map[self] or self
 end
 
-function M:inferGeneric(other, map)
-    if map[self] then
+function M:inferGeneric(other, result)
+    if result[self] then
         return
     end
-    map[self] = other
+    result[self] = other
 end
 
 ---@param name string

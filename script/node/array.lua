@@ -95,7 +95,7 @@ function M:resolveGeneric(map)
     return ls.node.array(newHead, self.len)
 end
 
-function M:inferGeneric(other, map)
+function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
@@ -104,7 +104,7 @@ function M:inferGeneric(other, map)
     or value == ls.node.NIL then
         return
     end
-    self.head:inferGeneric(value, map)
+    self.head:inferGeneric(value, result)
 end
 
 ---@param value Node

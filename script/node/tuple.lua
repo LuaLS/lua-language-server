@@ -142,12 +142,12 @@ function M:resolveGeneric(map)
     return ls.node.tuple(values)
 end
 
-function M:inferGeneric(other, map)
+function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
     for i, v in ipairs(self.values) do
-        v:inferGeneric(other:get(i), map)
+        v:inferGeneric(other:get(i), result)
     end
 end
 

@@ -387,7 +387,7 @@ function M:resolveGeneric(map)
     return newTable
 end
 
-function M:inferGeneric(other, map)
+function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
@@ -397,13 +397,13 @@ function M:inferGeneric(other, map)
             -- 仅支持 [K] 这种形式的推导，不支持 [K[]] 等嵌套形式
             if  field.key.kind == 'generic'
             and other.typeOfKey ~= ls.node.NEVER then
-                field.key:inferGeneric(other.typeOfKey, map)
+                field.key:inferGeneric(other.typeOfKey, result)
                 if field.value.hasGeneric then
-                    field.value:inferGeneric(other:get(ls.node.ANY), map)
+                    field.value:inferGeneric(other:get(ls.node.ANY), result)
                 end
             end
         elseif field.value.hasGeneric then
-            field.value:inferGeneric(other:get(field.key), map)
+            field.value:inferGeneric(other:get(field.key), result)
         end
     end
 end

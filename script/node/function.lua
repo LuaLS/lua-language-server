@@ -272,6 +272,10 @@ function M:resolveGeneric(map)
     return newFunc
 end
 
+function M:inferGeneric(other, result)
+    
+end
+
 function ls.node.func()
     return New 'Node.Function' ()
 end

@@ -230,7 +230,6 @@ function M:resolveGeneric(map)
     local newFunc = ls.node.func()
     if self.genericPack then
         newFunc.genericPack = self.genericPack:resolve(map)
-        --map = map:merge(newFunc.genericPack)
     end
     for i, param in ipairs(self.params) do
         if param.value.hasGeneric then

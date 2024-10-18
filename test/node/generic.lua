@@ -260,9 +260,6 @@ do
     local func = map1:get('set')
     ---@cast func Node.Function
     assert(func:view() == 'fun<V>(key: string, value: <V>)')
-    local fpack = func.genericPack
-    local fV = fpack.generics[1]
-    local rpack = fpack:resolve { [fV] = ls.node.INTEGER }
-    local rfunc = func:resolveGeneric(rpack)
+    local rfunc = func:resolveGeneric { [V] = ls.node.INTEGER }
     assert(rfunc:view() == 'fun<integer>(key: string, value: integer)')
 end

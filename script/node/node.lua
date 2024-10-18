@@ -199,11 +199,11 @@ end
 
 ---@param other Node
 ---@param map table<Node.Generic, Node>
-function M:guessGeneric(other, map)
+function M:inferGeneric(other, map)
     if not self.hasGeneric or self.value == self then
         return
     end
-    self.value:guessGeneric(other, map)
+    self.value:inferGeneric(other, map)
 end
 
 ---@generic T: Node

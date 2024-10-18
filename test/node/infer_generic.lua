@@ -1,7 +1,7 @@
 do
     local T = ls.node.generic 'T'
     local map = {}
-    T:guessGeneric(ls.node.NUMBER, map)
+    T:inferGeneric(ls.node.NUMBER, map)
 
     assert(map[T] == ls.node.NUMBER)
 end
@@ -15,7 +15,7 @@ do
     local map = {}
     local arrayT = ls.node.array(T)
     local arrayNumber = ls.node.array(ls.node.NUMBER)
-    arrayT:guessGeneric(arrayNumber, map)
+    arrayT:inferGeneric(arrayNumber, map)
 
     assert(map[T] == ls.node.NUMBER)
 end
@@ -29,7 +29,7 @@ do
     local map = {}
     local arrayT = ls.node.array(T)
     local table = ls.node.table()
-    arrayT:guessGeneric(table, map)
+    arrayT:inferGeneric(table, map)
 
     assert(map[T] == nil)
 end
@@ -45,7 +45,7 @@ do
     local table = ls.node.table {
         [ls.node.INTEGER] = ls.node.STRING,
     }
-    arrayT:guessGeneric(table, map)
+    arrayT:inferGeneric(table, map)
 
     assert(map[T] == ls.node.STRING)
 end
@@ -61,7 +61,7 @@ do
     local table = ls.node.table {
         [ls.node.NUMBER] = ls.node.STRING,
     }
-    arrayT:guessGeneric(table, map)
+    arrayT:inferGeneric(table, map)
 
     assert(map[T] == ls.node.STRING)
 end
@@ -78,7 +78,7 @@ do
         ls.node.NUMBER,
         ls.node.STRING,
     }
-    arrayT:guessGeneric(table, map)
+    arrayT:inferGeneric(table, map)
 
     assert(map[T]:view() == 'number | string')
 end

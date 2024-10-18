@@ -91,7 +91,7 @@ function M:resolveGeneric(map)
     return ls.node.array(newHead, self.len)
 end
 
-function M:guessGeneric(other, map)
+function M:inferGeneric(other, map)
     if not self.hasGeneric then
         return
     end
@@ -100,7 +100,7 @@ function M:guessGeneric(other, map)
     or value == ls.node.NIL then
         return
     end
-    self.head:guessGeneric(value, map)
+    self.head:inferGeneric(value, map)
 end
 
 ---@param value Node

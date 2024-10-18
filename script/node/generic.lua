@@ -47,7 +47,7 @@ function M:resolveGeneric(map)
     return map[self] or self
 end
 
-function M:guessGeneric(other, map)
+function M:inferGeneric(other, map)
     if map[self] then
         return
     end

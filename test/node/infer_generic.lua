@@ -305,3 +305,70 @@ do
     assert(result[T1]:view() == 'number')
     assert(result[T2]:view() == 'string')
 end
+
+do
+    --[[
+    fun(x: T1): T2 @ fun(x: number): string
+    T1 -> number
+    T2 -> string
+    ]]
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local funG = ls.node.func()
+        : addParam('x', T1)
+        : addReturn(nil, T2)
+    local target = ls.node.func()
+        : addParam('x', ls.node.NUMBER)
+        : addReturn(nil, ls.node.STRING)
+
+    local result = {}
+    funG:inferGeneric(target, result)
+
+    assert(result[T1]:view() == 'number')
+    assert(result[T2]:view() == 'string')
+end
+
+do
+    --[[
+    fun(x: T1, y: T2) @ fun(x: number, ...: string)
+    T1 -> number
+    T2 -> string
+    ]]
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local funG = ls.node.func()
+        : addParam('x', T1)
+        : addParam('y', T2)
+    local target = ls.node.func()
+        : addParam('x', ls.node.NUMBER)
+        : addVarargParam(ls.node.STRING)
+
+    local result = {}
+    funG:inferGeneric(target, result)
+
+    assert(result[T1]:view() == 'number')
+    assert(result[T2]:view() == 'string')
+end
+
+do
+    --[[
+    fun(x: T1, ...: T2) @ fun(x: number, y: boolean, ...: string)
+    T1 -> number
+    T2 -> boolean | string
+    ]]
+    local T1 = ls.node.generic 'T1'
+    local T2 = ls.node.generic 'T2'
+    local funG = ls.node.func()
+        : addParam('x', T1)
+        : addVarargParam(T2)
+    local target = ls.node.func()
+        : addParam('x', ls.node.NUMBER)
+        : addParam('y', ls.node.BOOLEAN)
+        : addVarargParam(ls.node.STRING)
+
+    local result = {}
+    funG:inferGeneric(target, result)
+
+    assert(result[T1]:view() == 'number')
+    assert(result[T2]:view() == 'boolean | string')
+end

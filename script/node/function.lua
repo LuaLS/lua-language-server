@@ -159,6 +159,40 @@ function M:getReturn(index)
     return nil
 end
 
+---@param index integer
+---@return Node?
+function M:getParamFrom(index)
+    local nodes = {}
+    for i = index, #self.params do
+        nodes[#nodes+1] = self.params[i].value
+    end
+    nodes[#nodes+1] = self.varargParam
+    if #nodes == 0 then
+        return nil
+    end
+    if #nodes == 1 then
+        return nodes[1]
+    end
+    return ls.node.union(nodes).value
+end
+
+---@param index integer
+---@return Node?
+function M:getReturnFrom(index)
+    local nodes = {}
+    for i = index, #self.returns do
+        nodes[#nodes+1] = self.returns[i].value
+    end
+    nodes[#nodes+1] = self.varargReturn
+    if #nodes == 0 then
+        return nil
+    end
+    if #nodes == 1 then
+        return nodes[1]
+    end
+    return ls.node.union(nodes).value
+end
+
 function M:view(skipLevel)
     local params = {}
     for i, v in ipairs(self.params) do
@@ -273,7 +307,51 @@ function M:resolveGeneric(map)
 end
 
 function M:inferGeneric(other, result)
-    
+    if not self.hasGeneric then
+        return
+    end
+    local value = other.value
+    if value.kind == 'union' then
+        ---@cast value Node.Union
+        for _, sub in ipairs(value.values) do
+            self:inferGeneric(sub, result)
+        end
+        return
+    end
+    if value.kind ~= 'function' then
+        return
+    end
+    ---@cast value Node.Function
+    for i, param in ipairs(self.params) do
+        if param.value.hasGeneric then
+            local otherParam = value:getParam(i)
+            if not otherParam then
+                break
+            end
+            param.value:inferGeneric(otherParam, result)
+        end
+    end
+    for i, ret in ipairs(self.returns) do
+        if ret.value.hasGeneric then
+            local otherReturn = value:getReturn(i)
+            if not otherReturn then
+                break
+            end
+            ret.value:inferGeneric(otherReturn, result)
+        end
+    end
+    if self.varargParam and self.varargParam.hasGeneric then
+        local otherParam = value:getParamFrom(#self.params + 1)
+        if otherParam then
+            self.varargParam:inferGeneric(otherParam, result)
+        end
+    end
+    if self.varargReturn and self.varargReturn.hasGeneric then
+        local otherReturn = value:getReturnFrom(#self.returns + 1)
+        if otherReturn then
+            self.varargReturn:inferGeneric(otherReturn, result)
+        end
+    end
 end
 
 function ls.node.func()

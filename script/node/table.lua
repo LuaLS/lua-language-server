@@ -49,6 +49,7 @@ function M:flushCache()
     self.types = nil
     self.others = nil
     self.hasGeneric = nil
+    self.typeOfKey = nil
 end
 
 function M:isEmpty()
@@ -78,7 +79,7 @@ function M:classifyFields()
             ---@cast key Node.Value
             local k = key.literal
             literals[k] = literals[k] | field.value
-        elseif key.typeName then
+        elseif key.kind == 'type' then
             types[key.typeName] = types[key.typeName] | field.value
         else
             others[#others+1] = field
@@ -90,7 +91,7 @@ function M:classifyFields()
                     ---@cast v Node.Value
                     local k = v.literal
                     literals[k] = literals[k] | field.value
-                elseif v.typeName then
+                elseif v.kind == 'type' then
                     types[v.typeName] = types[v.typeName] | field.value
                 else
                     others[#others+1] = field
@@ -138,6 +139,13 @@ M.__getter.keys = function (self)
     end
 
     return keys, true
+end
+
+---@param self Node.Table
+---@return Node
+---@return true
+M.__getter.typeOfKey = function (self)
+    return ls.node.union(self.keys).value, true
 end
 
 ---获取所有的值。按key的顺序排序。
@@ -377,6 +385,27 @@ function M:resolveGeneric(map)
         end
     end
     return newTable
+end
+
+function M:inferGeneric(other, map)
+    if not self.hasGeneric then
+        return
+    end
+    ---@param field Node.Field
+    for field in self.fields:pairsFast() do
+        if field.key.hasGeneric then
+            -- 仅支持 [K] 这种形式的推导，不支持 [K[]] 等嵌套形式
+            if  field.key.kind == 'generic'
+            and other.typeOfKey ~= ls.node.NEVER then
+                field.key:inferGeneric(other.typeOfKey, map)
+                if field.value.hasGeneric then
+                    field.value:inferGeneric(other:get(ls.node.ANY), map)
+                end
+            end
+        elseif field.value.hasGeneric then
+            field.value:inferGeneric(other:get(field.key), map)
+        end
+    end
 end
 
 ---@param fields? table<string|number|boolean|Node, string|number|boolean|Node>

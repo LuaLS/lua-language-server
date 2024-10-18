@@ -80,6 +80,9 @@ function M:get(key)
     return value:get(key)
 end
 
+---@type Node
+M.typeOfKey = ls.node.NEVER
+
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'
 
 function M:refreshCastCache()

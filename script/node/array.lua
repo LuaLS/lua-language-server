@@ -56,6 +56,10 @@ function M:get(key)
     return ls.node.NIL
 end
 
+M.__getter.typeOfKey = function ()
+    return ls.node.INTEGER, true
+end
+
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)

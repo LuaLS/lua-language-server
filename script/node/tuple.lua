@@ -33,6 +33,13 @@ M.__getter.keys = function (self)
     return keys, true
 end
 
+---@param self Node.Tuple
+---@return Node
+---@return true
+M.__getter.typeOfKey = function (self)
+    return ls.node.union(self.keys).value, true
+end
+
 function M:get(key)
     if key == ls.node.NEVER then
         return ls.node.NEVER
@@ -135,6 +142,14 @@ function M:resolveGeneric(map)
     return ls.node.tuple(values)
 end
 
+function M:inferGeneric(other, map)
+    if not self.hasGeneric then
+        return
+    end
+    for i, v in ipairs(self.values) do
+        v:inferGeneric(other:get(i), map)
+    end
+end
 
 ---@param values? Node[]
 ---@return Node.Tuple

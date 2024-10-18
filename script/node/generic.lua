@@ -47,6 +47,10 @@ function M:resolveGeneric(map)
     return map[self] or self
 end
 
+function M:guessGeneric(other, map)
+    map[self] = other
+end
+
 ---@param name string
 ---@param extends? Node
 ---@param default? Node

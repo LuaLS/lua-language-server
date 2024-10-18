@@ -379,7 +379,7 @@ function M:resolveGeneric(map)
     return newTable
 end
 
----@param fields? table
+---@param fields? table<string|number|boolean|Node, string|number|boolean|Node>
 ---@return Node.Table
 function ls.node.table(fields)
     return New 'Node.Table' (fields)

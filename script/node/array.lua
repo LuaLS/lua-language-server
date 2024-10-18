@@ -91,6 +91,18 @@ function M:resolveGeneric(map)
     return ls.node.array(newHead, self.len)
 end
 
+function M:guessGeneric(other, map)
+    if not self.hasGeneric then
+        return
+    end
+    local value = other:get(ls.node.INTEGER)
+    if value == ls.node.NEVER
+    or value == ls.node.NIL then
+        return
+    end
+    self.head:guessGeneric(value, map)
+end
+
 ---@param value Node
 ---@param len? number
 ---@return Node.Array

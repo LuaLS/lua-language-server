@@ -397,8 +397,7 @@ function M:getValueWithArgs(args)
     for i, param in ipairs(self.params.generics) do
         map[param] = args[i] or param.value
     end
-    local resolvedPack = self.params:resolve(map)
-    local resolvedValue = self.value:resolveGeneric(resolvedPack)
+    local resolvedValue = self.value:resolveGeneric(map)
     return resolvedValue
 end
 
@@ -410,7 +409,7 @@ function M:resolveGeneric(pack)
     end
     local nodes = {}
     for _, param in ipairs(self.params.generics) do
-        local value = pack:getGeneric(param) or param
+        local value = pack:getGeneric(param)
         nodes[#nodes+1] = value
     end
     return self:call(nodes)

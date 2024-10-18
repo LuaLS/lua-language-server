@@ -80,11 +80,11 @@ M.__getter.hasGeneric = function (self)
     return self.head.hasGeneric, true
 end
 
-function M:resolveGeneric(pack)
+function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
     end
-    local newHead = self.head:resolveGeneric(pack)
+    local newHead = self.head:resolveGeneric(map)
     if newHead == self.head then
         return self
     end

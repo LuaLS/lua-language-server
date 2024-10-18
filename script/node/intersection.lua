@@ -288,16 +288,16 @@ M.__getter.hasGeneric = function (self)
     end
 end
 
-function M:resolveGeneric(pack)
+function M:resolveGeneric(map)
     if self.value ~= self then
-        return self.value:resolveGeneric(pack)
+        return self.value:resolveGeneric(map)
     end
     if not self.hasGeneric then
         return self
     end
     local newValues = {}
     for _, v in ipairs(self.rawNodes) do
-        newValues[#newValues+1] = v:resolveGeneric(pack)
+        newValues[#newValues+1] = v:resolveGeneric(map)
     end
     return ls.node.intersection(newValues)
 end

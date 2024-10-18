@@ -31,27 +31,27 @@ do
 
     assert(intersection:view() == '<N:number> & <U>')
 
-    local newPack = pack:resolve {
-        [N] = ls.node.type 'integer'
-    }
+    local resolve = { [N] = ls.node.INTEGER }
+
+    local newPack = pack:resolve(resolve)
     assert(newPack:view() == '<integer, U>')
 
-    local newArray = array:resolveGeneric(newPack)
+    local newArray = array:resolveGeneric(resolve)
     assert(newArray:view() == 'integer[]')
 
-    local newTuple = tuple:resolveGeneric(newPack)
+    local newTuple = tuple:resolveGeneric(resolve)
     assert(newTuple:view() == '[integer, <U>]')
 
-    local newTable = table:resolveGeneric(newPack)
+    local newTable = table:resolveGeneric(resolve)
     assert(newTable:view() == '{ [integer]: <U> }')
 
-    local newFunc = func:resolveGeneric(newPack)
+    local newFunc = func:resolveGeneric(resolve)
     assert(newFunc:view() == 'fun<integer, U>(a: integer, ...: <U>):[integer, <U>]')
 
-    local newUnion = union:resolveGeneric(newPack)
+    local newUnion = union:resolveGeneric(resolve)
     assert(newUnion:view() == 'integer | <U>')
 
-    local newIntersection = intersection:resolveGeneric(newPack)
+    local newIntersection = intersection:resolveGeneric(resolve)
     assert(newIntersection:view() == 'integer')
 end
 

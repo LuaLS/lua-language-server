@@ -9,38 +9,23 @@ function M:__init(generics)
     self.generics = generics or {}
     ---@type table<Node.Generic, Node>
     self.refMap = {}
-
-    for _, generic in ipairs(self.generics) do
-        self.refMap[generic] = generic
-    end
 end
 
 ---@param generic Node.Generic
----@return Node?
+---@return Node
 function M:getGeneric(generic)
-    return self.refMap[generic]
+    return self.refMap[generic] or generic
 end
 
----@param pack Node.GenericPack | table<Node.Generic, Node>
+---@param map table<Node.Generic, Node>
 ---@return Node.GenericPack
-function M:resolve(pack)
-    local refMap = pack.kind == 'genericPack' and pack.refMap or pack
+function M:resolve(map)
     local new = ls.node.genericPack(self.generics)
-    for k in pairs(self.refMap) do
-        new.refMap[k] = refMap[k]
-    end
-    return new
-end
-
----@param pack Node.GenericPack
----@return Node.GenericPack
-function M:merge(pack)
-    local new = ls.node.genericPack()
-    for k, v in pairs(self.refMap) do
-        new.refMap[k] = v
-    end
-    for k, v in pairs(pack.refMap) do
-        new.refMap[k] = v
+    for _, generic in ipairs(self.generics) do
+        local value = map[generic]
+        if value then
+            new.refMap[generic] = value
+        end
     end
     return new
 end
@@ -66,7 +51,7 @@ end
 function M:view(skipLevel)
     local views = {}
     for i, generic in ipairs(self.generics) do
-        local node = self.refMap[generic]
+        local node = self:getGeneric(generic)
         if not node then
             views[i] = generic.name
             goto continue

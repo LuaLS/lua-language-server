@@ -188,13 +188,13 @@ M.__getter.hasGeneric = function (self)
     return self.value.hasGeneric, true
 end
 
----@param pack Node.GenericPack
+---@param map table<Node.Generic, Node>
 ---@return Node
-function M:resolveGeneric(pack)
+function M:resolveGeneric(map)
     if self.value == self then
         return self
     end
-    return self.value:resolveGeneric(pack)
+    return self.value:resolveGeneric(map)
 end
 
 ---@generic T: Node

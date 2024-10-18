@@ -43,8 +43,8 @@ M.__getter.value = function (self)
     return self.default or self.extends, true
 end
 
-function M:resolveGeneric(pack)
-    return pack:getGeneric(self) or self
+function M:resolveGeneric(map)
+    return map[self] or self
 end
 
 ---@param name string

@@ -3,16 +3,19 @@ local M = Class 'Scope'
 
 ---@param uri? Uri
 function M:__init(uri)
-    self.node = ls.node.createAPIs(self)
-    self.node:fillPresets()
-
     self.uri = uri
+    table.insert(ls.scope.all, self)
+
     ---@type Uri[]
     self.includeUris = {}
 
-    self.documents = ls.pathTable.create(false, true)
+    self.node = ls.node.createAPIs(self)
+    self.node:fillPresets()
 
-    table.insert(ls.scope.all, self)
+    self.documents = setmetatable({}, ls.util.MODE_V)
+    self.recentDocuments = ls.linkedTable.create()
+
+    self.vm = ls.vm.create(self)
 end
 
 function M:__del()
@@ -37,16 +40,15 @@ end
 
 ---@param uri Uri
 ---@return Document?
-function M:makeDocument(uri)
+function M:getDocument(uri)
     local file = ls.file.get(uri)
     if not file then
         return nil
     end
-    local path = { file.uri, file.serverVersion }
-    local document = self.documents:get(path)
+    local document = self.documents[file.uri]
     if not document then
         document = New 'Document' (file)
-        self.documents:set(path, document)
+        self.documents[file.uri] = document
     end
     return document
 end

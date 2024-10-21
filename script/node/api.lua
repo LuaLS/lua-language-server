@@ -211,6 +211,7 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.THREAD = self.type 'thread'
         : setConfig('basicType', true)
+    self.G = self.type 'G'
 
     self.ANY:addField {
         key   = self.ANY,

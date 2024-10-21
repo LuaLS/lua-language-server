@@ -1,18 +1,15 @@
 ---@class VM
----@overload fun(): self
 local M = Class 'VM'
 
----版本
-M.version = 0
----是否已经过期
-M.outdate = false
-
-function M:__init()
+---@param scope Scope
+function M:__init(scope)
+    self.scope = scope
 end
 
+---@param scope Scope
 ---@return VM
-function ls.vm.create()
-    return New 'VM' ()
+function ls.vm.create(scope)
+    return New 'VM' (scope)
 end
 
 return M

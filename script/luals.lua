@@ -24,13 +24,8 @@ ls.caselessTable = require 'tools.caseless-table'
 ls.uri           = require 'tools.uri'
 ls.task          = require 'tools.task'
 ls.timer         = require 'tools.timer'
-
-require 'tools.log'
-
-ls.config  = require 'config'
-
+ls.parser        = require 'parser'
 require 'file'
-
 require 'node'
 require 'vm'
 require 'scope'

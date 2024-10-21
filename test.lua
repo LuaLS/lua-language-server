@@ -33,13 +33,6 @@ test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create()
 
-test.singleFile = function (text)
-    ls.files = New 'FileManager' ()
-    ls.files:setText(test.fileUri, text)
-    ls.files:flush()
-    ls.vm = New 'VM' (ls.files)
-end
-
 print('开始测试')
 require 'test.parser'
 require 'test.node'

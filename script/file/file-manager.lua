@@ -1,14 +1,15 @@
 ---@class FileManager
----@overload fun(): self
+---@overload fun(ignoreCase?: boolean): self
 local M = Class 'FileManager'
 
-M.version = 0
-
-function M:__init()
+---@param ignoreCase? boolean
+function M:__init(ignoreCase)
     --文件表
-    self.fileMap = {}
-    --最近更新的文件
-    self.newFiles = {}
+    if ignoreCase then
+        self.fileMap = ls.caselessTable.create()
+    else
+        self.fileMap = {}
+    end
 end
 
 --获取文件
@@ -28,11 +29,15 @@ function M:newFile(uri)
 end
 
 ---@param uri uri
+---@param clientVersion? integer
 ---@return File
-function M:openFile(uri)
+function M:openFile(uri, clientVersion)
     local file = self:getFile(uri)
             or   self:newFile(uri)
-    file:open()
+    file:openByClient()
+    if clientVersion then
+        file:updateClientVersion(clientVersion)
+    end
     return file
 end
 
@@ -41,28 +46,32 @@ end
 function M:closeFile(uri)
     local file = self:getFile(uri)
             or   self:newFile(uri)
-    file:close()
+    file:closeByClient()
     return file
 end
 
 ---@param uri uri
 ---@return boolean
-function M:isOpened(uri)
+function M:isOpenedByClient(uri)
     local file = self:getFile(uri)
     if not file then
         return false
     end
-    return file.isOpened
+    return file.isOpenedByClient
 end
 
 ---@param uri uri
 ---@param text string
+---@param clientVersion? integer
 ---@return File
-function M:setText(uri, text)
+function M:setText(uri, text, clientVersion)
     local file = self:getFile(uri)
             or   self:newFile(uri)
     file:setText(text)
-    self.newFiles[uri] = true
+    if clientVersion then
+        file:updateClientVersion(clientVersion)
+    end
+    self.fileMap[uri] = true
     return file
 end
 
@@ -74,37 +83,4 @@ function M:removeFile(uri)
     return file
 end
 
----@type Timer?
-M.flushDelayTimer = nil
-
----@return boolean
-function M:flush()
-    if M.flushDelayTimer then
-        M.flushDelayTimer:remove()
-    end
-    if not next(self.newFiles) then
-        return false
-    end
-    local ok = false
-    for uri in ls.util.sortPairs(self.newFiles) do
-        local file = self:getFile(uri)
-        if file and file:flush() then
-            ok = true
-        end
-    end
-    self.newFiles = {}
-    return ok
-end
-
----@param time number
-function M:flushDelay(time)
-    if M.flushDelayTimer then
-        if M.flushDelayTimer:getRemainingTime() >= time then
-            return
-        end
-        M.flushDelayTimer:remove()
-    end
-    M.flushDelayTimer = ls.timer.wait(time, M.flush)
-end
-
-return M
+ls.file.manager = New 'FileManager' ()

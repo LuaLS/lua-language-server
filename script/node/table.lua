@@ -214,21 +214,20 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
-    if key == self.scope.node.NEVER then
-        return self.scope.node.NEVER
-    end
-    if key == self.scope.node.ANY
-    or key == self.scope.node.UNKNOWN then
-        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
-    end
-    if key == self.scope.node.NIL then
-        return self.scope.node.NIL
-    end
     if type(key) ~= 'table' then
         ---@cast key -Node
         return self.literals[key]
             or self:get(self.scope.node.value(key).nodeType)
             or self.scope.node.NIL
+    end
+    local typeName = key.typeName
+    if typeName == 'never'
+    or typeName == 'nil' then
+        return key
+    end
+    if typeName == 'any'
+    or typeName == 'unknown' then
+        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
@@ -237,9 +236,9 @@ function M:get(key)
             or self.scope.node.NIL
     end
     ---@cast key Node
-    if key.typeName then
-        if self.types[key.typeName] then
-            return self.types[key.typeName]
+    if typeName then
+        if self.types[typeName] then
+            return self.types[typeName]
         end
         ---@param field Node.Field
         for field in self.fields:pairsFast() do

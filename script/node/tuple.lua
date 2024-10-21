@@ -43,20 +43,19 @@ M.__getter.typeOfKey = function (self)
 end
 
 function M:get(key)
-    if key == self.scope.node.NEVER then
-        return self.scope.node.NEVER
-    end
-    if key == self.scope.node.ANY
-    or key == self.scope.node.UNKNOWN
-    or key == self.scope.node.TRULY then
-        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
-    end
-    if key == self.scope.node.NIL then
-        return self.scope.node.NIL
-    end
     if type(key) ~= 'table' then
         return self.values[key]
             or self.scope.node.NIL
+    end
+    local typeName = key.typeName
+    if typeName == 'never'
+    or typeName == 'nil' then
+        return self.scope.node.NEVER
+    end
+    if typeName == 'any'
+    or typeName == 'unknown'
+    or typeName == 'truly' then
+        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
     end
     if key.kind == 'value' then
         return self.values[key.literal]

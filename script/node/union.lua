@@ -56,7 +56,7 @@ M.values = nil
 M.__getter.values = function (self)
     local values = {}
     for _, v in ipairs(self.rawNodes) do
-        if v == self.scope.node.NEVER then
+        if v.typeName == 'never' then
             goto continue
         end
         if v.kind == 'union' then

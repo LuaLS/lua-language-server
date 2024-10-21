@@ -17,19 +17,20 @@ function M:__init(scope, value, len)
 end
 
 function M:get(key)
-    if key == self.scope.node.NEVER then
-        return self.scope.node.NEVER
-    end
-    if key == self.scope.node.ANY
-    or key == self.scope.node.UNKNOWN
-    or key == self.scope.node.TRULY then
-        return self.head
-    end
-    if key == self.scope.node.NIL then
-        return self.scope.node.NIL
-    end
-    if type(key) == 'table' and key.kind == 'value' then
-        key = key.literal
+    if type(key) == 'table' then
+        local typeName = key.typeName
+        if typeName == 'never'
+        or typeName == 'nil' then
+            return typeName
+        end
+        if typeName == 'any'
+        or typeName == 'unknown'
+        or typeName == 'truly' then
+            return self.head
+        end
+        if key.kind == 'value' then
+            key = key.literal
+        end
     end
     if type(key) ~= 'table' then
         if  type(key) == 'number'
@@ -105,8 +106,8 @@ function M:inferGeneric(other, result)
         return
     end
     local value = other:get(self.scope.node.INTEGER)
-    if value == self.scope.node.NEVER
-    or value == self.scope.node.NIL then
+    if value.typeName == 'never'
+    or value.typeName == 'nil' then
         return
     end
     self.head:inferGeneric(value, result)

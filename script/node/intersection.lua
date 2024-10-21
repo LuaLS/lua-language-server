@@ -136,7 +136,7 @@ M.__getter.values = function (self)
         local suc, new = merge(current, target)
         if suc then
             ---@cast new Node
-            if new == self.scope.node.NEVER then
+            if new.typeName == 'never' then
                 return {}, true
             end
             result[#result] = new

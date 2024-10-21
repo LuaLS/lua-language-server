@@ -246,7 +246,7 @@ function setfenv(f, table) end
 ---@field __newindex table|fun(t,k,v)|nil
 ---@field __call (fun(t,...):...)|nil
 ---#if VERSION > 5.1 or VERSION == JIT then
----@field __pairs (fun(t):(fun(t,k,v):any,any))|nil
+---@field __pairs (fun(t):((fun(t,k,v):any,any),any,any))|nil
 ---#end
 ---#if VERSION == JIT or VERSION == 5.2 then
 ---@field __ipairs (fun(t):(fun(t,k,v):(integer|nil),any))|nil

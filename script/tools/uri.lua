@@ -1,6 +1,6 @@
 local platform = require 'bee.platform'
 
----@alias uri string
+---@alias Uri string
 
 local escPatt = '[^%w%-%.%_%~%/]'
 
@@ -14,7 +14,7 @@ local function normalize(str)
     end)
 end
 
----@class Uri
+---@class Uri.API
 local M = {}
 
 -- c:\my\files               --> file:///c%3A/my/files
@@ -23,7 +23,7 @@ local M = {}
 
 --- path -> uri
 ---@param path string
----@return uri uri
+---@return Uri uri
 function M.encode(path)
     local authority = ''
     if platform.OS == 'Windows' then
@@ -65,7 +65,7 @@ end
 -- file://server/share/some/path  --> \\server\share\some\path
 
 --- uri -> path
----@param uri uri
+---@param uri Uri
 ---@return string path
 function M.decode(uri)
     local scheme, authority, path = uri:match('([^:]*):?/?/?([^/]*)(.*)')
@@ -89,7 +89,7 @@ function M.decode(uri)
     return value
 end
 
----@param uri uri
+---@param uri Uri
 ---@return string scheme
 ---@return string authority
 ---@return string path
@@ -113,8 +113,8 @@ function M.isFile(uri)
     return true
 end
 
----@param uri uri
----@return uri
+---@param uri Uri
+---@return Uri
 function M.normalize(uri)
     if not M.isFile(uri) then
         return uri
@@ -122,11 +122,24 @@ function M.normalize(uri)
     return M.encode(M.decode(uri))
 end
 
----@param uri uri
+---@param uri Uri
 ---@param path string
----@return uri
+---@return Uri
 function M.join(uri, path)
     return uri .. '/' .. path
+end
+
+---@param uri Uri
+---@param baseUri Uri
+---@return string?
+function M.relativePath(uri, baseUri)
+    if string.sub(uri, 1, #baseUri) ~= baseUri then
+        return nil
+    end
+    if string.sub(uri, #baseUri + 1, #baseUri + 1) ~= '/' then
+        return nil
+    end
+    return string.sub(uri, #baseUri + 2)
 end
 
 return M

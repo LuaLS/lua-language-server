@@ -21,7 +21,7 @@ function M:get(key)
         local typeName = key.typeName
         if typeName == 'never'
         or typeName == 'nil' then
-            return typeName
+            return key
         end
         if typeName == 'any'
         or typeName == 'unknown'

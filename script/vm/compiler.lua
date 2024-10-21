@@ -630,15 +630,17 @@ local function matchCall(source)
         newNode.originNode = myNode
         vm.setNode(source, newNode, true)
         if call.args then
-            -- clear node caches of args to allow recomputation with the type narrowed call
+            -- clear existing node caches of args to allow recomputation with the type narrowed call
             for _, arg in ipairs(call.args) do
-                vm.setNode(arg, vm.createNode(), true)
+                if vm.getNode(arg) then
+                    vm.setNode(arg, vm.createNode(), true)
+                end
             end
             for n in newNode:eachObject() do
                 if n.type == 'function'
                 or n.type == 'doc.type.function' then
                     for i, arg in ipairs(call.args) do
-                        if n.args[i] then
+                        if vm.getNode(arg) and n.args[i] then
                             vm.setNode(arg, vm.compileNode(n.args[i]))
                         end
                     end

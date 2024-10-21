@@ -4571,3 +4571,23 @@ else
     local <?b?> = a
 end
 ]]
+
+TEST 'nil' [[
+---@generic T
+---@param v T
+---@return T
+---@overload fun(): nil
+local function f(v) end
+
+local <?r?> = f()
+]]
+
+TEST 'string' [[
+---@generic T
+---@param v T
+---@return T
+---@overload fun(): nil
+local function f(v) end
+
+local <?r?> = f('')
+]]

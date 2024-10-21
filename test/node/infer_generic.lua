@@ -372,3 +372,31 @@ do
     assert(result[T1]:view() == 'number')
     assert(result[T2]:view() == 'boolean | string')
 end
+
+do
+    --[[
+    T | number @ number
+    T -> number
+    ]]
+    local T = ls.node.generic 'T'
+    local u = ls.node.union { T, ls.node.NUMBER }
+
+    local result = {}
+    u:inferGeneric(ls.node.NUMBER, result)
+
+    assert(result[T]:view() == 'number')
+end
+
+do
+    --[[
+    T & number @ number
+    T -> number
+    ]]
+    local T = ls.node.generic 'T'
+    local i = ls.node.intersection { T, ls.node.NUMBER }
+
+    local result = {}
+    i:inferGeneric(ls.node.NUMBER, result)
+
+    assert(result[T]:view() == 'number')
+end

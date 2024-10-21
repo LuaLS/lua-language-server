@@ -62,6 +62,10 @@ M.__getter.values = function (self)
             ---@cast y Node.Union
             y = y.value
         end
+        if x.kind == 'generic'
+        or y.kind == 'generic' then
+            return false
+        end
         if x >> y then
             return true, x
         end
@@ -113,11 +117,9 @@ M.__getter.values = function (self)
         if x.kind == 'table'
         or x.kind == 'type'
         or x.kind == 'union'
-        or x.kind == 'generic'
         or y.kind == 'table'
         or y.kind == 'type'
-        or y.kind == 'union'
-        or y.kind == 'generic' then
+        or y.kind == 'union' then
             return false
         end
 
@@ -300,6 +302,12 @@ function M:resolveGeneric(map)
         newValues[#newValues+1] = v:resolveGeneric(map)
     end
     return ls.node.intersection(newValues)
+end
+
+function M:inferGeneric(other, result)
+    for _, v in ipairs(self.values) do
+        v:inferGeneric(other, result)
+    end
 end
 
 ---@param nodes? Node[]

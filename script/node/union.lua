@@ -200,6 +200,12 @@ function M:resolveGeneric(map)
     return ls.node.union(newValues)
 end
 
+function M:inferGeneric(other, result)
+    for _, v in ipairs(self.values) do
+        v:inferGeneric(other, result)
+    end
+end
+
 ---@param nodes? Node[]
 ---@return Node.Union
 function ls.node.union(nodes)

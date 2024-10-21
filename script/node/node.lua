@@ -23,9 +23,6 @@ local function makeUnion(a, b)
     if a.typeName == 'never' then
         return b
     end
-    if a.typeName == 'any' then
-        return a
-    end
 end
 
 function M.__bor(a, b)

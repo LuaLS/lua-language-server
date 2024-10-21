@@ -52,7 +52,7 @@ do
     assert(newUnion:view() == 'integer | <U>')
 
     local newIntersection = intersection:resolveGeneric(resolve)
-    assert(newIntersection:view() == 'integer')
+    assert(newIntersection:view() == 'integer & <U>')
 end
 
 do

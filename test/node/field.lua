@@ -1,40 +1,40 @@
 do
-    assert(ls.node.NEVER:get('x') == ls.node.NEVER)
-    assert(ls.node.NIL:get('x') == ls.node.NEVER)
-    assert(ls.node.UNKNOWN:get('x') == ls.node.ANY)
-    assert(ls.node.ANY:get('x') == ls.node.ANY)
-    assert(ls.node.TABLE:get('x') == ls.node.ANY)
+    assert(test.scope.node.NEVER:get('x') == test.scope.node.NEVER)
+    assert(test.scope.node.NIL:get('x') == test.scope.node.NEVER)
+    assert(test.scope.node.UNKNOWN:get('x') == test.scope.node.ANY)
+    assert(test.scope.node.ANY:get('x') == test.scope.node.ANY)
+    assert(test.scope.node.TABLE:get('x') == test.scope.node.ANY)
 end
 
 do
-    local t = ls.node.table()
+    local t = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.type 'number'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.type 'number'
         }
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.type 'boolean'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.type 'boolean'
         }
         : addField {
-            key   = ls.node.value 'z',
-            value = ls.node.type 'string'
+            key   = test.scope.node.value 'z',
+            value = test.scope.node.type 'string'
         }
         : addField {
-            key   = ls.node.union { ls.node.value(1), ls.node.value(2) },
-            value = ls.node.value('union')
+            key   = test.scope.node.union { test.scope.node.value(1), test.scope.node.value(2) },
+            value = test.scope.node.value('union')
         }
         : addField {
-            key   = ls.node.type 'string',
-            value = ls.node.value('string')
+            key   = test.scope.node.type 'string',
+            value = test.scope.node.value('string')
         }
         : addField {
-            key   = ls.node.type 'integer',
-            value = ls.node.value('integer')
+            key   = test.scope.node.type 'integer',
+            value = test.scope.node.value('integer')
         }
         : addField {
-            key   = ls.node.type 'number',
-            value = ls.node.value('number')
+            key   = test.scope.node.type 'number',
+            value = test.scope.node.value('number')
         }
 
     assert(t:get('x'):view() == 'number')
@@ -46,35 +46,35 @@ do
     assert(t:get(3):view() == '"integer"')
     assert(t:get(0.5):view() == '"number"')
     assert(t:get(true):view() == 'nil')
-    assert(t:get(ls.node.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
-    assert(t.sortedFields[1].key == ls.node.value(1))
-    assert(t.sortedFields[2].key == ls.node.value(2))
-    assert(t.sortedFields[3].key == ls.node.value 'x')
-    assert(t.sortedFields[4].key == ls.node.value 'y')
-    assert(t.sortedFields[5].key == ls.node.value 'z')
-    assert(t.sortedFields[6].key == ls.node.type 'integer')
-    assert(t.sortedFields[7].key == ls.node.type 'number')
-    assert(t.sortedFields[8].key == ls.node.type 'string')
+    assert(t:get(test.scope.node.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
+    assert(t.sortedFields[1].key == test.scope.node.value(1))
+    assert(t.sortedFields[2].key == test.scope.node.value(2))
+    assert(t.sortedFields[3].key == test.scope.node.value 'x')
+    assert(t.sortedFields[4].key == test.scope.node.value 'y')
+    assert(t.sortedFields[5].key == test.scope.node.value 'z')
+    assert(t.sortedFields[6].key == test.scope.node.type 'integer')
+    assert(t.sortedFields[7].key == test.scope.node.type 'number')
+    assert(t.sortedFields[8].key == test.scope.node.type 'string')
 end
 
 do
-    local a = ls.node.table()
+    local a = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
 
-    local b = ls.node.table()
+    local b = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
 
     local u = a | b
 
     assert(u:get('x'):view() == '"x" | nil')
     assert(u:get('y'):view() == '"y" | nil')
-    assert(u:get(ls.node.ANY):view() == [["x" | "y"]])
+    assert(u:get(test.scope.node.ANY):view() == [["x" | "y"]])
 end
 
 do
@@ -83,8 +83,8 @@ do
     local names = {'A', 'A1', 'A2', 'A11', 'A12', 'A21', 'A22'}
 
     for _, name in ipairs(names) do
-        ls.node.TYPE_POOL[name] = nil
-        t[name] = ls.node.type(name)
+        test.scope.node.TYPE_POOL[name] = nil
+        t[name] = test.scope.node.type(name)
     end
 
     t.A:addExtends(t.A1)
@@ -105,8 +105,8 @@ do
 
     for _, name in ipairs(names) do
         t[name]:addField {
-            key   = ls.node.value(name),
-            value = ls.node.value(name),
+            key   = test.scope.node.value(name),
+            value = test.scope.node.value(name),
         }
     end
 
@@ -114,30 +114,30 @@ do
     assert(t.A:get('A11'):view() == '"A11"')
     assert(t.A:get('A33'):view() == 'nil')
 
-    assert(t.A:get(ls.node.ANY):view() == [["A" | "A1" | "A11" | "A12" | "A2" | "A21" | "A22"]])
+    assert(t.A:get(test.scope.node.ANY):view() == [["A" | "A1" | "A11" | "A12" | "A2" | "A21" | "A22"]])
     local value = t.A.value
     assert(value.kind == 'table')
     ---@cast value Node.Table
-    assert(value.sortedFields[1].key == ls.node.value "A")
-    assert(value.sortedFields[2].key == ls.node.value "A1")
-    assert(value.sortedFields[3].key == ls.node.value "A11")
-    assert(value.sortedFields[4].key == ls.node.value "A12")
-    assert(value.sortedFields[5].key == ls.node.value "A2")
-    assert(value.sortedFields[6].key == ls.node.value "A21")
-    assert(value.sortedFields[7].key == ls.node.value "A22")
+    assert(value.sortedFields[1].key == test.scope.node.value "A")
+    assert(value.sortedFields[2].key == test.scope.node.value "A1")
+    assert(value.sortedFields[3].key == test.scope.node.value "A11")
+    assert(value.sortedFields[4].key == test.scope.node.value "A12")
+    assert(value.sortedFields[5].key == test.scope.node.value "A2")
+    assert(value.sortedFields[6].key == test.scope.node.value "A21")
+    assert(value.sortedFields[7].key == test.scope.node.value "A22")
 end
 
 do
-    local a = ls.node.table()
+    local a = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
 
-    local b = ls.node.table()
+    local b = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
 
     local u = a & b
@@ -151,20 +151,20 @@ do
 end
 
 do
-    local a = ls.node.table()
+    local a = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
 
-    local b = ls.node.table()
+    local b = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'y'
         }
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
 
     local u = a & b
@@ -178,22 +178,22 @@ do
 end
 
 do
-    local a = ls.node.table()
+    local a = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
 
-    local b = ls.node.table()
+    local b = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
 
-    local c = ls.node.table()
+    local c = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'z',
-            value = ls.node.value 'z'
+            key   = test.scope.node.value 'z',
+            value = test.scope.node.value 'z'
         }
 
     local u = a & (b | c)
@@ -208,76 +208,76 @@ do
 end
 
 do
-    local t = ls.node.table()
+    local t = test.scope.node.table()
 
-    assert(t:get(ls.node.ANY):view() == 'nil')
-    assert(t:get(ls.node.UNKNOWN):view() == 'nil')
+    assert(t:get(test.scope.node.ANY):view() == 'nil')
+    assert(t:get(test.scope.node.UNKNOWN):view() == 'nil')
 end
 
 do
-    local t = ls.node.tuple()
+    local t = test.scope.node.tuple()
 
-    assert(t:get(ls.node.ANY):view() == 'nil')
-    assert(t:get(ls.node.UNKNOWN):view() == 'nil')
+    assert(t:get(test.scope.node.ANY):view() == 'nil')
+    assert(t:get(test.scope.node.UNKNOWN):view() == 'nil')
 end
 
 do
-    local t = ls.node.tuple()
-        : insert(ls.node.value 'x')
-        : insert(ls.node.value 'y')
-        : insert(ls.node.value 'z')
+    local t = test.scope.node.tuple()
+        : insert(test.scope.node.value 'x')
+        : insert(test.scope.node.value 'y')
+        : insert(test.scope.node.value 'z')
 
-    assert(t:get(ls.node.ANY):view() == '"x" | "y" | "z"')
-    assert(t:get(ls.node.UNKNOWN):view() == '"x" | "y" | "z"')
+    assert(t:get(test.scope.node.ANY):view() == '"x" | "y" | "z"')
+    assert(t:get(test.scope.node.UNKNOWN):view() == '"x" | "y" | "z"')
 
     assert(t:get(1):view() == '"x"')
     assert(t:get(2):view() == '"y"')
     assert(t:get(3):view() == '"z"')
     assert(t:get(4):view() == 'nil')
 
-    assert(t:get(ls.node.value(1)):view() == '"x"')
+    assert(t:get(test.scope.node.value(1)):view() == '"x"')
 
-    assert(t:get(ls.node.type 'number'):view() == '"x" | "y" | "z"')
-    assert(t:get(ls.node.type 'integer'):view() == '"x" | "y" | "z"')
-    assert(t:get(ls.node.type 'boolean'):view() == 'nil')
+    assert(t:get(test.scope.node.type 'number'):view() == '"x" | "y" | "z"')
+    assert(t:get(test.scope.node.type 'integer'):view() == '"x" | "y" | "z"')
+    assert(t:get(test.scope.node.type 'boolean'):view() == 'nil')
 
-    assert(t:get(ls.node.value(1) | ls.node.value(2) | ls.node.value(9)):view() == '"x" | "y" | nil')
+    assert(t:get(test.scope.node.value(1) | test.scope.node.value(2) | test.scope.node.value(9)):view() == '"x" | "y" | nil')
 end
 
 do
-    local t = ls.node.array(ls.node.value(true))
+    local t = test.scope.node.array(test.scope.node.value(true))
 
-    assert(t:get(ls.node.ANY):view() == 'true')
-    assert(t:get(ls.node.UNKNOWN):view() == 'true')
+    assert(t:get(test.scope.node.ANY):view() == 'true')
+    assert(t:get(test.scope.node.UNKNOWN):view() == 'true')
 
     assert(t:get(0):view() == 'nil')
     assert(t:get(1):view() == 'true')
-    assert(t:get(ls.node.value(1)):view() == 'true')
+    assert(t:get(test.scope.node.value(1)):view() == 'true')
 
-    assert(t:get(ls.node.type 'number'):view() == 'true')
-    assert(t:get(ls.node.type 'integer'):view() == 'true')
-    assert(t:get(ls.node.type 'boolean'):view() == 'nil')
+    assert(t:get(test.scope.node.type 'number'):view() == 'true')
+    assert(t:get(test.scope.node.type 'integer'):view() == 'true')
+    assert(t:get(test.scope.node.type 'boolean'):view() == 'nil')
 
-    assert(t:get(ls.node.value(1) | ls.node.value(2)):view() == 'true')
-    assert(t:get(ls.node.value(0) | ls.node.value(1)):view() == 'true | nil')
+    assert(t:get(test.scope.node.value(1) | test.scope.node.value(2)):view() == 'true')
+    assert(t:get(test.scope.node.value(0) | test.scope.node.value(1)):view() == 'true | nil')
 end
 
 do
-    local t = ls.node.array(ls.node.value(true), 3)
+    local t = test.scope.node.array(test.scope.node.value(true), 3)
 
-    assert(t:get(ls.node.ANY):view() == 'true')
-    assert(t:get(ls.node.UNKNOWN):view() == 'true')
+    assert(t:get(test.scope.node.ANY):view() == 'true')
+    assert(t:get(test.scope.node.UNKNOWN):view() == 'true')
 
     assert(t:get(0):view() == 'nil')
     assert(t:get(1):view() == 'true')
-    assert(t:get(ls.node.value(1)):view() == 'true')
-    assert(t:get(ls.node.value(4)):view() == 'nil')
+    assert(t:get(test.scope.node.value(1)):view() == 'true')
+    assert(t:get(test.scope.node.value(4)):view() == 'nil')
 
-    assert(t:get(ls.node.type 'number'):view() == 'true')
-    assert(t:get(ls.node.type 'integer'):view() == 'true')
-    assert(t:get(ls.node.type 'boolean'):view() == 'nil')
+    assert(t:get(test.scope.node.type 'number'):view() == 'true')
+    assert(t:get(test.scope.node.type 'integer'):view() == 'true')
+    assert(t:get(test.scope.node.type 'boolean'):view() == 'nil')
 
-    assert(t:get(ls.node.value(1) | ls.node.value(2)):view() == 'true')
-    assert(t:get(ls.node.value(0) | ls.node.value(1)):view() == 'true | nil')
-    assert(t:get(ls.node.value(1) | ls.node.value(4)):view() == 'true | nil')
+    assert(t:get(test.scope.node.value(1) | test.scope.node.value(2)):view() == 'true')
+    assert(t:get(test.scope.node.value(0) | test.scope.node.value(1)):view() == 'true | nil')
+    assert(t:get(test.scope.node.value(1) | test.scope.node.value(4)):view() == 'true | nil')
 end

@@ -2,7 +2,7 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(fields?: table): Node.Table
+---@overload fun(scope: Scope, fields?: table): Node.Table
 local M = ls.node.register 'Node.Table'
 
 M.kind = 'table'
@@ -11,16 +11,18 @@ M.kind = 'table'
 ---@field key Node
 ---@field value Node
 
+---@param scope Scope
 ---@param fields? table
-function M:__init(fields)
+function M:__init(scope, fields)
+    self.scope = scope
     self.fields = ls.linkedTable.create()
     if fields then
         for k, v in pairs(fields) do
             if type(k) ~= 'table' then
-                k = ls.node.value(k)
+                k = scope.node.value(k)
             end
             if type(v) ~= 'table' then
-                v = ls.node.value(v)
+                v = scope.node.value(v)
             end
             self.fields:pushTail { key = k, value = v }
         end
@@ -145,7 +147,7 @@ end
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return ls.node.union(self.keys).value, true
+    return self.scope.node.union(self.keys).value, true
 end
 
 ---获取所有的值。按key的顺序排序。
@@ -196,11 +198,11 @@ M.__getter.sortedFields = function (self)
             return sa < sb
         end
     end) do
-        values[#values+1] = { key = ls.node.value(k), value = v }
+        values[#values+1] = { key = self.scope.node.value(k), value = v }
     end
 
     for k, v in ls.util.sortPairs(self.types) do
-        values[#values+1] = { key = ls.node.type(k), value = v }
+        values[#values+1] = { key = self.scope.node.type(k), value = v }
     end
     for _, field in ipairs(self.others) do
         values[#values+1] = field
@@ -212,27 +214,27 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
-    if key == ls.node.NEVER then
-        return ls.node.NEVER
+    if key == self.scope.node.NEVER then
+        return self.scope.node.NEVER
     end
-    if key == ls.node.ANY
-    or key == ls.node.UNKNOWN then
-        return ls.node.union(self.values):getValue(ls.node.NIL)
+    if key == self.scope.node.ANY
+    or key == self.scope.node.UNKNOWN then
+        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
     end
-    if key == ls.node.NIL then
-        return ls.node.NIL
+    if key == self.scope.node.NIL then
+        return self.scope.node.NIL
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
         return self.literals[key]
-            or self:get(ls.node.value(key).nodeType)
-            or ls.node.NIL
+            or self:get(self.scope.node.value(key).nodeType)
+            or self.scope.node.NIL
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
         return self.literals[key.literal]
             or self:get(key.nodeType)
-            or ls.node.NIL
+            or self.scope.node.NIL
     end
     ---@cast key Node
     if key.typeName then
@@ -245,7 +247,7 @@ function M:get(key)
                 return field.value
             end
         end
-        return ls.node.NIL
+        return self.scope.node.NIL
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -257,7 +259,7 @@ function M:get(key)
         end
         return result
     end
-    return ls.node.NIL
+    return self.scope.node.NIL
 end
 
 ---@param other Node
@@ -280,10 +282,10 @@ end
 function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
-        local myType = self:get(ls.node.INTEGER)
+        local myType = self:get(self.scope.node.INTEGER)
         if myType:canCast(other.head) then
             return true
-        elseif myType ~= ls.node.NIL then
+        elseif myType ~= self.scope.node.NIL then
             return false
         end
         for k, v in pairs(self.literals) do
@@ -343,13 +345,13 @@ function M:extends(others)
 
     for k, v in pairs(literals) do
         self:addField {
-            key   = ls.node.value(k),
+            key   = self.scope.node.value(k),
             value = v,
         }
     end
     for k, v in pairs(types) do
         self:addField {
-            key   = ls.node.type(k),
+            key   = self.scope.node.type(k),
             value = v,
         }
     end
@@ -371,7 +373,7 @@ function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
     end
-    local newTable = ls.node.table()
+    local newTable = self.scope.node.table()
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
         if field.key.hasGeneric
@@ -396,20 +398,14 @@ function M:inferGeneric(other, result)
         if field.key.hasGeneric then
             -- 仅支持 [K] 这种形式的推导，不支持 [K[]] 等嵌套形式
             if  field.key.kind == 'generic'
-            and other.typeOfKey ~= ls.node.NEVER then
+            and other.typeOfKey ~= self.scope.node.NEVER then
                 field.key:inferGeneric(other.typeOfKey, result)
                 if field.value.hasGeneric then
-                    field.value:inferGeneric(other:get(ls.node.ANY), result)
+                    field.value:inferGeneric(other:get(self.scope.node.ANY), result)
                 end
             end
         elseif field.value.hasGeneric then
             field.value:inferGeneric(other:get(field.key), result)
         end
     end
-end
-
----@param fields? table<string|number|boolean|Node, string|number|boolean|Node>
----@return Node.Table
-function ls.node.table(fields)
-    return New 'Node.Table' (fields)
 end

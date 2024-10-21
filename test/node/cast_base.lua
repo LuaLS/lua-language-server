@@ -1,7 +1,7 @@
-local Any     = ls.node.ANY
-local Nil     = ls.node.NIL
-local Never   = ls.node.NEVER
-local Unknown = ls.node.UNKNOWN
+local Any     = test.scope.node.ANY
+local Nil     = test.scope.node.NIL
+local Never   = test.scope.node.NEVER
+local Unknown = test.scope.node.UNKNOWN
 
 do
     assert(Any >> Any == true)
@@ -32,110 +32,110 @@ do
 end
 
 do
-    assert(ls.node.value(1) >> Any == true)
-    assert(ls.node.value(1) >> Nil == false)
-    assert(ls.node.value(1) >> Never == false)
-    assert(ls.node.value(1) >> Unknown == true)
+    assert(test.scope.node.value(1) >> Any == true)
+    assert(test.scope.node.value(1) >> Nil == false)
+    assert(test.scope.node.value(1) >> Never == false)
+    assert(test.scope.node.value(1) >> Unknown == true)
 
-    assert(Any     >> ls.node.value(1) == true)
-    assert(Nil     >> ls.node.value(1) == false)
-    assert(Never   >> ls.node.value(1) == false)
-    assert(Unknown >> ls.node.value(1) == true)
+    assert(Any     >> test.scope.node.value(1) == true)
+    assert(Nil     >> test.scope.node.value(1) == false)
+    assert(Never   >> test.scope.node.value(1) == false)
+    assert(Unknown >> test.scope.node.value(1) == true)
 end
 
 do
-    assert(ls.node.value(1) >> ls.node.value(1) == true)
-    assert(ls.node.value(1) >> ls.node.value(2) == false)
-    assert(ls.node.value(1) >> ls.node.value(1.0) == true)
-    assert(ls.node.value(1) >> ls.node.type 'integer' == true)
+    assert(test.scope.node.value(1) >> test.scope.node.value(1) == true)
+    assert(test.scope.node.value(1) >> test.scope.node.value(2) == false)
+    assert(test.scope.node.value(1) >> test.scope.node.value(1.0) == true)
+    assert(test.scope.node.value(1) >> test.scope.node.type 'integer' == true)
 
-    assert(ls.node.type 'integer' >> ls.node.value(1) == false)
+    assert(test.scope.node.type 'integer' >> test.scope.node.value(1) == false)
 end
 
 do
-    assert(ls.node.value(1.0) >> ls.node.value(1) == true)
-    assert(ls.node.value(1.0) >> ls.node.value(1.0) == true)
-    assert(ls.node.value(1.0) >> ls.node.value(2) == false)
-    assert(ls.node.value(1.0) >> ls.node.type 'integer' == true)
+    assert(test.scope.node.value(1.0) >> test.scope.node.value(1) == true)
+    assert(test.scope.node.value(1.0) >> test.scope.node.value(1.0) == true)
+    assert(test.scope.node.value(1.0) >> test.scope.node.value(2) == false)
+    assert(test.scope.node.value(1.0) >> test.scope.node.type 'integer' == true)
 
-    assert(ls.node.type 'integer' >> ls.node.value(1.0) == false)
+    assert(test.scope.node.type 'integer' >> test.scope.node.value(1.0) == false)
 end
 
 do
-    assert(ls.node.value(1.1) >> ls.node.type 'integer' == false)
-    assert(ls.node.value(1.1) >> ls.node.type 'number'  == true)
+    assert(test.scope.node.value(1.1) >> test.scope.node.type 'integer' == false)
+    assert(test.scope.node.value(1.1) >> test.scope.node.type 'number'  == true)
 
-    assert(ls.node.type 'number' >> ls.node.value(1.1) == false)
+    assert(test.scope.node.type 'number' >> test.scope.node.value(1.1) == false)
 end
 
 do
-    assert(ls.node.value(true) >> ls.node.value(true) == true)
-    assert(ls.node.value(true) >> ls.node.value(false) == false)
-    assert(ls.node.value(true) >> ls.node.type 'boolean' == true)
+    assert(test.scope.node.value(true) >> test.scope.node.value(true) == true)
+    assert(test.scope.node.value(true) >> test.scope.node.value(false) == false)
+    assert(test.scope.node.value(true) >> test.scope.node.type 'boolean' == true)
 
-    assert(ls.node.type 'boolean' >> ls.node.value(true) == false)
+    assert(test.scope.node.type 'boolean' >> test.scope.node.value(true) == false)
 end
 
 do
-    assert(ls.node.value(false) >> ls.node.value(false) == true)
-    assert(ls.node.value(false) >> ls.node.value(true) == false)
-    assert(ls.node.value(false) >> ls.node.type 'boolean' == true)
+    assert(test.scope.node.value(false) >> test.scope.node.value(false) == true)
+    assert(test.scope.node.value(false) >> test.scope.node.value(true) == false)
+    assert(test.scope.node.value(false) >> test.scope.node.type 'boolean' == true)
 
-    assert(ls.node.type 'boolean' >> ls.node.value(false) == false)
+    assert(test.scope.node.type 'boolean' >> test.scope.node.value(false) == false)
 end
 
 do
-    assert(ls.node.value('abc', '"') >> ls.node.value('abc', '"') == true)
-    assert(ls.node.value('abc', '"') >> ls.node.value('abc', "'") == true)
-    assert(ls.node.value('abc', '"') >> ls.node.type 'string' == true)
+    assert(test.scope.node.value('abc', '"') >> test.scope.node.value('abc', '"') == true)
+    assert(test.scope.node.value('abc', '"') >> test.scope.node.value('abc', "'") == true)
+    assert(test.scope.node.value('abc', '"') >> test.scope.node.type 'string' == true)
 
-    assert(ls.node.type 'string' >> ls.node.value('abc', '"') == false)
+    assert(test.scope.node.type 'string' >> test.scope.node.value('abc', '"') == false)
 end
 
 do
-    local a = ls.node.type 'number'
-    local b = ls.node.type 'string'
+    local a = test.scope.node.type 'number'
+    local b = test.scope.node.type 'string'
 
     assert(a >> b == false)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.type 'number'
-    local b = ls.node.type 'number' | ls.node.type 'string'
+    local a = test.scope.node.type 'number'
+    local b = test.scope.node.type 'number' | test.scope.node.type 'string'
 
     assert(a >> b == true)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.type 'number' | ls.node.type 'string'
-    local b = ls.node.type 'number' | ls.node.type 'boolean'
+    local a = test.scope.node.type 'number' | test.scope.node.type 'string'
+    local b = test.scope.node.type 'number' | test.scope.node.type 'boolean'
 
     assert(a >> b == false)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.type 'number' | ls.node.type 'string'
-    local b = ls.node.type 'number' | ls.node.type 'boolean' | ls.node.type 'string'
+    local a = test.scope.node.type 'number' | test.scope.node.type 'string'
+    local b = test.scope.node.type 'number' | test.scope.node.type 'boolean' | test.scope.node.type 'string'
 
     assert(a >> b == true)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.type 'number'
-    local b = ls.node.type 'integer'
+    local a = test.scope.node.type 'number'
+    local b = test.scope.node.type 'integer'
 
     assert(a >> b == false)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.type 'A'
-    local b = ls.node.type 'B'
-    local c = ls.node.type 'C'
+    local a = test.scope.node.type 'A'
+    local b = test.scope.node.type 'B'
+    local c = test.scope.node.type 'C'
 
     a:addExtends(b)
     b:addExtends(c)
@@ -154,9 +154,9 @@ do
 end
 
 do
-    local a = ls.node.value(1)
-    local b = ls.node.value(2)
-    local c = ls.node.type 'number'
+    local a = test.scope.node.value(1)
+    local b = test.scope.node.value(2)
+    local c = test.scope.node.type 'number'
 
     assert(a >> b == false)
     assert(a >> c == true)
@@ -173,22 +173,22 @@ do
 end
 
 do
-    local a = ls.node.type 'number'
-            & (ls.node.value(1) | ls.node.value(2))
+    local a = test.scope.node.type 'number'
+            & (test.scope.node.value(1) | test.scope.node.value(2))
 
     assert(a:view() == '1 | 2')
 end
 
 do
-    local a = (ls.node.value(1) | ls.node.value(2))
-            & ls.node.type 'number'
+    local a = (test.scope.node.value(1) | test.scope.node.value(2))
+            & test.scope.node.type 'number'
 
     assert(a:view() == '1 | 2')
 end
 
 do
-    local a = (ls.node.value(1) | ls.node.value(2))
-            & (ls.node.type 'number' | ls.node.type 'string')
+    local a = (test.scope.node.value(1) | test.scope.node.value(2))
+            & (test.scope.node.type 'number' | test.scope.node.type 'string')
 
     assert(a:view() == '1 | 2')
 end

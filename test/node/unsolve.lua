@@ -1,6 +1,6 @@
 do
-    local a = ls.node.unsolve(ls.node.TABLE, function ()
-        return ls.node.table {
+    local a = test.scope.node.unsolve(test.scope.node.TABLE, function ()
+        return test.scope.node.table {
             x = 1,
             y = 2,
             z = 3,

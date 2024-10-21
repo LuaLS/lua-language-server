@@ -2,13 +2,15 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(nodes?: Node[]): Node.Intersection
+---@overload fun(scope: Scope, nodes?: Node[]): Node.Intersection
 local M = ls.node.register 'Node.Intersection'
 
 M.kind = 'intersection'
 
+---@param scope Scope
 ---@param nodes? Node[]
-function M:__init(nodes)
+function M:__init(scope, nodes)
+    self.scope = scope
     ---@type Node[]
     local values = {}
 
@@ -83,9 +85,9 @@ M.__getter.values = function (self)
                 return true, result[1]
             end
             if #result == 0 then
-                return true, ls.node.NEVER
+                return true, self.scope.node.NEVER
             end
-            return true, ls.node.union(result)
+            return true, self.scope.node.union(result)
         end
         if  y.kind == 'union'
         and canMerge(x) then
@@ -98,20 +100,20 @@ M.__getter.values = function (self)
                 return true, result[1]
             end
             if #result == 0 then
-                return true, ls.node.NEVER
+                return true, self.scope.node.NEVER
             end
-            return true, ls.node.union(result)
+            return true, self.scope.node.union(result)
         end
         if x.kind == 'type' then
             ---@cast x Node.Type
             if x.isBasicType then
-                return true, ls.node.NEVER
+                return true, self.scope.node.NEVER
             end
         end
         if y.kind == 'type' then
             ---@cast y Node.Type
             if y.isBasicType then
-                return true, ls.node.NEVER
+                return true, self.scope.node.NEVER
             end
         end
         if x.kind == 'table'
@@ -123,7 +125,7 @@ M.__getter.values = function (self)
             return false
         end
 
-        return true, ls.node.NEVER
+        return true, self.scope.node.NEVER
     end
 
     local values = self.rawNodes
@@ -134,7 +136,7 @@ M.__getter.values = function (self)
         local suc, new = merge(current, target)
         if suc then
             ---@cast new Node
-            if new == ls.node.NEVER then
+            if new == self.scope.node.NEVER then
                 return {}, true
             end
             result[#result] = new
@@ -153,11 +155,11 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = ls.node.NEVER
+    self.value = self.scope.node.NEVER
     local values = self.values
 
     if #values == 0 then
-        return ls.node.NEVER, true
+        return self.scope.node.NEVER, true
     end
     if #values == 1 then
         return values[1], true
@@ -199,16 +201,16 @@ M.__getter.value = function (self)
         ::continue::
     end
 
-    local table = ls.node.table()
+    local table = self.scope.node.table()
     for k, v in pairs(mergedLiterals) do
         table:addField {
-            key   = ls.node.value(k),
+            key   = self.scope.node.value(k),
             value = v,
         }
     end
     for k, v in pairs(mergedTypes) do
         table:addField {
-            key   = ls.node.type(k),
+            key   = self.scope.node.type(k),
             value = v,
         }
     end
@@ -217,7 +219,7 @@ M.__getter.value = function (self)
         return table, true
     end
 
-    local unionValue = ls.node.union(unionParts).value
+    local unionValue = self.scope.node.union(unionParts).value
 
     if unionValue.kind ~= 'union' then
         local result = table & unionValue
@@ -230,7 +232,7 @@ M.__getter.value = function (self)
         results[i] = table & n
     end
 
-    return ls.node.union(results), true
+    return self.scope.node.union(results), true
 end
 
 ---@param self Node.Intersection
@@ -301,17 +303,11 @@ function M:resolveGeneric(map)
     for _, v in ipairs(self.rawNodes) do
         newValues[#newValues+1] = v:resolveGeneric(map)
     end
-    return ls.node.intersection(newValues)
+    return self.scope.node.intersection(newValues)
 end
 
 function M:inferGeneric(other, result)
     for _, v in ipairs(self.values) do
         v:inferGeneric(other, result)
     end
-end
-
----@param nodes? Node[]
----@return Node.Intersection
-function ls.node.intersection(nodes)
-    return New 'Node.Intersection' (nodes)
 end

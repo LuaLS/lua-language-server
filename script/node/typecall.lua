@@ -2,15 +2,17 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(name: string, args: Node[]): Node.Typecall
+---@overload fun(scope: Scope, name: string, args: Node[]): Node.Typecall
 local M = ls.node.register 'Node.Typecall'
 
 M.kind = 'typecall'
 
+---@param scope Scope
 ---@param name string
 ---@param args Node[]
-function M:__init(name, args)
-    self.head = ls.node.type(name)
+function M:__init(scope, name, args)
+    self.scope = scope
+    self.head = scope.node.type(name)
     self.args = args
 end
 
@@ -25,7 +27,7 @@ function M:resolveGeneric(map)
     local args = ls.util.map(self.args, function (arg)
         return arg:resolveGeneric(map)
     end)
-    return ls.node.typecall(self.head.typeName, args)
+    return self.scope.node.typecall(self.head.typeName, args)
 end
 
 function M:view(skipLevel)
@@ -42,11 +44,4 @@ function M:view(skipLevel)
             return generic.value:view(skipLevel)
         end), ', ')
     )
-end
-
----@param name string
----@param args Node[]
----@return Node.Typecall
-function ls.node.typecall(name, args)
-    return New 'Node.Typecall' (name, args)
 end

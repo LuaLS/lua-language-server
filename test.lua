@@ -31,6 +31,7 @@ test.catch = require 'test.catch'
 test.rootPath = ls.runtime.rootPath .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
+test.scope    = ls.scope.create()
 
 test.singleFile = function (text)
     ls.files = New 'FileManager' ()

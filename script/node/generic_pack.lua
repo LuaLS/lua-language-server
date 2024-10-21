@@ -1,11 +1,13 @@
 ---@class Node.GenericPack: Class.Base
----@overload fun(generics?: Node.Generic[]): Node.GenericPack
+---@overload fun(scope: Scope, generics?: Node.Generic[]): Node.GenericPack
 local M = Class 'Node.GenericPack'
 
 M.kind = 'genericPack'
 
+---@param scope Scope
 ---@param generics? Node.Generic[]
-function M:__init(generics)
+function M:__init(scope, generics)
+    self.scope = scope
     self.generics = generics or {}
     ---@type table<Node.Generic, Node>
     self.refMap = {}
@@ -20,7 +22,7 @@ end
 ---@param map table<Node.Generic, Node>
 ---@return Node.GenericPack
 function M:resolve(map)
-    local new = ls.node.genericPack(self.generics)
+    local new = self.scope.node.genericPack(self.generics)
     for _, generic in ipairs(self.generics) do
         local value = map[generic]
         if value then
@@ -65,10 +67,4 @@ function M:view(skipLevel)
         ::continue::
     end
     return string.format('<%s>', table.concat(views, ', '))
-end
-
----@param generics? Node.Generic[]
----@return Node.GenericPack
-function ls.node.genericPack(generics)
-    return New 'Node.GenericPack' (generics)
 end

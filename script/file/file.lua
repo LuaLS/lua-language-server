@@ -63,4 +63,10 @@ function M:compileAst()
     return self.ast
 end
 
+---@param uri uri
+---@return File
+function ls.file.create(uri)
+    return New 'File' (uri)
+end
+
 return M

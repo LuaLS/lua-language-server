@@ -2,13 +2,15 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(values?: Node[]): Node.Tuple
+---@overload fun(scope: Scope, values?: Node[]): Node.Tuple
 local M = ls.node.register 'Node.Tuple'
 
 M.kind = 'tuple'
 
+---@param scope Scope
 ---@param values? Node[]
-function M:__init(values)
+function M:__init(scope, values)
+    self.scope = scope
     self.values = values or {}
 end
 
@@ -28,7 +30,7 @@ M.keys = nil
 M.__getter.keys = function (self)
     local keys = {}
     for i = 1, #self.values do
-        keys[i] = ls.node.value(i)
+        keys[i] = self.scope.node.value(i)
     end
     return keys, true
 end
@@ -37,32 +39,32 @@ end
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return ls.node.union(self.keys).value, true
+    return self.scope.node.union(self.keys).value, true
 end
 
 function M:get(key)
-    if key == ls.node.NEVER then
-        return ls.node.NEVER
+    if key == self.scope.node.NEVER then
+        return self.scope.node.NEVER
     end
-    if key == ls.node.ANY
-    or key == ls.node.UNKNOWN
-    or key == ls.node.TRULY then
-        return ls.node.union(self.values):getValue(ls.node.NIL)
+    if key == self.scope.node.ANY
+    or key == self.scope.node.UNKNOWN
+    or key == self.scope.node.TRULY then
+        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
     end
-    if key == ls.node.NIL then
-        return ls.node.NIL
+    if key == self.scope.node.NIL then
+        return self.scope.node.NIL
     end
     if type(key) ~= 'table' then
         return self.values[key]
-            or ls.node.NIL
+            or self.scope.node.NIL
     end
     if key.kind == 'value' then
         return self.values[key.literal]
-            or ls.node.NIL
+            or self.scope.node.NIL
     end
     if key.typeName == 'number'
     or key.typeName == 'integer' then
-        return ls.node.union(self.values):getValue(ls.node.NIL)
+        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -74,7 +76,7 @@ function M:get(key)
         end
         return result
     end
-    return ls.node.NIL
+    return self.scope.node.NIL
 end
 
 function M:view(skipLevel)
@@ -139,7 +141,7 @@ function M:resolveGeneric(map)
     for i, value in ipairs(self.values) do
         values[i] = value:resolveGeneric(map)
     end
-    return ls.node.tuple(values)
+    return self.scope.node.tuple(values)
 end
 
 function M:inferGeneric(other, result)
@@ -149,10 +151,4 @@ function M:inferGeneric(other, result)
     for i, v in ipairs(self.values) do
         v:inferGeneric(other:get(i), result)
     end
-end
-
----@param values? Node[]
----@return Node.Tuple
-function ls.node.tuple(values)
-    return New 'Node.Tuple' (values)
 end

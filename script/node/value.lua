@@ -6,9 +6,10 @@ local M = ls.node.register 'Node.Value'
 
 M.kind = 'value'
 
+---@param scope Scope
 ---@param v string | number | boolean
 ---@param quo? '"' | "'" | '[['
-function M:__init(v, quo)
+function M:__init(scope, v, quo)
     local tp = type(v)
     if tp ~= 'string' and tp ~= 'number' and tp ~= 'boolean' then
         error('Invalid value type: ' .. tp)
@@ -21,6 +22,7 @@ function M:__init(v, quo)
         self.typeName = 'integer'
     end
     self.quo = quo
+    self.scope = scope
 end
 
 function M:view(skipLevel)
@@ -54,48 +56,5 @@ end
 ---@type Node.Type
 M.nodeType = nil
 M.__getter.nodeType = function (self)
-    return ls.node.type(self.typeName), true
-end
-
----@type { [string | number | boolean]: Node.Value }
-ls.node.VALUE_POOL = setmetatable({}, {
-    __mode = 'v',
-    __index = function (t, k)
-        local v = New 'Node.Value' (k)
-        t[k] = v
-        return v
-    end,
-})
-
----@type { string: Node.Value }
-ls.node.VALUE_POOL_STR2 = setmetatable({}, {
-    __mode = 'v',
-    __index = function (t, k)
-        local v = New 'Node.Value' (k, "'")
-        t[k] = v
-        return v
-    end,
-})
-
----@type { string: Node.Value }
-ls.node.VALUE_POOL_STR3 = setmetatable({}, {
-    __mode = 'v',
-    __index = function (t, k)
-        local v = New 'Node.Value' (k, '[[')
-        t[k] = v
-        return v
-    end,
-})
-
----@overload fun(v: number): Node.Value
----@overload fun(v: boolean): Node.Value
----@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
-function ls.node.value(v, quo)
-    if quo == "'" then
-        return ls.node.VALUE_POOL_STR2[v]
-    end
-    if quo == '[[' then
-        return ls.node.VALUE_POOL_STR3[v]
-    end
-    return ls.node.VALUE_POOL[v]
+    return self.scope.node.type(self.typeName), true
 end

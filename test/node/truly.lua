@@ -1,37 +1,37 @@
 do
-    assert(ls.node.ANY.truly:view() == 'truly')
-    assert(ls.node.ANY.falsy:view() == 'false | nil')
+    assert(test.scope.node.ANY.truly:view() == 'truly')
+    assert(test.scope.node.ANY.falsy:view() == 'false | nil')
 
-    assert(ls.node.UNKNOWN.truly:view() == 'truly')
-    assert(ls.node.UNKNOWN.falsy:view() == 'false')
+    assert(test.scope.node.UNKNOWN.truly:view() == 'truly')
+    assert(test.scope.node.UNKNOWN.falsy:view() == 'false')
 
-    assert(ls.node.TRULY.truly:view() == 'truly')
-    assert(ls.node.TRULY.falsy:view() == 'never')
+    assert(test.scope.node.TRULY.truly:view() == 'truly')
+    assert(test.scope.node.TRULY.falsy:view() == 'never')
 
-    assert(ls.node.NIL.truly:view() == 'never')
-    assert(ls.node.NIL.falsy:view() == 'nil')
+    assert(test.scope.node.NIL.truly:view() == 'never')
+    assert(test.scope.node.NIL.falsy:view() == 'nil')
 
-    assert(ls.node.BOOLEAN.truly:view() == 'true')
-    assert(ls.node.BOOLEAN.falsy:view() == 'false')
+    assert(test.scope.node.BOOLEAN.truly:view() == 'true')
+    assert(test.scope.node.BOOLEAN.falsy:view() == 'false')
 
-    assert(ls.node.TRUE.truly:view() == 'true')
-    assert(ls.node.TRUE.falsy:view() == 'never')
+    assert(test.scope.node.TRUE.truly:view() == 'true')
+    assert(test.scope.node.TRUE.falsy:view() == 'never')
 
-    assert(ls.node.FALSE.truly:view() == 'never')
-    assert(ls.node.FALSE.falsy:view() == 'false')
+    assert(test.scope.node.FALSE.truly:view() == 'never')
+    assert(test.scope.node.FALSE.falsy:view() == 'false')
 
-    assert(ls.node.TABLE.truly:view() == 'table')
-    assert(ls.node.TABLE.falsy:view() == 'never')
+    assert(test.scope.node.TABLE.truly:view() == 'table')
+    assert(test.scope.node.TABLE.falsy:view() == 'never')
 
-    assert(ls.node.value(0).truly:view() == '0')
-    assert(ls.node.value(0).falsy:view() == 'never')
+    assert(test.scope.node.value(0).truly:view() == '0')
+    assert(test.scope.node.value(0).falsy:view() == 'never')
 
-    assert(ls.node.value(1).truly:view() == '1')
-    assert(ls.node.value(1).falsy:view() == 'never')
+    assert(test.scope.node.value(1).truly:view() == '1')
+    assert(test.scope.node.value(1).falsy:view() == 'never')
 end
 
 do
-    local u = ls.node.value(0) | ls.node.value(1) | ls.node.value(true) | ls.node.value(false) | ls.node.NIL
+    local u = test.scope.node.value(0) | test.scope.node.value(1) | test.scope.node.value(true) | test.scope.node.value(false) | test.scope.node.NIL
 
     assert(u:view() == '0 | 1 | true | false | nil')
     assert(u.truly:view() == '0 | 1 | true')
@@ -39,14 +39,14 @@ do
 end
 
 do
-    local u = ls.node.table()
+    local u = test.scope.node.table()
         : addField {
-            key   = ls.node.value('x'),
-            value = ls.node.value(1)
+            key   = test.scope.node.value('x'),
+            value = test.scope.node.value(1)
         }
         : addField {
-            key   = ls.node.value('y'),
-            value = ls.node.value(2)
+            key   = test.scope.node.value('y'),
+            value = test.scope.node.value(2)
         }
 
     assert(u:view() == '{ x: 1, y: 2 }')
@@ -55,15 +55,15 @@ do
 end
 
 do
-    local a = ls.node.table()
+    local a = test.scope.node.table()
         : addField {
-            key   = ls.node.value('x'),
-            value = ls.node.value(1)
+            key   = test.scope.node.value('x'),
+            value = test.scope.node.value(1)
         }
-    local b = ls.node.table()
+    local b = test.scope.node.table()
         : addField {
-            key   = ls.node.value('y'),
-            value = ls.node.value(2)
+            key   = test.scope.node.value('y'),
+            value = test.scope.node.value(2)
         }
 
     local u = a & b
@@ -73,19 +73,19 @@ do
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    local a = ls.node.type 'A'
+    test.scope.node.TYPE_POOL['A'] = nil
+    local a = test.scope.node.type 'A'
 
     assert(a.truly:view() == 'A')
     assert(a.falsy:view() == 'never')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    local a = ls.node.type 'A'
+    test.scope.node.TYPE_POOL['A'] = nil
+    local a = test.scope.node.type 'A'
         : addField {
-            key   = ls.node.value('x'),
-            value = ls.node.value(1)
+            key   = test.scope.node.value('x'),
+            value = test.scope.node.value(1)
         }
 
     assert(a.truly:view() == 'A')
@@ -93,12 +93,12 @@ do
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    local a = ls.node.type 'A'
-        : addAlias(ls.node.value(1))
-        : addAlias(ls.node.value(2))
-        : addAlias(ls.node.value(true))
-        : addAlias(ls.node.value(false))
+    test.scope.node.TYPE_POOL['A'] = nil
+    local a = test.scope.node.type 'A'
+        : addAlias(test.scope.node.value(1))
+        : addAlias(test.scope.node.value(2))
+        : addAlias(test.scope.node.value(true))
+        : addAlias(test.scope.node.value(false))
 
     assert(a:view() == 'A')
     assert(a.truly:view() == '1 | 2 | true')

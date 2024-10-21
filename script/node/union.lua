@@ -2,13 +2,15 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(nodes?: Node[]): Node.Union
+---@overload fun(scope: Scope, nodes?: Node[]): Node.Union
 local M = ls.node.register 'Node.Union'
 
 M.kind = 'union'
 
+---@param scope Scope
 ---@param nodes? Node[]
-function M:__init(nodes)
+function M:__init(scope, nodes)
+    self.scope = scope
     ---@package
     self.rawNodes = nodes or {}
 end
@@ -54,7 +56,7 @@ M.values = nil
 M.__getter.values = function (self)
     local values = {}
     for _, v in ipairs(self.rawNodes) do
-        if v == ls.node.NEVER then
+        if v == self.scope.node.NEVER then
             goto continue
         end
         if v.kind == 'union' then
@@ -121,9 +123,9 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = ls.node.NEVER
+    self.value = self.scope.node.NEVER
     if #self.values == 0 then
-        return ls.node.NEVER, true
+        return self.scope.node.NEVER, true
     end
     if #self.values == 1 then
         return self.values[1], true
@@ -148,7 +150,7 @@ M.__getter.truly = function (self)
     for _, v in ipairs(self.values) do
         result[#result+1] = v.truly
     end
-    return ls.node.union(result).value, true
+    return self.scope.node.union(result).value, true
 end
 
 ---@param self Node.Union
@@ -159,17 +161,17 @@ M.__getter.falsy = function (self)
     for _, v in ipairs(self.values) do
         result[#result+1] = v.falsy
     end
-    return ls.node.union(result).value, true
+    return self.scope.node.union(result).value, true
 end
 
 function M:narrow(other)
-    return ls.node.makeUnion(self.values, function (v)
+    return self.scope.node.union(self.values, function (v)
         return v:canCast(other)
     end)
 end
 
 function M:narrowByField(key, value)
-    return ls.node.makeUnion(self.values, function (v)
+    return self.scope.node.union(self.values, function (v)
         return v:get(key):canCast(value)
     end)
 end
@@ -197,36 +199,11 @@ function M:resolveGeneric(map)
     for _, v in ipairs(self.rawNodes) do
         newValues[#newValues+1] = v:resolveGeneric(map)
     end
-    return ls.node.union(newValues)
+    return self.scope.node.union(newValues)
 end
 
 function M:inferGeneric(other, result)
     for _, v in ipairs(self.values) do
         v:inferGeneric(other, result)
     end
-end
-
----@param nodes? Node[]
----@return Node.Union
-function ls.node.union(nodes)
-    return New 'Node.Union' (nodes)
-end
-
----@param values Node[]
----@param callback fun(node: Node): boolean
----@return Node
-function ls.node.makeUnion(values, callback)
-    local result = {}
-    for _, v in ipairs(values) do
-        if callback(v) then
-            result[#result+1] = v
-        end
-    end
-    if #result == 0 then
-        return ls.node.NEVER
-    end
-    if #result == 1 then
-        return result[1]
-    end
-    return ls.node.union(result)
 end

@@ -1,122 +1,122 @@
 do
-    local a = ls.node.func()
-    local b = ls.node.type 'function'
+    local a = test.scope.node.func()
+    local b = test.scope.node.type 'function'
 
     assert(a >> b == true)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
 
     assert(a >> b == true)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'boolean')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'boolean')
 
     assert(a >> b == false)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'integer')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'integer')
 
     assert(a >> b == false)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'number')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'number')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
 
     assert(a >> b == true)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'boolean')
-        : addVarargParam(ls.node.type 'string')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'boolean')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'boolean')
+        : addVarargParam(test.scope.node.type 'string')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'boolean')
 
     assert(a >> b == true)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'boolean')
-        : addVarargParam(ls.node.type 'string')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'boolean')
-        : addVarargParam(ls.node.type 'string')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'boolean')
+        : addVarargParam(test.scope.node.type 'string')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'boolean')
+        : addVarargParam(test.scope.node.type 'string')
 
     assert(a >> b == true)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'boolean')
-        : addVarargParam(ls.node.type 'string')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'boolean')
-        : addVarargParam(ls.node.type 'boolean')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'boolean')
+        : addVarargParam(test.scope.node.type 'string')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'boolean')
+        : addVarargParam(test.scope.node.type 'boolean')
 
     assert(a >> b == false)
     assert(b >> a == false)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addVarargParam(ls.node.type 'string')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addVarargParam(test.scope.node.type 'string')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
 
     assert(a >> b == true)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addVarargParam(ls.node.type 'string')
-    local b = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addParam('y', ls.node.type 'string')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addVarargParam(test.scope.node.type 'string')
+    local b = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addParam('y', test.scope.node.type 'string')
 
     assert(a >> b == true)
     assert(b >> a == true)
 end
 
 do
-    local a = ls.node.func()
-        : addParam('x', ls.node.type 'number')
-        : addVarargParam(ls.node.type 'string')
-    local b = ls.node.func()
-        : addVarargParam(ls.node.type 'string')
+    local a = test.scope.node.func()
+        : addParam('x', test.scope.node.type 'number')
+        : addVarargParam(test.scope.node.type 'string')
+    local b = test.scope.node.func()
+        : addVarargParam(test.scope.node.type 'string')
 
     assert(a >> b == false)
     assert(b >> a == false)

@@ -2,19 +2,21 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(name: string, extends?: Node, default?: Node): Node.Generic
+---@overload fun(scope: Scope, name: string, extends?: Node, default?: Node): Node.Generic
 local M = ls.node.register 'Node.Generic'
 
 M.kind = 'generic'
 
 M.hasGeneric = true
 
+---@param scope Scope
 ---@param name string
 ---@param extends? Node
 ---@param default? Node
-function M:__init(name, extends, default)
+function M:__init(scope, name, extends, default)
+    self.scope = scope
     self.name = name
-    self.extends = extends or ls.node.ANY
+    self.extends = extends or scope.node.ANY
     self.default = default
 end
 
@@ -24,7 +26,7 @@ function M:view(skipLevel)
     local buf = {}
     buf[#buf+1] = '<'
     buf[#buf+1] = self.name
-    if self.extends ~= ls.node.ANY then
+    if self.extends ~= self.scope.node.ANY then
         buf[#buf+1] = ':'
         buf[#buf+1] = self.extends:view(skipLevel)
     end
@@ -52,12 +54,4 @@ function M:inferGeneric(other, result)
         return
     end
     result[self] = other
-end
-
----@param name string
----@param extends? Node
----@param default? Node
----@return Node.Generic
-function ls.node.generic(name, extends, default)
-    return New 'Node.Generic' (name, extends, default)
 end

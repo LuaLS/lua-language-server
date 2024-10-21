@@ -1,78 +1,78 @@
 do
-    local a = ls.node.NIL & ls.node.value(1)
+    local a = test.scope.node.NIL & test.scope.node.value(1)
 
     assert(a:view() == 'never')
 end
 
 do
-    local a = ls.node.value(1) & ls.node.value(2)
+    local a = test.scope.node.value(1) & test.scope.node.value(2)
 
     assert(a:view() == 'never')
 end
 
 do
-    local a = ls.node.value(1) & ls.node.type('number')
+    local a = test.scope.node.value(1) & test.scope.node.type('number')
 
     assert(a:view() == '1')
 end
 
 do
-    local a = ls.node.type('number') & ls.node.value(1)
+    local a = test.scope.node.type('number') & test.scope.node.value(1)
 
     assert(a:view() == '1')
 end
 
 do
-    local a = ls.node.type('number') & ls.node.value(1)
+    local a = test.scope.node.type('number') & test.scope.node.value(1)
 
     assert(a:view() == '1')
 end
 
 do
-    local a = ls.node.type('number') & ls.node.type('string')
+    local a = test.scope.node.type('number') & test.scope.node.type('string')
 
     assert(a:view() == 'never')
 end
 
 do
-    local a = ls.node.type('number') & ls.node.type('number')
+    local a = test.scope.node.type('number') & test.scope.node.type('number')
 
     assert(a:view() == 'number')
 end
 
 do
-    local a = ls.node.type('number') & ls.node.type('number') & ls.node.type('string')
+    local a = test.scope.node.type('number') & test.scope.node.type('number') & test.scope.node.type('string')
 
     assert(a:view() == 'never')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    local a = ls.node.type('A') & ls.node.type('B')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    local a = test.scope.node.type('A') & test.scope.node.type('B')
 
     assert(a:view() == 'A & B')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    local a = ls.node.type('A') & ls.node.type('B') & ls.node.type('C')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    local a = test.scope.node.type('A') & test.scope.node.type('B') & test.scope.node.type('C')
 
     assert(a:view() == 'A & B & C')
 end
 
 do
-    local a = ls.node.table()
+    local a = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x',
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x',
         }
-    local b = ls.node.table()
+    local b = test.scope.node.table()
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y',
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y',
         }
     local c = a & b
 
@@ -80,29 +80,29 @@ do
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    local a = ls.node.type('A') & ls.node.type('B') & ls.node.type('C') & ls.node.type('A')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    local a = test.scope.node.type('A') & test.scope.node.type('B') & test.scope.node.type('C') & test.scope.node.type('A')
 
     assert(a:view() == 'A & B & C')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    ls.node.TYPE_POOL['D'] = nil
-    local a = ls.node.type('A') & (ls.node.type('B') | ls.node.type('C')) & ls.node.type('D')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    test.scope.node.TYPE_POOL['D'] = nil
+    local a = test.scope.node.type('A') & (test.scope.node.type('B') | test.scope.node.type('C')) & test.scope.node.type('D')
 
     assert(a:view() == 'A & (B | C) & D')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    local a = ls.node.type('A') & (ls.node.type('B') | ls.node.type('C')) & ls.node.type('A')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    local a = test.scope.node.type('A') & (test.scope.node.type('B') | test.scope.node.type('C')) & test.scope.node.type('A')
 
     assert(a:view() == 'A & (B | C)')
 end

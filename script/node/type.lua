@@ -7,16 +7,18 @@ local M = ls.node.register 'Node.Type'
 
 M.kind = 'type'
 
+---@param scope Scope
 ---@param name string
-function M:__init(name)
+function M:__init(scope, name)
     self.typeName = name
+    self.scope = scope
 end
 
 ---@param field Node.Field
 ---@return Node.Type
 function M:addField(field)
     if not self.table then
-        self.table = ls.node.table()
+        self.table = self.scope.node.table()
     end
     self.table:addField(field)
     self.value = nil
@@ -199,7 +201,7 @@ M.extendsTable = nil
 ---@return Node.Table
 ---@return true
 M.__getter.extendsTable = function (self)
-    local table = ls.node.table()
+    local table = self.scope.node.table()
 
     table:extends(self.fullExtends)
 
@@ -213,13 +215,13 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = ls.node.NEVER
+    self.value = self.scope.node.NEVER
     if not self:isComplex() then
         return self, true
     end
     if self:isClassLike() then
         if self.table and self.extends then
-            local value = ls.node.table()
+            local value = self.scope.node.table()
             value:extends { self.table, self.extendsTable }
             return value, true
         end
@@ -231,7 +233,7 @@ M.__getter.value = function (self)
             return head.value, true
         end
         local alias = self.alias:toArray()
-        local union = ls.node.union(alias)
+        local union = self.scope.node.union(alias)
         return union.value, true
     end
     return self, true
@@ -254,7 +256,7 @@ M.__getter.falsy = function (self)
     if self:isAliasLike() then
         return self.value.falsy, true
     end
-    return ls.node.NEVER, true
+    return self.scope.node.NEVER, true
 end
 
 function M:view(skipLevel)
@@ -365,7 +367,7 @@ function M:get(key)
         return self:call():get(key)
     end
     if self.value == self then
-        return ls.node.NEVER
+        return self.scope.node.NEVER
     end
     return self.value:get(key)
 end
@@ -431,7 +433,7 @@ function M:call(nodes)
         typecall = self.typecallPool:get(nodes)
     end
     if not typecall then
-        typecall = ls.node.typecall(self.typeName, nodes)
+        typecall = self.scope.node.typecall(self.typeName, nodes)
         if #nodes == 0 then
             self.typecallWithNoArgs = typecall
         else
@@ -455,20 +457,4 @@ M.typecallPool = nil
 ---@return true
 M.__getter.typecallPool = function (self)
     return ls.pathTable.create(true, true), true
-end
-
----@type { [string]: Node.Type}
-ls.node.TYPE_POOL = setmetatable({}, {
-    __mode = 'v',
-    __index = function (t, k)
-        local v = New 'Node.Type' (k)
-        t[k] = v
-        return v
-    end,
-})
-
----@param name string
----@return Node.Type
-function ls.node.type(name)
-    return ls.node.TYPE_POOL[name]
 end

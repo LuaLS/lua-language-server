@@ -3,6 +3,7 @@ New     = require 'class'.new
 Delete  = require 'class'.delete
 Type    = require 'class'.type
 IsValid = require 'class'.isValid
+Extends = require 'class'.extends
 
 ---@class LuaLS
 ls = {}
@@ -32,5 +33,6 @@ ls.files   = New 'FileManager' ()
 
 require 'node'
 require 'vm'
+require 'scope'
 
 return ls

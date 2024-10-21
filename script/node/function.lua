@@ -2,7 +2,7 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(): Node.Function
+---@overload fun(scope: Scope): Node.Function
 local M = ls.node.register 'Node.Function'
 
 M.kind = 'function'
@@ -15,7 +15,9 @@ M.kind = 'function'
 ---@field key? string
 ---@field value Node
 
-function M:__init()
+---@param scope Scope
+function M:__init(scope)
+    self.scope = scope
     ---@type Node.Function.Param[]
     self.params = {}
     ---@type Node.Function.Return[]
@@ -173,7 +175,7 @@ function M:getParamFrom(index)
     if #nodes == 1 then
         return nodes[1]
     end
-    return ls.node.union(nodes).value
+    return self.scope.node.union(nodes).value
 end
 
 ---@param index integer
@@ -190,7 +192,7 @@ function M:getReturnFrom(index)
     if #nodes == 1 then
         return nodes[1]
     end
-    return ls.node.union(nodes).value
+    return self.scope.node.union(nodes).value
 end
 
 function M:view(skipLevel)
@@ -261,7 +263,7 @@ function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
     end
-    local newFunc = ls.node.func()
+    local newFunc = self.scope.node.func()
     if self.genericPack then
         newFunc.genericPack = self.genericPack:resolve(map)
     end
@@ -352,8 +354,4 @@ function M:inferGeneric(other, result)
             self.varargReturn:inferGeneric(otherReturn, result)
         end
     end
-end
-
-function ls.node.func()
-    return New 'Node.Function' ()
 end

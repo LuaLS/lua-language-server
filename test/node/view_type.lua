@@ -1,22 +1,22 @@
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    local a = ls.node.type('A')
+    test.scope.node.TYPE_POOL['A'] = nil
+    local a = test.scope.node.type('A')
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'A')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    local a = ls.node.type('A')
+    test.scope.node.TYPE_POOL['A'] = nil
+    local a = test.scope.node.type('A')
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
 
     assert(a:view() == 'A')
@@ -24,25 +24,25 @@ do
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    ls.node.TYPE_POOL['D'] = nil
-    local a = ls.node.type('A')
-    local b = ls.node.type('B')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    test.scope.node.TYPE_POOL['D'] = nil
+    local a = test.scope.node.type('A')
+    local b = test.scope.node.type('B')
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
-    local c = ls.node.type('C')
+    local c = test.scope.node.type('C')
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
-    local d = ls.node.type('D')
+    local d = test.scope.node.type('D')
         : addField {
-            key   = ls.node.value 'z',
-            value = ls.node.value 'z'
+            key   = test.scope.node.value 'z',
+            value = test.scope.node.value 'z'
         }
 
     a:addExtends(b)
@@ -54,37 +54,37 @@ do
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    ls.node.TYPE_POOL['D'] = nil
-    local a = ls.node.type('A')
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    test.scope.node.TYPE_POOL['D'] = nil
+    local a = test.scope.node.type('A')
         : addField {
-            key   = ls.node.value 'w',
-            value = ls.node.value '1'
+            key   = test.scope.node.value 'w',
+            value = test.scope.node.value '1'
         }
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value '2'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value '2'
         }
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value '3'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value '3'
         }
-    local b = ls.node.type('B')
+    local b = test.scope.node.type('B')
         : addField {
-            key   = ls.node.value 'x',
-            value = ls.node.value 'x'
+            key   = test.scope.node.value 'x',
+            value = test.scope.node.value 'x'
         }
-    local c = ls.node.type('C')
+    local c = test.scope.node.type('C')
         : addField {
-            key   = ls.node.value 'y',
-            value = ls.node.value 'y'
+            key   = test.scope.node.value 'y',
+            value = test.scope.node.value 'y'
         }
-    local d = ls.node.type('D')
+    local d = test.scope.node.type('D')
         : addField {
-            key   = ls.node.value 'z',
-            value = ls.node.value 'z'
+            key   = test.scope.node.value 'z',
+            value = test.scope.node.value 'z'
         }
 
     a:addExtends(b)
@@ -96,34 +96,34 @@ do
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    local a = ls.node.type('A')
-        : addAlias(ls.node.value(1))
-        : addAlias(ls.node.value(2))
-        : addAlias(ls.node.value(3))
+    test.scope.node.TYPE_POOL['A'] = nil
+    local a = test.scope.node.type('A')
+        : addAlias(test.scope.node.value(1))
+        : addAlias(test.scope.node.value(2))
+        : addAlias(test.scope.node.value(3))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '1 | 2 | 3')
 end
 
 do
-    ls.node.TYPE_POOL['A'] = nil
-    ls.node.TYPE_POOL['B'] = nil
-    ls.node.TYPE_POOL['C'] = nil
-    ls.node.TYPE_POOL['D'] = nil
-    local a = ls.node.type('A')
-        : addAlias(ls.node.type 'B')
-        : addAlias(ls.node.type 'C')
-        : addAlias(ls.node.type 'D')
-    ls.node.type('B')
-        : addAlias(ls.node.value(1))
-        : addAlias(ls.node.value(2))
-    ls.node.type('C')
-        : addAlias(ls.node.value(2))
-        : addAlias(ls.node.value(3))
-    ls.node.type('D')
-        : addAlias(ls.node.value(3))
-        : addAlias(ls.node.value(4))
+    test.scope.node.TYPE_POOL['A'] = nil
+    test.scope.node.TYPE_POOL['B'] = nil
+    test.scope.node.TYPE_POOL['C'] = nil
+    test.scope.node.TYPE_POOL['D'] = nil
+    local a = test.scope.node.type('A')
+        : addAlias(test.scope.node.type 'B')
+        : addAlias(test.scope.node.type 'C')
+        : addAlias(test.scope.node.type 'D')
+    test.scope.node.type('B')
+        : addAlias(test.scope.node.value(1))
+        : addAlias(test.scope.node.value(2))
+    test.scope.node.type('C')
+        : addAlias(test.scope.node.value(2))
+        : addAlias(test.scope.node.value(3))
+    test.scope.node.type('D')
+        : addAlias(test.scope.node.value(3))
+        : addAlias(test.scope.node.value(4))
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'B | C | D')

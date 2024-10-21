@@ -2,6 +2,7 @@
 ---@field onCanCast? fun(self: Node, other: Node): boolean # 能否转换为另一个节点
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
+---@field scope Scope
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
@@ -28,7 +29,7 @@ end
 function M.__bor(a, b)
     return makeUnion(a, b)
         or makeUnion(b, a)
-        or ls.node.union {a, b}
+        or a.scope.node.union {a, b}
 end
 
 ---@param a Node
@@ -39,15 +40,20 @@ local function makeIntersection(a, b)
         return a
     end
     if a == nil or b == nil then
-        return ls.node.NEVER
+        return (a or b).scope.node.NEVER
     end
 end
 
+---@param a Node
+---@param b Node
+---@return Node?
 function M.__band(a, b)
     return makeIntersection(a, b)
-        or ls.node.intersection {a, b}
+        or a.scope.node.intersection {a, b}
 end
 
+---@param other Node
+---@return boolean
 function M:__shr(other)
     return self:canCast(other)
 end
@@ -72,13 +78,20 @@ end
 function M:get(key)
     local value = self.value
     if value == self then
-        return ls.node.NEVER
+        return self.scope.node.NEVER
     end
     return value:get(key)
 end
 
 ---@type Node
-M.typeOfKey = ls.node.NEVER
+M.typeOfKey = nil
+
+---@param self Node
+---@return Node
+---@return true
+M.__getter.typeOfKey = function (self)
+    return self.scope.node.NEVER, true
+end
 
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'
 
@@ -93,7 +106,7 @@ end
 function M:canCast(other)
     if type(other) ~= 'table' then
         ---@cast other -Node
-        other = ls.node.value(other)
+        other = self.scope.node.value(other)
     end
     if not self._castCache then
         self._castCache = setmetatable({}, ls.util.MODE_K)
@@ -147,7 +160,7 @@ end
 M.falsy = nil
 
 M.__getter.falsy = function (self)
-    return ls.node.NEVER
+    return self.scope.node.NEVER
 end
 
 ---@type boolean | number | string | nil
@@ -158,9 +171,9 @@ M.literal = nil
 ---@return Node otherHand
 function M:narrow(other)
     if self:canCast(other) then
-        return self, ls.node.NEVER
+        return self, self.scope.node.NEVER
     end
-    return ls.node.NEVER, self
+    return self.scope.node.NEVER, self
 end
 
 ---@param key string | number | boolean | Node
@@ -170,9 +183,9 @@ end
 function M:narrowByField(key, value)
     local myValue = self:get(key)
     if myValue:canCast(value) then
-        return self, ls.node.NEVER
+        return self, self.scope.node.NEVER
     end
-    return ls.node.NEVER, self
+    return self.scope.node.NEVER, self
 end
 
 ---@type boolean

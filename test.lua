@@ -13,17 +13,6 @@ ls.runtime = require 'runtime'
 
 fs.create_directories(fs.path(ls.runtime.logPath))
 
----@diagnostic disable-next-line: lowercase-global
-log = New 'Log' {
-    clock = function ()
-        return time.monotonic() / 1000.0
-    end,
-    time  = function ()
-        return time.time() // 1000
-    end,
-    path = ls.uri.decode(ls.runtime.logUri) .. '/test.log',
-}
-
 ---@class Test
 test = {}
 test.catch = require 'test.catch'

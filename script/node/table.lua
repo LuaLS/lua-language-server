@@ -45,15 +45,6 @@ function M:removeField(field)
     return self
 end
 
-function M:flushCache()
-    self.sortedFields = nil
-    self.literals = nil
-    self.types = nil
-    self.others = nil
-    self.hasGeneric = nil
-    self.typeOfKey = nil
-end
-
 function M:isEmpty()
     return self.fields:getSize() == 0
 end

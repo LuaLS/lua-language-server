@@ -21,7 +21,7 @@ function M:addField(field)
         self.table = self.scope.node.table()
     end
     self.table:addField(field)
-    self.value = nil
+    self:flushCache()
     return self
 end
 
@@ -35,7 +35,7 @@ function M:removeField(field)
     if self.table:isEmpty() then
         self.table = nil
     end
-    self.value = nil
+    self:flushCache()
     return self
 end
 
@@ -91,6 +91,7 @@ function M:addExtends(extends)
     end
     self.extends:pushTail(extends)
 
+    extends:flushMe(self, true)
     self:flushCache()
     return self
 end
@@ -106,6 +107,7 @@ function M:removeExtends(extends)
         self.extends = nil
     end
 
+    extends:flushMe(self, false)
     self:flushCache()
 
     return self
@@ -136,13 +138,6 @@ function M:removeAlias(alias)
     self:flushCache()
 
     return self
-end
-
-function M:flushCache()
-    self.value = nil
-    self.fullExtends = nil
-    self.extendsTable  = nil
-    self.isBasicType = nil
 end
 
 ---@type Node[]
@@ -382,10 +377,10 @@ end
 ---@type Node.GenericPack?
 M.params = nil
 
----@param pack Node.GenericPack
+---@param generics Node.Generic[]
 ---@return Node.Type
-function M:bindParams(pack)
-    self.params = pack
+function M:bindParams(generics)
+    self.params = self.scope.node.genericPack(generics)
     return self
 end
 

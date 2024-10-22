@@ -62,7 +62,7 @@ do
     local V = test.scope.node.generic 'V'
     local pack = test.scope.node.genericPack { K, V }
     local alias = test.scope.node.type 'Alias'
-    alias:bindParams(pack)
+    alias:bindParams { K, V }
 
     local aliasValue = K | V | test.scope.node.BOOLEAN
     alias:addAlias(aliasValue)
@@ -93,9 +93,8 @@ do
 
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local pack = test.scope.node.genericPack { K, V }
     local alias = test.scope.node.type 'Alias'
-    alias:bindParams(pack)
+    alias:bindParams { K, V }
 
     local aliasValue = K | V | test.scope.node.BOOLEAN
     alias:addAlias(aliasValue)
@@ -130,9 +129,8 @@ do
 
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local pack = test.scope.node.genericPack { K, V }
     local alias = test.scope.node.type 'Alias'
-    alias:bindParams(pack)
+    alias:bindParams { K, V }
 
     local aliasValue = test.scope.node.table { [K] = V }
     alias:addAlias(aliasValue)
@@ -170,9 +168,8 @@ do
 
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local pack = test.scope.node.genericPack { K, V }
     local map = test.scope.node.type 'Map'
-    map:bindParams(pack)
+    map:bindParams { K, V }
 
     map:addField {
         key   = K,
@@ -200,9 +197,8 @@ do
 
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local pack = test.scope.node.genericPack { K, V }
     local map = test.scope.node.type 'Map'
-    map:bindParams(pack)
+    map:bindParams { K, V }
 
     map:addField {
         key   = test.scope.node.value 'set',
@@ -238,7 +234,7 @@ do
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
     local map = test.scope.node.type 'Map'
-    map:bindParams(test.scope.node.genericPack { K })
+    map:bindParams { K }
 
     map:addField {
         key   = test.scope.node.value 'set',
@@ -279,7 +275,7 @@ do
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
     local map = test.scope.node.type 'Map'
-    map:bindParams(test.scope.node.genericPack { K, V })
+    map:bindParams { K, V }
 
     map:addField {
         key   = test.scope.node.value 'set',
@@ -314,7 +310,7 @@ do
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
     local map = test.scope.node.type 'Map'
-    map:bindParams(test.scope.node.genericPack { K, V })
+    map:bindParams { K, V }
     map:addField {
         key   = test.scope.node.value 'set',
         value = test.scope.node.func()
@@ -324,7 +320,7 @@ do
 
     local T = test.scope.node.generic 'T'
     local unit = test.scope.node.type 'Unit'
-    unit:bindParams(test.scope.node.genericPack { T })
+    unit:bindParams { T }
     unit:addField {
         key   = test.scope.node.value 'childs',
         value = map:call { T, test.scope.node.STRING },
@@ -358,7 +354,7 @@ do
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
     local map = test.scope.node.type 'Map'
-    map:bindParams(test.scope.node.genericPack { K, V })
+    map:bindParams { K, V }
     map:addField {
         key   = test.scope.node.value 'set',
         value = test.scope.node.func()
@@ -386,7 +382,7 @@ do
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
     local map = test.scope.node.type 'Map'
-    map:bindParams(test.scope.node.genericPack { K, V })
+    map:bindParams { K, V }
     map:addField {
         key   = test.scope.node.value 'set',
         value = test.scope.node.func()
@@ -414,7 +410,7 @@ do
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
     local map = test.scope.node.type 'Map'
-    map:bindParams(test.scope.node.genericPack { K, V })
+    map:bindParams { K, V }
     map:addField {
         key   = test.scope.node.value 'set',
         value = test.scope.node.func()
@@ -425,7 +421,7 @@ do
     local OK = test.scope.node.generic('OK', test.scope.node.NUMBER)
     local OV = test.scope.node.generic 'OV'
     local omap = test.scope.node.type 'OrderMap'
-    omap:bindParams(test.scope.node.genericPack { OK, OV })
+    omap:bindParams { OK, OV }
     omap:addExtends(map:call { OK, OV })
 
     assert(omap:get('set'):view() == 'fun(key: number, value: any)')

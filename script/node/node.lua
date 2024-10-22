@@ -219,6 +219,44 @@ function M:inferGeneric(other, result)
     self.value:inferGeneric(other, result)
 end
 
+---@type table<Node, true>?
+M.needFlush = nil
+
+---@param needReset boolean
+---@param me Node
+function M:flushMe(me, needReset)
+    if not self.needFlush then
+        self.needFlush = setmetatable({}, ls.util.MODE_K)
+    end
+    if needReset then
+        self.needFlush[me] = (self.needFlush[me] or 0) + 1
+    else
+        self.needFlush[me] = self.needFlush[me] - 1
+        if self.needFlush[me] == 0 then
+            self.needFlush[me] = nil
+        end
+    end
+end
+
+function M:flushCache()
+    if self.resetting then
+        return
+    end
+    self.resetting = true
+    local needFlush = self.needFlush
+    if needFlush then
+        for child in pairs(self.needFlush) do
+            child:flushCache()
+        end
+    end
+
+    local getter = self.__getter
+    for k in pairs(getter) do
+        self[k] = nil
+    end
+    self.resetting = false
+end
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

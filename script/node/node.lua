@@ -10,6 +10,10 @@ local M = Class 'Node'
 
 ---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'typecall'
 
+---@class Node.Location
+---@field uri Uri
+---@field offset integer
+
 ---基础分类
 ---@type Node.Kind
 M.kind = nil

@@ -10,6 +10,7 @@ M.kind = 'table'
 ---@class Node.Field
 ---@field key Node
 ---@field value Node
+---@field location? Node.Location
 
 ---@param scope Scope
 ---@param fields? table

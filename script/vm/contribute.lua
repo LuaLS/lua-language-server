@@ -1,6 +1,12 @@
 ---@class VM.Contribute
 local M = Class 'VM.Contribute'
 
+---@class VM.Contribute.Field
+---@field typeName string
+---@field field Node.Field
+
+---@alias VM.Contribute.Info VM.Contribute.Field
+
 ---@param scope Scope
 function M:__init(scope)
     self.scope = scope

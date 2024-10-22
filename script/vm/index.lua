@@ -9,12 +9,13 @@ function M:__init(vfile, ast)
     self.scope = vfile.scope
 end
 
+---@return VM.Contribute.Info[]
 function M:start()
-    local node = self.scope.node
-    node:lockCache()
+    ---@type VM.Contribute.Info[]
+    self.results = {}
     local main = self.ast.main
     self:parseBlock(main)
-    node:unlockCache()
+    return self.results
 end
 
 ---@private
@@ -28,6 +29,35 @@ end
 ---@private
 ---@param state LuaParser.Node.State
 function M:parseState(state)
+    if state.kind == 'assign' then
+        ---@cast state LuaParser.Node.Assign
+        for _, exp in ipairs(state.exps) do
+            if exp.kind == 'var' then
+                ---@cast exp LuaParser.Node.Var
+                self:parseVar(exp)
+            end
+        end
+    end
+end
+
+---@private
+---@param var LuaParser.Node.Var
+function M:parseVar(var)
+    if var.loc then
+        return
+    end
+    local node = self.scope.node
+    -- global, add to G
+    local value = var.value
+    if not value then
+        self.results[#self.results+1] = {
+            typeName = 'G',
+            field = {
+                key = node.value(var.id),
+                value = node.ANY,
+            },
+        }
+    end
 end
 
 ---@param vfile VM.Vfile

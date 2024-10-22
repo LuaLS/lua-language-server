@@ -1,0 +1,35 @@
+---@class VM.Contribute
+local M = Class 'VM.Contribute'
+
+---@param scope Scope
+function M:__init(scope)
+    self.scope = scope
+    ---@type [string, Node.Field][]
+    self.typeFields = {}
+end
+
+function M:__del()
+    for _, data in ipairs(self.typeFields) do
+        local typeName, field = data[1], data[2]
+        local tp = self.scope.node.type(typeName)
+        tp:removeField(field)
+    end
+end
+
+---@param typeName string
+---@param field Node.Field
+function M:addField(typeName, field)
+    local tp = self.scope.node.type(typeName)
+    tp:addField(field)
+    self.typeFields[#self.typeFields+1] = { typeName, field }
+end
+
+function M:remove()
+    Delete(self)
+end
+
+---@param scope Scope
+---@return VM.Contribute
+function ls.vm.createContribute(scope)
+    return New 'VM.Contribute' (scope)
+end

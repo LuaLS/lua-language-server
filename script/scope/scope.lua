@@ -10,10 +10,9 @@ function M:__init(uri)
     self.includeUris = {}
 
     self.node = ls.node.createAPIs(self)
-    self.node:fillPresets()
+    self.node:reset()
 
     self.documents = setmetatable({}, ls.util.MODE_V)
-    self.recentDocuments = ls.linkedTable.create()
 
     self.vm = ls.vm.create(self)
 end

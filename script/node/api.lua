@@ -7,10 +7,10 @@ function M:__init(scope)
     ---@private
     self.scope = scope
 
-    self:createPools()
     self:fillAPIs()
 end
 
+---@private
 function M:createPools()
     local scope = self.scope
     self.TYPE_POOL  = setmetatable({}, {
@@ -47,6 +47,7 @@ function M:createPools()
     })
 end
 
+---@private
 function M:fillAPIs()
     local scope = self.scope
     ---@param name string
@@ -152,6 +153,7 @@ function M:fillAPIs()
     end
 end
 
+---@private
 function M:fillPresets()
     self.TRUE = self.value(true)
     self.FALSE = self.value(false)
@@ -255,6 +257,11 @@ function M:fillPresets()
         key   = self.ANY,
         value = self.ANY,
     }
+end
+
+function M:reset()
+    self:createPools()
+    self:fillPresets()
 end
 
 ---@param scope Scope

@@ -14,8 +14,6 @@ local M = Class 'Node'
 ---@type Node.Kind
 M.kind = nil
 
-local castCache = nil
-
 ---@param a Node
 ---@param b Node
 ---@return Node?
@@ -112,9 +110,7 @@ function M:canCast(other)
         ---@cast other -Node
         other = self.scope.node.value(other)
     end
-    if not castCache then
-        castCache = ls.pathTable.create(true, false)
-    end
+    local castCache = self.scope.node.castCache
     local path = { self, other }
     local res = castCache:get(path)
     if res then
@@ -261,7 +257,7 @@ function M:flushCache()
         self[k] = nil
     end
     self.resetting = false
-    castCache = nil
+    self.scope.node.castCache = nil
 end
 
 ---@generic T: Node

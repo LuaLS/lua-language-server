@@ -1,6 +1,6 @@
----@class Node.API
----@overload fun(scope: Scope): Node.API
-local M = Class 'Node.API'
+---@class Node.Manager: Class.Base
+---@overload fun(scope: Scope): Node.Manager
+local M = Class 'Node.Manager'
 
 ---@param scope Scope
 function M:__init(scope)
@@ -8,6 +8,13 @@ function M:__init(scope)
     self.scope = scope
 
     self:fillAPIs()
+end
+
+---@type PathTable
+M.castCache = nil
+
+M.__getter.castCache = function (self)
+    return ls.pathTable.create(true, false), true
 end
 
 ---@private
@@ -265,8 +272,8 @@ function M:reset()
 end
 
 ---@param scope Scope
----@return Node.API
-function ls.node.createAPIs(scope)
-    local apis = New 'Node.API' (scope)
+---@return Node.Manager
+function ls.node.createManager(scope)
+    local apis = New 'Node.Manager' (scope)
     return apis
 end

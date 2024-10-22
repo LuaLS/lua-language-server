@@ -9,7 +9,7 @@ function M:__init(uri)
     ---@type Uri[]
     self.includeUris = {}
 
-    self.node = ls.node.createAPIs(self)
+    self.node = ls.node.createManager(self)
     self.node:reset()
 
     self.documents = setmetatable({}, ls.util.MODE_V)

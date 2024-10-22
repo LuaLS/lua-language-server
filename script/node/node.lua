@@ -18,17 +18,19 @@ M.kind = nil
 ---@param b Node
 ---@return Node?
 local function makeUnion(a, b)
+    if a == b then
+        return a
+    end
     if a == nil then
         return b
     end
-    if a.typeName == 'never' then
-        return b
+    if b == nil then
+        return a
     end
 end
 
 function M.__bor(a, b)
     return makeUnion(a, b)
-        or makeUnion(b, a)
         or a.scope.node.union {a, b}
 end
 

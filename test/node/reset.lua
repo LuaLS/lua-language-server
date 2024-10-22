@@ -69,4 +69,20 @@ do
     local a = node.type 'A'
     local T = node.generic 'T'
     a:bindParams { T }
+    a:addField {
+        key = node.value 'x',
+        value = T,
+    }
+
+    local an = a:call { node.NUMBER }
+    assert(an.value:view() == '{ x: number }')
+    assert(an:get('x'):view() == 'number')
+    assert(an:get('y'):view() == 'nil')
+
+    a:addField {
+        key = node.value 'y',
+        value = node.STRING,
+    }
+    assert(an.value:view() == '{ x: number, y: string }')
+    assert(an:get('y'):view() == 'string')
 end

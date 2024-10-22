@@ -14,6 +14,8 @@ function M:__init(scope, name, args)
     self.scope = scope
     self.head = scope.node.type(name)
     self.args = args
+
+    self.head:flushMe(self, true)
 end
 
 ---@param self Node.Typecall

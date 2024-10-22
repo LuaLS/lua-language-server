@@ -28,6 +28,10 @@ function M:__init(scope, nodes)
     end
 
     self.rawNodes = values
+
+    for _, v in ipairs(values) do
+        v:flushMe(self, true)
+    end
 end
 
 ---@type Node[]

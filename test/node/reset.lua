@@ -86,3 +86,28 @@ do
     assert(an.value:view() == '{ x: number, y: string }')
     assert(an:get('y'):view() == 'string')
 end
+
+do
+    local t1 = node.table {
+        x = 1
+    }
+    local t2 = node.table {
+        y = 2
+    }
+    local sec = t1 & t2
+
+    assert(sec:view() == '{ x: 1 } & { y: 2 }')
+    assert(sec.value:view() == '{ x: 1, y: 2 }')
+
+    t1:addField {
+        key = node.value 'xx',
+        value = node.value(11)
+    }
+    t2:addField {
+        key = node.value 'yy',
+        value = node.value(22)
+    }
+
+    assert(sec:view() == '{ x: 1, xx: 11 } & { y: 2, yy: 22 }')
+    assert(sec.value:view() == '{ x: 1, xx: 11, y: 2, yy: 22 }')
+end

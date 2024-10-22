@@ -162,12 +162,14 @@ end
 ---@param inExp? boolean # 在表达式中
 function M:skipSpace(inExp)
     if self.lexer.ci ~= self.lastSpaceCI then
+        ---@private
         self.lastRightCI = self.lexer.ci
     end
     repeat until not self:skipNL()
             and  not self:skipCat()
             and  not self:skipComment(inExp)
             and  not self:skipUnknown()
+    ---@private
     self.lastSpaceCI = self.lexer.ci
 end
 
@@ -187,14 +189,14 @@ end
 -- 创建一个节点
 ---@private
 ---@generic T: string
----@param type `T`
+---@param kind `T`
 ---@param data table
 ---@return T
-function M:createNode(type, data)
+function M:createNode(kind, data)
     data.ast = self
-    local node = New(type, data)
+    local node = New(kind, data)
 
-    local nodeMap = self.nodesMap[node.type]
+    local nodeMap = self.nodesMap[node.kind]
     nodeMap[#nodeMap+1] = node
 
     if node.isBlock then
@@ -211,8 +213,8 @@ function M:getCurrentFunction()
     local blocks = self.blocks
     for i = #blocks, 1, -1 do
         local block = blocks[i]
-        if block.type == 'Function'
-        or block.type == 'Main' then
+        if block.kind == 'function'
+        or block.kind == 'main' then
             ---@cast block LuaParser.Node.Function | LuaParser.Node.Main
             return block
         end

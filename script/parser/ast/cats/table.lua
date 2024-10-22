@@ -3,6 +3,8 @@
 ---@field fields LuaParser.Node.CatTableField[]
 local CatTable = Class('LuaParser.Node.CatTable', 'LuaParser.Node.Base')
 
+CatTable.kind = 'cattable'
+
 ---@class LuaParser.Node.CatTableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index'
 ---@field key? LuaParser.Node.CatTableFieldID | LuaParser.Node.CatType
@@ -12,10 +14,14 @@ local CatTable = Class('LuaParser.Node.CatTable', 'LuaParser.Node.Base')
 ---@field parent LuaParser.Node.CatTable
 local CatTableField = Class('LuaParser.Node.CatTableField', 'LuaParser.Node.Base')
 
+CatTableField.kind = 'cattablefield'
+
 ---@class LuaParser.Node.CatTableFieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.CatTableField
 local CatTableFieldID = Class('LuaParser.Node.CatTableFieldID', 'LuaParser.Node.Base')
+
+CatTableFieldID.kind = 'cattablefieldid'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'

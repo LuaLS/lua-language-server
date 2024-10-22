@@ -9,10 +9,14 @@
 ---@field value? LuaParser.Node.Exp
 local Field = Class('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
+Field.kind = 'field'
+
 ---@class LuaParser.Node.FieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.Field
 local FieldID = Class('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
+
+FieldID.kind = 'fieldid'
 
 ---@class LuaParser.Node.TableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index' | 'exp'
@@ -23,10 +27,14 @@ local FieldID = Class('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
 ---@field parent LuaParser.Node.Table
 local TableField = Class('LuaParser.Node.TableField', 'LuaParser.Node.Base')
 
+TableField.kind = 'tablefield'
+
 ---@class LuaParser.Node.TableFieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.TableField
 local TableFieldID = Class('LuaParser.Node.TableFieldID', 'LuaParser.Node.Base')
+
+TableFieldID.kind = 'tablefieldid'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'

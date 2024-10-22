@@ -14,7 +14,7 @@ end
 
 TEST ''
 {
-    type   = 'Main',
+    kind   = 'main',
     start  = 0,
     finish = 0,
 }
@@ -44,7 +44,7 @@ TEST ';;;x = 1'
     },
     childs = {
         [1] = {
-            type = 'Assign',
+            kind = 'assign',
             exps = {
                 [1] = {
                     id = 'x',
@@ -68,7 +68,7 @@ local x = 1 // 2
         [1] = {
             values = {
                 [1] = {
-                    type = 'Integer',
+                    kind = 'integer',
                 }
             }
         }
@@ -83,7 +83,7 @@ local x = 1 // 2
         [1] = {
             values = {
                 [1] = {
-                    type = 'Binary',
+                    kind = 'binary',
                     op   = '//'
                 }
             }
@@ -105,7 +105,7 @@ local x = {
         [1] = {
             values = {
                 [1] = {
-                    type = 'Table',
+                    kind = 'table',
                     fields = {
                         [1] = {
                             subtype = 'exp',
@@ -143,7 +143,7 @@ return {
         [2] = {
             exps = {
                 [1] = {
-                    type = 'Table',
+                    kind = 'table',
                     fields = {
                         [1] = {
                             subtype = 'field',
@@ -170,7 +170,7 @@ a = {
         [2] = {
             values = {
                 [1] = {
-                    type = 'Table',
+                    kind = 'table',
                     fields = {
                         [1] = {
                             subtype = 'exp',

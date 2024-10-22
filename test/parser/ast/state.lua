@@ -12,7 +12,7 @@ end
 
 TEST [[local x, y = 1, 2, 3]]
 {
-    type    = 'LocalDef',
+    kind    = 'localdef',
     start   = 0,
     finish  = 20,
     symbolPos = 11,
@@ -45,7 +45,7 @@ TEST [[local x, y = 1, 2, 3]]
 
 TEST [[x = 1]]
 {
-    type    = 'Assign',
+    kind    = 'assign',
     start   = 0,
     finish  = 5,
     symbolPos = 2,
@@ -68,7 +68,7 @@ TEST [[x = 1]]
 
 TEST [[x.x, y.y = 1, 2, 3]]
 {
-    type = 'Assign',
+    kind = 'assign',
     symbolPos = 9,
     exps = {
         [1] = {
@@ -108,18 +108,18 @@ TEST [[x.x, y.y = 1, 2, 3]]
 
 TEST [[x.y()]]
 {
-    type = 'Call',
+    kind = 'call',
 }
 
 TEST [[x.y().z = 1]]
 {
-    type = 'Assign',
+    kind = 'assign',
     symbolPos = 8,
     exps = {
         [1] = {
             subtype = 'field',
             last    = {
-                type   = 'Call',
+                kind   = 'call',
             },
             key     = {
                 id = 'z',
@@ -140,13 +140,13 @@ TEST [[local x, y = call()]]
 {
     values = {
         [1] = {
-            type = 'Call',
+            kind = 'call',
         },
         [2] = {
-            type  = 'Select',
+            kind  = 'select',
             index = 2,
             value = {
-                type = 'Call',
+                kind = 'call',
             },
         },
     }
@@ -156,13 +156,13 @@ TEST [[x, y = call()]]
 {
     values = {
         [1] = {
-            type = 'Call',
+            kind = 'call',
         },
         [2] = {
-            type  = 'Select',
+            kind  = 'select',
             index = 2,
             value = {
-                type = 'Call',
+                kind = 'call',
             },
         },
     }
@@ -172,7 +172,7 @@ TEST [[x, y = (call())]]
 {
     values = {
         [1] = {
-            type = 'Paren'
+            kind = 'paren'
         },
         [2] = NIL,
     }
@@ -182,10 +182,10 @@ TEST [[x, y, z = call(), nil]]
 {
     values = {
         [1] = {
-            type = 'Call'
+            kind = 'call'
         },
         [2] = {
-            type = 'Nil'
+            kind = 'nil'
         }
     }
 }
@@ -194,13 +194,13 @@ TEST [[x, y = ...]]
 {
     values = {
         [1] = {
-            type = 'Varargs'
+            kind = 'varargs'
         },
         [2] = {
-            type = 'Select',
+            kind = 'select',
             index = 2,
             value = {
-                type = 'Varargs',
+                kind = 'varargs',
             }
         }
     }
@@ -210,10 +210,10 @@ TEST [[x, y = ..., nil]]
 {
     values = {
         [1] = {
-            type = 'Varargs'
+            kind = 'varargs'
         },
         [2] = {
-            type = 'Nil',
+            kind = 'nil',
         }
     }
 }
@@ -222,9 +222,9 @@ TEST [[x, y = (...)]]
 {
     values = {
         [1] = {
-            type = 'Paren',
+            kind = 'paren',
             exp = {
-                type = 'Varargs',
+                kind = 'varargs',
             },
         },
         [2] = NIL,
@@ -233,7 +233,7 @@ TEST [[x, y = (...)]]
 
 TEST [[:: continue ::]]
 {
-    type   = 'Label',
+    kind   = 'label',
     start  = 0,
     finish = 14,
     symbolPos = 12,
@@ -246,7 +246,7 @@ TEST [[:: continue ::]]
 
 TEST [[goto continue]]
 {
-    type   = 'Goto',
+    kind   = 'goto',
     start  = 0,
     finish = 13,
     name  = {
@@ -261,7 +261,7 @@ do
 end
 ]]
 {
-    type  = 'Do',
+    kind  = 'do',
     left  = 0,
     right = 10003,
     symbolPos = 3,
@@ -274,26 +274,26 @@ else
 end
 ]]
 {
-    type   = 'If',
+    kind   = 'if',
     left   = 0,
     right  = 30003,
     childs = {
         [1] = {
-            type    = 'IfChild',
+            kind    = 'ifchild',
             subtype = 'if',
             condition = {
                 id = 'x',
             },
         },
         [2] = {
-            type    = 'IfChild',
+            kind    = 'ifchild',
             subtype = 'elseif',
             condition = {
                 id = 'y',
             },
         },
         [3] = {
-            type    = 'IfChild',
+            kind    = 'ifchild',
             subtype = 'else',
         },
     }
@@ -301,21 +301,21 @@ end
 
 TEST [[break]]
 {
-    type   = 'Break',
+    kind   = 'break',
     start  = 0,
     finish = 5,
 }
 
 TEST [[return]]
 {
-    type   = 'Return',
+    kind   = 'return',
     start  = 0,
     finish = 6,
 }
 
 TEST [[return 1, 2, 3]]
 {
-    type   = 'Return',
+    kind   = 'return',
     start  = 0,
     finish = 14,
     exps   = {
@@ -342,7 +342,7 @@ for i = 1, 10, 1 do
 end
 ]]
 {
-    type   = 'For',
+    kind   = 'for',
     subtype= 'loop',
     left   = 0,
     right  = 10003,
@@ -372,7 +372,7 @@ for k, v in next, t, nil do
 end
 ]]
 {
-    type   = 'For',
+    kind   = 'for',
     subtype= 'in',
     left   = 0,
     right  = 10003,
@@ -392,7 +392,7 @@ end
             id = 't',
         },
         [3] = {
-            type = 'Nil',
+            kind = 'nil',
         }
     },
     symbolPos1 = 9,
@@ -405,7 +405,7 @@ while true do
 end
 ]]
 {
-    type   = 'While',
+    kind   = 'while',
     left   = 0,
     right  = 10003,
     condition = {
@@ -420,7 +420,7 @@ repeat
 until false
 ]]
 {
-    type   = 'Repeat',
+    kind   = 'repeat',
     left   = 0,
     right  = 10011,
     symbolPos = 7,
@@ -434,9 +434,9 @@ function f(x, y)
 end
 ]]
 {
-    type   = 'Function',
+    kind   = 'function',
     name   = {
-        type = 'Var',
+        kind = 'var',
         id   = 'f'
     },
     params = {
@@ -454,9 +454,9 @@ function f.n(x, y)
 end
 ]]
 {
-    type   = 'Function',
+    kind   = 'function',
     name   = {
-        type = 'Field',
+        kind = 'field',
         last = {
             id = 'f'
         },
@@ -479,7 +479,7 @@ local f = function (x, y)
 end
 ]]
 {
-    type   = 'LocalDef',
+    kind   = 'localdef',
     vars   = {
         [1] = {
             id = 'f',
@@ -487,7 +487,7 @@ end
     },
     values = {
         [1] = {
-            type   = 'Function',
+            kind   = 'function',
             params = {
                 [1] = {
                     id = 'x'
@@ -505,9 +505,9 @@ local function f(x, y)
 end
 ]]
 {
-    type   = 'Function',
+    kind   = 'function',
     name   = {
-        type = 'Local',
+        kind = 'local',
         id   = 'f',
     },
     params = {

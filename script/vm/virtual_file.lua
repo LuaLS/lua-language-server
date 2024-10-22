@@ -49,6 +49,9 @@ function M:indexAst(ast)
         return
     end
     self.indexedVersion = self.version
+
+    local process = ls.vm.createIndexProcess(self, ast)
+    process:start()
 end
 
 

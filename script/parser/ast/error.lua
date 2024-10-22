@@ -3,10 +3,10 @@
 ---@field extra? table
 local Error = Class('LuaParser.Node.Error', 'LuaParser.Node.Base')
 
+Error.kind = 'error'
 Error.code = 'UNKNOWN'
 
 ---@class LuaParser.Ast
----@field extra? table
 local Ast = Class 'LuaParser.Ast'
 
 -- 添加错误信息

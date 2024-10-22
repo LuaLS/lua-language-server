@@ -281,7 +281,7 @@ function M:collectFlushNodes(node)
         self.waitFlushList = {}
     end
     self.waitFlushList[#self.waitFlushList+1] = node
-    if not self.cacheLocked then
+    if self.cacheLocked == 0 then
         self:flushNodesNow()
     end
 end
@@ -326,13 +326,17 @@ function M:flushNodesNow()
     end
 end
 
+M.cacheLocked = 0
+
 function M:lockCache()
-    self.cacheLocked = true
+    self.cacheLocked = self.cacheLocked + 1
 end
 
 function M:unlockCache()
-    self.cacheLocked = false
-    self:flushNodesNow()
+    self.cacheLocked = self.cacheLocked - 1
+    if self.cacheLocked == 0 then
+        self:flushNodesNow()
+    end
 end
 
 ---@param scope Scope

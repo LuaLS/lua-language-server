@@ -18,6 +18,8 @@ local UnaryAlias = {
 ---@field exp? LuaParser.Node.Exp
 local Unary = Class('LuaParser.Node.Unary', 'LuaParser.Node.Base')
 
+Unary.kind = 'unary'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

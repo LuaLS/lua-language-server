@@ -3,6 +3,7 @@
 ---@field parent LuaParser.Ast
 local Main = Class('LuaParser.Node.Main', 'LuaParser.Node.Function')
 
+Main.kind = 'main'
 Main.isMain = true
 
 function Main.__getter.parent()

@@ -11,6 +11,8 @@
 ---@field async? boolean # 是否异步
 local CatFunction = Class('LuaParser.Node.CatFunction', 'LuaParser.Node.Base')
 
+CatFunction.kind = 'catfunction'
+
 ---@class LuaParser.Node.CatParam: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatParamName
@@ -18,11 +20,15 @@ local CatFunction = Class('LuaParser.Node.CatFunction', 'LuaParser.Node.Base')
 ---@field value? LuaParser.Node.CatType
 local CatParam = Class('LuaParser.Node.CatParam', 'LuaParser.Node.Base')
 
+CatParam.kind = 'catparam'
+
 ---@class LuaParser.Node.CatParamName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatParam
 ---@field index integer
 ---@field id string
 local CatParamName = Class('LuaParser.Node.CatParamName', 'LuaParser.Node.Base')
+
+CatParamName.kind = 'catparamname'
 
 ---@class LuaParser.Node.CatReturn: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
@@ -31,11 +37,15 @@ local CatParamName = Class('LuaParser.Node.CatParamName', 'LuaParser.Node.Base')
 ---@field value? LuaParser.Node.CatType
 local CatReturn = Class('LuaParser.Node.CatReturn', 'LuaParser.Node.Base')
 
+CatReturn.kind = 'catreturn'
+
 ---@class LuaParser.Node.CatReturnName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatReturn
 ---@field index integer
 ---@field id string
 local CatReturnName = Class('LuaParser.Node.CatReturnName', 'LuaParser.Node.Base')
+
+CatReturnName.kind = 'catreturnname'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -75,8 +85,8 @@ function Ast:parseCatFunction()
     end
 
     self:skipSpace()
-    self.symbolPos3 = self.lexer:consume ':'
-    if self.symbolPos3 then
+    funNode.symbolPos3 = self.lexer:consume ':'
+    if funNode.symbolPos3 then
 
         self:skipSpace()
         funNode.symbolPos4 = self.lexer:consume '('

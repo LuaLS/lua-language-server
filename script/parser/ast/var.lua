@@ -8,9 +8,13 @@
 ---@field value? LuaParser.Node.Exp
 local Var = Class('LuaParser.Node.Var', 'LuaParser.Node.Base')
 
+Var.kind = 'var'
+
 ---@class LuaParser.Node.Varargs: LuaParser.Node.Base
 ---@field loc? LuaParser.Node.Local
 local Varargs = Class('LuaParser.Node.Varargs', 'LuaParser.Node.Base')
+
+Varargs.kind = 'varargs'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'

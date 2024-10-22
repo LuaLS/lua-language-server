@@ -5,6 +5,8 @@
 ---@field symbolPos2? integer # end 的位置
 local While = Class('LuaParser.Node.While', 'LuaParser.Node.Block')
 
+While.kind = 'while'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

@@ -8,6 +8,8 @@
 ---@field missQuo? true
 local String = Class('LuaParser.Node.String', 'LuaParser.Node.Literal')
 
+String.kind = 'string'
+
 local escMap = {
     ['a']  = '\a',
     ['b']  = '\b',

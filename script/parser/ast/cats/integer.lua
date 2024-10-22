@@ -3,6 +3,8 @@
 ---@field value integer
 local CatInteger = Class('LuaParser.Node.CatInteger', 'LuaParser.Node.Base')
 
+CatInteger.kind = 'catinteger'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

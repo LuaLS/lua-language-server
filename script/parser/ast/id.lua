@@ -113,7 +113,7 @@ function Ast:isKeyWord(word)
     return false
 end
 
----@Private
+---@private
 ---@param word string
 ---@return boolean
 function Ast:isReservedWord(word)

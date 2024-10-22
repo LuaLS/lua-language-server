@@ -4,6 +4,8 @@
 ---@field symbolPos? integer # until 的位置
 local Repeat = Class('LuaParser.Node.Repeat', 'LuaParser.Node.Block')
 
+Repeat.kind = 'repeat'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

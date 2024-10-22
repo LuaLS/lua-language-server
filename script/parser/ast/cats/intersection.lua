@@ -5,6 +5,8 @@ local class = require'class'
 ---@field exps LuaParser.Node.CatType[] # 所有的子表达式
 local Intersection = Class('LuaParser.Node.CatIntersection', 'LuaParser.Node.Base')
 
+Intersection.kind = 'catintersection'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

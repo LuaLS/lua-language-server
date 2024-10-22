@@ -3,6 +3,8 @@
 ---@field symbolPos? integer # end 的位置
 local Do = Class('LuaParser.Node.Do', 'LuaParser.Node.Block')
 
+Do.kind = 'do'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

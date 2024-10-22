@@ -5,6 +5,8 @@
 ---@field id string
 local Param = Class('LuaParser.Node.Param', 'LuaParser.Node.Local')
 
+Param.kind = 'param'
+
 ---@alias LuaParser.Node.FuncName
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.Field
@@ -18,6 +20,7 @@ local Param = Class('LuaParser.Node.Param', 'LuaParser.Node.Local')
 ---@field symbolPos3? integer # `end`
 local Function = Class('LuaParser.Node.Function', 'LuaParser.Node.Block')
 
+Function.kind = 'function'
 Function.isLiteral = true
 Function.isFunction = true
 
@@ -130,7 +133,7 @@ function Ast:parseFunctionName()
         local chain = self:parseField(current)
 
         if chain then
-            if  current.type == 'Field'
+            if  current.kind == 'field'
             and current.subtype == 'method' then
                 self:throwMissSymbol(current.finish, '(')
             end

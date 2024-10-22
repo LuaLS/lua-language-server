@@ -3,9 +3,12 @@
 ---@field id string
 local CatID = Class('LuaParser.Node.CatID', 'LuaParser.Node.Base')
 
+CatID.kind = 'catid'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.CatID?
 function Ast:parseCatID()
     local _, _, pos = self.lexer:peek()

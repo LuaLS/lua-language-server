@@ -5,6 +5,8 @@
 ---@field values? LuaParser.Node.Exp[]
 local LocalDef = Class('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
+LocalDef.kind = 'localdef'
+
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
@@ -16,6 +18,8 @@ local LocalDef = Class('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 ---@field envRefs? LuaParser.Node.Var[]
 ---@field attr? LuaParser.Node.Attr
 local Local = Class('LuaParser.Node.Local', 'LuaParser.Node.Base')
+
+Local.kind = 'local'
 
 -- 所有的引用对象
 Local.__getter.refs = function ()
@@ -33,7 +37,7 @@ Local.__getter.sets = function (self)
             sets[#sets+1] = ref
         else
             local parent = ref.parent
-            if parent and parent.type == 'Assign' then
+            if parent and parent.kind == 'assign' then
                 sets[#sets+1] = ref
             end
         end
@@ -49,7 +53,7 @@ Local.__getter.gets = function (self)
     local gets = {}
     for _, ref in ipairs(self.refs) do
         local parent = ref.parent
-        if parent and parent.type ~= 'Assign' then
+        if parent and parent.kind ~= 'assign' then
             gets[#gets+1] = ref
         end
     end
@@ -66,10 +70,14 @@ end
 ---@field symbolPos? integer # > 的位置
 local Attr = Class('LuaParser.Node.Attr', 'LuaParser.Node.Base')
 
+Attr.kind = 'attr'
+
 ---@class LuaParser.Node.AttrName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.Attr
 ---@field id string
 local AttrName = Class('LuaParser.Node.AttrName', 'LuaParser.Node.Base')
+
+AttrName.kind = 'attrname'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -260,7 +268,7 @@ end
 
 ---@private
 function Ast:checkAssignConst()
-    for _, loc in ipairs(self.nodesMap['Local']) do
+    for _, loc in ipairs(self.nodesMap['local']) do
         ---@cast loc LuaParser.Node.Local
         local attr = loc.attr and loc.attr.name and loc.attr.name.id
         if attr == 'const' or attr == 'close' then

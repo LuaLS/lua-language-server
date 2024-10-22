@@ -3,6 +3,8 @@
 ---@field value boolean
 local Boolean = Class('LuaParser.Node.Boolean', 'LuaParser.Node.Literal')
 
+Boolean.kind = 'boolean'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

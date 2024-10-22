@@ -5,6 +5,8 @@
 ---@field args LuaParser.Node.Exp[]
 local Call = Class('LuaParser.Node.Call', 'LuaParser.Node.Base')
 
+Call.kind = 'call'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

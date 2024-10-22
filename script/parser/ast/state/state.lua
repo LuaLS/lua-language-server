@@ -16,13 +16,19 @@ require 'parser.ast.state.break'
 ---@field values LuaParser.Node.Var[]
 local Assign = Class('LuaParser.Node.Assign', 'LuaParser.Node.Base')
 
+Assign.kind = 'assign'
+
 ---@class LuaParser.Node.SingleExp: LuaParser.Node.Base
 ---@field exp LuaParser.Node.Exp
 local SingleExp = Class('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
 
+SingleExp.kind = 'singleexp'
+
 ---@class LuaParser.Node.Select
 ---@field index integer
 local Select = Class('LuaParser.Node.Select', 'LuaParser.Node.Base')
+
+Select.kind = 'select'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -115,13 +121,13 @@ function Ast:parseStateStartWithExp()
         return nil
     end
 
-    if exp.type == 'Call' then
+    if exp.kind == 'call' then
         ---@cast exp LuaParser.Node.Call
         return exp
     end
 
-    if exp.type == 'Var'
-    or exp.type == 'Field' then
+    if exp.kind == 'var'
+    or exp.kind == 'field' then
         ---@cast exp LuaParser.Node.Field
         self:skipSpace()
         local assign = self:parseAssign(exp)
@@ -137,7 +143,7 @@ function Ast:parseStateStartWithExp()
     })
     exp.parent = state
 
-    if exp.type == 'Field' and exp.subtype == 'method' then
+    if exp.kind == 'field' and exp.subtype == 'method' then
         -- 已经throw过"缺少 `(`""
     else
         self:throw('EXP_IN_ACTION', state.start, state.finish)
@@ -203,6 +209,7 @@ function Ast:parseAssign(first)
     return assign
 end
 
+---@private
 ---@param values LuaParser.Node.Exp[]
 ---@param varCount integer
 function Ast:extendsAssignValues(values, varCount)
@@ -213,7 +220,7 @@ function Ast:extendsAssignValues(values, varCount)
     if not lastValue then
         return
     end
-    if lastValue.type ~= 'Call' and lastValue.type ~= 'Varargs' then
+    if lastValue.kind ~= 'call' and lastValue.kind ~= 'varargs' then
         return
     end
     for i = #values + 1, varCount do

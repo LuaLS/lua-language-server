@@ -27,3 +27,18 @@ do
     vfile:remove()
     assert(a.value:view() == 'A')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local g = node.type 'G'
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        A = 1
+    ]]
+    vfile:indexAst(ast)
+
+    --assert(g:get('A'):view() == '1')
+end

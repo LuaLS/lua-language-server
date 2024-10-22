@@ -3,6 +3,7 @@
 ---@field fields LuaParser.Node.Field[]
 local Table = Class('LuaParser.Node.Table', 'LuaParser.Node.Base')
 
+Table.kind = 'table'
 Table.isLiteral = true
 
 ---@class LuaParser.Ast

@@ -4,6 +4,8 @@
 ---@field value string
 local Comment = Class('LuaParser.Node.Comment', 'LuaParser.Node.Base')
 
+Comment.kind = 'comment'
+
 ---@param self LuaParser.Node.Comment
 ---@return string
 ---@return true

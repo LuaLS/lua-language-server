@@ -5,9 +5,12 @@
 ---@field extends? LuaParser.Node.CatType
 local CatClass = Class('LuaParser.Node.CatClass', 'LuaParser.Node.Base')
 
+CatClass.kind = 'catclass'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.CatClass?
 function Ast:parseCatClass()
     local classID = self:parseCatID()

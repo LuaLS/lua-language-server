@@ -17,11 +17,15 @@
 ---@field symbolPos? integer # 右括号的位置
 local CatParen = Class('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
 
+CatParen.kind = 'catparen'
+
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatType
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 local CatArray = Class('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
+
+CatArray.kind = 'catarray'
 
 ---@class LuaParser.Node.CatCall: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatID
@@ -29,6 +33,8 @@ local CatArray = Class('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 local CatCall = Class('LuaParser.Node.CatCall', 'LuaParser.Node.Base')
+
+CatCall.kind = 'catcall'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -163,7 +169,7 @@ function Ast:parseCatCall(head)
     call.symbolPos2 = self:assertSymbol '>'
     call.finish = self:getLastPos()
 
-    if head.type ~= 'CatID' then
+    if head.kind ~= 'CatID' then
         self:throw('UNEXPECT_CAT_CALL', pos1, call.finish)
     end
 

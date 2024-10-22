@@ -3,11 +3,15 @@
 ---@field childs LuaParser.Node.IfChild[]
 local If = Class('LuaParser.Node.If', 'LuaParser.Node.Base')
 
+If.kind = 'if'
+
 ---@class LuaParser.Node.IfChild: LuaParser.Node.Block
 ---@field subtype 'if' | 'elseif' | 'else'
 ---@field condition? LuaParser.Node.Exp
 ---@field symbolPos? integer # then 的位置
 local IfChild = Class('LuaParser.Node.IfChild', 'LuaParser.Node.Block')
+
+IfChild.kind = 'ifchild'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'

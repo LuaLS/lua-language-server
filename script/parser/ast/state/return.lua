@@ -3,6 +3,8 @@
 ---@field exps LuaParser.Node.Exp[]
 local Return = Class('LuaParser.Node.Return', 'LuaParser.Node.Base')
 
+Return.kind = 'return'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

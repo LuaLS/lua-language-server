@@ -21,6 +21,8 @@ require 'parser.ast.cats.string'
 ---@field tail? string
 local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
+Cat.kind = 'cat'
+
 ---@alias LuaParser.Node.CatValue
 ---| LuaParser.Node.CatClass
 ---| LuaParser.Node.CatType
@@ -28,6 +30,8 @@ local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
 local CatAttr = Class('LuaParser.Node.CatAttr', 'LuaParser.Node.Base')
+
+CatAttr.kind = 'catattr'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -145,11 +149,13 @@ function Ast:parseCat()
     return cat
 end
 
--- 会将解析结果存放到 `Ast.cats` 中
+---会将解析结果存放到 `Ast.cats` 中
+---@private
 function Ast:parseCatBlock()
     
 end
 
+---@private
 ---@return string?
 function Ast:parseTail()
     local startOffset = self:getLastPos() + 1

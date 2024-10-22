@@ -3,24 +3,29 @@
 ---@field breeakBlock? LuaParser.Node.Block
 local Break = Class('LuaParser.Node.Break', 'LuaParser.Node.Base')
 
+Break.kind = 'break'
+
 ---@class LuaParser.Node.Continue: LuaParser.Node.Base
 local Continue = Class('LuaParser.Node.Continue', 'LuaParser.Node.Base')
+
+Continue.kind = 'continue'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Block?
 function Ast:findBreakBlock()
     local blocks = self.blocks
     for i = #blocks, 1, -1 do
         local block = blocks[i]
-        if block.type == 'For'
-        or block.type == 'While'
-        or block.type == 'Repeat' then
+        if block.kind == 'for'
+        or block.kind == 'while'
+        or block.kind == 'repeat' then
             return block
         end
-        if block.type == 'Function'
-        or block.type == 'Main' then
+        if block.kind == 'function'
+        or block.kind == 'main' then
             return nil
         end
     end

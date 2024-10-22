@@ -2,6 +2,8 @@
 ---@class LuaParser.Node.ParenBase: LuaParser.Node.Base
 local ParenBase = Class('LuaParser.Node.ParenBase', 'LuaParser.Node.Base')
 
+ParenBase.kind = 'parenbase'
+
 function ParenBase.__getter.asNumber(self)
     return self.exp.asNumber, true
 end
@@ -38,6 +40,8 @@ end
 ---@field exp? LuaParser.Node.Exp
 ---@field next? LuaParser.Node.Field
 local Paren = Class('LuaParser.Node.Paren', 'LuaParser.Node.ParenBase')
+
+Paren.kind = 'paren'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -130,7 +134,7 @@ function Ast:parseTerm()
         return nil
     end
 
-    if head.type == 'Function' then
+    if head.kind == 'function' then
         if head.name then
             self:throw('UNEXPECT_EFUNC_NAME', head.name.start, head.name.finish)
         end
@@ -145,15 +149,15 @@ function Ast:parseTerm()
         local chain = self:parseField(current)
                 or    self:parseCall(current)
 
-        if  current.type == 'Field'
+        if  current.kind == 'field'
         and current.subtype == 'method' then
-            if not chain or chain.type ~= 'Call' then
+            if not chain or chain.kind ~= 'call' then
                 self:throwMissSymbol(current.finish, '(')
             end
         end
 
         if chain then
-            if chain.type == 'Call' and self.versionNum <= 51 then
+            if chain.kind == 'call' and self.versionNum <= 51 then
                 if current.finishRow ~= self.lexer:rowcol(chain.argPos) then
                     self:throw('AMBIGUOUS_SYNTAX', chain.argPos, chain.finish)
                 end

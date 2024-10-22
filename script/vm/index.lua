@@ -10,7 +10,24 @@ function M:__init(vfile, ast)
 end
 
 function M:start()
-    
+    local node = self.scope.node
+    node:lockCache()
+    local main = self.ast.main
+    self:parseBlock(main)
+    node:unlockCache()
+end
+
+---@private
+---@param block LuaParser.Node.Function
+function M:parseBlock(block)
+    for _, child in ipairs(block.childs) do
+        self:parseState(child)
+    end
+end
+
+---@private
+---@param state LuaParser.Node.State
+function M:parseState(state)
 end
 
 ---@param vfile VM.Vfile

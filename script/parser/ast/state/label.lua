@@ -5,6 +5,8 @@
 ---@field gotos LuaParser.Node.Goto[] # 关联的Goto
 local Label = Class('LuaParser.Node.Label', 'LuaParser.Node.Base')
 
+Label.kind = 'label'
+
 Label.__getter.gotos = function (self)
     return {}, true
 end
@@ -14,10 +16,14 @@ end
 ---@field id string
 local LabelName = Class('LuaParser.Node.LabelName', 'LuaParser.Node.Base')
 
+LabelName.kind = 'labelname'
+
 ---@class LuaParser.Node.Goto: LuaParser.Node.Base
 ---@field name? LuaParser.Node.LabelName
 ---@field label? LuaParser.Node.Label # 关联的Label
 local Goto = Class('LuaParser.Node.Goto', 'LuaParser.Node.Base')
+
+Goto.kind = 'goto'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -116,7 +122,7 @@ end
 
 ---@private
 function Ast:resolveAllGoto()
-    for _, gotoNode in ipairs(self.nodesMap['Goto']) do
+    for _, gotoNode in ipairs(self.nodesMap['goto']) do
         ---@cast gotoNode LuaParser.Node.Goto
         self:resolveGoto(gotoNode)
     end

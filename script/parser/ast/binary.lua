@@ -49,6 +49,8 @@ local RevertConcat = {
 ---@field exp2? LuaParser.Node.Exp
 local Binary = Class('LuaParser.Node.Binary', 'LuaParser.Node.Base')
 
+Binary.kind = 'binary'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

@@ -7,6 +7,7 @@
 ---@field numBase 2 | 10 | 16
 local Float = Class('LuaParser.Node.Float', 'LuaParser.Node.Literal')
 
+Float.kind = 'float'
 Float.value = 0.0
 
 ---@param self LuaParser.Node.Float
@@ -59,6 +60,7 @@ end
 ---@field intTail? 'LL' | 'ULL'
 local Integer = Class('LuaParser.Node.Integer', 'LuaParser.Node.Literal')
 
+Integer.kind = 'integer'
 Integer.value = 0
 
 ---@param self LuaParser.Node.Integer

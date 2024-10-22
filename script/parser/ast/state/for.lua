@@ -8,6 +8,7 @@
 ---@field symbolPos3? integer # end 的位置
 local For = Class('LuaParser.Node.For', 'LuaParser.Node.Block')
 
+For.kind = 'for'
 For.subtype = 'incomplete'
 For.vars = {}
 For.exps = {}

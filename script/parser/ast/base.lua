@@ -1,6 +1,5 @@
 
 ---@class LuaParser.Node.Base: Class.Base
----@field type string
 ---@field ast LuaParser.Ast
 ---@field start integer # 开始位置（偏移）
 ---@field finish integer # 结束位置（偏移）
@@ -28,6 +27,80 @@
 ---@field index? integer
 local Base = Class 'LuaParser.Node.Base'
 
+---@alias LuaParser.StateKind
+---| 'break'
+---| 'continue'
+---| 'do'
+---| 'for'
+---| 'function'
+---| 'if'
+---| 'label'
+---| 'goto'
+---| 'localdef'
+---| 'repeat'
+---| 'return'
+---| 'assign'
+---| 'singleexp'
+---| 'while'
+---| 'call'
+
+---@alias LuaParser.ExpKind
+---| 'local'
+---| 'select'
+---| 'literal'
+---| 'binary'
+---| 'boolean'
+---| 'call'
+---| 'paren'
+---| 'float'
+---| 'integer'
+---| 'string'
+---| 'table'
+---| 'unary'
+---| 'var'
+---| 'varargs'
+
+---@alias LuaParser.CatKind
+---| 'cat'
+---| 'catboolean'
+---| 'catclass'
+---| 'catattr'
+---| 'catfunction'
+---| 'catparam'
+---| 'catparamname'
+---| 'catreturn'
+---| 'catreturnname'
+---| 'catid'
+---| 'catinteger'
+---| 'catintersection'
+---| 'catstring'
+---| 'cattable'
+---| 'cattablefield'
+---| 'cattablefieldid'
+---| 'catparen'
+---| 'catarray'
+---| 'catcall'
+---| 'catunion'
+
+---@alias LuaParser.OtherKind
+---| 'param'
+---| 'ifchild'
+---| 'attr'
+---| 'attrname'
+---| 'block'
+---| 'comment'
+---| 'error'
+---| 'parenbase'
+---| 'field'
+---| 'fieldid'
+---| 'tablefield'
+---| 'tablefieldid'
+---| 'labelname'
+---| 'main'
+
+---@type LuaParser.StateKind | LuaParser.ExpKind | LuaParser.CatKind | LuaParser.OtherKind
+Base.kind = nil
+
 ---@type boolean
 Base.isBlock = false
 
@@ -38,13 +111,6 @@ Base.isFunction = false
 Base.isLiteral = false
 
 local rowcolMulti = 10000
-
----@param self LuaParser.Node.Base
----@return string
----@return true
-Base.__getter.type = function (self)
-    return Type(self):match '[^.]+$', true
-end
 
 ---@param self LuaParser.Node.Base
 ---@return integer
@@ -150,6 +216,7 @@ end
 ---@field value? nil|boolean|number|string|integer
 local Literal = Class('LuaParser.Node.Literal', 'LuaParser.Node.Base')
 
+Literal.kind = 'literal'
 Literal.isLiteral = true
 
 ---@param self LuaParser.Node.Literal

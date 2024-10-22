@@ -8,6 +8,8 @@
 ---@field labelMap table<string, LuaParser.Node.Label>
 local Block = Class('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
+Block.kind = 'block'
+
 Block.isBlock = true
 Block.isMain = false
 
@@ -120,7 +122,7 @@ function Ast:blockParseChilds(block)
         if state then
             state.parent = block
             block.childs[#block.childs+1] = state
-            if lastState and lastState.type == 'Return' then
+            if lastState and lastState.kind == 'return' then
                 ---@cast lastState LuaParser.Node.Return
                 self:throw('ACTION_AFTER_RETURN', lastState.start, lastState.finish)
             end

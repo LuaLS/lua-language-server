@@ -15,17 +15,17 @@ do
 end
 ]]
 {
-    type   = 'Do',
+    kind   = 'do',
     left   = 0,
     right  = 30003,
     childs = {
         [1] = {
-            type   = 'Assign',
+            kind   = 'assign',
             left   = 10004,
             right  = 10009,
         },
         [2] = {
-            type   = 'Assign',
+            kind   = 'assign',
             left   = 20004,
             right  = 20009,
         },
@@ -42,7 +42,7 @@ end
 {
     childs = {
         [1] = {
-            type   = 'LocalDef',
+            kind   = 'localdef',
             vars   = {
                 [1] = {
                     id   = 'x',
@@ -63,7 +63,7 @@ end
             },
         },
         [2] = {
-            type = 'Assign',
+            kind = 'assign',
             exps = {
                 [1] = {
                     id  = 'x',
@@ -74,7 +74,7 @@ end
             }
         },
         [3] = {
-            type = 'Call',
+            kind = 'call',
             args = {
                 [1] = {
                     id  = 'x',
@@ -97,10 +97,10 @@ do
 end
 ]]
 {
-    type = 'Do',
+    kind = 'do',
     childs = {
         [1] = {
-            type = 'LocalDef',
+            kind = 'localdef',
             vars = {
                 [1] = {
                     id = 'x',
@@ -108,10 +108,10 @@ end
             }
         },
         [2] = {
-            type = 'Do',
+            kind = 'do',
             childs = {
                 [1] = {
-                    type = 'LocalDef',
+                    kind = 'localdef',
                     vars = {
                         [1] = {
                             id = 'x',
@@ -127,7 +127,7 @@ end
                     }
                 },
                 [2] = {
-                    type = 'Call',
+                    kind = 'call',
                     args = {
                         [1] = {
                             id = 'x',
@@ -158,10 +158,10 @@ do
 end
 ]]
 {
-    type = 'Do',
+    kind = 'do',
     childs = {
         [1] = {
-            type = 'LocalDef',
+            kind = 'localdef',
             vars = {
                 [1] = {
                     id = 'x',
@@ -169,7 +169,7 @@ end
             }
         },
         [2] = {
-            type = 'If',
+            kind = 'if',
             childs = {
                 [1] = {
                     subtype = 'if',
@@ -181,7 +181,7 @@ end
                     },
                     childs = {
                         [1] = {
-                            type = 'LocalDef',
+                            kind = 'localdef',
                             vars = {
                                 [1] = {
                                     id = 'x',
@@ -197,7 +197,7 @@ end
                             }
                         },
                         [2] = {
-                            type = 'Call',
+                            kind = 'call',
                             args = {
                                 [1] = {
                                     id = 'x',
@@ -219,7 +219,7 @@ end
                     },
                     childs = {
                         [1] = {
-                            type = 'LocalDef',
+                            kind = 'localdef',
                             vars = {
                                 [1] = {
                                     id = 'x',
@@ -235,7 +235,7 @@ end
                             }
                         },
                         [2] = {
-                            type = 'Call',
+                            kind = 'call',
                             args = {
                                 [1] = {
                                     id = 'x',
@@ -251,7 +251,7 @@ end
                     subtype = 'else',
                     childs = {
                         [1] = {
-                            type = 'LocalDef',
+                            kind = 'localdef',
                             vars = {
                                 [1] = {
                                     id = 'x',
@@ -267,7 +267,7 @@ end
                             }
                         },
                         [2] = {
-                            type = 'Call',
+                            kind = 'call',
                             args = {
                                 [1] = {
                                     id = 'x',
@@ -292,7 +292,7 @@ end
 {
     childs = {
         [1] = {
-            type = 'Call',
+            kind = 'call',
             args = {
                 [1] = {
                     id = 'i',
@@ -313,7 +313,7 @@ end
 {
     childs = {
         [1] = {
-            type = 'Call',
+            kind = 'call',
             args = {
                 [1] = {
                     id = 'k',
@@ -341,7 +341,7 @@ end
 {
     childs = {
         [1] = {
-            type = 'LocalDef',
+            kind = 'localdef',
             vars = {
                 [1] = {
                     id = 'x',
@@ -349,7 +349,7 @@ end
             }
         },
         [2] = {
-            type = 'Call',
+            kind = 'call',
             args = {
                 [1] = {
                     id = 'x',
@@ -373,7 +373,7 @@ end
 {
     childs = {
         [1] = {
-            type = 'LocalDef',
+            kind = 'localdef',
             vars = {
                 [1] = {
                     id = 'x',
@@ -381,7 +381,7 @@ end
             }
         },
         [2] = {
-            type = 'Repeat',
+            kind = 'repeat',
             condition = {
                 id = 'x',
                 loc = {
@@ -390,7 +390,7 @@ end
             },
             childs = {
                 [1] = {
-                    type = 'LocalDef',
+                    kind = 'localdef',
                     vars = {
                         [1] = {
                             id = 'x',
@@ -418,7 +418,7 @@ end
     },
     childs = {
         [1] = {
-            type = 'Call',
+            kind = 'call',
             args = {
                 [1] = {
                     id = 'x',
@@ -445,7 +445,7 @@ end
 {
     childs = {
         [1] = {
-            type = 'Call',
+            kind = 'call',
             args = {
                 [1] = {
                     id = 'f',
@@ -463,10 +463,10 @@ local function a()
     return
 end]]
 {
-    type = 'Function',
+    kind = 'function',
     childs = {
         [1] = {
-            type = 'Return',
+            kind = 'return',
             exps = {
                 [1] = NIL
             }
@@ -480,13 +480,13 @@ local function f()
 end
 ]]
 {
-    type = 'Function',
+    kind = 'function',
     childs = {
         [1] = {
-            type = 'Return',
+            kind = 'return',
             exps = {
                 [1] = {
-                    type = 'Var',
+                    kind = 'var',
                     id   = 'f',
                     loc  = {
                         left = 15,

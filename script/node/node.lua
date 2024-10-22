@@ -241,23 +241,7 @@ function M:flushMe(me, needReset)
 end
 
 function M:flushCache()
-    if self.resetting then
-        return
-    end
-    self.resetting = true
-    local needFlush = self.needFlush
-    if needFlush then
-        for child in pairs(self.needFlush) do
-            child:flushCache()
-        end
-    end
-
-    local getter = self.__getter
-    for k in pairs(getter) do
-        self[k] = nil
-    end
-    self.resetting = false
-    self.scope.node.castCache = nil
+    self.scope.node:collectFlushNodes(self)
 end
 
 ---@generic T: Node

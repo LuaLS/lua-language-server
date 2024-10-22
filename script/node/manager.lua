@@ -10,13 +10,6 @@ function M:__init(scope)
     self:fillAPIs()
 end
 
----@type PathTable
-M.castCache = nil
-
-M.__getter.castCache = function (self)
-    return ls.pathTable.create(true, false), true
-end
-
 ---@private
 function M:createPools()
     local scope = self.scope
@@ -269,6 +262,77 @@ end
 function M:reset()
     self:createPools()
     self:fillPresets()
+    self.castCache = nil
+end
+
+
+---@type PathTable
+M.castCache = nil
+
+M.__getter.castCache = function (self)
+    return ls.pathTable.create(true, false), true
+end
+
+---@type Node[]
+M.waitFlushList = nil
+
+function M:collectFlushNodes(node)
+    if not self.waitFlushList then
+        self.waitFlushList = {}
+    end
+    self.waitFlushList[#self.waitFlushList+1] = node
+    if not self.cacheLocked then
+        self:flushNodesNow()
+    end
+end
+
+function M:flushNodesNow()
+    self.castCache = nil
+    local list = self.waitFlushList
+    if not list then
+        return
+    end
+    self.waitFlushList = nil
+
+    local flushed = {}
+    for _ = 1, 1000000 do
+        local node = list[#list]
+        if not node then
+            break
+        end
+        list[#list] = nil
+
+        if flushed[node] then
+            goto continue
+        end
+        flushed[node] = true
+
+        -- flush this node
+        local getter = node.__getter
+        for k in pairs(getter) do
+            node[k] = nil
+        end
+
+        -- push children to list
+        local needFlush = node.needFlush
+        if needFlush then
+            for child in pairs(needFlush) do
+                if not flushed[child] then
+                    list[#list+1] = child
+                end
+            end
+        end
+        ::continue::
+    end
+end
+
+function M:lockCache()
+    self.cacheLocked = true
+end
+
+function M:unlockCache()
+    self.cacheLocked = false
+    self:flushNodesNow()
 end
 
 ---@param scope Scope

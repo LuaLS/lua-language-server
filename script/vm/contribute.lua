@@ -9,11 +9,14 @@ function M:__init(scope)
 end
 
 function M:__del()
+    local node = self.scope.node
+    node:lockCache()
     for _, data in ipairs(self.typeFields) do
         local typeName, field = data[1], data[2]
-        local tp = self.scope.node.type(typeName)
+        local tp = node.type(typeName)
         tp:removeField(field)
     end
+    node:unlockCache()
 end
 
 ---@param typeName string

@@ -15,4 +15,4 @@ require 'node.generic'
 require 'node.generic_pack'
 require 'node.typecall'
 
-require 'node.api'
+require 'node.manager'

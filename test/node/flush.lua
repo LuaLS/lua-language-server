@@ -111,3 +111,19 @@ do
     assert(sec:view() == '{ x: 1, xx: 11 } & { y: 2, yy: 22 }')
     assert(sec.value:view() == '{ x: 1, xx: 11, y: 2, yy: 22 }')
 end
+
+do
+    local t1 = node.table {
+        x = 1
+    }
+    local t2 = node.table {
+        y = 2
+    }
+    assert((t1 >> t2) == false)
+
+    t1:addField {
+        key = node.value 'y',
+        value = node.value(2)
+    }
+    assert((t1 >> t2) == true)
+end

@@ -1,7 +1,5 @@
----@class Node.Variable: Node.CacheModule, Node.Field
+---@class Node.Variable: Class.Base, Node.Field
 local M = Class 'Node.Variable'
-
-Extends('Node.Variable', 'Node.CacheModule')
 
 M.kind = 'variable'
 
@@ -23,50 +21,58 @@ end
 ---@type LinkedTable
 M.nodes = nil
 
----@param node Node
+---@param node Node.Type
 ---@return Node.Variable
 function M:addNode(node)
     if not self.nodes then
         self.nodes = ls.linkedTable.create()
     end
     self.nodes:pushTail(node)
-    self:flushCache()
     return self
 end
 
----@param node Node
+---@param node Node.Type
 ---@return Node.Variable
 function M:removeNode(node)
     if not self.nodes then
         return self
     end
     self.nodes:pop(node)
-    self:flushCache()
     return self
 end
 
----@type Node.Table
-M.childs = nil
+---@type LinkedTable?
+M.fields = nil
 
 ---@param child Node.Variable
 ---@return Node.Variable
-function M:addChild(child)
-    if not self.childs then
-        self.childs = self.scope.node.table()
+function M:addField(child)
+    if not self.fields then
+        self.fields = ls.linkedTable.create()
     end
-    self.childs:addField(child)
-    self:flushCache()
+    self.fields:pushAfter(child)
+
+    ---@param node Node.Type
+    for node in child.nodes:pairsFast() do
+        node:addVariableField(child)
+    end
+
     return self
 end
 
 ---@param child Node.Variable
 ---@return Node.Variable
-function M:removeChild(child)
-    if not self.childs then
+function M:removeField(child)
+    if not self.fields then
         return self
     end
-    self.childs:removeField(child)
-    self:flushCache()
+    self.fields:pop(child)
+
+    ---@param node Node.Type
+    for node in child.nodes:pairsFast() do
+        node:removeVariableField(child)
+    end
+
     return self
 end
 
@@ -85,19 +91,6 @@ M.__getter.value = function (self)
     end
     local union = self.scope.node.union(self.nodes:toArray())
     return union.value, true
-end
-
----@type Node.Table
-M.childNode = nil
-
----@param self Node.Variable
----@return Node.Table
----@return true
-M.__getter.childNode = function (self)
-    local node = self.scope.node
-    local t = node.table()
-
-    return t, true
 end
 
 M.hideInView = false

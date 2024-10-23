@@ -312,6 +312,7 @@ function M:view(skipLevel)
     return '{ ' .. table.concat(fields, ', ') .. ' }'
 end
 
+---越靠前的字段越优先。只能调用一次。
 ---@param others Node[]
 function M:extends(others)
     local literals = self.literals

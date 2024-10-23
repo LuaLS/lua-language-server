@@ -126,6 +126,8 @@ function M:addAlias(alias)
     return self
 end
 
+---@param alias Node
+---@return Node.Type
 function M:removeAlias(alias)
     if not self.alias then
         return self
@@ -133,6 +135,85 @@ function M:removeAlias(alias)
     self.alias:pop(alias)
     if self.alias:getSize() == 0 then
         self.alias = nil
+    end
+
+    self:flushCache()
+
+    return self
+end
+
+---添加绑定的变量
+---@param variable Node.Variable
+---@return Node.Type
+function M:addVariable(variable)
+    if not self.variables then
+        self.variables = ls.linkedTable.create()
+    end
+
+    self.variables:pushTail(variable)
+
+    if variable.fields then
+        self.scope.node:lockCache()
+
+        for field in variable.fields:pairsFast() do
+            self:addVariableField(field)
+        end
+
+        self.scope.node:unlockCache()
+    end
+
+    return self
+end
+
+---@param variable Node.Variable
+---@return Node.Type
+function M:removeVariable(variable)
+    if not self.variables then
+        return self
+    end
+    self.variables:pop(variable)
+    if self.variables:getSize() == 0 then
+        self.variables = nil
+    end
+
+    if variable.fields then
+        self.scope.node:lockCache()
+
+        for field in variable.fields:pairsFast() do
+            self:removeVariableField(field)
+        end
+
+        self.scope.node:unlockCache()
+    end
+
+    return self
+end
+
+---@type Node.Table?
+M.variableTable = nil
+
+---@param field Node.Field
+---@return Node.Type
+function M:addVariableField(field)
+    if not self.variableTable then
+        self.variableTable = self.scope.node.table()
+    end
+    self.variableTable:addField(field)
+
+    self:flushCache()
+
+    return self
+end
+
+---@param field Node.Field
+---@return Node.Type
+function M:removeVariableField(field)
+    if not self.variableTable then
+        return self
+    end
+    self.variableTable:removeField(field)
+    if self.variableTable:isEmpty() then
+        self.variableTable = nil
     end
 
     self:flushCache()
@@ -188,7 +269,7 @@ M.__getter.fullExtends = function (self)
     return result, true
 end
 
----@type Node.Table[]
+---@type Node.Table
 M.extendsTable = nil
 
 ---获取所有继承的合并表
@@ -217,7 +298,16 @@ M.__getter.value = function (self)
     if self:isClassLike() then
         if self.table and self.extends then
             local value = self.scope.node.table()
-            value:extends { self.table, self.extendsTable }
+            local merging = {}
+            -- 1. 直接写在 class 里的字段
+            merging[#merging+1] = self.table
+            -- 2. 绑定的变量里的字段
+            if self.variableTable then
+                merging[#merging+1] = self.variableTable
+            end
+            -- 3. 继承来的字段
+            merging[#merging+1] = self.extendsTable
+            value:extends(merging)
             return value, true
         end
         return self.table or self.extendsTable, true

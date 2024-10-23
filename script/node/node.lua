@@ -1,4 +1,4 @@
----@class Node: Class.Base
+---@class Node: Node.CacheModule
 ---@field onCanCast? fun(self: Node, other: Node): boolean # 能否转换为另一个节点
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
@@ -7,6 +7,8 @@
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
 local M = Class 'Node'
+
+Extends('Node', 'Node.CacheModule')
 
 ---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'typecall'
 
@@ -223,29 +225,6 @@ function M:inferGeneric(other, result)
         return
     end
     self.value:inferGeneric(other, result)
-end
-
----@type table<Node, true>?
-M.needFlush = nil
-
----@param needReset boolean
----@param me Node
-function M:flushMe(me, needReset)
-    if not self.needFlush then
-        self.needFlush = setmetatable({}, ls.util.MODE_K)
-    end
-    if needReset then
-        self.needFlush[me] = (self.needFlush[me] or 0) + 1
-    else
-        self.needFlush[me] = self.needFlush[me] - 1
-        if self.needFlush[me] == 0 then
-            self.needFlush[me] = nil
-        end
-    end
-end
-
-function M:flushCache()
-    self.scope.node:collectFlushNodes(self)
 end
 
 ---@generic T: Node

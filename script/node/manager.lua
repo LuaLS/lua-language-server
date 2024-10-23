@@ -151,6 +151,13 @@ function M:fillAPIs()
     function self.unsolve(baseNode, onResolve)
         return New 'Node.Unsolve' (scope, baseNode, onResolve)
     end
+
+    ---@param name string | number | boolean | Node
+    ---@param parent? Node
+    ---@return Node.Variable
+    function self.variable(name, parent)
+        return New 'Node.Variable' (scope, name, parent)
+    end
 end
 
 ---@private
@@ -213,7 +220,7 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.THREAD = self.type 'thread'
         : setConfig('basicType', true)
-    self.G = self.type 'G'
+    self.G = self.type '_G'
 
     self.ANY:addField {
         key   = self.ANY,
@@ -273,9 +280,10 @@ M.__getter.castCache = function (self)
     return ls.pathTable.create(true, false), true
 end
 
----@type Node[]
+---@type Node.CacheModule[]
 M.waitFlushList = nil
 
+---@param node Node.CacheModule
 function M:collectFlushNodes(node)
     if not self.waitFlushList then
         self.waitFlushList = {}

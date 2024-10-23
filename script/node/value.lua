@@ -34,7 +34,8 @@ function M:view(skipLevel)
 end
 
 function M:viewAsKey(skipLevel)
-    if self.typeName == 'string' then
+    local literal = self.literal
+    if type(literal) == 'string' and literal:match '^[%a_][%w_]*$' then
         return self.literal
     else
         return '[' .. self:view(skipLevel) .. ']'

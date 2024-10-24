@@ -44,6 +44,9 @@ function M:removeType(node)
         return self
     end
     self.nodes:pop(node)
+    if self.nodes:getSize() == 0 then
+        self.nodes = nil
+    end
     self:flushCache()
 
     return self
@@ -71,6 +74,23 @@ function M:removeAssign(node)
         return self
     end
     self.assigns:pop(node)
+    if self.assigns:getSize() == 0 then
+        self.assigns = nil
+
+        local parent = self.parent
+        for _ = 1, 100 do
+            if not parent then
+                break
+            end
+            parent.childs[self.key] = nil
+            if not next(parent.childs) then
+                parent.childs = nil
+                parent = parent.parent
+            else
+                break
+            end
+        end
+    end
     self:flushCache()
 
     return self
@@ -98,6 +118,9 @@ function M:removeClass(node)
         return self
     end
     self.classes:pop(node)
+    if self.classes:getSize() == 0 then
+        self.classes = nil
+    end
     self:flushCache()
 
     return self
@@ -133,7 +156,7 @@ M.childs = nil
 ---@param key Node.Key
 ---@param path? Node.Key[]
 ---@return Node.Variable
-function M:getField(key, path)
+function M:getChild(key, path)
     local node = self.scope.node
     local current = self
     if path then
@@ -155,16 +178,12 @@ function M:getField(key, path)
     return child
 end
 
-M.childRefCount = 0
-
----@param key Node.Key
----@param value Node
+---@param field Node.Field
 ---@param path? Node.Key[]
 ---@return Node.Variable
-function M:addField(key, value, path)
+function M:addField(field, path)
     local node = self.scope.node
     local current = self
-    current.childRefCount = current.childRefCount + 1
     if not current.childs then
         current.childs = {}
     end
@@ -179,44 +198,33 @@ function M:addField(key, value, path)
                 current.childs[k] = node.variable(k, current)
             end
             current = current.childs[k]
-            current.childRefCount = current.childRefCount + 1
             if not current.childs then
                 current.childs = {}
             end
         end
     end
 
-    if type(key) ~= 'table' then
-        ---@cast key -Node
-        key = node.value(key)
+    if not current.childs[field.key] then
+        current.childs[field.key] = node.variable(field.key, current)
     end
-    if not current.childs[key] then
-        current.childs[key] = node.variable(key, current)
-    end
-    current = current.childs[key]
-    current:addAssign(value)
+    current = current.childs[field.key]
+    current:addAssign(field.value)
     current.parent:flushCache()
 
-    return self
+    return current
 end
 
----@param key Node.Key
----@param value Node
+---@param field Node.Field
 ---@param path? Node.Key[]
 ---@return Node.Variable
-function M:removeField(key, value, path)
+function M:removeField(field, path)
     if not self.childs then
         return self
     end
     ---@type Node.Variable
     local current = self
-    local currentChilds = current.childs
-    if not currentChilds then
+    if not current.childs then
         return self
-    end
-    current.childRefCount = current.childRefCount - 1
-    if current.childRefCount == 0 then
-        current.childs = nil
     end
 
     local node = self.scope.node
@@ -227,36 +235,21 @@ function M:removeField(key, value, path)
                 k = node.value(k)
             end
             ---@type Node.Variable
-            current = currentChilds[k]
-            if not current then
+            current = current.childs[k]
+            if not current or not current.childs then
                 return self
-            end
-            currentChilds = current.childs
-            if not currentChilds then
-                return self
-            end
-            current.childRefCount = current.childRefCount - 1
-            if current.childRefCount == 0 then
-                current.childs = nil
-                if current.parent then
-                    current.parent.childs[k] = nil
-                end
             end
         end
     end
 
-    if type(key) ~= 'table' then
-        ---@cast key -Node
-        key = node.value(key)
-    end
-    current = currentChilds[key]
+    current = current.childs[field.key]
     if not current then
         return self
     end
-    current:removeAssign(value)
+    current:removeAssign(field.value)
     current.parent:flushCache()
 
-    return self
+    return current
 end
 
 ---@type Node

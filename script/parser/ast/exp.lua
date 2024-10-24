@@ -101,10 +101,7 @@ end
 ---| LuaParser.Node.TermChain
 
 ---@alias LuaParser.Node.TermHead
----| LuaParser.Node.Nil
----| LuaParser.Node.Boolean
----| LuaParser.Node.Number
----| LuaParser.Node.String
+---| LuaParser.Node.Literal
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.Paren
 ---| LuaParser.Node.Varargs

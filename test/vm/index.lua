@@ -86,5 +86,6 @@ do
     ]]
     vfile:indexAst(ast)
 
-    --assert(g:get('A'):view() == '1')
+    assert(g:get('A'):view() == '1')
+    assert(node:globalGet('A').value:view() == '1')
 end

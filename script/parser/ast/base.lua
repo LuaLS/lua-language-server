@@ -3,8 +3,8 @@
 ---@field ast LuaParser.Ast
 ---@field start integer # 开始位置（偏移）
 ---@field finish integer # 结束位置（偏移）
----@field left integer # 开始位置（行号与列号合并）
----@field right integer # 结束位置（行号与列号合并）
+---@field left integer # 开始位置（行号与列号合并，仅用于测试）
+---@field right integer # 结束位置（行号与列号合并，仅用于测试）
 ---@field startRow integer # 开始行号
 ---@field startCol integer # 开始列号
 ---@field finishRow integer # 结束行号

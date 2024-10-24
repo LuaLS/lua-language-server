@@ -40,6 +40,39 @@ function M:parseState(state)
     end
 end
 
+---@param key string
+---@param value LuaParser.Node.Exp
+---@param var LuaParser.Node.Var
+---@return Node.Field
+function M:makeField(key, value, var)
+    local node = self.scope.node
+    local nkey = node.value(key)
+    local nvalue
+    ---@type Node.Location
+    local location = {
+        uri = self.vfile.uri,
+        offset = var.start,
+    }
+    if not value or value.kind == 'nil' then
+        nvalue = node.NIL
+    elseif value.isLiteral then
+        ---@cast value LuaParser.Node.Literal
+        nvalue = node.value(value.value)
+    elseif value.kind == 'function' then
+        nvalue = node.FUNCTION
+    elseif value.kind == 'table' then
+        nvalue = node.TABLE
+    else
+        nvalue = node.UNKNOWN
+    end
+    local field = {
+        key = nkey,
+        value = nvalue,
+        location = location,
+    }
+    return field
+end
+
 ---@private
 ---@param var LuaParser.Node.Var
 function M:parseVar(var)
@@ -48,9 +81,11 @@ function M:parseVar(var)
     end
     local node = self.scope.node
     -- global, add to G
-    local value = var.value
-    if not value then
-    end
+    local field = self:makeField(var.id, var.value, var)
+    self.results[#self.results+1] = {
+        kind = 'global',
+        field = field,
+    }
 end
 
 ---@param vfile VM.Vfile

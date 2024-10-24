@@ -1,7 +1,7 @@
 ---@class VM.Vfile
 local M = Class 'VM.Vfile'
 
-M.version = -1
+M.version = 0
 M.indexedVersion = -1
 
 ---@param scope Scope
@@ -51,7 +51,8 @@ function M:indexAst(ast)
     self.indexedVersion = self.version
 
     local process = ls.vm.createIndexProcess(self, ast)
-    process:start()
+    local actions = process:start()
+    self.contribute:commitActions(actions)
 end
 
 

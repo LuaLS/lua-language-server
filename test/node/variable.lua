@@ -133,13 +133,13 @@ do
     assert(b:view() == 'a.b')
     assert(b.value:view() == 'unknown')
 
-    local c = a:getChild('c', {'b'})
+    local c = a:getChild('b', 'c')
     assert(c)
     assert(c:view() == 'a.b.c')
     assert(c.value:view() == 'unknown')
     assert(c.fields:view() == '{ d: 1 }')
 
-    local d = a:getChild('d', {'b', 'c'})
+    local d = a:getChild('b', 'c', 'd')
     assert(d)
     assert(d:view() == 'a.b.c.d')
     assert(d.value:view() == '1')

@@ -8,20 +8,28 @@ do
     assert(a.value:view() == 'A')
 
     local vfile = vm:createFile('test.lua')
-    vfile.contribute:addField('A', {
-        key = node.value 'x',
-        value = node.NUMBER
-    })
+    vfile.contribute:commit {
+        kind = 'field',
+        typeName = 'A',
+        field = {
+            key = node.value 'x',
+            value = node.NUMBER,
+        }
+    }
 
     assert(a.value:view() == '{ x: number }')
 
     vfile:resetContribute()
     assert(a.value:view() == 'A')
 
-    vfile.contribute:addField('A', {
-        key = node.value 'x',
-        value = node.STRING
-    })
+    vfile.contribute:commit {
+        kind = 'field',
+        typeName = 'A',
+        field = {
+            key = node.value 'x',
+            value = node.STRING,
+        }
+    }
     assert(a.value:view() == '{ x: string }')
 
     vfile:remove()
@@ -32,7 +40,45 @@ do
     local vm = ls.vm.create(test.scope)
     node:reset()
 
-    local g = node.type 'G'
+    local g = node.type '_G'
+    assert(g.value:view() == '{}')
+    assert(node:globalGet('x').value:view() == 'unknown')
+
+    local vfile = vm:createFile('test.lua')
+    vfile.contribute:commit {
+        kind = 'global',
+        field = {
+            key = node.value 'x',
+            value = node.NUMBER,
+        }
+    }
+
+    assert(g.value:view() == '{ x: number }')
+    assert(node:globalGet('x').value:view() == 'number')
+
+    vfile:resetContribute()
+    assert(g.value:view() == '{}')
+
+    vfile.contribute:commit {
+        kind = 'global',
+        field = {
+            key = node.value 'x',
+            value = node.STRING,
+        }
+    }
+    assert(g.value:view() == '{ x: string }')
+    assert(node:globalGet('x').value:view() == 'string')
+
+    vfile:remove()
+    assert(g.value:view() == '{}')
+    assert(node:globalGet('x').value:view() == 'unknown')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local g = node.type '_G'
 
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[

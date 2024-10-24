@@ -9,9 +9,9 @@ function M:__init(vfile, ast)
     self.scope = vfile.scope
 end
 
----@return VM.Contribute.Info[]
+---@return VM.Contribute.Action[]
 function M:start()
-    ---@type VM.Contribute.Info[]
+    ---@type VM.Contribute.Action[]
     self.results = {}
     local main = self.ast.main
     self:parseBlock(main)
@@ -50,13 +50,6 @@ function M:parseVar(var)
     -- global, add to G
     local value = var.value
     if not value then
-        self.results[#self.results+1] = {
-            typeName = 'G',
-            field = {
-                key = node.value(var.id),
-                value = node.ANY,
-            },
-        }
     end
 end
 

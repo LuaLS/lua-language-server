@@ -222,7 +222,6 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.THREAD = self.type 'thread'
         : setConfig('basicType', true)
-    self.G = self.type '_G'
 
     self.ANY:addField {
         key   = self.ANY,
@@ -266,12 +265,38 @@ function M:fillPresets()
         key   = self.ANY,
         value = self.ANY,
     }
+
+    self.G = self.variable '_G'
+        : hideAtHead()
+        : addClass(self.type '_G')
+    self.type '_G'
+        : addVariable(self.G)
 end
 
 function M:reset()
     self:createPools()
     self:fillPresets()
     self.castCache = nil
+end
+
+---@param ... Node.Key
+---@return Node.Variable
+function M:globalGet(...)
+    return self.G:getChild(...)
+end
+
+---@param field Node.Field
+---@param path? Node.Key[]
+---@return Node.Variable
+function M:globalAdd(field, path)
+    return self.G:addField(field, path)
+end
+
+---@param field Node.Field
+---@param path? Node.Key[]
+---@return Node.Variable
+function M:globalRemove(field, path)
+    return self.G:removeField(field, path)
 end
 
 

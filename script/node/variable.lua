@@ -153,11 +153,19 @@ end
 ---@type table<Node, Node.Variable>?
 M.childs = nil
 
----@param key Node.Key
----@param path? Node.Key[]
+---@param key1 Node.Key
+---@param key2? Node.Key
+---@param ... Node.Key
 ---@return Node.Variable
-function M:getChild(key, path)
+function M:getChild(key1, key2, ...)
     local node = self.scope.node
+    local key = key1
+    local path
+    if key2 then
+        path = { key1, key2, ... }
+        key = path[#path]
+        path[#path] = nil
+    end
     local current = self
     if path then
         for _, k in ipairs(path) do
@@ -275,7 +283,13 @@ M.__getter.value = function (self)
     return self.scope.node.UNKNOWN, true
 end
 
-M.hideInView = false
+---@private
+M._hideAtHead = false
+
+function M:hideAtHead()
+    self._hideAtHead = true
+    return self
+end
 
 ---@param skipLevel? integer
 ---@return string
@@ -295,7 +309,7 @@ function M:view(skipLevel)
     if not tooLong then
         for i = #path, 2, -1 do
             local var = path[i]
-            if var.hideInView then
+            if var._hideAtHead then
                 path[i] = nil
             else
                 break

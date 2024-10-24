@@ -4,4 +4,4 @@ ls.vm = {}
 require 'vm.vm'
 require 'vm.virtual_file'
 require 'vm.contribute'
-require 'vm.index'
+require 'vm.index_process'

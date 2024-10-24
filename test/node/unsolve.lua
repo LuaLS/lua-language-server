@@ -1,5 +1,5 @@
 do
-    local a = test.scope.node.unsolve(test.scope.node.TABLE, function ()
+    local a = test.scope.node.unsolve(test.scope.node.TABLE, nil, function ()
         return test.scope.node.table {
             x = 1,
             y = 2,

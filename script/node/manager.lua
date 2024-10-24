@@ -145,11 +145,13 @@ function M:fillAPIs()
         return New 'Node.Union' (scope, result)
     end
 
+    ---@generic T
     ---@param baseNode Node
-    ---@param onResolve Node.Unsolve.Callback
+    ---@param context T
+    ---@param onResolve Node.Unsolve.Callback<T>
     ---@return Node.Unsolve
-    function self.unsolve(baseNode, onResolve)
-        return New 'Node.Unsolve' (scope, baseNode, onResolve)
+    function self.unsolve(baseNode, context, onResolve)
+        return New 'Node.Unsolve' (scope, baseNode, context, onResolve)
     end
 
     ---@param name string | number | boolean | Node

@@ -1,19 +1,21 @@
----@alias Node.Unsolve.Callback fun(Node.Unsolve): Node
+---@alias Node.Unsolve.Callback<T> fun(unsolve: Node.Unsolve, context: T): Node
 
 ---@class Node.Unsolve: Node
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, baseNode: Node, onResolve: Node.Unsolve.Callback): Node.Unsolve
+---@overload fun(scope: Scope, baseNode: Node, context: any, onResolve: Node.Unsolve.Callback): Node.Unsolve
 local M = ls.node.register 'Node.Unsolve'
 
 M.kind = 'unsolve'
 
 ---@param scope Scope
 ---@param baseNode Node
+---@param context any
 ---@param onResolve Node.Unsolve.Callback
-function M:__init(scope, baseNode, onResolve)
+function M:__init(scope, baseNode, context, onResolve)
     self.scope = scope
     self.baseNode = baseNode
+    self.context = context
     self.onResolve = onResolve
 end
 
@@ -22,6 +24,6 @@ end
 ---@return true
 M.__getter.value = function (self)
     self.value = self.baseNode
-    local value = self:onResolve()
+    local value = self:onResolve(self.context)
     return value, true
 end

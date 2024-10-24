@@ -1,5 +1,6 @@
 local tableSort    = table.sort
 local stringRep    = string.rep
+local stringByte   = string.byte
 local tableConcat  = table.concat
 local tostring     = tostring
 local type         = type
@@ -1014,6 +1015,29 @@ function m.map(t, callback)
         nt[k] = callback(v, k)
     end
     return nt
+end
+
+local sbyteMap = {
+    [stringByte '_'] = 200,
+}
+
+---@param a string
+---@param b string
+---@return boolean
+function m.stringLess(a, b)
+    for i = 1, #a do
+        if i > #b then
+            return false
+        end
+        local c1 = stringByte(a, i, i)
+        local c2 = stringByte(b, i, i)
+        c1 = sbyteMap[c1] or c1
+        c2 = sbyteMap[c2] or c2
+        if c1 ~= c2 then
+            return c1 < c2
+        end
+    end
+    return true
 end
 
 return m

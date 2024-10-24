@@ -175,13 +175,19 @@ M.__getter.sortedFields = function (self)
     }
 
     for k, v in ls.util.sortPairs(self.literals, function (a, b)
+        if a == b then
+            return false
+        end
         local ta = type(a)
         local tb = type(b)
         local sa = typeOrder[ta] or 0
         local sb = typeOrder[tb] or 0
         if sa == sb then
-            if ta == 'number' or ta == 'string' then
+            if ta == 'number' then
                 return a < b
+            elseif ta == 'string' then
+                ---@cast b string
+                return ls.util.stringLess(a, b)
             else
                 return a == true
             end

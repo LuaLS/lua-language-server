@@ -12,3 +12,5 @@ require 'test.node.unsolve'
 require 'test.node.generic'
 require 'test.node.infer_generic'
 require 'test.node.flush'
+
+require 'test.node.variable'

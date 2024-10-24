@@ -1,6 +1,8 @@
 ---@class Node.Variable: Class.Base, Node.CacheModule
 local M = Class 'Node.Variable'
 
+Extends('Node.Variable', 'Node.CacheModule')
+
 M.kind = 'variable'
 
 ---@param scope Scope
@@ -28,6 +30,8 @@ function M:addType(node)
         self.nodes = ls.linkedTable.create()
     end
     self.nodes:pushTail(node)
+    self:flushCache()
+
     return self
 end
 
@@ -38,6 +42,8 @@ function M:removeType(node)
         return self
     end
     self.nodes:pop(node)
+    self:flushCache()
+
     return self
 end
 
@@ -51,6 +57,8 @@ function M:addClass(node)
         self.classes = ls.linkedTable.create()
     end
     self.classes:pushTail(node)
+    self:flushCache()
+
     return self
 end
 
@@ -61,6 +69,8 @@ function M:removeClass(node)
         return self
     end
     self.classes:pop(node)
+    self:flushCache()
+
     return self
 end
 
@@ -145,12 +155,14 @@ function M:view(skipLevel)
     if tooLong then
         views[#views+1] = '...'
     end
-    for i = 1, #path do
+    views[#views+1] = path[#path].key:viewAsKey(skipLevel)
+    for i = #path - 1, 1, -1 do
         local var = path[i]
         local view = var.key:viewAsKey(skipLevel)
-        if i > 1 and view:sub(1, 1) ~= '[' then
+        if view:sub(1, 1) ~= '[' then
             view = '.' .. view
         end
+        views[#views+1] = view
     end
 
     return table.concat(views)

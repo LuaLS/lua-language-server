@@ -153,7 +153,7 @@ function M:fillAPIs()
     end
 
     ---@param name string | number | boolean | Node
-    ---@param parent? Node
+    ---@param parent? Node.Variable
     ---@return Node.Variable
     function self.variable(name, parent)
         return New 'Node.Variable' (scope, name, parent)
@@ -186,7 +186,7 @@ function M:fillPresets()
                 return true
             end
         end)
-        self.TRULY = self.type 'truly'
+    self.TRULY = self.type 'truly'
         : setConfig('onCanCast', function (_, other)
             if  other.value ~= self.NIL
             and other.value ~= self.FALSE then

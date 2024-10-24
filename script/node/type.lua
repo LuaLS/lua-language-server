@@ -59,7 +59,8 @@ end
 function M:isComplex()
     if self.table
     or self.extends
-    or self.alias then
+    or self.alias
+    or self.variables then
         return true
     end
     return false
@@ -68,7 +69,8 @@ end
 ---@return boolean
 function M:isClassLike()
     if self.table
-    or self.extends then
+    or self.extends
+    or self.variables then
         return true
     end
     return false
@@ -250,24 +252,28 @@ M.__getter.value = function (self)
         return self, true
     end
     if self:isClassLike() then
-        if self.table and self.extends then
-            local value = self.scope.node.table()
-            local merging = {}
-            -- 1. 直接写在 class 里的字段
-            merging[#merging+1] = self.table
-            -- 2. 绑定的变量里的字段
-            if self.variables then
-                ---@param variable Node.Variable
-                for variable in self.variables:pairsFast() do
-                    merging[#merging+1] = variable.fields
-                end
+        local merging = {}
+        -- 1. 直接写在 class 里的字段
+        merging[#merging+1] = self.table
+        -- 2. 绑定的变量里的字段
+        if self.variables then
+            ---@param variable Node.Variable
+            for variable in self.variables:pairsFast() do
+                merging[#merging+1] = variable.fields
             end
-            -- 3. 继承来的字段
-            merging[#merging+1] = self.extendsTable
-            value:extends(merging)
-            return value, true
         end
-        return self.table or self.extendsTable, true
+        -- 3. 继承来的字段
+        if not self.extendsTable:isEmpty() then
+            merging[#merging+1] = self.extendsTable
+        end
+
+        if #merging == 1 then
+            return merging[1], true
+        end
+
+        local value = self.scope.node.table()
+        value:extends(merging)
+        return value, true
     end
     if self:isAliasLike() then
         if self.alias:getSize() == 1 then

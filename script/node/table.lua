@@ -54,14 +54,14 @@ end
 M.literals = nil
 ---@type table<string, Node>
 M.types = nil
----@type Node.Field[]
+---@type LinkedTable
 M.others = nil
 
 ---@package
 function M:classifyFields()
     local literals = {}
     local types = {}
-    local others = {}
+    local others = ls.linkedTable.create()
     self.literal = literals
     self.types = types
     self.others = others
@@ -76,7 +76,7 @@ function M:classifyFields()
         elseif key.kind == 'type' then
             types[key.typeName] = types[key.typeName] | field.value
         else
-            others[#others+1] = field
+            others:pushTail(field)
         end
         if key.kind == 'union' then
             ---@cast key Node.Union
@@ -88,7 +88,7 @@ function M:classifyFields()
                 elseif v.kind == 'type' then
                     types[v.typeName] = types[v.typeName] | field.value
                 else
-                    others[#others+1] = field
+                    others:pushTail(field)
                 end
             end
         end
@@ -110,9 +110,8 @@ M.__getter.types = function (self)
     return self.types
 end
 
-
 ---@param self Node.Table
----@return table<Node, Node>
+---@return LinkedTable
 M.__getter.others = function (self)
     self:classifyFields()
     return self.others
@@ -196,7 +195,7 @@ M.__getter.sortedFields = function (self)
     for k, v in ls.util.sortPairs(self.types) do
         values[#values+1] = { key = self.scope.node.type(k), value = v }
     end
-    for _, field in ipairs(self.others) do
+    for field in self.others:pairsFast() do
         values[#values+1] = field
     end
 
@@ -312,41 +311,59 @@ function M:view(skipLevel)
     return '{ ' .. table.concat(fields, ', ') .. ' }'
 end
 
----越靠前的字段越优先。只能调用一次。
----@param others Node[]
-function M:extends(others)
-    local literals = self.literals
-    local types = self.types
+---越靠前的字段越优先。
+---@param childs Node[]
+function M:extends(childs)
+    local node = self.scope.node
+    node:lockCache()
 
-    for _, other in ipairs(others) do
-        local value = other.value
+    local addedLiterals = {}
+    local addedTypes    = {}
+    local addedOthers   = ls.linkedTable.create()
+
+    for _, child in ipairs(childs) do
+        local value = child.value
         if value.kind == 'table' then
             ---@cast value Node.Table
             for k, v in pairs(value.literals) do
-                if literals[k] == nil then
-                    literals[k] = v
+                if  self.literals[k] == nil
+                and addedLiterals[k] == nil then
+                    addedLiterals[k] = v
                 end
             end
             for k, v in pairs(value.types) do
-                if types[k] == nil then
-                    types[k] = v
+                if  self.types[k] == nil
+                and addedTypes[k] == nil then
+                    addedTypes[k] = v
+                end
+            end
+            ---@param field Node.Field
+            for field in value.others:pairsFast() do
+                if  not self.others:has(field)
+                and not addedOthers:has(field) then
+                    addedOthers:pushTail(field)
                 end
             end
         end
     end
 
-    for k, v in pairs(literals) do
+    for k, v in pairs(addedLiterals) do
         self:addField {
             key   = self.scope.node.value(k),
             value = v,
         }
     end
-    for k, v in pairs(types) do
+    for k, v in pairs(addedTypes) do
         self:addField {
             key   = self.scope.node.type(k),
             value = v,
         }
     end
+    for field in addedOthers:pairsFast() do
+        self:addField(field)
+    end
+
+    node:unlockCache()
 end
 
 ---@param self Node.Table

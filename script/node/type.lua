@@ -152,15 +152,8 @@ function M:addVariable(variable)
 
     self.variables:pushTail(variable)
 
-    if variable.fields then
-        self.scope.node:lockCache()
-
-        for field in variable.fields:pairsFast() do
-            self:addVariableField(field)
-        end
-
-        self.scope.node:unlockCache()
-    end
+    variable:flushMe(self, true)
+    self:flushCache()
 
     return self
 end
@@ -176,46 +169,7 @@ function M:removeVariable(variable)
         self.variables = nil
     end
 
-    if variable.fields then
-        self.scope.node:lockCache()
-
-        for field in variable.fields:pairsFast() do
-            self:removeVariableField(field)
-        end
-
-        self.scope.node:unlockCache()
-    end
-
-    return self
-end
-
----@type Node.Table?
-M.variableTable = nil
-
----@param field Node.Field
----@return Node.Type
-function M:addVariableField(field)
-    if not self.variableTable then
-        self.variableTable = self.scope.node.table()
-    end
-    self.variableTable:addField(field)
-
-    self:flushCache()
-
-    return self
-end
-
----@param field Node.Field
----@return Node.Type
-function M:removeVariableField(field)
-    if not self.variableTable then
-        return self
-    end
-    self.variableTable:removeField(field)
-    if self.variableTable:isEmpty() then
-        self.variableTable = nil
-    end
-
+    variable:flushMe(self, false)
     self:flushCache()
 
     return self
@@ -302,8 +256,11 @@ M.__getter.value = function (self)
             -- 1. 直接写在 class 里的字段
             merging[#merging+1] = self.table
             -- 2. 绑定的变量里的字段
-            if self.variableTable then
-                merging[#merging+1] = self.variableTable
+            if self.variables then
+                ---@param variable Node.Variable
+                for variable in self.variables:pairsFast() do
+                    merging[#merging+1] = variable.fields
+                end
             end
             -- 3. 继承来的字段
             merging[#merging+1] = self.extendsTable

@@ -1,4 +1,4 @@
----@class Node.Variable: Class.Base, Node.Field
+---@class Node.Variable: Class.Base, Node.CacheModule
 local M = Class 'Node.Variable'
 
 M.kind = 'variable'
@@ -23,7 +23,7 @@ M.nodes = nil
 
 ---@param node Node.Type
 ---@return Node.Variable
-function M:addNode(node)
+function M:addType(node)
     if not self.nodes then
         self.nodes = ls.linkedTable.create()
     end
@@ -33,7 +33,7 @@ end
 
 ---@param node Node.Type
 ---@return Node.Variable
-function M:removeNode(node)
+function M:removeType(node)
     if not self.nodes then
         return self
     end
@@ -41,37 +41,55 @@ function M:removeNode(node)
     return self
 end
 
----@type LinkedTable?
+---@type LinkedTable
+M.classes = nil
+
+---@param node Node.Type
+---@return Node.Variable
+function M:addClass(node)
+    if not self.classes then
+        self.classes = ls.linkedTable.create()
+    end
+    self.classes:pushTail(node)
+    return self
+end
+
+---@param node Node.Type
+---@return Node.Variable
+function M:removeClass(node)
+    if not self.classes then
+        return self
+    end
+    self.classes:pop(node)
+    return self
+end
+
+---@type Node.Table?
 M.fields = nil
 
----@param child Node.Variable
+---@param field Node.Field
 ---@return Node.Variable
-function M:addField(child)
+function M:addField(field)
     if not self.fields then
-        self.fields = ls.linkedTable.create()
+        self.fields = self.scope.node.table()
     end
-    self.fields:pushAfter(child)
-
-    ---@param node Node.Type
-    for node in child.nodes:pairsFast() do
-        node:addVariableField(child)
-    end
+    self.fields:addField(field)
+    self:flushCache()
 
     return self
 end
 
----@param child Node.Variable
+---@param field Node.Field
 ---@return Node.Variable
-function M:removeField(child)
+function M:removeField(field)
     if not self.fields then
         return self
     end
-    self.fields:pop(child)
-
-    ---@param node Node.Type
-    for node in child.nodes:pairsFast() do
-        node:removeVariableField(child)
+    self.fields:removeField(field)
+    if self.fields:isEmpty() then
+        self.fields = nil
     end
+    self:flushCache()
 
     return self
 end
@@ -83,14 +101,16 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    if not self.nodes or self.nodes:getSize() == 0 then
-        return self.scope.node.UNKNOWN, true
+    local node = self.scope.node
+    if self.classes then
+        local union = node.union(self.classes:toArray())
+        return union.value, true
     end
-    if self.nodes:getSize() == 1 then
-        return self.nodes:getHead(), true
+    if self.nodes then
+        local union = node.union(self.nodes:toArray())
+        return union.value, true
     end
-    local union = self.scope.node.union(self.nodes:toArray())
-    return union.value, true
+    return self.scope.node.UNKNOWN, true
 end
 
 M.hideInView = false

@@ -109,7 +109,7 @@ local function searchWord(source, pushResult, defMap, fileNotify)
             end)
         end
         ---@async
-        guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
+        guide.eachSourceTypes(state.ast, {'getfield', 'setfield', 'tablefield'}, function (src)
             if src.field and src.field[1] == key then
                 checkDef(src)
                 await.delay()

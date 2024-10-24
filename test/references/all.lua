@@ -139,3 +139,13 @@ function TestB(param)
     param:<!TestA!>()
 end
 ]]
+
+TEST [[
+---@class A
+---@field <~x~> number
+
+---@type A
+local t = {
+    <!x!> = 1
+}
+]]

@@ -19,6 +19,12 @@ end
 ---@return T
 function GCHost:bindGC(obj)
     if not self._gccontainer then
+        if not IsValid(self) then
+            if type(obj) == 'table' then
+                Delete(obj)
+            end
+            return nil
+        end
         ---@private
         self._gccontainer = New 'GC' ()
     end
@@ -59,7 +65,7 @@ end
 function GC:add(obj)
     -- TODO 插件BUG
     ---@cast obj table
-    if not IsValid(obj) then
+    if not IsValid(obj) or not IsValid(self) then
         Delete(obj)
         return nil
     end

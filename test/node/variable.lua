@@ -39,10 +39,7 @@ do
     node:reset()
     local var = node.variable('x')
 
-    var:addField {
-        key = node.value 'n',
-        value = node.type 'number',
-    }
+    var:addField('n', node.type 'number')
 
     assert(var:view() == 'x')
     assert(var.value:view() == 'unknown')
@@ -55,10 +52,7 @@ do
     a:addVariable(var)
     assert(a.value:view() == '{ n: number }')
 
-    var:addField {
-        key = node.value 'self',
-        value = a,
-    }
+    var:addField('self', a)
     assert(var.value:view() == 'unknown')
     assert(var.fields:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, self: A }')
@@ -98,18 +92,40 @@ do
     a:addVariable(m)
     m:addClass(a)
 
-    m:addField {
-        key = node.value '__index',
-        value = node.unsolve(node.TABLE, m, function (unsolve, var)
-            return var.value
-        end)
-    }
-    m:addField {
-        key = node.value 'y',
-        value = node.value 'abc',
-    }
+    m:addField('__index', node.unsolve(node.TABLE, m, function (unsolve, var)
+        return var.value
+    end))
+    m:addField('y', node.value 'abc')
 
     assert(a.value:view() == '{ x: number, y: "abc", __index: A }')
     assert(m.value:view() == 'A')
     assert(m.fields:view() == '{ y: "abc", __index: A }')
+end
+
+do
+    --[[
+    a.b.c.d = 1
+    ]]
+    node:reset()
+
+    local a = node.variable 'a'
+    a:addField('d', node.value(1), {'b', 'c'})
+    assert(a:view() == 'a')
+    assert(a.value:view() == 'unknown')
+
+    local b = a:getField('b')
+    assert(b)
+    assert(b:view() == 'a.b')
+    assert(b.value:view() == 'unknown')
+
+    local c = a:getField('c', {'b'})
+    assert(c)
+    assert(c:view() == 'a.b.c')
+    assert(c.value:view() == 'unknown')
+    assert(c.fields:view() == '{ d: 1 }')
+
+    local d = a:getField('d', {'b', 'c'})
+    assert(d)
+    assert(d:view() == 'a.b.c.d')
+    assert(d.value:view() == '1')
 end

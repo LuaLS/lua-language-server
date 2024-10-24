@@ -12,12 +12,15 @@ M.kind = 'table'
 ---@field value Node
 ---@field location? Node.Location
 
+---@type LinkedTable?
+M.fields = nil
+
 ---@param scope Scope
 ---@param fields? table
 function M:__init(scope, fields)
     self.scope = scope
-    self.fields = ls.linkedTable.create()
     if fields then
+        self.fields = ls.linkedTable.create()
         for k, v in pairs(fields) do
             if type(k) ~= 'table' then
                 k = scope.node.value(k)
@@ -33,20 +36,29 @@ end
 ---@param field Node.Field
 ---@return Node.Table
 function M:addField(field)
-    self:flushCache()
+    if not self.fields then
+        self.fields = ls.linkedTable.create()
+    end
     self.fields:pushTail(field)
+    self:flushCache()
     return self
 end
 
 ---@param field Node.Field
 ---@return Node.Table
 function M:removeField(field)
-    self:flushCache()
+    if not self.fields then
+        return self
+    end
     self.fields:pop(field)
+    self:flushCache()
     return self
 end
 
 function M:isEmpty()
+    if not self.fields then
+        return true
+    end
     return self.fields:getSize() == 0
 end
 
@@ -65,6 +77,10 @@ function M:classifyFields()
     self.literal = literals
     self.types = types
     self.others = others
+
+    if not self.fields then
+        return
+    end
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
@@ -211,6 +227,9 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
+    if not self.fields then
+        return self.scope.node.NIL
+    end
     if type(key) ~= 'table' then
         ---@cast key -Node
         return self.literals[key]
@@ -376,6 +395,9 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    if not self.fields then
+        return false, true
+    end
     for field in self.fields:pairsFast() do
         if field.key.hasGeneric or field.value.hasGeneric then
             return true, true

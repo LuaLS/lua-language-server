@@ -920,9 +920,9 @@ function m.resolvePathPlaceholders(path)
                 return addonsPath
             end
             local client = require("client")
-            local storagePath = fs.path(client.getOption("storagePath"))
+            local storagePath = client.getOption("storagePath")
             if storagePath then
-                addonsPath = (storagePath / "addonManager/addons"):string()
+                addonsPath = (fs.path(storagePath) / "addonManager" / "addons"):string()
             else
                 -- Common path across OSes
                 local dataPath = "User/globalStorage/sumneko.lua/addonManager/addons"

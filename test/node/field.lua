@@ -1,3 +1,5 @@
+local node = test.scope.node
+
 do
     assert(test.scope.node.NEVER:get('x') == test.scope.node.NEVER)
     assert(test.scope.node.NIL:get('x') == test.scope.node.NEVER)
@@ -47,14 +49,14 @@ do
     assert(t:get(0.5):view() == '"number"')
     assert(t:get(true):view() == 'nil')
     assert(t:get(test.scope.node.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
-    assert(t.sortedFields[1].key == test.scope.node.value(1))
-    assert(t.sortedFields[2].key == test.scope.node.value(2))
-    assert(t.sortedFields[3].key == test.scope.node.value 'x')
-    assert(t.sortedFields[4].key == test.scope.node.value 'y')
-    assert(t.sortedFields[5].key == test.scope.node.value 'z')
-    assert(t.sortedFields[6].key == test.scope.node.type 'integer')
-    assert(t.sortedFields[7].key == test.scope.node.type 'number')
-    assert(t.sortedFields[8].key == test.scope.node.type 'string')
+    assert(t.keys[1] == test.scope.node.value(1))
+    assert(t.keys[2] == test.scope.node.value(2))
+    assert(t.keys[3] == test.scope.node.value 'x')
+    assert(t.keys[4] == test.scope.node.value 'y')
+    assert(t.keys[5] == test.scope.node.value 'z')
+    assert(t.keys[6] == test.scope.node.type 'integer')
+    assert(t.keys[7] == test.scope.node.type 'number')
+    assert(t.keys[8] == test.scope.node.type 'string')
 end
 
 do
@@ -118,13 +120,13 @@ do
     local value = t.A.value
     assert(value.kind == 'table')
     ---@cast value Node.Table
-    assert(value.sortedFields[1].key == test.scope.node.value "A")
-    assert(value.sortedFields[2].key == test.scope.node.value "A1")
-    assert(value.sortedFields[3].key == test.scope.node.value "A11")
-    assert(value.sortedFields[4].key == test.scope.node.value "A12")
-    assert(value.sortedFields[5].key == test.scope.node.value "A2")
-    assert(value.sortedFields[6].key == test.scope.node.value "A21")
-    assert(value.sortedFields[7].key == test.scope.node.value "A22")
+    assert(value.keys[1] == test.scope.node.value "A")
+    assert(value.keys[2] == test.scope.node.value "A1")
+    assert(value.keys[3] == test.scope.node.value "A11")
+    assert(value.keys[4] == test.scope.node.value "A12")
+    assert(value.keys[5] == test.scope.node.value "A2")
+    assert(value.keys[6] == test.scope.node.value "A21")
+    assert(value.keys[7] == test.scope.node.value "A22")
 end
 
 do

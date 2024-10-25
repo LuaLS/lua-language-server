@@ -177,12 +177,12 @@ function M:removeVariable(variable)
     return self
 end
 
----@type Node[]
+---@type (Node.Type | Node.Typecall | Node.Table)[]
 M.fullExtends = nil
 
 ---获取所有继承（广度优先）
 ---@param self Node.Type
----@return Node[]
+---@return (Node.Type | Node.Typecall | Node.Table)[]
 ---@return true
 M.__getter.fullExtends = function (self)
     local result = {}
@@ -234,8 +234,29 @@ M.extendsTable = nil
 ---@return true
 M.__getter.extendsTable = function (self)
     local table = self.scope.node.table()
+    if #self.fullExtends == 0 then
+        return table, true
+    end
 
-    table:extends(self.fullExtends)
+    ---@type Node.Table[]
+    local tables = {}
+    for _, v in ipairs(self.fullExtends) do
+        if v.kind == 'table' then
+            ---@cast v Node.Table
+            tables[#tables+1] = v
+        elseif v.kind == 'type' then
+            ---@cast v Node.Type
+            tables[#tables+1] = v.table
+        else
+            ---@cast v -Node.Table, -Node.Type
+            local vv = v.value
+            if vv.kind == 'table' then
+                ---@cast vv Node.Table
+                tables[#tables+1] = vv
+            end
+        end
+    end
+    table:extends(tables)
 
     return table, true
 end

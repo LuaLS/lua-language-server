@@ -15,6 +15,7 @@ Extends('Node', 'Node.CacheModule')
 ---@class Node.Location
 ---@field uri Uri
 ---@field offset integer
+---@field length? integer
 
 ---基础分类
 ---@type Node.Kind

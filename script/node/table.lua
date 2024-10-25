@@ -11,6 +11,7 @@ M.kind = 'table'
 ---@field key Node
 ---@field value Node
 ---@field location? Node.Location
+---@field hideInView? boolean
 
 ---@type LinkedTable?
 M.fields = nil
@@ -62,75 +63,45 @@ function M:isEmpty()
     return self.fields:getSize() == 0
 end
 
----@type table<string|number|boolean, Node>
-M.literals = nil
----@type table<string, Node>
-M.types = nil
----@type LinkedTable
-M.others = nil
+---@type table<Node, Node.Field|Node.Field[]>
+M.fieldMap = nil
 
----@package
-function M:classifyFields()
-    local literals = {}
-    local types = {}
-    local others = ls.linkedTable.create()
-    self.literal = literals
-    self.types = types
-    self.others = others
+---@param self Node.Table
+---@return table<Node, Node.Field|Node.Field[]>
+---@return true
+M.__getter.fieldMap = function (self)
+    local fieldMap = {}
 
     if not self.fields then
-        return
+        return fieldMap, true
+    end
+
+    local function merge(field, old)
+        if not old then
+            return field
+        end
+        if #old == 0 then
+            return { old, field }
+        else
+            old[#old+1] = field
+            return old
+        end
     end
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
         local key = field.key
-        if key.kind == 'value' then
-            ---@cast key Node.Value
-            local k = key.literal
-            literals[k] = literals[k] | field.value
-        elseif key.kind == 'type' then
-            types[key.typeName] = types[key.typeName] | field.value
-        else
-            others:pushTail(field)
-        end
         if key.kind == 'union' then
             ---@cast key Node.Union
-            for _, v in ipairs(key.values) do
-                if v.kind == 'value' then
-                    ---@cast v Node.Value
-                    local k = v.literal
-                    literals[k] = literals[k] | field.value
-                elseif v.kind == 'type' then
-                    types[v.typeName] = types[v.typeName] | field.value
-                else
-                    others:pushTail(field)
-                end
+            for _, k in ipairs(key.values) do
+                fieldMap[k] = merge(field, fieldMap[k])
             end
+        else
+            fieldMap[key] = merge(field, fieldMap[key])
         end
     end
-end
 
----@param self Node.Table
----@return table<string|number|boolean, Node>
-M.__getter.literals = function (self)
-    self:classifyFields()
-    return self.literal
-end
-
-
----@param self Node.Table
----@return table<string, Node>
-M.__getter.types = function (self)
-    self:classifyFields()
-    return self.types
-end
-
----@param self Node.Table
----@return LinkedTable
-M.__getter.others = function (self)
-    self:classifyFields()
-    return self.others
+    return fieldMap, true
 end
 
 ---获取所有的键。
@@ -141,11 +112,56 @@ M.keys = nil
 ---@return Node[]
 ---@return true
 M.__getter.keys = function (self)
+    ---@type Node[]
     local keys = {}
 
-    for _, field in ipairs(self.sortedFields) do
-        keys[#keys+1] = field.key
+    for k in pairs(self.fieldMap) do
+        keys[#keys+1] = k
     end
+
+    local typeOrder = {
+        ['number']  = 1,
+        ['string']  = 2,
+        ['boolean'] = 3,
+    }
+
+    ls.util.sort(keys, function (a, b)
+        local isValueA = a.kind == 'value'
+        local isValueB = b.kind == 'value'
+        if isValueA == isValueB then
+            return nil
+        end
+        if isValueA then
+            return true
+        else
+            return false
+        end
+    end, function (a, b)
+        if a.kind == 'value' then
+            local va = a.literal
+            local vb = b.literal
+            if va == vb then
+                return
+            end
+            local ta = type(va)
+            local tb = type(vb)
+            if ta ~= tb then
+                return typeOrder[ta] < typeOrder[tb]
+            end
+            if ta == 'string' then
+                ---@cast vb string
+                return ls.util.stringLess(va, vb)
+            end
+            if ta == 'number' then
+                return va < vb
+            end
+            if ta == 'boolean' then
+                return (va == true) and (vb == false)
+            end
+        else
+            return a.typeName < b.typeName
+        end
+    end)
 
     return keys, true
 end
@@ -155,6 +171,48 @@ end
 ---@return true
 M.__getter.typeOfKey = function (self)
     return self.scope.node.union(self.keys).value, true
+end
+
+---@type table<Node, Node>
+M.valueMap = nil
+
+---@param self Node.Table
+---@return table<Node, Node>
+---@return true
+M.__getter.valueMap = function (self)
+    local valueMap = {}
+    for k, field in pairs(self.fieldMap) do
+        local v
+        if #field > 0 then
+            v = self.scope.node.union(ls.util.map(field, function (v, k)
+                return v.value
+            end))
+        else
+            v = field.value
+        end
+        valueMap[k] = v
+    end
+    return valueMap, true
+end
+
+---@type Node.Field[]
+M.typeFields = nil
+
+---@param self Node.Table
+---@return Node.Field[]
+---@return true
+M.__getter.typeFields = function (self)
+    local fields = {}
+    if not self.fields then
+        return fields, true
+    end
+    ---@param field Node.Field
+    for field in self.fields:pairsFast() do
+        if field.key.kind ~= 'value' then
+            fields[#fields+1] = field
+        end
+    end
+    return fields, true
 end
 
 ---获取所有的值。按key的顺序排序。
@@ -167,58 +225,8 @@ M.values = nil
 M.__getter.values = function (self)
     local values = {}
 
-    for _, field in ipairs(self.sortedFields) do
-        values[#values+1] = field.value
-    end
-
-    return values, true
-end
-
----@type Node.Field[]
-M.sortedFields = nil
-
----@param self Node.Table
----@return { key: Node, value: Node }[]
----@return true
-M.__getter.sortedFields = function (self)
-    ---@type { key: Node, value: Node }[]
-    local values = {}
-
-    local typeOrder = {
-        ['number']  = 1,
-        ['string']  = 2,
-        ['boolean'] = 3,
-    }
-
-    for k, v in ls.util.sortPairs(self.literals, function (a, b)
-        if a == b then
-            return false
-        end
-        local ta = type(a)
-        local tb = type(b)
-        local sa = typeOrder[ta] or 0
-        local sb = typeOrder[tb] or 0
-        if sa == sb then
-            if ta == 'number' then
-                return a < b
-            elseif ta == 'string' then
-                ---@cast b string
-                return ls.util.stringLess(a, b)
-            else
-                return a == true
-            end
-        else
-            return sa < sb
-        end
-    end) do
-        values[#values+1] = { key = self.scope.node.value(k), value = v }
-    end
-
-    for k, v in ls.util.sortPairs(self.types) do
-        values[#values+1] = { key = self.scope.node.type(k), value = v }
-    end
-    for field in self.others:pairsFast() do
-        values[#values+1] = field
+    for i, key in ipairs(self.keys) do
+        values[i] = self.valueMap[key]
     end
 
     return values, true
@@ -227,15 +235,31 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
+    local node = self.scope.node
     if not self.fields then
-        return self.scope.node.NIL
+        return node.NIL
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
-        return self.literals[key]
-            or self:get(self.scope.node.value(key).nodeType)
-            or self.scope.node.NIL
+        key = node.value(key)
     end
+    if key.kind == 'value' then
+        ---@cast key Node.Value
+        return self.valueMap[key]
+            or self:get(key.nodeType)
+            or node.NIL
+    end
+    if key.kind == 'union' then
+        ---@cast key Node.Union
+        ---@type Node[]
+        local results = {}
+        for _, v in ipairs(key.values) do
+            local r = self:get(v)
+            results[#results+1] = r
+        end
+        return node.union(results):getValue(node.NIL)
+    end
+    ---@cast key Node
     local typeName = key.typeName
     if typeName == 'never'
     or typeName == 'nil' then
@@ -243,38 +267,18 @@ function M:get(key)
     end
     if typeName == 'any'
     or typeName == 'unknown' then
-        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
+        return node.union(self.values):getValue(node.NIL)
     end
-    if key.kind == 'value' then
-        ---@cast key Node.Value
-        return self.literals[key.literal]
-            or self:get(key.nodeType)
-            or self.scope.node.NIL
+    local value = self.valueMap[key]
+    if value then
+        return value
     end
-    ---@cast key Node
-    if typeName then
-        if self.types[typeName] then
-            return self.types[typeName]
+    for _, field in ipairs(self.typeFields) do
+        if key:canCast(field.key) then
+            return field.value
         end
-        ---@param field Node.Field
-        for field in self.fields:pairsFast() do
-            if field.key.kind == 'type' and key:canCast(field.key) then
-                return field.value
-            end
-        end
-        return self.scope.node.NIL
     end
-    if key.kind == 'union' then
-        ---@cast key Node.Union
-        ---@type Node
-        local result
-        for _, v in ipairs(key.values) do
-            local r = self:get(v)
-            result = result | r
-        end
-        return result
-    end
-    return self.scope.node.NIL
+    return node.NIL
 end
 
 ---@param other Node
@@ -283,9 +287,10 @@ function M:onCanBeCast(other)
     if self == other then
         return true
     end
-    for _, field in ipairs(self.sortedFields) do
-        local v = other:get(field.key)
-        if not v:canCast(field.value) then
+    for _, key in ipairs(self.keys) do
+        local v = other:get(key)
+        local myType = self.valueMap[key]
+        if not v:canCast(myType) then
             return false
         end
     end
@@ -295,19 +300,22 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
+    local node = self.scope.node
     if other.kind == 'array' then
         ---@cast other Node.Array
-        local myType = self:get(self.scope.node.INTEGER)
+        local myType = self:get(node.INTEGER)
         if myType:canCast(other.head) then
             return true
-        elseif myType ~= self.scope.node.NIL then
+        elseif myType ~= node.NIL then
             return false
         end
-        for k, v in pairs(self.literals) do
-            if  type(k) == 'number'
-            and k % 1 == 0
-            and k >= 1
-            and k <= other.len then
+        for _, key in ipairs(self.keys) do
+            if  key.kind == 'value'
+            and type(key.literal) == 'number'
+            and key.literal % 1 == 0
+            and key.literal >= 1
+            and key.literal <= other.len then
+                local v = self.valueMap[key]
                 if not v:canCast(other.head) then
                     return false
                 end
@@ -319,73 +327,61 @@ function M:onCanCast(other)
 end
 
 function M:view(skipLevel)
-    if #self.sortedFields == 0 then
+    if #self.keys == 0 then
         return '{}'
     end
 
     local fields = {}
 
     local childSkipLevel = skipLevel and skipLevel + 1 or nil
-    for _, v in ipairs(self.sortedFields) do
+    for _, key in ipairs(self.keys) do
+        local field = self.fieldMap[key]
+        if #field == 0 then
+            if field.hideInView then
+                goto continue
+            end
+        else
+            for _, f in ipairs(field) do
+                if f.hideInView then
+                    goto continue
+                end
+            end
+        end
+        local value = self.valueMap[key]
         fields[#fields+1] = string.format('%s: %s'
-            , v.key:viewAsKey(childSkipLevel)
-            , v.value:view(childSkipLevel)
+            , key:viewAsKey(childSkipLevel)
+            , value:view(childSkipLevel)
         )
+        ::continue::
+    end
+
+    if #fields == 0 then
+        return '{}'
     end
 
     return '{ ' .. table.concat(fields, ', ') .. ' }'
 end
 
 ---越靠前的字段越优先。
----@param childs Node[]
+---@param childs Node.Table[]
 function M:extends(childs)
     local node = self.scope.node
     node:lockCache()
 
-    local addedLiterals = {}
-    local addedTypes    = {}
-    local addedOthers   = ls.linkedTable.create()
-
+    local fieldMap = self.fieldMap
+    local addedKeys = {}
     for _, child in ipairs(childs) do
         local value = child.value
         if value.kind == 'table' then
             ---@cast value Node.Table
-            for k, v in pairs(value.literals) do
-                if  self.literals[k] == nil
-                and addedLiterals[k] == nil then
-                    addedLiterals[k] = v
-                end
-            end
-            for k, v in pairs(value.types) do
-                if  self.types[k] == nil
-                and addedTypes[k] == nil then
-                    addedTypes[k] = v
-                end
-            end
-            ---@param field Node.Field
-            for field in value.others:pairsFast() do
-                if  not self.others:has(field)
-                and not addedOthers:has(field) then
-                    addedOthers:pushTail(field)
+            for key, field in pairs(value.fieldMap) do
+                if  not addedKeys[key]
+                and not fieldMap[key] then
+                    addedKeys[key] = true
+                    self:addField(field)
                 end
             end
         end
-    end
-
-    for k, v in pairs(addedLiterals) do
-        self:addField {
-            key   = self.scope.node.value(k),
-            value = v,
-        }
-    end
-    for k, v in pairs(addedTypes) do
-        self:addField {
-            key   = self.scope.node.type(k),
-            value = v,
-        }
-    end
-    for field in addedOthers:pairsFast() do
-        self:addField(field)
     end
 
     node:unlockCache()

@@ -694,6 +694,26 @@ function m.sortCallbackOfIndex(arr)
     end
 end
 
+---使用多个排序器排序，如果前一个排序器返回相等，则使用后一个排序器。
+---排序器返回 `true` 表示 `a` 在 `b` 前面，返回 `false` 表示 `a` 在 `b` 后面。
+---返回 `nil` 表示排序器无法比较 `a` 和 `b`或者 `a` 和 `b` 相等。
+---@generic T
+---@param tbl T[]
+---@param sorter fun(a: T, b: T): boolean?
+---@param ... fun(a: T, b: T): boolean?
+function m.sort(tbl, sorter, ...)
+    local sorters = { sorter, ... }
+    tableSort(tbl, function (a, b)
+        for _, f in ipairs(sorters) do
+            local res = f(a, b)
+            if res ~= nil then
+                return res
+            end
+        end
+        return false
+    end)
+end
+
 ---裁剪字符串
 ---@param str string
 ---@param mode? '"left"'|'"right"'

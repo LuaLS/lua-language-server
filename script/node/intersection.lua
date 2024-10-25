@@ -175,8 +175,7 @@ M.__getter.value = function (self)
         end
     end
 
-    local mergedLiterals = {}
-    local mergedTypes = {}
+    local valueMap = {}
     ---@type Node.Union[]
     local unionParts = {}
     for _, value in ipairs(values) do
@@ -187,37 +186,17 @@ M.__getter.value = function (self)
         end
         if value.kind == 'table' then
             ---@cast value Node.Table
-            for k, v in pairs(value.literals) do
-                if mergedLiterals[k] == nil then
-                    mergedLiterals[k] = v
+            for k, v in pairs(value.valueMap) do
+                if valueMap[k] then
+                    valueMap[k] = valueMap[k] & v
                 else
-                    mergedLiterals[k] = mergedLiterals[k] & v
-                end
-            end
-            for k, v in pairs(value.types) do
-                if mergedTypes[k] == nil then
-                    mergedTypes[k] = v
-                else
-                    mergedTypes[k] = mergedTypes[k] & v
+                    valueMap[k] = v
                 end
             end
         end
         ::continue::
     end
-
-    local table = self.scope.node.table()
-    for k, v in pairs(mergedLiterals) do
-        table:addField {
-            key   = self.scope.node.value(k),
-            value = v,
-        }
-    end
-    for k, v in pairs(mergedTypes) do
-        table:addField {
-            key   = self.scope.node.type(k),
-            value = v,
-        }
-    end
+    local table = self.scope.node.table(valueMap)
 
     if #unionParts == 0 then
         return table, true

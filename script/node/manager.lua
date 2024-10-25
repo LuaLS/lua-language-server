@@ -226,6 +226,7 @@ function M:fillPresets()
     self.ANY:addField {
         key   = self.ANY,
         value = self.ANY,
+        hideInView = true,
     }
     self.ANY.truly = self.TRULY
     self.ANY.falsy = self.FALSE | self.type 'nil'
@@ -233,6 +234,7 @@ function M:fillPresets()
     self.UNKNOWN:addField {
         key   = self.ANY,
         value = self.ANY,
+        hideInView = true,
     }
     self.UNKNOWN.truly = self.TRULY
     self.UNKNOWN.falsy = self.FALSE
@@ -240,6 +242,7 @@ function M:fillPresets()
     self.TRULY:addField {
         key   = self.ANY,
         value = self.ANY,
+        hideInView = true,
     }
 
     self.NIL.truly = self.NEVER
@@ -264,6 +267,7 @@ function M:fillPresets()
     self.USERDATA:addField {
         key   = self.ANY,
         value = self.ANY,
+        hideInView = true,
     }
 
     self.G = self.variable '_G'
@@ -271,6 +275,11 @@ function M:fillPresets()
         : addClass(self.type '_G')
     self.type '_G'
         : addVariable(self.G)
+        : addField {
+            key   = self.ANY,
+            value = self.ANY,
+            hideInView = true,
+        }
 end
 
 function M:reset()

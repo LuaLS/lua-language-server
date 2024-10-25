@@ -52,6 +52,7 @@ function M:makeField(key, value, var)
     local location = {
         uri = self.vfile.uri,
         offset = var.start,
+        length = var.finish - var.start,
     }
     if not value or value.kind == 'nil' then
         nvalue = node.NIL
@@ -79,7 +80,6 @@ function M:parseVar(var)
     if var.loc then
         return
     end
-    local node = self.scope.node
     -- global, add to G
     local field = self:makeField(var.id, var.value, var)
     self.results[#self.results+1] = {

@@ -721,7 +721,7 @@ function vm.getTableKey(uri, tnode, vnode, reverse)
                 if field.type == 'tablefield' then
                     result:merge(vm.declareGlobal('type', 'string'))
                 end
-                if field.type == 'tableexp' then
+                if field.type == 'tableexp' or field.type == 'varargs' then
                     result:merge(vm.declareGlobal('type', 'integer'))
                 end
             end

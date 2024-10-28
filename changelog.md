@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` A regression related to type narrow and generic param introduced since `v3.10.1`
+* `New` Support importing `enum` through class name suffix matching in quick fixes, allowing the import of `enum` from `table.table.enum; return table`.
 
 ## 3.11.1
 `2024-10-9`

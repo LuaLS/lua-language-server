@@ -101,7 +101,7 @@ local function askAutoRequire(uri, visiblePaths)
     return nameMap[result]
 end
 
-local function applyAutoRequire(uri, row, name, result, fmt)
+local function applyAutoRequire(uri, row, name, result, fmt, fullKeyPath)
     local quotedResult = ('%q'):format(result)
     if fmt.quot == "'" then
         quotedResult = ([['%s']]):format(quotedResult:sub(2, -2)
@@ -119,7 +119,7 @@ local function applyAutoRequire(uri, row, name, result, fmt)
     if fmt.col and fmt.col > #text then
         sp = (' '):rep(fmt.col - #text - 1)
     end
-    text = ('local %s%s= require%s\n'):format(name, sp, quotedResult)
+    text = ('local %s%s= require%s%s\n'):format(name, sp, quotedResult, fullKeyPath)
     client.editText(uri, {
         {
             start  = guide.positionOf(row, 0),
@@ -159,6 +159,6 @@ return function (data)
 
     local offset, fmt = findInsertRow(uri)
     if offset and fmt then
-        applyAutoRequire(uri, offset, name, requireName, fmt)
+        applyAutoRequire(uri, offset, name, requireName, fmt, data.fullKeyPath or '')
     end
 end

@@ -8,6 +8,8 @@ local rpath     = require 'workspace.require-path'
 local vm        = require 'vm'
 local matchKey  = require 'core.matchkey'
 
+local ipairs = ipairs
+
 ---@class auto-require
 local m = {}
 
@@ -36,6 +38,7 @@ end
 function m.check(state, word, position, callback)
     local globals = util.arrayToHash(config.get(state.uri, 'Lua.diagnostics.globals'))
     local locals = guide.getVisibleLocals(state.ast, position)
+    local hit = false
     for uri in files.eachFile(state.uri) do
         if uri == guide.getUri(state.ast) then
             goto CONTINUE
@@ -85,11 +88,67 @@ function m.check(state, word, position, callback)
                 and vm.getDeprecated(targetSource.node) then
                     goto INNER_CONTINUE
                 end
+                hit = true
                 callback(uri, stemName, targetSource)
             end
             ::INNER_CONTINUE::
         end
         ::CONTINUE::
+    end
+    -- 如果没命中, 则检查枚举
+    if not hit then
+        local docs = vm.getDocSets(state.uri)
+        for _, doc in ipairs(docs) do
+            if doc.type ~= 'doc.enum' or vm.getDeprecated(doc) then
+                goto CONTINUE
+            end
+            -- 检查枚举名是否匹配
+            if not (doc.enum[1] == word or doc.enum[1]:match(".*%.([^%.]*)$") == word) then
+                goto CONTINUE
+            end
+            local uri = guide.getUri(doc)
+            local targetState = files.getState(uri)
+            if not targetState then
+                goto CONTINUE
+            end
+            local targetSource = m.getTargetSource(targetState)
+            if not targetSource or (targetSource.type ~= 'getlocal' and targetSource.type ~= 'table') or vm.getDeprecated(targetSource.node) then
+                goto CONTINUE
+            end
+            -- 枚举的完整路径
+            local fullKeyPath = ""
+            local node = doc.bindSource.parent
+            while node do
+                -- 检查是否可见
+                if not vm.isVisible(state.ast, node) then
+                    goto CONTINUE
+                end
+                if node.type == 'setfield' or node.type == 'getfield' then
+                    fullKeyPath = "." .. node.field[1] .. fullKeyPath
+                end
+                if node.type == 'getlocal' then
+                    node = node.node
+                    break
+                end
+                node = node.node
+            end
+            -- 匹配导出的值, 确定最终路径
+            if targetSource.node == node then
+                hit = true
+            elseif targetSource.type == 'table' then
+                for _, value in ipairs(targetSource) do
+                    if value.value.node == node then
+                        fullKeyPath = "." .. value.value[1] .. fullKeyPath
+                        hit = true
+                        break
+                    end
+                end
+            end
+            if hit then
+                callback(guide.getUri(doc), nil, nil, fullKeyPath)
+            end
+            ::CONTINUE::
+        end
     end
 end
 

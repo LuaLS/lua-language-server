@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` A regression related to type narrow and generic param introduced since `v3.10.1`
 * `FIX` Reference should also look in tablefield
+* `FIX` Determine that the index of `{...}` is an integer when iterating
 
 ## 3.11.1
 `2024-10-9`

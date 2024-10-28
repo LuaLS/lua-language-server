@@ -4591,3 +4591,11 @@ local function f(v) end
 
 local <?r?> = f('')
 ]]
+
+TEST 'integer' [[
+local function F(...)
+    local t = {...}
+    for <?k?> in pairs(t) do
+    end
+end
+]]

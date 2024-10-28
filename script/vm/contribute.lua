@@ -4,14 +4,14 @@ local M = Class 'VM.Contribute'
 ---@class VM.Contribute.Global
 ---@field kind 'global'
 ---@field field Node.Field
----@field path? (string | number | boolean)[]
+---@field path? Node.Key[]
 
----@class VM.Contribute.Field
----@field kind 'field'
+---@class VM.Contribute.TypeField
+---@field kind 'typefield'
 ---@field typeName string
 ---@field field Node.Field
 
----@alias VM.Contribute.Action VM.Contribute.Global | VM.Contribute.Field
+---@alias VM.Contribute.Action VM.Contribute.Global | VM.Contribute.TypeField
 
 ---@param scope Scope
 function M:__init(scope)
@@ -32,8 +32,8 @@ end
 ---@param action VM.Contribute.Action
 function M:commit(action)
     local kind = action.kind
-    if kind == 'field' then
-        ---@cast action VM.Contribute.Field
+    if kind == 'typefield' then
+        ---@cast action VM.Contribute.TypeField
         local tp = self.scope.node.type(action.typeName)
         tp:addField(action.field)
     elseif kind == 'global' then
@@ -46,8 +46,8 @@ end
 ---@param action VM.Contribute.Action
 function M:revert(action)
     local kind = action.kind
-    if kind == 'field' then
-        ---@cast action VM.Contribute.Field
+    if kind == 'typefield' then
+        ---@cast action VM.Contribute.TypeField
         local tp = self.scope.node.type(action.typeName)
         tp:removeField(action.field)
     elseif kind == 'global' then

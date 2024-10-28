@@ -9,7 +9,7 @@ do
 
     local vfile = vm:createFile('test.lua')
     vfile.contribute:commit {
-        kind = 'field',
+        kind = 'typefield',
         typeName = 'A',
         field = {
             key = node.value 'x',
@@ -23,7 +23,7 @@ do
     assert(a.value:view() == 'A')
 
     vfile.contribute:commit {
-        kind = 'field',
+        kind = 'typefield',
         typeName = 'A',
         field = {
             key = node.value 'x',
@@ -87,5 +87,57 @@ do
     vfile:indexAst(ast)
 
     assert(g:get('A'):view() == '1')
+    assert(node:globalGet('A'):view() == 'A')
     assert(node:globalGet('A').value:view() == '1')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local g = node.type '_G'
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        A.B.C = 1
+    ]]
+    vfile:indexAst(ast)
+
+    assert(g:get('A'):view() == 'unknown')
+    assert(node:globalGet('A', 'B', 'C'):view() == 'A.B.C')
+    assert(node:globalGet('A', 'B', 'C').value:view() == '1')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local g = node.type '_G'
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        A[1].C = 1
+    ]]
+    vfile:indexAst(ast)
+
+    assert(g:get('A'):view() == 'unknown')
+    assert(node:globalGet('A', 1, 'C'):view() == 'A[1].C')
+    assert(node:globalGet('A', 1, 'C').value:view() == '1')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local g = node.type '_G'
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        A[XXX].C = 1
+    ]]
+    vfile:indexAst(ast)
+
+    assert(g:get('A'):view() == 'unknown')
+    assert(node:globalGet('A', node.UNKNOWN, 'C'):view() == 'A[unknown].C')
+    assert(node:globalGet('A', node.UNKNOWN, 'C').value:view() == '1')
 end

@@ -141,3 +141,21 @@ do
     assert(node:globalGet('A', node.UNKNOWN, 'C'):view() == 'A[unknown].C')
     assert(node:globalGet('A', node.UNKNOWN, 'C').value:view() == '1')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local g = node.type '_G'
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@class _G
+        ---@field A 1
+    ]]
+    vfile:indexAst(ast)
+
+    assert(g:get('A'):view() == '1')
+    assert(node:globalGet('A'):view() == 'A')
+    assert(node:globalGet('A').value:view() == '1')
+end

@@ -132,9 +132,10 @@ end
 -- 跳过注释
 ---@private
 ---@param inExp? boolean # 在表达式中
+---@param inBlock? boolean # 在代码块中
 ---@return boolean # 是否成功跳过注释
-function M:skipComment(inExp)
-    local comment = self:parseComment(inExp)
+function M:skipComment(inExp, inBlock)
+    local comment = self:parseComment(inExp, inBlock)
     if comment then
         self.comments[#self.comments+1] = comment
         return true
@@ -167,8 +168,8 @@ function M:skipSpace(inExp, inBlock)
         self.lastRightCI = self.lexer.ci
     end
     repeat until not self:skipNL()
-            and  not (inBlock and self:skipCat())
-            and  not self:skipComment(inExp)
+            and  not (not inBlock and self:skipCat())
+            and  not self:skipComment(inExp, inBlock)
             and  not self:skipUnknown()
     ---@private
     self.lastSpaceCI = self.lexer.ci

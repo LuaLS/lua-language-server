@@ -2,6 +2,7 @@
 require 'parser.ast.cats.id'
 require 'parser.ast.cats.class'
 require 'parser.ast.cats.type'
+require 'parser.ast.cats.field'
 require 'parser.ast.cats.union'
 require 'parser.ast.cats.intersection'
 require 'parser.ast.cats.function'
@@ -37,20 +38,34 @@ CatAttr.kind = 'catattr'
 local Ast = Class 'LuaParser.Ast'
 
 ---@private
+---@type table<string, LuaParser.Node.CatConfig>
 Ast.catParserMap = {}
+
+---@class LuaParser.Node.CatConfig
+---@field asState? boolean
+---@field parser fun(self: LuaParser.Ast)
 
 ---@private
 ---@param catType string
----@param parser fun(self: LuaParser.Ast)
-function Ast:registerCatParser(catType, parser)
-    Ast.catParserMap[catType] = parser
+---@param config LuaParser.Node.CatConfig
+function Ast:registerCatParser(catType, config)
+    Ast.catParserMap[catType] = config
 end
 
-Ast:registerCatParser('class', Ast.parseCatClass)
-Ast:registerCatParser('type',  function (self)
-    ---@diagnostic disable-next-line: invisible
-    return self:parseCatType(true)
-end)
+Ast:registerCatParser('class', {
+    asState = true,
+    parser = Ast.parseCatClass,
+})
+Ast:registerCatParser('type',  {
+    parser = function (self)
+        ---@diagnostic disable-next-line: invisible
+        return self:parseCatType(true)
+    end
+})
+Ast:registerCatParser('field', {
+    asState = true,
+    parser = Ast.parseCatField,
+})
 
 ---@private
 ---@return boolean
@@ -131,9 +146,9 @@ function Ast:parseCat()
         cat.attrPos2 = self.lexer:consume ')'
     end
 
-    local parser = Ast.catParserMap[cat.subtype]
-    if parser then
-        local value = parser(self)
+    local config = Ast.catParserMap[cat.subtype]
+    if config then
+        local value = config.parser(self)
         if value then
             cat.value = value
             value.parent = cat
@@ -149,7 +164,6 @@ function Ast:parseCat()
     return cat
 end
 
----会将解析结果存放到 `Ast.cats` 中
 ---@private
 function Ast:parseCatBlock()
     

@@ -28,10 +28,11 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param inExp? boolean
+---@param inBlock? boolean
 ---@return LuaParser.Node.Comment?
-function Ast:parseComment(inExp)
+function Ast:parseComment(inExp, inBlock)
     return self:parseLongComment()
-        or self:parseShortComment(inExp)
+        or self:parseShortComment(inExp, inBlock)
 end
 
 ---@private

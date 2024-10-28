@@ -9,6 +9,7 @@ require 'parser.ast.state.for'
 require 'parser.ast.state.while'
 require 'parser.ast.state.repeat'
 require 'parser.ast.state.break'
+require 'parser.ast.cats.cat'
 
 ---@class LuaParser.Node.Assign: LuaParser.Node.Base
 ---@field symbolPos? integer # 等号的位置
@@ -47,6 +48,7 @@ local Ast = Class 'LuaParser.Ast'
 ---| LuaParser.Node.While
 ---| LuaParser.Node.Repeat
 ---| LuaParser.Node.Function
+---| LuaParser.Node.Cat
 
 ---@private
 Ast.stateParserMap = {}
@@ -56,6 +58,7 @@ Ast.stateParserMap = {}
 ---@param token string
 ---@param parser fun(self: LuaParser.Ast): LuaParser.Node.State?, boolean?
 function Ast:registerStateParser(token, parser)
+    assert(parser)
     self.stateParserMap[token] = parser
 end
 

@@ -108,7 +108,7 @@ function Ast:blockParseChilds(block)
     local lastState
     while true do
         while self.lexer:consume ';' do
-            self:skipSpace()
+            self:skipSpace(false, true)
         end
         local token, _, pos = self.lexer:peek()
         if not token then

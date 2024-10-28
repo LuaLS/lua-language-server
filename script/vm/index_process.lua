@@ -44,6 +44,9 @@ function M:parseState(state)
             end
             ::continue::
         end
+    elseif state.kind == 'cat' then
+        ---@cast state LuaParser.Node.Cat
+        self:parseCat(state)
     end
 end
 

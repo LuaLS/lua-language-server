@@ -23,7 +23,7 @@ function TEST(text)
             files.setText(TESTURI, text)
             EditResult = nil
             local row, fmt = findInsertRow(TESTURI)
-            applyAutoRequire(TESTURI, row, name, name, fmt)
+            applyAutoRequire(TESTURI, row, name, name, fmt, "")
             assert(util.equal(EditResult, expect))
             files.remove(TESTURI)
         end

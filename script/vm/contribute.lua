@@ -6,12 +6,21 @@ local M = Class 'VM.Contribute'
 ---@field field Node.Field
 ---@field path? Node.Key[]
 
----@class VM.Contribute.TypeField
----@field kind 'typefield'
----@field typeName string
+---@class VM.Contribute.Class
+---@field kind 'class'
+---@field name string
+---@field location? Node.Location
+
+---@class VM.Contribute.ClassField
+---@field kind 'classfield'
+---@field className string
 ---@field field Node.Field
 
----@alias VM.Contribute.Action VM.Contribute.Global | VM.Contribute.TypeField
+
+---@alias VM.Contribute.Action
+---| VM.Contribute.Global
+---| VM.Contribute.Class
+---| VM.Contribute.ClassField
 
 ---@param scope Scope
 function M:__init(scope)
@@ -32,13 +41,16 @@ end
 ---@param action VM.Contribute.Action
 function M:commit(action)
     local kind = action.kind
-    if kind == 'typefield' then
-        ---@cast action VM.Contribute.TypeField
-        local tp = self.scope.node.type(action.typeName)
+    if kind == 'classfield' then
+        ---@cast action VM.Contribute.ClassField
+        local tp = self.scope.node.type(action.className)
         tp:addField(action.field)
     elseif kind == 'global' then
         ---@cast action VM.Contribute.Global
         self.scope.node:globalAdd(action.field, action.path)
+    elseif kind == 'class' then
+        ---@cast action VM.Contribute.Class
+        self.scope.node.type(action.name):addClass(action.location)
     end
     self.history[#self.history+1] = action
 end
@@ -46,13 +58,16 @@ end
 ---@param action VM.Contribute.Action
 function M:revert(action)
     local kind = action.kind
-    if kind == 'typefield' then
-        ---@cast action VM.Contribute.TypeField
-        local tp = self.scope.node.type(action.typeName)
+    if kind == 'classfield' then
+        ---@cast action VM.Contribute.ClassField
+        local tp = self.scope.node.type(action.className)
         tp:removeField(action.field)
     elseif kind == 'global' then
         ---@cast action VM.Contribute.Global
         self.scope.node:globalRemove(action.field, action.path)
+    elseif kind == 'class' then
+        ---@cast action VM.Contribute.Class
+        self.scope.node.type(action.name):removeClass(action.location)
     end
 end
 

@@ -57,18 +57,14 @@ end
 
 ---@return boolean
 function M:isComplex()
-    if self.table
-    or self.extends
-    or self.alias
-    or self.variables then
-        return true
-    end
-    return false
+    return self:isClassLike()
+        or self:isAliasLike()
 end
 
 ---@return boolean
 function M:isClassLike()
-    if self.table
+    if self.classLocations
+    or self.table
     or self.extends
     or self.variables then
         return true
@@ -83,6 +79,28 @@ function M:isAliasLike()
         return true
     end
     return false
+end
+
+---@type Node.Location[]
+M.classLocations = nil
+
+---@param location Node.Location
+function M:addClass(location)
+    if not self.classLocations then
+        self.classLocations = {}
+    end
+    self.classLocations[#self.classLocations+1] = location
+end
+
+---@param location Node.Location
+function M:removeClass(location)
+    if not self.classLocations then
+        return
+    end
+    ls.util.arrayRemove(self.classLocations, location)
+    if #self.classLocations == 0 then
+        self.classLocations = nil
+    end
 end
 
 ---@param extends Node.Type | Node.Typecall | Node.Table

@@ -29,6 +29,7 @@ end
 ---@private
 ---@param state LuaParser.Node.State
 function M:parseState(state)
+    local lastClass
     if state.kind == 'assign' then
         ---@cast state LuaParser.Node.Assign
         for _, exp in ipairs(state.exps) do
@@ -46,8 +47,30 @@ function M:parseState(state)
         end
     elseif state.kind == 'cat' then
         ---@cast state LuaParser.Node.Cat
-        self:parseCat(state)
+        local value = state.value
+        if not value then
+            goto continue
+        end
+        if value.kind == 'catclass' then
+            ---@cast value LuaParser.Node.CatClass
+            self:parseCatClass(value)
+            lastClass = value
+        elseif value.kind == 'catfield' then
+            ---@cast value LuaParser.Node.CatField
+            self:parseCatField(value, lastClass)
+        end
+        ::continue::
     end
+end
+
+---@param lnode LuaParser.Node.Base
+---@return Node.Location
+function M:makeLocation(lnode)
+    return {
+        uri = self.vfile.uri,
+        offset = lnode.start,
+        length = lnode.finish - lnode.start,
+    }
 end
 
 ---@param key Node.Key
@@ -66,12 +89,6 @@ function M:makeField(key, value, var)
         nkey = key
     end
     local nvalue
-    ---@type Node.Location
-    local location = {
-        uri = self.vfile.uri,
-        offset = var.start,
-        length = var.finish - var.start,
-    }
     if not value or value.kind == 'nil' then
         nvalue = node.NIL
     elseif value.isLiteral then
@@ -87,7 +104,7 @@ function M:makeField(key, value, var)
     local field = {
         key = nkey,
         value = nvalue,
-        location = location,
+        location = self:makeLocation(var),
     }
     return field
 end
@@ -173,6 +190,40 @@ function M:parseField(field)
         field = nfield,
         path = path,
     }
+end
+
+---@private
+---@param value LuaParser.Node.CatClass
+function M:parseCatClass(value)
+    self.results[#self.results+1] = {
+        kind = 'class',
+        name = value.classID.id,
+        location = self:makeLocation(value)
+    }
+end
+
+---@private
+---@param value LuaParser.Node.CatField
+---@param lastClass? LuaParser.Node.CatClass
+function M:parseCatField(value, lastClass)
+    if not lastClass then
+        return
+    end
+    local className = lastClass.classID.id
+    self.results[#self.results+1] = {
+        kind = 'classfield',
+        className = className,
+        field = {
+            key = self.scope.node.value(value.key.id),
+            value = self:parseNode(value.value) or self.scope.node.UNKNOWN,
+            location = self:makeLocation(value),
+        }
+    }
+end
+
+---@param value LuaParser.Node.CatType
+function M:parseNode(value)
+    
 end
 
 ---@param vfile VM.Vfile

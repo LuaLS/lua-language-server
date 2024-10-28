@@ -9,8 +9,8 @@ do
 
     local vfile = vm:createFile('test.lua')
     vfile.contribute:commit {
-        kind = 'typefield',
-        typeName = 'A',
+        kind = 'classfield',
+        className = 'A',
         field = {
             key = node.value 'x',
             value = node.NUMBER,
@@ -23,8 +23,8 @@ do
     assert(a.value:view() == 'A')
 
     vfile.contribute:commit {
-        kind = 'typefield',
-        typeName = 'A',
+        kind = 'classfield',
+        className = 'A',
         field = {
             key = node.value 'x',
             value = node.STRING,

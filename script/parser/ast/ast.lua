@@ -160,13 +160,14 @@ end
 -- 跳过空白符
 ---@private
 ---@param inExp? boolean # 在表达式中
-function M:skipSpace(inExp)
+---@param inBlock? boolean # 在代码块中
+function M:skipSpace(inExp, inBlock)
     if self.lexer.ci ~= self.lastSpaceCI then
         ---@private
         self.lastRightCI = self.lexer.ci
     end
     repeat until not self:skipNL()
-            and  not self:skipCat()
+            and  not (inBlock and self:skipCat())
             and  not self:skipComment(inExp)
             and  not self:skipUnknown()
     ---@private

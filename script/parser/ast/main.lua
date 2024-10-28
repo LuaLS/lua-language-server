@@ -60,7 +60,7 @@ function Ast:parseMain()
         self.localCount = 0
     end
 
-    self:skipSpace()
+    self:skipSpace(false, true)
     self:blockParseChilds(main)
     self:blockFinish(main)
 

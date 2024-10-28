@@ -69,6 +69,7 @@ Ast:registerStateParser('while'   , Ast.parseWhile)
 Ast:registerStateParser('repeat'  , Ast.parseRepeat)
 Ast:registerStateParser('continue', Ast.parseContinue)
 Ast:registerStateParser('::'      , Ast.parseLabel)
+Ast:registerStateParser('--'      , Ast.parseCat)
 Ast:registerStateParser('goto'    , function (ast)
     ---@class LuaParser.Ast
     local self = ast

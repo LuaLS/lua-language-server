@@ -28,8 +28,9 @@ function M:parseBlock(block)
     end
     self.parsedBlock[block] = true
     local isMain = block.isMain
+    local cache = {}
     for _, child in ipairs(block.childs) do
-        self:parseState(child, isMain)
+        self:parseState(child, isMain, cache)
     end
 end
 
@@ -50,8 +51,8 @@ end
 ---@private
 ---@param state LuaParser.Node.State
 ---@param isMain boolean
-function M:parseState(state, isMain)
-    local lastClass
+---@param cache table
+function M:parseState(state, isMain, cache)
     if isMain and state.kind == 'assign' then
         ---@cast state LuaParser.Node.Assign
         for _, exp in ipairs(state.exps) do
@@ -76,10 +77,10 @@ function M:parseState(state, isMain)
         if value.kind == 'catclass' then
             ---@cast value LuaParser.Node.CatClass
             self:parseCatClass(value)
-            lastClass = value
+            cache.lastClass = value
         elseif value.kind == 'catfield' then
             ---@cast value LuaParser.Node.CatField
-            self:parseCatField(value, lastClass)
+            self:parseCatField(value, cache.lastClass)
         end
         ::continue::
     end
@@ -237,15 +238,37 @@ function M:parseCatField(value, lastClass)
         className = className,
         field = {
             key = self.scope.node.value(value.key.id),
-            value = self:parseNode(value.value) or self.scope.node.UNKNOWN,
+            value = self:parseNode(value.value),
             location = self:makeLocation(value),
         }
     }
 end
 
----@param value LuaParser.Node.CatType
+---@param value? LuaParser.Node.CatType
+---@return Node
 function M:parseNode(value)
-    
+    local node = self.scope.node
+    if not value then
+        return node.ANY
+    end
+    local kind = value.kind
+    if kind == 'catid' then
+        ---@cast value LuaParser.Node.CatID
+        return node.type(value.id)
+    end
+    if kind == 'catinteger' then
+        ---@cast value LuaParser.Node.CatInteger
+        return node.value(value.value)
+    end
+    if kind == 'catboolean' then
+        ---@cast value LuaParser.Node.CatBoolean
+        return node.value(value.value)
+    end
+    if kind == 'catstring' then
+        ---@cast value LuaParser.Node.CatString
+        return node.value(value.value)
+    end
+    return node.ANY
 end
 
 ---@param vfile VM.Vfile

@@ -127,7 +127,7 @@ function Ast:blockParseChilds(block)
                 self:throw('ACTION_AFTER_RETURN', lastState.start, lastState.finish)
             end
             lastState = state
-            self:skipSpace()
+            self:skipSpace(false, true)
         else
             if block.isMain then
                 self.lexer:next()

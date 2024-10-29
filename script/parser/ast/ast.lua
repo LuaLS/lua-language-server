@@ -65,7 +65,6 @@ function M:__init(code, version, options)
     ---@type LuaParser.Node.Block?
     self.curBlock    = nil
     -- 按类型存放的节点
-    ---@private
     ---@type table<string, LuaParser.Node.Base[]>
     self.nodesMap = util.multiTable(2)
     -- 存放所有的block
@@ -79,7 +78,7 @@ function M:__init(code, version, options)
     ---@private
     ---@type LuaParser.Status
     self.status = 'Lua'
-    -- 未绑定的注解
+    ---未绑定的注解
     ---@private
     self.cats = {}
 

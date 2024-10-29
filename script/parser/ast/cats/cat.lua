@@ -174,7 +174,7 @@ end
 ---@return string?
 function Ast:parseTail()
     local startOffset = self:getLastPos() + 1
-    local tail = self.code:match('[^\r\n]+', startOffset)
+    local tail = self.code:match('^[^\r\n]+', startOffset)
     if not tail then
         return nil
     end

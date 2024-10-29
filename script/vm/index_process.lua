@@ -13,24 +13,46 @@ end
 function M:start()
     ---@type VM.Contribute.Action[]
     self.results = {}
+    self.parsedBlock = {}
     local main = self.ast.main
     self:parseBlock(main)
+    self:parseClasses(self.ast.nodesMap['catclass'])
     return self.results
 end
 
 ---@private
----@param block LuaParser.Node.Function
+---@param block LuaParser.Node.Block
 function M:parseBlock(block)
+    if self.parsedBlock[block] then
+        return
+    end
+    self.parsedBlock[block] = true
+    local isMain = block.isMain
     for _, child in ipairs(block.childs) do
-        self:parseState(child)
+        self:parseState(child, isMain)
+    end
+end
+
+---@private
+---@param classes LuaParser.Node.CatClass[]
+function M:parseClasses(classes)
+    if not classes then
+        return
+    end
+    for _, class in ipairs(classes) do
+        local block = class.parentBlock
+        if block then
+            self:parseBlock(block)
+        end
     end
 end
 
 ---@private
 ---@param state LuaParser.Node.State
-function M:parseState(state)
+---@param isMain boolean
+function M:parseState(state, isMain)
     local lastClass
-    if state.kind == 'assign' then
+    if isMain and state.kind == 'assign' then
         ---@cast state LuaParser.Node.Assign
         for _, exp in ipairs(state.exps) do
             if not exp.value then

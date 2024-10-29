@@ -3,6 +3,7 @@ require 'parser.ast.cats.id'
 require 'parser.ast.cats.class'
 require 'parser.ast.cats.type'
 require 'parser.ast.cats.field'
+require 'parser.ast.cats.alias'
 require 'parser.ast.cats.union'
 require 'parser.ast.cats.intersection'
 require 'parser.ast.cats.function'
@@ -28,6 +29,7 @@ Cat.kind = 'cat'
 ---| LuaParser.Node.CatClass
 ---| LuaParser.Node.CatType
 ---| LuaParser.Node.CatField
+---| LuaParser.Node.CatAlias
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
@@ -66,6 +68,10 @@ Ast:registerCatParser('type',  {
 Ast:registerCatParser('field', {
     asState = true,
     parser = Ast.parseCatField,
+})
+Ast:registerCatParser('alias', {
+    asState = true,
+    parser = Ast.parseCatAlias,
 })
 
 ---@private

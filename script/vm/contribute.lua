@@ -16,11 +16,18 @@ local M = Class 'VM.Contribute'
 ---@field className string
 ---@field field Node.Field
 
+---@class VM.Contribute.Alias
+---@field kind 'alias'
+---@field name string
+---@field value Node
+---@field location? Node.Location
+
 
 ---@alias VM.Contribute.Action
 ---| VM.Contribute.Global
 ---| VM.Contribute.Class
 ---| VM.Contribute.ClassField
+---| VM.Contribute.Alias
 
 ---@param scope Scope
 function M:__init(scope)
@@ -51,6 +58,9 @@ function M:commit(action)
     elseif kind == 'class' then
         ---@cast action VM.Contribute.Class
         self.scope.node.type(action.name):addClass(action.location)
+    elseif kind == 'alias' then
+        ---@cast action VM.Contribute.Alias
+        self.scope.node.type(action.name):addAlias(action.value, action.location)
     end
     self.history[#self.history+1] = action
 end
@@ -68,6 +78,9 @@ function M:revert(action)
     elseif kind == 'class' then
         ---@cast action VM.Contribute.Class
         self.scope.node.type(action.name):removeClass(action.location)
+    elseif kind == 'alias' then
+        ---@cast action VM.Contribute.Alias
+        self.scope.node.type(action.name):removeAlias(action.value, action.location)
     end
 end
 

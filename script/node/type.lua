@@ -90,6 +90,8 @@ function M:addClass(location)
         self.classLocations = {}
     end
     self.classLocations[#self.classLocations+1] = location
+
+    self:flushCache()
 end
 
 ---@param location Node.Location
@@ -101,6 +103,8 @@ function M:removeClass(location)
     if #self.classLocations == 0 then
         self.classLocations = nil
     end
+
+    self:flushCache()
 end
 
 ---@param extends Node.Type | Node.Typecall | Node.Table
@@ -133,13 +137,24 @@ function M:removeExtends(extends)
     return self
 end
 
+---@type Node.Location[]
+M.aliasLocations = nil
+
 ---@param alias Node
+---@param location? Node.Location
 ---@return Node.Type
-function M:addAlias(alias)
+function M:addAlias(alias, location)
     if not self.alias then
         self.alias = ls.linkedTable.create()
     end
     self.alias:pushTail(alias)
+
+    if location then
+        if not self.aliasLocations then
+            self.aliasLocations = {}
+        end
+        self.aliasLocations[#self.aliasLocations+1] = location
+    end
 
     self:flushCache()
 
@@ -147,14 +162,22 @@ function M:addAlias(alias)
 end
 
 ---@param alias Node
+---@param location? Node.Location
 ---@return Node.Type
-function M:removeAlias(alias)
+function M:removeAlias(alias, location)
     if not self.alias then
         return self
     end
     self.alias:pop(alias)
     if self.alias:getSize() == 0 then
         self.alias = nil
+    end
+
+    if location and self.aliasLocations then
+        ls.util.arrayRemove(self.aliasLocations, location)
+        if #self.aliasLocations == 0 then
+            self.aliasLocations = nil
+        end
     end
 
     self:flushCache()
@@ -317,7 +340,7 @@ M.__getter.value = function (self)
     if self:isAliasLike() then
         if self.alias:getSize() == 1 then
             local head = self.alias:getHead()
-            return head.value, true
+            return head, true
         end
         local alias = self.alias:toArray()
         local union = self.scope.node.union(alias)

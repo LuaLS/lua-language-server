@@ -159,3 +159,45 @@ do
     assert(node:globalGet('A'):view() == 'A')
     assert(node:globalGet('A').value:view() == 'unknown')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A 1
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == '1')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A 1 | 2 | 3
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == '1 | 2 | 3')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A B & C & D
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == 'B & C & D')
+end

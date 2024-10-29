@@ -1,4 +1,3 @@
-
 ---@class LuaParser.Node.CatClass: LuaParser.Node.Base
 ---@field classID LuaParser.Node.CatID
 ---@field symbolPos? integer # :的位置

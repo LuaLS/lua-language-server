@@ -17,6 +17,7 @@ function M:start()
     local main = self.ast.main
     self:parseBlock(main)
     self:parseClasses(self.ast.nodesMap['catclass'])
+    self:parseAliases(self.ast.nodesMap['catalias'])
     return self.results
 end
 
@@ -45,6 +46,22 @@ function M:parseClasses(classes)
         if block then
             self:parseBlock(block)
         end
+    end
+end
+
+---@private
+---@param aliases LuaParser.Node.CatAlias[]
+function M:parseAliases(aliases)
+    if not aliases then
+        return
+    end
+    for _, alias in ipairs(aliases) do
+        self.results[#self.results+1] = {
+            kind = 'alias',
+            name = alias.aliasID.id,
+            value = self:parseNode(alias.extends),
+            location = self:makeLocation(alias),
+        }
     end
 end
 
@@ -267,6 +284,18 @@ function M:parseNode(value)
     if kind == 'catstring' then
         ---@cast value LuaParser.Node.CatString
         return node.value(value.value)
+    end
+    if kind == 'catunion' then
+        ---@cast value LuaParser.Node.CatUnion
+        return node.union(ls.util.map(value.exps, function (v, k)
+            return self:parseNode(v)
+        end))
+    end
+    if kind == 'catintersection' then
+        ---@cast value LuaParser.Node.CatIntersection
+        return node.intersection(ls.util.map(value.exps, function (v, k)
+            return self:parseNode(v)
+        end))
     end
     return node.ANY
 end

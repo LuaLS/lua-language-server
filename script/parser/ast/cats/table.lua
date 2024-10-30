@@ -1,4 +1,3 @@
-
 ---@class LuaParser.Node.CatTable: LuaParser.Node.Base
 ---@field fields LuaParser.Node.CatTableField[]
 local CatTable = Class('LuaParser.Node.CatTable', 'LuaParser.Node.Base')

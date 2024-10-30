@@ -11,6 +11,7 @@ require 'parser.ast.cats.table'
 require 'parser.ast.cats.boolean'
 require 'parser.ast.cats.integer'
 require 'parser.ast.cats.string'
+require 'parser.ast.cats.tuple'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string

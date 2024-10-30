@@ -219,3 +219,45 @@ do
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A [1, 2, 3]
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == '[1, 2, 3]')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A string[3][4]
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == 'string[3][4]')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A table<number, boolean>
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == 'table<number, boolean>')
+end

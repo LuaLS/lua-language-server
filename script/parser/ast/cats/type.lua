@@ -11,6 +11,7 @@
 ---| LuaParser.Node.CatBoolean
 ---| LuaParser.Node.CatInteger
 ---| LuaParser.Node.CatString
+---| LuaParser.Node.CatTuple
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
@@ -21,6 +22,7 @@ CatParen.kind = 'catparen'
 
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatType
+---@field size? LuaParser.Node.CatInteger
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 local CatArray = Class('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
@@ -54,6 +56,7 @@ function Ast:parseCatTerm(required)
     local head = self:parseCatParen()
             or   self:parseCatFunction()
             or   self:parseCatTable()
+            or   self:parseCatTuple()
             or   self:parseCatBoolean()
             or   self:parseCatInteger()
             or   self:parseCatString()
@@ -134,6 +137,9 @@ function Ast:parseCatArray(head)
     head.parent = array
 
     self:skipSpace()
+    array.size = self:parseCatInteger()
+    self:skipSpace()
+
     array.symbolPos2 = self:assertSymbol ']'
     array.finish = self:getLastPos()
 

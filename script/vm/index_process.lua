@@ -317,6 +317,22 @@ function M:parseNode(value)
         end
         return t
     end
+    if kind == 'cattuple' then
+        ---@cast value LuaParser.Node.CatTuple
+        return node.tuple(ls.util.map(value.exps, function (v, k)
+            return self:parseNode(v)
+        end))
+    end
+    if kind == 'catarray' then
+        ---@cast value LuaParser.Node.CatArray
+        return node.array(self:parseNode(value.node), value.size and value.size.value)
+    end
+    if kind == 'catcall' then
+        ---@cast value LuaParser.Node.CatCall
+        return node.type(value.node.id):call(ls.util.map(value.args, function (v, k)
+            return self:parseNode(v)
+        end))
+    end
     return node.ANY
 end
 

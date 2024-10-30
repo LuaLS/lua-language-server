@@ -97,7 +97,6 @@ TEST [[
 --- x: number,
 --- y: number,
 --- [number]: boolean,
---- ...: string,
 ---}
 ]]
 {
@@ -121,11 +120,6 @@ TEST [[
                         subtype = 'index',
                         key = { id = 'number' },
                         value = { id = 'boolean' },
-                    },
-                    [4] = {
-                        subtype = 'field',
-                        key = { id = '...' },
-                        value = { id = 'string' },
                     },
                 }
             }

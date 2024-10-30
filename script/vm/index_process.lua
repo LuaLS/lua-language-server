@@ -297,6 +297,26 @@ function M:parseNode(value)
             return self:parseNode(v)
         end))
     end
+    if kind == 'cattable' then
+        ---@cast value LuaParser.Node.CatTable
+        local t = node.table()
+        for _, field in ipairs(value.fields) do
+            if field.subtype == 'field' then
+                t:addField {
+                    key      = node.value(field.key.id),
+                    value    = self:parseNode(field.value),
+                    location = self:makeLocation(field),
+                }
+            else
+                t:addField {
+                    key      = self:parseNode(field.key --[[@as LuaParser.Node.CatType]]),
+                    value    = self:parseNode(field.value),
+                    location = self:makeLocation(field),
+                }
+            end
+        end
+        return t
+    end
     return node.ANY
 end
 

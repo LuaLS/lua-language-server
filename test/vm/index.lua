@@ -201,3 +201,21 @@ do
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'B & C & D')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A {
+        --- x: number,
+        --- y: string,
+        --- [number]: boolean,
+        ---}
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
+end

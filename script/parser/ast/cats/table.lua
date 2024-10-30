@@ -99,18 +99,7 @@ end
 ---@private
 ---@return LuaParser.Node.CatTableField?
 function Ast:parseCatTableFieldAsField()
-    local key
-
-    local pos = self.lexer:consume '...'
-    if pos then
-        key = self:createNode('LuaParser.Node.CatTableFieldID', {
-            start  = pos,
-            finish = pos + #'...',
-            id     = '...',
-        })
-    else
-        key = self:parseID('LuaParser.Node.CatTableFieldID', false, true)
-    end
+    local key = self:parseID('LuaParser.Node.CatTableFieldID', false, true)
 
     if not key then
         return nil

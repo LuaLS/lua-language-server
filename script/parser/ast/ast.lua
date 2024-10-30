@@ -123,6 +123,27 @@ function M:skipNL()
     or status == 'LongCats'
     or status == 'LongLua' then
         return self.lexer:consumeType 'NL' ~= nil
+    elseif status == 'ShortCats' then
+        local _, tp = self.lexer:peek()
+        if tp ~= 'NL' then
+            return false
+        end
+        local s1, _, p1 = self.lexer:peek(1)
+        local s2, _, p2 = self.lexer:peek(2)
+        if s1 ~= '--' and s2 ~= '-' then
+            return false
+        end
+        ---@cast p1 -?
+        ---@cast p2 -?
+        local s3 = self.lexer:peek(3)
+        if s3 == '@' then
+            return false
+        end
+        if p1 + 2 ~= p2 then
+            return false
+        end
+        self.lexer:fastForward(p2 + 1)
+        return true
     else
         return false
     end

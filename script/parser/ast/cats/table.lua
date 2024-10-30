@@ -57,6 +57,7 @@ function Ast:parseCatTableFields()
     local fields = {}
     local wantSep = false
     while true do
+        self:skipSpace()
         local token, _, pos = self.lexer:peek()
         if not token or token == '}' then
             break

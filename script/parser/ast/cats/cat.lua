@@ -77,36 +77,12 @@ Ast:registerCatParser('alias', {
 ---@private
 ---@return boolean
 function Ast:skipCat()
-    if self:skipMultiLineCatHead()
-    or self:parseCat()
+    if self:parseCat()
     or self:parseCatBlock() then
         return true
     else
         return false
     end
-end
-
----@private
----@return boolean
-function Ast:skipMultiLineCatHead()
-    if self.status ~= 'ShortCats' then
-        return false
-    end
-    -- 下1个token是 `NL`，下2个token是 `---` 但不是 `---@`
-    local _, nlType = self.lexer:peek(1)
-    if nlType ~= 'NL' then
-        return false
-    end
-    local token, _, pos = self.lexer:peek(2)
-    if token ~= '--' then
-        return false
-    end
-    if self.code:sub(pos + 1, pos + 3) ~= '---'
-    or self.code:sub(pos + 4, pos + 4) == '@' then
-        return false
-    end
-    self.lexer:fastForward(pos + 3)
-    return true
 end
 
 -- 会将解析结果存放到 `Ast.cats` 中

@@ -54,3 +54,81 @@ TEST [[
         }
     }
 }
+
+TEST [[
+---@alias A 1
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catalias',
+                aliasID = {
+                    kind = 'catid',
+                    id   = 'A',
+                },
+                extends = {
+                    kind  = 'catinteger',
+                    value = 1,
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+---@type A
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catid',
+                id   = 'A',
+            }
+        }
+    }
+}
+
+TEST [[
+---@type {
+--- x: number,
+--- y: number,
+--- [number]: boolean,
+--- ...: string,
+---}
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'cattable',
+                fields = {
+                    [1] = {
+                        subtype = 'field',
+                        key = { id = 'x' },
+                        value = { id = 'number' },
+                    },
+                    [2] = {
+                        subtype = 'field',
+                        key = { id = 'y' },
+                        value = { id = 'number' },
+                    },
+                    [3] = {
+                        subtype = 'index',
+                        key = { id = 'number' },
+                        value = { id = 'boolean' },
+                    },
+                    [4] = {
+                        subtype = 'field',
+                        key = { id = '...' },
+                        value = { id = 'string' },
+                    },
+                }
+            }
+        }
+    }
+}

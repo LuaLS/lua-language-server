@@ -24,7 +24,7 @@ do
     assert(table:view() == '{ [<N:number>]: <U> }')
 
     assert(func:view() == 'fun(a: <N:number>, ...: <U>):[<N:number>, <U>]')
-    func:bindGenericPack(pack)
+    func:bindGenerics { N, U }
     assert(func:view() == 'fun<N:number, U>(a: <N:number>, ...: <U>):[<N:number>, <U>]')
 
     assert(union:view() == '<N:number> | <U>')
@@ -239,7 +239,7 @@ do
     map:addField {
         key   = test.scope.node.value 'set',
         value = test.scope.node.func()
-            : bindGenericPack(test.scope.node.genericPack { V })
+            : bindGenerics { V }
             : addParam('key', K)
             : addParam('value', V),
     }

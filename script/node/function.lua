@@ -267,10 +267,10 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
----@param pack Node.GenericPack
+---@param generics Node.Generic[]
 ---@return Node.Function
-function M:bindGenericPack(pack)
-    self.genericPack = pack
+function M:bindGenerics(generics)
+    self.genericPack = self.scope.node.genericPack(generics)
     return self
 end
 

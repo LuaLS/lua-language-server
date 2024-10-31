@@ -342,9 +342,9 @@ function M:parseNode(value)
             func:setAsync()
         end
         if value.generics then
-            func:bindGenericPack(node.genericPack(ls.util.map(value.generics, function (g, k)
+            func:bindGenerics(ls.util.map(value.generics, function (g, k)
                 return self:makeGeneric(g)
-            end)))
+            end))
         end
         if value.params then
             for _, param in ipairs(value.params) do

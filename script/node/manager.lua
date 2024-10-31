@@ -258,7 +258,7 @@ function M:fillPresets()
     do
         local K = self.generic('K', self.ANY, self.ANY)
         local V = self.generic('V', self.ANY, self.ANY)
-        self.TABLE:bindParams { K, V }
+        self.TABLE:addParams { K, V }
         self.TABLE:addField {
             key   = K,
             value = V,

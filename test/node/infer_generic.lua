@@ -293,7 +293,7 @@ do
     local map = test.scope.node.type 'Map'
     local K = test.scope.node.generic 'K'
     local V = test.scope.node.generic 'V'
-    map:bindParams { K, V }
+    map:addParams { K, V }
     map:addField { key = K, value = V }
 
     local T1 = test.scope.node.generic 'T1'

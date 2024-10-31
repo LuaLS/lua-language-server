@@ -33,12 +33,12 @@ function M:resolveGeneric(map)
 end
 
 function M:view(skipLevel)
-    if not self.head.params then
+    if not self.head.paramPacks then
         return self.head.typeName
     end
     return string.format('%s<%s>'
         , self.head.typeName
-        , table.concat(ls.util.map(self.head.params.generics, function (generic, i)
+        , table.concat(ls.util.map(self.head.paramPacks[1].generics, function (generic, i)
             local arg = self.args[i]
             if arg then
                 return arg:view(skipLevel)

@@ -68,7 +68,7 @@ do
 
     local a = node.type 'A'
     local T = node.generic 'T'
-    a:bindParams { T }
+    a:addParams { T }
     a:addField {
         key = node.value 'x',
         value = T,

@@ -370,8 +370,8 @@ M.__getter.falsy = function (self)
 end
 
 function M:view(skipLevel)
-    if self.params and not self._hideEmptyArgs then
-        return self.typeName .. self.params:view(skipLevel)
+    if self.paramPacks and not self._hideEmptyArgs then
+        return self.typeName .. self.paramPacks[1]:view(skipLevel)
     else
         return self.typeName
     end
@@ -473,7 +473,7 @@ function M:onCanCast(other)
 end
 
 function M:get(key)
-    if self.params then
+    if self.paramPacks then
         return self:call():get(key)
     end
     if self.value == self then
@@ -486,43 +486,66 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    return self.params ~= nil, true
+    return self.paramPacks ~= nil, true
 end
 
----@type Node.GenericPack?
-M.params = nil
+---@type Node.GenericPack[]?
+M.paramPacks = nil
 
 ---@param generics Node.Generic[]
 ---@return Node.Type
-function M:bindParams(generics)
-    self.params = self.scope.node.genericPack(generics)
+function M:addParams(generics)
+    if not self.paramPacks then
+        self.paramPacks = {}
+    end
+    self.paramPacks[#self.paramPacks+1] = self.scope.node.genericPack(generics)
+    return self
+end
+
+---@param generics Node.Generic[]
+---@return Node.Type
+function M:removeParams(generics)
+    if not self.paramPacks then
+        return self
+    end
+    for i, pack in ipairs(self.paramPacks) do
+        if pack.generics == generics then
+            table.remove(self.paramPacks, i)
+            break
+        end
+    end
+    if #self.paramPacks == 0 then
+        self.paramPacks = nil
+    end
     return self
 end
 
 ---@param args Node[]
 ---@return Node
 function M:getValueWithArgs(args)
-    if not self.params then
+    if not self.paramPacks then
         return self.value
     end
     local map = {}
-    for i, param in ipairs(self.params.generics) do
-        map[param] = args[i] or param.value
+    for _, pack in ipairs(self.paramPacks) do
+        for i, param in ipairs(pack.generics) do
+            map[param] = args[i] or param.value
+        end
     end
     local resolvedValue = self.value:resolveGeneric(map)
     return resolvedValue
 end
 
----@param pack Node.GenericPack
+---@param map table<Node.Generic, Node>
 ---@return Node.Type | Node.Typecall
-function M:resolveGeneric(pack)
-    if not self.params then
+function M:resolveGeneric(map)
+    if not self.paramPacks then
         return self
     end
+    local pack = self.paramPacks[1]
     local nodes = {}
-    for _, param in ipairs(self.params.generics) do
-        local value = pack:getGeneric(param)
-        nodes[#nodes+1] = value
+    for _, param in ipairs(pack.generics) do
+        nodes[#nodes+1] = map[param] or param
     end
     return self:call(nodes)
 end
@@ -530,7 +553,7 @@ end
 ---@param nodes? Node[]
 ---@return Node.Type | Node.Typecall
 function M:call(nodes)
-    if not self.params then
+    if not self.paramPacks then
         return self
     end
     if not nodes then

@@ -3,9 +3,11 @@
 ---@field childs LuaParser.Node.State[]
 ---@field locals LuaParser.Node.Local[]
 ---@field labels LuaParser.Node.Label[]
+---@field generics LuaParser.Node.CatGeneric[]
 ---@field isMain boolean
 ---@field localMap table<string, LuaParser.Node.Local>
 ---@field labelMap table<string, LuaParser.Node.Label>
+---@field genericMap table<string, LuaParser.Node.CatGeneric>
 local Block = Class('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.kind = 'block'
@@ -61,6 +63,28 @@ Block.__getter.labelMap = function (self)
     return setmetatable({}, {
         __index = function (t, k)
             local v = parentLabelMap[k] or false
+            t[k] = v
+            return v
+        end
+    }), true
+end
+
+Block.__getter.generics = function ()
+    return {}, true
+end
+
+---@param self LuaParser.Node.Block
+---@return table
+---@return true
+Block.__getter.genericMap = function (self)
+    local parentBlock = self.parentBlock
+    if not parentBlock then
+        return {}, true
+    end
+    local parentGenericMap = parentBlock.genericMap
+    return setmetatable({}, {
+        __index = function (t, k)
+            local v = parentGenericMap[k] or false
             t[k] = v
             return v
         end

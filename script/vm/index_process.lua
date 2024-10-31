@@ -14,6 +14,8 @@ function M:start()
     ---@type VM.Contribute.Action[]
     self.results = {}
     self.parsedBlock = {}
+    ---@type table<LuaParser.Node.CatGeneric, Node.Generic>
+    self.generics = {}
     local main = self.ast.main
     self:parseBlock(main)
     self:parseClasses(self.ast.nodesMap['catclass'])
@@ -333,7 +335,53 @@ function M:parseNode(value)
             return self:parseNode(v)
         end))
     end
+    if kind == 'catfunction' then
+        ---@cast value LuaParser.Node.CatFunction
+        local func = node.func()
+        if value.async then
+            func:setAsync()
+        end
+        if value.generics then
+            func:bindGenericPack(node.genericPack(ls.util.map(value.generics, function (g, k)
+                return self:makeGeneric(g)
+            end)))
+        end
+        if value.params then
+            for _, param in ipairs(value.params) do
+                local name = param.name
+                if name == '...' then
+                    func:addVarargParam(self:parseNode(param.value))
+                else
+                    func:addParam(name.id, self:parseNode(param.value))
+                end
+            end
+        end
+        if value.returns then
+            for _, ret in ipairs(value.returns) do
+                local name = ret.name and ret.name.id
+                if name == '...' then
+                    func:addVarargReturn(self:parseNode(ret.value))
+                else
+                    func:addReturn(name, self:parseNode(ret.value))
+                end
+            end
+        end
+        return func
+    end
     return node.ANY
+end
+
+---@param generic LuaParser.Node.CatGeneric
+---@return Node.Generic
+function M:makeGeneric(generic)
+    if self.generics[generic] then
+        return self.generics[generic]
+    end
+    local gnode = self.scope.node.generic(generic.id.id, generic.extends and self:parseNode(generic.extends))
+
+    self.generics[generic] = gnode
+
+    return gnode
 end
 
 ---@param vfile VM.Vfile

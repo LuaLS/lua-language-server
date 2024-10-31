@@ -261,3 +261,20 @@ do
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'table<number, boolean>')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A async fun<T1: table, T2>(a: T1, ...: T2)
+        ---: T2[]
+        ---, desc: string
+        ---, ...: T1
+    ]]
+    vfile:indexAst(ast)
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: T1, ...: T2):(T2[], (desc: string), (...: T1))')
+end

@@ -78,9 +78,6 @@ function M:__init(code, version, options)
     ---@private
     ---@type LuaParser.Status
     self.status = 'Lua'
-    ---未绑定的注解
-    ---@private
-    self.cats = {}
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
     ---@type integer

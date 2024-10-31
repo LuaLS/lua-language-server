@@ -1,6 +1,7 @@
 
 ---@class LuaParser.Node.CatID: LuaParser.Node.Base
 ---@field id string
+---@field generic? LuaParser.Node.CatGeneric
 local CatID = Class('LuaParser.Node.CatID', 'LuaParser.Node.Base')
 
 CatID.kind = 'catid'
@@ -24,9 +25,17 @@ function Ast:parseCatID()
     local finish = pos + #id
     self.lexer:fastForward(finish)
 
-    return self:createNode('LuaParser.Node.CatID', {
+    local res = self:createNode('LuaParser.Node.CatID', {
         id     = id,
         start  = pos,
         finish = finish,
     })
+
+    local block = self.curBlock
+    if block then
+        local generic = block.genericMap[id]
+        res.generic = generic
+    end
+
+    return res
 end

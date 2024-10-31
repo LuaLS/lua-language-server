@@ -1,8 +1,8 @@
 
 ---@class LuaParser.Node.CatFunction: LuaParser.Node.Base
----@field params LuaParser.Node.CatParam[]
----@field returns LuaParser.Node.CatType[]
----@field generics LuaParser.Node.CatGeneric[]
+---@field params? LuaParser.Node.CatParam[]
+---@field returns? LuaParser.Node.CatReturn[]
+---@field generics? LuaParser.Node.CatGeneric[]
 ---@field funPos      integer # `fun` 的位置
 ---@field genericPos1? integer # `<` 的位置
 ---@field genericPos2? integer # `>` 的位置
@@ -43,7 +43,7 @@ CatParamName.kind = 'catparamname'
 
 ---@class LuaParser.Node.CatReturn: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
----@field name LuaParser.Node.CatReturnName
+---@field name? LuaParser.Node.CatReturnName
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatType
 local CatReturn = Class('LuaParser.Node.CatReturn', 'LuaParser.Node.Base')
@@ -80,8 +80,6 @@ function Ast:parseCatFunction()
         start   = syncPos or funPos,
         async   = syncPos and true or false,
         funPos  = funPos,
-        params  = {},
-        returns = {},
     })
 
     self:skipSpace()
@@ -89,9 +87,14 @@ function Ast:parseCatFunction()
     if funNode.genericPos1 then
 
         self:skipSpace()
+        local block = self.curBlock
         funNode.generics = self:parseCatGenericList()
         for _, generic in ipairs(funNode.generics) do
             generic.parent = funNode
+            if block then
+                block.generics[#block.generics+1] = generic
+                block.genericMap[generic.id.id] = generic
+            end
         end
 
         self:skipSpace()

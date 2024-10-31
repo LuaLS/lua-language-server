@@ -30,6 +30,11 @@ function M:__init(scope)
     self.returnMap = {}
 end
 
+function M:setAsync()
+    self.async = true
+    return self
+end
+
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
@@ -209,20 +214,30 @@ function M:view(skipLevel)
 
     local returns = {}
     for i, v in ipairs(self.returns) do
-        returns[i] = v.value:view()
+        if v.key then
+            returns[i] = string.format('(%s: %s)', v.key, v.value:view())
+        else
+            returns[i] = v.value:view()
+        end
     end
     if self.varargReturn then
         returns[#returns+1] = string.format('(...: %s)', self.varargReturn:view())
     end
 
     if #returns > 0 then
-        return string.format('fun%s(%s):%s'
+        local returnPart = table.concat(returns, ', ')
+        if #returns > 1 then
+            returnPart = '(' .. returnPart .. ')'
+        end
+        return string.format('%sfun%s(%s):%s'
+            , self.async and 'async ' or ''
             , self.genericPack and self.genericPack:view(skipLevel) or ''
             , table.concat(params, ', ')
-            , table.concat(returns, ', ')
+            , returnPart
         )
     else
-        return string.format('fun%s(%s)'
+        return string.format('%sfun%s(%s)'
+            , self.async and 'async ' or ''
             , self.genericPack and self.genericPack:view(skipLevel) or ''
             , table.concat(params, ', ')
         )

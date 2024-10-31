@@ -155,5 +155,5 @@ do
         : addReturn('suc', test.scope.node.value(true))
         : addReturn(nil, test.scope.node.value(false))
 
-    assert(func:view() == 'fun(a: 1, b: 2):true, false')
+    assert(func:view() == 'fun(a: 1, b: 2):((suc: true), false)')
 end

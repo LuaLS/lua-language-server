@@ -226,7 +226,7 @@ TEST [[
                             kind = 'catparamname',
                             id   = 'a',
                         },
-                        value = { kind = 'catid', id = 'T1' },
+                        value = { kind = 'catid', id = 'T1', generic = {} },
                     },
                     [2] = {
                         kind = 'catparam',
@@ -235,7 +235,7 @@ TEST [[
                             kind = 'catparamname',
                             id   = '...',
                         },
-                        value = { kind = 'catid', id = 'T2' },
+                        value = { kind = 'catid', id = 'T2', generic = {} },
                     },
                 },
                 returns = {
@@ -254,7 +254,7 @@ TEST [[
                         kind = 'catreturn',
                         index = 3,
                         name = { kind = 'catreturnname', id = '...' },
-                        value = { kind = 'catid', id = 'T1' },
+                        value = { kind = 'catid', id = 'T1', generic = {} },
                     }
                 }
             }

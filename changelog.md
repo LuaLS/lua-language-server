@@ -2,7 +2,23 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.12.0
+`2024-10-30`
+* `NEW` Support importing `enum` through class name suffix matching in quick fixes, allowing the import of `enum` from `table.table.enum; return table`.
+* `NEW` Support limited multiline annotations
+  ```lua
+  ---@type {
+  --- x: number,
+  --- y: number,
+  --- z: number,
+  ---}
+  local point --> local point: { x: number, y: number, z: number }
+  ```
 * `FIX` A regression related to type narrow and generic param introduced since `v3.10.1`
+* `FIX` Parse storagePath to improve reliability of resolving ${addons} placeholder
+* `FIX` Reference should also look in tablefield
+* `FIX` Determine that the index of `{...}` is an integer when iterating
 
 ## 3.11.1
 `2024-10-9`

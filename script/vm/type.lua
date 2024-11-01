@@ -656,8 +656,7 @@ function vm.getTableValue(uri, tnode, knode, inversion)
                     end
                 end
                 if  field.type == 'tableexp'
-                and field.value
-                and field.tindex == 1 then
+                and field.value then
                     if inversion then
                         if vm.isSubType(uri, 'integer', knode) then
                             result:merge(vm.compileNode(field.value))

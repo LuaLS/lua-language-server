@@ -3139,6 +3139,44 @@ emit.on(emit, 'won', <??>)
 }
 
 TEST [[
+--- @alias event.AAA "AAA"
+--- @alias event.BBB "BBB"
+
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: event.AAA, cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: event.BBB, cb: fun(s: string))
+local emit = {}
+
+emit:on('AAA', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(i: integer)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+--- @alias event.AAA "AAA"
+--- @alias event.BBB "BBB"
+
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: event.AAA, cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: event.BBB, cb: fun(s: string))
+local emit = {}
+
+emit:on('BBB', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(s: string)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
 local function f()
     local inferCache
     in<??>

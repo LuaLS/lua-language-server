@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* NEW Support for Linux RISCV64 builds.
 
 ## 3.12.0
 `2024-10-30`

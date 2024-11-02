@@ -25,6 +25,8 @@ elseif platform.os == 'linux' then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
         lm.cc = 'aarch64-linux-gnu-gcc'
+    elseif lm.platform == "linux-riscv64" then
+        lm.cc = 'riscv64-linux-gnu-gcc'
     else
         error "unknown platform"
     end
@@ -49,6 +51,7 @@ local ARCH <const> = {
     x86_64 = 'x64',
     i686 = 'ia32',
     arm64 = 'arm64',
+    riscv64 = 'riscv64'
 }
 
 local function detectArch()

@@ -2,7 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` Using variables to retrieve array elements always prompts the first element type
+* `NEW` Setting: `Lua.type.inferTableSize`: A Small Table array can be infered
 
 ## 3.12.0
 `2024-10-30`

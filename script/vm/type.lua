@@ -668,8 +668,6 @@ function vm.getTableValue(uri, tnode, knode, inversion)
                             result:merge(vm.compileNode(field.value))
                         end
                     end
-                elseif field.tindex and field.tindex > N then
-                    fprint("field.tindex = %s", field.tindex)
                 end
                 if field.type == 'varargs' then
                     result:merge(vm.compileNode(field))

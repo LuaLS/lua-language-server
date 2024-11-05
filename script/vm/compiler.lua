@@ -962,6 +962,26 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     local function dealDocFunc(n)
         local myEvent
         if n.args[eventIndex] then
+            if eventMap and myIndex > eventIndex then
+                -- if call param has literal types, then also check if function def param has literal types
+                -- 1. has no literal values => not enough info, thus allowed by default
+                -- 2. has literal values and >= 1 matches call param's literal types => allowed
+                -- 3. has literal values but none matches call param's literal types => filtered
+                local myEventMap = vm.getLiterals(n.args[eventIndex])
+                if myEventMap then
+                    local found = false
+                    for k in pairs(eventMap) do
+                        if myEventMap[k] then
+                            -- there is a matching literal
+                            found = true
+                            break
+                        end
+                    end
+                    if not found then
+                        return
+                    end
+                end
+            end
             local argNode = vm.compileNode(n.args[eventIndex])
             myEvent = argNode:get(1)
         end

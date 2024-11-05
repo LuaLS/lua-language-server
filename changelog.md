@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Improve type narrow with **literal alias type** during completion and signature help
 * `NEW` Setting: `Lua.type.inferTableSize`: A Small Table array can be infered
 
 ## 3.12.0

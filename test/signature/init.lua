@@ -373,6 +373,40 @@ t:event("onTimer", <??>)
 '(method) (ev: "onTimer", <!t: integer!>)',
 }
 
+TEST [[
+---@alias event.onChat "onChat"
+---@alias event.onTimer "onTimer"
+
+---@class A
+---@field event fun(self: self, ev: event.onChat, c: string)
+---@field event fun(self: self, ev: event.onTimer, t: integer)
+
+---@type A
+local t
+
+t:event("onChat", <??>)
+]]
+{
+'(method) (ev: "onChat", <!c: string!>)',
+}
+
+TEST [[
+---@alias event.onChat "onChat"
+---@alias event.onTimer "onTimer"
+
+---@class A
+---@field event fun(self: self, ev: event.onChat, c: string)
+---@field event fun(self: self, ev: event.onTimer, t: integer)
+
+---@type A
+local t
+
+t:event("onTimer", <??>)
+]]
+{
+'(method) (ev: "onTimer", <!t: integer!>)',
+}
+
 local config = require 'config'
 config.set(nil, "Lua.type.inferParamType", true)
 

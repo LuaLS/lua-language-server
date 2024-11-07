@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Add custom repository support for addonManager. New configuration setting: `Lua.addonManager.repository_branch` and `Lua.addonManager.repository_path`
 
 ## 3.12.0
 `2024-10-30`

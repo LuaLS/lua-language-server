@@ -615,6 +615,7 @@ end
 ---@return vm.node?
 function vm.getTableValue(uri, tnode, knode, inversion)
     local result = vm.createNode()
+    local inferSize = config.get(uri, "Lua.type.inferTableSize")
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
@@ -657,7 +658,7 @@ function vm.getTableValue(uri, tnode, knode, inversion)
                 end
                 if  field.type == 'tableexp'
                 and field.value
-                and field.tindex == 1 then
+                and field.tindex <= inferSize then
                     if inversion then
                         if vm.isSubType(uri, 'integer', knode) then
                             result:merge(vm.compileNode(field.value))

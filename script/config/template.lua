@@ -403,6 +403,7 @@ local template = {
     ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
     ['Lua.type.inferParamType']             = Type.Boolean >> false,
     ['Lua.type.checkTableShape']            = Type.Boolean >> false,
+    ['Lua.type.inferTableSize']             = Type.Integer >> 10,
     ['Lua.doc.privateName']                 = Type.Array(Type.String),
     ['Lua.doc.protectedName']               = Type.Array(Type.String),
     ['Lua.doc.packageName']                 = Type.Array(Type.String),

@@ -4,7 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` Improve type narrow with **literal alias type** during completion and signature help
 * `NEW` Setting: `Lua.type.inferTableSize`: A Small Table array can be infered
-* `NEW` Add custom repository support for addonManager. New configuration setting: `Lua.addonManager.repository_branch` and `Lua.addonManager.repository_path`
+* `NEW` Add custom repository support for addonManager. New configuration setting: `Lua.addonManager.repositoryBranch` and `Lua.addonManager.repositoryPath`
 
 ## 3.12.0
 `2024-10-30`

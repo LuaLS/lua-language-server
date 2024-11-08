@@ -2,9 +2,9 @@
 
 config.addonManager.enable        =
 "是否启用扩展的附加插件管理器(Addon Manager)"
-config.addonManager.repository_branch =
+config.addonManager.repositoryBranch =
 "指定插件管理器(Addon Manager)使用的git仓库分支"
-config.addonManager.repository_path =
+config.addonManager.repositoryPath =
 "指定插件管理器(Addon Manager)使用的git仓库路径"
 config.runtime.version            =
 "Lua运行版本。"

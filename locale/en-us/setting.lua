@@ -2,9 +2,9 @@
 
 config.addonManager.enable        =
 "Whether the addon manager is enabled or not."
-config.addonManager.repository_branch =
+config.addonManager.repositoryBranch =
 "Specifies the git branch used by the addon manager."
-config.addonManager.repository_path =
+config.addonManager.repositoryPath =
 "Specifies the git path used by the addon manager."
 config.runtime.version            =
 "Lua runtime version."

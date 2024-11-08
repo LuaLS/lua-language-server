@@ -415,8 +415,8 @@ local template = {
     ["Lua.docScriptPath"]                   = Type.String,
     -- VSCode
     ["Lua.addonManager.enable"]             = Type.Boolean >> true,
-    ["Lua.addonManager.repository_path"]    = Type.String,
-    ["Lua.addonManager.repository_branch"]    = Type.String,
+    ["Lua.addonManager.repositoryPath"]    = Type.String,
+    ["Lua.addonManager.repositoryBranch"]    = Type.String,
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
                                             -- copy from VSCode default
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean) >> {

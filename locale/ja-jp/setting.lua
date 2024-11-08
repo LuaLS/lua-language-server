@@ -2,9 +2,9 @@
 
 config.addonManager.enable        = -- TODO: need translate!
 "Whether the addon manager is enabled or not."
-config.addonManager.repository_branch = -- TODO: need translate!
+config.addonManager.repositoryBranch = -- TODO: need translate!
 "Specifies the git branch used by the addon manager."
-config.addonManager.repository_path = -- TODO: need translate!
+config.addonManager.repositoryPath = -- TODO: need translate!
 "Specifies the git path used by the addon manager."
 config.runtime.version            = -- TODO: need translate!
 "Lua runtime version."

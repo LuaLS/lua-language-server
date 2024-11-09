@@ -1135,6 +1135,80 @@ xpcall(work, debug.traceback, function (<?value?>)
 end)
 ]]
 
+config.set(nil, "Lua.type.inferParamType", true)
+
+TEST 'Class' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback) end
+
+local function cb(<?value?>) end
+work(cb)
+]]
+
+TEST 'any' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback) end
+
+---@param value any
+local function cb(<?value?>) end
+work(cb)
+]]
+
+TEST 'any' [[
+---@class Class
+
+function work(callback) end
+
+local function cb(<?value?>) end
+work(cb)
+]]
+
+TEST 'string' [[
+---@class Class
+
+function work(callback) end
+
+---@param value string
+local function cb(<?value?>) end
+work(cb)
+]]
+
+
+TEST 'Parent' [[
+---@class Parent
+local Parent
+
+---@generic T
+---@param self T
+---@param callback fun(self: T)
+function Parent:work(callback) end
+
+local function cb(<?self?>) end
+Parent:work(cb)
+]]
+
+TEST 'Child' [[
+---@class Parent
+local Parent
+
+---@generic T
+---@param self T
+---@param callback fun(self: T)
+function Parent:work(callback) end
+
+---@class Child: Parent
+local Child
+
+local function cb(<?self?>) end
+Child:work(cb)
+]]
+
+config.set(nil, "Lua.type.inferParamType", false)
+
 TEST 'string' [[
 ---@generic T
 ---@param x T

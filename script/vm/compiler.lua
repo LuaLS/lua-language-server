@@ -1209,7 +1209,56 @@ local function compileFunctionParam(func, source)
             end
             ::continue::
         end
-        return found
+        if found then
+            return true
+        end
+        -- infer local callback function param type
+        --[[
+            ---@param callback fun(a: integer)
+            function register(callback) end
+
+            local function callback(a) end  --> a: integer
+            register(callback)
+        ]]
+        for _, ref in ipairs(refs) do
+            if ref.parent.type ~= 'callargs' then
+                goto continue
+            end
+            -- the parent function is a variable used as callback param, find the callback arg index first
+            local call = ref.parent.parent
+            local cbIndex
+            for i, arg in ipairs(call.args) do
+                if arg == ref then
+                    cbIndex = i
+                    break
+                end
+            end
+            ---@cast cbIndex integer
+
+            -- simulate a completion at `cbIndex` to infer this callback function type
+            ---@diagnostic disable-next-line: missing-fields
+            local node = vm.compileCallArg({ type = 'dummyarg', uri = guide.getUri(call) }, call, cbIndex)
+            if not node then
+                goto continue
+            end
+            for n in node:eachObject() do
+                -- check if the inferred function has arg at `aindex`
+                if n.type == 'doc.type.function' and n.args and n.args[aindex] then
+                    -- use type info on this `aindex` arg
+                    local argNode = vm.compileNode(n.args[aindex])
+                    for an in argNode:eachObject() do
+                        if an.type ~= 'doc.generic.name' then
+                            vm.setNode(source, an)
+                            found = true
+                        end
+                    end
+                end
+            end
+            ::continue::
+        end
+        if found then
+            return true
+        end
     end
 
     do

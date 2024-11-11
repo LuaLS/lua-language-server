@@ -5,6 +5,14 @@
 * `FIX` Improve type narrow with **literal alias type** during completion and signature help
 * `NEW` Setting: `Lua.type.inferTableSize`: A Small Table array can be infered
 * `NEW` Add custom repository support for addonManager. New configuration setting: `Lua.addonManager.repositoryBranch` and `Lua.addonManager.repositoryPath`
+* `NEW` Infer function parameter types when the function is used as an callback argument and that argument has a `fun()` annotation. Enable with `Lua.type.inferParamType` setting. [#2695](https://github.com/LuaLS/lua-language-server/pull/2695)
+  ```lua
+  ---@param callback fun(a: integer)
+  function register(callback) end
+
+  local function callback(a) end  --> a: integer
+  register(callback)
+  ```
 
 ## 3.12.0
 `2024-10-30`

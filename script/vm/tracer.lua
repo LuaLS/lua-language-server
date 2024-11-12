@@ -627,7 +627,7 @@ local lookIntoChild = util.switch()
     ---@param action   parser.object
     ---@param topNode  vm.node
     ---@param outNode? vm.node
-        : call(function (tracer, action, topNode, outNode)
+    : call(function (tracer, action, topNode, outNode)
         if not action[1] or not action[2] then
             tracer:lookIntoChild(action[1], topNode)
             tracer:lookIntoChild(action[2], topNode)
@@ -677,8 +677,10 @@ local lookIntoChild = util.switch()
                 end
             elseif handler.type == 'getfield'
             and    handler.node.type == 'getlocal' then
-                local tys = getNodeTypesWithLiteralField(
-                    tracer.uri, handler.node, handler.field[1], checker)
+                local tys
+                if handler.field then
+                    tys = getNodeTypesWithLiteralField(tracer.uri, handler.node, handler.field[1], checker)
+                end
 
                 -- TODO: handle more types
                 if tys and #tys == 1 then

@@ -11,8 +11,8 @@ local Ast = Class 'LuaParser.Ast'
 ---| LuaParser.Node.LabelName
 ---| LuaParser.Node.AttrName
 ---| LuaParser.Node.CatAttr
----| LuaParser.Node.CatParamName
----| LuaParser.Node.CatReturnName
+---| LuaParser.Node.CatFuncParamName
+---| LuaParser.Node.CatFuncReturnName
 
 ---@private
 ---@generic T: LuaParser.Node.ID

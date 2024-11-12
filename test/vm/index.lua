@@ -84,7 +84,7 @@ do
     local ast = ls.parser.compile [[
         A = 1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == '1')
     assert(node:globalGet('A'):view() == 'A')
@@ -101,7 +101,7 @@ do
     local ast = ls.parser.compile [[
         A.B.C = 1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == 'unknown')
     assert(node:globalGet('A', 'B', 'C'):view() == 'A.B.C')
@@ -118,7 +118,7 @@ do
     local ast = ls.parser.compile [[
         A[1].C = 1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == 'unknown')
     assert(node:globalGet('A', 1, 'C'):view() == 'A[1].C')
@@ -135,7 +135,7 @@ do
     local ast = ls.parser.compile [[
         A[XXX].C = 1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == 'unknown')
     assert(node:globalGet('A', node.UNKNOWN, 'C'):view() == 'A[unknown].C')
@@ -153,7 +153,7 @@ do
         ---@class _G
         ---@field A 1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == '1')
     assert(node:globalGet('A'):view() == 'A')
@@ -168,7 +168,7 @@ do
     local ast = ls.parser.compile [[
         ---@alias A 1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '1')
@@ -182,7 +182,7 @@ do
     local ast = ls.parser.compile [[
         ---@alias A 1 | 2 | 3
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '1 | 2 | 3')
@@ -196,7 +196,7 @@ do
     local ast = ls.parser.compile [[
         ---@alias A B & C & D
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'B & C & D')
@@ -214,7 +214,7 @@ do
         --- [number]: boolean,
         ---}
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
@@ -228,7 +228,7 @@ do
     local ast = ls.parser.compile [[
         ---@alias A [1, 2, 3]
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '[1, 2, 3]')
@@ -242,7 +242,7 @@ do
     local ast = ls.parser.compile [[
         ---@alias A string[3][4]
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'string[3][4]')
@@ -256,7 +256,7 @@ do
     local ast = ls.parser.compile [[
         ---@alias A table<number, boolean>
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'table<number, boolean>')
@@ -273,7 +273,7 @@ do
         ---, desc: string
         ---, ...: T1
     ]]
-    vfile:indexAst(ast)
+    vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: T1, ...: T2):(T2[], (desc: string), (...: T1))')

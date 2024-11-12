@@ -12,6 +12,8 @@ require 'parser.ast.cats.boolean'
 require 'parser.ast.cats.integer'
 require 'parser.ast.cats.string'
 require 'parser.ast.cats.tuple'
+require 'parser.ast.cats.param'
+require 'parser.ast.cats.return'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string
@@ -31,6 +33,8 @@ Cat.kind = 'cat'
 ---| LuaParser.Node.CatType
 ---| LuaParser.Node.CatField
 ---| LuaParser.Node.CatAlias
+---| LuaParser.Node.CatParam
+---| LuaParser.Node.CatReturn
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
@@ -73,6 +77,14 @@ Ast:registerCatParser('field', {
 Ast:registerCatParser('alias', {
     asState = true,
     parser = Ast.parseCatAlias,
+})
+Ast:registerCatParser('param', {
+    asState = true,
+    parser = Ast.parseCatParam,
+})
+Ast:registerCatParser('return', {
+    asState = true,
+    parser = Ast.parseCatReturn,
 })
 
 ---@private

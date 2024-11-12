@@ -1,11 +1,17 @@
 ---@class VM.IndexProcess
 local M = Class 'VM.IndexProcess'
 
+---@alias VM.IndexProcess.Mode
+---| 'meta'
+---| 'common'
+
 ---@param vfile VM.Vfile
 ---@param ast LuaParser.Ast
-function M:__init(vfile, ast)
+---@param mode VM.IndexProcess.Mode
+function M:__init(vfile, ast, mode)
     self.vfile = vfile
     self.ast = ast
+    self.mode = mode
     self.scope = vfile.scope
 end
 
@@ -13,23 +19,28 @@ end
 function M:start()
     ---@type VM.Contribute.Action[]
     self.results = {}
-    self.parsedBlock = {}
+    self.parsed = {}
     ---@type table<LuaParser.Node.CatGeneric, Node.Generic>
     self.generics = {}
+    ---@type table<LuaParser.Node.State, VM.DocGroup>
+    self.bindMap = {}
     local main = self.ast.main
+
     self:parseBlock(main)
-    self:parseClasses(self.ast.nodesMap['catclass'])
-    self:parseAliases(self.ast.nodesMap['catalias'])
+    if self.mode == 'common' then
+        self:parseClasses(self.ast.nodesMap['catclass'])
+        self:parseAliases(self.ast.nodesMap['catalias'])
+    end
     return self.results
 end
 
 ---@private
 ---@param block LuaParser.Node.Block
 function M:parseBlock(block)
-    if self.parsedBlock[block] then
+    if self.parsed[block] then
         return
     end
-    self.parsedBlock[block] = true
+    self.parsed[block] = true
     local isMain = block.isMain
     local cache = {}
     for _, child in ipairs(block.childs) do
@@ -58,13 +69,23 @@ function M:parseAliases(aliases)
         return
     end
     for _, alias in ipairs(aliases) do
-        self.results[#self.results+1] = {
-            kind = 'alias',
-            name = alias.aliasID.id,
-            value = self:parseNode(alias.extends),
-            location = self:makeLocation(alias),
-        }
+        self:parseCatAlias(alias)
     end
+end
+
+---@private
+---@param alias LuaParser.Node.CatAlias
+function M:parseCatAlias(alias)
+    if self.parsed[alias] then
+        return
+    end
+    self.parsed[alias] = true
+    self.results[#self.results+1] = {
+        kind = 'alias',
+        name = alias.aliasID.id,
+        value = self:parseNode(alias.extends),
+        location = self:makeLocation(alias),
+    }
 end
 
 ---@private
@@ -72,6 +93,10 @@ end
 ---@param isMain boolean
 ---@param cache table
 function M:parseState(state, isMain, cache)
+    if self.parsed[state] then
+        return
+    end
+    self.parsed[state] = true
     if isMain and state.kind == 'assign' then
         ---@cast state LuaParser.Node.Assign
         for _, exp in ipairs(state.exps) do
@@ -87,6 +112,9 @@ function M:parseState(state, isMain, cache)
             end
             ::continue::
         end
+    elseif state.kind == 'function' then
+        ---@cast state LuaParser.Node.Function
+        self:parseFuncState(state)
     elseif state.kind == 'cat' then
         ---@cast state LuaParser.Node.Cat
         local value = state.value
@@ -100,9 +128,63 @@ function M:parseState(state, isMain, cache)
         elseif value.kind == 'catfield' then
             ---@cast value LuaParser.Node.CatField
             self:parseCatField(value, cache.lastClass)
+        elseif value.kind == 'catalias' then
+            ---@cast value LuaParser.Node.CatAlias
+            self:parseCatAlias(value)
+        elseif value.kind == 'catparam' then
+            self:addFuncCatGroup(state)
+        elseif value.kind == 'catreturn' then
+            self:addFuncCatGroup(state)
         end
         ::continue::
     end
+end
+
+---@class VM.DocGroup
+---@field cats LuaParser.Node.Cat[]
+
+---@private
+---@param state LuaParser.Node.Cat
+function M:addFuncCatGroup(state)
+    if self.currentFuncCatGroup then
+        ---@type LuaParser.Node.Cat
+        local lastState = self.currentFuncCatGroup.cats[#self.currentFuncCatGroup.cats]
+    end
+    if not self.currentFuncCatGroup then
+        ---@private
+        self.currentFuncCatGroup = {
+            cats = {},
+        }
+    end
+    table.insert(self.currentFuncCatGroup.cats, state)
+end
+
+---@private
+---@param state LuaParser.Node.Function
+function M:parseFuncState(state)
+    local name = state.name
+    if not name then
+        return
+    end
+    self:bindFuncCatGroup(state)
+    if name.kind == 'var' then
+        ---@cast name LuaParser.Node.Var
+        self:parseVar(name)
+    elseif name.kind == 'field' then
+        ---@cast name LuaParser.Node.Field
+        self:parseField(name)
+    end
+end
+
+---@private
+---@param func LuaParser.Node.Function
+function M:bindFuncCatGroup(func)
+    local funcCatGroup = self.currentFuncCatGroup
+    if not funcCatGroup then
+        return
+    end
+    self.currentFuncCatGroup = nil
+    self.bindMap[func] = funcCatGroup
 end
 
 ---@param lnode LuaParser.Node.Base
@@ -137,7 +219,12 @@ function M:makeField(key, value, var)
         ---@cast value LuaParser.Node.Literal
         nvalue = node.value(value.value)
     elseif value.kind == 'function' then
-        nvalue = node.FUNCTION
+        ---@cast value LuaParser.Node.Function
+        if self.mode == 'meta' then
+            nvalue = self:parseNode(value)
+        else
+            nvalue = node.FUNCTION
+        end
     elseif value.kind == 'table' then
         nvalue = node.TABLE
     else
@@ -237,6 +324,10 @@ end
 ---@private
 ---@param value LuaParser.Node.CatClass
 function M:parseCatClass(value)
+    if self.parsed[value] then
+        return
+    end
+    self.parsed[value] = true
     self.results[#self.results+1] = {
         kind = 'class',
         name = value.classID.id,
@@ -263,7 +354,7 @@ function M:parseCatField(value, lastClass)
     }
 end
 
----@param value? LuaParser.Node.CatType
+---@param value? LuaParser.Node.CatType | LuaParser.Node.State
 ---@return Node
 function M:parseNode(value)
     local node = self.scope.node
@@ -368,6 +459,47 @@ function M:parseNode(value)
         end
         return func
     end
+    if kind == 'function' then
+        ---@cast value LuaParser.Node.Function
+        local catGroup = self.bindMap[value]
+
+        local function findParamType(key)
+            if not catGroup then
+                return nil
+            end
+            for _, cat in ipairs(catGroup.cats) do
+                local cvalue = cat.value
+                ---@cast cvalue -?
+                if cvalue.kind == 'catparam' then
+                    ---@cast cvalue LuaParser.Node.CatParam
+                    if cvalue.key.id == key then
+                        return self:parseNode(cvalue.value)
+                    end
+                end
+            end
+        end
+
+        local func = node.func()
+        for _, param in ipairs(value.params) do
+            if param.id == '...' then
+                func:addVarargParam(findParamType '...' or node.ANY)
+            else
+                func:addParam(param.id, findParamType(param.id) or node.ANY)
+            end
+        end
+        if catGroup then
+            for _, cat in ipairs(catGroup.cats) do
+                local cvalue = cat.value
+                ---@cast cvalue -?
+                if cvalue.kind == 'catreturn' then
+                    ---@cast cvalue LuaParser.Node.CatReturn
+                    func:addReturn(cvalue.key and cvalue.key.id, self:parseNode(cvalue.value))
+                end
+            end
+        end
+
+        return func
+    end
     return node.ANY
 end
 
@@ -386,7 +518,8 @@ end
 
 ---@param vfile VM.Vfile
 ---@param ast LuaParser.Ast
+---@param mode VM.IndexProcess.Mode
 ---@return VM.IndexProcess
-function ls.vm.createIndexProcess(vfile, ast)
-    return New 'VM.IndexProcess' (vfile, ast)
+function ls.vm.createIndexProcess(vfile, ast, mode)
+    return New 'VM.IndexProcess' (vfile, ast, mode)
 end

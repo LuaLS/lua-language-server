@@ -1,7 +1,7 @@
 
 ---@class LuaParser.Node.CatFunction: LuaParser.Node.Base
----@field params? LuaParser.Node.CatParam[]
----@field returns? LuaParser.Node.CatReturn[]
+---@field params? LuaParser.Node.CatFuncParam[]
+---@field returns? LuaParser.Node.CatFuncReturn[]
 ---@field generics? LuaParser.Node.CatGeneric[]
 ---@field funPos      integer # `fun` 的位置
 ---@field genericPos1? integer # `<` 的位置
@@ -24,42 +24,42 @@ local CatGeneric = Class('LuaParser.Node.CatGeneric', 'LuaParser.Node.Base')
 
 CatGeneric.kind = 'catgeneric'
 
----@class LuaParser.Node.CatParam: LuaParser.Node.Base
+---@class LuaParser.Node.CatFuncParam: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
----@field name LuaParser.Node.CatParamName
+---@field name LuaParser.Node.CatFuncParamName
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatType
-local CatParam = Class('LuaParser.Node.CatParam', 'LuaParser.Node.Base')
+local CatFuncParam = Class('LuaParser.Node.CatFuncParam', 'LuaParser.Node.Base')
 
-CatParam.kind = 'catparam'
+CatFuncParam.kind = 'catfuncparam'
 
----@class LuaParser.Node.CatParamName: LuaParser.Node.Base
----@field parent LuaParser.Node.CatParam
+---@class LuaParser.Node.CatFuncParamName: LuaParser.Node.Base
+---@field parent LuaParser.Node.CatFuncParam
 ---@field index integer
 ---@field id string
-local CatParamName = Class('LuaParser.Node.CatParamName', 'LuaParser.Node.Base')
+local CatFuncParamName = Class('LuaParser.Node.CatFuncParamName', 'LuaParser.Node.Base')
 
-CatParamName.kind = 'catparamname'
+CatFuncParamName.kind = 'catfuncparamname'
 
----@class LuaParser.Node.CatReturn: LuaParser.Node.Base
+---@class LuaParser.Node.CatFuncReturn: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
----@field name? LuaParser.Node.CatReturnName
+---@field name? LuaParser.Node.CatFuncReturnName
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatType
-local CatReturn = Class('LuaParser.Node.CatReturn', 'LuaParser.Node.Base')
+local CatFuncReturn = Class('LuaParser.Node.CatFuncReturn', 'LuaParser.Node.Base')
 
-CatReturn.kind = 'catreturn'
+CatFuncReturn.kind = 'catfuncreturn'
 
----@class LuaParser.Node.CatReturnName: LuaParser.Node.Base
----@field parent LuaParser.Node.CatReturn
+---@class LuaParser.Node.CatFuncReturnName: LuaParser.Node.Base
+---@field parent LuaParser.Node.CatFuncReturn
 ---@field index integer
 ---@field id string
----@field name? LuaParser.Node.CatReturnName
+---@field name? LuaParser.Node.CatFuncReturnName
 ---@field value LuaParser.Node.CatType
 ---@field symbolPos? integer # 冒号的位置
-local CatReturnName = Class('LuaParser.Node.CatReturnName', 'LuaParser.Node.Base')
+local CatFuncReturnName = Class('LuaParser.Node.CatFuncReturnName', 'LuaParser.Node.Base')
 
-CatReturnName.kind = 'catreturnname'
+CatFuncReturnName.kind = 'catfuncreturnname'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -141,26 +141,26 @@ end
 
 ---@private
 ---@param required? boolean
----@return LuaParser.Node.CatParam?
-function Ast:parseCatParam(required)
+---@return LuaParser.Node.CatFuncParam?
+function Ast:parseCatFuncParam(required)
     local name
 
     local pos = self.lexer:consume '...'
     if pos then
-        name = self:createNode('LuaParser.Node.CatParamName', {
+        name = self:createNode('LuaParser.Node.CatFuncParamName', {
             start  = pos,
             finish = pos + #'...',
             id     = '...',
         })
     else
-        name = self:parseID('LuaParser.Node.CatParamName', required, true)
+        name = self:parseID('LuaParser.Node.CatFuncParamName', required, true)
     end
 
     if not name then
         return nil
     end
 
-    local param = self:createNode('LuaParser.Node.CatParam', {
+    local param = self:createNode('LuaParser.Node.CatFuncParam', {
         start = name.start,
         name  = name,
     })
@@ -183,22 +183,22 @@ function Ast:parseCatParam(required)
 end
 
 ---@private
----@return LuaParser.Node.CatParam[]
+---@return LuaParser.Node.CatFuncParam[]
 function Ast:parseCatParamList()
-    local list = self:parseList(false, false, self.parseCatParam)
+    local list = self:parseList(false, false, self.parseCatFuncParam)
 
     return list
 end
 
 ---@private
 ---@param required? boolean
----@return LuaParser.Node.CatReturn?
-function Ast:parseCatReturn(required)
+---@return LuaParser.Node.CatFuncReturn?
+function Ast:parseCatFuncReturn(required)
     local name
 
     local pos = self.lexer:consume '...'
     if pos then
-        name = self:createNode('LuaParser.Node.CatReturnName', {
+        name = self:createNode('LuaParser.Node.CatFuncReturnName', {
             start  = pos,
             finish = pos + #'...',
             id     = '...',
@@ -206,7 +206,7 @@ function Ast:parseCatReturn(required)
     else
         local _, curType = self.lexer:peek()
         if curType == 'Word' and self.lexer:peek(1) == ':' then
-            name = self:parseID('LuaParser.Node.CatReturnName', required, true)
+            name = self:parseID('LuaParser.Node.CatFuncReturnName', required, true)
         end
     end
 
@@ -227,7 +227,7 @@ function Ast:parseCatReturn(required)
         return nil
     end
 
-    local ret = self:createNode('LuaParser.Node.CatReturn', {
+    local ret = self:createNode('LuaParser.Node.CatFuncReturn', {
         name = name,
         value = value,
         start = (name or value).start,
@@ -247,9 +247,9 @@ function Ast:parseCatReturn(required)
 end
 
 ---@private
----@return LuaParser.Node.CatReturn[]
+---@return LuaParser.Node.CatFuncReturn[]
 function Ast:parseCatReturnList()
-    local list = self:parseList(false, false, self.parseCatReturn)
+    local list = self:parseList(false, false, self.parseCatFuncReturn)
 
     return list
 end

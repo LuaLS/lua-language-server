@@ -19,8 +19,7 @@ end
 ---@type VM.Contribute
 M.contribute = nil
 
----@param indexNow? boolean
-function M:update(indexNow)
+function M:update()
     local document = self.scope:getDocument(self.uri)
     if not document then
         return
@@ -30,10 +29,6 @@ function M:update(indexNow)
     end
     self.version = document.serverVersion
     self:resetContribute()
-
-    if indexNow then
-        self:indexAst(document.ast)
-    end
 end
 
 function M:resetContribute()
@@ -44,13 +39,14 @@ function M:resetContribute()
 end
 
 ---@param ast LuaParser.Ast
-function M:indexAst(ast)
+---@param mode VM.IndexProcess.Mode
+function M:indexAst(ast, mode)
     if self.indexedVersion == self.version then
         return
     end
     self.indexedVersion = self.version
 
-    local process = ls.vm.createIndexProcess(self, ast)
+    local process = ls.vm.createIndexProcess(self, ast, mode)
     local actions = process:start()
     self.contribute:commitActions(actions)
 end

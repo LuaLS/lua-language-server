@@ -21,7 +21,6 @@ Param.kind = 'param'
 local Function = Class('LuaParser.Node.Function', 'LuaParser.Node.Block')
 
 Function.kind = 'function'
-Function.isLiteral = true
 Function.isFunction = true
 
 function Function.__getter.referFunction(self)

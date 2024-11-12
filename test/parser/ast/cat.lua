@@ -220,19 +220,19 @@ TEST [[
                 },
                 params = {
                     [1] = {
-                        kind = 'catparam',
+                        kind = 'catfuncparam',
                         index = 1,
                         name = {
-                            kind = 'catparamname',
+                            kind = 'catfuncparamname',
                             id   = 'a',
                         },
                         value = { kind = 'catid', id = 'T1', generic = {} },
                     },
                     [2] = {
-                        kind = 'catparam',
+                        kind = 'catfuncparam',
                         index = 2,
                         name = {
-                            kind = 'catparamname',
+                            kind = 'catfuncparamname',
                             id   = '...',
                         },
                         value = { kind = 'catid', id = 'T2', generic = {} },
@@ -240,20 +240,20 @@ TEST [[
                 },
                 returns = {
                     [1] = {
-                        kind = 'catreturn',
+                        kind = 'catfuncreturn',
                         index = 1,
                         value = { kind = 'catarray' }
                     },
                     [2] = {
-                        kind = 'catreturn',
+                        kind = 'catfuncreturn',
                         index = 2,
-                        name = { kind = 'catreturnname', id = 'desc' },
+                        name = { kind = 'catfuncreturnname', id = 'desc' },
                         value = { kind = 'catid', id = 'string' },
                     },
                     [3] = {
-                        kind = 'catreturn',
+                        kind = 'catfuncreturn',
                         index = 3,
-                        name = { kind = 'catreturnname', id = '...' },
+                        name = { kind = 'catfuncreturnname', id = '...' },
                         value = { kind = 'catid', id = 'T1', generic = {} },
                     }
                 }

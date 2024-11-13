@@ -364,4 +364,24 @@ local i
 f(i)
 ]]
 
+TEST [[
+---@class A: integer
+
+---@param a A
+local function f(a) end
+
+local t = {
+    { int = 123 },
+    { int = 456 },
+    { int = 789 },
+}
+
+---@type integer
+local i
+
+local k = t[i].int
+
+f(k)
+]]
+
 config.set(nil, 'Lua.type.checkTableShape', false)

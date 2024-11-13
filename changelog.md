@@ -3,6 +3,10 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 
+## 3.13.1
+`2024-11-13`
+* `FIX` Incorrect type check in some case
+
 ## 3.13.0
 `2024-11-13`
 * `NEW` Setting: `Lua.type.inferTableSize`: A Small Table array can be infered

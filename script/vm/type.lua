@@ -587,8 +587,10 @@ function vm.isSubType(uri, child, parent, mark, errs)
     and not mark[childName] then
         mark[childName] = true
         if vm.isSubType(uri, parentName, childName, mark) then
+            mark[childName] = nil
             return true
         end
+        mark[childName] = nil
     end
 
     if errs then

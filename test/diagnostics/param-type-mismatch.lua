@@ -352,4 +352,16 @@ function f(a) end
 f(a)
 ]]
 
+TEST [[
+---@class A: integer
+
+---@param a A
+local function f(a) end
+
+---@type integer
+local i
+
+f(i)
+]]
+
 config.set(nil, 'Lua.type.checkTableShape', false)

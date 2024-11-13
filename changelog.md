@@ -13,6 +13,16 @@
   local function callback(a) end  --> a: integer
   register(callback)
   ```
+* `CHG` Basic types allow contravariance
+  ```lua
+  ---@class int32: integer
+
+  ---@type integer
+  local n
+
+  ---@type int32
+  local a = n
+  ```
 
 ## 3.12.0
 `2024-10-30`

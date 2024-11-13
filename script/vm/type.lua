@@ -584,9 +584,11 @@ function vm.isSubType(uri, child, parent, mark, errs)
     local x = '' --> `string` set to `A`
     ]]
     if  guide.isBasicType(childName)
-    and guide.isLiteral(child)
-    and vm.isSubType(uri, parentName, childName, mark) then
-        return true
+    and not mark[childName] then
+        mark[childName] = true
+        if vm.isSubType(uri, parentName, childName, mark) then
+            return true
+        end
     end
 
     if errs then

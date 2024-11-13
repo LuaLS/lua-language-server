@@ -695,6 +695,9 @@ local function checkMissingRequire(results, uri, start, finish)
     end
 
     local function addRequires(global, endpos)
+        if not global then
+            return
+        end
         autoreq.check(state, global, endpos, function (moduleFile, _stemname, _targetSource, fullKeyPath)
             local visiblePaths = rpath.getVisiblePath(uri, furi.decode(moduleFile))
             if not visiblePaths or #visiblePaths == 0 then return end

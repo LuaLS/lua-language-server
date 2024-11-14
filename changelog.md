@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `CHG` fulfill zh-cn translations
 
 ## 3.13.1
 `2024-11-13`

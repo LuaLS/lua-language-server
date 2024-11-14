@@ -704,18 +704,19 @@ table.foreachi              =
 '遍历数组中的每一个元素，并以索引号index和value执行回调函数。如果回调函数返回一个非nil值则循环终止,并且返回这个值。该函数等同ipair(list),比ipair(list)更慢。不推荐使用'
 table.getn                  =
 '返回表的长度。该函数等价于#list。'
-table.new                   = -- TODO: need translate!
-[[This creates a pre-sized table, just like the C API equivalent `lua_createtable()`. This is useful for big tables if the final table size is known and automatic table resizing is too expensive. `narray` parameter specifies the number of array-like items, and `nhash` parameter specifies the number of hash-like items. The function needs to be required before use.
+table.new                   =
+[[创建一个有初始容量的表，就像 C API 等价于 `lua_createtable()`。对于数据量庞大的表，如果最终的容量是已知的，这将十分有用，因为动态对表进行扩容是十分昂贵的。`narray` 参数指定类数组成员的数量，`nhash` 参数指定类哈希成员的数量。在使用前需要先引入。
+
 ```lua
     require("table.new")
 ```
 ]]
-table.clear                 = -- TODO: need translate!
-[[This clears all keys and values from a table, but preserves the allocated array/hash sizes. This is useful when a table, which is linked from multiple places, needs to be cleared and/or when recycling a table for use by the same context. This avoids managing backlinks, saves an allocation and the overhead of incremental array/hash part growth. The function needs to be required before use.
+table.clear                 =
+[[清除表中所有的键值对，但是保留已经分配的数组或哈希的大小。当需要清除从多个位置链接的表和/或回收表供同一上下文使用时，这将十分有用。这避免了管理反向链接，节省了分配和增量数组或哈希部分增长的开销。在使用前需要先引入。
 ```lua
     require("table.clear").
 ```
-Please note this function is meant for very specific situations. In most cases it's better to replace the (usually single) link with a new table and let the GC do its work.
+请注意，此功能用于非常特殊的情况。在大多数情况下，最好用新表替换（通常是单个）链接，GC 完成回收工作。
 ]]
 
 utf8                        =

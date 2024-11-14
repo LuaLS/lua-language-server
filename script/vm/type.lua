@@ -321,9 +321,11 @@ local function checkTableShape(parent, child, uri, mark, errs)
             if myKeys[key] then
                 ok = vm.isSubType(uri, myKeys[key], nodeField, mark, errs)
                 if ok == false then
-                    errs[#errs+1] = 'TYPE_ERROR_PARENT_ALL_DISMATCH' -- error display can be greatly improved
-                    errs[#errs+1] = myKeys[key]
-                    errs[#errs+1] = nodeField
+                    if errs then
+                        errs[#errs+1] = 'TYPE_ERROR_PARENT_ALL_DISMATCH' -- error display can be greatly improved
+                        errs[#errs+1] = myKeys[key]
+                        errs[#errs+1] = nodeField
+                    end
                     failedCheck = true
                 end
             elseif not nodeField:isNullable() then
@@ -337,7 +339,7 @@ local function checkTableShape(parent, child, uri, mark, errs)
         end
         ::continue::
     end
-    if #missedKeys > 0 then
+    if errs and #missedKeys > 0 then
         errs[#errs+1] = 'DIAG_MISSING_FIELDS'
         errs[#errs+1] = parent
         errs[#errs+1] = table.concat(missedKeys, ', ')

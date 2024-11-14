@@ -646,15 +646,15 @@ CLI_CHECK_INITING =
 '正在初始化...'
 CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
-CLI_CHECK_PROGRESS = -- TODO: need translate!
-'Found {} problems in {} files'
+CLI_CHECK_PROGRESS =
+'检测到问题 {} 在文件 {} 中'
 CLI_CHECK_RESULTS =
 '诊断完成，共有 {} 个问题，请查看 {}'
-CLI_CHECK_MULTIPLE_WORKERS = -- TODO: need translate!
-'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
+CLI_CHECK_MULTIPLE_WORKERS =
+'开启 {} 个工作任务，进度输出将会被禁用。这可能会花费几分钟。'
 CLI_DOC_INITING   =
 '加载文档 ...'
-CLI_DOC_DONE      = -- TODO: need translate!
+CLI_DOC_DONE      =
 '文档导出完成！'
 CLI_DOC_WORKING   =
 '正在生成文档...'
@@ -694,51 +694,51 @@ TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
 TYPE_ERROR_DISMATCH =
 '类型 `{child}` 无法匹配 `{parent}`'
 
-LUADOC_DESC_CLASS = -- TODO: need translate!
+LUADOC_DESC_CLASS =
 [=[
-Defines a class/table structure
-## Syntax
+定义一个类或表的结构
+## 语法
 `---@class <name> [: <parent>[, <parent>]...]`
-## Usage
+## 用法
 ```
 ---@class Manager: Person, Human
 Manager = {}
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#class)
+[文档](https://luals.github.io/wiki/annotations#class)
 ]=]
-LUADOC_DESC_TYPE = -- TODO: need translate!
+LUADOC_DESC_TYPE =
 [=[
-Specify the type of a certain variable
+指定某个变量的类型
 
-Default types: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
+默认类型: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
 `function`, `table`, `thread`, `userdata`, `lightuserdata`
 
-(Custom types can be provided using `@alias`)
+(可以通过 `@alias` 来创建自定义类型)
 
-## Syntax
+## 语法
 `---@type <type>[| [type]...`
 
-## Usage
-### General
+## 用法
+### 常规
 ```
 ---@type nil|table|myClass
 local Example = nil
 ```
 
-### Arrays
+### 数组
 ```
 ---@type number[]
 local phoneNumbers = {}
 ```
 
-### Enums
+### 枚举
 ```
 ---@type "red"|"green"|"blue"
 local color = ""
 ```
 
-### Tables
+### 表
 ```
 ---@type table<string, boolean>
 local settings = {
@@ -750,19 +750,19 @@ local settings = {
 local x --x[""] is true
 ```
 
-### Functions
+### 函数
 ```
 ---@type fun(mode?: "r"|"w"): string
 local myFunction
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#type)
+[文档](https://luals.github.io/wiki/annotations#type)
 ]=]
-LUADOC_DESC_ALIAS = -- TODO: need translate!
+LUADOC_DESC_ALIAS =
 [=[
-Create your own custom type that can be used with `@param`, `@type`, etc.
+可以使用 `@param`, `@type` 等类型注解创建你的自定义类型。
 
-## Syntax
+## 语法
 `---@alias <name> <type> [description]`\
 or
 ```
@@ -772,8 +772,8 @@ or
 ...
 ```
 
-## Usage
-### Expand to other type
+## 用法
+### 扩展为其它类型
 ```
 ---@alias filepath string Path to a file
 
@@ -781,7 +781,7 @@ or
 function find(path, pattern) end
 ```
 
-### Enums
+### 枚举
 ```
 ---@alias font-style
 ---| '"underlined"' # Underline the text
@@ -792,7 +792,7 @@ function find(path, pattern) end
 function setFontStyle(style) end
 ```
 
-### Literal Enum
+### 字面量枚举
 ```
 local enums = {
     READ = 0,
@@ -806,17 +806,17 @@ local enums = {
 ---| `enums.CLOSE`
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#alias)
+[文档](https://luals.github.io/wiki/annotations#alias)
 ]=]
-LUADOC_DESC_PARAM = -- TODO: need translate!
+LUADOC_DESC_PARAM =
 [=[
-Declare a function parameter
+声明一个函数的参数
 
-## Syntax
+## 语法
 `@param <name>[?] <type> [comment]`
 
-## Usage
-### General
+## 用法
+### 常规
 ```
 ---@param url string The url to request
 ---@param headers? table<string, string> HTTP headers to send
@@ -824,26 +824,26 @@ Declare a function parameter
 function get(url, headers, timeout) end
 ```
 
-### Variable Arguments
+### 可变参数
 ```
 ---@param base string The base to concat to
 ---@param ... string The values to concat
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#param)
+[文档](https://luals.github.io/wiki/annotations#param)
 ]=]
-LUADOC_DESC_RETURN = -- TODO: need translate!
+LUADOC_DESC_RETURN =
 [=[
-Declare a return value
+声明返回值
 
-## Syntax
+## 语法
 `@return <type> [name] [description]`\
 or\
 `@return <type> [# description]`
 
-## Usage
-### General
+## 用法
+### 常规
 ```
 ---@return number
 ---@return number # The green component
@@ -851,36 +851,36 @@ or\
 function hexToRGB(hex) end
 ```
 
-### Type & name only
+### 只有类型和名称
 ```
 ---@return number x, number y
 function getCoords() end
 ```
 
-### Type only
+### 只有类型
 ```
 ---@return string, string
 function getFirstLast() end
 ```
 
-### Return variable values
+### 返回可变值
 ```
 ---@return string ... The tags of the item
 function getTags(item) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#return)
+[文档](https://luals.github.io/wiki/annotations#return)
 ]=]
-LUADOC_DESC_FIELD = -- TODO: need translate!
+LUADOC_DESC_FIELD =
 [=[
-Declare a field in a class/table. This allows you to provide more in-depth
-documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
-`protected`, `public`, or `package`.
+声明一个类或表的字段。这将允许你为表提供更详细的类型。
+在 `v3.6.0` 后， 你可以标记一个字段为 `private`，
+`protected`， `public` 或 `package`。
 
-## Syntax
+## 语法
 `---@field <name> <type> [description]`
 
-## Usage
+## 用法
 ```
 ---@class HTTP_RESPONSE
 ---@field status HTTP_STATUS
@@ -900,18 +900,18 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#field)
+[文档](https://luals.github.io/wiki/annotations#field)
 ]=]
-LUADOC_DESC_GENERIC = -- TODO: need translate!
+LUADOC_DESC_GENERIC =
 [=[
-Simulates generics. Generics can allow types to be re-used as they help define
-a "generic shape" that can be used with different types.
+仿照泛型。泛型可以允许类型被复用，
+因为它们有助于定义一种可以与不同类型一起使用的 “通用形状”。
 
-## Syntax
+## 语法
 `---@generic <name> [:parent_type] [, <name> [:parent_type]]`
 
-## Usage
-### General
+## 用法
+### 常规
 ```
 ---@generic T
 ---@param value T The value to return
@@ -934,7 +934,7 @@ b = echo(true)
 -- each allowed type
 ```
 
-### Capture name of generic type
+### 捕获泛型类型的名称
 ```
 ---@class Foo
 local Foo = {}
@@ -948,7 +948,7 @@ function Generic(name) end
 local v = Generic("Foo") -- v is an object of Foo
 ```
 
-### How Lua tables use generics
+### 在表中使用泛型
 ```
 ---@class table<K, V>: { [K]: V }
 
@@ -957,81 +957,79 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations/#generic)
+[文档](https://luals.github.io/wiki/annotations/#generic)
 ]=]
-LUADOC_DESC_VARARG = -- TODO: need translate!
+LUADOC_DESC_VARARG =
 [=[
-Primarily for legacy support for EmmyLua annotations. `@vararg` does not
-provide typing or allow descriptions.
+主要用于对 EmmyLua 传统注解支持。`@vararg` 并不提供输入或允许描述。
 
-**You should instead use `@param` when documenting parameters (variable or not).**
+**在描述参数时（无论是不是变量），你应该使用 `@param`。**
 
-## Syntax
+## 语法
 `@vararg <type>`
 
-## Usage
+## 用法
 ```
 ---Concat strings together
 ---@vararg string
 function concat(...) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#vararg)
+[文档](https://luals.github.io/wiki/annotations#vararg)
 ]=]
-LUADOC_DESC_OVERLOAD = -- TODO: need translate!
+LUADOC_DESC_OVERLOAD =
 [=[
-Allows defining of multiple function signatures.
+允许定义多个函数签名。
 
-## Syntax
+## 语法
 `---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
 
-## Usage
+## 用法
 ```
 ---@overload fun(t: table, value: any): number
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#overload)
+[文档](https://luals.github.io/wiki/annotations#overload)
 ]=]
-LUADOC_DESC_DEPRECATED = -- TODO: need translate!
+LUADOC_DESC_DEPRECATED =
 [=[
-Marks a function as deprecated. This results in any deprecated function calls
-being ~~struck through~~.
+将函数标记为已弃用。这会使任何已弃用函数被调用时出现删除线。
 
-## Syntax
+## 语法
 `---@deprecated`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#deprecated)
+[文档](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
-LUADOC_DESC_META = -- TODO: need translate!
+LUADOC_DESC_META =
 [=[
-Indicates that this is a meta file and should be used for definitions and intellisense only.
+标识这个文件是元文件，并且仅用于定义和语法提示。
 
-There are 3 main distinctions to note with meta files:
-1. There won't be any context-based intellisense in a meta file
-2. Hovering a `require` filepath in a meta file shows `[meta]` instead of an absolute path
-3. The `Find Reference` function will ignore meta files
+元文件中主要有三个需要注意的地方：
+1. 在元文件中不会有任何基于上下文的语法提示
+2. 悬停在使用元文件的 `require` 上时，会显示 `[meta]` 而不是绝对路径
+3. `Find Reference` 功能会忽略元文件
 
-## Syntax
+## 语法
 `---@meta`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#meta)
+[文档](https://luals.github.io/wiki/annotations#meta)
 ]=]
-LUADOC_DESC_VERSION = -- TODO: need translate!
+LUADOC_DESC_VERSION =
 [=[
-Specifies Lua versions that this function is exclusive to.
+指定此函数专用的 Lua 版本。
 
-Lua versions: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
+Lua 版本: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`。
 
-Requires configuring the `Diagnostics: Needed File Status` setting.
+需要配置 `Diagnostics: Needed File Status`。
 
-## Syntax
+## 语法
 `---@version <version>[, <version>]...`
 
-## Usage
-### General
+## 用法
+### 常规
 ```
 ---@version JIT
 function onlyWorksInJIT() end
@@ -1042,52 +1040,53 @@ function onlyWorksInJIT() end
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#version)
+[文档](https://luals.github.io/wiki/annotations#version)
 ]=]
-LUADOC_DESC_SEE = -- TODO: need translate!
+LUADOC_DESC_SEE =
 [=[
 Define something that can be viewed for more information
+定义可以查看更多信息的内容
 
-## Syntax
+## 语法
 `---@see <text>`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#see)
+[文档](https://luals.github.io/wiki/annotations#see)
 ]=]
-LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
+LUADOC_DESC_DIAGNOSTIC =
 [=[
-Enable/disable diagnostics for error/warnings/etc.
+开启或关闭对错误，警告或其他的诊断检查。
 
-Actions: `disable`, `enable`, `disable-line`, `disable-next-line`
+操作: `disable`, `enable`, `disable-line`, `disable-next-line`
 
-[Names](https://github.com/LuaLS/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+[名称](https://github.com/LuaLS/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
 
-## Syntax
+## 语法
 `---@diagnostic <action>[: <name>]`
 
-## Usage
-### Disable next line
+## 用法
+### 关闭下一行
 ```
 ---@diagnostic disable-next-line: undefined-global
 ```
 
-### Manually toggle
+### 手动切换
 ```
 ---@diagnostic disable: unused-local
 local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#diagnostic)
+[文档](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
-LUADOC_DESC_MODULE = -- TODO: need translate!
+LUADOC_DESC_MODULE =
 [=[
-Provides the semantics of `require`.
+提供 `require` 的语义。
 
-## Syntax
+## 语法
 `---@module <'module_name'>`
 
-## Usage
+## 用法
 ```
 ---@module 'string.utils'
 local stringUtils
@@ -1095,39 +1094,38 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#module)
+[文档](https://luals.github.io/wiki/annotations#module)
 ]=]
-LUADOC_DESC_ASYNC = -- TODO: need translate!
+LUADOC_DESC_ASYNC =
 [=[
-Marks a function as asynchronous.
+标记一个函数为异步
 
-## Syntax
+## 语法
 `---@async`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#async)
+[文档](https://luals.github.io/wiki/annotations#async)
 ]=]
-LUADOC_DESC_NODISCARD = -- TODO: need translate!
+LUADOC_DESC_NODISCARD =
 [=[
-Prevents this function's return values from being discarded/ignored.
-This will raise the `discard-returns` warning should the return values
-be ignored.
+阻止这个函数的返回值被丢弃或忽略。
+如果忽略返回值，将会引起 `discard-returns` 警告。
 
-## Syntax
+## 语法
 `---@nodiscard`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#nodiscard)
+[文档](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
-LUADOC_DESC_CAST = -- TODO: need translate!
+LUADOC_DESC_CAST =
 [=[
-Allows type casting (type conversion).
+允许类型转换。
 
-## Syntax
+## 语法
 `@cast <variable> <[+|-]type>[, <[+|-]type>]...`
 
-## Usage
-### Overwrite type
+## 用法
+### 改写类型
 ```
 ---@type integer
 local x --> integer
@@ -1135,7 +1133,7 @@ local x --> integer
 ---@cast x string
 print(x) --> string
 ```
-### Add Type
+### 添加类型
 ```
 ---@type string
 local x --> string
@@ -1143,7 +1141,7 @@ local x --> string
 ---@cast x +boolean, +number
 print(x) --> string|boolean|number
 ```
-### Remove Type
+### 移除类型
 ```
 ---@type string|table
 local x --> string|table
@@ -1152,17 +1150,17 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#cast)
+[文档](https://luals.github.io/wiki/annotations#cast)
 ]=]
-LUADOC_DESC_OPERATOR = -- TODO: need translate!
+LUADOC_DESC_OPERATOR =
 [=[
-Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+为[算子元方法](http://lua-users.org/wiki/MetatableEvents) 提供类型声明。
 
-## Syntax
+## 语法
 `@operator <operation>[(input_type)]:<resulting_type>`
 
-## Usage
-### Vector Add Metamethod
+## 用法
+### Vector 加方法
 ```
 ---@class Vector
 ---@operator add(Vector):Vector
@@ -1173,7 +1171,7 @@ vB = Vector.new(10, 20, 30)
 vC = vA + vB
 --> Vector
 ```
-### Unary Minus
+### 一元减法
 ```
 ---@class Passcode
 ---@operator unm:integer
@@ -1182,18 +1180,17 @@ pA = Passcode.new(1234)
 pB = -pA
 --> integer
 ```
-[View Request](https://github.com/LuaLS/lua-language-server/issues/599)
+[查看请求](https://github.com/LuaLS/lua-language-server/issues/599)
 ]=]
-LUADOC_DESC_ENUM = -- TODO: need translate!
+LUADOC_DESC_ENUM =
 [=[
-Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
-tag.
+将表标记为枚举。如果你想要一个枚举但是无法将其定义为 Lua 表，看一眼 [`@alias`](https://luals.github.io/wiki/annotations#alias)
+标签。
 
-## Syntax
+## 语法
 `@enum <name>`
 
-## Usage
+## 用法
 ```
 ---@enum colors
 local colors = {
@@ -1211,15 +1208,14 @@ local function setColor(color) end
 setColor(colors.green)
 ```
 ]=]
-LUADOC_DESC_SOURCE = -- TODO: need translate!
+LUADOC_DESC_SOURCE =
 [=[
-Provide a reference to some source code which lives in another file. When
-searching for the definition of an item, its `@source` will be used.
+提供一个其它文件中源代码的引用。当查找某一项的定义时，将会使用它的 `@source`。
 
-## Syntax
+## 语法
 `@source <path>`
 
-## Usage
+## 用法
 ```
 ---You can use absolute paths
 ---@source C:/Users/me/Documents/program/myFile.c
@@ -1238,15 +1234,14 @@ local c
 local d
 ```
 ]=]
-LUADOC_DESC_PACKAGE = -- TODO: need translate!
+LUADOC_DESC_PACKAGE =
 [=[
-Mark a function as private to the file it is defined in. A packaged function
-cannot be accessed from another file.
+标记一个函数为其所处文件的私有成员。一个打包的函数不可以被其它文件访问。
 
-## Syntax
+## 语法
 `@package`
 
-## Usage
+## 用法
 ```
 ---@class Animal
 ---@field private eyes integer
@@ -1259,15 +1254,14 @@ function Animal:eyesCount()
 end
 ```
 ]=]
-LUADOC_DESC_PRIVATE = -- TODO: need translate!
+LUADOC_DESC_PRIVATE =
 [=[
-Mark a function as private to a @class. Private functions can be accessed only
-from within their class and are not accessible from child classes.
+标记一个字段为类的私有成员。私有字段仅可在其所属的类中访问，并且不能被子类访问。
 
-## Syntax
+## 语法
 `@private`
 
-## Usage
+## 用法
 ```
 ---@class Animal
 ---@field private eyes integer
@@ -1285,15 +1279,14 @@ local myDog = {}
 myDog:eyesCount();
 ```
 ]=]
-LUADOC_DESC_PROTECTED = -- TODO: need translate!
+LUADOC_DESC_PROTECTED =
 [=[
-Mark a function as protected within a @class. Protected functions can be
-accessed only from within their class or from child classes.
+标记一个字段为类的受保护成员。受保护字段仅可在其所属的类或子类中访问。
 
-## Syntax
+## 语法
 `@protected`
 
-## Usage
+## 用法
 ```
 ---@class Animal
 ---@field private eyes integer

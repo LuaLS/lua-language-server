@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Add missing `errs ~= nil` checks to script/vm/type checkTableShape
 * `CHG` fulfill zh-cn translations
 
 ## 3.13.1

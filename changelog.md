@@ -2,8 +2,11 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` Add missing `errs ~= nil` checks to script/vm/type checkTableShape
+
+## 3.13.2
+`2024-11-21`
 * `CHG` fulfill zh-cn translations
+* `FIX` Add missing `errs ~= nil` checks to script/vm/type checkTableShape
 
 ## 3.13.1
 `2024-11-13`

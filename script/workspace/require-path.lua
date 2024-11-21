@@ -98,28 +98,6 @@ function mt:getRequireResultByPath(path)
             end
         end
 
-        -- handle `../?.lua`
-        local parentCount = 0
-        for _ = 1, 1000 do
-            if searcher:match '^%.%.[/\\]' then
-                parentCount = parentCount + 1
-                searcher = searcher:sub(4)
-            else
-                break
-            end
-        end
-        if parentCount > 0 then
-            local parentPath = libraryPath
-                            or (self.scp.uri and furi.decode(self.scp.uri))
-            if parentPath then
-                local tail
-                for _ = 1, parentCount do
-                    parentPath, tail = parentPath:match '^(.+)[/\\]([^/\\]*)$'
-                    currentPath = tail .. '/' .. currentPath
-                end
-            end
-        end
-
         repeat
             cutedPath = currentPath:sub(pos)
             head = currentPath:sub(1, pos - 1)

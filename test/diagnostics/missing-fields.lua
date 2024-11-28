@@ -353,3 +353,113 @@ TEST[[
 ---@type A
 local t = <!{x = 1}!>
 ]]
+
+-- Inheritance
+
+TEST[[
+---@class A
+---@field x number
+
+---@class B: A
+
+---@type B
+local t = <!{}!>
+]]
+
+TEST[[
+---@class A
+---@field x number
+---@field y number
+
+---@class B: A
+
+---@type B
+local t = <!{y = 1}!>
+]]
+
+TEST[[
+---@class A
+---@field x number
+
+---@class B: A
+---@field y number
+
+---@type B
+local t = <!{y = 1}!>
+]]
+
+-- Inheritance + optional
+
+TEST[[
+---@class A
+---@field x? number
+
+---@class B: A
+
+---@type B
+local t = {}
+]]
+
+TEST[[
+---@class A
+---@field x? number
+---@field y number
+
+---@class B: A
+
+---@type B
+local t = {y = 1}
+]]
+
+TEST[[
+---@class A
+---@field x? number
+
+---@class B: A
+---@field y number
+
+---@type B
+local t = {y = 1}
+]]
+
+-- Inheritance + function call
+
+TEST[[
+---@class A
+---@field x number
+
+---@class B: A
+
+---@param b B
+local function f(b) end
+
+f <!{}!>
+]]
+
+TEST[[
+---@class A
+---@field x number
+---@field y number
+
+---@class B: A
+
+---@param b B
+local function f(b) end
+
+f <!{y = 1}!>
+]]
+
+TEST[[
+---@class A
+---@field x number
+
+---@class B: A
+---@field y number
+
+---@param b B
+local function f(b) end
+
+f <!{y = 1}!>
+]]
+
+--

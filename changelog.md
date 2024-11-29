@@ -2,6 +2,8 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+`2024-11-26`
+* `CHG` Update Love2d version
 
 ## 3.13.2
 `2024-11-21`

@@ -244,6 +244,9 @@ local function checkValue(parent, child, mark, errs)
                 local knode = vm.compileNode(pfield.name)
                 local cvalues = vm.getTableValue(uri, tnode, knode, true)
                 if not cvalues then
+                    if pfield.optional then
+                        goto continue
+                    end
                     if errs then
                         errs[#errs+1] = 'TYPE_ERROR_TABLE_NO_FIELD'
                         errs[#errs+1] = pfield.name
@@ -260,6 +263,7 @@ local function checkValue(parent, child, mark, errs)
                     end
                     return false
                 end
+                ::continue::
             end
         end
         return true

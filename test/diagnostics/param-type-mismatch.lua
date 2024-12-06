@@ -384,4 +384,14 @@ local k = t[i].int
 f(k)
 ]]
 
+TEST [[
+---@type [1, 2, 3]
+local x
+
+---@param y { [1]?: 1, [2]?: 2, [3]?: 3, [4]?: 4}
+local function f(y) end
+
+f(x)
+]]
+
 config.set(nil, 'Lua.type.checkTableShape', false)

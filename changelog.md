@@ -2,6 +2,8 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.13.3
 * `CHG` Update Love2d version
 * `CHG` Improve type infer of `table.unpack` and `unpack`
 * `FIX` `missing-fields` diagnostic now warns about missing inherited fields

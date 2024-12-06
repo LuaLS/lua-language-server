@@ -41,7 +41,8 @@ return function (uri, callback)
         for className, samedefs in pairs(sortedDefs) do
             local missedKeys = {}
             for _, def in ipairs(samedefs) do
-                if not def.fields or #def.fields == 0 then
+                local fields = vm.getFields(def)
+                if #fields == 0 then
                     goto continue
                 end
 
@@ -55,7 +56,7 @@ return function (uri, callback)
                     end
                 end
 
-                for _, field in ipairs(def.fields) do
+                for _, field in ipairs(fields) do
                     if  not field.optional
                     and not vm.compileNode(field):isNullable() then
                         local key = vm.getKeyName(field)

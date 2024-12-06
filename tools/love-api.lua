@@ -82,6 +82,9 @@ function buildType(param)
     if param.table then
         return buildDocTable(param.table)
     end
+    if param.arraytype then
+        return ('%s[]'):format(getTypeName(param.arraytype))
+    end
     return getTypeName(param.type)
 end
 

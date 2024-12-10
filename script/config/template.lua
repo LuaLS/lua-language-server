@@ -369,6 +369,7 @@ local template = {
                                                 'Disable',
                                             },
     ['Lua.hint.await']                      = Type.Boolean >> true,
+    ['Lua.hint.awaitPropagate']             = Type.Boolean >> false,
     ['Lua.hint.arrayIndex']                 = Type.String >> 'Auto' << {
                                                 'Enable',
                                                 'Auto',

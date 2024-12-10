@@ -256,6 +256,9 @@ config.hint.arrayIndex.Disable           = -- TODO: need translate!
 'Disable hints of array index.'
 config.hint.await                        = -- TODO: need translate!
 'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.awaitPropagate               = -- TODO: need translate!
+'Enable the propagation of `await`. When a function calls a function marked `---@async`,\z
+it will be automatically marked as `---@async`.'
 config.hint.semicolon                    = -- TODO: need translate!
 'If there is no semicolon at the end of the statement, display a virtual semicolon.'
 config.hint.semicolon.All                = -- TODO: need translate!

@@ -1,8 +1,9 @@
-local files     = require 'files'
-local guide     = require 'parser.guide'
+local files  = require 'files'
+local await  = require 'await'
+local guide  = require 'parser.guide'
 ---@class vm
-local vm        = require 'vm.vm'
-local config    = require 'config'
+local vm     = require 'vm.vm'
+local config = require 'config'
 
 ---@class parser.object
 ---@field package _castTargetHead? parser.object | vm.global | false
@@ -186,17 +187,37 @@ function vm.getDeprecated(value, deep)
 end
 
 ---@param  value parser.object
+---@param  propagate boolean
+---@param  deepLevel integer?
 ---@return boolean
-local function isAsync(value)
+local function isAsync(value, propagate, deepLevel)
     if value.type == 'function' then
-        if not value.bindDocs then
-            return false
-        end
-        if value._async ~= nil then
+        if value._async ~= nil then --already calculated, directly return
             return value._async
         end
-        for _, doc in ipairs(value.bindDocs) do
-            if doc.type == 'doc.async' then
+        if value.bindDocs then --try parse the annotation
+            for _, doc in ipairs(value.bindDocs) do
+                if doc.type == 'doc.async' then
+                    value._async = true
+                    return true
+                end
+            end
+        end
+        if propagate then -- if enable async propagation, try check calling functions
+            if deepLevel and deepLevel > 50 then
+                return false
+            end
+            local isAsyncCall = vm.isAsyncCall
+            local callingAsync = guide.eachSourceType(value, 'call', function (source)
+                local nextLevel = (deepLevel or 1) + 1
+                local ok = isAsyncCall(source, nextLevel)
+                if ok then --if any calling function is async, directly return
+                    return ok
+                end
+                --if not, try check the next calling function
+                return nil
+            end)
+            if callingAsync then
                 value._async = true
                 return true
             end
@@ -212,9 +233,12 @@ end
 
 ---@param value parser.object
 ---@param deep  boolean?
+---@param deepLevel integer?
 ---@return boolean
-function vm.isAsync(value, deep)
-    if isAsync(value) then
+function vm.isAsync(value, deep, deepLevel)
+    local uri = guide.getUri(value)
+    local propagate = config.get(uri, 'Lua.hint.awaitPropagate')
+    if isAsync(value, propagate, deepLevel) then
         return true
     end
     if deep then
@@ -223,7 +247,7 @@ function vm.isAsync(value, deep)
             return false
         end
         for _, def in ipairs(defs) do
-            if isAsync(def) then
+            if isAsync(def, propagate, deepLevel) then
                 return true
             end
         end
@@ -325,16 +349,17 @@ function vm.isLinkedCall(node, index)
 end
 
 ---@param call parser.object
+---@param deepLevel integer?
 ---@return boolean
-function vm.isAsyncCall(call)
-    if vm.isAsync(call.node, true) then
+function vm.isAsyncCall(call, deepLevel)
+    if vm.isAsync(call.node, true, deepLevel) then
         return true
     end
     if not call.args then
         return false
     end
     for i, arg in ipairs(call.args) do
-        if  vm.isAsync(arg, true)
+        if  vm.isAsync(arg, true, deepLevel)
         and isLinkedCall(call.node, i) then
             return true
         end
@@ -485,3 +510,44 @@ function vm.docHasAttr(doc, key)
     end
     return false
 end
+
+---@async
+local function clearAsyncPropagate(uri)
+    local propagate = config.get(uri, 'Lua.hint.awaitPropagate')
+    if not propagate then
+        return
+    end
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local marked = {}
+    local list = {}
+    guide.eachSourceType(state.ast, 'function', function (source)
+        marked[source] = true
+        list[#list+1] = source
+    end)
+    local pairs = pairs
+    local remove = table.remove
+    while #list > 0 do
+        local source = remove(list)
+        local refs = vm.getRefs(source)
+        for _, ref in pairs(refs) do
+            while ref and ref.type ~= 'function' do
+                ref = ref.parent
+            end
+            if ref and not marked[ref] then
+                ref._async = nil
+                marked[ref] = true
+                list[#list+1] = ref
+            end
+        end
+        await.delay()
+    end
+end
+
+files.watch(function (ev, uri) ---@async
+    if ev == 'compile' then
+        clearAsyncPropagate(uri)
+    end
+end)

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Setting: `Lua.hint.awaitPropagate`: When enabled, --@async propagates to the caller.
 
 ## 3.13.3
 * `CHG` Update Love2d version

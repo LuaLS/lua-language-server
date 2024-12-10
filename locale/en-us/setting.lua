@@ -256,6 +256,9 @@ config.hint.arrayIndex.Disable           =
 'Disable hints of array index.'
 config.hint.await                        =
 'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.awaitPropagate               =
+'Enable the propagation of `await`. When a function calls a function marked `---@async`,\z
+it will be automatically marked as `---@async`.'
 config.hint.semicolon                    =
 'If there is no semicolon at the end of the statement, display a virtual semicolon.'
 config.hint.semicolon.All                =

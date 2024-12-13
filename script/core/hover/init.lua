@@ -9,6 +9,7 @@ local guide      = require 'parser.guide'
 local wssymbol   = require 'core.workspace-symbol'
 
 ---@async
+---@param level integer
 local function getHover(source, level)
     local md        = markdown()
     local defMark   = {}
@@ -126,6 +127,7 @@ local accept = {
 }
 
 ---@async
+---@param level integer
 local function getHoverByUri(uri, position, level)
     local ast = files.getState(uri)
     if not ast then
@@ -135,7 +137,7 @@ local function getHoverByUri(uri, position, level)
     if not source then
         return nil
     end
-    local hover = getHover(source)
+    local hover = getHover(source, level)
     if SHOWSOURCE then
         hover:splitLine()
         hover:add('md', 'Source Info')

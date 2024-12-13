@@ -277,7 +277,7 @@ end
 ---@async
 local function buildDesc(source)
     local desc = markdown()
-    local hover = getHover.get(source)
+    local hover = getHover.get(source, 1)
     desc:add('md', hover)
     desc:splitLine()
     desc:add('lua', getSnip(source))

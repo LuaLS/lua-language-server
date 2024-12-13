@@ -9,7 +9,7 @@ local guide      = require 'parser.guide'
 local wssymbol   = require 'core.workspace-symbol'
 
 ---@async
-local function getHover(source)
+local function getHover(source, level)
     local md        = markdown()
     local defMark   = {}
     local labelMark = {}
@@ -32,7 +32,7 @@ local function getHover(source)
         defMark[def] = true
 
         if checkLable then
-            local label = getLabel(def, oop)
+            local label = getLabel(def, oop, level)
             if not labelMark[tostring(label)] then
                 labelMark[tostring(label)] = true
                 md:add('lua', label)
@@ -126,7 +126,7 @@ local accept = {
 }
 
 ---@async
-local function getHoverByUri(uri, position)
+local function getHoverByUri(uri, position, level)
     local ast = files.getState(uri)
     if not ast then
         return nil

@@ -197,7 +197,7 @@ end
 
 export.makeDocObject['function'] = function(source, obj, has_seen)
     obj.args = export.documentObject(source.args, has_seen)
-    obj.view = getLabel(source, source.parent.type == 'setmethod')
+    obj.view = getLabel(source, source.parent.type == 'setmethod', 1)
     local _, _, max = vm.countReturnsOfFunction(source)
     if max > 0 then obj.returns = {} end
     for i = 1, max do

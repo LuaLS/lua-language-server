@@ -159,13 +159,18 @@ local function getNodeMap(uri, fields, keyMap)
 end
 
 ---@async
+---@param level integer
 ---@return string?
-return function (source)
+return function (source, level)
+    if level <= 0 then
+        return nil
+    end
     local uri = guide.getUri(source)
     local maxFields = config.get(uri, 'Lua.hover.previewFields')
     if maxFields <= 0 then
         return nil
     end
+    maxFields = maxFields * level
 
     local node = vm.compileNode(source)
     for n in node:eachObject() do

@@ -19,6 +19,8 @@ function TEST(script)
     end
 end
 
+config.set(nil, 'Lua.hover.previewFields', 50)
+
 TEST [[
 local function <?x?>(a, b)
 end

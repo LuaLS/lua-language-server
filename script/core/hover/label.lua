@@ -48,7 +48,7 @@ local function asValue(source, title, level)
     local ifr     = vm.getInfer(source)
     local type    = ifr:view(guide.getUri(source))
     local literal = ifr:viewLiterals()
-    local cont    = buildTable(source, level)
+    local cont, maxLevel = buildTable(source, level)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
@@ -70,7 +70,7 @@ local function asValue(source, title, level)
     if cont then
         pack[#pack+1] = cont
     end
-    return table.concat(pack, ' ')
+    return table.concat(pack, ' '), maxLevel
 end
 
 ---@async

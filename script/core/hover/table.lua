@@ -161,16 +161,13 @@ end
 ---@async
 ---@param level integer
 ---@return string?
+---@return integer?
 return function (source, level)
-    if level <= 0 then
-        return nil
-    end
     local uri = guide.getUri(source)
     local maxFields = config.get(uri, 'Lua.hover.previewFields')
     if maxFields <= 0 then
         return nil
     end
-    maxFields = maxFields * level
 
     local node = vm.compileNode(source)
     for n in node:eachObject() do
@@ -193,9 +190,15 @@ return function (source, level)
         return nil
     end
 
-    local reachMax = #keys - maxFields
-    if #keys > maxFields then
-        for i = maxFields + 1, #keys do
+    local maxLevel = math.ceil(math.sqrt(#keys / maxFields))
+    if level <= 0 then
+        return nil, maxLevel
+    end
+
+    local finalMaxFields = maxFields * level * level
+    local reachMax = #keys - finalMaxFields
+    if #keys > finalMaxFields then
+        for i = finalMaxFields + 1, #keys do
             map[keys[i]] = nil
             keys[i] = nil
         end
@@ -225,5 +228,5 @@ return function (source, level)
     --    result = ('\n--%s\n%s'):format(lang.script.HOVER_TABLE_TIME_UP, result)
     --end
 
-    return result
+    return result, maxLevel
 end

@@ -362,7 +362,7 @@ m.register 'textDocument/hover' {
             return nil
         end
         local pos = converter.unpackPosition(state, params.position)
-        local hover, source = core.byUri(uri, pos, 1)
+        local hover, source, maxLevel = core.byUri(uri, pos, params.level or 1)
         if not hover or not source then
             return nil
         end
@@ -372,6 +372,7 @@ m.register 'textDocument/hover' {
                 kind  = 'markdown',
             },
             range = converter.packRange(state, source.start, source.finish),
+            maxLevel = maxLevel,
         }
     end
 }

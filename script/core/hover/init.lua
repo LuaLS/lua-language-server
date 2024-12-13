@@ -15,6 +15,7 @@ local function getHover(source, level)
     local defMark   = {}
     local labelMark = {}
     local descMark  = {}
+    local totalMaxLevel = 0
 
     if source.type == 'doc.see.name' then
         for _, symbol in ipairs(wssymbol(source[1], guide.getUri(source))) do
@@ -33,7 +34,10 @@ local function getHover(source, level)
         defMark[def] = true
 
         if checkLable then
-            local label = getLabel(def, oop, level)
+            local label, maxLevel = getLabel(def, oop, level)
+            if maxLevel and totalMaxLevel < maxLevel then
+                totalMaxLevel = maxLevel
+            end
             if not labelMark[tostring(label)] then
                 labelMark[tostring(label)] = true
                 md:add('lua', label)
@@ -104,7 +108,7 @@ local function getHover(source, level)
         end
     end
 
-    return md
+    return md, totalMaxLevel
 end
 
 local accept = {
@@ -137,7 +141,7 @@ local function getHoverByUri(uri, position, level)
     if not source then
         return nil
     end
-    local hover = getHover(source, level)
+    local hover, maxLevel = getHover(source, level)
     if SHOWSOURCE then
         hover:splitLine()
         hover:add('md', 'Source Info')
@@ -152,7 +156,7 @@ local function getHoverByUri(uri, position, level)
             deep = 1,
         }))
     end
-    return hover, source
+    return hover, source, maxLevel
 end
 
 return {

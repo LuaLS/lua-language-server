@@ -3943,6 +3943,34 @@ TEST 'number' [[
 local function f(<?x?>) end
 ]]
 
+TEST 'number' [[
+---@type fun(x:number)[]
+local t = {
+    function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type fun(x:number)[]
+local t = {
+    [1] = function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type {[integer]: fun(x:number)}
+local t = {
+    function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type {[integer]: fun(x:number)}
+local t = {
+    [1] = function (<?x?>) end,
+}
+]]
+
 TEST 'boolean' [[
 ---@generic T: string | boolean | table
 ---@param x T

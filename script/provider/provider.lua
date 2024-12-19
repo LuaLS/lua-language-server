@@ -19,6 +19,7 @@ local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local guide      = require 'parser.guide'
 local fs         = require 'bee.filesystem'
+local version    = require 'version'
 
 require 'library'
 
@@ -128,6 +129,7 @@ m.register 'initialize' {
             capabilities = cap.getProvider(),
             serverInfo   = {
                 name    = 'sumneko.lua',
+                version = version.getVersion(),
             },
         }
         log.debug('Server init', inspect(response))

@@ -69,8 +69,9 @@ for i = 1, numThreads do
     end
 end
 
+local checkPassed = true
 for _, process in ipairs(procs) do
-    process:wait()
+    checkPassed = process:wait() == 0 and checkPassed
 end
 
 local outpath = CHECK_OUT_PATH
@@ -99,3 +100,4 @@ if numThreads > 1 then
         print(lang.script('CLI_CHECK_RESULTS', count, outpath))
     end
 end
+return checkPassed

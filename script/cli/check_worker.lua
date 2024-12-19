@@ -157,3 +157,4 @@ if not QUIET then
         print(lang.script('CLI_CHECK_RESULTS', count, outpath))
     end
 end
+os.exit(count == 0 and true or false)

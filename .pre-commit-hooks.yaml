@@ -1,0 +1,11 @@
+---
+- id: lua-language-server-check
+  name: lua language server check
+  description: >
+    linter for lua
+  entry: lua-language-server
+  language: lua
+  types:
+    - lua
+  args:
+    - --check

@@ -4,13 +4,13 @@ if _G['VERSION'] then
 end
 
 if _G['CHECK'] then
-    require 'cli.check'
-    os.exit(0, true)
+    local checkPassed = require 'cli.check'
+    os.exit(checkPassed and 0 or 1, true)
 end
 
 if _G['CHECK_WORKER'] then
-    require 'cli.check_worker'
-    os.exit(0, true)
+    local checkPassed = require 'cli.check_worker'
+    os.exit(checkPassed and 0 or 1, true)
 end
 
 if _G['DOC_UPDATE'] then

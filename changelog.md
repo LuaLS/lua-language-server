@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` Incorrect infer for function array annotation on tables [#2367](https://github.com/LuaLS/lua-language-server/issues/2367)
+* `CHG` Add server version information to `initialize` response #2996
 * `NEW` Setting: `Lua.hint.awaitPropagate`: When enabled, --@async propagates to the caller.
 
 ## 3.13.4

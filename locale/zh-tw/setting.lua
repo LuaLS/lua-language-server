@@ -255,6 +255,8 @@ config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
 config.hint.await                        =
 '如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。'
+config.hint.awaitPropagate               =
+'啟用 `await` 的傳播，當一個函數呼叫了一個 `---@async` 標記的函數時，會自動標記為 `---@async`。'
 config.hint.semicolon                    =
 '若陳述式尾部沒有分號，則顯示虛擬分號。'
 config.hint.semicolon.All                =

@@ -661,7 +661,7 @@ m.register 'textDocument/completion' {
                 sortText         = res.sortText or ('%04d'):format(i),
                 filterText       = res.filterText,
                 insertText       = res.insertText,
-                insertTextFormat = 2,
+                insertTextFormat = res.insertTextFormat or 1,
                 commitCharacters = res.commitCharacters,
                 command          = res.command,
                 textEdit         = res.textEdit and {

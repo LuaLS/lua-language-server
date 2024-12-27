@@ -141,7 +141,7 @@ m.register 'initialized'{
     ---@async
     function (_params)
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
-        m.updateConfig()
+        m.updateConfig((_params or {}).luarcParentUri)
         local registrations = {}
 
         if client.getAbility 'workspace.didChangeConfiguration.dynamicRegistration' then

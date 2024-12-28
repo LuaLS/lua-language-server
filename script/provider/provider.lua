@@ -141,7 +141,8 @@ m.register 'initialized'{
     ---@async
     function (_params)
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
-        m.updateConfig((_params or {}).luarcParentUri)
+        --- 传递`.luarc.doc.json`文件所在的文件夹路径
+        m.updateConfig(_params and _params.luarcParentUri)
         local registrations = {}
 
         if client.getAbility 'workspace.didChangeConfiguration.dynamicRegistration' then

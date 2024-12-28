@@ -193,8 +193,8 @@ function doc.runCLI()
 
     print('root uri = ' .. rootUri)
 
-    --- If '--configpath' is specified, get the folder path of the '.luarc.doc.josn' configuration file (without the file name)
-    --- 如果指定了'--configpath'，则获取`.luarc.doc.josn` 配置文件的文件夹路径(不包含文件名）
+    --- If '--configpath' is specified, get the folder path of the '.luarc.doc.json' configuration file (without the file name)
+    --- 如果指定了'--configpath'，则获取`.luarc.doc.json` 配置文件的文件夹路径(不包含文件名）
     --- This option is passed into the callback function of the initialized method in provide.
     --- 该选项会被传入到`provide`中的`initialized`方法的回调函数中
     local luarcParentUri
@@ -212,7 +212,7 @@ function doc.runCLI()
 
         client:initialize {
             rootUri = rootUri,
-            luarcParentUri = luarcParentUri
+            luarcParentUri = luarcParentUri,
         }
         io.write(lang.script('CLI_DOC_INITING'))
 

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
 
 ## 3.13.5
 `2024-12-20`

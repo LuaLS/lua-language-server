@@ -375,12 +375,12 @@ print(v1.<?bar1?>)
 ]]
 
 TEST [[
----@class n.Foo*
+---@class n.Foo.2
 local Foo = {}
 function Foo:bar1() end
 
 ---@generic T
----@param arg1 n.`T`*
+---@param arg1 n.`T`.2
 ---@return T
 function Generic(arg1) print(arg1) end
 
@@ -389,12 +389,12 @@ print(v1.<?bar1?>)
 ]]
 
 TEST [[
----@class n.Foo*
+---@class n.Foo.2
 local Foo = {}
 function Foo:<!bar1!>() end
 
 ---@generic T
----@param arg1 n.`T`*
+---@param arg1 n.`T`.2
 ---@return T
 function Generic(arg1) print(arg1) end
 

@@ -239,7 +239,7 @@ TEST [[
 AAAA = {};
 
 function AAAA:<!SSDF!>()
-    
+
 end
 
 AAAA.a.<?SSDF?>
@@ -304,6 +304,19 @@ local v1 = Generic(Foo)
 print(v1.<?bar1?>)
 ]]
 
+TEST [[
+---@class Foo
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@generic T
+---@param arg1 `T`
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic("Foo")
+print(v1.<?bar1?>)
+]]
 
 TEST [[
 ---@class n.Foo
@@ -320,12 +333,12 @@ print(v1.<?bar1?>)
 ]]
 
 TEST [[
----@class Foo
+---@class n.Foo
 local Foo = {}
 function Foo:<!bar1!>() end
 
 ---@generic T
----@param arg1 `T`
+---@param arg1 n.`T`
 ---@return T
 function Generic(arg1) print(arg1) end
 
@@ -333,14 +346,55 @@ local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
 
+TEST [[
+---@class Foo*
+local Foo = {}
+function Foo:bar1() end
+
+---@generic T
+---@param arg1 `T`*
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic(Foo)
+print(v1.<?bar1?>)
+]]
 
 TEST [[
----@class n.Foo
+---@class Foo*
 local Foo = {}
 function Foo:<!bar1!>() end
 
 ---@generic T
----@param arg1 n.`T`
+---@param arg1 `T`*
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic("Foo")
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class n.Foo*
+local Foo = {}
+function Foo:bar1() end
+
+---@generic T
+---@param arg1 n.`T`*
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic(Foo)
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class n.Foo*
+local Foo = {}
+function Foo:<!bar1!>() end
+
+---@generic T
+---@param arg1 n.`T`*
 ---@return T
 function Generic(arg1) print(arg1) end
 

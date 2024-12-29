@@ -54,7 +54,7 @@ EChar               <-  'a' -> ea
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {X16*} '}')    -> CharUtf8
 Symbol              <-  ({} {
-                            [:|,;<>()?+#{}]
+                            [:|,;<>()?+#{}.*]
                         /   '[]'
                         /   '...'
                         /   '['
@@ -744,30 +744,42 @@ local function parseCodePattern(parent)
     local codeOffset
     local finishOffset
     local content
-    for i = 2, 8 do
+    local i = 2
+    while true do
         local next, nextContent = peekToken(i)
         if not next or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
             if codeOffset then
-                finishOffset = i
+                finishOffset = i-1
                 break
             end
             ---不连续的name，无效的
             return nil
         end
-        if next == 'code' then
-            if codeOffset and content ~= nextContent then
+        if next == 'name' then
+            pattern = pattern .. nextContent
+        elseif next == 'code' then
+            if codeOffset then
                 -- 暂时不支持多generic
                 return nil
             end
             codeOffset = i
             pattern = pattern .. "%s"
             content = nextContent
-        elseif next ~= 'name' then
-            return nil
+        elseif codeOffset then
+            -- should be match with Parser "name" mask
+            if next == 'integer' then
+                pattern = pattern .. nextContent
+            elseif next == 'symbol' and (nextContent == '.' or nextContent == '*' or nextContent == '-') then
+                pattern = pattern .. nextContent
+            else
+                return nil
+            end
         else
-            pattern = pattern .. nextContent
+            return nil
         end
+        i = i + 1
     end
+    nextToken()
     local start = getStart()
     for _ = 2, finishOffset do
         nextToken()

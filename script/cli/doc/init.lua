@@ -41,7 +41,7 @@ local function getPathDocUpdate()
                     return section.DOC
                 end
             end
-    end)
+        end)
     if ok then
         local doc_json_dir = doc_json_path:string():gsub('/doc.json', '')
         return doc_json_dir, doc_path
@@ -131,7 +131,7 @@ local function injectBuildScript()
         },
         {__index = _G}))
     if err or not data then
-       error(err, 0)
+        error(err, 0)
     end
     data()
     return module
@@ -193,6 +193,15 @@ function doc.runCLI()
 
     print('root uri = ' .. rootUri)
 
+    --- If '--configpath' is specified, get the folder path of the '.luarc.doc.json' configuration file (without the file name)
+    --- 如果指定了'--configpath'，则获取`.luarc.doc.json` 配置文件的文件夹路径(不包含文件名）
+    --- This option is passed into the callback function of the initialized method in provide.
+    --- 该选项会被传入到`provide`中的`initialized`方法的回调函数中
+    local luarcParentUri
+    if CONFIGPATH then
+        luarcParentUri = furi.encode(fs.absolute(fs.path(CONFIGPATH)):parent_path():string())
+    end
+
     util.enableCloseFunction()
 
     local lastClock = os.clock()
@@ -203,6 +212,7 @@ function doc.runCLI()
 
         client:initialize {
             rootUri = rootUri,
+            luarcParentUri = luarcParentUri,
         }
         io.write(lang.script('CLI_DOC_INITING'))
 
@@ -222,11 +232,11 @@ function doc.runCLI()
             if os.clock() - lastClock > 0.2 then
                 lastClock = os.clock()
                 local output = '\x0D'
-                            .. ('>'):rep(math.ceil(i / max * 20))
-                            .. ('='):rep(20 - math.ceil(i / max * 20))
-                            .. ' '
-                            .. ('0'):rep(#tostring(max) - #tostring(i))
-                            .. tostring(i) .. '/' .. tostring(max)
+                    .. ('>'):rep(math.ceil(i / max * 20))
+                    .. ('='):rep(20 - math.ceil(i / max * 20))
+                    .. ' '
+                    .. ('0'):rep(#tostring(max) - #tostring(i))
+                    .. tostring(i) .. '/' .. tostring(max)
                 io.write(output)
             end
         end)

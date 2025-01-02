@@ -2,6 +2,15 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `CHG` [#3014] Generic pattern now supports definition after capture
+  ```lua
+  ---@generic T
+  ---@param t `T`.Cat
+  ---@return T
+  local function f(t) end
+
+  local t = f('Smile') --> t is `Smile.Cat`
+  ```
 * `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
 * `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
 

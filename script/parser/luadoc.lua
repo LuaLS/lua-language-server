@@ -54,12 +54,13 @@ EChar               <-  'a' -> ea
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {X16*} '}')    -> CharUtf8
 Symbol              <-  ({} {
-                            [:|,;<>()?+#{}]
+                            [:|,;<>()?+#{}*]
                         /   '[]'
                         /   '...'
                         /   '['
                         /   ']'
                         /   '-' !'-'
+                        /   '.' !'..'
                         } {})
                     ->  Symbol
 ]], {
@@ -720,57 +721,63 @@ local function parseString(parent)
     return str
 end
 
-local function parseCode(parent)
-    local tp, content = peekToken()
-    if not tp or tp ~= 'code' then
-        return nil
-    end
-    nextToken()
-    local code = {
-        type   = 'doc.type.code',
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = content,
-    }
-    return code
-end
-
 local function parseCodePattern(parent)
     local tp, pattern = peekToken()
-    if not tp or tp ~= 'name' then
+    if not tp or (tp ~= 'name' and tp ~= 'code') then
         return nil
     end
     local codeOffset
     local finishOffset
     local content
-    for i = 2, 8 do
+    local i = 1
+    if tp == 'code' then
+        codeOffset = i
+        content = pattern
+        pattern = '%s'
+    end
+    while true do
+        i = i + 1
         local next, nextContent = peekToken(i)
         if not next or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
             if codeOffset then
-                finishOffset = i
+                finishOffset = i-1
                 break
             end
             ---不连续的name，无效的
             return nil
         end
-        if next == 'code' then
-            if codeOffset and content ~= nextContent then
+        if next == 'name' then
+            pattern = pattern .. nextContent
+        elseif next == 'code' then
+            if codeOffset then
                 -- 暂时不支持多generic
                 return nil
             end
             codeOffset = i
-            pattern = pattern .. "%s"
+            pattern = pattern .. '%s'
             content = nextContent
-        elseif next ~= 'name' then
-            return nil
+        elseif codeOffset then
+            -- should be match with Parser "name" mask
+            if next == 'integer' then
+                pattern = pattern .. nextContent
+            elseif next == 'symbol' and (nextContent == '.' or nextContent == '*' or nextContent == '-') then
+                pattern = pattern .. nextContent
+            else
+                return nil
+            end
         else
-            pattern = pattern .. nextContent
+            return nil
         end
     end
+    nextToken()
     local start = getStart()
-    for _ = 2, finishOffset do
-        nextToken()
+    if finishOffset == 1 then
+        -- code only, no pattern
+        pattern = nil
+    else
+        for _ = 2, finishOffset do
+            nextToken()
+        end
     end
     local code = {
         type   = 'doc.type.code',
@@ -834,7 +841,6 @@ function parseTypeUnit(parent)
                 or parseTable(parent)
                 or parseTuple(parent)
                 or parseString(parent)
-                or parseCode(parent)
                 or parseInteger(parent)
                 or parseBoolean(parent)
                 or parseParen(parent)

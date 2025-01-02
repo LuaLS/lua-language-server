@@ -72,7 +72,7 @@ Symbol              <-  ({} {
     er = '\r',
     et = '\t',
     ev = '\v',
-    name = (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_')) * (m.R('az', 'AZ', '__', '09', '\x80\xff') + m.S('_.*-'))^0,
+    name = (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_')) * (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_.*-'))^0,
     Char10 = function (char)
         ---@type integer?
         char = tonumber(char)
@@ -727,7 +727,6 @@ local function parseCodePattern(parent)
         return nil
     end
     local codeOffset
-    local finishOffset
     local content
     local i = 1
     if tp == 'code' then
@@ -736,41 +735,41 @@ local function parseCodePattern(parent)
         pattern = '%s'
     end
     while true do
-        i = i + 1
-        local next, nextContent = peekToken(i)
-        if not next or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
-            if codeOffset then
-                finishOffset = i-1
-                break
-            end
+        i = i+1
+        local nextTp, nextContent = peekToken(i)
+        if not nextTp or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
             ---不连续的name，无效的
-            return nil
+            break
         end
-        if next == 'name' then
+        if nextTp == 'name' then
             pattern = pattern .. nextContent
-        elseif next == 'code' then
+        elseif nextTp == 'code' then
             if codeOffset then
                 -- 暂时不支持多generic
-                return nil
+                break
             end
             codeOffset = i
             pattern = pattern .. '%s'
             content = nextContent
         elseif codeOffset then
             -- should be match with Parser "name" mask
-            if next == 'integer' then
+            if nextTp == 'integer' then
                 pattern = pattern .. nextContent
-            elseif next == 'symbol' and (nextContent == '.' or nextContent == '*' or nextContent == '-') then
+            elseif nextTp == 'symbol' and (nextContent == '.' or nextContent == '*' or nextContent == '-') then
                 pattern = pattern .. nextContent
             else
-                return nil
+                break
             end
         else
-            return nil
+            break
         end
+    end
+    if not codeOffset then
+        return nil
     end
     nextToken()
     local start = getStart()
+    local finishOffset = i-1
     if finishOffset == 1 then
         -- code only, no pattern
         pattern = nil
@@ -932,7 +931,7 @@ function parseType(parent)
     local function pushResume()
         local comments
         for i = 0, 100 do
-            local nextComm = NextComment(i,'peek')
+            local nextComm = NextComment(i, true)
             if not nextComm then
                 return false
             end

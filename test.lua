@@ -10,6 +10,15 @@ DEVELOP = true
 --TRACE = true
 LOGPATH  = LOGPATH  or (ROOT:string() .. '/log')
 METAPATH = METAPATH or (ROOT:string() .. '/meta')
+TARGET_TEST_NAME = nil
+
+if arg then
+   for _, v in pairs(arg) do
+       if v:sub(1, 3) == "-n=" or v:sub(1, 7) == "--name=" then
+            TARGET_TEST_NAME = v:sub(v:find('=') + 1)
+       end
+   end
+end
 
 collectgarbage 'generational'
 
@@ -34,7 +43,11 @@ local function loadAllLibs()
     assert(require 'lpeglabel')
 end
 
+---@param name string
 local function test(name)
+    if TARGET_TEST_NAME and not name:match(TARGET_TEST_NAME) then
+        return
+    end
     local clock = os.clock()
     print(('测试[%s]...'):format(name))
     local originRequire = require

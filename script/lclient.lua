@@ -77,7 +77,7 @@ local defaultClientOptions = {
                         valueSet = {
                             define.DiagnosticTag.Unnecessary,
                             define.DiagnosticTag.Deprecated,
-                         },
+                        },
                     },
                 },
             },
@@ -92,7 +92,7 @@ local defaultClientOptions = {
 function mt:initialize(params)
     local initParams = util.tableMerge(params or {}, defaultClientOptions)
     self:awaitRequest('initialize', initParams)
-    self:notify('initialized')
+    self:notify('initialized', initParams)
 end
 
 function mt:reportHangs()

@@ -462,4 +462,38 @@ local function f(b) end
 f <!{y = 1}!>
 ]]
 
+-- partial class
+
+TEST[[
+---@class A
+---@field x number
+
+---@class (partial) B: A
+
+---@type B
+local t = {}
+]]
+
+TEST[[
+---@class A
+---@field x number
+
+---@class (partial) B: A
+---@field y number
+
+---@type B
+local t = <!{}!>
+]]
+
+TEST[[
+---@class A
+---@field x number
+
+---@class (partial) B: A
+---@field y number
+
+---@type B
+local t = {y = 1}
+]]
+
 --

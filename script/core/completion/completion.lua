@@ -1351,6 +1351,7 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
             description = description,
             kind        = define.CompletionItemKind.Function,
             insertText  = insertText,
+            insertTextFormat = 2,
         }
     elseif src.type == 'doc.enum' then
         ---@cast src parser.object

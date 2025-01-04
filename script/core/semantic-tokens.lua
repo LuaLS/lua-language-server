@@ -902,23 +902,23 @@ return function (uri, start, finish)
             return
         end
         if start <= comm.start and comm.finish <= finish then
+            -- the same logic as in buildLuaDoc
             local headPos = (comm.type == 'comment.short' and comm.text:match '^%-%s*[@|]()')
                          or (comm.type == 'comment.long'  and comm.text:match '^@()')
             if headPos then
-                local atPos
-                if comm.type == 'comment.short' then
-                    atPos = headPos + 2
-                else
-                    atPos = headPos + #comm.mark
+                -- absolute position of `@` symbol
+                local startOffset = comm.start + headPos
+                if comm.type == 'comment.long' then
+                    startOffset = comm.start + headPos + #comm.mark - 2
                 end
                 results[#results+1] = {
                     start  = comm.start,
-                    finish = comm.start + atPos - 2,
+                    finish = startOffset,
                     type   = define.TokenTypes.comment,
                 }
                 results[#results+1] = {
-                    start      = comm.start + atPos - 2,
-                    finish     = comm.start + atPos - 1 + #comm.text:match('%S*', headPos),
+                    start      = startOffset,
+                    finish     = startOffset + #comm.text:match('%S*', headPos) + 1,
                     type       = define.TokenTypes.keyword,
                     modifieres = define.TokenModifiers.documentation,
                 }

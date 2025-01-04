@@ -13,6 +13,7 @@
   ```
 * `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
 * `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
+* `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
 
 ## 3.13.5
 `2024-12-20`

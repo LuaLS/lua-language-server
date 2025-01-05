@@ -13,6 +13,7 @@
   ```
 * `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
 * `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
+* `FIX` Generic return can be optional.
 
 ## 3.13.5
 `2024-12-20`

@@ -1739,10 +1739,16 @@ local function buildLuaDoc(comment)
         local finish = result.firstFinish or result.finish
         if rests then
             for _, rest in ipairs(rests) do
-                rest.range = comment.finish
-                finish = rest.firstFinish or result.finish
+                rest.range = math.max(comment.finish, rest.finish)
+                finish = rest.firstFinish or rest.finish
             end
         end
+
+        -- `result` can be a multiline annotation or an alias, while `doc` is the first line, so we can't parse comment
+        if finish >= comment.finish then
+            return result, rests
+        end
+
         local cstart = doc:find('%S', finish - startOffset)
         if cstart then
             result.comment = {
@@ -1758,9 +1764,7 @@ local function buildLuaDoc(comment)
                 end
             end
         end
-    end
 
-    if result then
         return result, rests
     end
 

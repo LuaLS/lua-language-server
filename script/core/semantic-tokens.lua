@@ -904,7 +904,7 @@ return function (uri, start, finish)
         if start <= comm.start and comm.finish <= finish then
             -- the same logic as in buildLuaDoc
             local headPos = (comm.type == 'comment.short' and comm.text:match '^%-%s*[@|]()')
-                         or (comm.type == 'comment.long'  and comm.text:match '^@()')
+                         or (comm.type == 'comment.long'  and comm.text:match '^%s*@()')
             if headPos then
                 -- absolute position of `@` symbol
                 local startOffset = comm.start + headPos

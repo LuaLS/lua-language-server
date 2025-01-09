@@ -1714,7 +1714,7 @@ end
 
 local function buildLuaDoc(comment)
     local headPos = (comment.type == 'comment.short' and comment.text:match '^%-%s*@()')
-                 or (comment.type == 'comment.long'  and comment.text:match '^@()')
+                 or (comment.type == 'comment.long'  and comment.text:match '^%s*@()')
     if not headPos then
         return {
             type    = 'doc.comment',

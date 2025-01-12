@@ -203,16 +203,16 @@ m.register {
     'duplicate-index',
 } {
     group    = 'duplicate',
-    severity = 'Warning',
-    status   = 'Any',
+    severity = 'Information',
+    status   = 'None',
 }
 
 m.register {
     'duplicate-set-field',
 } {
     group    = 'duplicate',
-    severity = 'Warning',
-    status   = 'Opened',
+    severity = 'Information',
+    status   = 'None',
 }
 
 m.register {

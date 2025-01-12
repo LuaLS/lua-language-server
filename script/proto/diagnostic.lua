@@ -203,7 +203,7 @@ m.register {
     'duplicate-index',
 } {
     group    = 'duplicate',
-    severity = 'Information',
+    severity = 'Warning',
     status   = 'None',
 }
 
@@ -211,7 +211,7 @@ m.register {
     'duplicate-set-field',
 } {
     group    = 'duplicate',
-    severity = 'Information',
+    severity = 'Warning',
     status   = 'None',
 }
 

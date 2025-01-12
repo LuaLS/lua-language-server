@@ -59,7 +59,7 @@ function export.getLocalPath(uri)
     local local_file_uri = uri
     local i, j = local_file_uri:find(DOC)
     if not j then
-        return '[FORIEGN]'..uri
+        return '[FOREIGN] '..uri
     end
     return local_file_uri:sub( j + 1 )
 end

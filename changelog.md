@@ -14,6 +14,20 @@
 * `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
 * `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
 * `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
+* `NEW` `---@class` supports attribute `partial`, which will not check missing inherited fields [#3023](https://github.com/LuaLS/lua-language-server/issues/3023)
+  ```lua
+  ---@class Config
+  ---@field a number
+
+  ---@class (partial) Config.P: Config
+  ---@field b number
+
+  ---@type Config.P[]
+  local cfgs = {}
+  cfgs[1] = { b = 1 } -- no warning
+  cfgs[2] = {}        -- only warns missing `b`
+  ```
+  This enables the previous missing field check behavior before [#2970](https://github.com/LuaLS/lua-language-server/issues/2970)
 
 ## 3.13.5
 `2024-12-20`

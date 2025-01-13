@@ -26,6 +26,18 @@ return function (uri, callback)
                 local className = def.class[1]
                 if not sortedDefs[className] then
                     sortedDefs[className] = {}
+                    -- check if this class is a `partial` class
+                    -- a partial class will not check missing inherited fields
+                    local class = vm.getGlobal('type', className)
+                    ---@cast class -nil
+                    for _, set in ipairs(class:getSets(uri)) do
+                        if set.type == 'doc.class'
+                        and vm.docHasAttr(set, 'partial')
+                        then
+                            sortedDefs[className].isPartial = true
+                            break
+                        end
+                    end
                 end
                 local samedefs = sortedDefs[className]
                 samedefs[#samedefs+1] = def
@@ -41,8 +53,8 @@ return function (uri, callback)
         for className, samedefs in pairs(sortedDefs) do
             local missedKeys = {}
             for _, def in ipairs(samedefs) do
-                local fields = vm.getFields(def)
-                if #fields == 0 then
+                local fields = samedefs.isPartial and def.fields or vm.getFields(def)
+                if not fields or #fields == 0 then
                     goto continue
                 end
 
@@ -78,6 +90,12 @@ return function (uri, callback)
                     end
                 end
                 ::continue::
+
+                if not samedefs.isPartial then
+                    -- if not partial class, then all fields in this class have already been checked
+                    -- because in the above uses `vm.getFields` to get all fields
+                    break
+                end
             end
 
             if #missedKeys == 0 then

@@ -5,7 +5,7 @@ local vm            = require 'vm.vm'
 ---@class vm.sign
 ---@field parent    parser.object
 ---@field signList  vm.node[]
----@field docGenric parser.object[]
+---@field docGeneric parser.object[]
 local mt = {}
 mt.__index = mt
 mt.type = 'sign'
@@ -17,7 +17,7 @@ end
 
 ---@param doc parser.object
 function mt:addDocGeneric(doc)
-    self.docGenric[#self.docGenric+1] = doc
+    self.docGeneric[#self.docGeneric+1] = doc
 end
 
 ---@param uri uri
@@ -268,7 +268,7 @@ end
 function vm.createSign()
     local genericMgr = setmetatable({
         signList  = {},
-        docGenric = {},
+        docGeneric = {},
     }, mt)
     return genericMgr
 end

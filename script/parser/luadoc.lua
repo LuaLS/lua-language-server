@@ -1713,10 +1713,9 @@ local function trimTailComment(text)
 end
 
 local function buildLuaDoc(comment)
-    local text = comment.text
-    local startPos = (comment.type == 'comment.short' and text:match '^%-%s*@()')
-                  or (comment.type == 'comment.long'  and text:match '^@()')
-    if not startPos then
+    local headPos = (comment.type == 'comment.short' and comment.text:match '^%-%s*@()')
+                 or (comment.type == 'comment.long'  and comment.text:match '^%s*@()')
+    if not headPos then
         return {
             type    = 'doc.comment',
             start   = comment.start,
@@ -1725,32 +1724,39 @@ local function buildLuaDoc(comment)
             comment = comment,
         }
     end
-    local startOffset = comment.start
+    -- absolute position of `@` symbol
+    local startOffset = comment.start + headPos
     if comment.type == 'comment.long' then
-        startOffset = startOffset + #comment.mark - 2
+        startOffset = comment.start + headPos + #comment.mark - 2
     end
 
-    local doc = text:sub(startPos)
+    local doc = comment.text:sub(headPos)
 
-    parseTokens(doc, startOffset + startPos)
+    parseTokens(doc, startOffset)
     local result, rests = convertTokens(doc)
     if result then
         result.range = math.max(comment.finish, result.finish)
         local finish = result.firstFinish or result.finish
         if rests then
             for _, rest in ipairs(rests) do
-                rest.range = comment.finish
-                finish = rest.firstFinish or result.finish
+                rest.range = math.max(comment.finish, rest.finish)
+                finish = rest.firstFinish or rest.finish
             end
         end
-        local cstart = text:find('%S', finish - comment.start)
-        if cstart and cstart < comment.finish then
+
+        -- `result` can be a multiline annotation or an alias, while `doc` is the first line, so we can't parse comment
+        if finish >= comment.finish then
+            return result, rests
+        end
+
+        local cstart = doc:find('%S', finish - startOffset)
+        if cstart then
             result.comment = {
                 type   = 'doc.tailcomment',
-                start  = cstart + comment.start,
+                start  = startOffset + cstart,
                 finish = comment.finish,
                 parent = result,
-                text   = trimTailComment(text:sub(cstart)),
+                text   = trimTailComment(doc:sub(cstart)),
             }
             if rests then
                 for _, rest in ipairs(rests) do
@@ -1758,9 +1764,7 @@ local function buildLuaDoc(comment)
                 end
             end
         end
-    end
 
-    if result then
         return result, rests
     end
 

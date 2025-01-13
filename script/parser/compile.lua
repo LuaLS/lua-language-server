@@ -590,7 +590,7 @@ local function skipComment(isAction)
         local result, right = resolveLongString '*/'
         pushLongCommentError(left, right)
         State.comms[#State.comms+1] = {
-            type   = 'comment.long',
+            type   = 'comment.clong',
             start  = left,
             finish = right,
             text   = result,

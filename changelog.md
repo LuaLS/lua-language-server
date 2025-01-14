@@ -2,17 +2,18 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `CHG` [#3014] Generic pattern now supports definition after capture
+* `CHG` [#3014] Generic pattern now supports definition after capture and optional, union, array
   ```lua
   ---@generic T
-  ---@param t `T`.Cat
-  ---@return T
+  ---@param t `T`.Cat?
+  ---@return T?
   local function f(t) end
 
-  local t = f('Smile') --> t is `Smile.Cat`
+  local t = f('Smile') --> t is `(Smile.Cat)?`
   ```
 * `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
 * `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
+* `FIX` Generic return can be optional.
 * `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
 * `NEW` `---@class` supports attribute `partial`, which will not check missing inherited fields [#3023](https://github.com/LuaLS/lua-language-server/issues/3023)
   ```lua

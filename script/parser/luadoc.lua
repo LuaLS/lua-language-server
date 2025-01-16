@@ -2181,7 +2181,7 @@ local function bindDocs(state)
         if doc.specialBindGroup then
             bindDocWithSources(sources, doc.specialBindGroup)
             binded = nil
-        elseif isTailComment(text, doc) and doc.type ~= "doc.class" and doc.type ~= "doc.field" then
+        elseif isTailComment(text, doc) and doc.type ~= "doc.field" then
             bindDocWithSources(sources, binded)
             binded = nil
         else

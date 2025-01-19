@@ -363,6 +363,7 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
                         newText = newText,
                     },
                     sortText    = ('postfix-%04d'):format(i),
+                    insertTextFormat = 2,
 
                     additionalTextEdits = {
                         {

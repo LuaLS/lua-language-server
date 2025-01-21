@@ -44,9 +44,9 @@ function m.initRoot(uri)
 end
 
 --- 初始化工作区
-function m.create(uri)
+function m.create(uri, folderName)
     log.info('Workspace create: ', uri)
-    local scp = scope.createFolder(uri)
+    local scp = scope.createFolder(uri, folderName)
     m.folders[#m.folders+1] = scp
     if uri == furi.encode '/'
     or uri == furi.encode(os.getenv 'HOME' or '') then

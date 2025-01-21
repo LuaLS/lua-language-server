@@ -8,6 +8,7 @@ local m = {}
 ---@class scope
 ---@field type   scope.type
 ---@field uri?   uri
+---@field folderName? string
 ---@field _links table<uri, boolean>
 ---@field _data  table<string, any>
 ---@field _gc    gc
@@ -134,6 +135,11 @@ function mt:getName()
     return self.uri or ('<' .. self.type .. '>')
 end
 
+---@return string?
+function mt:getFolderName()
+    return self.folderName
+end
+
 function mt:gc(obj)
     self._gc:add(obj)
 end
@@ -187,10 +193,12 @@ end
 m.reset()
 
 ---@param uri uri
+---@param folderName? string
 ---@return scope
-function m.createFolder(uri)
+function m.createFolder(uri, folderName)
     local scope = createScope 'folder'
     scope.uri = uri
+    scope.folderName = folderName
 
     local inserted = false
     for i, otherScope in ipairs(m.folders) do

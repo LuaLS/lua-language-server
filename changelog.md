@@ -30,6 +30,7 @@
   cfgs[2] = {}        -- only warns missing `b`
   ```
   This enables the previous missing field check behavior before [#2970](https://github.com/LuaLS/lua-language-server/issues/2970)
+* `NEW` Added `--check_format=json|pretty` for use with `--check` to output diagnostics in a human readable format.
 
 ## 3.13.5
 `2024-12-20`

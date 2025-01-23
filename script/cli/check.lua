@@ -11,7 +11,7 @@ local function logFileForThread(threadId)
     return LOGPATH .. '/check-partial-' .. threadId .. '.json'
 end
 
-local function buildArgs(exe, numThreads, threadId)
+local function buildArgs(exe, numThreads, threadId, format, quiet)
     local args = {exe}
     local skipNext = false
     for i = 1, #arg do
@@ -35,7 +35,12 @@ local function buildArgs(exe, numThreads, threadId)
     args[#args + 1] = '--thread_id'
     args[#args + 1] = tostring(threadId)
     if numThreads > 1 then
-        args[#args + 1] = '--quiet'
+        if quiet then
+            args[#args + 1] = '--quiet'
+        end
+        if format then
+            args[#args + 1] = '--check_format=' .. format
+        end
         args[#args + 1] = '--check_out_path'
         args[#args + 1] = logFileForThread(threadId)
     end
@@ -62,7 +67,7 @@ function export.runCLI()
 
     local procs = {}
     for i = 1, numThreads do
-        local process, err = subprocess.spawn({buildArgs(exe, numThreads, i)})
+        local process, err = subprocess.spawn({buildArgs(exe, numThreads, i, CHECK_FORMAT, QUIET)})
         if err then
             print(err)
         end
@@ -74,11 +79,6 @@ function export.runCLI()
     local checkPassed = true
     for _, process in ipairs(procs) do
         checkPassed = process:wait() == 0 and checkPassed
-    end
-
-    local outpath = CHECK_OUT_PATH
-    if outpath == nil then
-        outpath = LOGPATH .. '/check.json'
     end
 
     if numThreads > 1 then
@@ -95,11 +95,22 @@ function export.runCLI()
                 end
             end
         end
-        util.saveFile(outpath, jsonb.beautify(mergedResults))
-        if count == 0 then
-            print(lang.script('CLI_CHECK_SUCCESS'))
-        else
-            print(lang.script('CLI_CHECK_RESULTS', count, outpath))
+
+        local outpath = nil
+
+        if CHECK_FORMAT == 'json' or CHECK_OUT_PATH then
+            outpath = CHECK_OUT_PATH or LOGPATH .. '/check.json'
+            util.saveFile(outpath, jsonb.beautify(mergedResults))
+        end
+
+        if not QUIET then
+            if count == 0 then
+                print(lang.script('CLI_CHECK_SUCCESS'))
+            elseif outpath then
+                print(lang.script('CLI_CHECK_RESULTS_OUTPATH', count, outpath))
+            else
+                print(lang.script('CLI_CHECK_RESULTS_PRETTY', count))
+            end
         end
     end
     return checkPassed and 0 or 1

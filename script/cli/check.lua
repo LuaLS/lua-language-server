@@ -7,6 +7,41 @@ local util       = require 'utility'
 
 local export = {}
 
+local function logFileForThread(threadId)
+    return LOGPATH .. '/check-partial-' .. threadId .. '.json'
+end
+
+local function buildArgs(exe, numThreads, threadId)
+    local args = {exe}
+    local skipNext = false
+    for i = 1, #arg do
+        local arg = arg[i]
+        -- --check needs to be transformed into --check_worker
+        if arg:lower():match('^%-%-check$') or arg:lower():match('^%-%-check=') then
+            args[#args + 1] = arg:gsub('%-%-%w*', '--check_worker')
+        -- --check_out_path needs to be removed if we have more than one thread
+        elseif arg:lower():match('%-%-check_out_path') and numThreads > 1 then
+            if not arg:match('%-%-%w*=') then
+                skipNext = true
+            end
+        else
+            if skipNext then
+                skipNext = false
+            else
+                args[#args + 1] = arg
+            end
+        end
+    end
+    args[#args + 1] = '--thread_id'
+    args[#args + 1] = tostring(threadId)
+    if numThreads > 1 then
+        args[#args + 1] = '--quiet'
+        args[#args + 1] = '--check_out_path'
+        args[#args + 1] = logFileForThread(threadId)
+    end
+    return args
+end
+
 function export.runCLI()
     local numThreads = tonumber(NUM_THREADS or 1)
 
@@ -21,48 +56,13 @@ function export.runCLI()
         exe = exe..'.exe'
     end
 
-    local function logFileForThread(threadId)
-        return LOGPATH .. '/check-partial-' .. threadId .. '.json'
-    end
-
-    local function buildArgs(threadId)
-        local args = {exe}
-        local skipNext = false
-        for i = 1, #arg do
-            local arg = arg[i]
-            -- --check needs to be transformed into --check_worker
-            if arg:lower():match('^%-%-check$') or arg:lower():match('^%-%-check=') then
-                args[#args + 1] = arg:gsub('%-%-%w*', '--check_worker')
-            -- --check_out_path needs to be removed if we have more than one thread
-            elseif arg:lower():match('%-%-check_out_path') and numThreads > 1 then
-                if not arg:match('%-%-%w*=') then
-                    skipNext = true
-                end
-            else
-                if skipNext then
-                    skipNext = false
-                else
-                    args[#args + 1] = arg
-                end
-            end
-        end
-        args[#args + 1] = '--thread_id'
-        args[#args + 1] = tostring(threadId)
-        if numThreads > 1 then
-            args[#args + 1] = '--quiet'
-            args[#args + 1] = '--check_out_path'
-            args[#args + 1] = logFileForThread(threadId)
-        end
-        return args
-    end
-
-    if numThreads > 1 then
+    if not QUIET and numThreads > 1 then
         print(lang.script('CLI_CHECK_MULTIPLE_WORKERS', numThreads))
     end
 
     local procs = {}
     for i = 1, numThreads do
-        local process, err = subprocess.spawn({buildArgs(i)})
+        local process, err = subprocess.spawn({buildArgs(exe, numThreads, i)})
         if err then
             print(err)
         end

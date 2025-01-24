@@ -17,6 +17,70 @@ require 'vm'
 
 local export = {}
 
+local function clear_line()
+    -- Write out empty space to ensure that the previous lien is cleared.
+    io.write('\x0D', (' '):rep(80), '\x0D')
+end
+
+--- @param i integer
+--- @param max integer
+--- @param results table<string, table[]>
+local function report_progress(i, max, results)
+    local filesWithErrors = 0
+    local errors = 0
+    for _, diags in pairs(results) do
+        filesWithErrors = filesWithErrors + 1
+        errors = errors + #diags
+    end
+
+    clear_line()
+    io.write(
+        ('>'):rep(math.ceil(i / max * 20)),
+        ('='):rep(20 - math.ceil(i / max * 20)),
+        ' ',
+        ('0'):rep(#tostring(max) - #tostring(i)),
+        tostring(i),
+        '/',
+        tostring(max)
+    )
+    if errors > 0 then
+        io.write(' [', lang.script('CLI_CHECK_PROGRESS', errors, filesWithErrors), ']')
+    end
+    io.flush()
+end
+
+--- @param uri string
+--- @param checkLevel integer
+local function apply_check_level(uri, checkLevel)
+    local config_disables = util.arrayToHash(config.get(uri, 'Lua.diagnostics.disable'))
+    local config_severities = config.get(uri, 'Lua.diagnostics.severity')
+    for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
+        serverity = config_severities[name] or serverity
+        if serverity:sub(-1) == '!' then
+            serverity = serverity:sub(1, -2)
+        end
+        if define.DiagnosticSeverity[serverity] > checkLevel then
+            config_disables[name] = true
+        end
+    end
+    config.set(uri, 'Lua.diagnostics.disable', util.getTableKeys(config_disables, true))
+end
+
+local function downgrade_checks_to_opened(uri)
+    local diagStatus = config.get(uri, 'Lua.diagnostics.neededFileStatus')
+    for d, status in pairs(diagStatus) do
+        if status == 'Any' or status == 'Any!' then
+            diagStatus[d] = 'Opened!'
+        end
+    end
+    for d, status in pairs(protoDiag.getDefaultStatus()) do
+        if status == 'Any' or status == 'Any!' then
+            diagStatus[d] = 'Opened!'
+        end
+    end
+    config.set(uri, 'Lua.diagnostics.neededFileStatus', diagStatus)
+end
+
 function export.runCLI()
     lang(LOCALE)
 
@@ -36,18 +100,16 @@ function export.runCLI()
     end
     rootUri = rootUri:gsub("/$", "")
 
-    if CHECKLEVEL then
-        if not define.DiagnosticSeverity[CHECKLEVEL] then
-            print(lang.script('CLI_CHECK_ERROR_LEVEL', 'Error, Warning, Information, Hint'))
-            return
-        end
+    if CHECKLEVEL and not define.DiagnosticSeverity[CHECKLEVEL] then
+        print(lang.script('CLI_CHECK_ERROR_LEVEL', 'Error, Warning, Information, Hint'))
+        return
     end
     local checkLevel = define.DiagnosticSeverity[CHECKLEVEL] or define.DiagnosticSeverity.Warning
 
     util.enableCloseFunction()
 
     local lastClock = os.clock()
-    local results = {}
+    local results = {}  --- @type table<string, table[]>
 
     local function errorhandler(err)
         print(err)
@@ -75,31 +137,12 @@ function export.runCLI()
 
         ws.awaitReady(rootUri)
 
-        local disables = util.arrayToHash(config.get(rootUri, 'Lua.diagnostics.disable'))
-        for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
-            serverity = config.get(rootUri, 'Lua.diagnostics.severity')[name] or serverity
-            if serverity:sub(-1) == '!' then
-                serverity = serverity:sub(1, -2)
-            end
-            if define.DiagnosticSeverity[serverity] > checkLevel then
-                disables[name] = true
-            end
-        end
-        config.set(rootUri, 'Lua.diagnostics.disable', util.getTableKeys(disables, true))
+        -- Disable any diagnostics that are above the check level
+        apply_check_level(rootUri, checkLevel)
 
-        -- Downgrade file opened status to Opened for everything to avoid reporting during compilation on files that do not belong to this thread
-        local diagStatus = config.get(rootUri, 'Lua.diagnostics.neededFileStatus')
-        for diag, status in pairs(diagStatus) do
-            if status == 'Any' or status == 'Any!' then
-                diagStatus[diag] = 'Opened!'
-            end
-        end
-        for diag, status in pairs(protoDiag.getDefaultStatus()) do
-            if status == 'Any' or status == 'Any!' then
-                diagStatus[diag] = 'Opened!'
-            end
-        end
-        config.set(rootUri, 'Lua.diagnostics.neededFileStatus', diagStatus)
+        -- Downgrade file opened status to Opened for everything to avoid
+        -- reporting during compilation on files that do not belong to this thread
+        downgrade_checks_to_opened(rootUri)
 
         local uris = files.getChildFiles(rootUri)
         local max  = #uris
@@ -108,28 +151,12 @@ function export.runCLI()
             if (i % numThreads + 1) == threadId then
                 files.open(uri)
                 diag.doDiagnostic(uri, true)
-                -- Print regularly but always print the last entry to ensure that logs written to files don't look incomplete.
-                if (os.clock() - lastClock > 0.2 or i == #uris) and not QUIET then
+                -- Print regularly but always print the last entry to ensure
+                -- that logs written to files don't look incomplete.
+                if not QUIET and (os.clock() - lastClock > 0.2 or i == #uris) then
                     lastClock = os.clock()
                     client:update()
-                    local output = '\x0D'
-                                .. ('>'):rep(math.ceil(i / max * 20))
-                                .. ('='):rep(20 - math.ceil(i / max * 20))
-                                .. ' '
-                                .. ('0'):rep(#tostring(max) - #tostring(i))
-                                .. tostring(i) .. '/' .. tostring(max)
-                    io.write(output)
-                    local filesWithErrors = 0
-                    local errors = 0
-                    for _, diags in pairs(results) do
-                        filesWithErrors = filesWithErrors + 1
-                        errors = errors + #diags
-                    end
-                    if errors > 0 then
-                        local errorDetails = ' [' .. lang.script('CLI_CHECK_PROGRESS', errors, filesWithErrors) .. ']'
-                        io.write(errorDetails)
-                    end
-                    io.flush()
+                    report_progress(i, max, results)
                 end
             end
         end
@@ -146,10 +173,8 @@ function export.runCLI()
         end
     end
 
-    local outpath = CHECK_OUT_PATH
-    if outpath == nil then
-        outpath = LOGPATH .. '/check.json'
-    end
+    local outpath = CHECK_OUT_PATH or LOGPATH .. '/check.json'
+
     -- Always write result, even if it's empty to make sure no one accidentally looks at an old output after a successful run.
     util.saveFile(outpath, jsonb.beautify(results))
 

@@ -40,8 +40,18 @@ local function include(a, b)
         return false
     end
     if tp1 == 'table' then
-        for k in pairs(a) do
-            if not eq(a[k], b[k]) then
+        -- a / b are array of completion results
+        -- when checking `include`, the array index order is not important
+        -- thus need to check every results in b
+        for _, v1 in ipairs(a) do
+            local ok = false
+            for _, v2 in ipairs(b) do
+                if eq(v1, v2) then
+                    ok = true
+                    break
+                end
+            end
+            if not ok then
                 return false
             end
         end

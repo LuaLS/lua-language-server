@@ -17,6 +17,7 @@
 * `FIX` Generic return can be optional.
 * `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
 * `FIX` Fixed cannot bind variables using tail comment `@class` [#2673](https://github.com/LuaLS/lua-language-server/issues/2673)
+* `FIX` Fixed missing field completion for generic class object [#2196](https://github.com/LuaLS/lua-language-server/issues/2196) [#2945](https://github.com/LuaLS/lua-language-server/issues/2945) [#3041](https://github.com/LuaLS/lua-language-server/issues/3041)
 * `NEW` `---@class` supports attribute `partial`, which will not check missing inherited fields [#3023](https://github.com/LuaLS/lua-language-server/issues/3023)
   ```lua
   ---@class Config

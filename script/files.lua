@@ -945,6 +945,17 @@ function m.resolvePathPlaceholders(path)
         elseif key:sub(1, 4) == "env:" then
             local env = os.getenv(key:sub(5))
             return env
+        elseif key == "workspaceFolder" then
+            local ws = require 'workspace'
+            return ws.rootUri and furi.decode(ws.rootUri)
+        elseif key:match("^workspaceFolder:.+$") then
+            local folderName = key:match("^workspaceFolder:(.+)$")
+            for _, scp in ipairs(scope.folders) do
+                if scp:getFolderName() == folderName then
+                    return scp.uri and furi.decode(scp.uri)
+                end
+            end
+            log.warn(('variable ${%s} cannot be resolved when processing path: %s'):format(key, path))
         end
     end)
 

@@ -119,7 +119,7 @@ m.register 'initialize' {
 
         if params.workspaceFolders then
             for _, folder in ipairs(params.workspaceFolders) do
-                workspace.create(files.getRealUri(folder.uri))
+                workspace.create(files.getRealUri(folder.uri), folder.name)
             end
         elseif params.rootUri then
             workspace.create(files.getRealUri(params.rootUri))

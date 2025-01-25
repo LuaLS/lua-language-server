@@ -4572,3 +4572,44 @@ M.create():optional(<??>):self()
         kind  = define.CompletionItemKind.EnumMember,
     },
 }
+
+TEST [[
+---@class Array<T>: { [integer]: T }
+---@field length integer
+local Array
+
+function Array:push() end
+
+---@type Array<string>
+local a
+print(a.<??>)
+]]
+{
+    include = true,
+    {
+        label = 'length',
+        kind  = define.CompletionItemKind.Field,
+    },
+    {
+        label = 'push(self)',
+        kind  = define.CompletionItemKind.Method,
+    },
+}
+
+TEST [[
+---@class Array<T>: { [integer]: T }
+---@field length integer
+local Array
+
+function Array:push() end
+
+---@type Array<string>
+local a
+print(a:<??>)
+]]
+{
+    {
+        label = 'push()',
+        kind  = define.CompletionItemKind.Method,
+    },
+}

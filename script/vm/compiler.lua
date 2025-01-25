@@ -304,6 +304,17 @@ local searchFieldSwitch = util.switch()
             end
         end
     end)
+    : case 'doc.type.sign'
+    : call(function (suri, source, key, pushResult)
+        if not source.node[1] then
+            return
+        end
+        local global = vm.getGlobal('type', source.node[1])
+        if not global then
+            return
+        end
+        vm.getClassFields(suri, global, key, pushResult)
+    end)
     : case 'global'
     : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then

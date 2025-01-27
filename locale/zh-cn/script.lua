@@ -648,8 +648,10 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_PROGRESS =
 '检测到问题 {} 在文件 {} 中'
-CLI_CHECK_RESULTS =
+CLI_CHECK_RESULTS_OUTPATH =
 '诊断完成，共有 {} 个问题，请查看 {}'
+CLI_CHECK_RESULTS_PRETTY =
+'诊断完成，共有 {} 个问题'
 CLI_CHECK_MULTIPLE_WORKERS =
 '开启 {} 个工作任务，进度输出将会被禁用。这可能会花费几分钟。'
 CLI_DOC_INITING   =

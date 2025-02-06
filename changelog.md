@@ -32,6 +32,7 @@
   ```
   This enables the previous missing field check behavior before [#2970](https://github.com/LuaLS/lua-language-server/issues/2970)
 * `NEW` Added variable substitution support for vscode's `${workspaceFolder:x}` when resolving path placeholders [#2987](https://github.com/LuaLS/lua-language-server/issues/2987)
+* `NEW` Added `--check_format=json|pretty` for use with `--check` to output diagnostics in a human readable format.
 
 ## 3.13.5
 `2024-12-20`

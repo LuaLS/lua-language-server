@@ -2,22 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` Don't truncate any output when running in `--doc` mode [#3049](https://github.com/LuaLS/lua-language-server/issues/3049)
-* `CHG` [#3014] Generic pattern now supports definition after capture and optional, union, array
-  ```lua
-  ---@generic T
-  ---@param t `T`.Cat?
-  ---@return T?
-  local function f(t) end
 
-  local t = f('Smile') --> t is `(Smile.Cat)?`
-  ```
-* `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
-* `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
-* `FIX` Generic return can be optional.
-* `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
-* `FIX` Fixed cannot bind variables using tail comment `@class` [#2673](https://github.com/LuaLS/lua-language-server/issues/2673)
-* `FIX` Fixed missing field completion for generic class object [#2196](https://github.com/LuaLS/lua-language-server/issues/2196) [#2945](https://github.com/LuaLS/lua-language-server/issues/2945) [#3041](https://github.com/LuaLS/lua-language-server/issues/3041)
+## 3.13.6
+`2025-2-6`
 * `NEW` `---@class` supports attribute `partial`, which will not check missing inherited fields [#3023](https://github.com/LuaLS/lua-language-server/issues/3023)
   ```lua
   ---@class Config
@@ -34,6 +21,22 @@
   This enables the previous missing field check behavior before [#2970](https://github.com/LuaLS/lua-language-server/issues/2970)
 * `NEW` Added variable substitution support for vscode's `${workspaceFolder:x}` when resolving path placeholders [#2987](https://github.com/LuaLS/lua-language-server/issues/2987)
 * `NEW` Added `--check_format=json|pretty` for use with `--check` to output diagnostics in a human readable format.
+* `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
+* `CHG` [#3014] Generic pattern now supports definition after capture and optional, union, array
+  ```lua
+  ---@generic T
+  ---@param t `T`.Cat?
+  ---@return T?
+  local function f(t) end
+
+  local t = f('Smile') --> t is `(Smile.Cat)?`
+  ```
+* `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
+* `FIX` Don't truncate any output when running in `--doc` mode [#3049](https://github.com/LuaLS/lua-language-server/issues/3049)
+* `FIX` Generic return can be optional.
+* `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
+* `FIX` Fixed cannot bind variables using tail comment `@class` [#2673](https://github.com/LuaLS/lua-language-server/issues/2673)
+* `FIX` Fixed missing field completion for generic class object [#2196](https://github.com/LuaLS/lua-language-server/issues/2196) [#2945](https://github.com/LuaLS/lua-language-server/issues/2945) [#3041](https://github.com/LuaLS/lua-language-server/issues/3041)
 
 ## 3.13.5
 `2024-12-20`

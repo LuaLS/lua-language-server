@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Don't truncate any output when running in `--doc` mode [#3049](https://github.com/LuaLS/lua-language-server/issues/3049)
 * `CHG` [#3014] Generic pattern now supports definition after capture and optional, union, array
   ```lua
   ---@generic T

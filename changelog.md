@@ -22,7 +22,7 @@
 * `NEW` Added variable substitution support for vscode's `${workspaceFolder:x}` when resolving path placeholders [#2987](https://github.com/LuaLS/lua-language-server/issues/2987)
 * `NEW` Added `--check_format=json|pretty` for use with `--check` to output diagnostics in a human readable format.
 * `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
-* `CHG` [#3014] Generic pattern now supports definition after capture and optional, union, array
+* `CHG` Generic pattern now supports definition after capture and optional, union, array [#3014](https://github.com/LuaLS/lua-language-server/issues/3014) [#3031](https://github.com/LuaLS/lua-language-server/pull/3031)
   ```lua
   ---@generic T
   ---@param t `T`.Cat?
@@ -34,14 +34,14 @@
 * `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
 * `FIX` Don't truncate any output when running in `--doc` mode [#3049](https://github.com/LuaLS/lua-language-server/issues/3049)
 * `FIX` Generic return can be optional.
-* `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment`.
+* `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment` [#3028](https://github.com/LuaLS/lua-language-server/pull/3028)
 * `FIX` Fixed cannot bind variables using tail comment `@class` [#2673](https://github.com/LuaLS/lua-language-server/issues/2673)
 * `FIX` Fixed missing field completion for generic class object [#2196](https://github.com/LuaLS/lua-language-server/issues/2196) [#2945](https://github.com/LuaLS/lua-language-server/issues/2945) [#3041](https://github.com/LuaLS/lua-language-server/issues/3041)
 
 ## 3.13.5
 `2024-12-20`
-* `NEW` Setting: `Lua.hint.awaitPropagate`: When enabled, --@async propagates to the caller.
-* `CHG` Add server version information to `initialize` response #2996
+* `NEW` Setting: `Lua.hint.awaitPropagate`: When enabled, `--@async` propagates to the caller.
+* `CHG` Add server version information to `initialize` response [#2996](https://github.com/LuaLS/lua-language-server/pull/2996)
 * `CHG` If the `---@field` of the same name has a type of `fun`, the `duplicate-doc-field` check will not be performed.
 * `FIX` Incorrect infer for function array annotation on tables [#2367](https://github.com/LuaLS/lua-language-server/issues/2367)
 

@@ -458,6 +458,6 @@ command.addon_manager.open = -- TODO: need translate!
 command.reloadFFIMeta = -- TODO: need translate!
 'Lua: Reload luajit ffi meta'
 command.startServer = -- TODO: need translate!
-'Lua: (debug) Start Language Server'
+'Lua: Restart Language Server'
 command.stopServer = -- TODO: need translate!
-'Lua: (debug) Stop Language Server'
+'Lua: Stop Language Server'

@@ -21,7 +21,7 @@ local function buildArgs(exe, numThreads, threadId, format, quiet)
             args[#args + 1] = arg:gsub('%-%-%w*', '--check_worker')
         -- --check_out_path needs to be removed if we have more than one thread
         elseif arg:lower():match('%-%-check_out_path') and numThreads > 1 then
-            if not arg:match('%-%-%w*=') then
+            if not arg:match('%-%-[%w_]*=') then
                 skipNext = true
             end
         else

@@ -8,6 +8,8 @@ local getLabel = require 'core.hover.label'
 local jsonb    = require 'json-beautify'
 local util     = require 'utility'
 local markdown = require 'provider.markdown'
+local fs       = require 'bee.filesystem'
+local furi     = require 'file-uri'
 
 ---@alias doctype
 ---| 'doc.alias'
@@ -55,13 +57,12 @@ local markdown = require 'provider.markdown'
 local export = {}
 
 function export.getLocalPath(uri)
-    --remove uri root (and prefix)
-    local local_file_uri = uri
-    local i, j = local_file_uri:find(DOC)
-    if not j then
-        return '[FOREIGN] '..uri
+    local relativePath = fs.relative(furi.decode(uri), DOC):string()
+    if relativePath:sub(1, 2) == '..' then
+        -- not under project directory
+        return '[FOREIGN] ' .. uri
     end
-    return local_file_uri:sub( j + 1 )
+    return relativePath
 end
 
 function export.positionOf(rowcol)

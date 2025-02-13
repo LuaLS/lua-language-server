@@ -57,10 +57,13 @@ local furi     = require 'file-uri'
 local export = {}
 
 function export.getLocalPath(uri)
-    local relativePath = fs.relative(furi.decode(uri), DOC):string()
-    if relativePath:sub(1, 2) == '..' then
+    local file_canonical = fs.canonical(furi.decode(uri)):string()
+    local doc_canonical = fs.canonical(DOC):string()
+    local relativePath = fs.relative(file_canonical, doc_canonical):string()
+    local _, j = file_canonical:find(doc_canonical, 1, true)
+    if not j then
         -- not under project directory
-        return '[FOREIGN] ' .. uri
+        return '[FOREIGN] ' .. file_canonical
     end
     return relativePath
 end

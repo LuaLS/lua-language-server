@@ -60,8 +60,7 @@ function export.getLocalPath(uri)
     local file_canonical = fs.canonical(furi.decode(uri)):string()
     local doc_canonical = fs.canonical(DOC):string()
     local relativePath = fs.relative(file_canonical, doc_canonical):string()
-    local _, j = file_canonical:find(doc_canonical, 1, true)
-    if not j then
+    if relativePath == "" or relativePath:sub(1, 2) == '..' then
         -- not under project directory
         return '[FOREIGN] ' .. file_canonical
     end

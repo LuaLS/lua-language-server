@@ -295,7 +295,7 @@ function export.getLualsConfig()
     return {
         name = 'LuaLS',
         type = 'luals.config',
-        DOC = fs.absolute(fs.path(DOC)):string(),
+        DOC = fs.canonical(fs.path(DOC)):string(),
         defines = {},
         fields = {}
     }

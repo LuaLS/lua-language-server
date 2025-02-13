@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument
+* `FIX` incorrect error message for `--doc_update`.
 
 ## 3.13.6
 `2025-2-6`

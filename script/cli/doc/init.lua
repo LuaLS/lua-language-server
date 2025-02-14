@@ -242,6 +242,10 @@ function doc.runCLI()
         end)
         io.write('\x0D')
 
+        if not DOC_OUT_PATH then
+            DOC_OUT_PATH = fs.current_path():string()
+        end
+
         local ok, outPaths, err = dirty_export.serializeAndExport(docs, DOC_OUT_PATH)
         print(lang.script('CLI_DOC_DONE'))
         for i, path in ipairs(outPaths) do

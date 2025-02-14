@@ -187,7 +187,7 @@ function export.runCLI()
         return
     end
 
-    local rootPath = fs.absolute(fs.path(CHECK_WORKER)):string()
+    local rootPath = fs.canonical(fs.path(CHECK_WORKER)):string()
     local rootUri = furi.encode(rootPath)
     if not rootUri then
         print(lang.script('CLI_CHECK_ERROR_URI', rootPath))

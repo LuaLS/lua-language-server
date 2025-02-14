@@ -2,8 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument
+* `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argumen
 * `CHG` default path for `--doc_out_path` is the current directory
+* `FIX` remove extra `./` path prefix in the check report when using `--check=.`
 
 ## 3.13.6
 `2025-2-6`

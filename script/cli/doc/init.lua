@@ -185,7 +185,7 @@ function doc.runCLI()
         return
     end
 
-    local rootUri = furi.encode(fs.absolute(fs.path(DOC)):string())
+    local rootUri = furi.encode(fs.canonical(fs.path(DOC)):string())
     if not rootUri then
         print(lang.script('CLI_CHECK_ERROR_URI', DOC))
         return

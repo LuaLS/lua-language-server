@@ -55,7 +55,8 @@ local args = {
         type = 'string',
         description = [[
             Generate documentation from a workspace.
-            The files will be output in your log path.
+            The files will be written to the documentation output path passed
+            in --doc_out_path.
         ]],
         example = [[--doc=C:/Users/Me/Documents/myLuaProject/]]
     },
@@ -63,9 +64,17 @@ local args = {
         type = 'string',
         description = [[
             The path to output generated documentation at.
+            If --doc_out_path is missing, the documentation will be written
+            to the current directory.
             See --doc for more info.
         ]],
         example = [[--doc_out_path=C:/Users/Me/Documents/myLuaProjectDocumentation]]
+    },
+    ['--doc_update'] = {
+        type = 'string',
+        description = [[
+            Update existing documentation files at the given path.
+        ]]
     },
     ['--logpath'] = {
         type = 'string',

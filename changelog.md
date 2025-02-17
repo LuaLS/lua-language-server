@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Update `--help` message.
 
 ## 3.13.7
 `2025-3-10`

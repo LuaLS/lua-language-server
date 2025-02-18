@@ -217,10 +217,6 @@ export.makeDocObject['local'] = function(source, obj, has_seen)
     obj.name = source[1]
 end
 
-export.makeDocObject['luals.config'] = function(source, obj, has_seen)
-
-end
-
 export.makeDocObject['self'] = export.makeDocObject['local']
 
 export.makeDocObject['setfield'] = export.makeDocObject['doc.class']
@@ -287,15 +283,23 @@ end
 ---@param callback fun(i, max)
 function export.makeDocs(globals, callback)
     local docs = {}
-
     for i, global in ipairs(globals) do
         table.insert(docs, export.documentObject(global))
         callback(i, #globals)
     end
-
+    docs[#docs+1] = export.getLualsConfig()
     table.sort(docs, export.sortDoc)
-
     return docs
+end
+
+function export.getLualsConfig()
+    return {
+        name = 'LuaLS',
+        type = 'luals.config',
+        DOC = fs.canonical(fs.path(DOC)):string(),
+        defines = {},
+        fields = {}
+    }
 end
 
 ---takes the table from `makeDocs`, serializes it, and exports it

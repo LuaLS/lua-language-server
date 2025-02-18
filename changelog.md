@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument
+* `FIX` incorrect file names in file doc.json
 * `FIX` remove extra `./` path prefix in the check report when using `--check=.`
 
 ## 3.13.6

@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument
+* `CHG` default path for `--doc_out_path` is the current directory
 * `FIX` incorrect error message for `--doc_update`.
 * `FIX` reimplement section `luals.config` in file doc.json
 * `FIX` incorrect file names in file doc.json

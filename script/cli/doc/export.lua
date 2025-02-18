@@ -8,6 +8,8 @@ local getLabel = require 'core.hover.label'
 local jsonb    = require 'json-beautify'
 local util     = require 'utility'
 local markdown = require 'provider.markdown'
+local fs       = require 'bee.filesystem'
+local furi     = require 'file-uri'
 
 ---@alias doctype
 ---| 'doc.alias'
@@ -55,13 +57,14 @@ local markdown = require 'provider.markdown'
 local export = {}
 
 function export.getLocalPath(uri)
-    --remove uri root (and prefix)
-    local local_file_uri = uri
-    local i, j = local_file_uri:find(DOC)
-    if not j then
-        return '[FOREIGN] '..uri
+    local file_canonical = fs.canonical(furi.decode(uri)):string()
+    local doc_canonical = fs.canonical(DOC):string()
+    local relativePath = fs.relative(file_canonical, doc_canonical):string()
+    if relativePath == "" or relativePath:sub(1, 2) == '..' then
+        -- not under project directory
+        return '[FOREIGN] ' .. file_canonical
     end
-    return local_file_uri:sub( j + 1 )
+    return relativePath
 end
 
 function export.positionOf(rowcol)
@@ -214,10 +217,6 @@ export.makeDocObject['local'] = function(source, obj, has_seen)
     obj.name = source[1]
 end
 
-export.makeDocObject['luals.config'] = function(source, obj, has_seen)
-
-end
-
 export.makeDocObject['self'] = export.makeDocObject['local']
 
 export.makeDocObject['setfield'] = export.makeDocObject['doc.class']
@@ -284,15 +283,23 @@ end
 ---@param callback fun(i, max)
 function export.makeDocs(globals, callback)
     local docs = {}
-
     for i, global in ipairs(globals) do
         table.insert(docs, export.documentObject(global))
         callback(i, #globals)
     end
-
+    docs[#docs+1] = export.getLualsConfig()
     table.sort(docs, export.sortDoc)
-
     return docs
+end
+
+function export.getLualsConfig()
+    return {
+        name = 'LuaLS',
+        type = 'luals.config',
+        DOC = fs.canonical(fs.path(DOC)):string(),
+        defines = {},
+        fields = {}
+    }
 end
 
 ---takes the table from `makeDocs`, serializes it, and exports it

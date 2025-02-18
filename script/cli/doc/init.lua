@@ -16,7 +16,7 @@ local doc = {}
 local function findDocJson()
     local doc_json_path
     if type(DOC_UPDATE) == 'string' then
-        doc_json_path = fs.absolute(fs.path(DOC_UPDATE)) .. '/doc.json'
+        doc_json_path = fs.canonical(fs.path(DOC_UPDATE)) .. '/doc.json'
     else
         doc_json_path = fs.current_path() .. '/doc.json'
     end
@@ -46,7 +46,7 @@ local function getPathDocUpdate()
         local doc_json_dir = doc_json_path:string():gsub('/doc.json', '')
         return doc_json_dir, doc_path
     else
-        error(string.format('Error: Cannot update "%s".', doc_json_path .. '/doc.json'))
+        error(string.format('Error: Cannot update "%s".', doc_json_path))
     end
 end
 
@@ -185,7 +185,7 @@ function doc.runCLI()
         return
     end
 
-    local rootUri = furi.encode(fs.absolute(fs.path(DOC)):string())
+    local rootUri = furi.encode(fs.canonical(fs.path(DOC)):string())
     if not rootUri then
         print(lang.script('CLI_CHECK_ERROR_URI', DOC))
         return

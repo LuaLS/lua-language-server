@@ -24,7 +24,7 @@ function M:createFile(uri)
 end
 
 ---@param uri Uri
-function M:removeFilre(uri)
+function M:removeFile(uri)
     local vfile = self.vfiles[uri]
     if not vfile then
         return

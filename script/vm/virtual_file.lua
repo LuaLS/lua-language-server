@@ -51,7 +51,6 @@ function M:indexAst(ast, mode)
     self.contribute:commitActions(actions)
 end
 
-
 function M:remove()
     Delete(self)
 end

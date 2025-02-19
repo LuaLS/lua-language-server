@@ -27,10 +27,8 @@ function M:start()
     local main = self.ast.main
 
     self:parseBlock(main)
-    if self.mode == 'common' then
-        self:parseClasses(self.ast.nodesMap['catclass'])
-        self:parseAliases(self.ast.nodesMap['catalias'])
-    end
+    self:parseClasses(self.ast.nodesMap['catclass'])
+    self:parseAliases(self.ast.nodesMap['catalias'])
     return self.results
 end
 
@@ -219,12 +217,9 @@ function M:makeField(key, value, var)
         ---@cast value LuaParser.Node.Literal
         nvalue = node.value(value.value)
     elseif value.kind == 'function' then
-        ---@cast value LuaParser.Node.Function
-        if self.mode == 'meta' then
-            nvalue = self:parseNode(value)
-        else
-            nvalue = node.FUNCTION
-        end
+        nvalue = node.unsolve(node.FUNCTION, value, function (unsolve, context)
+            return node.FUNCTION -- TODO: parse function
+        end)
     elseif value.kind == 'table' then
         nvalue = node.TABLE
     else

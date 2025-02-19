@@ -9,7 +9,7 @@ os = {}
 ---@nodiscard
 function os.clock() end
 
----@class osdate
+---@class osdate:osdateparam
 ---#DES 'osdate.year'
 ---@field year  integer|string
 ---#DES 'osdate.month'

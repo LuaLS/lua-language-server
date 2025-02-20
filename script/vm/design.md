@@ -10,3 +10,10 @@
    1. 调用 `vfile:resetContribute()` 清空全局贡献
    2. 调用 `vfile:resetRunners()` 清空runner
    3. 调用 `vfile:indexAst(ast, 'common')` 提交全局贡献
+
+`indexAst` 内部调用 `runner` 来进行索引。
+内部先不使用单独抽象的 `contribute` 了（可以保留给外部继续使用？）
+
+`runner` 得继承 `GCHost` ，贡献类的操作用 `bindGC` 绑定析构操作。（支持用函数做析构器，省一个对象？）
+
+vfile -> [block]: runner -> [source]: node

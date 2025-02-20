@@ -4,7 +4,6 @@
 local Table = Class('LuaParser.Node.Table', 'LuaParser.Node.Base')
 
 Table.kind = 'table'
-Table.isLiteral = true
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'

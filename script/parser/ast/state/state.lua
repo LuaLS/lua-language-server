@@ -25,7 +25,7 @@ local SingleExp = Class('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
 
 SingleExp.kind = 'singleexp'
 
----@class LuaParser.Node.Select
+---@class LuaParser.Node.Select: LuaParser.Node.Base
 ---@field index integer
 local Select = Class('LuaParser.Node.Select', 'LuaParser.Node.Base')
 

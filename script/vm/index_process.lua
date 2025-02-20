@@ -32,6 +32,10 @@ function M:start()
     return self.results
 end
 
+---@class VM.IndexCache
+---@field lastClass? LuaParser.Node.CatClass
+---@field classBindMap? table<LuaParser.Node.Var | string, string>
+
 ---@private
 ---@param block LuaParser.Node.Block
 function M:parseBlock(block)
@@ -39,10 +43,9 @@ function M:parseBlock(block)
         return
     end
     self.parsed[block] = true
-    local isMain = block.isMain
     local cache = {}
     for _, child in ipairs(block.childs) do
-        self:parseState(child, isMain, cache)
+        self:parseState(child, cache)
     end
 end
 
@@ -88,28 +91,32 @@ end
 
 ---@private
 ---@param state LuaParser.Node.State
----@param isMain boolean
----@param cache table
-function M:parseState(state, isMain, cache)
+---@param cache VM.IndexCache
+function M:parseState(state, cache)
     if self.parsed[state] then
         return
     end
     self.parsed[state] = true
-    if isMain and state.kind == 'assign' then
+    if state.kind == 'assign' then
         ---@cast state LuaParser.Node.Assign
+        self:checkBindClass(state.exps[1], cache)
         for _, exp in ipairs(state.exps) do
             if not exp.value then
                 goto continue
             end
             if exp.kind == 'var' then
                 ---@cast exp LuaParser.Node.Var
-                self:parseVar(exp)
+                self:parseGlobalVar(exp)
             elseif exp.kind == 'field' then
                 ---@cast exp LuaParser.Node.Field
-                self:parseField(exp)
+                self:parseGlobalField(exp)
+                self:parseBindedClassField(exp, cache)
             end
             ::continue::
         end
+    elseif state.kind == 'localdef' then
+        ---@cast state LuaParser.Node.LocalDef
+        self:checkBindClass(state.vars[1], cache)
     elseif state.kind == 'function' then
         ---@cast state LuaParser.Node.Function
         self:parseFuncState(state)
@@ -117,7 +124,7 @@ function M:parseState(state, isMain, cache)
         ---@cast state LuaParser.Node.Cat
         local value = state.value
         if not value then
-            goto continue
+            return
         end
         if value.kind == 'catclass' then
             ---@cast value LuaParser.Node.CatClass
@@ -134,8 +141,24 @@ function M:parseState(state, isMain, cache)
         elseif value.kind == 'catreturn' then
             self:addFuncCatGroup(state)
         end
-        ::continue::
     end
+end
+
+---@private
+---@param exp LuaParser.Node.Base
+---@param cache VM.IndexCache
+---@return LuaParser.Node.CatClass?
+function M:findClassLastLine(exp, cache)
+    local lastClass = cache.lastClass
+    if not lastClass then
+        return
+    end
+    local classLine = lastClass.finishRow
+    local stateLine = exp.startRow
+    if stateLine - classLine > 1 then
+        return
+    end
+    return lastClass
 end
 
 ---@class VM.DocGroup
@@ -167,10 +190,10 @@ function M:parseFuncState(state)
     self:bindFuncCatGroup(state)
     if name.kind == 'var' then
         ---@cast name LuaParser.Node.Var
-        self:parseVar(name)
+        self:parseGlobalVar(name)
     elseif name.kind == 'field' then
         ---@cast name LuaParser.Node.Field
-        self:parseField(name)
+        self:parseGlobalField(name)
     end
 end
 
@@ -198,8 +221,9 @@ end
 ---@param key Node.Key
 ---@param value LuaParser.Node.Exp
 ---@param var LuaParser.Node.Base
+---@param useType? boolean
 ---@return Node.Field
-function M:makeField(key, value, var)
+function M:makeField(key, value, var, useType)
     local node = self.scope.node
     ---@type Node
     local nkey
@@ -216,14 +240,13 @@ function M:makeField(key, value, var)
     elseif value.isLiteral then
         ---@cast value LuaParser.Node.Literal
         nvalue = node.value(value.value)
-    elseif value.kind == 'function' then
-        nvalue = node.unsolve(node.FUNCTION, value, function (unsolve, context)
-            return node.FUNCTION -- TODO: parse function
-        end)
-    elseif value.kind == 'table' then
-        nvalue = node.TABLE
+        if useType then
+            nvalue = node.type(nvalue.typeName)
+        end
     else
-        nvalue = node.UNKNOWN
+        nvalue = node.unsolve(node.UNKNOWN, value, function (unsolve, context)
+            return node.UNKNOWN -- TODO: parse function
+        end)
     end
     local field = {
         key = nkey,
@@ -233,9 +256,27 @@ function M:makeField(key, value, var)
     return field
 end
 
+---@param exp LuaParser.Node.Exp | LuaParser.Node.Local
+---@param cache VM.IndexCache
+function M:checkBindClass(exp, cache)
+    local lastClass = self:findClassLastLine(exp, cache)
+    if not lastClass then
+        return
+    end
+    local className = lastClass.classID.id
+    if not cache.classBindMap then
+        cache.classBindMap = {}
+    end
+
+    if exp.kind == 'local' then
+        ---@cast exp LuaParser.Node.Local
+        cache.classBindMap[exp] = className
+    end
+end
+
 ---@private
 ---@param var LuaParser.Node.Var
-function M:parseVar(var)
+function M:parseGlobalVar(var)
     if var.loc then
         return
     end
@@ -300,7 +341,7 @@ end
 
 ---@private
 ---@param field LuaParser.Node.Field
-function M:parseField(field)
+function M:parseGlobalField(field)
     local key = self:getFieldPath(field)
 
     local path, var = self:makeFieldPath(field)
@@ -313,6 +354,30 @@ function M:parseField(field)
         kind = 'global',
         field = nfield,
         path = path,
+    }
+end
+
+---@private
+---@param field LuaParser.Node.Field
+---@param cache VM.IndexCache
+function M:parseBindedClassField(field, cache)
+    if not cache.classBindMap then
+        return
+    end
+    local var = field.last
+    if not var or not var.loc then
+        return
+    end
+    local className = cache.classBindMap[var.loc]
+    if not className then
+        return
+    end
+    local key = self:getFieldPath(field)
+    local nfield = self:makeField(key, field.value, field)
+    self.results[#self.results+1] = {
+        kind = 'classfield',
+        className = className,
+        field = nfield,
     }
 end
 

@@ -16,7 +16,7 @@ local Ast = Class 'LuaParser.Ast'
 function Ast:parseCall(last)
     local token, _, pos = self.lexer:peek()
     if token == '(' then
-        if last.isLiteral then
+        if last.isLiteral or last.kind == 'table' then
             return nil
         end
         self.lexer:next()

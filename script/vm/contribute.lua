@@ -5,6 +5,7 @@ local M = Class 'VM.Contribute'
 ---@field kind 'global'
 ---@field field Node.Field
 ---@field path? Node.Key[]
+---@field className? string
 
 ---@class VM.Contribute.Class
 ---@field kind 'class'
@@ -21,7 +22,6 @@ local M = Class 'VM.Contribute'
 ---@field name string
 ---@field value Node
 ---@field location? Node.Location
-
 
 ---@alias VM.Contribute.Action
 ---| VM.Contribute.Global
@@ -54,7 +54,10 @@ function M:commit(action)
         tp:addField(action.field)
     elseif kind == 'global' then
         ---@cast action VM.Contribute.Global
-        self.scope.node:globalAdd(action.field, action.path)
+        local variable = self.scope.node:globalAdd(action.field, action.path)
+        if action.className then
+            local class = self.scope.node.type(action.className)
+        end
     elseif kind == 'class' then
         ---@cast action VM.Contribute.Class
         self.scope.node.type(action.name):addClass(action.location)

@@ -160,7 +160,7 @@ function Ast:parseTerm()
                 end
             end
 
-            if current.isLiteral then
+            if current.isLiteral or current.kind == 'table' then
                 self:throw('NEED_PAREN', current.start, current.finish)
             end
 

@@ -5,7 +5,6 @@
 3. 按需执行runner（先检查是否绑定过语义或推测，然后检查是否分配过runner）
     1. 调用 `vfile:createRunner(block)` 为每个block分配一个runner，从上至下的遍历block，递归解析语义
     2. 调用 `runner:infer(source, node)` 绑定语义
-    3. 调用 `runner:guess(source, node)` 为无法推测的变量绑定猜测
 4. 当文件发生变化时？
    1. 调用 `vfile:resetRunners()` 清空runner
    2. 调用 `vfile:indexAst(ast, 'common')` 重新索引文件

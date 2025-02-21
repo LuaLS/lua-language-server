@@ -120,27 +120,6 @@ function M:parseState(state, cache)
     elseif state.kind == 'function' then
         ---@cast state LuaParser.Node.Function
         self:parseFuncState(state)
-    elseif state.kind == 'cat' then
-        ---@cast state LuaParser.Node.Cat
-        local value = state.value
-        if not value then
-            return
-        end
-        if value.kind == 'catclass' then
-            ---@cast value LuaParser.Node.CatClass
-            self:parseCatClass(value)
-            cache.lastClass = value
-        elseif value.kind == 'catfield' then
-            ---@cast value LuaParser.Node.CatField
-            self:parseCatField(value, cache.lastClass)
-        elseif value.kind == 'catalias' then
-            ---@cast value LuaParser.Node.CatAlias
-            self:parseCatAlias(value)
-        elseif value.kind == 'catparam' then
-            self:addFuncCatGroup(state)
-        elseif value.kind == 'catreturn' then
-            self:addFuncCatGroup(state)
-        end
     end
 end
 
@@ -378,20 +357,6 @@ function M:parseBindedClassField(field, cache)
         kind = 'classfield',
         className = className,
         field = nfield,
-    }
-end
-
----@private
----@param value LuaParser.Node.CatClass
-function M:parseCatClass(value)
-    if self.parsed[value] then
-        return
-    end
-    self.parsed[value] = true
-    self.results[#self.results+1] = {
-        kind = 'class',
-        name = value.classID.id,
-        location = self:makeLocation(value)
     }
 end
 

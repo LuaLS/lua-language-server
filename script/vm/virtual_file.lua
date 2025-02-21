@@ -9,15 +9,13 @@ M.indexedVersion = -1
 function M:__init(scope, uri)
     self.scope = scope
     self.uri = uri
-    self.contribute = ls.vm.createContribute(self.scope)
+    ---@type table<LuaParser.Node.Block, VM.Runner?>
+    self.runners = {}
 end
 
 function M:__del()
-    self.contribute:remove()
+    self:resetRunners()
 end
-
----@type VM.Contribute
-M.contribute = nil
 
 function M:update()
     local document = self.scope:getDocument(self.uri)
@@ -28,14 +26,14 @@ function M:update()
         return
     end
     self.version = document.serverVersion
-    self:resetContribute()
+    self:resetRunners()
 end
 
-function M:resetContribute()
-    if self.contribute then
-        self.contribute:remove()
+function M:resetRunners()
+    for block, runner in pairs(self.runners) do
+        Delete(runner)
+        self.runners[block] = nil
     end
-    self.contribute = ls.vm.createContribute(self.scope)
 end
 
 ---@param ast LuaParser.Ast
@@ -46,9 +44,17 @@ function M:indexAst(ast, mode)
     end
     self.indexedVersion = self.version
 
-    local process = ls.vm.createIndexProcess(self, ast, mode)
-    local actions = process:start()
-    self.contribute:commitActions(actions)
+    self:runBlock(ast.main)
+end
+
+---@param block LuaParser.Node.Block
+function M:runBlock(block)
+    local runner = self.runners[block]
+    if not runner then
+        runner = ls.vm.createRunner(block, self.scope)
+        self.runners[block] = runner
+    end
+    runner:run()
 end
 
 function M:remove()

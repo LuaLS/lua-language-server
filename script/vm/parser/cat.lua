@@ -1,4 +1,4 @@
-ls.vm.registerRunnerProvider('cat', function (runner, source)
+ls.vm.registerRunnerParser('cat', function (runner, source)
     ---@cast source LuaParser.Node.Cat
     local value = source.value
     if not value then
@@ -8,7 +8,42 @@ ls.vm.registerRunnerProvider('cat', function (runner, source)
     return node
 end)
 
-ls.vm.registerRunnerProvider('catclass', function (runner, source)
+ls.vm.registerRunnerParser('catid', function (runner, source)
+    ---@cast source LuaParser.Node.CatID
+
+    return runner.node.type(source.id)
+end)
+
+ls.vm.registerRunnerParser('catinteger', function (runner, source)
+    ---@cast source LuaParser.Node.CatInteger
+    return runner.node.value(source.value)
+end)
+
+ls.vm.registerRunnerParser('catboolean', function (runner, source)
+    ---@cast source LuaParser.Node.CatBoolean
+    return runner.node.value(source.value)
+end)
+
+ls.vm.registerRunnerParser('catstring', function (runner, source)
+    ---@cast source LuaParser.Node.CatString
+    return runner.node.value(source.value)
+end)
+
+ls.vm.registerRunnerParser('catunion', function (runner, source)
+    ---@cast source LuaParser.Node.CatUnion
+    return runner.node.union(ls.util.map(source.exps, function (v, k)
+        return runner:parse(v)
+    end))
+end)
+
+ls.vm.registerRunnerParser('catintersection', function (runner, source)
+    ---@cast source LuaParser.Node.CatIntersection
+    return runner.node.intersection(ls.util.map(source.exps, function (v, k)
+        return runner:parse(v)
+    end))
+end)
+
+ls.vm.registerRunnerParser('catclass', function (runner, source)
     ---@cast source LuaParser.Node.CatClass
 
     local class = runner.node.type(source.classID.id)
@@ -37,7 +72,7 @@ ls.vm.registerRunnerProvider('catclass', function (runner, source)
     return class
 end)
 
-ls.vm.registerRunnerProvider('catfield', function (runner, source)
+ls.vm.registerRunnerParser('catfield', function (runner, source)
     ---@cast source LuaParser.Node.CatField
 
     local field = {
@@ -57,7 +92,7 @@ ls.vm.registerRunnerProvider('catfield', function (runner, source)
     end)
 end)
 
-ls.vm.registerRunnerProvider('catalias', function (runner, source)
+ls.vm.registerRunnerParser('catalias', function (runner, source)
     ---@cast source LuaParser.Node.CatAlias
 
     local alias = runner.node.type(source.aliasID.id)

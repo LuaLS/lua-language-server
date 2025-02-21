@@ -387,34 +387,6 @@ function M:parseNode(value)
         return node.ANY
     end
     local kind = value.kind
-    if kind == 'catid' then
-        ---@cast value LuaParser.Node.CatID
-        return node.type(value.id)
-    end
-    if kind == 'catinteger' then
-        ---@cast value LuaParser.Node.CatInteger
-        return node.value(value.value)
-    end
-    if kind == 'catboolean' then
-        ---@cast value LuaParser.Node.CatBoolean
-        return node.value(value.value)
-    end
-    if kind == 'catstring' then
-        ---@cast value LuaParser.Node.CatString
-        return node.value(value.value)
-    end
-    if kind == 'catunion' then
-        ---@cast value LuaParser.Node.CatUnion
-        return node.union(ls.util.map(value.exps, function (v, k)
-            return self:parseNode(v)
-        end))
-    end
-    if kind == 'catintersection' then
-        ---@cast value LuaParser.Node.CatIntersection
-        return node.intersection(ls.util.map(value.exps, function (v, k)
-            return self:parseNode(v)
-        end))
-    end
     if kind == 'cattable' then
         ---@cast value LuaParser.Node.CatTable
         local t = node.table()

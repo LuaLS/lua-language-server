@@ -54,11 +54,11 @@ function M:parse(source)
         return node
     end
     self.nodeMap[source] = self.node.UNKNOWN
-    local provider = M.providers[source.kind]
-    if not provider then
+    local parser = M.parsers[source.kind]
+    if not parser then
         return self.node.UNKNOWN
     end
-    node = provider(self, source)
+    node = parser(self, source)
     if not node then
         return self.node.UNKNOWN
     end
@@ -163,16 +163,16 @@ function M:makeNodeField(var, key, value, useType)
     return field
 end
 
----@alias VM.RunnerProvider fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?
+---@alias VM.RunnerParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?
 
 ---@private
----@type table<string, VM.RunnerProvider>
-M.providers = {}
+---@type table<string, VM.RunnerParser>
+M.parsers = {}
 
 ---@param kind string
----@param provider VM.RunnerProvider
-function ls.vm.registerRunnerProvider(kind, provider)
-    M.providers[kind] = provider
+---@param parser VM.RunnerParser
+function ls.vm.registerRunnerParser(kind, parser)
+    M.parsers[kind] = parser
 end
 
 ---@param block LuaParser.Node.Block

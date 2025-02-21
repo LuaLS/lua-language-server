@@ -1,4 +1,4 @@
-ls.vm.registerRunnerProvider('assign', function (runner, source)
+ls.vm.registerRunnerParser('assign', function (runner, source)
     ---@cast source LuaParser.Node.Assign
 
     for _, exp in ipairs(source.exps) do
@@ -6,7 +6,7 @@ ls.vm.registerRunnerProvider('assign', function (runner, source)
     end
 end)
 
-ls.vm.registerRunnerProvider('var', function (runner, source)
+ls.vm.registerRunnerParser('var', function (runner, source)
     ---@cast source LuaParser.Node.Var
 
     if source.loc then
@@ -24,7 +24,7 @@ ls.vm.registerRunnerProvider('var', function (runner, source)
     end
 end)
 
-ls.vm.registerRunnerProvider('field', function (runner, source)
+ls.vm.registerRunnerParser('field', function (runner, source)
     ---@cast source LuaParser.Node.Field
 
     local key = runner:getKey(source)

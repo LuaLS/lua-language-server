@@ -647,11 +647,13 @@ string.char                 =
 'Returns a string with length equal to the number of arguments, in which each character has the internal numeric code equal to its corresponding argument.'
 string.dump                 =
 'Returns a string containing a binary representation (a *binary chunk*) of the given function.'
-string.find                 =
+string.find['>5.2']         =
 'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.find['=5.1']         =
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
 string.format               =
 'Returns a formatted version of its variable number of arguments following the description given in its first argument.'
-string.gmatch               =
+string.gmatch['>5.2']       =
 [[
 Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
 
@@ -664,17 +666,34 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gsub                 =
+string.gmatch['=5.1']       =
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub['>5.2']         =
 'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['=5.1']         =
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
 string.len                  =
 'Returns its length.'
 string.lower                =
 'Returns a copy of this string with all uppercase letters changed to lowercase.'
-string.match                =
+string.match['>5.2']        =
 'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.pack                 =
+string.match['=5.1']        =
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.pack['>5.2']         =
 'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
-string.packsize             =
+string.packsize['>5.2']     =
 'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
 string.rep['>5.2']          =
 'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'

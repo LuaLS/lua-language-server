@@ -37,7 +37,7 @@ function M:resetRunners()
 end
 
 ---@param ast LuaParser.Ast
----@param mode VM.IndexProcess.Mode
+---@param mode any
 function M:indexAst(ast, mode)
     if self.indexedVersion == self.version then
         return

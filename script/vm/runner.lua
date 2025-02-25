@@ -6,6 +6,7 @@ M.state = 'ready'
 
 ---@class VM.Runner.Context
 ---@field lastClass? Node.Type
+---@field generics? table<LuaParser.Node.CatGeneric, Node.Generic>
 
 ---@param block LuaParser.Node.Block
 ---@param scope Scope
@@ -161,6 +162,24 @@ function M:makeNodeField(var, key, value, useType)
         location = self:makeLocation(var),
     }
     return field
+end
+
+---@param generic LuaParser.Node.CatGeneric
+---@return Node.Generic
+function M:makeGeneric(generic)
+    local generics = self.context.generics
+    if not generics then
+        generics = {}
+        self.context.generics = generics
+    end
+    if generics[generic] then
+        return generics[generic]
+    end
+    local gnode = self.node.generic(generic.id.id, generic.extends and self:parse(generic.extends))
+
+    generics[generic] = gnode
+
+    return gnode
 end
 
 ---@alias VM.RunnerParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?

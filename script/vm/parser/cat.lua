@@ -29,6 +29,28 @@ ls.vm.registerRunnerParser('catstring', function (runner, source)
     return runner.node.value(source.value)
 end)
 
+ls.vm.registerRunnerParser('cattable', function (runner, source)
+    ---@cast source LuaParser.Node.Table
+    local node = runner.node
+    local t = node.table()
+    for _, field in ipairs(source.fields) do
+        if field.subtype == 'field' then
+            t:addField {
+                key      = node.value(field.key.id),
+                value    = runner:parse(field.value),
+                location = runner:makeLocation(field),
+            }
+        else
+            t:addField {
+                key      = runner:parse(field.key),
+                value    = runner:parse(field.value),
+                location = runner:makeLocation(field),
+            }
+        end
+    end
+    return t
+end)
+
 ls.vm.registerRunnerParser('catunion', function (runner, source)
     ---@cast source LuaParser.Node.CatUnion
     return runner.node.union(ls.util.map(source.exps, function (v, k)
@@ -41,6 +63,59 @@ ls.vm.registerRunnerParser('catintersection', function (runner, source)
     return runner.node.intersection(ls.util.map(source.exps, function (v, k)
         return runner:parse(v)
     end))
+end)
+
+ls.vm.registerRunnerParser('cattuple', function (runner, source)
+    ---@cast source LuaParser.Node.CatTuple
+    return runner.node.tuple(ls.util.map(source.exps, function (v, k)
+        return runner:parse(v)
+    end))
+end)
+
+ls.vm.registerRunnerParser('catarray', function (runner, source)
+    ---@cast source LuaParser.Node.CatArray
+    return runner.node.array(runner:parse(source.node), source.size and source.size.value)
+end)
+
+ls.vm.registerRunnerParser('catcall', function (runner, source)
+    ---@cast source LuaParser.Node.CatCall
+    return runner.node.type(source.node.id):call(ls.util.map(source.args, function (v, k)
+        return runner:parse(v)
+    end))
+end)
+
+ls.vm.registerRunnerParser('catfunction', function (runner, source)
+    ---@cast source LuaParser.Node.CatFunction
+    local func = runner.node.func()
+    if source.async then
+        func:setAsync()
+    end
+    if source.generics then
+        func:bindGenerics(ls.util.map(source.generics, function (g, k)
+            return runner:makeGeneric(g)
+        end))
+    end
+    if source.params then
+        for _, param in ipairs(source.params) do
+            local name = param.name
+            if name == '...' then
+                func:addVarargParam(runner:parse(param.value))
+            else
+                func:addParam(name.id, runner:parse(param.value))
+            end
+        end
+    end
+    if source.returns then
+        for _, ret in ipairs(source.returns) do
+            local name = ret.name and ret.name.id
+            if name == '...' then
+                func:addVarargReturn(runner:parse(ret.value))
+            else
+                func:addReturn(name, runner:parse(ret.value))
+            end
+        end
+    end
+    return func
 end)
 
 ls.vm.registerRunnerParser('catclass', function (runner, source)

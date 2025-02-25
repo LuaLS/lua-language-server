@@ -144,6 +144,9 @@ ls.vm.registerRunnerParser('catclass', function (runner, source)
         end
     end
 
+    runner:startCatGroup()
+    runner:addToCatGroup(source.parent)
+
     return class
 end)
 

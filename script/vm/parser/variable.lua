@@ -6,6 +6,25 @@ ls.vm.registerRunnerParser('assign', function (runner, source)
     end
 end)
 
+---@param runner VM.Runner
+---@param source LuaParser.Node.Base
+---@param variable Node.Variable
+local function bindSourceWithClass(runner, source, variable)
+    local catGroup = runner:getCatGroup(source, 'catclass')
+    if not catGroup then
+        return
+    end
+    local class = runner:parse(catGroup[1])
+    ---@cast class Node.Type
+    class:addVariable(variable)
+    variable:addClass(class)
+
+    runner:addDispose(function ()
+        class:removeVariable(variable)
+        variable:removeClass(class)
+    end)
+end
+
 ls.vm.registerRunnerParser('var', function (runner, source)
     ---@cast source LuaParser.Node.Var
 
@@ -14,11 +33,13 @@ ls.vm.registerRunnerParser('var', function (runner, source)
     else
         -- 全局变量
         local field = runner:makeNodeField(source, source.id, source.value)
-        runner.node:globalAdd(field)
+        local variable = runner.node:globalAdd(field)
 
         runner:addDispose(function ()
             runner.node:globalRemove(field)
         end)
+
+        bindSourceWithClass(runner, source, variable)
 
         return field.value
     end

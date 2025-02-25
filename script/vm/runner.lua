@@ -7,6 +7,8 @@ M.state = 'ready'
 ---@class VM.Runner.Context
 ---@field lastClass? Node.Type
 ---@field generics? table<LuaParser.Node.CatGeneric, Node.Generic>
+---@field catGroup? LuaParser.Node.Cat[]
+---@field catGroupMap? table<LuaParser.Node.Cat, LuaParser.Node.Cat[]>
 
 ---@param block LuaParser.Node.Block
 ---@param scope Scope
@@ -180,6 +182,57 @@ function M:makeGeneric(generic)
     generics[generic] = gnode
 
     return gnode
+end
+
+---@return LuaParser.Node.Cat[]
+function M:startCatGroup()
+    local group = {}
+    self.context.catGroup = group
+    return group
+end
+
+function M:endCatGroup()
+    self.context.catGroup = nil
+end
+
+---@param cat LuaParser.Node.Cat
+function M:addToCatGroup(cat)
+    local group = self.context.catGroup
+    if not group then
+        return
+    end
+    group[#group+1] = cat
+    local map = self.context.catGroupMap
+    if not map then
+        map = {}
+        self.context.catGroupMap = map
+    end
+    map[cat] = group
+end
+
+---@param nearbySource? LuaParser.Node.Base
+---@param expect? string
+---@return LuaParser.Node.Cat[]?
+function M:getCatGroup(nearbySource, expect)
+    local group = self.context.catGroup
+    if not group then
+        return nil
+    end
+    local first = group[1]
+    if not first then
+        return nil
+    end
+    if expect and first.value.kind ~= expect then
+        return nil
+    end
+    if nearbySource then
+        local sourceLine = nearbySource.startRow
+        local catLine = group[#group].finishRow
+        if sourceLine - 1 ~= catLine then
+            return nil
+        end
+    end
+    return group
 end
 
 ---@alias VM.RunnerParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?

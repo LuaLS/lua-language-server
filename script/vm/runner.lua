@@ -18,6 +18,8 @@ function M:__init(block, scope)
     self.node  = scope.node
     ---@type table<LuaParser.Node.Base, Node?>
     self.nodeMap = {}
+    ---@type table<LuaParser.Node.Base, Node.Variable?>
+    self.variableMap = {}
     ---@type VM.Runner.Context
     self.context = {}
     ---@type function[]
@@ -233,6 +235,19 @@ function M:getCatGroup(nearbySource, expect)
         end
     end
     return group
+end
+
+---@param source LuaParser.Node.Base
+---@param variable Node.Variable
+function M:setVariable(source, variable)
+    self.variableMap[source] = variable
+end
+
+---@param source LuaParser.Node.Base
+---@return Node.Variable?
+function M:getVariable(source)
+    self:parse(source)
+    return self.variableMap[source]
 end
 
 ---@alias VM.RunnerParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?

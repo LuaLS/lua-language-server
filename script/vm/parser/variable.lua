@@ -9,7 +9,7 @@ end)
 ---@param runner VM.Runner
 ---@param source LuaParser.Node.Base
 ---@param variable Node.Variable
-local function bindSourceWithClass(runner, source, variable)
+local function bindVariableWithClass(runner, source, variable)
     local catGroup = runner:getCatGroup(source, 'catclass')
     if not catGroup then
         return
@@ -39,10 +39,28 @@ ls.vm.registerRunnerParser('var', function (runner, source)
             runner.node:globalRemove(field)
         end)
 
-        bindSourceWithClass(runner, source, variable)
+        bindVariableWithClass(runner, source, variable)
 
         return field.value
     end
+end)
+
+ls.vm.registerRunnerParser('localdef', function (runner, source)
+    ---@cast source LuaParser.Node.LocalDef
+
+    local firstVar = source.vars[1]
+
+    local firstVariable = runner:getVariable(firstVar)
+    if firstVariable then
+        bindVariableWithClass(runner, source, firstVariable)
+    end
+end)
+
+ls.vm.registerRunnerParser('local', function (runner, source)
+    ---@cast source LuaParser.Node.Local
+
+    local variable = runner.node.variable(source.id)
+    runner:setVariable(source, variable)
 end)
 
 ls.vm.registerRunnerParser('field', function (runner, source)
@@ -60,6 +78,17 @@ ls.vm.registerRunnerParser('field', function (runner, source)
 
     if var.loc then
         -- 局部变量的字段
+        if value then
+            local locVariable = runner:getVariable(var.loc)
+            if locVariable then
+                local variable = locVariable:addField(field)
+                runner:addDispose(function ()
+                    locVariable:removeField(field)
+                end)
+
+                bindVariableWithClass(runner, source, variable)
+            end
+        end
     else
         -- 全局变量的字段
         if value then
@@ -68,6 +97,8 @@ ls.vm.registerRunnerParser('field', function (runner, source)
             runner:addDispose(function ()
                 runner.node:globalRemove(field, path)
             end)
+
+            bindVariableWithClass(runner, source, variable)
         end
     end
 

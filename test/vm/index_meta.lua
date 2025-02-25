@@ -24,7 +24,7 @@ do
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
         ---@class A
-        local A = {}
+        A = {}
 
         A.x = 1
         A.y = 2
@@ -42,7 +42,25 @@ do
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
         ---@class A
-        A = {}
+        A.B = {}
+
+        A.B.x = 1
+        A.B.y = 2
+    ]]
+
+    vfile:indexAst(ast, 'meta')
+
+    assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@class A
+        local A = {}
 
         A.x = 1
         A.y = 2

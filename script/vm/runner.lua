@@ -109,10 +109,8 @@ end
 
 ---@param field LuaParser.Node.Field
 ---@return Node.Key[]
----@return LuaParser.Node.Var?
-function M:makeFullPath(field)
+function M:getFullPath(field)
     local path = {}
-    local var
 
     local current = field.last
     for _ = 1, 1000 do
@@ -121,7 +119,6 @@ function M:makeFullPath(field)
         end
         path[#path+1] = self:getKey(current)
         if current.kind == 'var' then
-            var = current
             break
         end
         current = current.last
@@ -129,7 +126,23 @@ function M:makeFullPath(field)
 
     ls.util.revertArray(path)
 
-    return path, var
+    return path
+end
+
+---@param field LuaParser.Node.Field
+---@return LuaParser.Node.Var?
+function M:getFirstVar(field)
+    local current = field.last
+    for _ = 1, 1000 do
+        if not current then
+            return nil
+        end
+        if current.kind == 'var' then
+            ---@cast current LuaParser.Node.Var
+            return current
+        end
+        current = current.last
+    end
 end
 
 ---@param var LuaParser.Node.Base

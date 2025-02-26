@@ -234,6 +234,7 @@ function math.tanh(x) end
 ---@nodiscard
 function math.tointeger(x) end
 
+---@version >5.3
 ---#DES 'math.type'
 ---@param x any
 ---@return
@@ -243,6 +244,7 @@ function math.tointeger(x) end
 ---@nodiscard
 function math.type(x) end
 
+---@version >5.3
 ---#DES 'math.ult'
 ---@param m integer
 ---@param n integer

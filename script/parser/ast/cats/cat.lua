@@ -24,6 +24,7 @@ require 'parser.ast.cats.return'
 ---@field value? LuaParser.Node.CatValue
 ---@field extends? LuaParser.Node.CatType
 ---@field tail? string
+---@field used? boolean
 local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 Cat.kind = 'cat'
@@ -90,15 +91,14 @@ Ast:registerCatParser('return', {
 ---@private
 ---@return boolean
 function Ast:skipCat()
-    if self:parseCat()
-    or self:parseCatBlock() then
-        return true
-    else
+    local cat = self:parseCat()
+            or  self:parseCatBlock()
+    if not cat then
         return false
     end
+    return true
 end
 
--- 会将解析结果存放到 `Ast.cats` 中
 ---@private
 ---@return LuaParser.Node.Cat?
 function Ast:parseCat()

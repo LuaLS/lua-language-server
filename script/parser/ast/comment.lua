@@ -28,23 +28,18 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param inExp? boolean
----@param inBlock? boolean
 ---@return LuaParser.Node.Comment?
-function Ast:parseComment(inExp, inBlock)
+function Ast:parseComment(inExp)
     return self:parseLongComment()
-        or self:parseShortComment(inExp, inBlock)
+        or self:parseShortComment(inExp)
 end
 
 ---@private
 ---@param inExp? boolean
----@param inBlock? boolean
 ---@return LuaParser.Node.Comment?
-function Ast:parseShortComment(inExp, inBlock)
+function Ast:parseShortComment(inExp)
     local token, _, pos = self.lexer:peek()
     if not token then
-        return nil
-    end
-    if inBlock and self.code:match('^%-[ \t]*()@(%a+)', pos + 3) then
         return nil
     end
     ---@cast pos -?

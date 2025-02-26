@@ -132,7 +132,7 @@ function Ast:blockParseChilds(block)
     local lastState
     while true do
         while self.lexer:consume ';' do
-            self:skipSpace(false, true)
+            self:skipSpace(false)
         end
         local token, _, pos = self.lexer:peek()
         if not token then
@@ -151,7 +151,7 @@ function Ast:blockParseChilds(block)
                 self:throw('ACTION_AFTER_RETURN', lastState.start, lastState.finish)
             end
             lastState = state
-            self:skipSpace(false, true)
+            self:skipSpace(false)
         else
             if block.isMain then
                 self.lexer:next()
@@ -161,6 +161,33 @@ function Ast:blockParseChilds(block)
             end
         end
     end
+    self:mergeStatesAndCats(block)
+end
+
+---@private
+---@param block LuaParser.Node.Block
+function Ast:mergeStatesAndCats(block)
+    ---@type LuaParser.Node.Cat[]
+    local catList = self.nodesMap['cat']
+    local needMerge
+
+    for i = #catList, 1, -1 do
+        local cat = catList[i]
+        if cat.used then
+            break
+        end
+        cat.used = true
+        needMerge = true
+        block.childs[#block.childs+1] = cat
+    end
+
+    if not needMerge then
+        return
+    end
+
+    table.sort(block.childs, function (a, b)
+        return a.start < b.start
+    end)
 end
 
 ---@package

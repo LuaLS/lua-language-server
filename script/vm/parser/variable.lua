@@ -45,6 +45,8 @@ ls.vm.registerRunnerParser('var', function (runner, source)
             runner.node:globalRemove(field)
         end)
 
+        runner:setVariable(source, variable)
+
         bindVariableWithClass(runner, source, variable)
 
         return field.value
@@ -84,28 +86,32 @@ ls.vm.registerRunnerParser('field', function (runner, source)
 
     if var.loc then
         -- 局部变量的字段
+        local lastVariable = runner:getVariable(source.last)
+        if not lastVariable then
+            return field.value
+        end
+
+        local variable = lastVariable:addField(field)
+        runner:addDispose(function ()
+            lastVariable:removeField(field)
+        end)
+        runner:setVariable(source, variable)
+
         if value then
             -- 局部变量的字段赋值
-            local lastVariable = runner:getVariable(source.last)
-            if lastVariable then
-                local variable = lastVariable:addField(field)
-                runner:addDispose(function ()
-                    lastVariable:removeField(field)
-                end)
-
-                bindVariableWithClass(runner, source, variable)
-            end
+            bindVariableWithClass(runner, source, variable)
         end
     else
         -- 全局变量的字段
+        local path = runner:getFullPath(source)
+        local variable = runner.node:globalAdd(field, path)
+        runner:addDispose(function ()
+            runner.node:globalRemove(field, path)
+        end)
+        runner:setVariable(source, variable)
+
         if value then
             -- 全局变量的字段赋值
-            local path = runner:getFullPath(source)
-            local variable = runner.node:globalAdd(field, path)
-            runner:addDispose(function ()
-                runner.node:globalRemove(field, path)
-            end)
-
             bindVariableWithClass(runner, source, variable)
         end
     end

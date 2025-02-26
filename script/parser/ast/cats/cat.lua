@@ -157,6 +157,16 @@ function Ast:parseCat()
 
     self.status = oldStatus
 
+    local curBlock = self.curBlock
+    if curBlock then
+        local cats = curBlock.cats
+        if not cats then
+            cats = {}
+            curBlock.cats = cats
+        end
+        cats[#cats+1] = cat
+    end
+
     return cat
 end
 

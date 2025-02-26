@@ -3,6 +3,7 @@
 ---@field childs LuaParser.Node.State[]
 ---@field locals LuaParser.Node.Local[]
 ---@field labels LuaParser.Node.Label[]
+---@field cats? LuaParser.Node.Cat[]
 ---@field generics LuaParser.Node.CatGeneric[]
 ---@field isMain boolean
 ---@field localMap table<string, LuaParser.Node.Local>
@@ -167,12 +168,14 @@ end
 ---@private
 ---@param block LuaParser.Node.Block
 function Ast:mergeStatesAndCats(block)
-    ---@type LuaParser.Node.Cat[]
-    local catList = self.nodesMap['cat']
+    local cats = block.cats
+    if not cats then
+        return
+    end
     local needMerge
 
-    for i = #catList, 1, -1 do
-        local cat = catList[i]
+    for i = #cats, 1, -1 do
+        local cat = cats[i]
         if cat.used then
             break
         end

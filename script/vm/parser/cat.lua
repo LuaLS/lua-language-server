@@ -144,7 +144,7 @@ ls.vm.registerRunnerParser('catclass', function (runner, source)
         end
     end
 
-    runner:startCatGroup()
+    runner:clearCatGroup()
     runner:addToCatGroup(source.parent)
 
     return class
@@ -182,4 +182,16 @@ ls.vm.registerRunnerParser('catalias', function (runner, source)
     runner:addDispose(function ()
         alias:removeAlias(value, location)
     end)
+end)
+
+ls.vm.registerRunnerParser('catparam', function (runner, source)
+    ---@cast source LuaParser.Node.CatParam
+
+    runner:addToCatGroup(source.parent, true)
+end)
+
+ls.vm.registerRunnerParser('catreturn', function (runner, source)
+    ---@cast source LuaParser.Node.CatReturn
+
+    runner:addToCatGroup(source.parent, true)
 end)

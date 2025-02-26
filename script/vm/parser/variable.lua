@@ -10,11 +10,15 @@ end)
 ---@param source LuaParser.Node.Base
 ---@param variable Node.Variable
 local function bindVariableWithClass(runner, source, variable)
-    local catGroup = runner:getCatGroup(source, 'catclass')
+    local catGroup = runner:getCatGroup(source)
     if not catGroup then
         return
     end
-    local class = runner:parse(catGroup[1])
+    local first = catGroup[1]
+    if first.value.kind ~= 'catclass' then
+        return
+    end
+    local class = runner:parse(first)
     ---@cast class Node.Type
     class:addVariable(variable)
     variable:addClass(class)

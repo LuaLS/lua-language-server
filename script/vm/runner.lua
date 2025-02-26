@@ -171,7 +171,7 @@ function M:makeNodeField(var, key, value, useType)
             nvalue = node.type(nvalue.typeName)
         end
     else
-        nvalue = node.unsolve(node.UNKNOWN, value, self.resolve)
+        nvalue = self:unsolve(node.UNKNOWN, value)
     end
     local field = {
         key = nkey,
@@ -179,6 +179,16 @@ function M:makeNodeField(var, key, value, useType)
         location = self:makeLocation(var),
     }
     return field
+end
+
+---@param baseNode Node
+---@param source? LuaParser.Node.Base
+---@return Node
+function M:unsolve(baseNode, source)
+    if not source then
+        return baseNode
+    end
+    return self.node.unsolve(baseNode, source, self.resolve)
 end
 
 ---@param generic LuaParser.Node.CatGeneric
@@ -199,36 +209,46 @@ function M:makeGeneric(generic)
     return gnode
 end
 
----@return LuaParser.Node.Cat[]
-function M:startCatGroup()
-    local group = {}
-    self.context.catGroup = group
-    return group
+function M:clearCatGroup()
+    local context = self.context
+    context.catGroup = nil
 end
 
-function M:endCatGroup()
-    self.context.catGroup = nil
+---@param group LuaParser.Node.Cat[]
+---@param cat LuaParser.Node.Cat
+---@return boolean
+local function isNearby(group, cat)
+    local last = group[#group]
+    if not last then
+        return true
+    end
+    return (last.finishRow + 1) == cat.startRow
 end
 
 ---@param cat LuaParser.Node.Cat
-function M:addToCatGroup(cat)
-    local group = self.context.catGroup
-    if not group then
-        return
+---@param nearby? boolean
+function M:addToCatGroup(cat, nearby)
+    local context = self.context
+    local group = context.catGroup
+
+    if not group
+    or (nearby and not isNearby(group, cat)) then
+        group = {}
+        context.catGroup = group
     end
     group[#group+1] = cat
-    local map = self.context.catGroupMap
+
+    local map = context.catGroupMap
     if not map then
         map = {}
-        self.context.catGroupMap = map
+        context.catGroupMap = map
     end
     map[cat] = group
 end
 
 ---@param nearbySource? LuaParser.Node.Base
----@param expect? string
 ---@return LuaParser.Node.Cat[]?
-function M:getCatGroup(nearbySource, expect)
+function M:getCatGroup(nearbySource)
     local group = self.context.catGroup
     if not group then
         return nil
@@ -237,13 +257,10 @@ function M:getCatGroup(nearbySource, expect)
     if not first then
         return nil
     end
-    if expect and first.value.kind ~= expect then
-        return nil
-    end
     if nearbySource then
         local sourceLine = nearbySource.startRow
         local catLine = group[#group].finishRow
-        if sourceLine - 1 ~= catLine then
+        if (sourceLine - 1) ~= catLine then
             return nil
         end
     end

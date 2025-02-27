@@ -268,6 +268,11 @@ local function getNodeTypesWithLiteralField(uri, source, fieldName, literal)
         return
     end
 
+    -- Literal must has a value
+    if literal[1] == nil then
+        return
+    end
+
     local tys
 
     for _, c in ipairs(vm.compileNode(loc)) do
@@ -277,10 +282,10 @@ local function getNodeTypesWithLiteralField(uri, source, fieldName, literal)
                     for _, f in ipairs(set.fields) do
                         if f.field[1] == fieldName then
                             for _, t in ipairs(f.extends.types) do
-                                if t[1] == literal[1] then
-                                  tys = tys or {}
-                                  table.insert(tys, {set.class[1], #f.extends.types > 1})
-                                  break
+                                if guide.isLiteral(t) and t[1] ~= nil and t[1] == literal[1] then
+                                    tys = tys or {}
+                                    table.insert(tys, { set.class[1], #f.extends.types > 1 })
+                                    break
                                 end
                             end
                             break

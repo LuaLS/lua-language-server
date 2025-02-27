@@ -8,6 +8,7 @@
 * `FIX` reimplement section `luals.config` in file doc.json
 * `FIX` incorrect file names in file doc.json
 * `FIX` remove extra `./` path prefix in the check report when using `--check=.`
+* `FIX` Narrowing of types with literal fields: [#3056](https://github.com/LuaLS/lua-language-server/issues/3056), [#3089](https://github.com/LuaLS/lua-language-server/issues/3089)
 
 ## 3.13.6
 `2025-2-6`

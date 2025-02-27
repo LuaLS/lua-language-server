@@ -66,3 +66,17 @@ end
 
 x()
 ]]
+
+-- #3056
+TEST [[
+---@class A
+---@field b string
+---@field c 'string'|string1'
+---@field d 0|1|2
+
+---@type A?
+local a
+
+if <!a!>.b == "string1" then end
+if <!a!>.b == "string" then end
+]]

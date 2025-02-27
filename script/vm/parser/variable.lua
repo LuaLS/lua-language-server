@@ -66,6 +66,10 @@ ls.vm.registerRunnerParser('localdef', function (runner, source)
     if firstVariable then
         bindVariableWithClass(runner, source, firstVariable)
     end
+
+    for _, var in ipairs(source.vars) do
+        runner:parse(var)
+    end
 end)
 
 ls.vm.registerRunnerParser('local', function (runner, source)
@@ -73,6 +77,19 @@ ls.vm.registerRunnerParser('local', function (runner, source)
 
     local variable = runner.node.variable(source.id)
     runner:setVariable(source, variable)
+
+    if source.value then
+        local vnode = runner:parse(source.value)
+        if vnode.kind == 'table' then
+            ---@cast vnode Node.Table
+            if vnode.fields then
+                for field in vnode.fields:pairsFast() do
+                    variable:addField(field)
+                end
+            end
+        end
+        return vnode
+    end
 end)
 
 ls.vm.registerRunnerParser('field', function (runner, source)

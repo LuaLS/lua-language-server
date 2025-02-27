@@ -204,3 +204,24 @@ do
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: T1, ...: T2):(T2[], (desc: string), (...: T1))')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@class A
+        local m = {
+            x = 1,
+            y = 2,
+            ['abc'] = 3,
+            [10] = 4,
+            5,
+        }
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == '{ [1]: 5, [10]: 4, abc: 3, x: 1, y: 2 }')
+end

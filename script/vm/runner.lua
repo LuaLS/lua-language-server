@@ -145,12 +145,12 @@ function M:getFirstVar(field)
     end
 end
 
----@param var LuaParser.Node.Base
+---@param source LuaParser.Node.Base
 ---@param key Node.Key
 ---@param value? LuaParser.Node.Exp
 ---@param useType? boolean
 ---@return Node.Field
-function M:makeNodeField(var, key, value, useType)
+function M:makeNodeField(source, key, value, useType)
     local node = self.scope.node
     ---@type Node
     local nkey
@@ -176,7 +176,7 @@ function M:makeNodeField(var, key, value, useType)
     local field = {
         key = nkey,
         value = nvalue,
-        location = self:makeLocation(var),
+        location = self:makeLocation(source),
     }
     return field
 end

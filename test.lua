@@ -1,5 +1,4 @@
 local fs   = require 'bee.filesystem'
-local time = require 'bee.time'
 
 collectgarbage('generational', 10, 50)
 

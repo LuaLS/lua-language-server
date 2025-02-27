@@ -22,7 +22,7 @@ end
 ---@param self Node.Unsolve
 ---@return Node
 ---@return true
-M.__getter.value = function (self)
+M.__getter.solve = function (self)
     self.value = self.baseNode
     local value = self:onResolve(self.context)
     return value, true

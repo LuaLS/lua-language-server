@@ -155,6 +155,13 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
+    return self.solve, true
+end
+
+---@type Node
+M.solve = nil
+
+M.__getter.solve = function (self)
     return self, true
 end
 

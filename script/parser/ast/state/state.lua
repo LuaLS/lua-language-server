@@ -49,6 +49,7 @@ local Ast = Class 'LuaParser.Ast'
 ---| LuaParser.Node.Repeat
 ---| LuaParser.Node.Function
 ---| LuaParser.Node.Cat
+---| LuaParser.Node.FuncName
 
 ---@private
 Ast.stateParserMap = {}
@@ -90,7 +91,10 @@ Ast:registerStateParser('function', function (ast)
         self:throw('MISS_NAME', self:getLastPos())
         return nil
     end
-    if not func.name then
+    if func.name then
+        func.parent = func.name
+        return func.name
+    else
         self:throw('MISS_NAME', func.symbolPos1)
     end
     return func

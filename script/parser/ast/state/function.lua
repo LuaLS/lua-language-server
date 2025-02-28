@@ -68,6 +68,18 @@ function Ast:parseFunction(isLocal)
         self:throwMissSymbol(self:getLastPos(), '(')
     end
 
+    if name and name.subtype == 'method' then
+        ---@cast name LuaParser.Node.Field
+        if not params then
+            params = {}
+        end
+        table.insert(params, 1, self:createNode('LuaParser.Node.Param', {
+            start  = name.last.start,
+            finish = name.last.finish,
+            id     = 'self',
+        }))
+    end
+
     local func = self:createNode('LuaParser.Node.Function', {
         start      = pos,
         name       = name,

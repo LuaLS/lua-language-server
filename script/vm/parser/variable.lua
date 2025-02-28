@@ -92,6 +92,13 @@ ls.vm.registerRunnerParser('local', function (runner, source)
     end
 end)
 
+ls.vm.registerRunnerParser('param', function (runner, source)
+    ---@cast source LuaParser.Node.Param
+
+    local variable = runner.node.variable(source.id)
+    runner:setVariable(source, variable)
+end)
+
 ls.vm.registerRunnerParser('field', function (runner, source)
     ---@cast source LuaParser.Node.Field
 
@@ -134,6 +141,13 @@ ls.vm.registerRunnerParser('field', function (runner, source)
         if value then
             -- 全局变量的字段赋值
             bindVariableWithClass(runner, source, variable)
+        end
+    end
+
+    if value and value.kind == 'function' then
+        ---@cast value LuaParser.Node.Function
+        if source.subtype == 'method' then
+            runner:runSubBlock(value)
         end
     end
 

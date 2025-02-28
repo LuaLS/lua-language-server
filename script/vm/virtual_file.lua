@@ -48,13 +48,41 @@ function M:indexAst(ast, mode)
 end
 
 ---@param block LuaParser.Node.Block
-function M:runBlock(block)
+---@param context? VM.Runner.Context
+---@return VM.Runner
+function M:runBlock(block, context)
     local runner = self.runners[block]
     if not runner then
-        runner = ls.vm.createRunner(block, self.scope)
+        runner = ls.vm.createRunner(block, self)
+        if context then
+            runner:setContext(context)
+        end
         self.runners[block] = runner
     end
     runner:run()
+    return runner
+end
+
+---@param source LuaParser.Node.Base
+---@return Node?
+function M:getNode(source)
+    local block = source.parentBlock
+    if not block then
+        return nil
+    end
+    local runner = self:runBlock(block)
+    return runner:parse(source)
+end
+
+---@param source LuaParser.Node.Base
+---@return Node.Variable?
+function M:getVariable(source)
+    local block = source.parentBlock
+    if not block then
+        return nil
+    end
+    local runner = self:runBlock(block)
+    return runner:getVariable(source)
 end
 
 function M:remove()

@@ -11,11 +11,11 @@ M.state = 'ready'
 ---@field catGroupMap? table<LuaParser.Node.Cat, LuaParser.Node.Cat[]>
 
 ---@param block LuaParser.Node.Block
----@param scope Scope
-function M:__init(block, scope)
+---@param vfile VM.Vfile
+function M:__init(block, vfile)
     self.block = block
-    self.scope = scope
-    self.node  = scope.node
+    self.vfile = vfile
+    self.node  = vfile.scope.node
     ---@type table<LuaParser.Node.Base, Node?>
     self.nodeMap = {}
     ---@type table<LuaParser.Node.Base, Node.Variable?>
@@ -75,12 +75,11 @@ end
 ---@return Node.Location
 function M:makeLocation(source)
     return {
-        uri = self.scope.uri,
+        uri = self.vfile.uri,
         offset = source.start,
         length = source.finish - source.start,
     }
 end
-
 
 ---@param field LuaParser.Node.Term
 ---@return Node.Key
@@ -95,15 +94,15 @@ function M:getKey(field)
             ---@cast key LuaParser.Node.Exp
             if key.isLiteral then
                 ---@cast key LuaParser.Node.Literal
-                return key.value or self.scope.node.UNKNOWN
+                return key.value or self.node.UNKNOWN
             end
-            return self.scope.node.UNKNOWN
+            return self.node.UNKNOWN
         end
     elseif field.kind == 'var' then
         ---@cast field LuaParser.Node.Var
         return field.id
     else
-        return self.scope.node.UNKNOWN
+        return self.node.UNKNOWN
     end
 end
 
@@ -151,7 +150,7 @@ end
 ---@param useType? boolean
 ---@return Node.Field
 function M:makeNodeField(source, key, value, useType)
-    local node = self.scope.node
+    local node = self.node
     ---@type Node
     local nkey
     if type(key) ~= 'table' then
@@ -280,6 +279,17 @@ function M:getVariable(source)
     return self.variableMap[source]
 end
 
+---@param block LuaParser.Node.Block
+---@return VM.Runner
+function M:runSubBlock(block)
+    return self.vfile:runBlock(block, self.context)
+end
+
+---@param context VM.Runner.Context
+function M:setContext(context)
+    self.context = context
+end
+
 ---@alias VM.RunnerParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?
 
 ---@private
@@ -293,8 +303,8 @@ function ls.vm.registerRunnerParser(kind, parser)
 end
 
 ---@param block LuaParser.Node.Block
----@param scope Scope
+---@param vfile VM.Vfile
 ---@return VM.Runner
-function ls.vm.createRunner(block, scope)
-    return New 'VM.Runner' (block, scope)
+function ls.vm.createRunner(block, vfile)
+    return New 'VM.Runner' (block, vfile)
 end

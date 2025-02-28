@@ -208,3 +208,26 @@ do
     assert(d.fields == nil)
     assert(A.value:view() == '{}')
 end
+
+do
+    node:reset()
+
+    local t = node.type('A')
+    local a = node.variable 'a'
+    local b = node.variable 'b'
+
+    t:addVariable(a)
+    a:addSubVariable(b)
+
+    a:addField {
+        key = node.value 'x',
+        value = node.value(1),
+    }
+
+    b:addField {
+        key = node.value 'y',
+        value = node.value(2),
+    }
+
+    assert(t.value:view() == '{ x: 1, y: 2 }')
+end

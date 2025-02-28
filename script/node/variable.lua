@@ -126,8 +126,55 @@ function M:removeClass(node)
     return self
 end
 
+---@type LinkedTable
+M.subVariables = nil
+
+---@param variable Node.Variable
+---@return Node.Variable
+function M:addSubVariable(variable)
+    if not self.subVariables then
+        self.subVariables = ls.linkedTable.create()
+    end
+    self.subVariables:pushTail(variable)
+    self:flushCache()
+
+    return self
+end
+
+---@param variable Node.Variable
+---@return Node.Variable
+function M:removeSubVariable(variable)
+    if not self.subVariables then
+        return self
+    end
+    self.subVariables:pop(variable)
+    if self.subVariables:getSize() == 0 then
+        self.subVariables = nil
+    end
+    self:flushCache()
+
+    return self
+end
+
 ---@type Node.Table?
 M.fields = nil
+
+---@pacakge
+---@param t Node.Table
+---@param variable Node.Variable
+function M:mergeFields(t, variable)
+    local node = self.scope.node
+    for k, v in pairs(variable.childs) do
+        if type(k) ~= 'table' then
+            ---@cast k -Node
+            k = node.value(k)
+        end
+        t:addField {
+            key = k,
+            value = v.value,
+        }
+    end
+end
 
 ---@param self Node.Variable
 ---@return Node.Table?
@@ -137,15 +184,12 @@ M.__getter.fields = function (self)
         return nil, false
     end
     local t = self.scope.node.table()
-    for k, v in pairs(self.childs) do
-        if type(k) ~= 'table' then
-            ---@cast k -Node
-            k = self.scope.node.value(k)
+    self:mergeFields(t, self)
+    local subVariables = self.subVariables
+    if subVariables then
+        for sub in subVariables:pairsFast() do
+            self:mergeFields(t, sub)
         end
-        t:addField {
-            key = k,
-            value = v.value,
-        }
     end
     return t, true
 end

@@ -83,6 +83,7 @@ ls.vm.registerRunnerParser('function', function (runner, source)
         local tp = node.ANY
         if cat then
             tp = subRunner:parse(cat)
+            variable:addType(tp)
             subRunner:setNode(param, tp)
         else
             tp = subRunner:parse(param)

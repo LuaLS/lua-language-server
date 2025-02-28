@@ -25,7 +25,7 @@ end
 ---@type LinkedTable
 M.nodes = nil
 
----@param node Node.Type
+---@param node Node
 ---@return Node.Variable
 function M:addType(node)
     if not self.nodes then
@@ -37,7 +37,7 @@ function M:addType(node)
     return self
 end
 
----@param node Node.Type
+---@param node Node
 ---@return Node.Variable
 function M:removeType(node)
     if not self.nodes then

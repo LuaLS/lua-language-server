@@ -99,7 +99,7 @@ function m.getRealUri(uri)
     if uri == ruri then
         return ruri
     end
-    local real = getRealParent(path:parent_path()) / res:filename()
+    local real = getRealParent(path:parent_path())
     ruri = furi.encode(real:string())
     if uri == ruri then
         return ruri

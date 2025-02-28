@@ -51,13 +51,13 @@ local function bindSelf(runner, source)
     local classList = classes:toArray()
     runner:setNode(first, runner.node.union(classList))
     ---@param class Node.Type
-    for class in classes:pairsFast() do
+    for _, class in ipairs(classList) do
         class:addVariable(variable)
         variable:addClass(class)
     end
     runner:addDispose(function ()
         ---@param class Node.Type
-        for class in classes:pairsFast() do
+        for _, class in ipairs(classList) do
             class:removeVariable(variable)
             variable:removeClass(class)
         end
@@ -70,13 +70,29 @@ ls.vm.registerRunnerParser('function', function (runner, source)
     local node = runner.node
     local subRunner = runner:getSubRunner(source)
 
+    bindSelf(subRunner, source)
+
     local func = node.func()
     for _, param in ipairs(source.params) do
-        if param.id == '...' then
-            func:addVarargParam(subRunner:unsolve(node.ANY, findParamType(catGroup, '...')))
-        else
-            func:addParam(param.id, subRunner:unsolve(node.ANY, findParamType(catGroup, param.id)))
+        local variable = subRunner:getVariable(param)
+        if not variable then
+            goto continue
         end
+        local cat = findParamType(catGroup, param.id)
+        ---@type Node
+        local tp = node.ANY
+        if cat then
+            tp = subRunner:parse(cat)
+            subRunner:setNode(param, tp)
+        else
+            tp = subRunner:parse(param)
+        end
+        if param.id == '...' then
+            func:addVarargParam(tp)
+        else
+            func:addParam(param.id, tp)
+        end
+        ::continue::
     end
     if catGroup then
         for _, cat in ipairs(catGroup) do
@@ -88,8 +104,6 @@ ls.vm.registerRunnerParser('function', function (runner, source)
             end
         end
     end
-
-    bindSelf(subRunner, source)
 
     return func
 end)

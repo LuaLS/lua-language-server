@@ -97,6 +97,8 @@ ls.vm.registerRunnerParser('param', function (runner, source)
 
     local variable = runner.node.variable(source.id)
     runner:setVariable(source, variable)
+
+    return runner.node.ANY
 end)
 
 ls.vm.registerRunnerParser('field', function (runner, source)

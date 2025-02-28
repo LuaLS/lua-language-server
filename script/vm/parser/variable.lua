@@ -147,7 +147,7 @@ ls.vm.registerRunnerParser('field', function (runner, source)
     if value and value.kind == 'function' then
         ---@cast value LuaParser.Node.Function
         if source.subtype == 'method' then
-            runner:runSubBlock(value)
+            runner:indexSubRunner(value)
         end
     end
 

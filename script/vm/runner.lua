@@ -1,7 +1,7 @@
 ---@class VM.Runner
 local M = Class 'VM.Runner'
 
----@type 'ready' | 'running' | 'finished'
+---@type 'ready' | 'indexing' | 'indexed' | 'running' | 'runned'
 M.state = 'ready'
 
 ---@class VM.Runner.Context
@@ -40,15 +40,16 @@ function M:addDispose(dispose)
     self.disposes[#self.disposes+1] = dispose
 end
 
-function M:run()
+function M:index()
     if self.state ~= 'ready' then
         return
     end
-    self.state = 'running'
+    self.state = 'indexing'
+    self:parse(self.block)
     for _, state in ipairs(self.block.childs) do
         self:parse(state)
     end
-    self.state = 'finished'
+    self.state = 'indexed'
 end
 
 ---@param source LuaParser.Node.Base
@@ -69,6 +70,12 @@ function M:parse(source)
     end
     self.nodeMap[source] = node
     return node
+end
+
+---@param source LuaParser.Node.Base
+---@param node Node
+function M:setNode(source, node)
+    self.nodeMap[source] = node
 end
 
 ---@param source LuaParser.Node.Base
@@ -281,8 +288,17 @@ end
 
 ---@param block LuaParser.Node.Block
 ---@return VM.Runner
-function M:runSubBlock(block)
-    return self.vfile:runBlock(block, self.context)
+function M:getSubRunner(block)
+    local runner = self.vfile:getRunner(block, self.context)
+    return runner
+end
+
+---@param block LuaParser.Node.Block
+---@return VM.Runner
+function M:indexSubRunner(block)
+    local runner = self:getSubRunner(block)
+    runner:index()
+    return runner
 end
 
 ---@param context VM.Runner.Context

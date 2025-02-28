@@ -170,7 +170,7 @@ end
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return self.scope.node.union(self.keys).value, true
+    return self.scope.node.union(self.keys), true
 end
 
 ---@type table<Node, Node>
@@ -257,7 +257,10 @@ function M:get(key)
             local r = self:get(v)
             results[#results+1] = r
         end
-        return node.union(results):getValue(node.NIL)
+        if #results == 0 then
+            return node.NIL
+        end
+        return node.union(results)
     end
     ---@cast key Node
     local typeName = key.typeName
@@ -267,7 +270,10 @@ function M:get(key)
     end
     if typeName == 'any'
     or typeName == 'unknown' then
-        return node.union(self.values):getValue(node.NIL)
+        if #self.values == 0 then
+            return node.NIL
+        end
+        return node.union(self.values)
     end
     local value = self.valueMap[key]
     if value then

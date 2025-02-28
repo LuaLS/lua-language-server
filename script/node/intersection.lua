@@ -202,7 +202,7 @@ M.__getter.value = function (self)
         return table, true
     end
 
-    local unionValue = self.scope.node.union(unionParts).value
+    local unionValue = self.scope.node.union(unionParts)
 
     if unionValue.kind ~= 'union' then
         local result = table & unionValue

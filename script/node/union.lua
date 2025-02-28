@@ -133,15 +133,6 @@ M.__getter.value = function (self)
     return self, true
 end
 
----@param default Node
----@return Node
-function M:getValue(default)
-    if #self.values == 0 then
-        return default
-    end
-    return self.value
-end
-
 ---@param self Node.Union
 ---@return Node
 ---@return true
@@ -150,7 +141,7 @@ M.__getter.truly = function (self)
     for _, v in ipairs(self.values) do
         result[#result+1] = v.truly
     end
-    return self.scope.node.union(result).value, true
+    return self.scope.node.union(result), true
 end
 
 ---@param self Node.Union
@@ -161,7 +152,7 @@ M.__getter.falsy = function (self)
     for _, v in ipairs(self.values) do
         result[#result+1] = v.falsy
     end
-    return self.scope.node.union(result).value, true
+    return self.scope.node.union(result), true
 end
 
 function M:narrow(other)

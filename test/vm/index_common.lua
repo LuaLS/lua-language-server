@@ -233,6 +233,20 @@ do
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
         ---@class A
+        B = {}
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    assert(node:globalGet('B').value:view() == 'A')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@class A
         local m = {}
 
         function m:init()

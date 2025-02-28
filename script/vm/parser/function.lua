@@ -48,6 +48,8 @@ local function bindSelf(runner, source)
     if not classes then
         return
     end
+    local classList = classes:toArray()
+    runner:setNode(first, runner.node.union(classList))
     ---@param class Node.Type
     for class in classes:pairsFast() do
         class:addVariable(variable)
@@ -66,13 +68,14 @@ ls.vm.registerRunnerParser('function', function (runner, source)
     ---@cast source LuaParser.Node.Function
     local catGroup = runner:getCatGroup(source)
     local node = runner.node
+    local subRunner = runner:getSubRunner(source)
 
     local func = node.func()
     for _, param in ipairs(source.params) do
         if param.id == '...' then
-            func:addVarargParam(runner:unsolve(node.ANY, findParamType(catGroup, '...')))
+            func:addVarargParam(subRunner:unsolve(node.ANY, findParamType(catGroup, '...')))
         else
-            func:addParam(param.id, runner:unsolve(node.ANY, findParamType(catGroup, param.id)))
+            func:addParam(param.id, subRunner:unsolve(node.ANY, findParamType(catGroup, param.id)))
         end
     end
     if catGroup then
@@ -81,16 +84,12 @@ ls.vm.registerRunnerParser('function', function (runner, source)
             ---@cast cvalue -?
             if cvalue.kind == 'catreturn' then
                 ---@cast cvalue LuaParser.Node.CatReturn
-                func:addReturn(cvalue.key and cvalue.key.id, runner:unsolve(node.ANY, cvalue.value))
+                func:addReturn(cvalue.key and cvalue.key.id, subRunner:unsolve(node.ANY, cvalue.value))
             end
         end
     end
 
-    if source.name then
-        runner:parse(source.name)
-    end
-
-    bindSelf(runner, source)
+    bindSelf(subRunner, source)
 
     return func
 end)

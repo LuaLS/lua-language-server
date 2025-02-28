@@ -120,12 +120,20 @@ function M:fillAPIs()
         return New 'Node.Typecall' (scope, name, args)
     end
 
-    ---@overload fun(nodes?: Node[]): Node.Union
+    ---@overload fun(nodes?: Node[]): Node
     ---@param nodes? Node[]
     ---@param filter fun(node: Node): boolean
     ---@return Node
     function self.union(nodes, filter)
         if not filter then
+            if nodes then
+                if #nodes == 0 then
+                    return scope.node.NEVER
+                end
+                if #nodes == 1 then
+                    return nodes[1]
+                end
+            end
             return New 'Node.Union' (scope, nodes)
         end
         if not nodes then

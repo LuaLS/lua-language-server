@@ -180,7 +180,7 @@ function M:getParamFrom(index)
     if #nodes == 1 then
         return nodes[1]
     end
-    return self.scope.node.union(nodes).value
+    return self.scope.node.union(nodes)
 end
 
 ---@param index integer
@@ -197,7 +197,7 @@ function M:getReturnFrom(index)
     if #nodes == 1 then
         return nodes[1]
     end
-    return self.scope.node.union(nodes).value
+    return self.scope.node.union(nodes)
 end
 
 function M:view(skipLevel)

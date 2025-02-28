@@ -39,7 +39,7 @@ end
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return self.scope.node.union(self.keys).value, true
+    return self.scope.node.union(self.keys), true
 end
 
 function M:get(key)
@@ -55,7 +55,10 @@ function M:get(key)
     if typeName == 'any'
     or typeName == 'unknown'
     or typeName == 'truly' then
-        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
+        if #self.values == 0 then
+            return self.scope.node.NIL
+        end
+        return self.scope.node.union(self.values)
     end
     if key.kind == 'value' then
         return self.values[key.literal]
@@ -63,7 +66,10 @@ function M:get(key)
     end
     if key.typeName == 'number'
     or key.typeName == 'integer' then
-        return self.scope.node.union(self.values):getValue(self.scope.node.NIL)
+        if #self.values == 0 then
+            return self.scope.node.NIL
+        end
+        return self.scope.node.union(self.values)
     end
     if key.kind == 'union' then
         ---@cast key Node.Union

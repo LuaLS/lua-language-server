@@ -314,15 +314,15 @@ M.__getter.value = function (self)
     local node = self.scope.node
     if self.classes then
         local union = node.union(self.classes:toArray())
-        return union.value, true
+        return union, true
     end
     if self.nodes then
         local union = node.union(self.nodes:toArray())
-        return union.value, true
+        return union, true
     end
     if self.assigns then
         local union = node.union(self.assigns:toArray())
-        return union.value, true
+        return union, true
     end
     return self.scope.node.UNKNOWN, true
 end

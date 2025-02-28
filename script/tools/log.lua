@@ -25,12 +25,9 @@ M.level = 'debug'
 M.clock = os.clock
 
 ---@private
-M.time = os.time
-
----@private
 M.messageFormat = '[%s][%5s][%s]: %s\n'
 
----@enum(key) Log.Level
+---@enum (key) Log.Level
 M.logLevel = {
     trace = 1,
     debug = 2,
@@ -45,6 +42,9 @@ M.needTraceBack = {
     error = true,
     fatal = true,
 }
+
+--是否打印到日志文件中
+M.enable = true
 
 ---@param a  table
 ---@param b? table
@@ -70,8 +70,9 @@ end
 ---@field level? Log.Level # 日志等级，低于此等级的日志将不会被记录
 ---@field logLevel? table<Log.Level, integer> # 自定义日志等级
 ---@field needTraceBack? table<Log.Level, boolean> # 是否需要打印堆栈信息
----@field time? fun(): integer # 获取当前时刻（秒），需要精确到秒
----@field clock? fun(): number # 获取当前时间（秒），需要精确到毫秒
+---@field clock? fun(): number # 获取当前时间，需要精确到毫秒
+---@field startTime? integer # 日志开始的时间戳，若不提供则会使用`os.time`获取
+---@field traceback? (fun(message: string, level: integer): string) # 获取堆栈的函数，默认为debug.traceback
 
 ---@param path string
 ---@param mode openmode
@@ -98,23 +99,22 @@ end
 function M:__init(option)
     self.maxSize = option.maxSize
     self.level   = option.level
-    self.clock   = option.clock
-    self.time    = option.time
-    if not option.file then
+    self.clock = option.clock
+    ---@private
+    self.option = option
+    if option.file then
+        self.file = option.file
+    else
         if option.path then
             local file, err = ioOpen(option.path, 'w+b')
             if file then
                 self.file = file
                 self.file:setvbuf 'no'
             elseif err then
-                if option.print then
-                    pcall(option.print, 'warn', err)
-                end
+                self:applyPrint('warn', err, self:getTimeStamp())
             end
         end
     end
-    ---@private
-    self.option = option
     ---@private
     self.logLevel = merge(M.logLevel, option.logLevel)
     ---@private
@@ -128,17 +128,36 @@ function M:__init(option)
     ---@private
     self.startClock = self.clock()
     ---@private
-    self.startTime  = self.time()
+    self.startTime  = option.startTime or os.time()
 end
 
 ---@private
 ---@return string
 function M:getTimeStamp()
     local deltaClock = self.clock() - self.startClock
-    local sec, ms = math.modf((self.startTime + deltaClock) / 1000.0)
+    local deltaSec, ms = math.modf(deltaClock)
+    local sec = self.startTime + deltaSec
     local timeStamp = os.date('%m-%d %H:%M:%S', sec) --[[@as string]]
     timeStamp = ('%s.%03.f'):format(timeStamp, ms * 1000)
     return timeStamp
+end
+
+---@private
+M.lockPrint = false
+
+---@private
+---@param level string
+---@param message string
+---@param timeStamp string
+function M:applyPrint(level, message, timeStamp)
+    if self.option.print then
+        if M.lockPrint then
+            return
+        end
+        M.lockPrint = true
+        pcall(self.option.print, level, message, timeStamp)
+        M.lockPrint = false
+    end
 end
 
 ---@private
@@ -154,7 +173,11 @@ function M:build(level, ...)
     local message = table.concat(t, '\t', 1, t.n)
 
     if self.needTraceBack[level] then
-        message = debug.traceback(message, 3)
+        if debug.getinfo(1, "t").istailcall then
+            message = (self.option.traceback or debug.traceback)(message, 2)
+        else
+            message = (self.option.traceback or debug.traceback)(message, 3)
+        end
     end
 
     local timeStamp = self:getTimeStamp()
@@ -163,11 +186,13 @@ function M:build(level, ...)
         return message, timeStamp
     end
 
-    if self.option.print then
-        pcall(self.option.print, level, message, timeStamp)
-    end
+    self:applyPrint(level, message, timeStamp)
 
     if not self.file then
+        return message, timeStamp
+    end
+
+    if not self.enable then
         return message, timeStamp
     end
 

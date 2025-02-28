@@ -1,0 +1,2 @@
+---@class LSP
+local M = {}

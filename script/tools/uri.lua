@@ -26,7 +26,7 @@ local M = {}
 ---@return Uri uri
 function M.encode(path)
     local authority = ''
-    if platform.OS == 'Windows' then
+    if platform.os == 'windows' then
         path = path:gsub('\\', '/')
     end
 
@@ -83,7 +83,7 @@ function M.decode(uri)
     else
         value = path
     end
-    if platform.OS == 'Windows' then
+    if platform.os == 'windows' then
         value = value:gsub('/', '\\')
     end
     return value

@@ -55,7 +55,7 @@ lm:executable "lua-language-server" {
 }
 
 local platform = require 'bee.platform'
-local exe      = platform.OS == 'Windows' and ".exe" or ""
+local exe      = platform.os == 'windows' and ".exe" or ""
 
 lm:copy "copy_lua-language-server" {
     input = lm.bindir .. "/lua-language-server" .. exe,

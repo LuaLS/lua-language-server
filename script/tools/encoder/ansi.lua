@@ -1,7 +1,7 @@
 local platform = require 'bee.platform'
 local unicode
 
-if platform.OS == 'Windows' then
+if platform.os == 'windows' then
     unicode = require 'bee.unicode'
 end
 

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` --check now respects ignoreDir setting
 
 ## 3.13.3
 * `CHG` Update Love2d version

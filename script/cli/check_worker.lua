@@ -102,7 +102,7 @@ xpcall(lclient.start, errorhandler, lclient, function (client)
     local max  = #uris
     table.sort(uris)    -- sort file list to ensure the work distribution order across multiple threads
     for i, uri in ipairs(uris) do
-        if (i % numThreads + 1) == threadId then
+        if (i % numThreads + 1) == threadId and not ws.isIgnored(uri) then
             files.open(uri)
             diag.doDiagnostic(uri, true)
             -- Print regularly but always print the last entry to ensure that logs written to files don't look incomplete.

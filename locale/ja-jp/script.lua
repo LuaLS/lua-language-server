@@ -649,8 +649,10 @@ CLI_CHECK_SUCCESS =
 '診断が完了しました。問題は見つかりませんでした'
 CLI_CHECK_PROGRESS =
 '{} ファイルに渡り、{} 個の問題が発見されました'
-CLI_CHECK_RESULTS =
+CLI_CHECK_RESULTS_OUTPATH =
 '診断が完了しました。{} 個の問題が発見されました。詳しくは {} をご確認ください'
+CLI_CHECK_RESULTS_PRETTY =
+'診断が完了しました。{} 個の問題が発見されました'
 CLI_CHECK_MULTIPLE_WORKERS =
 '{} 個のワーカータスクを開始しているため、進行状況の出力が無効になります。完了まで数分かかることがあります。'
 CLI_DOC_INITING   =

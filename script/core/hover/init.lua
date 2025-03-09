@@ -9,11 +9,13 @@ local guide      = require 'parser.guide'
 local wssymbol   = require 'core.workspace-symbol'
 
 ---@async
-local function getHover(source)
+---@param level integer
+local function getHover(source, level)
     local md        = markdown()
     local defMark   = {}
     local labelMark = {}
     local descMark  = {}
+    local totalMaxLevel = 0
 
     if source.type == 'doc.see.name' then
         for _, symbol in ipairs(wssymbol(source[1], guide.getUri(source))) do
@@ -32,7 +34,10 @@ local function getHover(source)
         defMark[def] = true
 
         if checkLable then
-            local label = getLabel(def, oop)
+            local label, maxLevel = getLabel(def, oop, level)
+            if maxLevel and totalMaxLevel < maxLevel then
+                totalMaxLevel = maxLevel
+            end
             if not labelMark[tostring(label)] then
                 labelMark[tostring(label)] = true
                 md:add('lua', label)
@@ -103,7 +108,7 @@ local function getHover(source)
         end
     end
 
-    return md
+    return md, totalMaxLevel
 end
 
 local accept = {
@@ -126,7 +131,8 @@ local accept = {
 }
 
 ---@async
-local function getHoverByUri(uri, position)
+---@param level integer
+local function getHoverByUri(uri, position, level)
     local ast = files.getState(uri)
     if not ast then
         return nil
@@ -135,7 +141,7 @@ local function getHoverByUri(uri, position)
     if not source then
         return nil
     end
-    local hover = getHover(source)
+    local hover, maxLevel = getHover(source, level)
     if SHOWSOURCE then
         hover:splitLine()
         hover:add('md', 'Source Info')
@@ -150,7 +156,7 @@ local function getHoverByUri(uri, position)
             deep = 1,
         }))
     end
-    return hover, source
+    return hover, source, maxLevel
 end
 
 return {

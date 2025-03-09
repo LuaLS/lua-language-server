@@ -359,8 +359,32 @@ end
 local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 ]]
 
+TEST 'nil' [[
+local <?k?>, <?v?> = next()
+local <?k?>, <?v?> = next({})
+]]
+
+TEST 'integer?' [[
+local <?k?>, <?v?> = next({1})
+]]
+
+TEST 'integer?' [[
+local a
+local <?k?>, v = next({a})
+]]
+
+-- probably explicit unknown generic should be unknown
+TEST 'nil' [[
+local a
+local k, <?v?> = next({a})
+]]
+
 TEST 'unknown' [[
-local <?x?> = next()
+---@generic T
+---@param t T?
+---@return T
+local function F(t) end
+local <?x?> = F()
 ]]
 
 TEST 'unknown' [[
@@ -3941,6 +3965,34 @@ local t = {
 TEST 'number' [[
 ---@type fun(x: number)
 local function f(<?x?>) end
+]]
+
+TEST 'number' [[
+---@type fun(x:number)[]
+local t = {
+    function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type fun(x:number)[]
+local t = {
+    [1] = function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type {[integer]: fun(x:number)}
+local t = {
+    function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type {[integer]: fun(x:number)}
+local t = {
+    [1] = function (<?x?>) end,
+}
 ]]
 
 TEST 'boolean' [[

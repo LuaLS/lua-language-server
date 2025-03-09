@@ -54,12 +54,13 @@ EChar               <-  'a' -> ea
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {X16*} '}')    -> CharUtf8
 Symbol              <-  ({} {
-                            [:|,;<>()?+#{}]
+                            [:|,;<>()?+#{}*]
                         /   '[]'
                         /   '...'
                         /   '['
                         /   ']'
                         /   '-' !'-'
+                        /   '.' !'..'
                         } {})
                     ->  Symbol
 ]], {
@@ -71,7 +72,7 @@ Symbol              <-  ({} {
     er = '\r',
     et = '\t',
     ev = '\v',
-    name = (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_')) * (m.R('az', 'AZ', '__', '09', '\x80\xff') + m.S('_.*-'))^0,
+    name = (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_')) * (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_.*-'))^0,
     Char10 = function (char)
         ---@type integer?
         char = tonumber(char)
@@ -720,57 +721,62 @@ local function parseString(parent)
     return str
 end
 
-local function parseCode(parent)
-    local tp, content = peekToken()
-    if not tp or tp ~= 'code' then
-        return nil
-    end
-    nextToken()
-    local code = {
-        type   = 'doc.type.code',
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = content,
-    }
-    return code
-end
-
 local function parseCodePattern(parent)
     local tp, pattern = peekToken()
-    if not tp or tp ~= 'name' then
+    if not tp or (tp ~= 'name' and tp ~= 'code') then
         return nil
     end
     local codeOffset
-    local finishOffset
     local content
-    for i = 2, 8 do
-        local next, nextContent = peekToken(i)
-        if not next or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
+    local i = 1
+    if tp == 'code' then
+        codeOffset = i
+        content = pattern
+        pattern = '%s'
+    end
+    while true do
+        i = i+1
+        local nextTp, nextContent = peekToken(i)
+        if not nextTp or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
+            ---不连续的name，无效的
+            break
+        end
+        if nextTp == 'name' then
+            pattern = pattern .. nextContent
+        elseif nextTp == 'code' then
             if codeOffset then
-                finishOffset = i
+                -- 暂时不支持多generic
                 break
             end
-            ---不连续的name，无效的
-            return nil
-        end
-        if next == 'code' then
-            if codeOffset and content ~= nextContent then
-                -- 暂时不支持多generic
-                return nil
-            end
             codeOffset = i
-            pattern = pattern .. "%s"
+            pattern = pattern .. '%s'
             content = nextContent
-        elseif next ~= 'name' then
-            return nil
+        elseif codeOffset then
+            -- should be match with Parser "name" mask
+            if nextTp == 'integer' then
+                pattern = pattern .. nextContent
+            elseif nextTp == 'symbol' and (nextContent == '.' or nextContent == '*' or nextContent == '-') then
+                pattern = pattern .. nextContent
+            else
+                break
+            end
         else
-            pattern = pattern .. nextContent
+            break
         end
     end
+    if not codeOffset then
+        return nil
+    end
+    nextToken()
     local start = getStart()
-    for _ = 2, finishOffset do
-        nextToken()
+    local finishOffset = i-1
+    if finishOffset == 1 then
+        -- code only, no pattern
+        pattern = nil
+    else
+        for _ = 2, finishOffset do
+            nextToken()
+        end
     end
     local code = {
         type   = 'doc.type.code',
@@ -834,7 +840,6 @@ function parseTypeUnit(parent)
                 or parseTable(parent)
                 or parseTuple(parent)
                 or parseString(parent)
-                or parseCode(parent)
                 or parseInteger(parent)
                 or parseBoolean(parent)
                 or parseParen(parent)
@@ -926,7 +931,7 @@ function parseType(parent)
     local function pushResume()
         local comments
         for i = 0, 100 do
-            local nextComm = NextComment(i,'peek')
+            local nextComm = NextComment(i, true)
             if not nextComm then
                 return false
             end
@@ -1707,10 +1712,9 @@ local function trimTailComment(text)
 end
 
 local function buildLuaDoc(comment)
-    local text = comment.text
-    local startPos = (comment.type == 'comment.short' and text:match '^%-%s*@()')
-                  or (comment.type == 'comment.long'  and text:match '^@()')
-    if not startPos then
+    local headPos = (comment.type == 'comment.short' and comment.text:match '^%-%s*@()')
+                 or (comment.type == 'comment.long'  and comment.text:match '^%s*@()')
+    if not headPos then
         return {
             type    = 'doc.comment',
             start   = comment.start,
@@ -1719,32 +1723,39 @@ local function buildLuaDoc(comment)
             comment = comment,
         }
     end
-    local startOffset = comment.start
+    -- absolute position of `@` symbol
+    local startOffset = comment.start + headPos
     if comment.type == 'comment.long' then
-        startOffset = startOffset + #comment.mark - 2
+        startOffset = comment.start + headPos + #comment.mark - 2
     end
 
-    local doc = text:sub(startPos)
+    local doc = comment.text:sub(headPos)
 
-    parseTokens(doc, startOffset + startPos)
+    parseTokens(doc, startOffset)
     local result, rests = convertTokens(doc)
     if result then
         result.range = math.max(comment.finish, result.finish)
         local finish = result.firstFinish or result.finish
         if rests then
             for _, rest in ipairs(rests) do
-                rest.range = comment.finish
-                finish = rest.firstFinish or result.finish
+                rest.range = math.max(comment.finish, rest.finish)
+                finish = rest.firstFinish or rest.finish
             end
         end
-        local cstart = text:find('%S', finish - comment.start)
-        if cstart and cstart < comment.finish then
+
+        -- `result` can be a multiline annotation or an alias, while `doc` is the first line, so we can't parse comment
+        if finish >= comment.finish then
+            return result, rests
+        end
+
+        local cstart = doc:find('%S', finish - startOffset)
+        if cstart then
             result.comment = {
                 type   = 'doc.tailcomment',
-                start  = cstart + comment.start,
+                start  = startOffset + cstart,
                 finish = comment.finish,
                 parent = result,
-                text   = trimTailComment(text:sub(cstart)),
+                text   = trimTailComment(doc:sub(cstart)),
             }
             if rests then
                 for _, rest in ipairs(rests) do
@@ -1752,9 +1763,7 @@ local function buildLuaDoc(comment)
                 end
             end
         end
-    end
 
-    if result then
         return result, rests
     end
 
@@ -2172,7 +2181,7 @@ local function bindDocs(state)
         if doc.specialBindGroup then
             bindDocWithSources(sources, doc.specialBindGroup)
             binded = nil
-        elseif isTailComment(text, doc) and doc.type ~= "doc.class" and doc.type ~= "doc.field" then
+        elseif isTailComment(text, doc) and doc.type ~= "doc.field" then
             bindDocWithSources(sources, binded)
             binded = nil
         else

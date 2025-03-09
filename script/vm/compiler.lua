@@ -304,6 +304,17 @@ local searchFieldSwitch = util.switch()
             end
         end
     end)
+    : case 'doc.type.sign'
+    : call(function (suri, source, key, pushResult)
+        if not source.node[1] then
+            return
+        end
+        local global = vm.getGlobal('type', source.node[1])
+        if not global then
+            return
+        end
+        vm.getClassFields(suri, global, key, pushResult)
+    end)
     : case 'global'
     : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
@@ -1671,7 +1682,9 @@ local compilerSwitch = util.switch()
                 vm.compileByParentNode(source.node, key, function (src)
                     if src.type == 'doc.field'
                     or src.type == 'doc.type.field'
-                    or src.type == 'doc.type.name' then
+                    or src.type == 'doc.type.name'
+                    or src.type == 'doc.type.function'
+                    then
                         hasMarkDoc = true
                         vm.setNode(source, vm.compileNode(src))
                     end

@@ -42,12 +42,13 @@ local function asDocTypeName(source)
 end
 
 ---@async
-local function asValue(source, title)
+---@param level integer
+local function asValue(source, title, level)
     local name    = buildName(source, false) or ''
     local ifr     = vm.getInfer(source)
     local type    = ifr:view(guide.getUri(source))
     local literal = ifr:viewLiterals()
-    local cont    = buildTable(source)
+    local cont, maxLevel = buildTable(source, level)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
@@ -69,11 +70,12 @@ local function asValue(source, title)
     if cont then
         pack[#pack+1] = cont
     end
-    return table.concat(pack, ' ')
+    return table.concat(pack, ' '), maxLevel
 end
 
 ---@async
-local function asLocal(source)
+---@param level integer
+local function asLocal(source, level)
     local node
     if source.type == 'local'
     or source.type == 'self' then
@@ -82,20 +84,21 @@ local function asLocal(source)
         node = source.node
     end
     if node.type == 'self' then
-        return asValue(source, '(self)')
+        return asValue(source, '(self)', level)
     end
     if node.parent.type == 'funcargs' then
-        return asValue(source, '(parameter)')
+        return asValue(source, '(parameter)', level)
     elseif guide.getParentFunction(source) ~= guide.getParentFunction(node) then
-        return asValue(source, '(upvalue)')
+        return asValue(source, '(upvalue)', level)
     else
-        return asValue(source, 'local')
+        return asValue(source, 'local', level)
     end
 end
 
 ---@async
-local function asGlobal(source)
-    return asValue(source, '(global)')
+---@param level integer
+local function asGlobal(source, level)
+    return asValue(source, '(global)', level)
 end
 
 local function isGlobalField(source)
@@ -126,11 +129,12 @@ local function isGlobalField(source)
 end
 
 ---@async
-local function asField(source)
+---@param level integer
+local function asField(source, level)
     if isGlobalField(source) then
-        return asGlobal(source)
+        return asGlobal(source, level)
     end
-    return asValue(source, '(field)')
+    return asValue(source, '(field)', level)
 end
 
 local function asDocFieldName(source)
@@ -192,7 +196,8 @@ local function asNumber(source)
 end
 
 ---@async
-return function (source, oop)
+---@param level integer
+return function (source, oop, level)
     if     source.type == 'function'
     or     source.type == 'doc.type.function' then
         return asFunction(source, oop)
@@ -200,10 +205,10 @@ return function (source, oop)
     or     source.type == 'self'
     or     source.type == 'getlocal'
     or     source.type == 'setlocal' then
-        return asLocal(source)
+        return asLocal(source, level)
     elseif source.type == 'setglobal'
     or     source.type == 'getglobal' then
-        return asGlobal(source)
+        return asGlobal(source, level)
     elseif source.type == 'getfield'
     or     source.type == 'setfield'
     or     source.type == 'getmethod'
@@ -211,7 +216,7 @@ return function (source, oop)
     or     source.type == 'tablefield'
     or     source.type == 'field'
     or     source.type == 'method' then
-        return asField(source)
+        return asField(source, level)
     elseif source.type == 'string' then
         return asString(source)
     elseif source.type == 'number'

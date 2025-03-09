@@ -1,8 +1,9 @@
-local files     = require 'files'
-local guide     = require 'parser.guide'
+local files  = require 'files'
+local await  = require 'await'
+local guide  = require 'parser.guide'
 ---@class vm
-local vm        = require 'vm.vm'
-local config    = require 'config'
+local vm     = require 'vm.vm'
+local config = require 'config'
 
 ---@class parser.object
 ---@field package _castTargetHead? parser.object | vm.global | false
@@ -186,20 +187,53 @@ function vm.getDeprecated(value, deep)
 end
 
 ---@param  value parser.object
+---@param  propagate boolean
+---@param  deepLevel integer?
 ---@return boolean
-local function isAsync(value)
+local function isAsync(value, propagate, deepLevel)
     if value.type == 'function' then
-        if not value.bindDocs then
-            return false
-        end
-        if value._async ~= nil then
+        if value._async ~= nil then --already calculated, directly return
             return value._async
         end
-        for _, doc in ipairs(value.bindDocs) do
-            if doc.type == 'doc.async' then
-                value._async = true
+        local asyncCache
+        if propagate then
+            asyncCache = vm.getCache 'async.propagate'
+            local result = asyncCache[value]
+            if result ~= nil then
+                return result
+            end
+        end
+        if value.bindDocs then --try parse the annotation
+            for _, doc in ipairs(value.bindDocs) do
+                if doc.type == 'doc.async' then
+                    value._async = true
+                    return true
+                end
+            end
+        end
+        if propagate then -- if enable async propagation, try check calling functions
+            if deepLevel and deepLevel > 50 then
+                return false
+            end
+            local isAsyncCall = vm.isAsyncCall
+            local callingAsync = guide.eachSourceType(value, 'call', function (source)
+                local parent = guide.getParentFunction(source)
+                if parent ~= value then
+                    return nil
+                end
+                local nextLevel = (deepLevel or 1) + 1
+                local ok = isAsyncCall(source, nextLevel)
+                if ok then --if any calling function is async, directly return
+                    return ok
+                end
+                --if not, try check the next calling function
+                return nil
+            end)
+            if callingAsync then
+                asyncCache[value] = true
                 return true
             end
+            asyncCache[value] = false
         end
         value._async = false
         return false
@@ -212,9 +246,12 @@ end
 
 ---@param value parser.object
 ---@param deep  boolean?
+---@param deepLevel integer?
 ---@return boolean
-function vm.isAsync(value, deep)
-    if isAsync(value) then
+function vm.isAsync(value, deep, deepLevel)
+    local uri = guide.getUri(value)
+    local propagate = config.get(uri, 'Lua.hint.awaitPropagate')
+    if isAsync(value, propagate, deepLevel) then
         return true
     end
     if deep then
@@ -223,7 +260,7 @@ function vm.isAsync(value, deep)
             return false
         end
         for _, def in ipairs(defs) do
-            if isAsync(def) then
+            if isAsync(def, propagate, deepLevel) then
                 return true
             end
         end
@@ -325,16 +362,17 @@ function vm.isLinkedCall(node, index)
 end
 
 ---@param call parser.object
+---@param deepLevel integer?
 ---@return boolean
-function vm.isAsyncCall(call)
-    if vm.isAsync(call.node, true) then
+function vm.isAsyncCall(call, deepLevel)
+    if vm.isAsync(call.node, true, deepLevel) then
         return true
     end
     if not call.args then
         return false
     end
     for i, arg in ipairs(call.args) do
-        if  vm.isAsync(arg, true)
+        if  vm.isAsync(arg, true, deepLevel)
         and isLinkedCall(call.node, i) then
             return true
         end

@@ -43,7 +43,7 @@ end
 
 ---@async
 local function makeOneSignature(source, oop, index)
-    local label = hoverLabel(source, oop)
+    local label = hoverLabel(source, oop, 0)
     if not label then
         return nil
     end

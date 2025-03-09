@@ -940,6 +940,7 @@ local assignTypeMap = {
     ['setindex']          = true,
     ['tablefield']        = true,
     ['tableindex']        = true,
+    ['tableexp']          = true,
     ['label']             = true,
     ['doc.class']         = true,
     ['doc.alias']         = true,

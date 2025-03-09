@@ -10,7 +10,7 @@ function TEST(script)
     return function (expect)
         local newScript, catched = catch(script, '?')
         files.setText(TESTURI, newScript)
-        local hover = core.byUri(TESTURI, catched['?'][1][1])
+        local hover = core.byUri(TESTURI, catched['?'][1][1], 1)
         assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         local label = hover:string():gsub('\r\n', '\n'):match('```lua[\r\n]*(.-)[\r\n]*```')
@@ -18,6 +18,8 @@ function TEST(script)
         files.remove(TESTURI)
     end
 end
+
+config.set(nil, 'Lua.hover.previewFields', 50)
 
 TEST [[
 local function <?x?>(a, b)

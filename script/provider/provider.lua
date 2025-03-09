@@ -19,6 +19,7 @@ local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local guide      = require 'parser.guide'
 local fs         = require 'bee.filesystem'
+local version    = require 'version'
 
 require 'library'
 
@@ -118,7 +119,7 @@ m.register 'initialize' {
 
         if params.workspaceFolders then
             for _, folder in ipairs(params.workspaceFolders) do
-                workspace.create(files.getRealUri(folder.uri))
+                workspace.create(files.getRealUri(folder.uri), folder.name)
             end
         elseif params.rootUri then
             workspace.create(files.getRealUri(params.rootUri))
@@ -128,6 +129,7 @@ m.register 'initialize' {
             capabilities = cap.getProvider(),
             serverInfo   = {
                 name    = 'sumneko.lua',
+                version = version.getVersion(),
             },
         }
         log.debug('Server init', inspect(response))
@@ -137,9 +139,10 @@ m.register 'initialize' {
 
 m.register 'initialized'{
     ---@async
-    function (_params)
+    function (params)
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
-        m.updateConfig()
+        --- 传递`.luarc.doc.json`文件所在的文件夹路径
+        m.updateConfig(params and params.luarcParentUri)
         local registrations = {}
 
         if client.getAbility 'workspace.didChangeConfiguration.dynamicRegistration' then
@@ -362,7 +365,7 @@ m.register 'textDocument/hover' {
             return nil
         end
         local pos = converter.unpackPosition(state, params.position)
-        local hover, source = core.byUri(uri, pos)
+        local hover, source, maxLevel = core.byUri(uri, pos, params.level or 1)
         if not hover or not source then
             return nil
         end
@@ -372,6 +375,7 @@ m.register 'textDocument/hover' {
                 kind  = 'markdown',
             },
             range = converter.packRange(state, source.start, source.finish),
+            maxLevel = maxLevel,
         }
     end
 }
@@ -658,7 +662,7 @@ m.register 'textDocument/completion' {
                 sortText         = res.sortText or ('%04d'):format(i),
                 filterText       = res.filterText,
                 insertText       = res.insertText,
-                insertTextFormat = 2,
+                insertTextFormat = res.insertTextFormat or 1,
                 commitCharacters = res.commitCharacters,
                 command          = res.command,
                 textEdit         = res.textEdit and {

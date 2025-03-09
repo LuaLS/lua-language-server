@@ -136,6 +136,9 @@ function mt:resolve(uri, args)
             end
         end
     end
+    if protoNode:isOptional() then
+        result:addOptional()
+    end
     return result
 end
 

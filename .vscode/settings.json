@@ -5,7 +5,7 @@
         "--develop=true",
         "--dbgport=11413",
         "--loglevel=trace",
-        "--shownode",
+        //"--shownode",
         //"--lazy",
     ],
 }

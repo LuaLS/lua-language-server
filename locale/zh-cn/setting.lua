@@ -255,6 +255,8 @@ config.hint.arrayIndex.Disable           =
 '禁用数组索引提示。'
 config.hint.await                        =
 '如果调用的函数被标记为了 `---@async` ，则在调用处提示 `await` 。'
+config.hint.awaitPropagate               =
+'启用 `await` 的传播, 当一个函数调用了一个`---@async`标记的函数时，会自动标记为`---@async`。'
 config.hint.semicolon                    =
 '若语句尾部没有分号，则显示虚拟分号。'
 config.hint.semicolon.All                =
@@ -454,6 +456,6 @@ command.addon_manager.open =
 command.reloadFFIMeta =
 'Lua: 重新生成luajit的FFI模块C语言元数据'
 command.startServer =
-'Lua: (debug) 启动服务器'
+'Lua: 重启语言服务器'
 command.stopServer =
-'Lua: (debug) 停止服务器'
+'Lua: 停止语言服务器'

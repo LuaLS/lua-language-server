@@ -3,8 +3,61 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` --check now respects ignoreDir setting
+* `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument
+* `CHG` default path for `--doc_out_path` is the current directory
+* `FIX` incorrect error message for `--doc_update`.
+* `FIX` reimplement section `luals.config` in file doc.json
+* `FIX` incorrect file names in file doc.json
+* `FIX` remove extra `./` path prefix in the check report when using `--check=.`
+
+## 3.13.6
+`2025-2-6`
+* `NEW` `---@class` supports attribute `partial`, which will not check missing inherited fields [#3023](https://github.com/LuaLS/lua-language-server/issues/3023)
+  ```lua
+  ---@class Config
+  ---@field a number
+
+  ---@class (partial) Config.P: Config
+  ---@field b number
+
+  ---@type Config.P[]
+  local cfgs = {}
+  cfgs[1] = { b = 1 } -- no warning
+  cfgs[2] = {}        -- only warns missing `b`
+  ```
+  This enables the previous missing field check behavior before [#2970](https://github.com/LuaLS/lua-language-server/issues/2970)
+* `NEW` Added variable substitution support for vscode's `${workspaceFolder:x}` when resolving path placeholders [#2987](https://github.com/LuaLS/lua-language-server/issues/2987)
+* `NEW` Added `--check_format=json|pretty` for use with `--check` to output diagnostics in a human readable format.
+* `NEW` Test CLI: `--name=<testname>` `-n=<testname>`: run specify unit test
+* `CHG` Generic pattern now supports definition after capture and optional, union, array [#3014](https://github.com/LuaLS/lua-language-server/issues/3014) [#3031](https://github.com/LuaLS/lua-language-server/pull/3031)
+  ```lua
+  ---@generic T
+  ---@param t `T`.Cat?
+  ---@return T?
+  local function f(t) end
+
+  local t = f('Smile') --> t is `(Smile.Cat)?`
+  ```
+* `FIX` Fixed the error that the configuration file pointed to by the `--configpath` option was not read and loaded.
+* `FIX` Don't truncate any output when running in `--doc` mode [#3049](https://github.com/LuaLS/lua-language-server/issues/3049)
+* `FIX` Generic return can be optional.
+* `FIX` Fixed the comment calculating in docs `---@param a string?Comment` - now its `Comment` instead of `omment` [#3028](https://github.com/LuaLS/lua-language-server/pull/3028)
+* `FIX` Fixed cannot bind variables using tail comment `@class` [#2673](https://github.com/LuaLS/lua-language-server/issues/2673)
+* `FIX` Fixed missing field completion for generic class object [#2196](https://github.com/LuaLS/lua-language-server/issues/2196) [#2945](https://github.com/LuaLS/lua-language-server/issues/2945) [#3041](https://github.com/LuaLS/lua-language-server/issues/3041)
+
+## 3.13.5
+`2024-12-20`
+* `NEW` Setting: `Lua.hint.awaitPropagate`: When enabled, `--@async` propagates to the caller.
+* `CHG` Add server version information to `initialize` response [#2996](https://github.com/LuaLS/lua-language-server/pull/2996)
+* `CHG` If the `---@field` of the same name has a type of `fun`, the `duplicate-doc-field` check will not be performed.
+* `FIX` Incorrect infer for function array annotation on tables [#2367](https://github.com/LuaLS/lua-language-server/issues/2367)
+
+## 3.13.4
+`2024-12-13`
+* `CHG` Can adjust the level of detail of Hover (VSCode)
 
 ## 3.13.3
+`2024-12-6`
 * `CHG` Update Love2d version
 * `CHG` Improve type infer of `table.unpack` and `unpack`
 * `FIX` `missing-fields` diagnostic now warns about missing inherited fields

@@ -9,6 +9,7 @@
 * `FIX` reimplement section `luals.config` in file doc.json
 * `FIX` incorrect file names in file doc.json
 * `FIX` remove extra `./` path prefix in the check report when using `--check=.`
+* `FIX` correct lua version of `math.ult` and `math.type`
 * `FIX` incorrect links for `pattern` in `string` methods
 * `FIX` fix type annotations for bit module
 * `FIX` Another regression related to type narrow and generic param introduced since `v3.10.1` [#3087](https://github.com/LuaLS/lua-language-server/issues/3087)

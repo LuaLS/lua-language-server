@@ -1,3 +1,8 @@
+if _G['HELP'] then
+    require 'cli.help'
+    os.exit(0, true)
+end
+
 if _G['VERSION'] then
     require 'cli.version'
     os.exit(0, true)

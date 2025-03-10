@@ -4743,6 +4743,46 @@ local function f(v) end
 local <?r?> = f('')
 ]]
 
+TEST 'A' [[
+---@class A
+local A = {}
+
+---@generic T
+---@param self T
+---@param s string
+---@return T
+function A:f(s) end
+
+---@generic T
+---@param self T
+---@param i integer
+---@return T
+function A:f(i) end
+
+local <?r?> = A:f('')
+]]
+
+TEST 'B' [[
+---@class A
+local A = {}
+
+---@generic T
+---@param self T
+---@param s string
+---@return T
+function A:f(s) end
+
+---@generic T
+---@param self T
+---@param i integer
+---@return T
+function A:f(i) end
+
+---@class B: A
+local B = {}
+local <?r?> = B:f('')
+]]
+
 TEST 'integer' [[
 local function F(...)
     local t = {...}

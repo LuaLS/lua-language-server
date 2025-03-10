@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.13.7
+`2025-3-10`
 * `NEW` CLI: added `--help`.
 * `CHG` default path for `--doc_out_path` is the current directory
 * `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument

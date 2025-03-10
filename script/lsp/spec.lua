@@ -1417,4 +1417,647 @@ M.TextDocumentSaveReason = {
 --- notification should not be sent.
 ---@field save? boolean | SaveOptions
 
+
+--- A notebook document.
+---
+---@since 3.17.0
+---@class NotebookDocument
+--- The notebook document's URI.
+---@field uri URI
+--- The type of the notebook.
+---@field notebookType string
+--- The version number of this document (it will increase after each
+--- change, including undo/redo).
+---@field version integer
+--- Additional metadata stored with the notebook
+--- document.
+---@field metadata? LSPObject
+--- The cells of a notebook.
+---@field cells NotebookCell[]
+
+
+--- A notebook cell.
+---
+--- A cell's document URI must be unique across ALL notebook
+--- cells and can therefore be used to uniquely identify a  
+--- notebook cell or the cell's text document.
+---
+---@since 3.17.0
+---@class NotebookCell
+--- The cell's kind.
+---@field kind NotebookCellKind
+--- The URI of the cell's text document
+--- content.
+---@field document DocumentUri
+--- Additional metadata stored with the cell.
+---@field metadata? LSPObject
+--- Additional execution summary information
+--- if supported by the client.
+---@field executionSummary? ExecutionSummary
+
+
+---@enum NotebookCellKind
+M.NotebookCellKind = {
+    --- A markup-cell is a formatted source that is used for display.
+    Markup = 1,
+    --- A code-cell is source code.
+    Code = 2,
+}
+
+
+---@class ExecutionSummary 
+--- A strictly monotonically increasing value
+--- indicating the execution order of a cell
+--- inside a notebook.
+---@field executionOrder uinteger
+--- Whether the execution was successful or
+--- not if known by the client.
+---@field success? boolean
+
+
+--- A notebook cell text document filter denotes a cell text
+--- document by different properties.
+---
+---@since 3.17.0
+---@class NotebookCellTextDocumentFilter
+--- A filter that matches against the notebook
+--- containing the notebook cell. If a string
+--- value is provided, it matches against the
+--- notebook type. '---' matches every notebook.
+---@field notebook string | NotebookDocumentFilter
+--- A language ID like `python`.
+---
+--- Will be matched against the language ID of the
+--- notebook cell document. '---' matches every language.
+---@field language? string
+
+
+---@alias NotebookDocumentFilter
+---| { notebookType: string, scheme?: string, pattern?: GlobPattern }
+---| { notebookType?: string, scheme: string, pattern?: GlobPattern }
+---| { notebookType?: string, scheme?: string, pattern: GlobPattern }
+
+
+--- Notebook specific client capabilities.
+---
+---@since 3.17.0
+---@class NotebookDocumentSyncClientCapabilities
+--- Whether implementation supports dynamic registration. If this is
+--- set to `true`, the client supports the new
+--- `(NotebookDocumentSyncRegistrationOptions & NotebookDocumentSyncOptions)`
+--- return value for the corresponding server capability as well.
+---@field dynamicRegistration? boolean
+--- The client supports sending execution summary data per cell.
+---@field executionSummarySupport? boolean
+
+
+---@class NotebookDocumentSyncOptions.NotebookSelector1
+--- The notebook to be synced. If a string
+--- value is provided, it matches against the
+--- notebook type. '---' matches every notebook.
+---@field notebook string | NotebookDocumentFilter
+--- The cells of the matching notebook to be synced.
+---@field cells? { language: string }[]
+
+
+---@class NotebookDocumentSyncOptions.NotebookSelector2
+--- The notebook to be synced. If a string
+--- value is provided, it matches against the
+--- notebook type. '---' matches every notebook.
+---@field notebook? string | NotebookDocumentFilter
+--- The cells of the matching notebook to be synced.
+---@field cells { language: string }[]
+
+
+--- Options specific to a notebook plus its cells
+--- to be synced to the server.
+---
+--- If a selector provides a notebook document
+--- filter but no cell selector, all cells of a
+--- matching notebook document will be synced.
+---
+--- If a selector provides no notebook document
+--- filter but only a cell selector, all notebook
+--- documents that contain at least one matching
+--- cell will be synced.
+---
+---@since 3.17.0
+---@class NotebookDocumentSyncOptions
+--- The notebooks to be synced
+---@field notebookSelector (NotebookDocumentSyncOptions.NotebookSelector1 | NotebookDocumentSyncOptions.NotebookSelector2)[]
+--- Whether save notifications should be forwarded to
+--- the server. Will only be honored if mode === `notebook`.
+---@field save? boolean
+
+
+--- Registration options specific to a notebook.
+---
+---@since 3.17.0
+---@class NotebookDocumentSyncRegistrationOptions : NotebookDocumentSyncOptions, StaticRegistrationOptions
+
+
+--- The params sent in an open notebook document notification.
+---
+---@since 3.17.0
+---@class DidOpenNotebookDocumentParams
+--- The notebook document that got opened.
+---@field notebookDocument NotebookDocument
+--- The text documents that represent the content
+--- of a notebook cell.
+---@field cellTextDocuments TextDocumentItem[]
+
+
+--- The params sent in a change notebook document notification.
+---
+---@since 3.17.0
+---@class DidChangeNotebookDocumentParams
+--- The notebook document that did change. The version number points
+--- to the version after all provided changes have been applied.
+---@field notebookDocument VersionedNotebookDocumentIdentifier
+--- The actual changes to the notebook document.
+---
+--- The change describes a single state change to the notebook document,
+--- so it moves a notebook document, its cells and its cell text document
+--- contents from state S to S'.
+---
+--- To mirror the content of a notebook using change events use the
+--- following approach:
+--- - start with the same initial content
+--- - apply the 'notebookDocument/didChange' notifications in the order
+---   you receive them.
+---@field change NotebookDocumentChangeEvent
+
+
+--- A versioned notebook document identifier.
+---
+---@since 3.17.0
+---@class VersionedNotebookDocumentIdentifier
+--- The version number of this notebook document.
+---@field version integer
+--- The notebook document's URI.
+---@field uri URI
+
+
+--- A change event for a notebook document.
+---
+---@since 3.17.0
+---@class NotebookDocumentChangeEvent
+--- The changed meta data if any.
+---@field metadata? LSPObject
+--- Changes to cells.
+---@field cells? NotebookDocumentChangeEvent.Cells
+
+
+---@class NotebookDocumentChangeEvent.Cells
+--- Changes to the cell structure to add or
+--- remove cells.
+---@field structure? NotebookDocumentChangeEvent.Cells.Structure
+--- Changes to notebook cells properties like its
+--- kind, execution summary or metadata.
+---@field data? NotebookCell[]
+--- Changes to the text content of notebook cells.
+---@field textContent? {
+--- document: VersionedTextDocumentIdentifier,
+--- changes: TextDocumentContentChangeEvent[],
+---}[]
+
+
+---@class NotebookDocumentChangeEvent.Cells.Structure
+--- The change to the cell array.
+---@field array NotebookCellArrayChange
+--- Additional opened cell text documents.
+---@field didOpen? TextDocumentItem[]
+--- Additional closed cell text documents.
+---@field didClose? TextDocumentIdentifier[]
+
+
+--- A change describing how to move a `NotebookCell`
+--- array from state S to S'.
+---
+---@since 3.17.0
+---@class NotebookCellArrayChange
+--- The start offset of the cell that changed.
+---@field start uinteger
+--- The number of deleted cells.
+---@field deleteCount uinteger
+--- The new cells, if any.
+---@field cells? NotebookCell[]
+
+
+--- The params sent in a save notebook document notification.
+---
+---@since 3.17.0
+---@class DidSaveNotebookDocumentParams
+--- The notebook document that got saved.
+---@field notebookDocument NotebookDocumentIdentifier
+
+
+--- The params sent in a close notebook document notification.
+---
+---@since 3.17.0
+---@class DidCloseNotebookDocumentParams
+--- The notebook document that got closed.
+---@field notebookDocument NotebookDocumentIdentifier
+--- The text documents that represent the content
+--- of a notebook cell that got closed.
+---@field cellTextDocuments TextDocumentIdentifier[]
+
+
+--- A literal to identify a notebook document in the client.
+---
+---@since 3.17.0
+---@class NotebookDocumentIdentifier
+--- The notebook document's URI.
+---@field uri URI
+
+
+---@class DeclarationClientCapabilities 
+--- Whether declaration supports dynamic registration. If this is set to
+--- `true`, the client supports the new `DeclarationRegistrationOptions`
+--- return value for the corresponding server capability as well.
+---@field dynamicRegistration? boolean
+--- The client supports additional metadata in the form of declaration links.
+---@field linkSupport? boolean
+
+
+---@class DeclarationOptions : WorkDoneProgressOptions
+
+
+---@class DeclarationRegistrationOptions : DeclarationOptions, TextDocumentRegistrationOptions, StaticRegistrationOptions
+
+
+---@class DeclarationParams : TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams
+
+
+---@class DefinitionClientCapabilities
+--- Whether definition supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- The client supports additional metadata in the form of definition links.
+---
+---@since 3.14.0
+---@field linkSupport? boolean
+
+
+---@class DefinitionOptions : WorkDoneProgressOptions
+
+
+---@class DefinitionRegistrationOptions : TextDocumentRegistrationOptions, DefinitionOptions 
+
+
+---@class DefinitionParams : TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams
+
+
+---@class TypeDefinitionClientCapabilities
+--- Whether implementation supports dynamic registration. If this is set to
+--- `true`, the client supports the new `TypeDefinitionRegistrationOptions`
+--- return value for the corresponding server capability as well.
+---@field dynamicRegistration? boolean
+--- The client supports additional metadata in the form of definition links.
+---
+---@since 3.14.0
+---@field linkSupport? boolean
+
+
+---@class TypeDefinitionOptions : WorkDoneProgressOptions
+
+
+---@class TypeDefinitionRegistrationOptions : TextDocumentRegistrationOptions, TypeDefinitionOptions, StaticRegistrationOptions
+
+
+---@class TypeDefinitionParams : TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams
+
+
+---@class ImplementationClientCapabilities 
+--- Whether the implementation supports dynamic registration. If this is set to
+--- `true`, the client supports the new `ImplementationRegistrationOptions`
+--- return value for the corresponding server capability as well.
+---@field dynamicRegistration? boolean
+--- The client supports additional metadata in the form of definition links.
+---
+---@since 3.14.0
+---@field linkSupport? boolean
+
+
+---@class ImplementationOptions : WorkDoneProgressOptions
+
+
+---@class ImplementationRegistrationOptions : TextDocumentRegistrationOptions, ImplementationOptions, StaticRegistrationOptions
+
+
+---@class ImplementationParams : TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams
+
+
+---@class ReferenceClientCapabilities 
+--- Whether references supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+---@class ReferenceOptions : WorkDoneProgressOptions 
+
+
+---@class ReferenceRegistrationOptions : TextDocumentRegistrationOptions, ReferenceOptions
+
+
+---@class ReferenceParams : TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams
+---@field context ReferenceContext
+
+
+---@class ReferenceContext 
+--- Include the declaration of the current symbol.
+---@field includeDeclaration boolean
+
+
+---@class CallHierarchyClientCapabilities 
+--- Whether implementation supports dynamic registration. If this is set to
+--- `true` the client supports the new `(TextDocumentRegistrationOptions &
+--- StaticRegistrationOptions)` return value for the corresponding server
+--- capability as well.
+---@field dynamicRegistration? boolean
+
+
+---@class CallHierarchyOptions : WorkDoneProgressOptions
+
+
+---@class CallHierarchyRegistrationOptions : TextDocumentRegistrationOptions, CallHierarchyOptions, StaticRegistrationOptions
+
+
+---@class CallHierarchyPrepareParams : TextDocumentPositionParams, WorkDoneProgressParams
+
+
+---@class CallHierarchyItem 
+--- The name of this item.
+---@field name string
+--- The kind of this item.
+---@field kind SymbolKind
+--- Tags for this item.
+---@field tags? SymbolTag[]
+--- More detail for this item, e.g. the signature of a function.
+---@field detail? string
+--- The resource identifier of this item.
+---@field uri DocumentUri
+--- The range enclosing this symbol not including leading/trailing whitespace
+--- but everything else, e.g. comments and code.
+---@field range Range
+--- The range that should be selected and revealed when this symbol is being
+--- picked, e.g. the name of a function. Must be contained by the
+--- [`range`](#CallHierarchyItem.range).
+---@field selectionRange Range
+--- A data entry field that is preserved between a call hierarchy prepare and
+--- incoming calls or outgoing calls requests.
+---@field data? LSPAny
+
+
+---@class CallHierarchyIncomingCallsParams : WorkDoneProgressParams, PartialResultParams 
+---@field item CallHierarchyItem
+
+
+---@class CallHierarchyIncomingCall 
+--- The item that makes the call.
+---@field from CallHierarchyItem
+--- The ranges at which the calls appear. This is relative to the caller
+--- denoted by [`this.from`](#CallHierarchyIncomingCall.from).
+---@field fromRanges Range[]
+
+
+---@class CallHierarchyOutgoingCallsParams : WorkDoneProgressParams, PartialResultParams 
+---@field item CallHierarchyItem
+
+
+---@class CallHierarchyOutgoingCall 
+--- The item that is called.
+---@field to CallHierarchyItem
+--- The range at which this item is called. This is the range relative to
+--- the caller, e.g., the item passed to `callHierarchy/outgoingCalls` request.
+---@field fromRanges Range[]
+
+
+---@class TypeHierarchyClientCapabilities
+--- Whether implementation supports dynamic registration. If this is set to
+--- `true` the client supports the new `(TextDocumentRegistrationOptions &
+--- StaticRegistrationOptions)` return value for the corresponding server
+--- capability as well.
+---@field dynamicRegistration? boolean
+
+
+---@class TypeHierarchyOptions : WorkDoneProgressOptions 
+
+
+---@class TypeHierarchyRegistrationOptions : TextDocumentRegistrationOptions, TypeHierarchyOptions, StaticRegistrationOptions
+
+
+---@class TypeHierarchyPrepareParams : TextDocumentPositionParams, WorkDoneProgressParams
+
+
+---@class TypeHierarchyItem 
+--- The name of this item.
+---@field name string
+--- The kind of this item.
+---@field kind SymbolKind
+--- Tags for this item.
+---@field tags? SymbolTag[]
+--- More detail for this item, e.g. the signature of a function.
+---@field detail? string
+--- The resource identifier of this item.
+---@field uri DocumentUri
+--- The range enclosing this symbol not including leading/trailing whitespace
+--- but everything else, e.g. comments and code.
+---@field range Range
+--- The range that should be selected and revealed when this symbol is being
+--- picked, e.g. the name of a function. Must be contained by the
+--- [`range`](#TypeHierarchyItem.range).
+---@field selectionRange Range
+--- A data entry field that is preserved between a type hierarchy prepare and
+--- supertypes or subtypes requests. It could also be used to identify the
+--- type hierarchy in the server, helping improve the performance on
+--- resolving supertypes and subtypes.
+---@field data? LSPAny
+
+
+---@class TypeHierarchySupertypesParams : WorkDoneProgressParams, PartialResultParams 
+---@field item TypeHierarchyItem
+
+
+---@class TypeHierarchySubtypesParams : WorkDoneProgressParams, PartialResultParams 
+---@field item TypeHierarchyItem
+
+
+---@class DocumentHighlightClientCapabilities 
+--- Whether document highlight supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+---@class DocumentHighlightOptions : WorkDoneProgressOptions 
+
+
+---@class DocumentHighlightRegistrationOptions : TextDocumentRegistrationOptions, DocumentHighlightOptions 
+
+
+---@class DocumentHighlightParams : TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams
+
+
+--- A document highlight is a range inside a text document which deserves
+--- special attention. Usually a document highlight is visualized by changing
+--- the background color of its range.
+---
+---@class DocumentHighlight
+--- The range this highlight applies to.
+---@field range Range
+--- The highlight kind, default is DocumentHighlightKind.Text.
+---@field kind? DocumentHighlightKind
+
+
+--- A document highlight kind.
+---@enum DocumentHighlightKind
+M.DocumentHighlightKind = {
+    --- A textual occurrence.
+    Text = 1,
+    --- Read-access of a symbol, like reading a variable.
+    Read = 2,
+    --- Write-access of a symbol, like writing to a variable.
+    Write = 3,
+}
+
+
+---@class DocumentLinkClientCapabilities 
+--- Whether document link supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- Whether the client supports the `tooltip` property on `DocumentLink`.
+---
+---@since 3.15.0
+---@field tooltipSupport? boolean
+
+
+---@class DocumentLinkOptions : WorkDoneProgressOptions 
+--- Document links have a resolve provider as well.
+---@field resolveProvider? boolean
+
+
+---@class DocumentLinkRegistrationOptions : TextDocumentRegistrationOptions, DocumentLinkOptions 
+
+
+---@class DocumentLinkParams : WorkDoneProgressParams, PartialResultParams
+--- The document to provide document links for.
+---@field textDocument TextDocumentIdentifier
+
+
+--- A document link is a range in a text document that links to an internal or
+--- external resource, like another text document or a web site.
+---@class DocumentLink
+--- The range this link applies to.
+---@field range Range
+--- The URI this link points to. If missing, a resolve request is sent later.
+---@field target? URI
+--- The tooltip text when you hover over this link.
+---
+--- If a tooltip is provided, it will be displayed in a string that includes
+--- instructions on how to trigger the link, such as `0 (ctrl + click)`.
+--- The specific instructions vary depending on OS, user settings, and
+--- localization.
+---
+---@since 3.15.0
+---@field tooltip? string
+--- A data entry field that is preserved on a document link between a
+--- DocumentLinkRequest and a DocumentLinkResolveRequest.
+---@field data? LSPAny
+
+
+---@class HoverClientCapabilities 
+--- Whether hover supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- Client supports the following content formats if the content
+--- property refers to a `literal of type MarkupContent`.
+--- The order describes the preferred format of the client.
+---@field contentFormat? MarkupKind[]
+
+
+---@class HoverOptions : WorkDoneProgressOptions 
+
+
+---@class HoverRegistrationOptions: TextDocumentRegistrationOptions, HoverOptions
+
+
+---@class HoverParams : TextDocumentPositionParams, WorkDoneProgressParams
+
+
+--- The result of a hover request.
+---@class Hover
+--- The hover's content.
+---@field contents MarkedString | MarkedString[] | MarkupContent
+--- An optional range is a range inside a text document
+--- that is used to visualize a hover, e.g. by changing the background color.
+---@field range? Range
+
+
+--- MarkedString can be used to render human readable text. It is either a
+--- markdown string or a code-block that provides a language and a code snippet.
+--- The language identifier is semantically equal to the optional language
+--- identifier in fenced code blocks in GitHub issues.
+---
+--- The pair of a language and a value is an equivalent to markdown:
+--- ```$language
+--- $value
+--- ```
+---
+--- Note that markdown strings will be sanitized - that means html will be
+--- escaped.
+---
+---@deprecated use MarkupContent instead.
+---@alias MarkedString string |  { language: string, value: string }
+
+
+---@class CodeLensClientCapabilities 
+--- Whether code lens supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- Whether the client supports resolving additional code lens
+--- properties via a separate `codeLens/resolve` request.
+---
+---@since 3.18.0
+---@field resolveSupport? ClientCodeLensResolveOptions
+
+---@since 3.18.0
+---@class ClientCodeLensResolveOptions
+--- The properties that a client can resolve lazily.
+---@field properties string[]
+
+
+---@class CodeLensOptions : WorkDoneProgressOptions 
+--- Code lens has a resolve provider as well.
+---@field resolveProvider? boolean
+
+
+---@class CodeLensRegistrationOptions : TextDocumentRegistrationOptions, CodeLensOptions 
+
+
+---@class CodeLensParams : WorkDoneProgressParams, PartialResultParams 
+--- The document to request code lens for.
+---@field textDocument TextDocumentIdentifier
+
+
+--- A code lens represents a command that should be shown along with
+--- source text, like the number of references, a way to run tests, etc.
+---
+--- A code lens is _unresolved_ when no command is associated to it. For
+--- performance reasons the creation of a code lens and resolving should be done
+--- in two stages.
+---@class CodeLens
+--- The range in which this code lens is valid. Should only span a single
+--- line.
+---@field range Range
+--- The command this code lens represents.
+---@field command? Command
+--- A data entry field that is preserved on a code lens item between
+--- a code lens and a code lens resolve request.
+---@field data? LSPAny
+
+
+---@class CodeLensWorkspaceClientCapabilities 
+--- Whether the client implementation supports a refresh request sent from the
+--- server to the client.
+---
+--- Note that this event is global and will force the client to refresh all
+--- code lenses currently shown. It should be used with absolute care and is
+--- useful for situation where a server, for example, detects a project wide
+--- change that requires such a calculation.
+---@field refreshSupport? boolean
+
 return M

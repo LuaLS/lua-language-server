@@ -1,7 +1,7 @@
 ---@class LSP
 local M = {}
 
-
+---@alias decimal number
 ---@alias uinteger integer
 
 ---@alias LSPAny LSPObject | LSPArray | string | number | boolean | nil
@@ -268,7 +268,7 @@ M.PositionEncodingKind = {
 ---@field pattern Pattern
 
 
----@alias GlobalPattern Pattern | RelativePattern
+---@alias GlobPattern Pattern | RelativePattern
 
 
 ---@class DocumentFilter
@@ -282,7 +282,7 @@ M.PositionEncodingKind = {
 ---
 --- Whether clients support relative patterns depends on the client
 --- capability `textDocuments.filters.relativePatternSupport`.
----@field pattern? GlobalPattern
+---@field pattern? GlobPattern
 
 
 ---@alias DocumentSelector DocumentFilter[]
@@ -3567,5 +3567,1449 @@ M.DocumentDiagnosticReportKind = {
 ---@since 3.17.0
 ---@class DiagnosticServerCancellationData
 ---@field retriggerRequest boolean
+
+
+--- Parameters of the workspace diagnostic request.
+---
+---@since 3.17.0
+---@class WorkspaceDiagnosticParams : WorkDoneProgressParams, PartialResultParams
+--- The additional identifier provided during registration.
+---@field identifier? string
+--- The currently known diagnostic reports with their
+--- previous result IDs.
+---@field previousResultIds PreviousResultId[]
+
+
+--- A previous result ID in a workspace pull request.
+---
+---@since 3.17.0
+---@class PreviousResultId
+--- The URI for which the client knows a
+--- result ID.
+---@field uri DocumentUri
+--- The value of the previous result ID.
+---@field value string
+
+
+--- A workspace diagnostic report.
+---
+---@since 3.17.0
+---@class WorkspaceDiagnosticReport
+---@field items WorkspaceDocumentDiagnosticReport[]
+
+
+--- A full document diagnostic report for a workspace diagnostic result.
+---
+---@since 3.17.0
+---@class WorkspaceFullDocumentDiagnosticReport : FullDocumentDiagnosticReport
+--- The URI for which diagnostic information is reported.
+---@field uri DocumentUri
+--- The version number for which the diagnostics are reported.
+--- If the document is not marked as open, `nil` can be provided.
+---@field version integer | nil
+
+
+--- An unchanged document diagnostic report for a workspace diagnostic result.
+---
+---@since 3.17.0
+---@class WorkspaceUnchangedDocumentDiagnosticReport : UnchangedDocumentDiagnosticReport
+--- The URI for which diagnostic information is reported.
+---@field uri DocumentUri
+--- The version number for which the diagnostics are reported.
+--- If the document is not marked as open, `nil` can be provided.
+---@field version integer | nil
+
+
+--- A workspace diagnostic document report.
+---
+---@since 3.17.0
+---@alias WorkspaceDocumentDiagnosticReport WorkspaceFullDocumentDiagnosticReport | WorkspaceUnchangedDocumentDiagnosticReport
+
+
+--- A partial result for a workspace diagnostic report.
+---
+---@since 3.17.0
+---@class WorkspaceDiagnosticReportPartialResult
+---@field items WorkspaceDocumentDiagnosticReport[]
+
+
+--- Workspace client capabilities specific to diagnostic pull requests.
+---
+---@since 3.17.0
+---@class DiagnosticWorkspaceClientCapabilities
+--- Whether the client implementation supports a refresh request sent from
+--- the server to the client.
+---
+--- Note that this event is global and will force the client to refresh all
+--- pulled diagnostics currently shown. It should be used with absolute care
+--- and is useful for situation where a server, for example, detects a project
+--- wide change that requires such a calculation.
+---@field refreshSupport? boolean
+
+
+---@class SignatureHelpClientCapabilities
+--- Whether signature help supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- The client supports the following `SignatureInformation`
+--- specific properties.
+---@field signatureInformation? SignatureHelpClientCapabilities.SignatureInformation
+--- The client supports sending additional context information for a
+--- `textDocument/signatureHelp` request. A client that opts into
+--- contextSupport will also support the `retriggerCharacters` on
+--- `SignatureHelpOptions`.
+---
+---@since 3.15.0
+---@field contextSupport? boolean
+
+
+---@class SignatureHelpClientCapabilities.SignatureInformation
+--- Client supports the following content formats for the documentation
+--- property. The order describes the preferred format of the client.
+---@field documentationFormat? MarkupKind[]
+--- Client capabilities specific to parameter information.
+---@field parameterInformation? { labelOffsetSupport?: boolean }
+--- The client supports the `activeParameter` property on
+--- `SignatureInformation` literal.
+---
+---@since 3.16.0
+---@field activeParameterSupport? boolean
+--- The client supports the `activeParameter` property on
+--- `SignatureHelp`/`SignatureInformation` being set to `nil` to
+--- indicate that no parameter should be active.
+---
+---@since 3.18.0
+---@field noActiveParameterSupport? boolean
+
+
+---@class SignatureHelpOptions : WorkDoneProgressOptions 
+--- The characters that trigger signature help
+--- automatically.
+---@field triggerCharacters? string[]
+--- List of characters that re-trigger signature help.
+---
+--- These trigger characters are only active when signature help is already
+--- showing. All trigger characters are also counted as re-trigger
+--- characters.
+---
+---@since 3.15.0
+---@field retriggerCharacters? string[]
+
+
+---@class SignatureHelpRegistrationOptions : TextDocumentRegistrationOptions, SignatureHelpOptions 
+
+
+---@class SignatureHelpParams : TextDocumentPositionParams, WorkDoneProgressParams
+--- The signature help context. This is only available if the client
+--- specifies to send this using the client capability
+--- `textDocument.signatureHelp.contextSupport === true`
+---
+---@since 3.15.0
+---@field context? SignatureHelpContext
+
+
+--- How a signature help was triggered.
+---
+---@since 3.15.0
+---@enum SignatureHelpTriggerKind
+M.SignatureHelpTriggerKind = {
+    --- Signature help was invoked manually by the user or by a command.
+    Invoked = 1,
+    --- Signature help was triggered by a trigger character.
+    TriggerCharacter = 2,
+    --- Signature help was triggered by the cursor moving or by the document
+    --- content changing.
+    ContentChange = 3,
+}
+
+
+--- Additional information about the context in which a signature help request
+--- was triggered.
+---
+---@since 3.15.0
+---@class SignatureHelpContext
+--- Action that caused signature help to be triggered.
+---@field triggerKind SignatureHelpTriggerKind
+--- Character that caused signature help to be triggered.
+---
+--- This is undefined when triggerKind !==
+--- SignatureHelpTriggerKind.TriggerCharacter
+---@field triggerCharacter? string
+--- `true` if signature help was already showing when it was triggered.
+---
+--- Retriggers occur when the signature help is already active and can be
+--- caused by actions such as typing a trigger character, a cursor move, or
+--- document content changes.
+---@field isRetrigger boolean
+--- The currently active `SignatureHelp`.
+---
+--- The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field
+--- updated based on the user navigating through available signatures.
+---@field activeSignatureHelp? SignatureHelp
+
+
+--- Signature help represents the signature of something
+--- callable. There can be multiple signatures,
+--- but only one active one and only one active parameter.
+---@class SignatureHelp
+--- One or more signatures. If no signatures are available,
+--- the signature help request should return `nil`.
+---@field signatures SignatureInformation[]
+--- The active signature. If omitted or the value lies outside the
+--- range of `signatures`, the value defaults to zero or is ignored if
+--- the `SignatureHelp` has no signatures.
+---
+--- Whenever possible, implementers should make an active decision about
+--- the active signature and shouldn't rely on a default value.
+---
+--- In future versions of the protocol, this property might become
+--- mandatory to better express this.
+---@field activeSignature? uinteger
+--- The active parameter of the active signature.
+---
+--- If `nil`, no parameter of the signature is active (for example, a named
+--- argument that does not match any declared parameters). This is only valid
+--- since 3.18.0 and if the client specifies the client capability
+--- `textDocument.signatureHelp.noActiveParameterSupport === true`.
+---
+--- If omitted or the value lies outside the range of
+--- `signatures[activeSignature].parameters`, it defaults to 0 if the active
+--- signature has parameters.
+---
+--- If the active signature has no parameters, it is ignored.
+---
+--- In future versions of the protocol this property might become
+--- mandatory (but still nilable) to better express the active parameter if
+--- the active signature does have any.
+---@field activeParameter? uinteger | nil
+
+
+--- Represents the signature of something callable. A signature
+--- can have a label, like a function-name, a doc-comment, and
+--- a set of parameters.
+---@class SignatureInformation
+--- The label of this signature. Will be shown in the UI.
+---@field label string
+--- The human-readable doc-comment of this signature.
+--- Will be shown in the UI but can be omitted.
+---@field documentation? string | MarkupContent
+--- The parameters of this signature.
+---@field parameters? ParameterInformation[]
+--- The index of the active parameter.
+---
+--- If `nil`, no parameter of the signature is active (for example, a named
+--- argument that does not match any declared parameters). This is only valid
+--- since 3.18.0 and if the client specifies the client capability
+--- `textDocument.signatureHelp.noActiveParameterSupport === true`.
+---
+--- If provided (or `nil`), this is used in place of
+--- `SignatureHelp.activeParameter`.
+---
+---@since 3.16.0
+---@field activeParameter? uinteger | nil
+
+
+--- Represents a parameter of a callable-signature. A parameter can
+--- have a label and a doc-comment.
+---@class ParameterInformation
+--- The label of this parameter information.
+---
+--- Either a string or an inclusive start and exclusive end offset within
+--- its containing signature label (see SignatureInformation.label). The
+--- offsets are based on a UTF-16 string representation, as `Position` and
+--- `Range` do.
+---
+--- To avoid ambiguities, a server should use the [start, end] offset value
+--- instead of using a substring. Whether a client support this is
+--- controlled via `labelOffsetSupport` client capability.
+---
+---*Note*: a label of type string should be a substring of its containing
+--- signature label. Its intended use case is to highlight the parameter
+--- label part in the `SignatureInformation.label`.
+---@field label string | [uinteger, uinteger]
+--- The human-readable doc-comment of this parameter. Will be shown
+--- in the UI but can be omitted.
+---@field documentation? string | MarkupContent
+
+
+---@class CodeActionClientCapabilities
+--- Whether code action supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- The client supports code action literals as a valid
+--- response of the `textDocument/codeAction` request.
+---
+---@since 3.8.0
+---@field codeActionLiteralSupport? { codeActionKind: { valueSet: CodeActionKind[] } }
+--- Whether code action supports the `isPreferred` property.
+---
+---@since 3.15.0
+---@field isPreferredSupport? boolean
+--- Whether code action supports the `disabled` property.
+---
+---@since 3.16.0
+---@field disabledSupport? boolean
+--- Whether code action supports the `data` property which is
+--- preserved between a `textDocument/codeAction` and a
+--- `codeAction/resolve` request.
+---
+---@since 3.16.0
+---@field dataSupport? boolean
+--- Whether the client supports resolving additional code action
+--- properties via a separate `codeAction/resolve` request.
+---
+---@since 3.16.0
+---@field resolveSupport? { properties: string[] }
+--- Whether the client honors the change annotations in
+--- text edits and resource operations returned via the
+--- `CodeAction#edit` property by, for example, presenting
+--- the workspace edit in the user interface and asking
+--- for confirmation.
+---
+---@since 3.16.0
+---@field honorsChangeAnnotations? boolean
+--- Whether the client supports documentation for a class of code actions.
+---
+---@since 3.18.0
+---@proposed
+---@field documentationSupport? boolean
+--- Client supports the tag property on a code action. Clients
+--- supporting tags have to handle unknown tags gracefully.
+---
+---@since 3.18.0 - proposed
+---@field tagSupport? { valueSet: CodeActionTag[] }
+
+
+--- Documentation for a class of code actions.
+---
+---@since 3.18.0
+---@proposed
+---@class CodeActionKindDocumentation
+--- The kind of the code action being documented.
+---
+--- If the kind is generic, such as `CodeActionKind.Refactor`, the
+--- documentation will be shown whenever any refactorings are returned. If
+--- the kind is more specific, such as `CodeActionKind.RefactorExtract`, the
+--- documentation will only be shown when extract refactoring code actions
+--- are returned.
+---@field kind CodeActionKind
+--- Command that is used to display the documentation to the user.
+---
+--- The title of this documentation code action is taken
+--- from {@linkcode Command.title}
+---@field command Command
+
+
+---@class CodeActionOptions : WorkDoneProgressOptions {
+--- CodeActionKinds that this server may return.
+---
+--- The list of kinds may be generic, such as `CodeActionKind.Refactor`,
+--- or the server may list out every specific kind they provide.
+---@field codeActionKinds? CodeActionKind[]
+--- Static documentation for a class of code actions.
+---
+--- Documentation from the provider should be shown in the code actions
+--- menu if either:
+---
+--- - Code actions of `kind` are requested by the editor. In this case,
+---   the editor will show the documentation that most closely matches the
+---   requested code action kind. For example, if a provider has
+---   documentation for both `Refactor` and `RefactorExtract`, when the
+---   user requests code actions for `RefactorExtract`, the editor will use
+---   the documentation for `RefactorExtract` instead of the documentation
+---   for `Refactor`.
+---
+--- - Any code actions of `kind` are returned by the provider.
+---
+--- At most one documentation entry should be shown per provider.
+---
+---@since 3.18.0
+---@proposed
+---@field documentation? CodeActionKindDocumentation[]
+--- The server provides support to resolve additional
+--- information for a code action.
+---
+---@since 3.16.0
+---@field resolveProvider? boolean
+
+
+---@class CodeActionRegistrationOptions : TextDocumentRegistrationOptions, CodeActionOptions
+
+
+--- Params for the CodeActionRequest.
+---@class CodeActionParams : WorkDoneProgressParams, PartialResultParams
+--- The document in which the command was invoked.
+---@field textDocument TextDocumentIdentifier
+--- The range for which the command was invoked.
+---@field range Range
+--- Context carrying additional information.
+---@field context CodeActionContext
+
+
+--- The kind of a code action.
+---
+--- Kinds are a hierarchical list of identifiers separated by `.`,
+--- e.g. `"refactor.extract.function"`.
+---
+--- The set of kinds is open and the client needs to announce
+--- the kinds it supports to the server during initialization.
+--- A set of predefined code action kinds.
+---@enum CodeActionKind
+M.CodeActionKind = {
+    --- Empty kind.
+    Empty = '',
+    --- Base kind for quickfix ---@field actions 'quickfix'.
+    QuickFix = 'quickfix',
+    --- Base kind for refactoring ---@field actions 'refactor'.
+    Refactor = 'refactor',
+    --- Base kind for refactoring extraction ---@field actions 'refactor.extract'.
+    ---
+    --- Example extract actions:
+    ---
+    --- - Extract method
+    --- - Extract function
+    --- - Extract variable
+    --- - Extract interface from class
+    --- - ...
+    RefactorExtract = 'refactor.extract',
+    --- Base kind for refactoring inline ---@field actions 'refactor.inline'.
+    ---
+    --- Example inline actions:
+    ---
+    --- - Inline function
+    --- - Inline variable
+    --- - Inline constant
+    --- - ...
+    RefactorInline = 'refactor.inline',
+    --- Base kind for refactoring move ---@field actions 'refactor.move'
+    ---
+    --- Example move actions:
+    ---
+    --- - Move a function to a new file
+    --- - Move a property between classes
+    --- - Move method to base class
+    --- - ...
+    ---
+    ---@since 3.18.0 - proposed
+    RefactorMove = 'refactor.move',
+    --- Base kind for refactoring rewrite ---@field actions 'refactor.rewrite'.
+    ---
+    --- Example rewrite actions:
+    ---
+    --- - Convert JavaScript function to class
+    --- - Add or remove parameter
+    --- - Encapsulate field
+    --- - Make method static
+    --- - ...
+    RefactorRewrite = 'refactor.rewrite',
+    --- Base kind for source ---@field actions `source`.
+    ---
+    --- Source code actions apply to the entire file.
+    Source = 'source',
+    --- Base kind for an organize imports source action:
+    --- `source.organizeImports`.
+    SourceOrganizeImports = 'source.organizeImports',
+    --- Base kind for a 'fix all' source ---@field action `source.fixAll`.
+    ---
+    --- 'Fix all' actions automatically fix errors that have a clear fix that
+    --- do not require user input. They should not suppress errors or perform
+    --- unsafe fixes such as generating new types or classes.
+    ---
+    ---@since 3.17.0
+    SourceFixAll = 'source.fixAll',
+    --- Base kind for all code actions applying to the entire notebook's scope. CodeActionKinds using
+    --- this should always begin with `notebook.`
+    ---
+    ---@since 3.18.0
+    Notebook = 'notebook',
+}
+
+
+--- Contains additional diagnostic information about the context in which
+--- a code action is run.
+---@class CodeActionContext
+--- An array of diagnostics known on the client side overlapping the range
+--- provided to the `textDocument/codeAction` request. They are provided so
+--- that the server knows which errors are currently presented to the user
+--- for the given range. There is no guarantee that these accurately reflect
+--- the error state of the resource. The primary parameter
+--- to compute code actions is the provided range.
+---
+--- Note that the client should check the `textDocument.diagnostic.markupMessageSupport`
+--- server capability before sending diagnostics with markup messages to a server.
+--- Diagnostics with markup messages should be excluded for servers that don't support
+--- them.
+---@field diagnostics Diagnostic[]
+--- Requested kind of actions to return.
+---
+--- Actions not of this kind are filtered out by the client before being
+--- shown, so servers can omit computing them.
+---@field only? CodeActionKind[]
+--- The reason why code actions were requested.
+---
+---@since 3.17.0
+---@field triggerKind? CodeActionTriggerKind
+
+
+--- The reason why code actions were requested.
+---
+---@since 3.17.0
+---@enum CodeActionTriggerKind
+M.CodeActionTriggerKind = {
+    --- Code actions were explicitly requested by the user or by an extension.
+    Invoked = 1,
+    --- Code actions were requested automatically.
+    ---
+    --- This typically happens when the current selection in a file changes,
+    --- but can also be triggered when file content changes.
+    Automatic = 2,
+}
+
+
+--- Code action tags are extra annotations that tweak the behavior of a code action.
+---
+---@since 3.18.0 - proposed
+---@enum CodeActionTag
+M.CodeActionTag = {
+    --- Marks the code action as LLM-generated.
+    LLMGenerated = 1,
+}
+
+
+--- A code action represents a change that can be performed in code, e.g. to fix
+--- a problem or to refactor code.
+---
+--- A CodeAction must set either `edit` and/or a `command`. If both are supplied,
+--- the `edit` is applied first, then the `command` is executed.
+---@class CodeAction
+--- A short, human-readable title for this code action.
+---@field title string
+--- The kind of the code action.
+---
+--- Used to filter code actions.
+---@field kind? CodeActionKind
+--- The diagnostics that this code action resolves.
+---@field diagnostics? Diagnostic[]
+--- Marks this as a preferred action. Preferred actions are used by the
+--- `auto fix` command and can be targeted by keybindings.
+---
+--- A quick fix should be marked preferred if it properly addresses the
+--- underlying error. A refactoring should be marked preferred if it is the
+--- most reasonable choice of actions to take.
+---
+---@since 3.15.0
+---@field isPreferred? boolean
+--- Marks that the code action cannot currently be applied.
+---
+--- Clients should follow the following guidelines regarding disabled code
+--- actions:
+---
+--- - Disabled code actions are not shown in automatic lightbulbs code
+---   action menus.
+---
+--- - Disabled actions are shown as faded out in the code action menu when
+---   the user request a more specific type of code action, such as
+---   refactorings.
+---
+--- - If the user has a keybinding that auto applies a code action and only
+---   a disabled code actions are returned, the client should show the user
+---   an error message with `reason` in the editor.
+---
+---@since 3.16.0
+---@field disabled? { reason: string }
+--- The workspace edit this code action performs.
+---@field edit? WorkspaceEdit
+--- A command this code action executes. If a code action
+--- provides an edit and a command, first the edit is
+--- executed and then the command.
+---@field command? Command
+--- A data entry field that is preserved on a code action between
+--- a `textDocument/codeAction` and a `codeAction/resolve` request.
+---
+---@since 3.16.0
+---@field data? LSPAny
+--- Tags for this code action.
+---
+---@since 3.18.0 - proposed
+---@field tags? CodeActionTag[]
+
+
+---@class DocumentColorClientCapabilities
+--- Whether document color supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+---@class DocumentColorOptions : WorkDoneProgressOptions 
+
+
+---@class DocumentColorRegistrationOptions : TextDocumentRegistrationOptions, StaticRegistrationOptions, DocumentColorOptions
+
+
+---@class DocumentColorParams : WorkDoneProgressParams, PartialResultParams
+--- The text document.
+---@field textDocument TextDocumentIdentifier
+
+
+---@class ColorInformation
+--- The range in the document where this color appears.
+---@field range Range
+--- The actual color value for this color range.
+---@field color Color
+
+
+--- Represents a color in RGBA space.
+---@class Color
+--- The red component of this color in the range [0-1].
+---@field red decimal
+--- The green component of this color in the range [0-1].
+---@field green decimal
+--- The blue component of this color in the range [0-1].
+---@field blue decimal
+--- The alpha component of this color in the range [0-1].
+---@field alpha decimal
+
+
+---@class ColorPresentationParams : WorkDoneProgressParams, PartialResultParams
+--- The text document.
+---@field textDocument TextDocumentIdentifier
+--- The color information to request presentations for.
+---@field color Color
+--- The range where the color would be inserted. Serves as a context.
+---@field range Range
+
+
+---@class ColorPresentation
+--- The label of this color presentation. It will be shown on the color
+--- picker header. By default, this is also the text that is inserted when
+--- selecting this color presentation.
+---@field label string
+--- An [edit](#TextEdit) which is applied to a document when selecting
+--- this presentation for the color. When omitted, the
+--- [label](#ColorPresentation.label) is used.
+---@field textEdit? TextEdit
+--- An optional array of additional [text edits](#TextEdit) that are applied
+--- when selecting this color presentation. Edits must not overlap with the
+--- main [edit](#ColorPresentation.textEdit) nor with themselves.
+---@field additionalTextEdits? TextEdit[]
+
+
+---@class DocumentFormattingClientCapabilities
+--- Whether formatting supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+---@class DocumentFormattingOptions : WorkDoneProgressOptions 
+
+
+---@class DocumentFormattingRegistrationOptions : TextDocumentRegistrationOptions, DocumentFormattingOptions
+
+
+---@class DocumentFormattingParams : WorkDoneProgressParams 
+--- The document to format.
+---@field textDocument TextDocumentIdentifier
+--- The formatting options.
+---@field options FormattingOptions
+
+
+--- Value-object describing what options formatting should use.
+---@class FormattingOptions
+--- Size of a tab in spaces.
+---@field tabSize uinteger
+--- Prefer spaces over tabs.
+---@field insertSpaces boolean
+--- Trim trailing whitespace on a line.
+---
+---@since 3.15.0
+---@field trimTrailingWhitespace? boolean
+--- Insert a newline character at the end of the file if one does not exist.
+---
+---@since 3.15.0
+---@field insertFinalNewline? boolean
+--- Trim all newlines after the final newline at the end of the file.
+---
+---@since 3.15.0
+---@field trimFinalNewlines? boolean
+--- Signature for further properties.
+---@field [string] boolean | integer | string
+
+
+---@class DocumentRangeFormattingClientCapabilities
+--- Whether formatting supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- Whether the client supports formatting multiple ranges at once.
+---
+---@since 3.18.0
+---@proposed
+---@field rangesSupport? boolean
+
+
+---@class DocumentRangeFormattingOptions : WorkDoneProgressOptions
+--- Whether the server supports formatting multiple ranges at once.
+---
+---@since 3.18.0
+---@proposed
+---@field rangesSupport? boolean
+
+
+---@class DocumentRangeFormattingRegistrationOptions : TextDocumentRegistrationOptions, DocumentRangeFormattingOptions
+
+
+---@class DocumentRangeFormattingParams : WorkDoneProgressParams 
+--- The document to format.
+---@field textDocument TextDocumentIdentifier
+--- The range to format.
+---@field range Range
+--- The formatting options.
+---@field options FormattingOptions
+
+
+---@class DocumentRangesFormattingParams : WorkDoneProgressParams 
+--- The document to format.
+---@field textDocument TextDocumentIdentifier
+--- The ranges to format.
+---@field ranges Range[]
+--- The format options.
+---@field options FormattingOptions
+
+
+---@class DocumentOnTypeFormattingClientCapabilities
+--- Whether on type formatting supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+---@class DocumentOnTypeFormattingOptions
+--- A character on which formatting should be triggered, like ``.
+---@field firstTriggerCharacter string
+--- More trigger characters.
+---@field moreTriggerCharacter? string[]
+
+
+---@class DocumentOnTypeFormattingRegistrationOptions : TextDocumentRegistrationOptions, DocumentOnTypeFormattingOptions
+
+
+---@class DocumentOnTypeFormattingParams
+--- The document to format.
+---@field textDocument TextDocumentIdentifier
+--- The position around which the on type formatting should happen.
+--- This is not necessarily the exact position where the character denoted
+--- by the property `ch` got typed.
+---@field position Position
+--- The character that has been typed that triggered the formatting
+--- on type request. That is not necessarily the last character that
+--- got inserted into the document since the client could auto insert
+--- characters as well (e.g. automatic brace completion).
+---@field ch string
+--- The formatting options.
+---@field options FormattingOptions
+
+
+---@enum PrepareSupportDefaultBehavior
+M.PrepareSupportDefaultBehavior = {
+    --- The client's default behavior is to select the identifier
+    --- according to the language's syntax rule.
+    Identifier = 1,
+}
+
+
+---@class RenameClientCapabilities
+--- Whether rename supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- Client supports testing for validity of rename operations
+--- before execution.
+---
+---@since version 3.12.0
+---@field prepareSupport? boolean
+--- Client supports the default behavior result
+--- (` ---@field defaultBehavior boolean `).
+---
+--- The value indicates the default behavior used by the
+--- client.
+---
+---@since version 3.16.0
+---@field prepareSupportDefaultBehavior? PrepareSupportDefaultBehavior
+--- Whether the client honors the change annotations in
+--- text edits and resource operations returned via the
+--- rename request's workspace edit by, for example, presenting
+--- the workspace edit in the user interface and asking
+--- for confirmation.
+---
+---@since 3.16.0
+---@field honorsChangeAnnotations? boolean
+
+
+---@class RenameOptions : WorkDoneProgressOptions 
+--- Renames should be checked and tested before being executed.
+---@field prepareProvider? boolean
+
+
+---@class RenameRegistrationOptions : TextDocumentRegistrationOptions, RenameOptions
+
+
+---@class RenameParams : TextDocumentPositionParams, WorkDoneProgressParams
+--- The new name of the symbol. If the given name is not valid, the
+--- request must return a [ResponseError](#ResponseError) with an
+--- appropriate message set.
+---@field newName string
+
+
+---@class PrepareRenameParams : TextDocumentPositionParams, WorkDoneProgressParams 
+
+
+---@class LinkedEditingRangeClientCapabilities
+--- Whether the implementation supports dynamic registration.
+--- If this is set to `true` the client supports the new
+--- `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+--- return value for the corresponding server capability as well.
+---@field dynamicRegistration? boolean
+
+
+---@class LinkedEditingRangeOptions : WorkDoneProgressOptions 
+
+
+---@class LinkedEditingRangeRegistrationOptions : TextDocumentRegistrationOptions, LinkedEditingRangeOptions, StaticRegistrationOptions
+
+
+---@class LinkedEditingRangeParams : TextDocumentPositionParams, WorkDoneProgressParams
+
+
+---@class LinkedEditingRanges
+--- A list of ranges that can be renamed together. The ranges must have
+--- identical length and contain identical text content. The ranges cannot
+--- overlap.
+---@field ranges Range[]
+--- An optional word pattern (regular expression) that describes valid
+--- contents for the given ranges. If no pattern is provided, the client
+--- configuration's word pattern will be used.
+---@field wordPattern? string
+
+
+--- Client capabilities specific to inline completions.
+---
+---@since 3.18.0
+---@class InlineCompletionClientCapabilities
+--- Whether implementation supports dynamic registration for inline
+--- completion providers.
+---@field dynamicRegistration? boolean
+
+
+--- Inline completion options used during static registration.
+---
+---@since 3.18.0
+---@class InlineCompletionOptions : WorkDoneProgressOptions
+
+
+--- Inline completion options used during static or dynamic registration.
+---
+---@since 3.18.0
+---@class InlineCompletionRegistrationOptions : InlineCompletionOptions, TextDocumentRegistrationOptions, StaticRegistrationOptions
+
+
+--- A parameter literal used in inline completion requests.
+---
+---@since 3.18.0
+---@class InlineCompletionParams : TextDocumentPositionParams, WorkDoneProgressParams
+--- Additional information about the context in which inline completions
+--- were requested.
+---@field context InlineCompletionContext
+
+
+--- Provides information about the context in which an inline completion was
+--- requested.
+---
+---@since 3.18.0
+---@class InlineCompletionContext
+--- Describes how the inline completion was triggered.
+---@field triggerKind InlineCompletionTriggerKind
+--- Provides information about the currently selected item in the
+--- autocomplete widget if it is visible.
+---
+--- If set, provided inline completions must extend the text of the
+--- selected item and use the same range, otherwise they are not shown as
+--- preview.
+--- As an example, if the document text is `console.` and the selected item
+--- is `.log` replacing the `.` in the document, the inline completion must
+--- also replace `.` and start with `.log`, for example `.log()`.
+---
+--- Inline completion providers are requested again whenever the selected
+--- item changes.
+---@field selectedCompletionInfo? SelectedCompletionInfo
+
+
+--- Describes how an @link InlineCompletionItemProvider inline completion
+--- provider was triggered.
+---
+---@since 3.18.0
+---@enum InlineCompletionTriggerKind
+M.InlineCompletionTriggerKind = {
+    --- Completion was triggered explicitly by a user gesture.
+    --- Return multiple completion items to enable cycling through them.
+    Invoked = 1,
+    --- Completion was triggered automatically while editing.
+    --- It is sufficient to return a single completion item in this case.
+    Automatic = 2,
+}
+
+
+--- Describes the currently selected completion item.
+---
+---@since 3.18.0
+---@class SelectedCompletionInfo
+--- The range that will be replaced if this completion item is accepted.
+---@field range Range
+--- The text the range will be replaced with if this completion is
+--- accepted.
+---@field text string
+
+
+--- Represents a collection of @link InlineCompletionItem inline completion
+--- items to be presented in the editor.
+---
+---@since 3.18.0
+---@class InlineCompletionList
+--- The inline completion items.
+---@field items InlineCompletionItem[]
+
+
+--- An inline completion item represents a text snippet that is proposed inline
+--- to complete text that is being typed.
+---
+---@since 3.18.0
+---@class InlineCompletionItem
+--- The text to replace the range with. Must be set.
+--- Is used both for the preview and the accept operation.
+---@field insertText string | StringValue
+--- A text that is used to decide if this inline completion should be
+--- shown. When `falsy`, the @link InlineCompletionItem.insertText is
+--- used.
+---
+--- An inline completion is shown if the text to replace is a prefix of the
+--- filter text.
+---@field filterText? string
+--- The range to replace.
+--- Must begin and end on the same line.
+---
+--- Prefer replacements over insertions to provide a better experience when
+--- the user deletes typed text.
+---@field range? Range
+--- An optional @link Command that is executed*after* inserting this
+--- completion.
+---@field command? Command
+
+
+---@class WorkspaceSymbolClientCapabilities
+--- Symbol request supports dynamic registration.
+---@field dynamicRegistration? boolean
+--- Specific capabilities for the `SymbolKind` in the `workspace/symbol`
+--- request.
+---@field symbolKind? { valueSet?: SymbolKind[] }
+--- The client supports tags on `SymbolInformation` and `WorkspaceSymbol`.
+--- Clients supporting tags have to handle unknown tags gracefully.
+---
+---@since 3.16.0
+---@field tagSupport? { valueSet: SymbolTag[] }
+--- The client supports partial workspace symbols. The client will send the
+--- request `workspaceSymbol/resolve` to the server to resolve additional
+--- properties.
+---
+---@since 3.17.0 - proposedState
+---@field resolveSupport? { properties: string[] }
+
+
+---@class WorkspaceSymbolOptions : WorkDoneProgressOptions 
+--- The server provides support to resolve additional
+--- information for a workspace symbol.
+---
+---@since 3.17.0
+---@field resolveProvider? boolean
+
+
+---@class WorkspaceSymbolRegistrationOptions : WorkspaceSymbolOptions 
+
+
+--- The parameters of a Workspace Symbol Request.
+---@class WorkspaceSymbolParams : WorkDoneProgressParams, PartialResultParams
+--- A query string to filter symbols by. Clients may send an empty
+--- string here to request all symbols.
+---
+--- The `query`-parameter should be interpreted in a*relaxed way* as editors
+--- will apply their own highlighting and scoring on the results. A good rule
+--- of thumb is to match case-insensitive and to simply check that the
+--- characters of*query* appear in their order in a candidate symbol.
+--- Servers shouldn't use prefix, substring, or similar strict matching.
+---@field query string
+
+
+--- A special workspace symbol that supports locations without a range.
+---
+---@since 3.17.0
+---@class WorkspaceSymbol
+--- The name of this symbol.
+---@field name string
+--- The kind of this symbol.
+---@field kind SymbolKind
+--- Tags for this completion item.
+---@field tags? SymbolTag[]
+--- The name of the symbol containing this symbol. This information is for
+--- user interface purposes (e.g. to render a qualifier in the user interface
+--- if necessary). It can't be used to re-infer a hierarchy for the document
+--- symbols.
+---@field containerName? string
+--- The location of this symbol. Whether a server is allowed to
+--- return a location without a range depends on the client
+--- capability `workspace.symbol.resolveSupport`.
+---
+--- See also `SymbolInformation.location`.
+---@field location Location | { uri: DocumentUri }
+--- A data entry field that is preserved on a workspace symbol between a
+--- workspace symbol request and a workspace symbol resolve request.
+---@field data? LSPAny
+
+
+---@class ConfigurationParams
+---@field items ConfigurationItem[]
+
+
+---@class ConfigurationItem
+--- The scope to get the configuration section for.
+---@field scopeUri? URI
+--- The configuration section asked for.
+---@field section? string
+
+
+---@class DidChangeConfigurationClientCapabilities
+--- Did change configuration notification supports dynamic registration.
+---
+---@since 3.6.0 to support the new pull model.
+---@field dynamicRegistration? boolean
+
+
+---@class DidChangeConfigurationParams
+--- The actual changed settings.
+---@field settings LSPAny
+
+
+---@class WorkspaceFoldersServerCapabilities
+--- The server has support for workspace folders.
+---@field supported? boolean
+--- Whether the server wants to receive workspace folder
+--- change notifications.
+---
+--- If a string is provided, the string is treated as an ID
+--- under which the notification is registered on the client
+--- side. The ID can be used to unregister for these events
+--- using the `client/unregisterCapability` request.
+---@field changeNotifications? string | boolean
+
+
+---@class WorkspaceFolder
+--- The associated URI for this workspace folder.
+---@field uri URI
+--- The name of the workspace folder. Used to refer to this
+--- workspace folder in the user interface.
+---@field name string
+
+
+---@class DidChangeWorkspaceFoldersParams
+--- The actual workspace folder change event.
+---@field event WorkspaceFoldersChangeEvent
+
+
+--- The workspace folder change event.
+---@class WorkspaceFoldersChangeEvent
+--- The array of added workspace folders.
+---@field added WorkspaceFolder[]
+--- The array of removed workspace folders.
+---@field removed WorkspaceFolder[]
+
+
+--- The options to register for file operations.
+---
+---@since 3.16.0
+---@class FileOperationRegistrationOptions
+--- The actual filters.
+---@field filters FileOperationFilter[]
+
+
+--- A pattern kind describing if a glob pattern matches a file,
+--- a folder, or both.
+---
+---@since 3.16.0
+---@enum FileOperationPatternKind
+M.FileOperationPatternKind = {
+    --- The pattern matches a file only.
+    file = 'file',
+    --- The pattern matches a folder only.
+    folder = 'folder',
+}
+
+
+--- Matching options for the file operation pattern.
+---
+---@since 3.16.0
+---@class FileOperationPatternOptions
+--- The pattern should be matched ignoring casing.
+---@field ignoreCase? boolean
+
+
+--- A pattern to describe in which file operation requests or notifications
+--- the server is interested in.
+---
+---@since 3.16.0
+---@class FileOperationPattern
+--- The glob pattern to match. Glob patterns can have the following syntax:
+--- - `*` to match one or more characters in a path segment
+--- - `?` to match on one character in a path segment
+--- - `**` to match any number of path segments, including none
+--- - `` to group sub patterns into an OR expression. (e.g. `**鈥?*.ts,js`
+---   matches all TypeScript and JavaScript files)
+--- - `[]` to declare a range of characters to match in a path segment
+---   (e.g., `example.[0-9]` to match on `example.0`, `example.1`, 鈥?
+--- - `[!...]` to negate a range of characters to match in a path segment
+---   (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but
+---   not `example.0`)
+---@field glob string
+--- Whether to match files or folders with this pattern.
+---
+--- Matches both if undefined.
+---@field matches? FileOperationPatternKind
+--- Additional options used during matching.
+---@field options? FileOperationPatternOptions
+
+
+--- A filter to describe in which file operation requests or notifications
+--- the server is interested in.
+---
+---@since 3.16.0
+---@class FileOperationFilter
+--- A URI scheme, like `file` or `untitled`.
+---@field scheme? string
+--- The actual file operation pattern.
+---@field pattern FileOperationPattern
+
+
+--- The parameters sent in notifications/requests for user-initiated creation
+--- of files.
+---
+---@since 3.16.0
+---@class CreateFilesParams
+--- An array of all files/folders created in this operation.
+---@field files FileCreate[]
+
+
+--- Represents information on a file/folder create.
+---
+---@since 3.16.0
+---@class FileCreate
+--- A file:// URI for the location of the file/folder being created.
+---@field uri string
+
+
+--- The parameters sent in notifications/requests for user-initiated renames
+--- of files.
+---
+---@since 3.16.0
+---@class RenameFilesParams
+--- An array of all files/folders renamed in this operation. When a folder
+--- is renamed, only the folder will be included, and not its children.
+---@field files FileRename[]
+
+
+--- Represents information on a file/folder rename.
+---
+---@since 3.16.0
+---@class FileRename
+--- A file:// URI for the original location of the file/folder being renamed.
+---@field oldUri string
+--- A file:// URI for the new location of the file/folder being renamed.
+---@field newUri string
+
+
+--- The parameters sent in notifications/requests for user-initiated deletes
+--- of files.
+---
+---@since 3.16.0
+---@class DeleteFilesParams
+--- An array of all files/folders deleted in this operation.
+---@field files FileDelete[]
+
+
+--- Represents information on a file/folder delete.
+---
+---@since 3.16.0
+---@class FileDelete
+--- A file:// URI for the location of the file/folder being deleted.
+---@field uri string
+
+
+---@class DidChangeWatchedFilesClientCapabilities
+--- Did change watched files notification supports dynamic registration.
+--- Please note that the current protocol doesn't support static
+--- configuration for file changes from the server side.
+---@field dynamicRegistration? boolean
+--- Whether the client has support for relative patterns
+--- or not.
+---
+---@since 3.17.0
+---@field relativePatternSupport? boolean
+
+
+--- Describe options to be used when registering for file system change events.
+---@class DidChangeWatchedFilesRegistrationOptions
+--- The watchers to register.
+---@field watchers FileSystemWatcher[]
+
+
+---@class FileSystemWatcher
+--- The glob pattern to watch. See @link GlobPattern glob pattern
+--- for more detail.
+---
+---@since 3.17.0 support for relative patterns.
+---@field globPattern GlobPattern
+--- The kind of events of interest. If omitted, it defaults
+--- to WatchKind.Create | WatchKind.Change | WatchKind.Delete
+--- which is 7.
+---@field kind? WatchKind
+
+
+---@enum WatchKind
+M.WatchKind = {
+    --- Interested in create events.
+    Create = 1,
+    --- Interested in change events.
+    Change = 2,
+    --- Interested in delete events.
+    Delete = 4,
+}
+
+
+---@class DidChangeWatchedFilesParams
+--- The actual file events.
+---@field changes FileEvent[]
+
+
+--- An event describing a file change.
+---@class FileEvent
+--- The file's URI.
+---@field uri DocumentUri
+--- The change type.
+---@field type FileChangeType
+
+
+--- The file event type.
+---@enum FileChangeType
+M.FileChangeType = {
+    --- The file got created.
+    Created = 1,
+    --- The file got changed.
+    Changed = 2,
+    --- The file got deleted.
+    Deleted = 3,
+}
+
+
+---@class ExecuteCommandClientCapabilities
+--- Execute command supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+---@class ExecuteCommandOptions : WorkDoneProgressOptions 
+--- The commands to be executed on the server.
+---@field commands string[]
+
+
+--- Execute command registration options.
+---@class ExecuteCommandRegistrationOptions : ExecuteCommandOptions
+
+
+---@class ExecuteCommandParams : WorkDoneProgressParams 
+--- The identifier of the actual command handler.
+---@field command string
+--- Arguments that the command should be invoked with.
+---@field arguments? LSPAny[]
+
+
+---@class ApplyWorkspaceEditParams
+--- An optional label of the workspace edit. This label is
+--- presented in the user interface, for example, on an undo
+--- stack to undo the workspace edit.
+---@field label? string
+--- The edits to apply.
+---@field edit WorkspaceEdit
+--- Additional data about the edit.
+---
+---@since 3.18.0
+---@proposed
+---@field metadata? WorkspaceEditMetadata
+
+
+--- Additional data about a workspace edit.
+---
+---@since 3.18.0
+---@proposed
+---@class WorkspaceEditMetadata
+--- Signal to the editor that this edit is a refactoring.
+---@field isRefactoring? boolean
+
+
+---@class ApplyWorkspaceEditResult
+--- Indicates whether the edit was applied or not.
+---@field applied boolean
+--- An optional textual description for why the edit was not applied.
+--- This may be used by the server for diagnostic logging or to provide
+--- a suitable error for a request that triggered the edit.
+---@field failureReason? string
+--- Depending on the client's failure handling strategy, `failedChange`
+--- might contain the index of the change that failed. This property is
+--- only available if the client signals a `failureHandling` strategy
+--- in its client capabilities.
+---@field failedChange? uinteger
+
+
+--- Client capabilities for a text document content provider.
+---
+---@since 3.18.0
+---@class TextDocumentContentClientCapabilities
+--- Text document content provider supports dynamic registration.
+---@field dynamicRegistration? boolean
+
+
+--- Text document content provider options.
+---
+---@since 3.18.0
+---@class TextDocumentContentOptions
+--- The schemes for which the server provides content.
+---@field schemes string[]
+
+
+--- Text document content provider registration options.
+---
+---@since 3.18.0
+---@class TextDocumentContentRegistrationOptions : TextDocumentContentOptions, StaticRegistrationOptions
+
+
+--- Parameters for the `workspace/textDocumentContent` request.
+---
+---@since 3.18.0
+---@class TextDocumentContentParams
+--- The uri of the text document.
+---@field uri DocumentUri
+
+
+--- Result of the `workspace/textDocumentContent` request.
+---
+---@since 3.18.0
+---@proposed
+---@class TextDocumentContentResult
+--- The text content of the text document. Please note, that the content of
+--- any subsequent open notifications for the text document might differ
+--- from the returned content due to whitespace and line ending
+--- normalizations done on the client
+---@field text string
+
+
+--- Parameters for the `workspace/textDocumentContent/refresh` request.
+---
+---@since 3.18.0
+---@class TextDocumentContentRefreshParams
+--- The uri of the text document to refresh.
+---@field uri DocumentUri
+
+
+---@class ShowMessageParams
+--- The message type. See @link MessageType.
+---@field type MessageType
+--- The actual message.
+---@field message string
+
+
+---@enum MessageType
+M.MessageType = {
+    --- An error message.
+    Error = 1,
+    --- A warning message.
+    Warning = 2,
+    --- An information message.
+    Info = 3,
+    --- A log message.
+    Log = 4,
+    --- A debug message.
+    ---
+    ---@since 3.18.0
+    Debug = 5,
+}
+
+
+--- Show message request client capabilities
+---@class ShowMessageRequestClientCapabilities
+--- Capabilities specific to the `MessageActionItem` type.
+---@field messageActionItem? { additionalPropertiesSupport?: boolean }
+
+
+---@class ShowMessageRequestParams
+--- The message type. See @link MessageType.
+---@field type MessageType
+--- The actual message.
+---@field message string
+--- The message action items to present.
+---@field actions? MessageActionItem[]
+
+
+---@class MessageActionItem
+--- A short title like 'Retry', 'Open Log' etc.
+---@field title string
+
+
+--- Client capabilities for the show document request.
+---
+---@since 3.16.0
+---@class ShowDocumentClientCapabilities
+--- The client has support for the show document
+--- request.
+---@field support boolean
+
+
+--- Params to show a resource.
+---
+---@since 3.16.0
+---@class ShowDocumentParams
+--- The URI to show.
+---@field uri URI
+--- Indicates to show the resource in an external program.
+--- To show, for example, `https:--code.visualstudio.com/`
+--- in the default web browser, set `external` to `true`.
+---@field external? boolean
+--- An optional property to indicate whether the editor
+--- showing the document should take focus or not.
+--- Clients might ignore this property if an external
+--- program is started.
+---@field takeFocus? boolean
+--- An optional selection range if the document is a text
+--- document. Clients might ignore this property if an
+--- external program is started or the file is not a text
+--- file.
+---@field selection? Range
+
+
+--- The result of a show document request.
+---
+---@since 3.16.0
+---@class ShowDocumentResult
+--- A boolean indicating if the show was successful.
+---@field success boolean
+
+
+---@class LogMessageParams
+--- The message type. See @link MessageType.
+---@field type MessageType
+--- The actual message.
+---@field message string
+
+
+---@class WorkDoneProgressCreateParams
+--- The token to be used to report progress.
+---@field token ProgressToken
+
+
+---@class WorkDoneProgressCancelParams
+--- The token to be used to report progress.
+---@field token ProgressToken
 
 return M

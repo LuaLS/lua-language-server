@@ -2,8 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `CHG` When analyzing the literal table, only the first 100 items are analyzed at most.
-* `CHG` When checking type matching for union types, only the first 100 items are checked at most.
+* `CHG` when analyzing the literal table, only the first 100 items are analyzed at most
+* `CHG` when checking type matching for union types, only the first 100 items are checked at most
+* `FIX` Update `--help` message.
 * `FIX` --check now respects ignoreDir setting
 * `FIX` incorrect argument skip pattern for `--check_out_path=`, which incorrectly skips the next argument
 

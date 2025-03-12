@@ -4606,6 +4606,31 @@ local a = {}
 function a:func(<?x?>) end
 ]]
 
+-- #3089
+TEST 'fun(x: number, y: number)' [[
+---@class Person
+---@field age? number
+---@field foo fun(x: number, y: number)
+
+---@param person Person
+local function test(person)
+    if person.foo ~= nil then
+        local <?b?> = person.foo
+    end
+end
+]]
+
+-- #2952
+TEST 'A' [[
+---@class A
+---@field b {[C]:D}
+local A
+
+if A.b ~= {} then
+    local C = <?A?>
+end
+]]
+
 TEST 'A' [[
 ---@class A
 ---@field type 'a'
@@ -4716,6 +4741,46 @@ TEST 'string' [[
 local function f(v) end
 
 local <?r?> = f('')
+]]
+
+TEST 'A' [[
+---@class A
+local A = {}
+
+---@generic T
+---@param self T
+---@param s string
+---@return T
+function A:f(s) end
+
+---@generic T
+---@param self T
+---@param i integer
+---@return T
+function A:f(i) end
+
+local <?r?> = A:f('')
+]]
+
+TEST 'B' [[
+---@class A
+local A = {}
+
+---@generic T
+---@param self T
+---@param s string
+---@return T
+function A:f(s) end
+
+---@generic T
+---@param self T
+---@param i integer
+---@return T
+function A:f(i) end
+
+---@class B: A
+local B = {}
+local <?r?> = B:f('')
 ]]
 
 TEST 'integer' [[

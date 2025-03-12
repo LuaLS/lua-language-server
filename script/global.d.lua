@@ -109,3 +109,5 @@ THREAD_ID = 1
 CHECK_WORKER = ''
 
 QUIET = false
+
+HELP = false

@@ -178,7 +178,10 @@ local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (_suri, source, key, pushResult)
         local hasFiled = false
-        for _, field in ipairs(source) do
+        for i, field in ipairs(source) do
+            if i > 100 then
+                break
+            end
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 local fieldKey = guide.getKeyName(field)
@@ -641,20 +644,11 @@ local function matchCall(source)
         newNode.originNode = myNode
         vm.setNode(source, newNode, true)
         if call.args then
-            -- clear existing node caches of args to allow recomputation with the type narrowed call
+            -- recompile existing node caches of args to allow recomputation with the type narrowed call
             for _, arg in ipairs(call.args) do
                 if vm.getNode(arg) then
-                    vm.setNode(arg, vm.createNode(), true)
-                end
-            end
-            for n in newNode:eachObject() do
-                if n.type == 'function'
-                or n.type == 'doc.type.function' then
-                    for i, arg in ipairs(call.args) do
-                        if vm.getNode(arg) and n.args[i] then
-                            vm.setNode(arg, vm.compileNode(n.args[i]))
-                        end
-                    end
+                    vm.removeNode(arg)
+                    vm.compileNode(arg)
                 end
             end
         end

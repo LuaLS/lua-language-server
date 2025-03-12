@@ -373,7 +373,12 @@ function vm.isSubType(uri, child, parent, mark, errs)
     elseif child.type == 'vm.node' then
         if config.get(uri, 'Lua.type.weakUnionCheck') then
             local hasKnownType = 0
+            local i = 0
             for n in child:eachObject() do
+                i = i + 1
+                if i > 100 then
+                    break
+                end
                 if vm.getNodeName(n) then
                     local res = vm.isSubType(uri, n, parent, mark, errs)
                     if res == true then
@@ -397,7 +402,12 @@ function vm.isSubType(uri, child, parent, mark, errs)
         else
             local weakNil = config.get(uri, 'Lua.type.weakNilCheck')
             local skipTable
+            local i = 0
             for n in child:eachObject() do
+                i = i + 1
+                if i > 100 then
+                    break
+                end
                 if skipTable == nil and n.type == "table" and parent.type == "vm.node" then -- skip table type check if child has class
                     ---@cast parent vm.node
                     for _, c in ipairs(child) do
@@ -462,7 +472,12 @@ function vm.isSubType(uri, child, parent, mark, errs)
         parent = global
     elseif parent.type == 'vm.node' then
         local hasKnownType = 0
+        local i = 0
         for n in parent:eachObject() do
+            i = i + 1
+            if i > 100 then
+                break
+            end
             if vm.getNodeName(n) then
                 local res = vm.isSubType(uri, child, n, mark, errs)
                 if res == true then

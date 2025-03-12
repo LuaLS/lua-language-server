@@ -178,7 +178,10 @@ local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (_suri, source, key, pushResult)
         local hasFiled = false
-        for _, field in ipairs(source) do
+        for i, field in ipairs(source) do
+            if i > 100 then
+                break
+            end
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 local fieldKey = guide.getKeyName(field)

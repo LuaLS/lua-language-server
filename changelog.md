@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.13.8
+`2025-3-12`
 * `CHG` when analyzing the literal table, only the first 100 items are analyzed at most
 * `CHG` when checking type matching for union types, only the first 100 items are checked at most
 * `FIX` Update `--help` message.

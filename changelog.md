@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.13.9
+`2025-3-13`
 * `CHG` remove the limit for analyzing the literal table
 
 ## 3.13.8

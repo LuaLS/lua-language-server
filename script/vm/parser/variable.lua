@@ -9,14 +9,15 @@ end)
 ---@param runner VM.Runner
 ---@param source LuaParser.Node.Base
 ---@param variable Node.Variable
+---@return Node?
 local function bindVariableWithClass(runner, source, variable)
     local catGroup = runner:getCatGroup(source)
     if not catGroup then
-        return
+        return nil
     end
     local first = catGroup[1]
     if first.value.kind ~= 'catclass' then
-        return
+        return nil
     end
     local class = runner:parse(first)
     ---@cast class Node.Type
@@ -27,6 +28,32 @@ local function bindVariableWithClass(runner, source, variable)
         class:removeVariable(variable)
         variable:removeClass(class)
     end)
+
+    return class
+end
+
+---@param runner VM.Runner
+---@param source LuaParser.Node.Base
+---@param variable Node.Variable
+---@return Node?
+local function bindVariableWithType(runner, source, variable)
+    local catGroup = runner:getCatGroup(source)
+    if not catGroup then
+        return nil
+    end
+    local tnode
+    for _, cat in ipairs(catGroup) do
+        if cat.value.kind == 'cattype' then
+            tnode = runner:parse(cat)
+        end
+    end
+    if not tnode then
+        return nil
+    end
+
+    variable:addType(tnode)
+
+    return tnode
 end
 
 ls.vm.registerRunnerParser('var', function (runner, source)
@@ -78,8 +105,22 @@ ls.vm.registerRunnerParser('local', function (runner, source)
     local variable = runner.node.variable(source.id)
     runner:setVariable(source, variable)
 
+    local bindType = bindVariableWithType(runner, source, variable)
+    if bindType then
+        return
+    end
+
     if source.value then
         local vnode = runner:parse(source.value)
+
+        -- 如果局部变量没有其他赋值，那么认为是个常量
+        if  vnode.kind == 'value'
+        and source.value.isLiteral
+        and #source.sets > 0 then
+            ---@cast vnode Node.Value
+            return runner.node.type(vnode.typeName)
+        end
+
         if vnode.kind == 'table' then
             ---@cast vnode Node.Table
             if vnode.fields then
@@ -88,6 +129,7 @@ ls.vm.registerRunnerParser('local', function (runner, source)
                 end
             end
         end
+
         return vnode
     end
 end)

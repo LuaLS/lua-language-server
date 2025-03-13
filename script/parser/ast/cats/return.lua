@@ -1,7 +1,7 @@
 
 ---@class LuaParser.Node.CatReturn: LuaParser.Node.Base
 ---@field key? LuaParser.Node.CatReturnName
----@field value LuaParser.Node.CatType
+---@field value CatExp
 local CatReturn = Class('LuaParser.Node.CatReturn', 'LuaParser.Node.Base')
 
 CatReturn.kind = 'catreturn'
@@ -19,7 +19,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@private
 ---@return LuaParser.Node.CatReturn?
 function Ast:parseCatReturn()
-    local value = self:parseCatType(true)
+    local value = self:parseCatExp(true)
     if not value then
         return nil
     end

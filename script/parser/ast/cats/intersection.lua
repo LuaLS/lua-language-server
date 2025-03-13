@@ -2,7 +2,7 @@ local class = require'class'
 
 ---@class LuaParser.Node.CatIntersection: LuaParser.Node.Base
 ---@field poses integer[] # 所有 & 的位置
----@field exps LuaParser.Node.CatType[] # 所有的子表达式
+---@field exps CatExp[] # 所有的子表达式
 local Intersection = Class('LuaParser.Node.CatIntersection', 'LuaParser.Node.Base')
 
 Intersection.kind = 'catintersection'
@@ -12,7 +12,7 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean
----@return LuaParser.Node.CatType?
+---@return CatExp?
 function Ast:parseCatIntersection(required)
     local first = self:parseCatTerm(required)
     if not first then

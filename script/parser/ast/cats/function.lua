@@ -18,7 +18,7 @@ CatFunction.kind = 'catfunction'
 
 ---@class LuaParser.Node.CatGeneric: LuaParser.Node.Base
 ---@field id LuaParser.Node.CatID
----@field extends? LuaParser.Node.CatType
+---@field extends? CatExp
 ---@field symbolPos? integer # 冒号的位置
 local CatGeneric = Class('LuaParser.Node.CatGeneric', 'LuaParser.Node.Base')
 
@@ -28,7 +28,7 @@ CatGeneric.kind = 'catgeneric'
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatFuncParamName
 ---@field symbolPos? integer # 冒号的位置
----@field value? LuaParser.Node.CatType
+---@field value? CatExp
 local CatFuncParam = Class('LuaParser.Node.CatFuncParam', 'LuaParser.Node.Base')
 
 CatFuncParam.kind = 'catfuncparam'
@@ -45,7 +45,7 @@ CatFuncParamName.kind = 'catfuncparamname'
 ---@field parent LuaParser.Node.CatFunction
 ---@field name? LuaParser.Node.CatFuncReturnName
 ---@field symbolPos? integer # 冒号的位置
----@field value? LuaParser.Node.CatType
+---@field value? CatExp
 local CatFuncReturn = Class('LuaParser.Node.CatFuncReturn', 'LuaParser.Node.Base')
 
 CatFuncReturn.kind = 'catfuncreturn'
@@ -55,7 +55,7 @@ CatFuncReturn.kind = 'catfuncreturn'
 ---@field index integer
 ---@field id string
 ---@field name? LuaParser.Node.CatFuncReturnName
----@field value LuaParser.Node.CatType
+---@field value CatExp
 ---@field symbolPos? integer # 冒号的位置
 local CatFuncReturnName = Class('LuaParser.Node.CatFuncReturnName', 'LuaParser.Node.Base')
 
@@ -171,7 +171,7 @@ function Ast:parseCatFuncParam(required)
     if param.symbolPos then
 
         self:skipSpace()
-        param.value = self:parseCatType()
+        param.value = self:parseCatExp()
         if param.value then
             param.value.parent = param
         end
@@ -220,7 +220,7 @@ function Ast:parseCatFuncReturn(required)
 
     local value
     if not name or symbolPos then
-        value = self:parseCatType()
+        value = self:parseCatExp()
     end
 
     if not name and not value then
@@ -272,7 +272,7 @@ function Ast:parseCatGeneric()
     if generic.symbolPos then
 
         self:skipSpace()
-        generic.extends = self:parseCatType()
+        generic.extends = self:parseCatExp()
         if generic.extends then
             generic.extends.parent = generic
         end

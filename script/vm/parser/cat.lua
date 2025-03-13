@@ -195,3 +195,14 @@ ls.vm.registerRunnerParser('catreturn', function (runner, source)
 
     runner:addToCatGroup(source.parent, true)
 end)
+
+ls.vm.registerRunnerParser('cattype', function (runner, source)
+    ---@cast source CatExp
+
+    local class = runner.node.type(source.id)
+
+    runner:clearCatGroup()
+    runner:addToCatGroup(source.parent)
+
+    return class
+end)

@@ -1,5 +1,5 @@
 ---@class LuaParser.Node.CatTuple: LuaParser.Node.Base
----@field exps LuaParser.Node.CatType[]
+---@field exps CatExp[]
 local CatTuple = Class('LuaParser.Node.CatTuple', 'LuaParser.Node.Base')
 
 CatTuple.kind = 'cattuple'

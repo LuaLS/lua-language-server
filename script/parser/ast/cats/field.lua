@@ -1,7 +1,7 @@
 
 ---@class LuaParser.Node.CatField: LuaParser.Node.Base
 ---@field key LuaParser.Node.CatFieldName
----@field value? LuaParser.Node.CatType
+---@field value? CatExp
 local CatField = Class('LuaParser.Node.CatField', 'LuaParser.Node.Base')
 
 CatField.kind = 'catfield'
@@ -33,7 +33,7 @@ function Ast:parseCatField()
 
     self:skipSpace()
 
-    catField.value = self:parseCatType(true)
+    catField.value = self:parseCatExp(true)
 
     catField.finish = self:getLastPos()
 

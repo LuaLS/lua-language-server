@@ -1,7 +1,7 @@
 ---@class LuaParser.Node.CatClass: LuaParser.Node.Base
 ---@field classID LuaParser.Node.CatID
 ---@field symbolPos? integer # :的位置
----@field extends? LuaParser.Node.CatType[]
+---@field extends? CatExp[]
 local CatClass = Class('LuaParser.Node.CatClass', 'LuaParser.Node.Base')
 
 CatClass.kind = 'catclass'
@@ -27,7 +27,7 @@ function Ast:parseCatClass()
     local symbolPos = self.lexer:consume ':'
     if symbolPos then
         catClass.symbolPos = symbolPos
-        catClass.extends = self:parseList(true, true, self.parseCatType)
+        catClass.extends = self:parseList(true, true, self.parseCatExp)
         for _, extend in ipairs(catClass.extends) do
             extend.parent = catClass
         end

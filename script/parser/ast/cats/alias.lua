@@ -1,6 +1,6 @@
 ---@class LuaParser.Node.CatAlias: LuaParser.Node.Base
 ---@field aliasID LuaParser.Node.CatID
----@field extends? LuaParser.Node.CatType
+---@field extends? CatExp
 local CatAlias = Class('LuaParser.Node.CatAlias', 'LuaParser.Node.Base')
 
 CatAlias.kind = 'catalias'
@@ -23,7 +23,7 @@ function Ast:parseCatAlias()
 
     aliasID.parent = catAlias
 
-    local extends = self:parseCatType(true)
+    local extends = self:parseCatExp(true)
     if extends then
         catAlias.extends = extends
         extends.parent = catAlias

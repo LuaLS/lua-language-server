@@ -1,7 +1,7 @@
 
 ---@class LuaParser.Node.CatParam: LuaParser.Node.Base
 ---@field key LuaParser.Node.CatParamName
----@field value? LuaParser.Node.CatType
+---@field value? CatExp
 local CatParam = Class('LuaParser.Node.CatParam', 'LuaParser.Node.Base')
 
 CatParam.kind = 'catparam'
@@ -33,7 +33,7 @@ function Ast:parseCatParam()
 
     self:skipSpace()
 
-    catParam.value = self:parseCatType(true)
+    catParam.value = self:parseCatExp(true)
 
     if catParam.value then
         catParam.value.parent = catParam

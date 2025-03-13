@@ -6,8 +6,8 @@ CatTable.kind = 'cattable'
 
 ---@class LuaParser.Node.CatTableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index'
----@field key? LuaParser.Node.CatTableFieldID | LuaParser.Node.CatType
----@field value? LuaParser.Node.CatType
+---@field key? LuaParser.Node.CatTableFieldID | CatExp
+---@field value? CatExp
 ---@field symbolPos? integer
 ---@field symbolPos2? integer
 ---@field parent LuaParser.Node.CatTable
@@ -108,7 +108,7 @@ function Ast:parseCatTableFieldAsField()
     self:skipSpace()
     if self.lexer:consume ':' then
         self:skipSpace()
-        value = self:parseCatType(true)
+        value = self:parseCatExp(true)
     end
 
     local tfield = self:createNode('LuaParser.Node.CatTableField', {
@@ -134,7 +134,7 @@ function Ast:parseCatTableFieldAsIndex()
     end
     self.lexer:next()
     self:skipSpace()
-    local key = self:parseCatType(true)
+    local key = self:parseCatExp(true)
     self:skipSpace()
     local pos2 = self:assertSymbol ']'
     self:skipSpace()
@@ -142,7 +142,7 @@ function Ast:parseCatTableFieldAsIndex()
     local value
     if self.lexer:consume ':' then
         self:skipSpace()
-        value = self:parseCatType(true)
+        value = self:parseCatExp(true)
     end
     local tfield = self:createNode('LuaParser.Node.CatTableField', {
         subtype = 'index',

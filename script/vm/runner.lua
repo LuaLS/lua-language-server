@@ -52,6 +52,14 @@ function M:index()
     self.state = 'indexed'
 end
 
+function M:run()
+    if self.state ~= 'indexed' then
+        return
+    end
+    self.state = 'running'
+    self.state = 'runned'
+end
+
 ---@param source LuaParser.Node.Base
 ---@return Node
 function M:parse(source)

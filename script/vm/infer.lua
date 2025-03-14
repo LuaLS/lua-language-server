@@ -473,7 +473,8 @@ function mt:view(uri, default)
         end
     end
 
-    if #view > 200 then
+    -- do not truncate if exporting doc
+    if not DOC and #view > 200 then
         view = view:sub(1, 180) .. '...(too long)...' .. view:sub(-10)
     end
 

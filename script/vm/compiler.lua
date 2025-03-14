@@ -304,6 +304,17 @@ local searchFieldSwitch = util.switch()
             end
         end
     end)
+    : case 'doc.type.sign'
+    : call(function (suri, source, key, pushResult)
+        if not source.node[1] then
+            return
+        end
+        local global = vm.getGlobal('type', source.node[1])
+        if not global then
+            return
+        end
+        vm.getClassFields(suri, global, key, pushResult)
+    end)
     : case 'global'
     : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
@@ -630,20 +641,11 @@ local function matchCall(source)
         newNode.originNode = myNode
         vm.setNode(source, newNode, true)
         if call.args then
-            -- clear existing node caches of args to allow recomputation with the type narrowed call
+            -- recompile existing node caches of args to allow recomputation with the type narrowed call
             for _, arg in ipairs(call.args) do
                 if vm.getNode(arg) then
-                    vm.setNode(arg, vm.createNode(), true)
-                end
-            end
-            for n in newNode:eachObject() do
-                if n.type == 'function'
-                or n.type == 'doc.type.function' then
-                    for i, arg in ipairs(call.args) do
-                        if vm.getNode(arg) and n.args[i] then
-                            vm.setNode(arg, vm.compileNode(n.args[i]))
-                        end
-                    end
+                    vm.removeNode(arg)
+                    vm.compileNode(arg)
                 end
             end
         end
@@ -1671,7 +1673,9 @@ local compilerSwitch = util.switch()
                 vm.compileByParentNode(source.node, key, function (src)
                     if src.type == 'doc.field'
                     or src.type == 'doc.type.field'
-                    or src.type == 'doc.type.name' then
+                    or src.type == 'doc.type.name'
+                    or src.type == 'doc.type.function'
+                    then
                         hasMarkDoc = true
                         vm.setNode(source, vm.compileNode(src))
                     end

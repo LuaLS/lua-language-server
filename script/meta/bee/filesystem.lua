@@ -112,4 +112,10 @@ end
 function fs.current_path()
 end
 
+---@param path fs.path
+---@param base fs.path
+---@return fs.path
+function fs.relative(path, base)
+end
+
 return fs

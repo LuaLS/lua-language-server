@@ -69,6 +69,9 @@ CHECKLEVEL = 'Warning'
 ---@type string|nil
 CHECK_OUT_PATH = ''
 
+---@type string | 'json' | 'pretty'
+CHECK_FORMAT = 'pretty'
+
 ---@type 'trace' | 'debug' | 'info' | 'warn' | 'error'
 LOGLEVEL = 'warn'
 
@@ -106,3 +109,5 @@ THREAD_ID = 1
 CHECK_WORKER = ''
 
 QUIET = false
+
+HELP = false

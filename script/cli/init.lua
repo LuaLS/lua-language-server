@@ -1,16 +1,21 @@
+if _G['HELP'] then
+    require 'cli.help'
+    os.exit(0, true)
+end
+
 if _G['VERSION'] then
     require 'cli.version'
     os.exit(0, true)
 end
 
 if _G['CHECK'] then
-    require 'cli.check'
-    os.exit(0, true)
+    local ret = require 'cli.check'.runCLI()
+    os.exit(ret, true)
 end
 
 if _G['CHECK_WORKER'] then
-    require 'cli.check_worker'
-    os.exit(0, true)
+    local ret = require 'cli.check_worker'.runCLI()
+    os.exit(ret or 0, true)
 end
 
 if _G['DOC_UPDATE'] then

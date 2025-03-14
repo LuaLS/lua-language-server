@@ -156,3 +156,21 @@ function F()
 
 end
 ]]
+
+TEST [[
+---@generic T
+---@param t T
+---@return T
+function F(t)
+	return t
+end
+]]
+
+TEST [[
+---@generic T
+---@param t T
+---@return T?
+function F(t)
+
+end
+]]

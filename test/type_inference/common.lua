@@ -359,8 +359,32 @@ end
 local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 ]]
 
+TEST 'nil' [[
+local <?k?>, <?v?> = next()
+local <?k?>, <?v?> = next({})
+]]
+
+TEST 'integer?' [[
+local <?k?>, <?v?> = next({1})
+]]
+
+TEST 'integer?' [[
+local a
+local <?k?>, v = next({a})
+]]
+
+-- probably explicit unknown generic should be unknown
+TEST 'nil' [[
+local a
+local k, <?v?> = next({a})
+]]
+
 TEST 'unknown' [[
-local <?x?> = next()
+---@generic T
+---@param t T?
+---@return T
+local function F(t) end
+local <?x?> = F()
 ]]
 
 TEST 'unknown' [[
@@ -3943,6 +3967,34 @@ TEST 'number' [[
 local function f(<?x?>) end
 ]]
 
+TEST 'number' [[
+---@type fun(x:number)[]
+local t = {
+    function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type fun(x:number)[]
+local t = {
+    [1] = function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type {[integer]: fun(x:number)}
+local t = {
+    function (<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type {[integer]: fun(x:number)}
+local t = {
+    [1] = function (<?x?>) end,
+}
+]]
+
 TEST 'boolean' [[
 ---@generic T: string | boolean | table
 ---@param x T
@@ -4554,6 +4606,31 @@ local a = {}
 function a:func(<?x?>) end
 ]]
 
+-- #3089
+TEST 'fun(x: number, y: number)' [[
+---@class Person
+---@field age? number
+---@field foo fun(x: number, y: number)
+
+---@param person Person
+local function test(person)
+    if person.foo ~= nil then
+        local <?b?> = person.foo
+    end
+end
+]]
+
+-- #2952
+TEST 'A' [[
+---@class A
+---@field b {[C]:D}
+local A
+
+if A.b ~= {} then
+    local C = <?A?>
+end
+]]
+
 TEST 'A' [[
 ---@class A
 ---@field type 'a'
@@ -4664,6 +4741,46 @@ TEST 'string' [[
 local function f(v) end
 
 local <?r?> = f('')
+]]
+
+TEST 'A' [[
+---@class A
+local A = {}
+
+---@generic T
+---@param self T
+---@param s string
+---@return T
+function A:f(s) end
+
+---@generic T
+---@param self T
+---@param i integer
+---@return T
+function A:f(i) end
+
+local <?r?> = A:f('')
+]]
+
+TEST 'B' [[
+---@class A
+local A = {}
+
+---@generic T
+---@param self T
+---@param s string
+---@return T
+function A:f(s) end
+
+---@generic T
+---@param self T
+---@param i integer
+---@return T
+function A:f(i) end
+
+---@class B: A
+local B = {}
+local <?r?> = B:f('')
 ]]
 
 TEST 'integer' [[

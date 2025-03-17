@@ -18,7 +18,7 @@ CatFunction.kind = 'catfunction'
 
 ---@class LuaParser.Node.CatGeneric: LuaParser.Node.Base
 ---@field id LuaParser.Node.CatID
----@field extends? CatExp
+---@field extends? LuaParser.Node.CatExp
 ---@field symbolPos? integer # 冒号的位置
 local CatGeneric = Class('LuaParser.Node.CatGeneric', 'LuaParser.Node.Base')
 
@@ -28,7 +28,7 @@ CatGeneric.kind = 'catgeneric'
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatFuncParamName
 ---@field symbolPos? integer # 冒号的位置
----@field value? CatExp
+---@field value? LuaParser.Node.CatExp
 local CatFuncParam = Class('LuaParser.Node.CatFuncParam', 'LuaParser.Node.Base')
 
 CatFuncParam.kind = 'catfuncparam'
@@ -45,7 +45,7 @@ CatFuncParamName.kind = 'catfuncparamname'
 ---@field parent LuaParser.Node.CatFunction
 ---@field name? LuaParser.Node.CatFuncReturnName
 ---@field symbolPos? integer # 冒号的位置
----@field value? CatExp
+---@field value? LuaParser.Node.CatExp
 local CatFuncReturn = Class('LuaParser.Node.CatFuncReturn', 'LuaParser.Node.Base')
 
 CatFuncReturn.kind = 'catfuncreturn'
@@ -55,7 +55,7 @@ CatFuncReturn.kind = 'catfuncreturn'
 ---@field index integer
 ---@field id string
 ---@field name? LuaParser.Node.CatFuncReturnName
----@field value CatExp
+---@field value LuaParser.Node.CatExp
 ---@field symbolPos? integer # 冒号的位置
 local CatFuncReturnName = Class('LuaParser.Node.CatFuncReturnName', 'LuaParser.Node.Base')
 

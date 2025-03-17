@@ -1,7 +1,7 @@
 
 ---@class LuaParser.Node.CatParam: LuaParser.Node.Base
 ---@field key LuaParser.Node.CatParamName
----@field value? CatExp
+---@field value? LuaParser.Node.CatExp
 local CatParam = Class('LuaParser.Node.CatParam', 'LuaParser.Node.Base')
 
 CatParam.kind = 'catparam'

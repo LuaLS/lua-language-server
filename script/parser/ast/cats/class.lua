@@ -1,7 +1,7 @@
 ---@class LuaParser.Node.CatClass: LuaParser.Node.Base
 ---@field classID LuaParser.Node.CatID
 ---@field symbolPos? integer # :的位置
----@field extends? CatExp[]
+---@field extends? LuaParser.Node.CatExp[]
 local CatClass = Class('LuaParser.Node.CatClass', 'LuaParser.Node.Base')
 
 CatClass.kind = 'catclass'

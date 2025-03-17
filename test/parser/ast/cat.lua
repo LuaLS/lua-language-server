@@ -85,8 +85,11 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'catid',
-                id   = 'A',
+                kind = 'cattype',
+                exp  = {
+                    kind = 'catid',
+                    id   = 'A',
+                }
             }
         }
     }
@@ -104,23 +107,26 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattable',
-                fields = {
-                    [1] = {
-                        subtype = 'field',
-                        key = { id = 'x' },
-                        value = { id = 'number' },
-                    },
-                    [2] = {
-                        subtype = 'field',
-                        key = { id = 'y' },
-                        value = { id = 'number' },
-                    },
-                    [3] = {
-                        subtype = 'index',
-                        key = { id = 'number' },
-                        value = { id = 'boolean' },
-                    },
+                kind = 'cattype',
+                exp  = {
+                    kind = 'cattable',
+                    fields = {
+                        [1] = {
+                            subtype = 'field',
+                            key = { id = 'x' },
+                            value = { id = 'number' },
+                        },
+                        [2] = {
+                            subtype = 'field',
+                            key = { id = 'y' },
+                            value = { id = 'number' },
+                        },
+                        [3] = {
+                            subtype = 'index',
+                            key = { id = 'number' },
+                            value = { id = 'boolean' },
+                        },
+                    }
                 }
             }
         }
@@ -135,11 +141,14 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattuple',
-                exps = {
-                    [1] = { kind = 'catinteger', value = 1 },
-                    [2] = { kind = 'catinteger', value = 2 },
-                    [3] = { kind = 'catinteger', value = 3 },
+                kind = 'cattype',
+                exp  = {
+                    kind = 'cattuple',
+                    exps = {
+                        [1] = { kind = 'catinteger', value = 1 },
+                        [2] = { kind = 'catinteger', value = 2 },
+                        [3] = { kind = 'catinteger', value = 3 },
+                    }
                 }
             }
         }
@@ -154,20 +163,23 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'catarray',
-                size = {
-                    kind = 'catinteger',
-                    value = 4,
-                },
-                node = {
+                kind = 'cattype',
+                exp  = {
                     kind = 'catarray',
                     size = {
                         kind = 'catinteger',
-                        value = 3,
+                        value = 4,
                     },
                     node = {
-                        kind = 'catid',
-                        id = 'string',
+                        kind = 'catarray',
+                        size = {
+                            kind = 'catinteger',
+                            value = 3,
+                        },
+                        node = {
+                            kind = 'catid',
+                            id = 'string',
+                        }
                     }
                 }
             }
@@ -183,11 +195,14 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'catcall',
-                node = { kind = 'catid', id = 'A' },
-                args = {
-                    [1] = { kind = 'catid', id = 'number' },
-                    [2] = { kind = 'catid', id = 'boolean' },
+                kind = 'cattype',
+                exp  = {
+                    kind = 'catcall',
+                    node = { kind = 'catid', id = 'A' },
+                    args = {
+                        [1] = { kind = 'catid', id = 'number' },
+                        [2] = { kind = 'catid', id = 'boolean' },
+                    }
                 }
             }
         },
@@ -205,56 +220,59 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind  = 'catfunction',
-                async = true,
-                generics = {
-                    [1] = {
-                        kind = 'catgeneric',
-                        id   = { kind = 'catid', id = 'T1' },
-                        extends = { kind = 'catid', id = 'table' },
-                    },
-                    [2] = {
-                        kind = 'catgeneric',
-                        id   = { kind = 'catid', id = 'T2' },
-                    },
-                },
-                params = {
-                    [1] = {
-                        kind = 'catfuncparam',
-                        index = 1,
-                        name = {
-                            kind = 'catfuncparamname',
-                            id   = 'a',
+                kind = 'cattype',
+                exp  = {
+                    kind  = 'catfunction',
+                    async = true,
+                    generics = {
+                        [1] = {
+                            kind = 'catgeneric',
+                            id   = { kind = 'catid', id = 'T1' },
+                            extends = { kind = 'catid', id = 'table' },
                         },
-                        value = { kind = 'catid', id = 'T1', generic = {} },
-                    },
-                    [2] = {
-                        kind = 'catfuncparam',
-                        index = 2,
-                        name = {
-                            kind = 'catfuncparamname',
-                            id   = '...',
+                        [2] = {
+                            kind = 'catgeneric',
+                            id   = { kind = 'catid', id = 'T2' },
                         },
-                        value = { kind = 'catid', id = 'T2', generic = {} },
                     },
-                },
-                returns = {
-                    [1] = {
-                        kind = 'catfuncreturn',
-                        index = 1,
-                        value = { kind = 'catarray' }
+                    params = {
+                        [1] = {
+                            kind = 'catfuncparam',
+                            index = 1,
+                            name = {
+                                kind = 'catfuncparamname',
+                                id   = 'a',
+                            },
+                            value = { kind = 'catid', id = 'T1', generic = {} },
+                        },
+                        [2] = {
+                            kind = 'catfuncparam',
+                            index = 2,
+                            name = {
+                                kind = 'catfuncparamname',
+                                id   = '...',
+                            },
+                            value = { kind = 'catid', id = 'T2', generic = {} },
+                        },
                     },
-                    [2] = {
-                        kind = 'catfuncreturn',
-                        index = 2,
-                        name = { kind = 'catfuncreturnname', id = 'desc' },
-                        value = { kind = 'catid', id = 'string' },
-                    },
-                    [3] = {
-                        kind = 'catfuncreturn',
-                        index = 3,
-                        name = { kind = 'catfuncreturnname', id = '...' },
-                        value = { kind = 'catid', id = 'T1', generic = {} },
+                    returns = {
+                        [1] = {
+                            kind = 'catfuncreturn',
+                            index = 1,
+                            value = { kind = 'catarray' }
+                        },
+                        [2] = {
+                            kind = 'catfuncreturn',
+                            index = 2,
+                            name = { kind = 'catfuncreturnname', id = 'desc' },
+                            value = { kind = 'catid', id = 'string' },
+                        },
+                        [3] = {
+                            kind = 'catfuncreturn',
+                            index = 3,
+                            name = { kind = 'catfuncreturnname', id = '...' },
+                            value = { kind = 'catid', id = 'T1', generic = {} },
+                        }
                     }
                 }
             }

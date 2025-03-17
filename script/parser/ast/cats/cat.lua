@@ -23,7 +23,7 @@ require 'parser.ast.cats.return'
 ---@field attrPos2? integer # 右括号的位置
 ---@field attrs? LuaParser.Node.CatAttr[]
 ---@field value? LuaParser.Node.CatValue
----@field extends? CatExp
+---@field extends? LuaParser.Node.CatExp
 ---@field tail? string
 ---@field used? boolean
 local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
@@ -32,7 +32,7 @@ Cat.kind = 'cat'
 
 ---@alias LuaParser.Node.CatValue
 ---| LuaParser.Node.CatClass
----| CatExp
+---| LuaParser.Node.CatExp
 ---| LuaParser.Node.CatField
 ---| LuaParser.Node.CatAlias
 ---| LuaParser.Node.CatParam
@@ -67,10 +67,7 @@ Ast:registerCatParser('class', {
     parser = Ast.parseCatClass,
 })
 Ast:registerCatParser('type',  {
-    parser = function (self)
-        ---@diagnostic disable-next-line: invisible
-        return self:parseCatExp(true)
-    end
+    parser = Ast.parseCatType,
 })
 Ast:registerCatParser('field', {
     asState = true,

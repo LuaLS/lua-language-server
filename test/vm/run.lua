@@ -28,7 +28,7 @@ do
 
     local loc = ast.main.localMap['x']
     local n = vfile:getNode(loc)
-    assert(n and n:view() == 'integer')
+    assert(n and n:view() == '1')
 end
 
 do
@@ -38,8 +38,7 @@ do
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
         ---@type 1
-        local x = 1
-        x = 2
+        local x
     ]]
     vfile:indexAst(ast, 'common')
 

@@ -1,6 +1,6 @@
 ---@param catGroup LuaParser.Node.Cat[]?
 ---@param key string
----@return CatExp?
+---@return LuaParser.Node.CatExp?
 local function findParamType(catGroup, key)
     if not catGroup then
         return nil

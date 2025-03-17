@@ -107,20 +107,11 @@ ls.vm.registerRunnerParser('local', function (runner, source)
 
     local bindType = bindVariableWithType(runner, source, variable)
     if bindType then
-        return
+        return bindType
     end
 
     if source.value then
         local vnode = runner:parse(source.value)
-
-        -- 如果局部变量没有其他赋值，那么认为是个常量
-        if  vnode.kind == 'value'
-        and source.value.isLiteral
-        and #source.sets > 0 then
-            ---@cast vnode Node.Value
-            return runner.node.type(vnode.typeName)
-        end
-
         if vnode.kind == 'table' then
             ---@cast vnode Node.Table
             if vnode.fields then

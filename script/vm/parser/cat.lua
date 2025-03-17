@@ -197,12 +197,12 @@ ls.vm.registerRunnerParser('catreturn', function (runner, source)
 end)
 
 ls.vm.registerRunnerParser('cattype', function (runner, source)
-    ---@cast source CatExp
+    ---@cast source LuaParser.Node.CatType
 
-    local class = runner.node.type(source.id)
+    local node = runner:parse(source.exp)
 
     runner:clearCatGroup()
     runner:addToCatGroup(source.parent)
 
-    return class
+    return node
 end)

@@ -1,6 +1,6 @@
 ---@class LuaParser.Node.CatAlias: LuaParser.Node.Base
 ---@field aliasID LuaParser.Node.CatID
----@field extends? CatExp
+---@field extends? LuaParser.Node.CatExp
 local CatAlias = Class('LuaParser.Node.CatAlias', 'LuaParser.Node.Base')
 
 CatAlias.kind = 'catalias'

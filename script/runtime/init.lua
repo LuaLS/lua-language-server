@@ -48,7 +48,11 @@ ls.util.tableMerge(M.args, argparser.parse(arg, true))
 local function findRoot()
     local currentPath
     for i = 1, 100 do
-        currentPath = debug.getinfo(i, 'S').source
+        local info = debug.getinfo(i, 'S')
+        if not info then
+            break
+        end
+        currentPath = info.source
         if currentPath:match '@%a:' then
             break
         end

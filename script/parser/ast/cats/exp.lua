@@ -1,5 +1,5 @@
 
----@alias CatExp
+---@alias LuaParser.Node.CatExp
 ---| LuaParser.Node.CatID
 ---| LuaParser.Node.CatParen
 ---| LuaParser.Node.CatArray
@@ -14,14 +14,14 @@
 ---| LuaParser.Node.CatTuple
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
----@field value? CatExp
+---@field value? LuaParser.Node.CatExp
 ---@field symbolPos? integer # 右括号的位置
 local CatParen = Class('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
 
 CatParen.kind = 'catparen'
 
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
----@field node CatExp
+---@field node LuaParser.Node.CatExp
 ---@field size? LuaParser.Node.CatInteger
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
@@ -31,7 +31,7 @@ CatArray.kind = 'catarray'
 
 ---@class LuaParser.Node.CatCall: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatID
----@field args CatExp[]
+---@field args LuaParser.Node.CatExp[]
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 local CatCall = Class('LuaParser.Node.CatCall', 'LuaParser.Node.Base')
@@ -43,7 +43,7 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean
----@return CatExp?
+---@return LuaParser.Node.CatExp?
 function Ast:parseCatExp(required)
     local catType = self:parseCatUnion(required)
     return catType
@@ -51,7 +51,7 @@ end
 
 ---@private
 ---@param required? boolean
----@return CatExp?
+---@return LuaParser.Node.CatExp?
 function Ast:parseCatTerm(required)
     local head = self:parseCatParen()
             or   self:parseCatFunction()
@@ -69,7 +69,7 @@ function Ast:parseCatTerm(required)
         return nil
     end
 
-    ---@type CatExp
+    ---@type LuaParser.Node.CatExp
     local current = head
     while true do
         self:skipSpace()
@@ -89,7 +89,7 @@ end
 
 ---@private
 ---@param atLeastOne? boolean
----@return CatExp[]
+---@return LuaParser.Node.CatExp[]
 function Ast:parseCatTypeList(atLeastOne)
     return self:parseList(atLeastOne, false, self.parseCatExp)
 end
@@ -121,7 +121,7 @@ function Ast:parseCatParen()
 end
 
 ---@private
----@param head CatExp
+---@param head LuaParser.Node.CatExp
 ---@return LuaParser.Node.CatArray?
 function Ast:parseCatArray(head)
     local pos1 = self.lexer:consume '['
@@ -147,7 +147,7 @@ function Ast:parseCatArray(head)
 end
 
 ---@private
----@param head CatExp
+---@param head LuaParser.Node.CatExp
 ---@return LuaParser.Node.CatCall?
 function Ast:parseCatCall(head)
     local pos1 = self.lexer:consume '<'

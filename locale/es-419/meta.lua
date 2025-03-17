@@ -191,7 +191,7 @@ bit32.arshift       =
 [[
 Retorna el número `x` desplazado `disp` bits a la derecha. Los desplazamientos negativos lo hacen a la izquierda.
 
-Esta operación de desplazamiento es lo que se llama desplazamiento aritmético. Los bits vacantes del lado izquierdo se llenan con copias del bit más alto de `x`; los bits vacantes del lado derecho se llenan con ceros.
+Esta operación de desplazamiento es lo que se llama desplazamiento aritmético. Los bits vacíos del lado izquierdo se llenan con copias del bit más alto de `x`; los bits vacíos del lado derecho se llenan con ceros.
 ]]
 bit32.band          =
 'Retorna la operación lógica *and* de sus operandos.'
@@ -218,7 +218,7 @@ bit32.lrotate       =
 'Retorna el número `x` rotado `disp` bits a la izquierda. Las rotaciones negativas lo hacen a la derecha.'
 bit32.lshift        =
 [[
-Returns the number `x` shifted `disp` bits to the left. Negative displacements shift to the right. In any direction, vacant bits are filled with zeros.
+Retorna el número `x` desplazado `disp` bits a la izquierda. Los desplazamientos negativos lo hacen a la derecha. En cualquier dirección, los bits vacíos se llenan con ceros.
 
 ```lua
 assert(bit32.lshift(b, disp) ==
@@ -226,10 +226,10 @@ assert(bit32.lshift(b, disp) ==
 ```
 ]]
 bit32.rrotate       =
-'Returns the number `x` rotated `disp` bits to the right. Negative displacements rotate to the left.'
+'Retorna el número `x` rotado `disp` bits a la derecha. Las rotaciones negativas lo hacen a la izquierda.'
 bit32.rshift        =
 [[
-Returns the number `x` shifted `disp` bits to the right. Negative displacements shift to the left. In any direction, vacant bits are filled with zeros.
+Retorna el número `x` desplazado `disp` bits a la derecha. Los desplazamientos negativos lo hacen a la izquierda. En cualquier dirección, los bits vacíos se llenan con ceros.
 
 ```lua
 assert(bit32.rshift(b, disp) ==
@@ -240,93 +240,93 @@ math.floor(b % 2^32 / 2^disp))
 coroutine                   =
 ''
 coroutine.create            =
-'Creates a new coroutine, with body `f`. `f` must be a function. Returns this new coroutine, an object with type `"thread"`.'
+'Crea una co-rutina nueva con cuerpo `f`. `f` debe ser una función. Retorna esta nueva co-rutina, un objeto con tipo `thread`.'
 coroutine.isyieldable       =
-'Returns true when the running coroutine can yield.'
+'Retorna verdadero cuando la co-rutina en ejecución puede suspenderse cediendo el control.'
 coroutine.isyieldable['>5.4']=
-'Returns true when the coroutine `co` can yield. The default for `co` is the running coroutine.'
+'Retorna verdadero cuando la co-rutina `co` puede suspenderse cediendo el control. El valor por omisión para `co` es la co-rutina actualmente en ejecución.' 
 coroutine.close             =
-'Closes coroutine `co` , closing all its pending to-be-closed variables and putting the coroutine in a dead state.'
+'Cierra la co-rutina `co`, cerrando todas sus variables prontas a cerrarse, dejando la co-rutina en un estado muerto.'
 coroutine.resume            =
-'Starts or continues the execution of coroutine `co`.'
+'Empieza o continua la ejecución de la co-rutina `co`.'
 coroutine.running           =
-'Returns the running coroutine plus a boolean, true when the running coroutine is the main one.'
+'Retorna la co-rutina en ejecución con un booleano adicional, señalando si la co-rutina en ejecución es la principal.'
 coroutine.status            =
-'Returns the status of coroutine `co`.'
+'Retorna el estado de la co-rutina `co`.'
 coroutine.wrap              =
-'Creates a new coroutine, with body `f`; `f` must be a function. Returns a function that resumes the coroutine each time it is called.'
+'Crea una co-rutina nueva con cuerpo `f`; `f` debe ser una función. Retorna una función que resume la co-rutina cada vez que se le llama.'
 coroutine.yield             =
-'Suspends the execution of the calling coroutine.'
+'Suspende la ejecución de la co-rutina que le llama, cediendo el control.'
 
 costatus.running            =
-'Is running.'
+'Está corriendo.'
 costatus.suspended          =
-'Is suspended or not started.'
+'Está suspendida o no ha empezado.'
 costatus.normal             =
-'Is active but not running.'
+'Está activa, pero no en ejecución.'
 costatus.dead               =
-'Has finished or stopped with an error.'
+'Ha terminado o se detuvo con un error.'
 
 debug                       =
 ''
 debug.debug                 =
-'Enters an interactive mode with the user, running each string that the user enters.'
+'Entra a un modo interactivo con el usuario, ejecutando cada string que el usuario ingrese.'
 debug.getfenv               =
-'Returns the environment of object `o` .'
+'Retorna el ambiente del objeto `o` .'
 debug.gethook               =
-'Returns the current hook settings of the thread.'
+'Retorna las configuraciones `hook` de la hebra.'
 debug.getinfo               =
-'Returns a table with information about a function.'
+'Retorna una tabla con información acerca de una función.'
 debug.getlocal['<5.1']      =
-'Returns the name and the value of the local variable with index `local` of the function at level `level` of the stack.'
+'Retorna el nombre y el valor de la variable local con índice `local` de la función en el nivel `level` de la pila.'
 debug.getlocal['>5.2']      =
-'Returns the name and the value of the local variable with index `local` of the function at level `f` of the stack.'
+'Retorna el nombre y el valor de la variable local con índice `local` de la función en el nivel `f` de la pila.'
 debug.getmetatable          =
-'Returns the metatable of the given value.'
+'Retorna la metatabla del valor provisto.'
 debug.getregistry           =
-'Returns the registry table.'
+'Retorna la tabla de registro.'
 debug.getupvalue            =
-'Returns the name and the value of the upvalue with index `up` of the function.'
+'Retorna el nombre y el valor de la variable anterior con índice `up` de la función.'
 debug.getuservalue['<5.3']  =
-'Returns the Lua value associated to u.'
+'Retorna el valor de Lua asociado a u.'
 debug.getuservalue['>5.4']  =
 [[
-Returns the `n`-th user value associated
-to the userdata `u` plus a boolean,
-`false` if the userdata does not have that value.
+Retorna el `n`-ésimo valor asociado
+a la data de usuario `u` con un booleano adicional,
+`false` si la data de usuario no tiene ese valor.
 ]]
 debug.setcstacklimit        =
 [[
-### **Deprecated in `Lua 5.4.2`**
+### **Obsoleto desde `Lua 5.4.2`**
 
-Sets a new limit for the C stack. This limit controls how deeply nested calls can go in Lua, with the intent of avoiding a stack overflow.
+Asigna un límite nuevo para la pila C. Este límite controla qué tan profundo pueden llegar las llamadas anidadas en Lua con la intención de evitar un desbordamiento de la pila (stack overflow).
 
-In case of success, this function returns the old limit. In case of error, it returns `false`.
+En caso de éxito, esta función retorna el límite anterior. En caso de error, retorna `false`.
 ]]
 debug.setfenv               =
-'Sets the environment of the given `object` to the given `table` .'
+'Asigna el ambiente del objeto `object` provisto a la tabla `table` provista.'
 debug.sethook               =
-'Sets the given function as a hook.'
+'Asigna la función provista como un `hook`.'
 debug.setlocal              =
-'Assigns the `value` to the local variable with index `local` of the function at `level` of the stack.'
+'Asigna el valor `value` a la variable local con índice `local` de la función en el nivel `level` de la pila.'
 debug.setmetatable          =
-'Sets the metatable for the given value to the given table (which can be `nil`).'
+'Asigna la metatabla del valor provisto a la tabla provista (la cual puede ser `nil`).'
 debug.setupvalue            =
-'Assigns the `value` to the upvalue with index `up` of the function.'
+'Asigna el valor `value` al valor anterior con índice `up` de la función.'
 debug.setuservalue['<5.3']  =
-'Sets the given value as the Lua value associated to the given udata.'
+'Asigna el valor provisto como el valor de Lua asociado a la provista data de usuario `udata`.'
 debug.setuservalue['>5.4']  =
 [[
-Sets the given `value` as
-the `n`-th user value associated to the given `udata`.
-`udata` must be a full userdata.
+Asigna el valor `value` como
+el `n`-ésimo valor asociado a la data de usuario `udata` provista.
+`udata` debe ser data de usuario completa.
 ]]
 debug.traceback             =
-'Returns a string with a traceback of the call stack. The optional message string is appended at the beginning of the traceback.'
+'Retorna un string con la traza de la pila de llamadas. El string de mensaje opcional está anexado al principio de la traza.'
 debug.upvalueid             =
-'Returns a unique identifier (as a light userdata) for the upvalue numbered `n` from the given function.'
+'Retorna un identificador único (como data de usuario ligera) para el valor anterior número `n` de la función provista.'
 debug.upvaluejoin           =
-'Make the `n1`-th upvalue of the Lua closure `f1` refer to the `n2`-th upvalue of the Lua closure `f2`.'
+'Hace que el `n1`-ésimo valor anterior de la clausura de Lua `f1` se refiera a el `n2`-ésimo valor anterior de la clausura de Lua `f2`.'
 
 infowhat.n                  =
 '`name` and `namewhat`'

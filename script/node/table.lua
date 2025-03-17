@@ -9,7 +9,7 @@ M.kind = 'table'
 
 ---@class Node.Field
 ---@field key Node
----@field value Node
+---@field value? Node
 ---@field location? Node.Location
 ---@field hideInView? boolean
 

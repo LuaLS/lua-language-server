@@ -27,3 +27,8 @@ M.__getter.solve = function (self)
     local value = self:onResolve(self.context)
     return value, true
 end
+
+function M:view(skipLevel)
+    local view = self.solve:view(skipLevel)
+    return view
+end

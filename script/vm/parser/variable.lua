@@ -65,6 +65,9 @@ ls.vm.registerRunnerParser('var', function (runner, source)
         local variable = runner:getVariable(source.loc)
         if variable then
             runner:setVariable(source, variable)
+            if source.value then
+                variable:addAssign(runner:parse(source.value))
+            end
         end
         return locNode
     else
@@ -163,6 +166,7 @@ ls.vm.registerRunnerParser('field', function (runner, source)
         if value then
             -- 局部变量的字段赋值
             bindVariableWithClass(runner, source, variable)
+            variable:addAssign(field.value)
         end
     else
         -- 全局变量的字段
@@ -176,6 +180,7 @@ ls.vm.registerRunnerParser('field', function (runner, source)
         if value then
             -- 全局变量的字段赋值
             bindVariableWithClass(runner, source, variable)
+            variable:addAssign(field.value)
         end
     end
 

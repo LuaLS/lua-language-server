@@ -59,8 +59,12 @@ function M:fillAPIs()
     ---@overload fun(v: number): Node.Value
     ---@overload fun(v: boolean): Node.Value
     ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
+    ---@overload fun(v: nil): Node.Type
     function self.value(...)
         local v, quo = ...
+        if v == nil then
+            return scope.node.NIL
+        end
         if quo == "'" then
             return self.VALUE_POOL_STR2[v]
         end

@@ -8,7 +8,7 @@ ls.vm.registerRunnerParser('table', function (runner, source)
         if field.key.kind == 'tablefieldid' then
             key = field.key.id
         else
-            key = runner:unsolve(runner.node.UNKNOWN, field.key)
+            key = runner:lazyParse(field.key)
         end
         local nfield = runner:makeNodeField(field, key, field.value)
         t:addField(nfield)

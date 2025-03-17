@@ -25,7 +25,9 @@ function M:__init(block, vfile)
     ---@type function[]
     self.disposes = {}
     self.resolve = function (unsolve, source)
-        return self:parse(source)
+        local node = self:parse(source)
+        self.nodeMap[source] = node
+        return node
     end
 end
 
@@ -65,7 +67,15 @@ end
 function M:parse(source)
     local node = self.nodeMap[source]
     if node then
-        return node
+        if node.kind ~= 'unsolve' then
+            return node
+        else
+            self.nodeMap[source] = nil
+        end
+    end
+    if source.isLiteral then
+        ---@cast source LuaParser.Node.Literal
+        return self.node.value(source.value)
     end
     self.nodeMap[source] = self.node.UNKNOWN
     local parser = M.parsers[source.kind]
@@ -78,6 +88,23 @@ function M:parse(source)
     end
     self.nodeMap[source] = node
     return node
+end
+
+---@param source LuaParser.Node.Base
+---@param default? Node
+---@return Node
+function M:lazyParse(source, default)
+    local node = self.nodeMap[source]
+    if node then
+        return node
+    end
+    if source.isLiteral then
+        ---@cast source LuaParser.Node.Literal
+        return self.node.value(source.value)
+    end
+    local unsolve = self.node.unsolve(default or self.node.UNKNOWN, source, self.resolve)
+    self.nodeMap[source] = unsolve
+    return unsolve
 end
 
 ---@param source LuaParser.Node.Base
@@ -162,9 +189,8 @@ end
 ---@param source LuaParser.Node.Base
 ---@param key Node.Key
 ---@param value? LuaParser.Node.Exp
----@param useType? boolean
 ---@return Node.Field
-function M:makeNodeField(source, key, value, useType)
+function M:makeNodeField(source, key, value)
     local node = self.node
     ---@type Node
     local nkey
@@ -176,16 +202,8 @@ function M:makeNodeField(source, key, value, useType)
         nkey = key
     end
     local nvalue
-    if not value or value.kind == 'nil' then
-        nvalue = node.NIL
-    elseif value.isLiteral then
-        ---@cast value LuaParser.Node.Literal
-        nvalue = node.value(value.value)
-        if useType then
-            nvalue = node.type(nvalue.typeName)
-        end
-    else
-        nvalue = self:unsolve(node.UNKNOWN, value)
+    if value ~= nil then
+        nvalue = self:lazyParse(value)
     end
     local field = {
         key = nkey,
@@ -193,16 +211,6 @@ function M:makeNodeField(source, key, value, useType)
         location = self:makeLocation(source),
     }
     return field
-end
-
----@param baseNode Node
----@param source? LuaParser.Node.Base
----@return Node
-function M:unsolve(baseNode, source)
-    if not source then
-        return baseNode
-    end
-    return self.node.unsolve(baseNode, source, self.resolve)
 end
 
 ---@param generic LuaParser.Node.CatGeneric

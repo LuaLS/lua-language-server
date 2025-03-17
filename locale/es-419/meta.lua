@@ -329,9 +329,9 @@ debug.upvaluejoin           =
 'Hace que el `n1`-ésimo valor anterior de la clausura de Lua `f1` se refiera a el `n2`-ésimo valor anterior de la clausura de Lua `f2`.'
 
 infowhat.n                  =
-'`name` and `namewhat`'
+'`name` y `namewhat`'
 infowhat.S                  =
-'`source`, `short_src`, `linedefined`, `lastlinedefined`, and `what`'
+'`source`, `short_src`, `linedefined`, `lastlinedefined`, y `what`'
 infowhat.l                  =
 '`currentline`'
 infowhat.t                  =
@@ -339,27 +339,27 @@ infowhat.t                  =
 infowhat.u['<5.1']          =
 '`nups`'
 infowhat.u['>5.2']          =
-'`nups`, `nparams`, and `isvararg`'
+'`nups`, `nparams`, y `isvararg`'
 infowhat.f                  =
 '`func`'
 infowhat.r                  =
-'`ftransfer` and `ntransfer`'
+'`ftransfer` y `ntransfer`'
 infowhat.L                  =
 '`activelines`'
 
 hookmask.c                  =
-'Calls hook when Lua calls a function.'
+'Llama al hook cuando se llama a una función desde Lua.'
 hookmask.r                  =
-'Calls hook when Lua returns from a function.'
+'Llama al hook cuand se retorna de una función desde Lua.'
 hookmask.l                  =
-'Calls hook when Lua enters a new line of code.'
+'Llama al hook cuand se entra a una nueva línea de código desde Lua.'
 
 file                        =
 ''
 file[':close']              =
-'Close `file`.'
+'Cierra el archivo `file`.'
 file[':flush']              =
-'Saves any written data to `file`.'
+'Guarda la data escrita al archivo `file`.'
 file[':lines']              =
 [[
 ------
@@ -370,29 +370,30 @@ end
 ```
 ]]
 file[':read']               =
-'Reads the `file`, according to the given formats, which specify what to read.'
+'Lee el archivo `file`, de acuerdo a los formatos provistos, los cuales especifican qué leer.'
 file[':seek']               =
-'Sets and gets the file position, measured from the beginning of the file.'
+'Fija y obtiene la posición del archivo, a contar del principio del archivo.'
 file[':setvbuf']            =
-'Sets the buffering mode for an output file.'
+'Fija el modo de buffer para un archivo de salida.'
 file[':write']              =
-'Writes the value of each of its arguments to `file`.'
+'Escribe el valor de cada uno de sus argumentos al archivo`file`.'
 
 readmode.n                  =
-'Reads a numeral and returns it as number.'
+'Lee un numeral y lo devuelve como un número.'
 readmode.a                  =
-'Reads the whole file.'
+'Lee todo el archivo.'
 readmode.l                  =
-'Reads the next line skipping the end of line.'
+'Lee la siguiente línea, saltándose el fin-de-línea.'
 readmode.L                  =
-'Reads the next line keeping the end of line.'
+'Lee la siguiente línea, manteniendo el fin-de-línea.'
 
 seekwhence.set              =
-'Base is beginning of the file.'
+'Sitúa la posición base está al inicio del archivo.'
 seekwhence.cur              =
-'Base is current position.'
+'Sitúa la posición base en la actual.'
+
 seekwhence['.end']          =
-'Base is end of file.'
+'Sitúa la posición base al final del archivo.'
 
 vbuf.no                     =
 'Output operation appears immediately.'

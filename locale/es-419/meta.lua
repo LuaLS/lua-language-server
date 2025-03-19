@@ -40,7 +40,7 @@ Normalmente `error` tiene información extra acerca la posición del error al in
 ]]
 
 _G                  =
-'Una variable global (no una función) que tiene el ambiente global (vea §2.2). Esta variable no se ocupa en Lua mismo; el cambiar su valor no afecta a ningún ambiente y vice-versa.'
+'Una variable global (no una función) que tiene el ambiente global (véase §2.2). Esta variable no se ocupa en Lua mismo; el cambiar su valor no afecta a ningún ambiente y vice-versa.'
 
 getfenv             =
 'Retorna el ambiente que usa la función actualmente. `f` puede ser una función de Lua o un número que especifica la función en ese nivel de la pila de llamadas.'
@@ -50,7 +50,7 @@ getmetatable        =
 
 ipairs              =
 [[
-Retorna tres valores (una función de iterador, la tabla `t` y `0`) cosa que la estructura
+Retorna tres valores (una función iteradora, la tabla `t` y `0`) cosa que la estructura
 ```lua
     for i,v in ipairs(t) do body end
 ```
@@ -149,7 +149,7 @@ tonumber            =
 [[
 Cuando se llama sin `base`, `toNumber` intenta convertir el argumento a un número. Si el argumento ya es un número o un texto convertible a un número, entonces `tonumber` retorna este número; si no es el caso, retorna `fail`
 
-La conversión de strings puede resultar en enteros o flotantes, de acuerdo a las convenciones léxicas de Lua (vea §3.1). El string puede tener espacios al principio, al final y tener un signo.
+La conversión de strings puede resultar en enteros o flotantes, de acuerdo a las convenciones léxicas de Lua (véase §3.1). El string puede tener espacios al principio, al final y tener un signo.
 ]]
 
 tostring            =
@@ -244,7 +244,7 @@ coroutine.create            =
 coroutine.isyieldable       =
 'Retorna verdadero cuando la co-rutina en ejecución puede suspenderse cediendo el control.'
 coroutine.isyieldable['>5.4']=
-'Retorna verdadero cuando la co-rutina `co` puede suspenderse cediendo el control. El valor por omisión para `co` es la co-rutina actualmente en ejecución.' 
+'Retorna verdadero cuando la co-rutina `co` puede suspenderse cediendo el control. El valor predeterminado para `co` es la co-rutina actualmente en ejecución.'
 coroutine.close             =
 'Cierra la co-rutina `co`, cerrando todas sus variables prontas a cerrarse, dejando la co-rutina en un estado muerto.'
 coroutine.resume            =
@@ -396,26 +396,26 @@ seekwhence['.end']          =
 'Sitúa la posición base al final del archivo.'
 
 vbuf.no                     =
-'Output operation appears immediately.'
+'La salida de la operación aparece de inmediato.'
 vbuf.full                   =
-'Performed only when the buffer is full.'
+'Realizado solo cuando el `buffer` está lleno.'
 vbuf.line                   =
-'Buffered until a newline is output.'
+'Almacenado en el `buffer` hasta que se encuentra un salto de línea en la salida.'
 
 io                          =
 ''
 io.stdin                    =
-'standard input.'
+'Entrada estándar.'
 io.stdout                   =
-'standard output.'
+'Salida estándar.'
 io.stderr                   =
-'standard error.'
+'Salida de error estándar.'
 io.close                    =
-'Close `file` or default output file.'
+'Cierra el archivo `file` o el archivo de salida predeterminado.'
 io.flush                    =
-'Saves any written data to default output file.'
+'Guarda la data escrita al archivo de salida predeterminado.'
 io.input                    =
-'Sets `file` as the default input file.'
+'Asigna `file` como el archivo de entrada predeterminado.'
 io.lines                    =
 [[
 ------
@@ -426,113 +426,113 @@ end
 ```
 ]]
 io.open                     =
-'Opens a file, in the mode specified in the string `mode`.'
+'Abre un archivo en el modo especificado en el string `mode`.'
 io.output                   =
-'Sets `file` as the default output file.'
+'Asigna `file` como el archivo de salida predeterminado.'
 io.popen                    =
-'Starts program prog in a separated process.'
+'Inicia el programa provisto como un proceso separado.'
 io.read                     =
-'Reads the `file`, according to the given formats, which specify what to read.'
+'Lee el archivo de acuerdo a los formatos provistos, los cuales especifican qué leer.'
 io.tmpfile                  =
-'In case of success, returns a handle for a temporary file.'
+'En caso de éxito retorna un descriptor de archvivo a un archivo temporal.'
 io.type                     =
-'Checks whether `obj` is a valid file handle.'
+'Verifica si el objeto `obj` es un descriptor de archivo válido.'
 io.write                    =
-'Writes the value of each of its arguments to default output file.'
+'Escribe el valor de cada uno de sus argumentos al archivo de salida predeterminado.'
 
 openmode.r                  =
-'Read mode.'
+'Modo de lectura.'
 openmode.w                  =
-'Write mode.'
+'Modo de escritura.'
 openmode.a                  =
-'Append mode.'
+'Modo de agregado.'
 openmode['.r+']             =
-'Update mode, all previous data is preserved.'
+'Modo de actualización, toda data existente es preservada.'
 openmode['.w+']             =
-'Update mode, all previous data is erased.'
+'Modo de actualización, toda data existente es borrada.'
 openmode['.a+']             =
-'Append update mode, previous data is preserved, writing is only allowed at the end of file.'
+'Modo de agregado y actualización, toda data existente es preservada, la escritura solo es permitida al final del archivo.'
 openmode.rb                 =
-'Read mode. (in binary mode.)'
+'Modo de lectura. (en modo binario)'
 openmode.wb                 =
-'Write mode. (in binary mode.)'
+'Modo de escritura. (en modo binario)'
 openmode.ab                 =
-'Append mode. (in binary mode.)'
+'Modo de agregado. (en modo binario)'
 openmode['.r+b']            =
-'Update mode, all previous data is preserved. (in binary mode.)'
+'Modo de actualización, toda data existente es preservada. (en modo binario)'
 openmode['.w+b']            =
-'Update mode, all previous data is erased. (in binary mode.)'
+'Modo de actualización, toda data existente es borrada. (en modo binario)'
 openmode['.a+b']            =
-'Append update mode, previous data is preserved, writing is only allowed at the end of file. (in binary mode.)'
+'Modo de agregado y actualización, toda data existente es preservada, la escritura solo es permitida al final del archivo. (en modo binario)'
 
 popenmode.r                 =
-'Read data from this program by `file`.'
+'Lee data the este programa por archivo `file`.'
 popenmode.w                 =
-'Write data to this program by `file`.'
+'Escribe data the este programa por archivo `file`.'
 
 filetype.file               =
-'Is an open file handle.'
+'Es un descriptor de archivo abierto.'
 filetype['.closed file']    =
-'Is a closed file handle.'
+'Es un descriptor de archivo cerrado.'
 filetype['.nil']            =
-'Is not a file handle.'
+'No es un descriptor de archivo.'
 
 math                        =
 ''
 math.abs                    =
-'Returns the absolute value of `x`.'
+'Retorna el valor absoluto de `x`.'
 math.acos                   =
-'Returns the arc cosine of `x` (in radians).'
+'Retorna el arcocoseno de `x` (en radianes).'
 math.asin                   =
-'Returns the arc sine of `x` (in radians).'
+'Retorna el arcoseno de `x` (en radianes).'
 math.atan['<5.2']           =
-'Returns the arc tangent of `x` (in radians).'
+'Retorna el arcotangente de `x` (en radianes).'
 math.atan['>5.3']           =
-'Returns the arc tangent of `y/x` (in radians).'
+'Retorna el arcotangente de `y/x` (en radianes).'
 math.atan2                  =
-'Returns the arc tangent of `y/x` (in radians).'
+'Retorna el arcotangente de `y/x` (en radianes).'
 math.ceil                   =
-'Returns the smallest integral value larger than or equal to `x`.'
+'Retorna el menor valor integral mayor o igual a `x`.'
 math.cos                    =
-'Returns the cosine of `x` (assumed to be in radians).'
+'Retorna el coseno de `x` (se asume que está en radianes).'
 math.cosh                   =
-'Returns the hyperbolic cosine of `x` (assumed to be in radians).'
+'Retorna el coseno hiperbólico de `x` (se asume que está en radianes).'
 math.deg                    =
-'Converts the angle `x` from radians to degrees.'
+'Convierte el ángulo `x` de radianes a grados.'
 math.exp                    =
-'Returns the value `e^x` (where `e` is the base of natural logarithms).'
+'Retorna el valor `e^x` (donde `e` es la base del logaritmo natural).'
 math.floor                  =
-'Returns the largest integral value smaller than or equal to `x`.'
+'Retorna el mayor valor integral más menor o igual a `x`.'
 math.fmod                   =
-'Returns the remainder of the division of `x` by `y` that rounds the quotient towards zero.'
+'Retorna el resto de la división de `x` por `y` que redondea el cuociente hacia cero.'
 math.frexp                  =
-'Decompose `x` into tails and exponents. Returns `m` and `e` such that `x = m * (2 ^ e)`, `e` is an integer and the absolute value of `m` is in the range [0.5, 1) (or zero when `x` is zero).'
+'Descompone `x` en mantisa y exponente. Retorna `m` y `e` tal que  `x = m * (2 ^ e)`, `e` es un entero y el valor absoluto de `m` está en el rango [0.5, 1) (ó cero cuando `x` es cero).'
 math.huge                   =
-'A value larger than any other numeric value.'
+'Un valor mayor que cualquier otro valor numérico.'
 math.ldexp                  =
-'Returns `m * (2 ^ e)` .'
+'Retorna `m * (2 ^ e)` .'
 math.log['<5.1']            =
-'Returns the natural logarithm of `x` .'
+'Retorna el logaritmo natural de `x` .'
 math.log['>5.2']            =
-'Returns the logarithm of `x` in the given base.'
+'Retorna el logaritmo de `x` en la base provista.'
 math.log10                  =
-'Returns the base-10 logarithm of x.'
+'Retorna el logaritmo en base 10 de `x` .'
 math.max                    =
-'Returns the argument with the maximum value, according to the Lua operator `<`.'
+'Retorna el argumento con el valor máximo, de acuerdo al operador de Lua `<`.'
 math.maxinteger['>5.3']     =
-'An integer with the maximum value for an integer.'
+'Un entero con el valor máximo para un entero.'
 math.min                    =
-'Returns the argument with the minimum value, according to the Lua operator `<`.'
+'Retorna el argumento con el valor mínimo, de acuerdo al operador de Lua `<`.'
 math.mininteger['>5.3']     =
-'An integer with the minimum value for an integer.'
+'Un entero con el valor mínimo para un entero.'
 math.modf                   =
-'Returns the integral part of `x` and the fractional part of `x`.'
+'Retorna la parte integral de `x` y la parte fraccional de `x`.'
 math.pi                     =
-'The value of *π*.'
+'El valor de *π*.'
 math.pow                    =
-'Returns `x ^ y` .'
+'Retorna `x ^ y` .'
 math.rad                    =
-'Converts the angle `x` from degrees to radians.'
+'Convierte el ángulo `x` de grados a radianes.'
 math.random                 =
 [[
 * `math.random()`: Returns a float in the range [0,1).
@@ -540,7 +540,7 @@ math.random                 =
 * `math.random(m, n)`: Returns a integer in the range [m, n].
 ]]
 math.randomseed['<5.3']     =
-'Sets `x` as the "seed" for the pseudo-random generator.'
+'Asigna `x` como el valor de semilla para el generador de números pseudo-aleatorios.'
 math.randomseed['>5.4']     =
 [[
 * `math.randomseed(x, y)`: Concatenate `x` and `y` into a 128-bit `seed` to reinitialize the pseudo-random generator.
@@ -548,51 +548,51 @@ math.randomseed['>5.4']     =
 * `math.randomseed()`: Generates a seed with a weak attempt for randomness.
 ]]
 math.sin                    =
-'Returns the sine of `x` (assumed to be in radians).'
+'Retorna el seno de `x` (se asume que está en radianes).'
 math.sinh                   =
-'Returns the hyperbolic sine of `x` (assumed to be in radians).'
+'Retorna el seno hiperbólico de `x` (se asume que está en radianes).'
 math.sqrt                   =
-'Returns the square root of `x`.'
+'Retorna la raíz cuadrada de `x`.'
 math.tan                    =
-'Returns the tangent of `x` (assumed to be in radians).'
+'Retorna la tangente de `x` (se asume que está en radianes).'
 math.tanh                   =
-'Returns the hyperbolic tangent of `x` (assumed to be in radians).'
+'Retorna la tangente hiperbólica de `x` (se asume que está en radianes).'
 math.tointeger['>5.3']      =
-'If the value `x` is convertible to an integer, returns that integer.'
+'Si el valor de `x` se puede convertir a un entero, retorna ese entero.'
 math.type['>5.3']           =
-'Returns `"integer"` if `x` is an integer, `"float"` if it is a float, or `nil` if `x` is not a number.'
+'Retorna `"integer"` si `x` es un entero, `"float"` si es un flotante ó `nil` si `x` no es un número.'
 math.ult['>5.3']            =
-'Returns `true` if and only if `m` is below `n` when they are compared as unsigned integers.'
+'Retorna `true` si y sólo si `m` es menor que `n` cuando son comparados como enteros sin signo.'
 
 os                          =
 ''
 os.clock                    =
-'Returns an approximation of the amount in seconds of CPU time used by the program.'
+'Retorna una aproximación de la cantidad de segundos en tiempo de CPU usado por el programa.'
 os.date                     =
-'Returns a string or a table containing date and time, formatted according to the given string `format`.'
+'Retorna un string o una tabla que contiene la fecha y el tiempo, formateados de acuerdo al string `format` provisto.'
 os.difftime                 =
-'Returns the difference, in seconds, from time `t1` to time `t2`.'
+'Retorna la diferencia, en segundos, desde el tiempo `t1` al tiempo `t2`.'
 os.execute                  =
-'Passes `command` to be executed by an operating system shell.'
+'Pasa el comando `command` para ser ejecutado por una llamada al intérprete *shell* del sistema operativo.'
 os.exit['<5.1']             =
-'Calls the C function `exit` to terminate the host program.'
+'Llama la función de C `exit` para terminar el programa anfitrión.'
 os.exit['>5.2']             =
-'Calls the ISO C function `exit` to terminate the host program.'
+'Llama la función de C ISO `exit` para terminar el programa anfitrión.'
 os.getenv                   =
-'Returns the value of the process environment variable `varname`.'
+'Retorna el valor de la variable `varname` del ambiente del proceso.'
 os.remove                   =
-'Deletes the file with the given name.'
+'Borra el archivo con el nombre provisto.'
 os.rename                   =
-'Renames the file or directory named `oldname` to `newname`.'
+'Renombra el archivo o directorio con nombre `oldname` al nuevo `newname`.'
 os.setlocale                =
-'Sets the current locale of the program.'
+'Fija la localización linguística actual del programa.'
 os.time                     =
-'Returns the current time when called without arguments, or a time representing the local date and time specified by the given table.'
+'Retorna el tiempo actual cuando se le llama sin argumentos o el tiempo que representa la fecha y hora local especificadas por la tabla provista.'
 os.tmpname                  =
-'Returns a string with a file name that can be used for a temporary file.'
+'Retorna un string con un nombre de archivo que puede ser usado como archivo temporal.'
 
 osdate.year                 =
-'four digits'
+'cuatro dígitos'
 osdate.month                =
 '1-12'
 osdate.day                  =
@@ -604,58 +604,58 @@ osdate.min                  =
 osdate.sec                  =
 '0-61'
 osdate.wday                 =
-'weekday, 1–7, Sunday is 1'
+'día de la semana, 1-7, Domingo es 1'
 osdate.yday                 =
-'day of the year, 1–366'
+'día del año, 1–366'
 osdate.isdst                =
-'daylight saving flag, a boolean'
+'indicador de horario de verano, un booleano'
 
 package                     =
 ''
 
 require['<5.3']             =
-'Loads the given module, returns any value returned by the given module(`true` when `nil`).'
+'Carga el módulo provisto, retorna cualquier valor retornado por el módulo provisto (`true` cuando es `nil`).'
 require['>5.4']             =
-'Loads the given module, returns any value returned by the searcher(`true` when `nil`). Besides that value, also returns as a second result the loader data returned by the searcher, which indicates how `require` found the module. (For instance, if the module came from a file, this loader data is the file path.)'
+'Carga el módulo provisto, retorna cualquier valor retornado por el buscador (`true` cuando es `nil`). Aparte de ese valor, también retorna el cargador de datos retornados por el buscador como segundo resultado, lo que indica cómo `require` encontró el módulo. (Por ejemplo, si el módulo viene de un archivo, los datos del cargador son la ruta a dicho archivo.'
 
 package.config              =
-'A string describing some compile-time configurations for packages.'
+'Un string describiendo algunas configuracions en tiempo de compilación para los paquetes.'
 package.cpath               =
-'The path used by `require` to search for a C loader.'
+'La ruta usada por `require` para buscar por un cargador de C.'
 package.loaded              =
-'A table used by `require` to control which modules are already loaded.'
+'Una tabla usada por `require` para controlar qué módulos ya se han cargado.'
 package.loaders             =
-'A table used by `require` to control how to load modules.'
+'Una tabla usada por `require` para controlar cómo cargar los módulos.'
 package.loadlib             =
-'Dynamically links the host program with the C library `libname`.'
+'Enlaza dinámicamente el programa anfitrión con la biblioteca de C `libname`.'
 package.path                =
-'The path used by `require` to search for a Lua loader.'
+'Ruta usada por `require` para buscar por un cargador de Lua.'
 package.preload             =
-'A table to store loaders for specific modules.'
+'Tabla para almacenar cargadores de módulos específicos.'
 package.searchers           =
-'A table used by `require` to control how to load modules.'
+'Una tabla usada por `require` para controlar cómo buscar los módulos.'
 package.searchpath          =
-'Searches for the given `name` in the given `path`.'
+'Busca por el nombre `name` en la ruta `path`.'
 package.seeall              =
-'Sets a metatable for `module` with its `__index` field referring to the global environment, so that this module inherits values from the global environment. To be used as an option to function `module` .'
+'Asigna una metatabla para el `module` con su campo `__index` apuntando al ambiente global, de manera que este módulo hereda los valores del ambiente global. Se usa como opción para la función `module` .'
 
 string                      =
 ''
 string.byte                 =
-'Returns the internal numeric codes of the characters `s[i], s[i+1], ..., s[j]`.'
+'Retorna los códigos numéricos internos de los caracteres `s[i], s[i+1], ..., s[j]`.'
 string.char                 =
-'Returns a string with length equal to the number of arguments, in which each character has the internal numeric code equal to its corresponding argument.'
+'Retorna un string con largo igual al número de argumeentos, en el que cada caracter tiene el código numérico internol igual a su argumento correspondiente.'
 string.dump                 =
-'Returns a string containing a binary representation (a *binary chunk*) of the given function.'
+'Retorna un string que contiene una representación binaria de la función provista.'
 string.find                 =
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+'Busca el primer calce del patrón `pattern` (véase §6.4.1) en el string.'
 string.format               =
-'Returns a formatted version of its variable number of arguments following the description given in its first argument.'
+'Retorna una versión formateada de su argumentos (en número variable) siguiendo la descripción dada en su primer argumento.'
 string.gmatch               =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+Retorna una función iteradora que cada vez que es llamada retorna las siguientes capturas del patrón `pattern` (véase §6.4.1) sobre el string s.
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+Por ejemplo, el bucle siguiente itera sobre todas las palabras del sstring s, imprimiendo una por línea:
 ```lua
     s =
 "hello world from Lua"
@@ -665,41 +665,41 @@ As an example, the following loop will iterate over all the words from string s,
 ```
 ]]
 string.gsub                 =
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
+'Retorna una copia de s en la cual todos (o los primeras `n`, si es provisto este argumento) ocurrencias del patrón `pattern` (vease §6.4.1) han sido reemplazadas por el string de reemplazo especificado por `repl`.'
 string.len                  =
-'Returns its length.'
+'Retorna el largo.'
 string.lower                =
-'Returns a copy of this string with all uppercase letters changed to lowercase.'
+'Retorna una copia de este string con todas sus letras mayúsculas cambiadas a minúsculas.'
 string.match                =
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+'Busca el primer calce del patrón `pattern` (véase §6.4.1) en el string.'
 string.pack                 =
-'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
+'Retorna el string binario que contiene los valores `v1`, `v2`, etc. empacados (serializados en forma binaria) de acuerdo al string de formato `fmt` (véase §6.4.2) .'
 string.packsize             =
-'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
+'Retorna el largo del string que retorna `string.pack` con el formato `fmt` (véase §6.4.2) provisto.'
 string.rep['>5.2']          =
-'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'
+'Retorna el string que es la concatenación de `n` copias del string `s` separado por el string `sep`.'
 string.rep['<5.1']          =
-'Returns a string that is the concatenation of `n` copies of the string `s` .'
+'Retorna el string que es la concatenación de `n` copias del string `s` .'
 string.reverse              =
-'Returns a string that is the string `s` reversed.'
+'Retorna el string que es el string `s` al revés.'
 string.sub                  =
-'Returns the substring of the string that starts at `i` and continues until `j`.'
+'Retorna el substring del string que empieza en `i` y continúa hasta `j`.'
 string.unpack               =
-'Returns the values packed in string according to the format string `fmt` (see §6.4.2) .'
+'Retorna los valores empacados en el string de acuerdo al string de formato `fmt` (véase §6.4.2) .'
 string.upper                =
-'Returns a copy of this string with all lowercase letters changed to uppercase.'
+'Retorna una copia de este string con todas sus letras minúsculas cambiadas a mayúsculas.'
 
 table                       =
 ''
 table.concat                =
-'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
+'Dada una lista donde todos los elementos son strings o números, retorna el string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
 table.insert                =
-'Inserts element `value` at position `pos` in `list`.'
+'Inserta el elemento `value` en la posición `pos` en la lista `list`.'
 table.maxn                  =
-'Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.'
+'Retorna el índice numérico positivo más grande de la tabla provista o cero si la tabla no tiene un índice numérico positivo.'
 table.move                  =
 [[
-Moves elements from table `a1` to table `a2`.
+Mueve los elementos de la tabla `a1` a la tabla `a2`.
 ```lua
 a2[t],··· =
 a1[f],···,a1[e]
@@ -707,58 +707,58 @@ return a2
 ```
 ]]
 table.pack                  =
-'Returns a new table with all arguments stored into keys `1`, `2`, etc. and with a field `"n"` with the total number of arguments.'
+'Retorna una nueva tabla con todos los argumentos almacenados en las claves `1`, `2`, etc. y con un campo `"n"` con el número total de argumentos.'
 table.remove                =
-'Removes from `list` the element at position `pos`, returning the value of the removed element.'
+'Remueve de la lista `list`, el elemento en la posición `pos`, retornando el valor del elemento removido.'
 table.sort                  =
-'Sorts list elements in a given order, *in-place*, from `list[1]` to `list[#list]`.'
+'Ordena los elementos de la lista en un orden dado, *modificando la propia lista*, desde `list[1]` hasta `list[#list]`.'
 table.unpack                =
 [[
-Returns the elements from the given list. This function is equivalent to
+Retorna los elementos de la lista provista. Esta función es equivalente a
 ```lua
     return list[i], list[i+1], ···, list[j]
 ```
 By default, `i` is `1` and `j` is `#list`.
 ]]
 table.foreach               =
-'Executes the given f over all elements of table. For each element, f is called with the index and respective value as arguments. If f returns a non-nil value, then the loop is broken, and this value is returned as the final value of foreach.'
+'Llama a la función provista f sobre cada uno de los elementos de la tabla. Por cada elemento, f es llamada con el índice y valor respectivo como argumentos. Si f retorna un valor no-nulo, el bucle se termina forzosamente y este valor es retornado como el valor final de foreach.'
 table.foreachi              =
-'Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.'
+'Ejecuta la f provista sobre los índices numéricos de la tabla. Por cada índice, f es llamada con el índice y valor respectivo como argumentos. Los índices son visitados en orden secuencial, de 1 a n, donde ne es el tamaño de la tabla. Si f retorna un valor no-nulo, el bucle se termina forzosamente y este valor es retornado como el valor final de foreachi.'
 table.getn                  =
-'Returns the number of elements in the table. This function is equivalent to `#list`.'
+'Retorna el número de elmentos en la tabla. Esta función es equivalente a `#list`.'
 table.new                   =
-[[This creates a pre-sized table, just like the C API equivalent `lua_createtable()`. This is useful for big tables if the final table size is known and automatic table resizing is too expensive. `narray` parameter specifies the number of array-like items, and `nhash` parameter specifies the number of hash-like items. The function needs to be required before use.
+[[Esta función crea una tabla con el tamaño provisto, como la API en C equivalente `lua_createtable()`. Esta función es útil para tablas grandes si el tamaño final de la tabla es conocido y el agrandar automáticamente la tabla es muy caro. El parámetro `narray` especifica el número de ítemes de tipo de arreglo y el parámetro `nhash` especifica el número de ítemes de tipo diccionario.
 ```lua
     require("table.new")
 ```
 ]]
 table.clear                 =
-[[This clears all keys and values from a table, but preserves the allocated array/hash sizes. This is useful when a table, which is linked from multiple places, needs to be cleared and/or when recycling a table for use by the same context. This avoids managing backlinks, saves an allocation and the overhead of incremental array/hash part growth. The function needs to be required before use.
+[[Esta función barre con todas las claves y valores de una tabla, pero preserva los tamaños de arreglo/diccionario reservados en memoria. Esta función es útil cuando una tabla que ha sido enlazada desde múltiples otras partes requiere ser vaciada y/o cuando se recicla una tabla para ser usada en el mismo contexto. Esto previene manejar enlaces de vuelta, previene tener que asignar memoria y el costo operativo del crecimiento incremental de la parte arreglo/diccionario.
 ```lua
     require("table.clear").
 ```
-Please note this function is meant for very specific situations. In most cases it's better to replace the (usually single) link with a new table and let the GC do its work.
+Nótese que esta función está hecha para situaciones muy específicas. En la mayoría de los casos es mejor reemplazar el enlace (el cual suele ser simple) con una tabla nueva y permitir que el recolector de basura haga su trabajo.
 ]]
 
 utf8                        =
 ''
 utf8.char                   =
-'Receives zero or more integers, converts each one to its corresponding UTF-8 byte sequence and returns a string with the concatenation of all these sequences.'
+'Recibe cero ó más enteros, convierte a cada uno a su secuencia de bytes en UTF-8 correspondiente y retorna un string con la concatenación de todas estas secuencias.'
 utf8.charpattern            =
-'The pattern which matches exactly one UTF-8 byte sequence, assuming that the subject is a valid UTF-8 string.'
+'El patrón con el que se calza exactamente una secuencia de bytes en UTF-8, asumiendo que el sujeto es un string en UTF-8 válido.'
 utf8.codes                  =
 [[
-Returns values so that the construction
+Retorna valores tal que el constructo
 ```lua
 for p, c in utf8.codes(s) do
     body
 end
 ```
-will iterate over all UTF-8 characters in string s, with p being the position (in bytes) and c the code point of each character. It raises an error if it meets any invalid byte sequence.
+itera sobre todos los caracteres en UTF-8 en el string s, con p siendo la posición en bytes y c el punto de código de cada caracter. Alza un error si se encuentra con alguna secuencia inválida de bytes.
 ]]
 utf8.codepoint              =
-'Returns the codepoints (as integers) from all characters in `s` that start between byte position `i` and `j` (both included).'
+'Retorna los puntos de códigos como enteros de todos los caracteres en `s` que empiezan entre la posición en bytes `i` y `j` (ambos inclusive).'
 utf8.len                    =
-'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
+'Retorna el número de caracteres en UTF-8 en el string `s` que empiezan entre las posiciones `i` y `j` (ambos inclusive).'
 utf8.offset                 =
-'Returns the position (in bytes) where the encoding of the `n`-th character of `s` (counting from position `i`) starts.'
+'Retorna la posición en bytes donde la codificación del caracter `n`-ésimo de `s` empieza, contado a partir de la posición `i`.'

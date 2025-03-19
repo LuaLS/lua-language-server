@@ -1,211 +1,211 @@
 DIAG_LINE_ONLY_SPACE    =
-'Line with spaces only.'
+'Línea con solo espacios.'
 DIAG_LINE_POST_SPACE    =
-'Line with trailing space.'
+'Línea con espacio al final.'
 DIAG_UNUSED_LOCAL       =
-'Unused local `{}`.'
+'Variable sin usar `{}`.'
 DIAG_UNDEF_GLOBAL       =
-'Undefined global `{}`.'
+'Variable global no definida `{}`.'
 DIAG_UNDEF_FIELD        =
-'Undefined field `{}`.'
+'Campo no definido `{}`.'
 DIAG_UNDEF_ENV_CHILD    =
-'Undefined variable `{}` (overloaded `_ENV` ).'
+'Variable no definida `{}` (`_ENV` sobrecargado).'
 DIAG_UNDEF_FENV_CHILD   =
-'Undefined variable `{}` (inside module).'
+'Variable no definida `{}` (dentro del módulo).'
 DIAG_GLOBAL_IN_NIL_ENV  =
-'Invalid global (`_ENV` is `nil`).'
+'Variable global inválida `{}` (`_ENV` es `nil`).'
 DIAG_GLOBAL_IN_NIL_FENV =
-'Invalid global (module environment is `nil`).'
+'Variable global (módulo de ambiente es `nil`).'
 DIAG_UNUSED_LABEL       =
-'Unused label `{}`.'
+'Etiqueta sin uso `{}`.'
 DIAG_UNUSED_FUNCTION    =
-'Unused functions.'
+'Funciones sin uso.'
 DIAG_UNUSED_VARARG      =
-'Unused vararg.'
+'vararg sin uso.'
 DIAG_REDEFINED_LOCAL    =
-'Redefined local `{}`.'
+'Variable re-definida `{}`.'
 DIAG_DUPLICATE_INDEX    =
-'Duplicate index `{}`.'
+'Índice duplicado `{}`.'
 DIAG_DUPLICATE_METHOD   =
-'Duplicate method `{}`.'
+'Método duplicado `{}`.'
 DIAG_PREVIOUS_CALL      =
-'Will be interpreted as `{}{}`. It may be necessary to add a `,`.'
+'Se intrepretará como `{}{}`. Podría ser necesario agregar una `.`.'
 DIAG_PREFIELD_CALL      =
-'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
+'Se intrepretará como `{}{}`. Podría ser necesario agregar una `.` ó `;`.'
 DIAG_OVER_MAX_ARGS      =
-'This function expects a maximum of {:d} argument(s) but instead it is receiving {:d}.'
+'Esta función espera un máximo de {:d} argumento(s), pero está recibiendo {:d}.'
 DIAG_MISS_ARGS          =
-'This function requires {:d} argument(s) but instead it is receiving {:d}.'
+'Esta función requiere {:d} argumento(s), pero está recibiendo {:d}.'
 DIAG_OVER_MAX_VALUES    =
-'Only has {} variables, but you set {} values.'
+'Solo tiene {} variables, pero se están asignando {} valores.'
 DIAG_AMBIGUITY_1        =
-'Compute `{}` first. You may need to add brackets.'
+'Se calcula `{}` primero. Agregar corchetes podría ser necesario.'
 DIAG_LOWERCASE_GLOBAL   =
-'Global variable in lowercase initial, Did you miss `local` or misspell it?'
+'Variable global con inicial minúscula, ¿olvidó agregar `local` o está mal escrita?'
 DIAG_EMPTY_BLOCK        =
-'Empty block.'
+'Bloque vacío.'
 DIAG_DIAGNOSTICS        =
-'Lua Diagnostics.'
+'Diagnósticos de Lua.'
 DIAG_SYNTAX_CHECK       =
-'Lua Syntax Check.'
+'Chequeo sintáctico de Lua.'
 DIAG_NEED_VERSION       =
-'Supported in {}, current is {}.'
+'Soportado en {}, actualmente usando {}.'
 DIAG_DEFINED_VERSION    =
-'Defined in {}, current is {}.'
+'Definido en {}, actualmente usando {}.'
 DIAG_DEFINED_CUSTOM     =
-'Defined in {}.'
+'Definido en {}.'
 DIAG_DUPLICATE_CLASS    =
-'Duplicate Class `{}`.'
+'La Clase `{}` está duplicada.'
 DIAG_UNDEFINED_CLASS    =
-'Undefined Class `{}`.'
+'La Clase `{}` no está definida.'
 DIAG_CYCLIC_EXTENDS     =
-'Cyclic extends.'
+'Extensiones cíclicas'
 DIAG_INEXISTENT_PARAM   =
-'Inexistent param.'
+'Parametro inexistente.'
 DIAG_DUPLICATE_PARAM    =
-'Duplicate param.'
+'Parametro duplicado.'
 DIAG_NEED_CLASS         =
-'Class needs to be defined first.'
+'La clase debe ser definida primero.'
 DIAG_DUPLICATE_SET_FIELD=
-'Duplicate field `{}`.'
+'Campo duplicado `{}`.'
 DIAG_SET_CONST          =
-'Assignment to const variable.'
+'Asignación de valor a una variable constante.'
 DIAG_SET_FOR_STATE      =
-'Assignment to for-state variable.'
+'Asignación de valor a una variable de bucle.'
 DIAG_CODE_AFTER_BREAK   =
-'Unable to execute code after `break`.'
+'Código después de `break` nunca se ejecuta.'
 DIAG_UNBALANCED_ASSIGNMENTS =
-'The value is assigned as `nil` because the number of values is not enough. In Lua, `x, y = 1 ` is equivalent to `x, y = 1, nil` .'
+'El valor que se asigna es `nil` debido a que el número de valores no es suficiente. En Lua, `x, y = 1 ` es equivalente a `x, y = 1, nil` .'
 DIAG_REQUIRE_LIKE       =
-'You can treat `{}` as `require` by setting.'
+'Puede tratar `{}` como `require` por configuración.'
 DIAG_COSE_NON_OBJECT    =
-'Cannot close a value of this type. (Unless set `__close` meta method)'
+'No se puede cerrar un valor de este tipo. (A menos que se asigne el método meta `__close`)'
 DIAG_COUNT_DOWN_LOOP    =
-'Do you mean `{}` ?'
+'Quizo decir `{}` ?'
 DIAG_UNKNOWN            =
-'Can not infer type.'
+'No se puede inferir el tipo.'
 DIAG_DEPRECATED         =
-'Deprecated.'
+'Obsoleto.'
 DIAG_DIFFERENT_REQUIRES =
-'The same file is required with different names.'
+'Al mismo archivo se le requiere con `require` con distintos nombres.'
 DIAG_REDUNDANT_RETURN   =
-'Redundant return.'
+'Retorno redundante.'
 DIAG_AWAIT_IN_SYNC      =
-'Async function can only be called in async function.'
+'Una función asíncrona solo puede ser llamada en una función asíncrona.'
 DIAG_NOT_YIELDABLE      =
-'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
+'El parámetro {}-ésimo de esta función no fue marcado como suspendible para ceder el control (`yield`), en vez, una función asíncrona fue provista. (Use `---@param nombre async fun()` para marcarlo como suspendible)'
 DIAG_DISCARD_RETURNS    =
-'The return values of this function cannot be discarded.'
+'No se pueden descartar los valores retornados por esta función.'
 DIAG_NEED_CHECK_NIL     =
-'Need check nil.'
+'Un chequeo de nil es necesario.'
 DIAG_CIRCLE_DOC_CLASS                 =
-'Circularly inherited classes.'
+'Clases con herencia circular.'
 DIAG_DOC_FIELD_NO_CLASS               =
-'The field must be defined after the class.'
+'El campo debe estar definido después que la clase.'
 DIAG_DUPLICATE_DOC_ALIAS              =
-'Duplicate defined alias `{}`.'
+'Alias `{}` fue definido múltiples veces.'
 DIAG_DUPLICATE_DOC_FIELD              =
-'Duplicate defined fields `{}`.'
+'Campos definidos múltiples veces `{}`.'
 DIAG_DUPLICATE_DOC_PARAM              =
-'Duplicate params `{}`.'
+'Parámetros duplicados `{}`.'
 DIAG_UNDEFINED_DOC_CLASS              =
-'Undefined class `{}`.'
+'Clase no definida `{}`.'
 DIAG_UNDEFINED_DOC_NAME               =
-'Undefined type or alias `{}`.'
+'Tipo o alias no definido `{}`.'
 DIAG_UNDEFINED_DOC_PARAM              =
-'Undefined param `{}`.'
+'Parámetro no definido `{}`.'
 DIAG_MISSING_GLOBAL_DOC_COMMENT       =
-'Missing comment for global function `{}`.'
+'Falta un comentario para la función global `{}`.'
 DIAG_MISSING_GLOBAL_DOC_PARAM         =
-'Missing @param annotation for parameter `{}` in global function `{}`.'
+'Falta una anotación @param para el parámetro `{}` en la función global `{}`.'
 DIAG_MISSING_GLOBAL_DOC_RETURN        =
-'Missing @return annotation at index `{}` in global function `{}`.'
+'Falta una anotación @return para el índice `{}` en la función global `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT  =
-'Missing comment for exported local function `{}`.'
+'Falta un un comentario para la función local exportada `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM    =
-'Missing @param annotation for parameter `{}` in exported local function `{}`.'
+'Falta una anotación @param para el parámetro `{}` en la función local `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN   =
-'Missing @return annotation at index `{}` in exported local function `{}`.'
+'Falta una anotación @return para el índice `{}` en la función local `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
-'Incomplete signature. Missing @param annotation for parameter `{}`.'
+'Firma incompleta. Falta una anotación @param para el parámetro `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
-'Incomplete signature. Missing @return annotation at index `{}`.'
+'Firma incompleta. Falta una anotación @return para el índice `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
-'Unknown diagnostic code `{}`.'
+'Código de diagnóstico desconocido `{}`.'
 DIAG_CAST_LOCAL_TYPE                  =
-'This variable is defined as type `{def}`. Cannot convert its type to `{ref}`.'
+'Esta variable fue definida como tipo `{def}`. No se puede convertir su tipo a `{ref}`.'
 DIAG_CAST_FIELD_TYPE                  =
-'This field is defined as type `{def}`. Cannot convert its type to `{ref}`.'
+'Este campo fue definido como tipo `{def}`. No se puede convertir su tipo a `{ref}`.'
 DIAG_ASSIGN_TYPE_MISMATCH             =
-'Cannot assign `{ref}` to `{def}`.'
+'No se puede asignar `{ref}` a `{def}`'
 DIAG_PARAM_TYPE_MISMATCH              =
 'Cannot assign `{ref}` to parameter `{def}`.'
 DIAG_UNKNOWN_CAST_VARIABLE            =
-'Unknown type conversion variable `{}`.'
+'Variable de conversión de tipo desconocida `{}`.'
 DIAG_CAST_TYPE_MISMATCH               =
-'Cannot convert `{def}` to `{ref}`。'
+'No se puede convertir `{ref}` a `{def}`。'
 DIAG_MISSING_RETURN_VALUE             =
-'Annotations specify that at least {min} return value(s) are required, found {rmax} returned here instead.'
+'Las anotaciones especifican que se requieren al menos {min} valor(es) de retorno, en cambio, se encontró que se retornaron {rmax}.'
 DIAG_MISSING_RETURN_VALUE_RANGE       =
-'Annotations specify that at least {min} return value(s) are required, found {rmin} to {rmax} returned here instead.'
+'Las anotaciones especifican que se requieren al menos {min} valor(es), en cambio, se encontró que se retornaron entre {rmin} y {rmax}.'
 DIAG_REDUNDANT_RETURN_VALUE           =
-'Annotations specify that at most {max} return value(s) are required, found {rmax} returned here instead.'
+'Las anotaciones especifican que se retornan a lo más {max} valor(es), en cambio, se encontró que se retornaron {rmax}.'
 DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
-'Annotations specify that at most {max} return value(s) are required, found {rmin} to {rmax} returned here instead.'
+'Las anotaciones especifican que se retornan a lo más {max} valor(es), en cambio, se encontró que se retornaron entre {rmin} y {rmax}.'
 DIAG_MISSING_RETURN                   =
-'Annotations specify that a return value is required here.'
+'Las anotaciones especifican que se requiere un valor de retorno aquí.'
 DIAG_RETURN_TYPE_MISMATCH             =
-'Annotations specify that return value #{index} has a type of `{def}`, returning value of type `{ref}` here instead.'
+'Las anotaciones especifican que el valor de retorno #{index} tiene `{def}` como tipo, en cambio, se está retornando un valor de tipo `{ref}`.'
 DIAG_UNKNOWN_OPERATOR                 =
-'Unknown operator `{}`.'
+'Operación desconocida `{}`.'
 DIAG_UNREACHABLE_CODE                 =
-'Unreachable code.'
+'Este código nunca es ejecutado.'
 DIAG_INVISIBLE_PRIVATE                =
-'Field `{field}` is private, it can only be accessed in class `{class}`.'
+'El campo `{field}` es privado, solo puede ser accedido desde la clase `{class}`.'
 DIAG_INVISIBLE_PROTECTED              =
-'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
+'El campo `{field}` es protegido, solo puede ser accedido desde la clase `{class}` y sus sub-clases.'
 DIAG_INVISIBLE_PACKAGE                =
-'Field `{field}` can only be accessed in same file `{uri}`.'
+'Al campo `{field}` solo se le puede acceder dentro del mismo archivo `{uri}`.'
 DIAG_GLOBAL_ELEMENT                   =
-'Element is global.'
+'El elemento es global.'
 DIAG_MISSING_FIELDS                   =
-'Missing required fields in type `{1}`: {2}'
+'Faltan los campos requeridos en el tipo `{1}`: {2}'
 DIAG_INJECT_FIELD                     =
-'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
+'Los campos no pueden ser inyectados a la referencia de `{class}` para `{field}`. {fix}'
 DIAG_INJECT_FIELD_FIX_CLASS           =
-'To do so, use `---@class` for `{node}`.'
+'Para que sea así, use `---@class` para `{node}`.'
 DIAG_INJECT_FIELD_FIX_TABLE           =
-'To allow injection, add `{fix}` to the definition.'
+'Para permitir la inyección, agregue `{fix}` a la definición.'
 
 MWS_NOT_SUPPORT         =
-'{} does not support multi workspace for now, I may need to restart to support the new workspace ...'
+'{} no soporta múltiples espacios de trabajo por ahora, podría ser necesario que me reinicie para soportar el nuevo espacio de trabajo ...'
 MWS_RESTART             =
-'Restart'
+'Reiniciar'
 MWS_NOT_COMPLETE        =
-'Workspace is not complete yet. You may try again later...'
+'El espacio de trabajo aún no está completo. Puede intentarlo más tarde...'
 MWS_COMPLETE            =
-'Workspace is complete now. You may try again...'
+'El espacio de trabajo está completado. Puede intentarlo de nuevo...'
 MWS_MAX_PRELOAD         =
-'Preloaded files has reached the upper limit ({}), you need to manually open the files that need to be loaded.'
+'El número de archivos pre-cargados ha llegado al límite ({}), es necesario abrir manualmente los archivos que necesiten ser cargados.'
 MWS_UCONFIG_FAILED      =
-'Saving user setting failed.'
+'El guardado de la configuración de usuario falló.'
 MWS_UCONFIG_UPDATED     =
-'User setting updated.'
+'La configuración de usuario fue actualizada.'
 MWS_WCONFIG_UPDATED     =
-'Workspace setting updated.'
+'El espacio de trabajo fue actualizado.'
 
 WORKSPACE_SKIP_LARGE_FILE =
-'Too large file: {} skipped. The currently set size limit is: {} KB, and the file size is: {} KB.'
+'Archivo es muy grande: {} fue omitido. El límite de tamaño actual es: {} KB, y el tamaño de archivo es: {} KB.'
 WORKSPACE_LOADING         =
-'Loading workspace'
+'Cargando el espacio de trabajo.'
 WORKSPACE_DIAGNOSTIC      =
-'Diagnosing workspace'
+'Diagnosticando el espacio de trabajo'
 WORKSPACE_SKIP_HUGE_FILE  =
-'For performance reasons, the parsing of this file has been stopped: {}'
+'Por temas de rendimiento se detuvo la lectura de este archivo: {}'
 WORKSPACE_NOT_ALLOWED     =
-'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
+'Su espacio de trabajo está asignado a `{}`. El servidor de lenguage de Lua se rehusó a cargar este directorio. Por favor, revise se configuración. [más info acá (en inglés)](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
-'More than {} files have been scanned. The current scanned directory is `{}`. Please see the [FAQ](https://luals.github.io/wiki/faq/#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
+'Se revisaron más de {} archivos. El directorio actual de revisión es `{}`. Por favor, revise [estas preguntas y respuestas frecuentes (en inglés)](https://luals.github.io/wiki/faq/#how-can-i-improve-startup-speeds) para ver cómo se podrían incluir menos archivos. También es posible que su [configuración esté incorrecta (en inglés)](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 'Parser crashed! Last words:{}'

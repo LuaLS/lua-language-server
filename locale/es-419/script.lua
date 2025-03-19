@@ -208,33 +208,33 @@ WORKSPACE_SCAN_TOO_MUCH   =
 'Se revisaron más de {} archivos. El directorio actual de revisión es `{}`. Por favor, revise [estas preguntas y respuestas frecuentes (en inglés)](https://luals.github.io/wiki/faq/#how-can-i-improve-startup-speeds) para ver cómo se podrían incluir menos archivos. También es posible que su [configuración esté incorrecta (en inglés)](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
-'Parser crashed! Last words:{}'
+'¡El lector se cayó! Las últimas palabras fueron:{}'
 PARSER_UNKNOWN          =
-'Unknown syntax error...'
+'Error desconocido de sintaxis...'
 PARSER_MISS_NAME        =
-'<name> expected.'
+'Se esperaba <name>.'
 PARSER_UNKNOWN_SYMBOL   =
-'Unexpected symbol `{symbol}`.'
+'Símbolo inesperado `{symbol}`.'
 PARSER_MISS_SYMBOL      =
-'Missed symbol `{symbol}`.'
+'Símbolo faltante `{symbol}`.'
 PARSER_MISS_ESC_X       =
-'Should be 2 hexadecimal digits.'
+'Deberían ser 2 dígitos hexadecimales.'
 PARSER_UTF8_SMALL       =
-'At least 1 hexadecimal digit.'
+'Al menos 1 dígito hexadecimal.'
 PARSER_UTF8_MAX         =
-'Should be between {min} and {max} .'
+'Deberían ser entre {min} y {max}.'
 PARSER_ERR_ESC          =
-'Invalid escape sequence.'
+'Secuencia inválida de escape.'
 PARSER_MUST_X16         =
-'Should be hexadecimal digits.'
+'Deberían ser dígitos hexadecimales.'
 PARSER_MISS_EXPONENT    =
-'Missed digits for the exponent.'
+'Faltan los dígitos para el exponente.'
 PARSER_MISS_EXP         =
-'<exp> expected.'
+'Se esperaba <exp>.'
 PARSER_MISS_FIELD       =
-'<field> expected.'
+'Se esperaba <field>.'
 PARSER_MISS_METHOD      =
-'<method> expected.'
+'Se esperaba <method>.'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` should be the last arg.'
 PARSER_KEYWORD          =
@@ -246,303 +246,303 @@ PARSER_BREAK_OUTSIDE    =
 PARSER_MALFORMED_NUMBER =
 'Malformed number.'
 PARSER_ACTION_AFTER_RETURN =
-'<eof> expected after `return`.'
+'Se esperaba <eof> después de `return`.'
 PARSER_ACTION_AFTER_BREAK =
-'<eof> expected after `break`.'
+'Se esperaba <eof> después de `break`.'
 PARSER_NO_VISIBLE_LABEL =
-'No visible label `{label}` .'
+'No se ve la etiqueta `{label}` .'
 PARSER_REDEFINE_LABEL   =
-'Label `{label}` already defined.'
+'La etiqueta `{label}` ya fue definida.'
 PARSER_UNSUPPORT_SYMBOL =
-'{version} does not support this grammar.'
+'{version} no soporta esta gramática.'
 PARSER_UNEXPECT_DOTS    =
-'Cannot use `...` outside a vararg function.'
+'No se puede usar `...` fuera de una función de vararg.'
 PARSER_UNEXPECT_SYMBOL  =
-'Unexpected symbol `{symbol}` .'
+'Símbolo inesperado `{symbol}`.'
 PARSER_UNKNOWN_TAG      =
-'Unknown attribute.'
+'Atributo desconocido.'
 PARSER_MULTI_TAG        =
-'Does not support multi attributes.'
+'Los multi-atributos no están soportados.'
 PARSER_UNEXPECT_LFUNC_NAME =
-'Local function can only use identifiers as name.'
+'La función local solo puede ser usar identificadores como nombre.'
 PARSER_UNEXPECT_EFUNC_NAME =
-'Function as expression cannot be named.'
+'La función como expresión no puede ser nombrada.'
 PARSER_ERR_LCOMMENT_END =
-'Multi-line annotations should be closed by `{symbol}` .'
+'Las anotaciones multi-línea deben ser cerradas por `{symbol}` .'
 PARSER_ERR_C_LONG_COMMENT =
-'Lua should use `--[[ ]]` for multi-line annotations.'
+'En Lua debe usarse `--[[ ]]` para anotaciones multi-línea.'
 PARSER_ERR_LSTRING_END  =
-'Long string should be closed by `{symbol}` .'
+'Los strings largos se deben cerrar con `{symbol}` .'
 PARSER_ERR_ASSIGN_AS_EQ =
-'Should use `=` for assignment.'
+'Se debe usar `=` para la asignación.'
 PARSER_ERR_EQ_AS_ASSIGN =
-'Should use `==` for equal.'
+'Se debe usar `==` para la igualdad.'
 PARSER_ERR_UEQ          =
-'Should use `~=` for not equal.'
+'Se debe usar `~=` para la no igualdad.'
 PARSER_ERR_THEN_AS_DO   =
-'Should use `then` .'
+'Debería usar `then` .'
 PARSER_ERR_DO_AS_THEN   =
-'Should use `do` .'
+'Debería usar `do` .'
 PARSER_MISS_END         =
-'Miss corresponding `end` .'
+'Falta el `end` correspondiente.'
 PARSER_ERR_COMMENT_PREFIX =
-'Lua should use `--` for annotations.'
+'En Lua se debe usar `--` para las anotaciones.'
 PARSER_MISS_SEP_IN_TABLE =
-'Miss symbol `,` or `;` .'
+'Falta el símbolo `,` ó `;` .'
 PARSER_SET_CONST         =
-'Assignment to const variable.'
+'Asignación de valor a una variable constante.'
 PARSER_UNICODE_NAME      =
-'Contains Unicode characters.'
+'Contiene caracteres Unicode.'
 PARSER_ERR_NONSTANDARD_SYMBOL =
-'Lua should use `{symbol}` .'
+'En Lua se debe usar `{symbol}` .'
 PARSER_MISS_SPACE_BETWEEN =
-'Spaces must be left between symbols.'
+'Se deben dejar espacios entre símbolos.'
 PARSER_INDEX_IN_FUNC_NAME =
-'The `[name]` form cannot be used in the name of a named function.'
+'La forma `[name]` no puede ser usada en el nombre de una función nombrada.'
 PARSER_UNKNOWN_ATTRIBUTE  =
-'Local attribute should be `const` or `close`'
+'El atributo local debe ser `const` ó `close`'
 PARSER_AMBIGUOUS_SYNTAX   =
-'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
+'En Lua 5.1, los corchetes izquierdos llamados por la función deben estar en la misma línea que la función.'
 PARSER_NEED_PAREN         =
-'Need to add a pair of parentheses.'
+'Se necesita agregar un par de paréntesis.'
 PARSER_NESTING_LONG_MARK  =
-'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
+'La anidación de `[[...]]` no está permitida en Lua 5.1 .'
 PARSER_LOCAL_LIMIT        =
-'Only 200 active local variables and upvalues can be existed at the same time.'
-PARSER_LUADOC_MISS_CLASS_NAME           =
-'<class name> expected.'
-PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
-'`:` expected.'
-PARSER_LUADOC_MISS_CLASS_EXTENDS_NAME   =
-'<class extends name> expected.'
-PARSER_LUADOC_MISS_SYMBOL               =
-'`{symbol}` expected.'
-PARSER_LUADOC_MISS_ARG_NAME             =
-'<arg name> expected.'
-PARSER_LUADOC_MISS_TYPE_NAME            =
-'<type name> expected.'
-PARSER_LUADOC_MISS_ALIAS_NAME           =
-'<alias name> expected.'
-PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
-'<alias extends> expected.'
-PARSER_LUADOC_MISS_PARAM_NAME           =
-'<param name> expected.'
-PARSER_LUADOC_MISS_PARAM_EXTENDS        =
-'<param extends> expected.'
-PARSER_LUADOC_MISS_FIELD_NAME           =
-'<field name> expected.'
-PARSER_LUADOC_MISS_FIELD_EXTENDS        =
-'<field extends> expected.'
-PARSER_LUADOC_MISS_GENERIC_NAME         =
-'<generic name> expected.'
-PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME =
-'<generic extends name> expected.'
-PARSER_LUADOC_MISS_VARARG_TYPE          =
-'<vararg type> expected.'
-PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
-'`fun` expected.'
-PARSER_LUADOC_MISS_CATE_NAME            =
-'<doc name> expected.'
-PARSER_LUADOC_MISS_DIAG_MODE            =
-'<diagnostic mode> expected.'
-PARSER_LUADOC_ERROR_DIAG_MODE           =
+'Solo 200 variables locales activas y valores anteriores pueden existir al mismo tiempo.'
+PARSER_LUADOC_MISS_CLASS_NAME          =
+'Se esperaba <class name>.'
+PARSER_LUADOC_MISS_EXTENDS_SYMBOL      =
+'Se esperaba `:`.'
+PARSER_LUADOC_MISS_CLASS_EXTENDS_NAME  =
+'Se esperaba <class extends name>.'
+PARSER_LUADOC_MISS_SYMBOL              =
+'Se esperaba `{symbol}`.'
+PARSER_LUADOC_MISS_ARG_NAME            =
+'Se esperaba <arg name>.'
+PARSER_LUADOC_MISS_TYPE_NAME           =
+'Se esperaba <type name>.'
+PARSER_LUADOC_MISS_ALIAS_NAME          =
+'Se esperaba <alias name>.'
+PARSER_LUADOC_MISS_ALIAS_EXTENDS       =
+'Se esperaba <alias extends>.'
+PARSER_LUADOC_MISS_PARAM_NAME          =
+'Se esperaba <param name>.'
+PARSER_LUADOC_MISS_PARAM_EXTENDS       =
+'Se esperaba <param extends>.'
+PARSER_LUADOC_MISS_FIELD_NAME          =
+'Se esperaba <field name>.'
+PARSER_LUADOC_MISS_FIELD_EXTENDS       =
+'Se esperaba <field extends>.'
+PARSER_LUADOC_MISS_GENERIC_NAME        =
+'Se esperaba <generic name>.'
+PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME=
+'Se esperaba <generic extends name>.'
+PARSER_LUADOC_MISS_VARARG_TYPE         =
+'Se esperaba <vararg type>.'
+PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD  =
+'Se esperaba `fun`.'
+PARSER_LUADOC_MISS_CATE_NAME           =
+'Se esperaba <doc name>.'
+PARSER_LUADOC_MISS_DIAG_MODE           =
+'Se esperaba <diagnostic mode>.'
+PARSER_LUADOC_ERROR_DIAG_MODE          =
 '<diagnostic mode> incorrect.'
-PARSER_LUADOC_MISS_LOCAL_NAME           =
-'<local name> expected.'
+PARSER_LUADOC_MISS_LOCAL_NAME          =
+'Se esperaba <local name>.'
 
-SYMBOL_ANONYMOUS        =
+SYMBOL_ANONYMOUS       =
 '<Anonymous>'
 
-HOVER_VIEW_DOCUMENTS    =
-'View documents'
-HOVER_DOCUMENT_LUA51    =
+HOVER_VIEW_DOCUMENTS   =
+'Ver documentos'
+HOVER_DOCUMENT_LUA51   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_DOCUMENT_LUA52    =
+HOVER_DOCUMENT_LUA52   =
 'http://www.lua.org/manual/5.2/manual.html#{}'
-HOVER_DOCUMENT_LUA53    =
+HOVER_DOCUMENT_LUA53   =
 'http://www.lua.org/manual/5.3/manual.html#{}'
-HOVER_DOCUMENT_LUA54    =
+HOVER_DOCUMENT_LUA54   =
 'http://www.lua.org/manual/5.4/manual.html#{}'
-HOVER_DOCUMENT_LUAJIT   =
+HOVER_DOCUMENT_LUAJIT  =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_NATIVE_DOCUMENT_LUA51     =
+HOVER_NATIVE_DOCUMENT_LUA51    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA52     =
+HOVER_NATIVE_DOCUMENT_LUA52    =
 'command:extension.lua.doc?["en-us/52/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA53     =
+HOVER_NATIVE_DOCUMENT_LUA53    =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA54     =
+HOVER_NATIVE_DOCUMENT_LUA54    =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUAJIT    =
+HOVER_NATIVE_DOCUMENT_LUAJIT   =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-HOVER_MULTI_PROTOTYPE      =
-'({} prototypes)'
-HOVER_STRING_BYTES         =
+HOVER_MULTI_PROTOTYPE     =
+'({} prototipos)'
+HOVER_STRING_BYTES        =
 '{} bytes'
-HOVER_STRING_CHARACTERS    =
+HOVER_STRING_CHARACTERS   =
 '{} bytes, {} characters'
-HOVER_MULTI_DEF_PROTO      =
-'({} definitions, {} prototypes)'
-HOVER_MULTI_PROTO_NOT_FUNC =
-'({} non functional definition)'
-HOVER_USE_LUA_PATH      =
-'(Search path: `{}`)'
-HOVER_EXTENDS           =
-'Expand to {}'
-HOVER_TABLE_TIME_UP     =
-'Partial type inference has been disabled for performance reasons.'
-HOVER_WS_LOADING        =
-'Workspace loading: {} / {}'
-HOVER_AWAIT_TOOLTIP     =
-'Calling async function, current thread may be yielded.'
+HOVER_MULTI_DEF_PROTO     =
+'({} definiciones, {} prototipos)'
+HOVER_MULTI_PROTO_NOT_FUNC=
+'({} definiciones no-funcionales)'
+HOVER_USE_LUA_PATH     =
+'(Ruta de búsqueda: `{}`)'
+HOVER_EXTENDS          =
+'Se expande a {}'
+HOVER_TABLE_TIME_UP    =
+'Por temas de rendimiento se deshabilito la inferencia parcial de tipo.'
+HOVER_WS_LOADING       =
+'Cargando espacio de trabajo: {} / {}'
+HOVER_AWAIT_TOOLTIP    =
+'Llamando a la función asíncrona, la hebra actual podría ser suspendida.'
 
-ACTION_DISABLE_DIAG     =
-'Disable diagnostics in the workspace ({}).'
-ACTION_MARK_GLOBAL      =
-'Mark `{}` as defined global.'
-ACTION_REMOVE_SPACE     =
-'Clear all postemptive spaces.'
-ACTION_ADD_SEMICOLON    =
-'Add `;` .'
-ACTION_ADD_BRACKETS     =
-'Add brackets.'
-ACTION_RUNTIME_VERSION  =
-'Change runtime version to {} .'
-ACTION_OPEN_LIBRARY     =
-'Load globals from {} .'
-ACTION_ADD_DO_END       =
-'Add `do ... end` .'
-ACTION_FIX_LCOMMENT_END =
-'Modify to the correct multi-line annotations closing symbol.'
-ACTION_ADD_LCOMMENT_END =
-'Close multi-line annotations.'
-ACTION_FIX_C_LONG_COMMENT =
+ACTION_DISABLE_DIAG    =
+'Deshabilita los diagnósticos en el espacio de trabajo ({}).'
+ACTION_MARK_GLOBAL     =
+'Marca `{}` como global definida.'
+ACTION_REMOVE_SPACE    =
+'Quita todos los espacios al final de línea.'
+ACTION_ADD_SEMICOLON   =
+'Agrega `;` .'
+ACTION_ADD_BRACKETS    =
+'Agrega corchetes.'
+ACTION_RUNTIME_VERSION =
+'Cambia la versión a ejecutar a {} .'
+ACTION_OPEN_LIBRARY    =
+'Carga globales de {} .'
+ACTION_ADD_DO_END      =
+'Agrega `do ... end` .'
+ACTION_FIX_LCOMMENT_END=
+'Modifica al símbolo de cierre correcto para la anotación multi-línea.'
+ACTION_ADD_LCOMMENT_END=
+'Cierra las anotaciones multi-línea.'
+ACTION_FIX_C_LONG_COMMENT= -- TODO: needs localisation
 'Modify to Lua multi-line annotations format.'
-ACTION_FIX_LSTRING_END  =
+ACTION_FIX_LSTRING_END = -- TODO: needs localisation
 'Modify to the correct long string closing symbol.'
-ACTION_ADD_LSTRING_END  =
+ACTION_ADD_LSTRING_END = -- TODO: needs localisation
 'Close long string.'
-ACTION_FIX_ASSIGN_AS_EQ =
+ACTION_FIX_ASSIGN_AS_EQ= -- TODO: needs localisation
 'Modify to `=` .'
-ACTION_FIX_EQ_AS_ASSIGN =
+ACTION_FIX_EQ_AS_ASSIGN= -- TODO: needs localisation
 'Modify to `==` .'
-ACTION_FIX_UEQ          =
+ACTION_FIX_UEQ         = -- TODO: needs localisation
 'Modify to `~=` .'
-ACTION_FIX_THEN_AS_DO   =
+ACTION_FIX_THEN_AS_DO  = -- TODO: needs localisation
 'Modify to `then` .'
-ACTION_FIX_DO_AS_THEN   =
+ACTION_FIX_DO_AS_THEN  = -- TODO: needs localisation
 'Modify to `do` .'
-ACTION_ADD_END          =
+ACTION_ADD_END         = -- TODO: needs localisation
 'Add `end` (infer the addition location ny indentations).'
-ACTION_FIX_COMMENT_PREFIX =
+ACTION_FIX_COMMENT_PREFIX= -- TODO: needs localisation
 'Modify to `--` .'
-ACTION_FIX_NONSTANDARD_SYMBOL =
+ACTION_FIX_NONSTANDARD_SYMBOL= -- TODO: needs localisation
 'Modify to `{symbol}` .'
-ACTION_RUNTIME_UNICODE_NAME =
+ACTION_RUNTIME_UNICODE_NAME= -- TODO: needs localisation
 'Allow Unicode characters.'
-ACTION_SWAP_PARAMS      =
+ACTION_SWAP_PARAMS     = -- TODO: needs localisation
 'Change to parameter {index} of `{node}`'
-ACTION_FIX_INSERT_SPACE =
+ACTION_FIX_INSERT_SPACE= -- TODO: needs localisation
 'Insert space.'
-ACTION_JSON_TO_LUA      =
+ACTION_JSON_TO_LUA     = -- TODO: needs localisation
 'Convert JSON to Lua'
 ACTION_DISABLE_DIAG_LINE=
 'Disable diagnostics on this line ({}).'
 ACTION_DISABLE_DIAG_FILE=
 'Disable diagnostics in this file ({}).'
-ACTION_MARK_ASYNC       =
+ACTION_MARK_ASYNC      = -- TODO: needs localisation
 'Mark current function as async.'
-ACTION_ADD_DICT         =
+ACTION_ADD_DICT        = -- TODO: needs localisation
 'Add \'{}\' to workspace dict'
-ACTION_FIX_ADD_PAREN    =
+ACTION_FIX_ADD_PAREN   = -- TODO: needs localisation
 'Add parentheses.'
-ACTION_AUTOREQUIRE      =
+ACTION_AUTOREQUIRE     = -- TODO: needs localisation
 "Import '{}' as {}"
 
-COMMAND_DISABLE_DIAG       =
+COMMAND_DISABLE_DIAG      = -- TODO: needs localisation
 'Disable diagnostics'
-COMMAND_MARK_GLOBAL        =
+COMMAND_MARK_GLOBAL       = -- TODO: needs localisation
 'Mark defined global'
-COMMAND_REMOVE_SPACE       =
+COMMAND_REMOVE_SPACE      = -- TODO: needs localisation
 'Clear all postemptive spaces'
-COMMAND_ADD_BRACKETS       =
+COMMAND_ADD_BRACKETS      = -- TODO: needs localisation
 'Add brackets'
-COMMAND_RUNTIME_VERSION    =
+COMMAND_RUNTIME_VERSION   = -- TODO: needs localisation
 'Change runtime version'
-COMMAND_OPEN_LIBRARY       =
+COMMAND_OPEN_LIBRARY      = -- TODO: needs localisation
 'Load globals from 3rd library'
-COMMAND_UNICODE_NAME       =
+COMMAND_UNICODE_NAME      = -- TODO: needs localisation
 'Allow Unicode characters.'
-COMMAND_JSON_TO_LUA        =
+COMMAND_JSON_TO_LUA       = -- TODO: needs localisation
 'Convert JSON to Lua'
-COMMAND_JSON_TO_LUA_FAILED =
+COMMAND_JSON_TO_LUA_FAILED= -- TODO: needs localisation
 'Convert JSON to Lua failed: {}'
-COMMAND_ADD_DICT           =
+COMMAND_ADD_DICT          = -- TODO: needs localisation
 'Add Word to dictionary'
-COMMAND_REFERENCE_COUNT    =
+COMMAND_REFERENCE_COUNT   = -- TODO: needs localisation
 '{} references'
 
-COMPLETION_IMPORT_FROM           =
+COMPLETION_IMPORT_FROM          = -- TODO: needs localisation
 'Import from {}'
-COMPLETION_DISABLE_AUTO_REQUIRE  =
+COMPLETION_DISABLE_AUTO_REQUIRE = -- TODO: needs localisation
 'Disable auto require'
-COMPLETION_ASK_AUTO_REQUIRE      =
+COMPLETION_ASK_AUTO_REQUIRE     = -- TODO: needs localisation
 'Add the code at the top of the file to require this file?'
 
-DEBUG_MEMORY_LEAK       =
+DEBUG_MEMORY_LEAK      = -- TODO: needs localisation
 "{} I'm sorry for the serious memory leak. The language service will be restarted soon."
-DEBUG_RESTART_NOW       =
+DEBUG_RESTART_NOW      = -- TODO: needs localisation
 'Restart now'
 
-WINDOW_COMPILING                 =
+WINDOW_COMPILING                = -- TODO: needs localisation
 'Compiling'
-WINDOW_DIAGNOSING                =
+WINDOW_DIAGNOSING               = -- TODO: needs localisation
 'Diagnosing'
-WINDOW_INITIALIZING              =
+WINDOW_INITIALIZING             = -- TODO: needs localisation
 'Initializing...'
-WINDOW_PROCESSING_HOVER          =
+WINDOW_PROCESSING_HOVER         = -- TODO: needs localisation
 'Processing hover...'
-WINDOW_PROCESSING_DEFINITION     =
+WINDOW_PROCESSING_DEFINITION    = -- TODO: needs localisation
 'Processing definition...'
-WINDOW_PROCESSING_REFERENCE      =
+WINDOW_PROCESSING_REFERENCE     = -- TODO: needs localisation
 'Processing reference...'
-WINDOW_PROCESSING_RENAME         =
+WINDOW_PROCESSING_RENAME        = -- TODO: needs localisation
 'Processing rename...'
-WINDOW_PROCESSING_COMPLETION     =
+WINDOW_PROCESSING_COMPLETION    = -- TODO: needs localisation
 'Processing completion...'
-WINDOW_PROCESSING_SIGNATURE      =
+WINDOW_PROCESSING_SIGNATURE     = -- TODO: needs localisation
 'Processing signature help...'
-WINDOW_PROCESSING_SYMBOL         =
+WINDOW_PROCESSING_SYMBOL        = -- TODO: needs localisation
 'Processing file symbols...'
-WINDOW_PROCESSING_WS_SYMBOL      =
+WINDOW_PROCESSING_WS_SYMBOL     = -- TODO: needs localisation
 'Processing workspace symbols...'
-WINDOW_PROCESSING_SEMANTIC_FULL  =
+WINDOW_PROCESSING_SEMANTIC_FULL = -- TODO: needs localisation
 'Processing full semantic tokens...'
-WINDOW_PROCESSING_SEMANTIC_RANGE =
+WINDOW_PROCESSING_SEMANTIC_RANGE= -- TODO: needs localisation
 'Processing incremental semantic tokens...'
-WINDOW_PROCESSING_HINT           =
+WINDOW_PROCESSING_HINT          = -- TODO: needs localisation
 'Processing inline hint...'
-WINDOW_PROCESSING_BUILD_META     =
+WINDOW_PROCESSING_BUILD_META    = -- TODO: needs localisation
 'Processing build meta...'
-WINDOW_INCREASE_UPPER_LIMIT      =
+WINDOW_INCREASE_UPPER_LIMIT     = -- TODO: needs localisation
 'Increase upper limit'
-WINDOW_CLOSE                     =
+WINDOW_CLOSE                    = -- TODO: needs localisation
 'Close'
-WINDOW_SETTING_WS_DIAGNOSTIC     =
+WINDOW_SETTING_WS_DIAGNOSTIC    = -- TODO: needs localisation
 'You can delay or disable workspace diagnostics in settings'
-WINDOW_DONT_SHOW_AGAIN           =
+WINDOW_DONT_SHOW_AGAIN          = -- TODO: needs localisation
 "Don't show again"
-WINDOW_DELAY_WS_DIAGNOSTIC       =
+WINDOW_DELAY_WS_DIAGNOSTIC      = -- TODO: needs localisation
 'Idle time diagnosis (delay {} seconds)'
-WINDOW_DISABLE_DIAGNOSTIC        =
+WINDOW_DISABLE_DIAGNOSTIC       = -- TODO: needs localisation
 'Disable workspace diagnostics'
-WINDOW_LUA_STATUS_WORKSPACE      =
+WINDOW_LUA_STATUS_WORKSPACE     = -- TODO: needs localisation
 'Workspace   : {}'
-WINDOW_LUA_STATUS_CACHED_FILES   =
+WINDOW_LUA_STATUS_CACHED_FILES  = -- TODO: needs localisation
 'Cached files: {ast}/{max}'
-WINDOW_LUA_STATUS_MEMORY_COUNT   =
+WINDOW_LUA_STATUS_MEMORY_COUNT  = -- TODO: needs localisation
 'Memory usage: {mem:.f}M'
-WINDOW_LUA_STATUS_TIP            =
+WINDOW_LUA_STATUS_TIP           = -- TODO: needs localisation
 [[
 
 This icon is a cat,
@@ -551,54 +551,54 @@ Not a dog nor a fox!
 ]]
 WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
 'Perform workspace diagnosis'
-WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG = -- TODO: needs localisation
 'Do you want to perform workspace diagnosis?'
-WINDOW_APPLY_SETTING             =
+WINDOW_APPLY_SETTING            = -- TODO: needs localisation
 'Apply setting'
-WINDOW_CHECK_SEMANTIC            =
+WINDOW_CHECK_SEMANTIC           = -- TODO: needs localisation
 'If you are using the color theme in the market, you may need to modify `editor.semanticHighlighting.enabled` to `true` to make semantic tokens take effect.'
-WINDOW_TELEMETRY_HINT            =
+WINDOW_TELEMETRY_HINT           = -- TODO: needs localisation
 'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://luals.github.io/privacy#language-server) .'
-WINDOW_TELEMETRY_ENABLE          =
+WINDOW_TELEMETRY_ENABLE         = -- TODO: needs localisation
 'Allow'
-WINDOW_TELEMETRY_DISABLE         =
+WINDOW_TELEMETRY_DISABLE        = -- TODO: needs localisation
 'Prohibit'
-WINDOW_CLIENT_NOT_SUPPORT_CONFIG =
+WINDOW_CLIENT_NOT_SUPPORT_CONFIG= -- TODO: needs localisation
 'Your client does not support modifying settings from the server side, please manually modify the following settings:'
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
 'Automatic modification of local settings is not currently supported, please manually modify the following settings:'
-WINDOW_MANUAL_CONFIG_ADD         =
+WINDOW_MANUAL_CONFIG_ADD        = -- TODO: needs localisation
 '`{key}`: add element `{value:q}` ;'
-WINDOW_MANUAL_CONFIG_SET         =
+WINDOW_MANUAL_CONFIG_SET        = -- TODO: needs localisation
 '`{key}`: set to `{value:q}` ;'
-WINDOW_MANUAL_CONFIG_PROP        =
+WINDOW_MANUAL_CONFIG_PROP       = -- TODO: needs localisation
 '`{key}`: set the property `{prop}` to `{value:q}`;'
-WINDOW_APPLY_WHIT_SETTING        =
+WINDOW_APPLY_WHIT_SETTING       = -- TODO: needs localisation
 'Apply and modify settings'
-WINDOW_APPLY_WHITOUT_SETTING     =
+WINDOW_APPLY_WHITOUT_SETTING    = -- TODO: needs localisation
 'Apply but do not modify settings'
-WINDOW_ASK_APPLY_LIBRARY         =
+WINDOW_ASK_APPLY_LIBRARY        = -- TODO: needs localisation
 'Do you need to configure your work environment as `{}`?'
-WINDOW_SEARCHING_IN_FILES        =
+WINDOW_SEARCHING_IN_FILES       = -- TODO: needs localisation
 'Searching in files...'
-WINDOW_CONFIG_LUA_DEPRECATED     =
+WINDOW_CONFIG_LUA_DEPRECATED    = -- TODO: needs localisation
 '`config.lua` is deprecated, please use `config.json` instead.'
-WINDOW_CONVERT_CONFIG_LUA        =
+WINDOW_CONVERT_CONFIG_LUA       = -- TODO: needs localisation
 'Convert to `config.json`'
-WINDOW_MODIFY_REQUIRE_PATH       =
+WINDOW_MODIFY_REQUIRE_PATH      = -- TODO: needs localisation
 'Do you want to modify the require path?'
-WINDOW_MODIFY_REQUIRE_OK         =
+WINDOW_MODIFY_REQUIRE_OK        = -- TODO: needs localisation
 'Modify'
 
-CONFIG_LOAD_FAILED               =
+CONFIG_LOAD_FAILED              = -- TODO: needs localisation
 'Unable to read the settings file: {}'
-CONFIG_LOAD_ERROR                =
+CONFIG_LOAD_ERROR               = -- TODO: needs localisation
 'Setting file loading error: {}'
-CONFIG_TYPE_ERROR                =
+CONFIG_TYPE_ERROR               = -- TODO: needs localisation
 'The setting file must be in lua or json format: {}'
-CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR = -- TODO: needs localisation
 'Failed to modify settings, there are syntax errors in the settings file: {}'
-CONFIG_MODIFY_FAIL_NO_WORKSPACE  =
+CONFIG_MODIFY_FAIL_NO_WORKSPACE = -- TODO: needs localisation
 [[
 Failed to modify settings:
 * The current mode is single-file mode, server cannot create `.luarc.json` without workspace.
@@ -607,7 +607,7 @@ Failed to modify settings:
 Please modify following settings manually:
 {}
 ]]
-CONFIG_MODIFY_FAIL               =
+CONFIG_MODIFY_FAIL              = -- TODO: needs localisation
 [[
 Failed to modify settings
 
@@ -615,88 +615,88 @@ Please modify following settings manually:
 {}
 ]]
 
-PLUGIN_RUNTIME_ERROR             =
+PLUGIN_RUNTIME_ERROR            = -- TODO: needs localisation
 [[
 An error occurred in the plugin, please report it to the plugin author.
 Please check the details in the output or log.
 Plugin path: {}
 ]]
-PLUGIN_TRUST_LOAD                =
+PLUGIN_TRUST_LOAD               = -- TODO: needs localisation
 [[
 The current settings try to load the plugin at this location:{}
 
 Note that malicious plugin may harm your computer
 ]]
-PLUGIN_TRUST_YES                 =
+PLUGIN_TRUST_YES                = -- TODO: needs localisation
 [[
 Trust and load this plugin
 ]]
-PLUGIN_TRUST_NO                  =
+PLUGIN_TRUST_NO                 = -- TODO: needs localisation
 [[
 Don't load this plugin
 ]]
 
-CLI_CHECK_ERROR_TYPE =
+CLI_CHECK_ERROR_TYPE= -- TODO: needs localisation
 'The argument of CHECK must be a string, but got {}'
-CLI_CHECK_ERROR_URI =
+CLI_CHECK_ERROR_URI= -- TODO: needs localisation
 'The argument of CHECK must be a valid uri, but got {}'
-CLI_CHECK_ERROR_LEVEL =
+CLI_CHECK_ERROR_LEVEL= -- TODO: needs localisation
 'Checklevel must be one of: {}'
-CLI_CHECK_INITING =
+CLI_CHECK_INITING= -- TODO: needs localisation
 'Initializing ...'
-CLI_CHECK_SUCCESS =
+CLI_CHECK_SUCCESS= -- TODO: needs localisation
 'Diagnosis completed, no problems found'
-CLI_CHECK_PROGRESS =
+CLI_CHECK_PROGRESS= -- TODO: needs localisation
 'Found {} problems in {} files'
-CLI_CHECK_RESULTS =
+CLI_CHECK_RESULTS= -- TODO: needs localisation
 'Diagnosis complete, {} problems found, see {}'
-CLI_CHECK_MULTIPLE_WORKERS =
+CLI_CHECK_MULTIPLE_WORKERS= -- TODO: needs localisation
 'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
-CLI_DOC_INITING   =
+CLI_DOC_INITING  = -- TODO: needs localisation
 'Loading documents ...'
-CLI_DOC_DONE      =
+CLI_DOC_DONE     = -- TODO: needs localisation
 [[
 Documentation exported:
 ]]
-CLI_DOC_WORKING   =
+CLI_DOC_WORKING  = -- TODO: needs localisation
 'Building docs...'
 
-TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH= -- TODO: needs localisation
 'Type `{child}` cannot match enumeration type of `{parent}`'
-TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED =
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED= -- TODO: needs localisation
 'Cannot use generic `{child}` in enumeration'
-TYPE_ERROR_ENUM_LITERAL_DISMATCH =
+TYPE_ERROR_ENUM_LITERAL_DISMATCH= -- TODO: needs localisation
 'Literal `{child}` cannot match the enumeration value of `{parent}`'
-TYPE_ERROR_ENUM_OBJECT_DISMATCH =
+TYPE_ERROR_ENUM_OBJECT_DISMATCH= -- TODO: needs localisation
 'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
-TYPE_ERROR_ENUM_NO_OBJECT =
+TYPE_ERROR_ENUM_NO_OBJECT= -- TODO: needs localisation
 'The passed in enumeration value `{child}` is not recognized'
-TYPE_ERROR_INTEGER_DISMATCH =
+TYPE_ERROR_INTEGER_DISMATCH= -- TODO: needs localisation
 'Literal `{child}` cannot match integer `{parent}`'
-TYPE_ERROR_STRING_DISMATCH =
+TYPE_ERROR_STRING_DISMATCH= -- TODO: needs localisation
 'Literal `{child}` cannot match string `{parent}`'
-TYPE_ERROR_BOOLEAN_DISMATCH =
+TYPE_ERROR_BOOLEAN_DISMATCH= -- TODO: needs localisation
 'Literal `{child}` cannot match boolean `{parent}`'
-TYPE_ERROR_TABLE_NO_FIELD =
+TYPE_ERROR_TABLE_NO_FIELD= -- TODO: needs localisation
 'Field `{key}` does not exist in the table'
-TYPE_ERROR_TABLE_FIELD_DISMATCH =
+TYPE_ERROR_TABLE_FIELD_DISMATCH= -- TODO: needs localisation
 'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
-TYPE_ERROR_CHILD_ALL_DISMATCH =
+TYPE_ERROR_CHILD_ALL_DISMATCH= -- TODO: needs localisation
 'All subtypes in `{child}` cannot match `{parent}`'
-TYPE_ERROR_PARENT_ALL_DISMATCH =
+TYPE_ERROR_PARENT_ALL_DISMATCH= -- TODO: needs localisation
 '`{child}` cannot match any subtypes in `{parent}`'
-TYPE_ERROR_UNION_DISMATCH =
+TYPE_ERROR_UNION_DISMATCH= -- TODO: needs localisation
 '`{child}` cannot match `{parent}`'
-TYPE_ERROR_OPTIONAL_DISMATCH =
+TYPE_ERROR_OPTIONAL_DISMATCH= -- TODO: needs localisation
 'Optional type cannot match `{parent}`'
-TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER= -- TODO: needs localisation
 'The number `{child}` cannot be converted to an integer'
-TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER= -- TODO: needs localisation
 'Cannot convert number type to integer type'
-TYPE_ERROR_DISMATCH =
+TYPE_ERROR_DISMATCH= -- TODO: needs localisation
 'Type `{child}` cannot match `{parent}`'
 
-LUADOC_DESC_CLASS =
+LUADOC_DESC_CLASS= -- TODO: needs localisation
 [=[
 Defines a class/table structure
 ## Syntax
@@ -709,7 +709,7 @@ Manager = {}
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#class)
 ]=]
-LUADOC_DESC_TYPE =
+LUADOC_DESC_TYPE= -- TODO: needs localisation
 [=[
 Specify the type of a certain variable
 
@@ -760,7 +760,7 @@ local myFunction
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#type)
 ]=]
-LUADOC_DESC_ALIAS =
+LUADOC_DESC_ALIAS= -- TODO: needs localisation
 [=[
 Create your own custom type that can be used with `@param`, `@type`, etc.
 
@@ -810,7 +810,7 @@ local enums = {
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#alias)
 ]=]
-LUADOC_DESC_PARAM =
+LUADOC_DESC_PARAM= -- TODO: needs localisation
 [=[
 Declare a function parameter
 
@@ -835,7 +835,7 @@ function concat(base, ...) end
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#param)
 ]=]
-LUADOC_DESC_RETURN =
+LUADOC_DESC_RETURN= -- TODO: needs localisation
 [=[
 Declare a return value
 
@@ -873,7 +873,7 @@ function getTags(item) end
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#return)
 ]=]
-LUADOC_DESC_FIELD =
+LUADOC_DESC_FIELD= -- TODO: needs localisation
 [=[
 Declare a field in a class/table. This allows you to provide more in-depth
 documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
@@ -904,7 +904,7 @@ statusCode = response.status.code
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#field)
 ]=]
-LUADOC_DESC_GENERIC =
+LUADOC_DESC_GENERIC= -- TODO: needs localisation
 [=[
 Simulates generics. Generics can allow types to be re-used as they help define
 a "generic shape" that can be used with different types.
@@ -961,7 +961,7 @@ local v = Generic("Foo") -- v is an object of Foo
 ---
 [View Wiki](https://luals.github.io/wiki/annotations/#generic)
 ]=]
-LUADOC_DESC_VARARG =
+LUADOC_DESC_VARARG= -- TODO: needs localisation
 [=[
 Primarily for legacy support for EmmyLua annotations. `@vararg` does not
 provide typing or allow descriptions.
@@ -980,7 +980,7 @@ function concat(...) end
 ---
 [View Wiki](https://luals.github.io/wiki/annotations/#vararg)
 ]=]
-LUADOC_DESC_OVERLOAD =
+LUADOC_DESC_OVERLOAD= -- TODO: needs localisation
 [=[
 Allows defining of multiple function signatures.
 
@@ -995,7 +995,7 @@ function table.insert(t, position, value) end
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#overload)
 ]=]
-LUADOC_DESC_DEPRECATED =
+LUADOC_DESC_DEPRECATED= -- TODO: needs localisation
 [=[
 Marks a function as deprecated. This results in any deprecated function calls
 being ~~struck through~~.
@@ -1006,7 +1006,7 @@ being ~~struck through~~.
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
-LUADOC_DESC_META =
+LUADOC_DESC_META= -- TODO: needs localisation
 [=[
 Indicates that this is a meta file and should be used for definitions and intellisense only.
 
@@ -1021,7 +1021,7 @@ There are 3 main distinctions to note with meta files:
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#meta)
 ]=]
-LUADOC_DESC_VERSION =
+LUADOC_DESC_VERSION= -- TODO: needs localisation
 [=[
 Specifies Lua versions that this function is exclusive to.
 
@@ -1046,7 +1046,7 @@ function oldLuaOnly() end
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#version)
 ]=]
-LUADOC_DESC_SEE =
+LUADOC_DESC_SEE= -- TODO: needs localisation
 [=[
 Define something that can be viewed for more information
 
@@ -1056,7 +1056,7 @@ Define something that can be viewed for more information
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#see)
 ]=]
-LUADOC_DESC_DIAGNOSTIC =
+LUADOC_DESC_DIAGNOSTIC= -- TODO: needs localisation
 [=[
 Enable/disable diagnostics for error/warnings/etc.
 
@@ -1082,7 +1082,7 @@ local unused = "hello world"
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
-LUADOC_DESC_MODULE =
+LUADOC_DESC_MODULE= -- TODO: needs localisation
 [=[
 Provides the semantics of `require`.
 
@@ -1099,7 +1099,7 @@ local module = require('string.utils')
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#module)
 ]=]
-LUADOC_DESC_ASYNC =
+LUADOC_DESC_ASYNC= -- TODO: needs localisation
 [=[
 Marks a function as asynchronous.
 
@@ -1109,7 +1109,7 @@ Marks a function as asynchronous.
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#async)
 ]=]
-LUADOC_DESC_NODISCARD =
+LUADOC_DESC_NODISCARD= -- TODO: needs localisation
 [=[
 Prevents this function's return values from being discarded/ignored.
 This will raise the `discard-returns` warning should the return values
@@ -1121,7 +1121,7 @@ be ignored.
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
-LUADOC_DESC_CAST =
+LUADOC_DESC_CAST= -- TODO: needs localisation
 [=[
 Allows type casting (type conversion).
 
@@ -1156,7 +1156,7 @@ print(x) --> table
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#cast)
 ]=]
-LUADOC_DESC_OPERATOR =
+LUADOC_DESC_OPERATOR= -- TODO: needs localisation
 [=[
 Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
 
@@ -1186,7 +1186,7 @@ pB = -pA
 ```
 [View Request](https://github.com/LuaLS/lua-language-server/issues/599)
 ]=]
-LUADOC_DESC_ENUM =
+LUADOC_DESC_ENUM= -- TODO: needs localisation
 [=[
 Mark a table as an enum. If you want an enum but can't define it as a Lua
 table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
@@ -1213,7 +1213,7 @@ local function setColor(color) end
 setColor(colors.green)
 ```
 ]=]
-LUADOC_DESC_SOURCE =
+LUADOC_DESC_SOURCE= -- TODO: needs localisation
 [=[
 Provide a reference to some source code which lives in another file. When
 searching for the definition of an item, its `@source` will be used.
@@ -1240,7 +1240,7 @@ local c
 local d
 ```
 ]=]
-LUADOC_DESC_PACKAGE =
+LUADOC_DESC_PACKAGE= -- TODO: needs localisation
 [=[
 Mark a function as private to the file it is defined in. A packaged function
 cannot be accessed from another file.
@@ -1261,7 +1261,7 @@ function Animal:eyesCount()
 end
 ```
 ]=]
-LUADOC_DESC_PRIVATE =
+LUADOC_DESC_PRIVATE= -- TODO: needs localisation
 [=[
 Mark a function as private to a @class. Private functions can be accessed only
 from within their class and are not accessible from child classes.
@@ -1287,7 +1287,7 @@ local myDog = {}
 myDog:eyesCount();
 ```
 ]=]
-LUADOC_DESC_PROTECTED =
+LUADOC_DESC_PROTECTED= -- TODO: needs localisation
 [=[
 Mark a function as protected within a @class. Protected functions can be
 accessed only from within their class or from child classes.

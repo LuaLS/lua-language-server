@@ -1,23 +1,23 @@
 ---@diagnostic disable: undefined-global
 
-config.addonManager.enable        =
+config.addonManager.enable        = -- TODO: needs localisation
 "Whether the addon manager is enabled or not."
-config.addonManager.repositoryBranch =
+config.addonManager.repositoryBranch = -- TODO: needs localisation
 "Specifies the git branch used by the addon manager."
-config.addonManager.repositoryPath =
+config.addonManager.repositoryPath = -- TODO: needs localisation
 "Specifies the git path used by the addon manager."
-config.runtime.version            =
+config.runtime.version            = -- TODO: needs localisation
 "Lua runtime version."
-config.runtime.path               =
+config.runtime.path               = -- TODO: needs localisation
 [[
 When using `require`, how to find the file based on the input name.
 Setting this config to `?/init.lua` means that when you enter `require 'myfile'`, `${workspace}/myfile/init.lua` will be searched from the loaded files.
 if `runtime.pathStrict` is `false`, `${workspace}/**/myfile/init.lua` will also be searched.
 If you want to load files outside the workspace, you need to set `Lua.workspace.library` first.
 ]]
-config.runtime.pathStrict         =
+config.runtime.pathStrict         = -- TODO: needs localisation
 'When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.'
-config.runtime.special            =
+config.runtime.special            = -- TODO: needs localisation
 [[The custom global variables are regarded as some special built-in variables, and the language server will provide special support
 The following example shows that 'include' is treated as' require '.
 ```json
@@ -26,17 +26,17 @@ The following example shows that 'include' is treated as' require '.
 }
 ```
 ]]
-config.runtime.unicodeName        =
+config.runtime.unicodeName        = -- TODO: needs localisation
 "Allows Unicode characters in name."
-config.runtime.nonstandardSymbol  =
+config.runtime.nonstandardSymbol  = -- TODO: needs localisation
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
-config.runtime.plugin             =
+config.runtime.plugin             = -- TODO: needs localisation
 "Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
-config.runtime.pluginArgs         =
+config.runtime.pluginArgs         = -- TODO: needs localisation
 "Additional arguments for the plugin."
-config.runtime.fileEncoding       =
+config.runtime.fileEncoding       = -- TODO: needs localisation
 "File encoding. The `ansi` option is only available under the `Windows` platform."
-config.runtime.builtin            =
+config.runtime.builtin            = -- TODO: needs localisation
 [[
 Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
 
@@ -44,23 +44,23 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
-config.runtime.meta               =
+config.runtime.meta               = -- TODO: needs localisation
 'Format of the directory name of the meta files.'
-config.diagnostics.enable         =
+config.diagnostics.enable         = -- TODO: needs localisation
 "Enable diagnostics."
-config.diagnostics.disable        =
+config.diagnostics.disable        = -- TODO: needs localisation
 "Disabled diagnostic (Use code in hover brackets)."
-config.diagnostics.globals        =
+config.diagnostics.globals        = -- TODO: needs localisation
 "Defined global variables."
-config.diagnostics.globalsRegex   =
+config.diagnostics.globalsRegex   = -- TODO: needs localisation
 "Find defined global variables using regex."
-config.diagnostics.severity       =
+config.diagnostics.severity       = -- TODO: needs localisation
 [[
 Modify the diagnostic severity.
 
 End with `!` means override the group setting `diagnostics.groupSeverity`.
 ]]
-config.diagnostics.neededFileStatus =
+config.diagnostics.neededFileStatus = -- TODO: needs localisation
 [[
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
@@ -68,13 +68,13 @@ config.diagnostics.neededFileStatus =
 
 End with `!` means override the group setting `diagnostics.groupFileStatus`.
 ]]
-config.diagnostics.groupSeverity  =
+config.diagnostics.groupSeverity  = -- TODO: needs localisation
 [[
 Modify the diagnostic severity in a group.
 `Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
 Other settings will override individual settings without end of `!`.
 ]]
-config.diagnostics.groupFileStatus =
+config.diagnostics.groupFileStatus = -- TODO: needs localisation
 [[
 Modify the diagnostic needed file status in a group.
 
@@ -85,51 +85,51 @@ Modify the diagnostic needed file status in a group.
 `Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
 Other settings will override individual settings without end of `!`.
 ]]
-config.diagnostics.workspaceEvent =
+config.diagnostics.workspaceEvent = -- TODO: needs localisation
 "Set the time to trigger workspace diagnostics."
-config.diagnostics.workspaceEvent.OnChange =
+config.diagnostics.workspaceEvent.OnChange = -- TODO: needs localisation
 "Trigger workspace diagnostics when the file is changed."
-config.diagnostics.workspaceEvent.OnSave =
+config.diagnostics.workspaceEvent.OnSave = -- TODO: needs localisation
 "Trigger workspace diagnostics when the file is saved."
-config.diagnostics.workspaceEvent.None =
+config.diagnostics.workspaceEvent.None = -- TODO: needs localisation
 "Disable workspace diagnostics."
-config.diagnostics.workspaceDelay =
+config.diagnostics.workspaceDelay = -- TODO: needs localisation
 "Latency (milliseconds) for workspace diagnostics."
-config.diagnostics.workspaceRate  =
+config.diagnostics.workspaceRate  = -- TODO: needs localisation
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
-config.diagnostics.libraryFiles   =
+config.diagnostics.libraryFiles   = -- TODO: needs localisation
 "How to diagnose files loaded via `Lua.workspace.library`."
-config.diagnostics.libraryFiles.Enable   =
+config.diagnostics.libraryFiles.Enable   = -- TODO: needs localisation
 "Always diagnose these files."
-config.diagnostics.libraryFiles.Opened   =
+config.diagnostics.libraryFiles.Opened   = -- TODO: needs localisation
 "Only when these files are opened will it be diagnosed."
-config.diagnostics.libraryFiles.Disable  =
+config.diagnostics.libraryFiles.Disable  = -- TODO: needs localisation
 "These files are not diagnosed."
-config.diagnostics.ignoredFiles   =
+config.diagnostics.ignoredFiles   = -- TODO: needs localisation
 "How to diagnose ignored files."
-config.diagnostics.ignoredFiles.Enable   =
+config.diagnostics.ignoredFiles.Enable   = -- TODO: needs localisation
 "Always diagnose these files."
-config.diagnostics.ignoredFiles.Opened   =
+config.diagnostics.ignoredFiles.Opened   = -- TODO: needs localisation
 "Only when these files are opened will it be diagnosed."
-config.diagnostics.ignoredFiles.Disable  =
+config.diagnostics.ignoredFiles.Disable  = -- TODO: needs localisation
 "These files are not diagnosed."
-config.diagnostics.disableScheme  =
+config.diagnostics.disableScheme  = -- TODO: needs localisation
 'Do not diagnose Lua files that use the following scheme.'
-config.diagnostics.unusedLocalExclude =
+config.diagnostics.unusedLocalExclude = -- TODO: needs localisation
 'Do not diagnose `unused-local` when the variable name matches the following pattern.'
-config.workspace.ignoreDir        =
+config.workspace.ignoreDir        = -- TODO: needs localisation
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
-config.workspace.ignoreSubmodules =
+config.workspace.ignoreSubmodules = -- TODO: needs localisation
 "Ignore submodules."
-config.workspace.useGitIgnore     =
+config.workspace.useGitIgnore     = -- TODO: needs localisation
 "Ignore files list in `.gitignore` ."
-config.workspace.maxPreload       =
+config.workspace.maxPreload       = -- TODO: needs localisation
 "Max preloaded files."
-config.workspace.preloadFileSize  =
+config.workspace.preloadFileSize  = -- TODO: needs localisation
 "Skip files larger than this value (KB) when preloading."
-config.workspace.library          =
+config.workspace.library          = -- TODO: needs localisation
 "In addition to the current workspace, which directories will load files from. The files in these directories will be treated as externally provided code libraries, and some features (such as renaming fields) will not modify these files."
-config.workspace.checkThirdParty  =
+config.workspace.checkThirdParty  = -- TODO: needs localisation
 [[
 Automatic detection and adaptation of third-party libraries, currently supported libraries are:
 
@@ -140,321 +140,321 @@ Automatic detection and adaptation of third-party libraries, currently supported
 * skynet
 * Jass
 ]]
-config.workspace.userThirdParty          =
+config.workspace.userThirdParty          = -- TODO: needs localisation
 'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)'
-config.workspace.supportScheme           =
+config.workspace.supportScheme           = -- TODO: needs localisation
 'Provide language server for the Lua files of the following scheme.'
-config.completion.enable                 =
+config.completion.enable                 = -- TODO: needs localisation
 'Enable completion.'
-config.completion.callSnippet            =
+config.completion.callSnippet            = -- TODO: needs localisation
 'Shows function call snippets.'
-config.completion.callSnippet.Disable    =
+config.completion.callSnippet.Disable    = -- TODO: needs localisation
 "Only shows `function name`."
-config.completion.callSnippet.Both       =
+config.completion.callSnippet.Both       = -- TODO: needs localisation
 "Shows `function name` and `call snippet`."
-config.completion.callSnippet.Replace    =
+config.completion.callSnippet.Replace    = -- TODO: needs localisation
 "Only shows `call snippet.`"
-config.completion.keywordSnippet         =
+config.completion.keywordSnippet         = -- TODO: needs localisation
 'Shows keyword syntax snippets.'
-config.completion.keywordSnippet.Disable =
+config.completion.keywordSnippet.Disable = -- TODO: needs localisation
 "Only shows `keyword`."
-config.completion.keywordSnippet.Both    =
+config.completion.keywordSnippet.Both    = -- TODO: needs localisation
 "Shows `keyword` and `syntax snippet`."
-config.completion.keywordSnippet.Replace =
+config.completion.keywordSnippet.Replace = -- TODO: needs localisation
 "Only shows `syntax snippet`."
-config.completion.displayContext         =
+config.completion.displayContext         = -- TODO: needs localisation
 "Previewing the relevant code snippet of the suggestion may help you understand the usage of the suggestion. The number set indicates the number of intercepted lines in the code fragment. If it is set to `0`, this feature can be disabled."
-config.completion.workspaceWord          =
+config.completion.workspaceWord          = -- TODO: needs localisation
 "Whether the displayed context word contains the content of other files in the workspace."
-config.completion.showWord               =
+config.completion.showWord               = -- TODO: needs localisation
 "Show contextual words in suggestions."
-config.completion.showWord.Enable        =
+config.completion.showWord.Enable        = -- TODO: needs localisation
 "Always show context words in suggestions."
-config.completion.showWord.Fallback      =
+config.completion.showWord.Fallback      = -- TODO: needs localisation
 "Contextual words are only displayed when suggestions based on semantics cannot be provided."
-config.completion.showWord.Disable       =
+config.completion.showWord.Disable       = -- TODO: needs localisation
 "Do not display context words."
-config.completion.autoRequire            =
+config.completion.autoRequire            = -- TODO: needs localisation
 "When the input looks like a file name, automatically `require` this file."
-config.completion.showParams             =
+config.completion.showParams             = -- TODO: needs localisation
 "Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
-config.completion.requireSeparator       =
+config.completion.requireSeparator       = -- TODO: needs localisation
 "The separator used when `require`."
-config.completion.postfix                =
+config.completion.postfix                = -- TODO: needs localisation
 "The symbol used to trigger the postfix suggestion."
-config.color.mode                        =
+config.color.mode                        = -- TODO: needs localisation
 "Color mode."
-config.color.mode.Semantic               =
+config.color.mode.Semantic               = -- TODO: needs localisation
 "Semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect."
-config.color.mode.SemanticEnhanced       =
+config.color.mode.SemanticEnhanced       = -- TODO: needs localisation
 "Enhanced semantic color. Like `Semantic`, but with additional analysis which might be more computationally expensive."
-config.color.mode.Grammar                =
+config.color.mode.Grammar                = -- TODO: needs localisation
 "Grammar color."
-config.semantic.enable                   =
+config.semantic.enable                   = -- TODO: needs localisation
 "Enable semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect."
-config.semantic.variable                 =
+config.semantic.variable                 = -- TODO: needs localisation
 "Semantic coloring of variables/fields/parameters."
-config.semantic.annotation               =
+config.semantic.annotation               = -- TODO: needs localisation
 "Semantic coloring of type annotations."
-config.semantic.keyword                  =
+config.semantic.keyword                  = -- TODO: needs localisation
 "Semantic coloring of keywords/literals/operators. You only need to enable this feature if your editor cannot do syntax coloring."
-config.signatureHelp.enable              =
+config.signatureHelp.enable              = -- TODO: needs localisation
 "Enable signature help."
-config.hover.enable                      =
+config.hover.enable                      = -- TODO: needs localisation
 "Enable hover."
-config.hover.viewString                  =
+config.hover.viewString                  = -- TODO: needs localisation
 "Hover to view the contents of a string (only if the literal contains an escape character)."
-config.hover.viewStringMax               =
+config.hover.viewStringMax               = -- TODO: needs localisation
 "The maximum length of a hover to view the contents of a string."
-config.hover.viewNumber                  =
+config.hover.viewNumber                  = -- TODO: needs localisation
 "Hover to view numeric content (only if literal is not decimal)."
-config.hover.fieldInfer                  =
+config.hover.fieldInfer                  = -- TODO: needs localisation
 "When hovering to view a table, type infer will be performed for each field. When the accumulated time of type infer reaches the set value (MS), the type infer of subsequent fields will be skipped."
-config.hover.previewFields               =
+config.hover.previewFields               = -- TODO: needs localisation
 "When hovering to view a table, limits the maximum number of previews for fields."
-config.hover.enumsLimit                  =
+config.hover.enumsLimit                  = -- TODO: needs localisation
 "When the value corresponds to multiple types, limit the number of types displaying."
-config.hover.expandAlias                 =
+config.hover.expandAlias                 = -- TODO: needs localisation
 [[
 Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
 ]]
-config.develop.enable                    =
+config.develop.enable                    = -- TODO: needs localisation
 'Developer mode. Do not enable, performance will be affected.'
-config.develop.debuggerPort              =
+config.develop.debuggerPort              = -- TODO: needs localisation
 'Listen port of debugger.'
-config.develop.debuggerWait              =
+config.develop.debuggerWait              = -- TODO: needs localisation
 'Suspend before debugger connects.'
-config.intelliSense.searchDepth          =
+config.intelliSense.searchDepth          = -- TODO: needs localisation
 'Set the search depth for IntelliSense. Increasing this value increases accuracy, but decreases performance. Different workspace have different tolerance for this setting. Please adjust it to the appropriate value.'
-config.intelliSense.fastGlobal           =
+config.intelliSense.fastGlobal           = -- TODO: needs localisation
 'In the global variable completion, and view `_G` suspension prompt. This will slightly reduce the accuracy of type speculation, but it will have a significant performance improvement for projects that use a lot of global variables.'
-config.window.statusBar                  =
+config.window.statusBar                  = -- TODO: needs localisation
 'Show extension status in status bar.'
-config.window.progressBar                =
+config.window.progressBar                = -- TODO: needs localisation
 'Show progress bar in status bar.'
-config.hint.enable                       =
+config.hint.enable                       = -- TODO: needs localisation
 'Enable inlay hint.'
-config.hint.paramType                    =
+config.hint.paramType                    = -- TODO: needs localisation
 'Show type hints at the parameter of the function.'
-config.hint.setType                      =
+config.hint.setType                      = -- TODO: needs localisation
 'Show hints of type at assignment operation.'
-config.hint.paramName                    =
+config.hint.paramName                    = -- TODO: needs localisation
 'Show hints of parameter name at the function call.'
-config.hint.paramName.All                =
+config.hint.paramName.All                = -- TODO: needs localisation
 'All types of parameters are shown.'
-config.hint.paramName.Literal            =
+config.hint.paramName.Literal            = -- TODO: needs localisation
 'Only literal type parameters are shown.'
-config.hint.paramName.Disable            =
+config.hint.paramName.Disable            = -- TODO: needs localisation
 'Disable parameter hints.'
-config.hint.arrayIndex                   =
+config.hint.arrayIndex                   = -- TODO: needs localisation
 'Show hints of array index when constructing a table.'
-config.hint.arrayIndex.Enable            =
+config.hint.arrayIndex.Enable            = -- TODO: needs localisation
 'Show hints in all tables.'
-config.hint.arrayIndex.Auto              =
+config.hint.arrayIndex.Auto              = -- TODO: needs localisation
 'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
-config.hint.arrayIndex.Disable           =
+config.hint.arrayIndex.Disable           = -- TODO: needs localisation
 'Disable hints of array index.'
-config.hint.await                        =
+config.hint.await                        = -- TODO: needs localisation
 'If the called function is marked `---@async`, prompt `await` at the call.'
-config.hint.semicolon                    =
+config.hint.semicolon                    = -- TODO: needs localisation
 'If there is no semicolon at the end of the statement, display a virtual semicolon.'
-config.hint.semicolon.All                =
+config.hint.semicolon.All                = -- TODO: needs localisation
 'All statements display virtual semicolons.'
-config.hint.semicolon.SameLine            =
+config.hint.semicolon.SameLine            = -- TODO: needs localisation
 'When two statements are on the same line, display a semicolon between them.'
-config.hint.semicolon.Disable            =
+config.hint.semicolon.Disable            = -- TODO: needs localisation
 'Disable virtual semicolons.'
-config.codeLens.enable                   =
+config.codeLens.enable                   = -- TODO: needs localisation
 'Enable code lens.'
-config.format.enable                     =
+config.format.enable                     = -- TODO: needs localisation
 'Enable code formatter.'
-config.format.defaultConfig              =
+config.format.defaultConfig              = -- TODO: needs localisation
 [[
 The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
 Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
 ]]
-config.spell.dict                        =
+config.spell.dict                        = -- TODO: needs localisation
 'Custom words for spell checking.'
-config.nameStyle.config                  =
+config.nameStyle.config                  = -- TODO: needs localisation
 'Set name style config'
-config.telemetry.enable                  =
+config.telemetry.enable                  = -- TODO: needs localisation
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://luals.github.io/privacy/#language-server).
 ]]
-config.misc.parameters                   =
+config.misc.parameters                   = -- TODO: needs localisation
 '[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language server in VSCode.'
-config.misc.executablePath               =
+config.misc.executablePath               = -- TODO: needs localisation
 'Specify the executable path in VSCode.'
-config.language.fixIndent                =
+config.language.fixIndent                = -- TODO: needs localisation
 '(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function."'
-config.language.completeAnnotation       =
+config.language.completeAnnotation       = -- TODO: needs localisation
 '(VSCode only) Automatically insert "---@ " after a line break following a annotation.'
-config.type.castNumberToInteger          =
+config.type.castNumberToInteger          = -- TODO: needs localisation
 'Allowed to assign the `number` type to the `integer` type.'
-config.type.weakUnionCheck               =
+config.type.weakUnionCheck               = -- TODO: needs localisation
 [[
 Once one subtype of a union type meets the condition, the union type also meets the condition.
 
 When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
 ]]
-config.type.weakNilCheck                 =
+config.type.weakNilCheck                 = -- TODO: needs localisation
 [[
 When checking the type of union type, ignore the `nil` in it.
 
 When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
 ]]
-config.type.inferParamType               =
+config.type.inferParamType               = -- TODO: needs localisation
 [[
 When a parameter type is not annotated, it is inferred from the function's call sites.
 
 When this setting is `false`, the type of the parameter is `any` when it is not annotated.
 ]]
-config.type.checkTableShape              =
+config.type.checkTableShape              = -- TODO: needs localisation
 [[
 Strictly check the shape of the table.
 ]]
-config.doc.privateName                   =
+config.doc.privateName                   = -- TODO: needs localisation
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
-config.doc.protectedName                 =
+config.doc.protectedName                 = -- TODO: needs localisation
 'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
-config.doc.packageName                   =
+config.doc.packageName                   = -- TODO: needs localisation
 'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
-config.diagnostics['unused-local']          =
+config.diagnostics['unused-local']          = -- TODO: needs localisation
 'Enable unused local variable diagnostics.'
-config.diagnostics['unused-function']       =
+config.diagnostics['unused-function']       = -- TODO: needs localisation
 'Enable unused function diagnostics.'
-config.diagnostics['undefined-global']      =
+config.diagnostics['undefined-global']      = -- TODO: needs localisation
 'Enable undefined global variable diagnostics.'
-config.diagnostics['global-in-nil-env']     =
+config.diagnostics['global-in-nil-env']     = -- TODO: needs localisation
 'Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.'
-config.diagnostics['unused-label']          =
+config.diagnostics['unused-label']          = -- TODO: needs localisation
 'Enable unused label diagnostics.'
-config.diagnostics['unused-vararg']         =
+config.diagnostics['unused-vararg']         = -- TODO: needs localisation
 'Enable unused vararg diagnostics.'
-config.diagnostics['trailing-space']        =
+config.diagnostics['trailing-space']        = -- TODO: needs localisation
 'Enable trailing space diagnostics.'
-config.diagnostics['redefined-local']       =
+config.diagnostics['redefined-local']       = -- TODO: needs localisation
 'Enable redefined local variable diagnostics.'
-config.diagnostics['newline-call']          =
+config.diagnostics['newline-call']          = -- TODO: needs localisation
 'Enable newline call diagnostics. Is\'s raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.'
-config.diagnostics['newfield-call']         =
+config.diagnostics['newfield-call']         = -- TODO: needs localisation
 'Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.'
-config.diagnostics['redundant-parameter']   =
+config.diagnostics['redundant-parameter']   = -- TODO: needs localisation
 'Enable redundant function parameter diagnostics.'
-config.diagnostics['ambiguity-1']           =
+config.diagnostics['ambiguity-1']           = -- TODO: needs localisation
 'Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.'
-config.diagnostics['lowercase-global']      =
+config.diagnostics['lowercase-global']      = -- TODO: needs localisation
 'Enable lowercase global variable definition diagnostics.'
-config.diagnostics['undefined-env-child']   =
+config.diagnostics['undefined-env-child']   = -- TODO: needs localisation
 'Enable undefined environment variable diagnostics. It\'s raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.'
-config.diagnostics['duplicate-index']       =
+config.diagnostics['duplicate-index']       = -- TODO: needs localisation
 'Enable duplicate table index diagnostics.'
-config.diagnostics['empty-block']           =
+config.diagnostics['empty-block']           = -- TODO: needs localisation
 'Enable empty code block diagnostics.'
-config.diagnostics['redundant-value']       =
+config.diagnostics['redundant-value']       = -- TODO: needs localisation
 'Enable the redundant values assigned diagnostics. It\'s raised during assignment operation, when the number of values is higher than the number of objects being assigned.'
-config.diagnostics['assign-type-mismatch']  =
+config.diagnostics['assign-type-mismatch']  = -- TODO: needs localisation
 'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
-config.diagnostics['await-in-sync']         =
+config.diagnostics['await-in-sync']         = -- TODO: needs localisation
 'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
-config.diagnostics['cast-local-type']    =
+config.diagnostics['cast-local-type']    = -- TODO: needs localisation
 'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
-config.diagnostics['cast-type-mismatch']    =
+config.diagnostics['cast-type-mismatch']    = -- TODO: needs localisation
 'Enable diagnostics for casts where the target type does not match the initial type.'
-config.diagnostics['circular-doc-class']    =
+config.diagnostics['circular-doc-class']    = -- TODO: needs localisation
 'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
-config.diagnostics['close-non-object']      =
+config.diagnostics['close-non-object']      = -- TODO: needs localisation
 'Enable diagnostics for attempts to close a variable with a non-object.'
-config.diagnostics['code-after-break']      =
+config.diagnostics['code-after-break']      = -- TODO: needs localisation
 'Enable diagnostics for code placed after a break statement in a loop.'
-config.diagnostics['codestyle-check']       =
+config.diagnostics['codestyle-check']       = -- TODO: needs localisation
 'Enable diagnostics for incorrectly styled lines.'
-config.diagnostics['count-down-loop']       =
+config.diagnostics['count-down-loop']       = -- TODO: needs localisation
 'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
-config.diagnostics['deprecated']            =
+config.diagnostics['deprecated']            = -- TODO: needs localisation
 'Enable diagnostics to highlight deprecated API.'
-config.diagnostics['different-requires']    =
+config.diagnostics['different-requires']    = -- TODO: needs localisation
 'Enable diagnostics for files which are required by two different paths.'
-config.diagnostics['discard-returns']       =
+config.diagnostics['discard-returns']       = -- TODO: needs localisation
 'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
-config.diagnostics['doc-field-no-class']    =
+config.diagnostics['doc-field-no-class']    = -- TODO: needs localisation
 'Enable diagnostics to highlight a field annotation without a defining class annotation.'
-config.diagnostics['duplicate-doc-alias']   =
+config.diagnostics['duplicate-doc-alias']   = -- TODO: needs localisation
 'Enable diagnostics for a duplicated alias annotation name.'
-config.diagnostics['duplicate-doc-field']   =
+config.diagnostics['duplicate-doc-field']   = -- TODO: needs localisation
 'Enable diagnostics for a duplicated field annotation name.'
-config.diagnostics['duplicate-doc-param']   =
+config.diagnostics['duplicate-doc-param']   = -- TODO: needs localisation
 'Enable diagnostics for a duplicated param annotation name.'
-config.diagnostics['duplicate-set-field']   =
+config.diagnostics['duplicate-set-field']   = -- TODO: needs localisation
 'Enable diagnostics for setting the same field in a class more than once.'
-config.diagnostics['incomplete-signature-doc']    =
+config.diagnostics['incomplete-signature-doc']    = -- TODO: needs localisation
 'Incomplete @param or @return annotations for functions.'
-config.diagnostics['invisible']             =
+config.diagnostics['invisible']             = -- TODO: needs localisation
 'Enable diagnostics for accesses to fields which are invisible.'
-config.diagnostics['missing-global-doc']    =
+config.diagnostics['missing-global-doc']    = -- TODO: needs localisation
 'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
-config.diagnostics['missing-local-export-doc'] =
+config.diagnostics['missing-local-export-doc'] = -- TODO: needs localisation
 'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
-config.diagnostics['missing-parameter']     =
+config.diagnostics['missing-parameter']     = -- TODO: needs localisation
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
-config.diagnostics['missing-return']        =
+config.diagnostics['missing-return']        = -- TODO: needs localisation
 'Enable diagnostics for functions with return annotations which have no return statement.'
-config.diagnostics['missing-return-value']  =
+config.diagnostics['missing-return-value']  = -- TODO: needs localisation
 'Enable diagnostics for return statements without values although the containing function declares returns.'
-config.diagnostics['need-check-nil']        =
+config.diagnostics['need-check-nil']        = -- TODO: needs localisation
 'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
-config.diagnostics['no-unknown']            =
+config.diagnostics['no-unknown']            = -- TODO: needs localisation
 'Enable diagnostics for cases in which the type cannot be inferred.'
-config.diagnostics['not-yieldable']         =
+config.diagnostics['not-yieldable']         = -- TODO: needs localisation
 'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
-config.diagnostics['param-type-mismatch']   =
+config.diagnostics['param-type-mismatch']   = -- TODO: needs localisation
 'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
-config.diagnostics['redundant-return']      =
+config.diagnostics['redundant-return']      = -- TODO: needs localisation
 'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
-config.diagnostics['redundant-return-value']=
+config.diagnostics['redundant-return-value']= -- TODO: needs localisation
 'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
-config.diagnostics['return-type-mismatch']  =
+config.diagnostics['return-type-mismatch']  = -- TODO: needs localisation
 'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
-config.diagnostics['spell-check']           =
+config.diagnostics['spell-check']           = -- TODO: needs localisation
 'Enable diagnostics for typos in strings.'
-config.diagnostics['name-style-check']      =
+config.diagnostics['name-style-check']      = -- TODO: needs localisation
 'Enable diagnostics for name style.'
-config.diagnostics['unbalanced-assignments']=
+config.diagnostics['unbalanced-assignments']= -- TODO: needs localisation
 'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
-config.diagnostics['undefined-doc-class']   =
+config.diagnostics['undefined-doc-class']   = -- TODO: needs localisation
 'Enable diagnostics for class annotations in which an undefined class is referenced.'
-config.diagnostics['undefined-doc-name']    =
+config.diagnostics['undefined-doc-name']    = -- TODO: needs localisation
 'Enable diagnostics for type annotations referencing an undefined type or alias.'
-config.diagnostics['undefined-doc-param']   =
+config.diagnostics['undefined-doc-param']   = -- TODO: needs localisation
 'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
-config.diagnostics['undefined-field']       =
+config.diagnostics['undefined-field']       = -- TODO: needs localisation
 'Enable diagnostics for cases in which an undefined field of a variable is read.'
-config.diagnostics['unknown-cast-variable'] =
+config.diagnostics['unknown-cast-variable'] = -- TODO: needs localisation
 'Enable diagnostics for casts of undefined variables.'
-config.diagnostics['unknown-diag-code']     =
+config.diagnostics['unknown-diag-code']     = -- TODO: needs localisation
 'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
-config.diagnostics['unknown-operator']      =
+config.diagnostics['unknown-operator']      = -- TODO: needs localisation
 'Enable diagnostics for unknown operators.'
-config.diagnostics['unreachable-code']      =
+config.diagnostics['unreachable-code']      = -- TODO: needs localisation
 'Enable diagnostics for unreachable code.'
-config.diagnostics['global-element']       =
+config.diagnostics['global-element']       = -- TODO: needs localisation
 'Enable diagnostics to warn about global elements.'
-config.typeFormat.config                    =
+config.typeFormat.config                    = -- TODO: needs localisation
 'Configures the formatting behavior while typing Lua code.'
-config.typeFormat.config.auto_complete_end  =
+config.typeFormat.config.auto_complete_end  = -- TODO: needs localisation
 'Controls if `end` is automatically completed at suitable positions.'
-config.typeFormat.config.auto_complete_table_sep =
+config.typeFormat.config.auto_complete_table_sep = -- TODO: needs localisation
 'Controls if a separator is automatically appended at the end of a table declaration.'
-config.typeFormat.config.format_line        =
+config.typeFormat.config.format_line        = -- TODO: needs localisation
 'Controls if a line is formatted at all.'
 
-command.exportDocument =
+command.exportDocument = -- TODO: needs localisation
 'Lua: Export Document ...'
-command.addon_manager.open =
+command.addon_manager.open = -- TODO: needs localisation
 'Lua: Open Addon Manager ...'
-command.reloadFFIMeta =
+command.reloadFFIMeta = -- TODO: needs localisation
 'Lua: Reload luajit ffi meta'
-command.startServer =
+command.startServer = -- TODO: needs localisation
 'Lua: (debug) Start Language Server'
-command.stopServer =
+command.stopServer = -- TODO: needs localisation
 'Lua: (debug) Stop Language Server'

@@ -416,48 +416,48 @@ ACTION_FIX_LCOMMENT_END=
 'Modifica al símbolo de cierre correcto para la anotación multi-línea.'
 ACTION_ADD_LCOMMENT_END=
 'Cierra las anotaciones multi-línea.'
-ACTION_FIX_C_LONG_COMMENT= -- TODO: needs localisation
-'Modify to Lua multi-line annotations format.'
-ACTION_FIX_LSTRING_END = -- TODO: needs localisation
-'Modify to the correct long string closing symbol.'
-ACTION_ADD_LSTRING_END = -- TODO: needs localisation
-'Close long string.'
-ACTION_FIX_ASSIGN_AS_EQ= -- TODO: needs localisation
-'Modify to `=` .'
-ACTION_FIX_EQ_AS_ASSIGN= -- TODO: needs localisation
-'Modify to `==` .'
-ACTION_FIX_UEQ         = -- TODO: needs localisation
-'Modify to `~=` .'
-ACTION_FIX_THEN_AS_DO  = -- TODO: needs localisation
-'Modify to `then` .'
-ACTION_FIX_DO_AS_THEN  = -- TODO: needs localisation
-'Modify to `do` .'
-ACTION_ADD_END         = -- TODO: needs localisation
-'Add `end` (infer the addition location ny indentations).'
-ACTION_FIX_COMMENT_PREFIX= -- TODO: needs localisation
-'Modify to `--` .'
-ACTION_FIX_NONSTANDARD_SYMBOL= -- TODO: needs localisation
-'Modify to `{symbol}` .'
-ACTION_RUNTIME_UNICODE_NAME= -- TODO: needs localisation
-'Allow Unicode characters.'
-ACTION_SWAP_PARAMS     = -- TODO: needs localisation
-'Change to parameter {index} of `{node}`'
-ACTION_FIX_INSERT_SPACE= -- TODO: needs localisation
-'Insert space.'
-ACTION_JSON_TO_LUA     = -- TODO: needs localisation
-'Convert JSON to Lua'
+ACTION_FIX_C_LONG_COMMENT=
+'Modifica al formato de anotaciones multi-línea de Lua.'
+ACTION_FIX_LSTRING_END =
+'Modifica al símbolo correcto de cierre de string largo.'
+ACTION_ADD_LSTRING_END =
+'Cierra string largo.'
+ACTION_FIX_ASSIGN_AS_EQ=
+'Modifica a `=` .'
+ACTION_FIX_EQ_AS_ASSIGN=
+'Modifica a `==` .'
+ACTION_FIX_UEQ         =
+'Modifica a `~=` .'
+ACTION_FIX_THEN_AS_DO  =
+'Modifica a `then` .'
+ACTION_FIX_DO_AS_THEN  =
+'Modifica a `do` .'
+ACTION_ADD_END         =
+'Agrega `end` (infiere la marca en base ala indentación).'
+ACTION_FIX_COMMENT_PREFIX=
+'Modifica a `--` .'
+ACTION_FIX_NONSTANDARD_SYMBOL=
+'Modifica a `{symbol}` .'
+ACTION_RUNTIME_UNICODE_NAME=
+'Permite caracteres Unicode.'
+ACTION_SWAP_PARAMS     =
+'Cambia al parámetro {index} de `{node}`'
+ACTION_FIX_INSERT_SPACE=
+'Inserte espacio.'
+ACTION_JSON_TO_LUA     =
+'Convierte JSON a Lua'
 ACTION_DISABLE_DIAG_LINE=
-'Disable diagnostics on this line ({}).'
+'Deshabilita diagnósticos en esta línea ({}).'
 ACTION_DISABLE_DIAG_FILE=
-'Disable diagnostics in this file ({}).'
-ACTION_MARK_ASYNC      = -- TODO: needs localisation
-'Mark current function as async.'
-ACTION_ADD_DICT        = -- TODO: needs localisation
-'Add \'{}\' to workspace dict'
-ACTION_FIX_ADD_PAREN   = -- TODO: needs localisation
-'Add parentheses.'
-ACTION_AUTOREQUIRE     = -- TODO: needs localisation
-"Import '{}' as {}"
+'Deshabilita diagnósticos en este archivo ({}).'
+ACTION_MARK_ASYNC      =
+'Marca la función actual como asíncrona.'
+ACTION_ADD_DICT        =
+'Agrega \'{}\' al diccionario de espacio de trabajo'
+ACTION_FIX_ADD_PAREN   =
+'Agrega paréntesis.'
+ACTION_AUTOREQUIRE     =
+"Importa '{}' como {}"
 
 COMMAND_DISABLE_DIAG      = -- TODO: needs localisation
 'Disable diagnostics'
@@ -588,7 +588,7 @@ WINDOW_CONVERT_CONFIG_LUA       = -- TODO: needs localisation
 WINDOW_MODIFY_REQUIRE_PATH      = -- TODO: needs localisation
 'Do you want to modify the require path?'
 WINDOW_MODIFY_REQUIRE_OK        = -- TODO: needs localisation
-'Modify'
+'Modifica'
 
 CONFIG_LOAD_FAILED              = -- TODO: needs localisation
 'Unable to read the settings file: {}'

@@ -439,7 +439,7 @@ ACTION_FIX_COMMENT_PREFIX=
 ACTION_FIX_NONSTANDARD_SYMBOL=
 'Modifica a `{symbol}` .'
 ACTION_RUNTIME_UNICODE_NAME=
-'Permite caracteres Unicode.'
+'Permite el uso de caracteres Unicode.'
 ACTION_SWAP_PARAMS     =
 'Cambia al parámetro {index} de `{node}`'
 ACTION_FIX_INSERT_SPACE=
@@ -472,7 +472,7 @@ COMMAND_RUNTIME_VERSION   =
 COMMAND_OPEN_LIBRARY      =
 'Carga variables globales de una biblioteca externa'
 COMMAND_UNICODE_NAME      =
-'Permite caracteres Unicode.'
+'Permite el uso de caracteres Unicode.'
 COMMAND_JSON_TO_LUA       =
 'Convierte JSON a Lua'
 COMMAND_JSON_TO_LUA_FAILED=

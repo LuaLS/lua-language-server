@@ -258,249 +258,207 @@ config.hint.arrayIndex.Disable           =
 'Deshabilita las pistas en de los índices de arreglos.'
 config.hint.await                        =
 'Si la función que se llama está marcada con `---@async`, pregunta por un `await` en la llamada.'
-config.hint.semicolon                    = -- TODO: needs localisation
+config.hint.semicolon                    =
 'Si no hay punto y coma al final de la sentencia, despliega un punto y coma virtual.'
-config.hint.semicolon.All                = -- TODO: needs localisation
+config.hint.semicolon.All                =
 'Todas las sentencias con un punto y coma virtual desplegado.'
-config.hint.semicolon.SameLine            = -- TODO: needs localisation
+config.hint.semicolon.SameLine            =
 'Cuando dos sentencias están en la misma línea, despliega un punto y coma entre ellas.'
-config.hint.semicolon.Disable            = -- TODO: needs localisation
+config.hint.semicolon.Disable            =
 'Deshabilita punto y coma virtuales.'
-config.codeLens.enable                   = -- TODO: needs localisation
+config.codeLens.enable                   =
 'Habilita el lente para código.'
-config.format.enable                     = -- TODO: needs localisation
+config.format.enable                     =
 'Habilita el formateador de código.'
-config.format.defaultConfig              = -- TODO: needs localisation
+config.format.defaultConfig              =
 [[
 La configuración de formateo predeterminada. Tiene menor prioridad que el archivo `.editorconfig`
 en el espacio de trabajo.
 Revise [la documentación del formateador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)
 para aprender más sobre su uso.
 ]]
-config.spell.dict                        = -- TODO: needs localisation
+config.spell.dict                        =
 'Palabras extra para el corrector ortográfico.'
-config.nameStyle.config                  = -- TODO: needs localisation
+config.nameStyle.config                  =
 'Configuración de estilo para nombres.'
-config.telemetry.enable                  = -- TODO: needs localisation
+config.telemetry.enable                  =
 [[
 Habilita la telemetría para enviar información del editor y registros de errores por la red. Lea nuestra política de privacidad [aquí (en inglés)](https://luals.github.io/privacy#language-server).
 ]]
-config.misc.parameters                   = -- TODO: needs localisation
+config.misc.parameters                   =
 '[Parámetros de la línea de comando](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) para iniciar el servidor de lenguage en VSCode.'
-config.misc.executablePath               = -- TODO: needs localisation
+config.misc.executablePath               =
 'Especifica la ruta del ejecutable en VSCode.'
-config.language.fixIndent                = -- TODO: needs localisation
+config.language.fixIndent                =
 '(Solo en VSCode) Arregla la auto-indentación incorrecta, como aquella cuando los quiebres de línea ocurren dentro de un string que contengan la palabra "function".'
-config.language.completeAnnotation       = -- TODO: needs localisation
+config.language.completeAnnotation       =
 '(Solo en VSCode) Inserta automáticamente un "---@ " después de un quiebre de línea que sucede a una anotación.'
-config.type.castNumberToInteger          = -- TODO: needs localisation
+config.type.castNumberToInteger          =
 'Se permite asignar el tipo "número" al tipo "entero".'
-config.type.weakUnionCheck               = -- TODO: needs localisation
+config.type.weakUnionCheck               =
 [[
 Una vez que un sub-tipo de un tipo de unión satisface la condición, el tipo de unión también satisface la condición.
 
 Cuando esta configuración es `false`, el tipo `number|boolean` no puede ser asignado al tipo `number`. Solo se puede con `true`.
 ]]
-config.type.weakNilCheck                 = -- TODO: needs localisation
+config.type.weakNilCheck                 =
 [[
 Cuando se revisa el tipo de un tipo de unión, los `nil` dentro son ignorados.
 
 Cuando esta configuración es `false`, el tipo `number|nil` no puede ser asignado al tipo `number`. Solo se puede con `true`.
 ]]
-config.type.inferParamType               = -- TODO: needs localisation
+config.type.inferParamType               =
 [[
 Cuando un tipo de parámetro no está anotado, se infiere su tipo de los lugares donde la función es llamada.
 
 Cuando esta configuración es `false`, el tipo del parámetro `any` cuando no puede ser anotado.
 ]]
-config.type.checkTableShape              = -- TODO: needs localisation
+config.type.checkTableShape              =
 [[
 Chequea estrictamente la forma de la tabla.
 ]]
-config.doc.privateName                   = -- TODO: needs localisation
+config.doc.privateName                   =
 'Trata los nombres específicos de campo como privados. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase.'
-config.doc.protectedName                 = -- TODO: needs localisation
+config.doc.protectedName                 =
 'Trata los nombres específicos de campo como protegidos. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase y sus subclases.'
-config.doc.packageName                   = -- TODO: needs localisation
+config.doc.packageName                   =
 'Trata los nombres específicos de campo como del paquete. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son de paquete, por lo que solo pueden ser accedidos en el archivo donde son definidos.'
-config.diagnostics['unused-local']          = -- TODO: needs localisation
+config.diagnostics['unused-local']          =
 'Habilita el diagnóstico de variables local sin uso.'
-config.diagnostics['unused-function']       = -- TODO: needs localisation
+config.diagnostics['unused-function']       =
 'Habilita el diagnóstico funcines sin uso.'
-config.diagnostics['undefined-global']      = -- TODO: needs localisation
+config.diagnostics['undefined-global']      =
 'Habilita el diagnóstico de variables globales sin definir.'
-config.diagnostics['global-in-nil-env']     = -- TODO: needs localisation
+config.diagnostics['global-in-nil-env']     =
 'Habilita el diagnóstico para la prohibición de uso de variables globales (`_ENV` se fija a `nil`).'
-config.diagnostics['unused-label']          = -- TODO: needs localisation
+config.diagnostics['unused-label']          =
 'Habilita el diagnóstico de etiquetas sin uso.'
-config.diagnostics['unused-vararg']         = -- TODO: needs localisation
+config.diagnostics['unused-vararg']         =
 'Habilita el diagnóstico de expresión de número variable de argumentos (vararg) sin uso.'
-config.diagnostics['trailing-space']        = -- TODO: needs localisation
+config.diagnostics['trailing-space']        =
 'Habilita el diagnóstico de espacios al final de línea.'
-config.diagnostics['redefined-local']       = -- TODO: needs localisation
+config.diagnostics['redefined-local']       =
 'Habilita el diagnóstico de variables locals redefinidas.'
-config.diagnostics['newline-call']          = -- TODO: needs localisation
+config.diagnostics['newline-call']          =
 'Habilita el diagnóstico de llamadas en línea nueva. Se alza un error en las líneas que comienzan con `(`, lo que se lee sintácticamente como una llamada a la línea anterior.'
-config.diagnostics['newfield-call']         = -- TODO: needs localisation
+config.diagnostics['newfield-call']         =
 'Habilita el diagnóstico de campo nuevo en una llamada. Se alza un error cuando los paréntesis de una llamada a una función aparecen en la siguiente línea cuando se define un campo en una tabla.'
-config.diagnostics['redundant-parameter']   = -- TODO: needs localisation
+config.diagnostics['redundant-parameter']   =
 'Habilita el diagnóstico de parámetros redundantes de una función.'
-config.diagnostics['ambiguity-1']           = -- TODO: needs localisation
+config.diagnostics['ambiguity-1']           =
 'Habilita el diagnóstico de precedencia de operadores ambiguos. Por ejemplo, ante la expresión `num or 0 + 1` se sugerirrá `(num or 0) + 1`.'
-config.diagnostics['lowercase-global']      = -- TODO: needs localisation
+config.diagnostics['lowercase-global']      =
 'Habilita el diagnóstico de definiciones de variables globacels con minúsculas.'
-config.diagnostics['undefined-env-child']   = -- TODO: needs localisation
+config.diagnostics['undefined-env-child']   =
 'Habilita el diagnóstico de variables de ambientes sin definir. Se alza un error cuando a la tabla `_ENV` se le asigna una tabla literal nueva, pero la variable global usada no está presente en el ambiente global.'
-config.diagnostics['duplicate-index']       = -- TODO: needs localisation
+config.diagnostics['duplicate-index']       =
 'Habilita el diagnóstico de índices de tabla duplicados.'
-config.diagnostics['empty-block']           = -- TODO: needs localisation
+config.diagnostics['empty-block']           =
 'Habilita el diagnóstico de bloques de código vacíos.'
-config.diagnostics['redundant-value']       = -- TODO: needs localisation
+config.diagnostics['redundant-value']       =
 'Habilita el diagnóstico de valores asignados redundantemente. Se alza un error en una asignación, cuando el número de valores es mayor que el número de objetos a los cuales se les asigna.'
-config.diagnostics['assign-type-mismatch']  = -- TODO: needs localisation
-'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
-'Habilita el diagnóstico .'
-config.diagnostics['await-in-sync']         = -- TODO: needs localisation
-'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
-'Habilita el diagnóstico .'
-config.diagnostics['cast-local-type']    = -- TODO: needs localisation
-'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
-'Habilita el diagnóstico .'
-config.diagnostics['cast-type-mismatch']    = -- TODO: needs localisation
-'Enable diagnostics for casts where the target type does not match the initial type.'
-'Habilita el diagnóstico .'
-config.diagnostics['circular-doc-class']    = -- TODO: needs localisation
-'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
-'Habilita el diagnóstico .'
-config.diagnostics['close-non-object']      = -- TODO: needs localisation
-'Enable diagnostics for attempts to close a variable with a non-object.'
-'Habilita el diagnóstico .'
-config.diagnostics['code-after-break']      = -- TODO: needs localisation
-'Enable diagnostics for code placed after a break statement in a loop.'
-'Habilita el diagnóstico .'
-config.diagnostics['codestyle-check']       = -- TODO: needs localisation
-'Enable diagnostics for incorrectly styled lines.'
-'Habilita el diagnóstico .'
-config.diagnostics['count-down-loop']       = -- TODO: needs localisation
-'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
-'Habilita el diagnóstico .'
-config.diagnostics['deprecated']            = -- TODO: needs localisation
-'Enable diagnostics to highlight deprecated API.'
-'Habilita el diagnóstico .'
-config.diagnostics['different-requires']    = -- TODO: needs localisation
-'Enable diagnostics for files which are required by two different paths.'
-'Habilita el diagnóstico .'
-config.diagnostics['discard-returns']       = -- TODO: needs localisation
-'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
-'Habilita el diagnóstico .'
-config.diagnostics['doc-field-no-class']    = -- TODO: needs localisation
-'Enable diagnostics to highlight a field annotation without a defining class annotation.'
-'Habilita el diagnóstico .'
-config.diagnostics['duplicate-doc-alias']   = -- TODO: needs localisation
-'Enable diagnostics for a duplicated alias annotation name.'
-'Habilita el diagnóstico .'
-config.diagnostics['duplicate-doc-field']   = -- TODO: needs localisation
-'Enable diagnostics for a duplicated field annotation name.'
-'Habilita el diagnóstico .'
-config.diagnostics['duplicate-doc-param']   = -- TODO: needs localisation
-'Enable diagnostics for a duplicated param annotation name.'
-'Habilita el diagnóstico .'
-config.diagnostics['duplicate-set-field']   = -- TODO: needs localisation
-'Enable diagnostics for setting the same field in a class more than once.'
-'Habilita el diagnóstico .'
-config.diagnostics['incomplete-signature-doc']    = -- TODO: needs localisation
-'Incomplete @param or @return annotations for functions.'
-'Habilita el diagnóstico .'
-config.diagnostics['invisible']             = -- TODO: needs localisation
-'Enable diagnostics for accesses to fields which are invisible.'
-'Habilita el diagnóstico .'
-config.diagnostics['missing-global-doc']    = -- TODO: needs localisation
-'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
-'Habilita el diagnóstico .'
-config.diagnostics['missing-local-export-doc'] = -- TODO: needs localisation
-'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
-'Habilita el diagnóstico .'
-config.diagnostics['missing-parameter']     = -- TODO: needs localisation
-'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
-'Habilita el diagnóstico .'
-config.diagnostics['missing-return']        = -- TODO: needs localisation
-'Enable diagnostics for functions with return annotations which have no return statement.'
-'Habilita el diagnóstico .'
-config.diagnostics['missing-return-value']  = -- TODO: needs localisation
-'Enable diagnostics for return statements without values although the containing function declares returns.'
-'Habilita el diagnóstico .'
-config.diagnostics['need-check-nil']        = -- TODO: needs localisation
-'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
-'Habilita el diagnóstico .'
-config.diagnostics['no-unknown']            = -- TODO: needs localisation
-'Enable diagnostics for cases in which the type cannot be inferred.'
-'Habilita el diagnóstico .'
-config.diagnostics['not-yieldable']         = -- TODO: needs localisation
-'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
-'Habilita el diagnóstico .'
-config.diagnostics['param-type-mismatch']   = -- TODO: needs localisation
-'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
-config.diagnostics['redundant-return']      = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
-config.diagnostics['redundant-return-value']= -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
-config.diagnostics['return-type-mismatch']  = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
-config.diagnostics['spell-check']           = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for typos in strings.'
-config.diagnostics['name-style-check']      = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for name style.'
-config.diagnostics['unbalanced-assignments']= -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
-config.diagnostics['undefined-doc-class']   = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for class annotations in which an undefined class is referenced.'
-config.diagnostics['undefined-doc-name']    = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for type annotations referencing an undefined type or alias.'
-config.diagnostics['undefined-doc-param']   = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
-config.diagnostics['undefined-field']       = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for cases in which an undefined field of a variable is read.'
-config.diagnostics['unknown-cast-variable'] = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for casts of undefined variables.'
-config.diagnostics['unknown-diag-code']     = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
-config.diagnostics['unknown-operator']      = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for unknown operators.'
-config.diagnostics['unreachable-code']      = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics for unreachable code.'
-config.diagnostics['global-element']       = -- TODO: needs localisation
-'Habilita el diagnóstico .'
-'Enable diagnostics to warn about global elements.'
-config.typeFormat.config                    = -- TODO: needs localisation
-'Configures the formatting behavior while typing Lua code.'
-config.typeFormat.config.auto_complete_end  = -- TODO: needs localisation
-'Controls if `end` is automatically completed at suitable positions.'
-config.typeFormat.config.auto_complete_table_sep = -- TODO: needs localisation
-'Controls if a separator is automatically appended at the end of a table declaration.'
-config.typeFormat.config.format_line        = -- TODO: needs localisation
-'Controls if a line is formatted at all.'
+config.diagnostics['assign-type-mismatch']  =
+'Habilita el diagnóstico para asignaciones en las cuales el valor del tipo no calza con el tipo de la variable siendo asignada.'
+config.diagnostics['await-in-sync']         =
+'Habilita el diagnóstico para llamadas a funciones asíncronas dentro de una función síncrona.'
+config.diagnostics['cast-local-type']    =
+'Habilita el diagnóstico para conversión de tipos de variables locales donde el tipo objetivo no calza con el tipo definido.'
+config.diagnostics['cast-type-mismatch']    =
+'Habilita el diagnóstico para conversiones de tipos donde el tipo objetivo no calza con el tipo inicial.'
+config.diagnostics['circular-doc-class']    =
+'Habilita el diagnóstico para pares de clases que heredan una de la otra, introduciendo una relación circular.'
+config.diagnostics['close-non-object']      =
+'Habilita el diagnóstico para intentos de cerra una variable con un no-objeto.'
+config.diagnostics['code-after-break']      =
+'Habilita el diagnóstico para el código que viene después de un `break` en un bucle.'
+config.diagnostics['codestyle-check']       =
+'Habilita el diagnóstico para líneas formateadas incorrectamente.'
+config.diagnostics['count-down-loop']       =
+'Habilita el diagnóstico para bucles `for` en los cuales nunca se alcanza su máximo o límite por que el bucle es incremental en vez de decremental.'
+config.diagnostics['deprecated']            =
+'Habilita el diagnóstico para resaltar APIs obsoletas.'
+config.diagnostics['different-requires']    =
+'Habilita el diagnóstico para archivos que son requeridos con dos rutas distintas.'
+config.diagnostics['discard-returns']       =
+'Habilita el diagnóstico para llamadas de funciones anotadas con `---@nodiscard` en las cuales se ignore los valores retornados.'
+config.diagnostics['doc-field-no-class']    =
+'Habilita el diagnóstico para resaltar una anotación de campo sin una anotación de clase que lo defina.'
+config.diagnostics['duplicate-doc-alias']   =
+'Habilita el diagnóstico para nombres de alias duplicados en una anotación.'
+config.diagnostics['duplicate-doc-field']   =
+'Habilita el diagnóstico para nombres de campo duplicados en una anotación.'
+config.diagnostics['duplicate-doc-param']   =
+'Habilita el diagnóstico para nombres de parámetros duplicados en una anotación.'
+config.diagnostics['duplicate-set-field']   =
+'Habilita el diagnóstico para cuando se asigna el mismo campo en una clase más de una vez.'
+config.diagnostics['incomplete-signature-doc']    =
+'Habilita el diagnóstico para anotaciones @param o @return incompletas para funciones.'
+config.diagnostics['invisible']             =
+'Habilita el diagnóstico para accesos a campos que son invisibles.'
+config.diagnostics['missing-global-doc']    =
+'Habilita el diagnóstico para globales faltantes. Las funciones globales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.'
+config.diagnostics['missing-local-export-doc'] =
+'Habilita el diagnóstico para locales exportadas. Las funciones locales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.'
+config.diagnostics['missing-parameter']     =
+'Habilita el diagnóstico para llamados de funciones donde el número de argumentos es menore que el número de parámetros anotados de la función.'
+config.diagnostics['missing-return']        =
+'Habilita el diagnóstico para para funciones con anotaciones de retorno que no tienen la expresión `return …`.'
+config.diagnostics['missing-return-value']  =
+'Habilita el diagnóstico para expresiones `return …` sin valores aunque la función que la contiene declare retornos.'
+config.diagnostics['need-check-nil']        =
+'Habilita el diagnóstico para usos de variables si `nil` o un valor opcional (potencialmente `nil`) haya sido asignado a la variable anteriormente.'
+config.diagnostics['no-unknown']            =
+'Habilita el diagnóstico para los casos en que el tipo no puede ser inferido.'
+config.diagnostics['not-yieldable']         =
+'Habilita el diagnóstico para llamadas a `coroutine.yield()` cuando no esté permitido.'
+config.diagnostics['param-type-mismatch']   =
+'Habilita el diagnóstico para llamadas a funciones donde el tipo de un parámetro provisto no calza con el tipo de la definición anotado de la función.'
+config.diagnostics['redundant-return']      =
+'Habilita el diagnóstico para sentencias de retorno que no son necesarias porque la función terminaría de igual manera.'
+config.diagnostics['redundant-return-value']=
+'Habilita el diagnóstico para sentencias de retorno que retornan un valor extra que no fue especificado por una anotación de retorno.'
+config.diagnostics['return-type-mismatch']  =
+'Habilita el diagnóstico para valores retornados cuyo tipo no calza con el tipo declarado en la anotación correspondiente de la función.'
+config.diagnostics['spell-check']           =
+'Habilita el diagnóstico para errores tipográficos en strings.'
+config.diagnostics['name-style-check']      =
+'Habilita el diagnóstico para el estilo de nombres.'
+config.diagnostics['unbalanced-assignments']=
+'Habilita el diagnóstico para asignaciones múltiplies si no todas las variables obtienen un valor (por ejemplo, `local x,y = 1`).'
+config.diagnostics['undefined-doc-class']   =
+'Habilita el diagnóstico para las anotaciones de clase en las cuales una clase sin definir es referenciada.'
+config.diagnostics['undefined-doc-name']    =
+'Habilita el diagnóstico para anotaciones de tipo que referencian a un tipo o alias sin definir.'
+config.diagnostics['undefined-doc-param']   =
+'Habilita el diagnóstico para casos en que una anotación de parámetro es dado sin declarar el parámetro en la definición de la función.'
+config.diagnostics['undefined-field']       =
+'Habilita el diagnóstico para los casos en que se lee un campo sin definir de una variable.'
+config.diagnostics['unknown-cast-variable'] =
+'Habilita el diagnóstico para conversiones de tipo de variables sin definir.'
+config.diagnostics['unknown-diag-code']     =
+'Habilita el diagnóstico para los casos en que un código desconocido de diagnóstico es ingresado.'
+config.diagnostics['unknown-operator']      =
+'Habilita el diagnóstico para operadores desconocidos.'
+config.diagnostics['unreachable-code']      =
+'Habilita el diagnóstico para código inalcanzable.'
+config.diagnostics['global-element']       =
+'Habilita el diagnóstico que alerta sobre elementos globales.'
+config.typeFormat.config                    =
+'Configura el comportamiento del formateo mientras se tipea código Lua.'
+config.typeFormat.config.auto_complete_end  =
+'Controla si se completa automáticamente con `end` en las posiciones correspondientes.'
+config.typeFormat.config.auto_complete_table_sep =
+'Controla si se agrega automáticamente un separador al final de la declaración de una tabla.'
+config.typeFormat.config.format_line        =
+'Controla si una línea se formatea'
 
-command.exportDocument = -- TODO: needs localisation
-'Lua: Export Document ...'
-command.addon_manager.open = -- TODO: needs localisation
-'Lua: Open Addon Manager ...'
-command.reloadFFIMeta = -- TODO: needs localisation
-'Lua: Reload luajit ffi meta'
-command.startServer = -- TODO: needs localisation
-'Lua: (debug) Start Language Server'
-command.stopServer = -- TODO: needs localisation
-'Lua: (debug) Stop Language Server'
+command.exportDocument =
+'Lua: Exporta Documento ...'
+command.addon_manager.open =
+'Lua: Abre el Manejador de Extensiones ...'
+command.reloadFFIMeta =
+'Lua: Recarga meta de ffi para luajit'
+command.startServer =
+'Lua: (debug) Carga el Servidor de Lenguaje'
+command.stopServer =
+'Lua: (debug) Detén el Servidor de Lenguaje'

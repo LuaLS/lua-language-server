@@ -459,434 +459,435 @@ ACTION_FIX_ADD_PAREN   =
 ACTION_AUTOREQUIRE     =
 "Importa '{}' como {}"
 
-COMMAND_DISABLE_DIAG      = -- TODO: needs localisation
-'Disable diagnostics'
-COMMAND_MARK_GLOBAL       = -- TODO: needs localisation
-'Mark defined global'
-COMMAND_REMOVE_SPACE      = -- TODO: needs localisation
-'Clear all postemptive spaces'
-COMMAND_ADD_BRACKETS      = -- TODO: needs localisation
-'Add brackets'
-COMMAND_RUNTIME_VERSION   = -- TODO: needs localisation
-'Change runtime version'
-COMMAND_OPEN_LIBRARY      = -- TODO: needs localisation
-'Load globals from 3rd library'
-COMMAND_UNICODE_NAME      = -- TODO: needs localisation
-'Allow Unicode characters.'
-COMMAND_JSON_TO_LUA       = -- TODO: needs localisation
-'Convert JSON to Lua'
-COMMAND_JSON_TO_LUA_FAILED= -- TODO: needs localisation
-'Convert JSON to Lua failed: {}'
-COMMAND_ADD_DICT          = -- TODO: needs localisation
-'Add Word to dictionary'
-COMMAND_REFERENCE_COUNT   = -- TODO: needs localisation
-'{} references'
+COMMAND_DISABLE_DIAG      =
+'Deshabilita los diagnósticos'
+COMMAND_MARK_GLOBAL       =
+'Marca la variable como global definida'
+COMMAND_REMOVE_SPACE      =
+'Quita todos los espacios al final de línea.'
+COMMAND_ADD_BRACKETS      =
+'Agrega corchetes'
+COMMAND_RUNTIME_VERSION   =
+'Cambia la versión a ejecutar'
+COMMAND_OPEN_LIBRARY      =
+'Carga variables globales de una biblioteca externa'
+COMMAND_UNICODE_NAME      =
+'Permite caracteres Unicode.'
+COMMAND_JSON_TO_LUA       =
+'Convierte JSON a Lua'
+COMMAND_JSON_TO_LUA_FAILED=
+'Falló la conversión JSON a Lua: {}'
+COMMAND_ADD_DICT          =
+'Agrega la palabra al diccionario'
+COMMAND_REFERENCE_COUNT   =
+'{} referencias'
 
-COMPLETION_IMPORT_FROM          = -- TODO: needs localisation
-'Import from {}'
-COMPLETION_DISABLE_AUTO_REQUIRE = -- TODO: needs localisation
-'Disable auto require'
-COMPLETION_ASK_AUTO_REQUIRE     = -- TODO: needs localisation
-'Add the code at the top of the file to require this file?'
+COMPLETION_IMPORT_FROM          =
+'Importa de {}'
+COMPLETION_DISABLE_AUTO_REQUIRE =
+'Deshabilita auto require'
+COMPLETION_ASK_AUTO_REQUIRE     =
+'¿Desea agregar el código al inicio del archivo para hacer require a este archivo?'
 
-DEBUG_MEMORY_LEAK      = -- TODO: needs localisation
-"{} I'm sorry for the serious memory leak. The language service will be restarted soon."
-DEBUG_RESTART_NOW      = -- TODO: needs localisation
-'Restart now'
+DEBUG_MEMORY_LEAK      =
+"{} Lamento la fuga de memoria. Pronto se reiniciará el servicio de lenguage."
+DEBUG_RESTART_NOW      =
+'Reinicia ahora'
 
-WINDOW_COMPILING                = -- TODO: needs localisation
-'Compiling'
-WINDOW_DIAGNOSING               = -- TODO: needs localisation
-'Diagnosing'
-WINDOW_INITIALIZING             = -- TODO: needs localisation
-'Initializing...'
-WINDOW_PROCESSING_HOVER         = -- TODO: needs localisation
-'Processing hover...'
-WINDOW_PROCESSING_DEFINITION    = -- TODO: needs localisation
-'Processing definition...'
-WINDOW_PROCESSING_REFERENCE     = -- TODO: needs localisation
-'Processing reference...'
-WINDOW_PROCESSING_RENAME        = -- TODO: needs localisation
-'Processing rename...'
-WINDOW_PROCESSING_COMPLETION    = -- TODO: needs localisation
-'Processing completion...'
-WINDOW_PROCESSING_SIGNATURE     = -- TODO: needs localisation
-'Processing signature help...'
-WINDOW_PROCESSING_SYMBOL        = -- TODO: needs localisation
-'Processing file symbols...'
-WINDOW_PROCESSING_WS_SYMBOL     = -- TODO: needs localisation
-'Processing workspace symbols...'
-WINDOW_PROCESSING_SEMANTIC_FULL = -- TODO: needs localisation
-'Processing full semantic tokens...'
-WINDOW_PROCESSING_SEMANTIC_RANGE= -- TODO: needs localisation
-'Processing incremental semantic tokens...'
-WINDOW_PROCESSING_HINT          = -- TODO: needs localisation
-'Processing inline hint...'
-WINDOW_PROCESSING_BUILD_META    = -- TODO: needs localisation
-'Processing build meta...'
-WINDOW_INCREASE_UPPER_LIMIT     = -- TODO: needs localisation
-'Increase upper limit'
-WINDOW_CLOSE                    = -- TODO: needs localisation
-'Close'
-WINDOW_SETTING_WS_DIAGNOSTIC    = -- TODO: needs localisation
-'You can delay or disable workspace diagnostics in settings'
-WINDOW_DONT_SHOW_AGAIN          = -- TODO: needs localisation
-"Don't show again"
-WINDOW_DELAY_WS_DIAGNOSTIC      = -- TODO: needs localisation
-'Idle time diagnosis (delay {} seconds)'
-WINDOW_DISABLE_DIAGNOSTIC       = -- TODO: needs localisation
-'Disable workspace diagnostics'
-WINDOW_LUA_STATUS_WORKSPACE     = -- TODO: needs localisation
-'Workspace   : {}'
-WINDOW_LUA_STATUS_CACHED_FILES  = -- TODO: needs localisation
-'Cached files: {ast}/{max}'
-WINDOW_LUA_STATUS_MEMORY_COUNT  = -- TODO: needs localisation
-'Memory usage: {mem:.f}M'
-WINDOW_LUA_STATUS_TIP           = -- TODO: needs localisation
+WINDOW_COMPILING                =
+'Compilando'
+WINDOW_DIAGNOSING               =
+'Diagnosticando'
+WINDOW_INITIALIZING             =
+'Inicializando...'
+WINDOW_PROCESSING_HOVER         =
+'Procesando ratón rondando...'
+WINDOW_PROCESSING_DEFINITION    =
+'Procesando definición...'
+WINDOW_PROCESSING_REFERENCE     =
+'Procesando referencia...'
+WINDOW_PROCESSING_RENAME        =
+'Procesando renombre...'
+WINDOW_PROCESSING_COMPLETION    =
+'Procesando completado...'
+WINDOW_PROCESSING_SIGNATURE     =
+'Procesando ayuda de firma...'
+WINDOW_PROCESSING_SYMBOL        =
+'Procesando símbolos de archivo...'
+WINDOW_PROCESSING_WS_SYMBOL     =
+'Procesando símbolos de espacio de trabajo...'
+WINDOW_PROCESSING_SEMANTIC_FULL =
+'Procesando tóquenes semánticos completos...'
+WINDOW_PROCESSING_SEMANTIC_RANGE=
+'Procesando tóquenes semánticos incrementales...'
+WINDOW_PROCESSING_HINT          =
+'Procesando pista en línea...'
+WINDOW_PROCESSING_BUILD_META    =
+'Procesando meta de construcción...'
+WINDOW_INCREASE_UPPER_LIMIT     =
+'Incrementa límite superior'
+WINDOW_CLOSE                    =
+'Cierra'
+WINDOW_SETTING_WS_DIAGNOSTIC    =
+'Puede desahibilitar los diagnósticos del espacio de trabajo o dejarlos para después en la configuración'
+WINDOW_DONT_SHOW_AGAIN          =
+'No lo muestres de nuevo'
+WINDOW_DELAY_WS_DIAGNOSTIC      =
+'Diagnósticos de tiempo ocioso (retardo de {} segundos)'
+WINDOW_DISABLE_DIAGNOSTIC       =
+'Deshabilita los diagnósticos del espacio de trabajo'
+WINDOW_LUA_STATUS_WORKSPACE     =
+'Espacio de trabajo  : {}'
+WINDOW_LUA_STATUS_CACHED_FILES  =
+'Archivos en caché: {ast}/{max}'
+WINDOW_LUA_STATUS_MEMORY_COUNT  =
+'Memoria en uso: {mem:.f}M'
+WINDOW_LUA_STATUS_TIP           =
 [[
 
-This icon is a cat,
-Not a dog nor a fox!
+Este ícono es un gato,
+¡no es un perro o un zorro!
              ↓↓↓
 ]]
 WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
-'Perform workspace diagnosis'
-WINDOW_LUA_STATUS_DIAGNOSIS_MSG = -- TODO: needs localisation
-'Do you want to perform workspace diagnosis?'
-WINDOW_APPLY_SETTING            = -- TODO: needs localisation
-'Apply setting'
-WINDOW_CHECK_SEMANTIC           = -- TODO: needs localisation
-'If you are using the color theme in the market, you may need to modify `editor.semanticHighlighting.enabled` to `true` to make semantic tokens take effect.'
-WINDOW_TELEMETRY_HINT           = -- TODO: needs localisation
-'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://luals.github.io/privacy#language-server) .'
-WINDOW_TELEMETRY_ENABLE         = -- TODO: needs localisation
-'Allow'
-WINDOW_TELEMETRY_DISABLE        = -- TODO: needs localisation
-'Prohibit'
-WINDOW_CLIENT_NOT_SUPPORT_CONFIG= -- TODO: needs localisation
-'Your client does not support modifying settings from the server side, please manually modify the following settings:'
+'Realiza los diagnósticos del espacio de trabajo'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG =
+'¿Quiere realizar los diagnósticos del espacio de trabajo?'
+WINDOW_APPLY_SETTING            =
+'Aplica la configuración'
+WINDOW_CHECK_SEMANTIC           =
+'Puede ser que necesite modificar `editor.semanticHighlighting.enabled` a `true` si está usando el tema de colores del mercado para hacer que los tóquenes semánticos tengan efecto, '
+WINDOW_TELEMETRY_HINT           =
+'Por favor, permita el envío de datos de uso anónimos y de reportes de errores para ayudarnos a mejorar esta extensión. Lea nuestra política de privacidad [aquí (en inglés)](https://luals.github.io/privacy#language-server) .'
+WINDOW_TELEMETRY_ENABLE         =
+'Permitida'
+WINDOW_TELEMETRY_DISABLE        =
+'Prohibida'
+WINDOW_CLIENT_NOT_SUPPORT_CONFIG=
+'Su cliente no soporta la modificación de la configuación desde el servidor, por favor, modifique manualmente las siguientes configuraciones:'
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
-'Automatic modification of local settings is not currently supported, please manually modify the following settings:'
-WINDOW_MANUAL_CONFIG_ADD        = -- TODO: needs localisation
-'`{key}`: add element `{value:q}` ;'
-WINDOW_MANUAL_CONFIG_SET        = -- TODO: needs localisation
-'`{key}`: set to `{value:q}` ;'
-WINDOW_MANUAL_CONFIG_PROP       = -- TODO: needs localisation
-'`{key}`: set the property `{prop}` to `{value:q}`;'
-WINDOW_APPLY_WHIT_SETTING       = -- TODO: needs localisation
-'Apply and modify settings'
-WINDOW_APPLY_WHITOUT_SETTING    = -- TODO: needs localisation
-'Apply but do not modify settings'
-WINDOW_ASK_APPLY_LIBRARY        = -- TODO: needs localisation
-'Do you need to configure your work environment as `{}`?'
-WINDOW_SEARCHING_IN_FILES       = -- TODO: needs localisation
-'Searching in files...'
-WINDOW_CONFIG_LUA_DEPRECATED    = -- TODO: needs localisation
-'`config.lua` is deprecated, please use `config.json` instead.'
-WINDOW_CONVERT_CONFIG_LUA       = -- TODO: needs localisation
-'Convert to `config.json`'
-WINDOW_MODIFY_REQUIRE_PATH      = -- TODO: needs localisation
-'Do you want to modify the require path?'
-WINDOW_MODIFY_REQUIRE_OK        = -- TODO: needs localisation
+'La modificación automática de la configuración local no está soportada actualmente, por favor, modifique manualmente las siguientes configuraciones:'
+WINDOW_MANUAL_CONFIG_ADD        =
+'`{key}`: agregue el elemento `{value:q}` ;'
+WINDOW_MANUAL_CONFIG_SET        =
+'`{key}`: asignado a `{value:q}` ;'
+WINDOW_MANUAL_CONFIG_PROP       =
+'`{key}`: la propiedad `{prop}` asignada a `{value:q}`;'
+WINDOW_APPLY_WHIT_SETTING       =
+'Aplica y modifica la configuración'
+WINDOW_APPLY_WHITOUT_SETTING    =
+'Aplica pero sin modificar la configuración'
+WINDOW_ASK_APPLY_LIBRARY        =
+'¿Necesita configurar su ambiente de trabajo como `{}`?'
+WINDOW_SEARCHING_IN_FILES       =
+'Buscando en los archivos...'
+WINDOW_CONFIG_LUA_DEPRECATED    =
+'`config.lua` está obsoleto, por favor, use `config.json`.'
+WINDOW_CONVERT_CONFIG_LUA       =
+'Convierte a `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH      =
+'¿Desea modificar la ruta para requerir módulos?'
+WINDOW_MODIFY_REQUIRE_OK        =
 'Modifica'
 
-CONFIG_LOAD_FAILED              = -- TODO: needs localisation
-'Unable to read the settings file: {}'
-CONFIG_LOAD_ERROR               = -- TODO: needs localisation
-'Setting file loading error: {}'
-CONFIG_TYPE_ERROR               = -- TODO: needs localisation
-'The setting file must be in lua or json format: {}'
-CONFIG_MODIFY_FAIL_SYNTAX_ERROR = -- TODO: needs localisation
-'Failed to modify settings, there are syntax errors in the settings file: {}'
-CONFIG_MODIFY_FAIL_NO_WORKSPACE = -- TODO: needs localisation
+CONFIG_LOAD_FAILED              =
+'No se pudo leer el archivo de configuración: {}'
+CONFIG_LOAD_ERROR               =
+'Error al cargar el archivo de configuración: {}'
+CONFIG_TYPE_ERROR               =
+'El el archivo de configuración debe estar o en formato lua o en formato json: {}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR =
+'Falló la modificación de la configuración, hay errores de sintaxis en el archivo de configuración: {}'
+CONFIG_MODIFY_FAIL_NO_WORKSPACE =
 [[
-Failed to modify settings:
-* The current mode is single-file mode, server cannot create `.luarc.json` without workspace.
-* The language client dose not support modifying settings from the server side.
+Falló la modificación de la configuración:
+* El modo actual es "solo un archivo", el servidor no puede crear `.luarc.json` sin un espacio de trabajo.
+* El cliente de lenguage no soporta la modificación de la configuración desde el servidor.
 
-Please modify following settings manually:
+Por favor, modifique manualmente las siguientes configuraciones:
 {}
 ]]
-CONFIG_MODIFY_FAIL              = -- TODO: needs localisation
+CONFIG_MODIFY_FAIL              =
 [[
-Failed to modify settings
+Falló la modificación de la configuración:
 
-Please modify following settings manually:
+Por favor, modifique manualmente las siguientes configuraciones:
 {}
 ]]
 
-PLUGIN_RUNTIME_ERROR            = -- TODO: needs localisation
+PLUGIN_RUNTIME_ERROR            =
 [[
-An error occurred in the plugin, please report it to the plugin author.
-Please check the details in the output or log.
-Plugin path: {}
+Hubo un error en el plugin, por favor, repórtelo con la persona autora del plugin.
+Por favor, revise los detalles en la salida o registros.
+Ruta del plugin: {}
 ]]
-PLUGIN_TRUST_LOAD               = -- TODO: needs localisation
+PLUGIN_TRUST_LOAD               =
 [[
-The current settings try to load the plugin at this location:{}
+La configuración actual intenta cargar el plugin ubicado aquí:{}
 
-Note that malicious plugin may harm your computer
+Tenga precaución con algún plugin malicioso que pueda dañar su computador
 ]]
-PLUGIN_TRUST_YES                = -- TODO: needs localisation
+PLUGIN_TRUST_YES                =
 [[
-Trust and load this plugin
+Confía y carga este plugin
 ]]
-PLUGIN_TRUST_NO                 = -- TODO: needs localisation
+PLUGIN_TRUST_NO                 =
 [[
-Don't load this plugin
+No cargues este plugin
 ]]
 
-CLI_CHECK_ERROR_TYPE= -- TODO: needs localisation
-'The argument of CHECK must be a string, but got {}'
-CLI_CHECK_ERROR_URI= -- TODO: needs localisation
-'The argument of CHECK must be a valid uri, but got {}'
-CLI_CHECK_ERROR_LEVEL= -- TODO: needs localisation
-'Checklevel must be one of: {}'
-CLI_CHECK_INITING= -- TODO: needs localisation
-'Initializing ...'
-CLI_CHECK_SUCCESS= -- TODO: needs localisation
-'Diagnosis completed, no problems found'
-CLI_CHECK_PROGRESS= -- TODO: needs localisation
-'Found {} problems in {} files'
-CLI_CHECK_RESULTS= -- TODO: needs localisation
-'Diagnosis complete, {} problems found, see {}'
-CLI_CHECK_MULTIPLE_WORKERS= -- TODO: needs localisation
-'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
-CLI_DOC_INITING  = -- TODO: needs localisation
-'Loading documents ...'
-CLI_DOC_DONE     = -- TODO: needs localisation
+CLI_CHECK_ERROR_TYPE=
+'El argumento de CHECK debe ser un string, pero se tiene {}'
+CLI_CHECK_ERROR_URI=
+'El argumento de CHECK debe ser una uri válida, pero se tiene {}'
+CLI_CHECK_ERROR_LEVEL=
+'El nivel de chequeo debe ser uno de: {}'
+CLI_CHECK_INITING=
+'Inicializando...'
+CLI_CHECK_SUCCESS=
+'Se completó el diagnóstico, no se encontraron problemas'
+CLI_CHECK_PROGRESS=
+'Se encontraron {} problema(s) en {} archivo(s)'
+CLI_CHECK_RESULTS=
+'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
+CLI_CHECK_MULTIPLE_WORKERS=
+'Iniciando {} tarea(s) de trabajo, se ha deshabitado la salida de progreso. Esto podría tomar unos minutos.'
+CLI_DOC_INITING  =
+'Cargando documentos ...'
+CLI_DOC_DONE     =
 [[
-Documentation exported:
+Documentación exportada:
 ]]
-CLI_DOC_WORKING  = -- TODO: needs localisation
-'Building docs...'
+CLI_DOC_WORKING  =
+'Construyendo la documentación...'
 
-TYPE_ERROR_ENUM_GLOBAL_DISMATCH= -- TODO: needs localisation
-'Type `{child}` cannot match enumeration type of `{parent}`'
-TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED= -- TODO: needs localisation
-'Cannot use generic `{child}` in enumeration'
-TYPE_ERROR_ENUM_LITERAL_DISMATCH= -- TODO: needs localisation
-'Literal `{child}` cannot match the enumeration value of `{parent}`'
-TYPE_ERROR_ENUM_OBJECT_DISMATCH= -- TODO: needs localisation
-'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
-TYPE_ERROR_ENUM_NO_OBJECT= -- TODO: needs localisation
-'The passed in enumeration value `{child}` is not recognized'
-TYPE_ERROR_INTEGER_DISMATCH= -- TODO: needs localisation
-'Literal `{child}` cannot match integer `{parent}`'
-TYPE_ERROR_STRING_DISMATCH= -- TODO: needs localisation
-'Literal `{child}` cannot match string `{parent}`'
-TYPE_ERROR_BOOLEAN_DISMATCH= -- TODO: needs localisation
-'Literal `{child}` cannot match boolean `{parent}`'
-TYPE_ERROR_TABLE_NO_FIELD= -- TODO: needs localisation
-'Field `{key}` does not exist in the table'
-TYPE_ERROR_TABLE_FIELD_DISMATCH= -- TODO: needs localisation
-'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
-TYPE_ERROR_CHILD_ALL_DISMATCH= -- TODO: needs localisation
-'All subtypes in `{child}` cannot match `{parent}`'
-TYPE_ERROR_PARENT_ALL_DISMATCH= -- TODO: needs localisation
-'`{child}` cannot match any subtypes in `{parent}`'
-TYPE_ERROR_UNION_DISMATCH= -- TODO: needs localisation
-'`{child}` cannot match `{parent}`'
-TYPE_ERROR_OPTIONAL_DISMATCH= -- TODO: needs localisation
-'Optional type cannot match `{parent}`'
-TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER= -- TODO: needs localisation
-'The number `{child}` cannot be converted to an integer'
-TYPE_ERROR_NUMBER_TYPE_TO_INTEGER= -- TODO: needs localisation
-'Cannot convert number type to integer type'
-TYPE_ERROR_DISMATCH= -- TODO: needs localisation
-'Type `{child}` cannot match `{parent}`'
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH=
+'El tipo `{child}` no calza con el tipo de enumeración `{parent}`'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED=
+'No se puede usar el genérico `{child}` en enumeraciones'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH=
+'El literal `{child}` no calza con el valor de enumeración `{parent}`'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH=
+'El literal `{child}` no calza con el valor de enumeración `{parent}`. Deben ser el mismo objeto'
+TYPE_ERROR_ENUM_NO_OBJECT=
+'No se reconoce el valor de enumeración entregado `{child}`'
+TYPE_ERROR_INTEGER_DISMATCH=
+'El literal `{child}` no calza con el entero `{parent}`'
+TYPE_ERROR_STRING_DISMATCH=
+'El literal `{child}` no calza con el string `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH=
+'El literal `{child}` no calza con el booleano `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD=
+'El campo `{key}` no existe en la tabla'
+TYPE_ERROR_TABLE_FIELD_DISMATCH=
+'El tipo del campo `{key}` es `{child}`, que no calza con `{parent}`'
+TYPE_ERROR_CHILD_ALL_DISMATCH=
+'Todos los sub-tipos en `{child}` no calzan con  `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH=
+'`{child}` no calza con ningún sub-tipo en `{parent}`'
+TYPE_ERROR_UNION_DISMATCH=
+'`{child}` no calza con `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH=
+'El tipo opcional no calza con `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER=
+'El número `{child}` no puede ser convertido a un entero'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER=
+"No se puede convertir un tipo 'número' a un tipo 'entero'"
+TYPE_ERROR_DISMATCH=
+'El tipo `{child}` no calza con `{parent}`'
 
-LUADOC_DESC_CLASS= -- TODO: needs localisation
+LUADOC_DESC_CLASS=
 [=[
-Defines a class/table structure
-## Syntax
-`---@class <name> [: <parent>[, <parent>]...]`
-## Usage
+Define una estructura de clase o tabla
+## Sintaxis
+`---@class <nombre> [: <madre>[, <madre>]...]`
+## Uso
 ```
----@class Manager: Person, Human
-Manager = {}
+---@class Gerente: Persona, Humano
+Gerente = {}
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#class)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#class)
 ]=]
-LUADOC_DESC_TYPE= -- TODO: needs localisation
+LUADOC_DESC_TYPE=
 [=[
-Specify the type of a certain variable
+Especifica el tipo de una cierta variable
 
-Default types: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
+Tipos predefinidos: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
 `function`, `table`, `thread`, `userdata`, `lightuserdata`
 
-(Custom types can be provided using `@alias`)
+(Otros tipos pueden ser provistos usando `@alias`)
 
-## Syntax
-`---@type <type>[| [type]...`
+## Sintaxis
+`---@type <tipo>[| [tipo]...`
 
-## Usage
-### General
+## Uso
+### En general
 ```
----@type nil|table|myClass
-local Example = nil
+---@type nil|table|miClase
+local Ejemplo = nil
 ```
 
-### Arrays
+### Arreglos
 ```
 ---@type number[]
-local phoneNumbers = {}
+local numsTelefonicos = {}
 ```
 
-### Enums
+### Enumeraciones
 ```
 ---@type "red"|"green"|"blue"
 local color = ""
 ```
 
-### Tables
+### Tablas
 ```
 ---@type table<string, boolean>
-local settings = {
-    disableLogging = true,
-    preventShutdown = false,
+local config = {
+    desahibilitaRegistra = true,
+    previeneElApagado = false,
 }
 
 ---@type { [string]: true }
-local x --x[""] is true
+local x --x[""] es `true`
 ```
 
-### Functions
+### Funciones
 ```
 ---@type fun(mode?: "r"|"w"): string
-local myFunction
+local miFun
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#type)
+[Revisar la Wiki](https://luals.github.io/wiki/annotations#type)
 ]=]
-LUADOC_DESC_ALIAS= -- TODO: needs localisation
+LUADOC_DESC_ALIAS=
 [=[
-Create your own custom type that can be used with `@param`, `@type`, etc.
+Se pueden crear tipos propios que pueden ser usados con `@param`, `@type`, etc.
 
-## Syntax
-`---@alias <name> <type> [description]`\
+## Sintaxis
+`---@alias <nombre> <tipo> [descripción]`\
 or
 ```
----@alias <name>
----| 'value' [# comment]
----| 'value2' [# comment]
+---@alias <nombre>
+---| 'valor' [# comentario]
+---| 'valor2' [# comentario]
 ...
 ```
 
-## Usage
-### Expand to other type
+## Uso
+### Expansión a otro tipo
 ```
----@alias filepath string Path to a file
+---@alias rutaArchivo string ruta a un archivo
 
----@param path filepath Path to the file to search in
-function find(path, pattern) end
-```
-
-### Enums
-```
----@alias font-style
----| '"underlined"' # Underline the text
----| '"bold"' # Bolden the text
----| '"italic"' # Make the text italicized
-
----@param style font-style Style to apply
-function setFontStyle(style) end
+---@param ruta rutaArchivo Ruta al archivo para buscar
+function encuentra(ruta, patron) end
 ```
 
-### Literal Enum
+### Enumeraciones
 ```
-local enums = {
-    READ = 0,
-    WRITE = 1,
-    CLOSED = 2
+---@alias estilo-de-fuente
+---| '"subrayado"' # Subraya el texto
+---| '"negrita"' # Pon el texto en negrita
+---| '"italica"' # Italiza el texto
+
+---@param estilo estilo-de-fuente Estilo a aplicar
+function asignaEstiloDeFuente(estilo) end
+```
+
+### Enumeraciones literales
+```
+local enumeraciones = {
+    LECTURA = 0,
+    ESCRITURA = 1,
+    CERRADO = 2
 }
 
----@alias FileStates
----| `enums.READ`
----| `enums.WRITE`
----| `enums.CLOSE`
+---@alias EstadosDeArchivo
+---| `enumeraciones.LECTURA`
+---| `enumeraciones.ESCRITURA`
+---| `enumeraciones.CERRADO`
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#alias)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#alias)
 ]=]
-LUADOC_DESC_PARAM= -- TODO: needs localisation
+LUADOC_DESC_PARAM=
 [=[
-Declare a function parameter
+Declaración de un parámetro de una función
 
-## Syntax
-`@param <name>[?] <type> [comment]`
+## Sintaxis
+`@param <nombre>[?] <tipo> [comentario]`
 
-## Usage
-### General
+## Uso
+### En general
 ```
----@param url string The url to request
----@param headers? table<string, string> HTTP headers to send
----@param timeout? number Timeout in seconds
-function get(url, headers, timeout) end
+---@param url string La url a requerir
+---@param cabeceras? table<string, string> Cabeceras HTTP a enviar
+---@param expiracion? number Tiempo de expiración en segundos
+function get(url, cabeceras, expiracion) end
 ```
 
-### Variable Arguments
+### Argumentos variables
 ```
----@param base string The base to concat to
----@param ... string The values to concat
+---@param base string La base de la concatenación
+---@param ... string Los valores a concatenar
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#param)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#param)
 ]=]
-LUADOC_DESC_RETURN= -- TODO: needs localisation
+LUADOC_DESC_RETURN=
 [=[
-Declare a return value
+Declaración de un valor de retorno
 
-## Syntax
-`@return <type> [name] [description]`\
+## Sintaxis
+`@return <tipo> [nombre] [descripción]`\
 or\
-`@return <type> [# description]`
+`@return <tipo> [# descripción]`
 
-## Usage
-### General
+## Uso
+### En general
 ```
 ---@return number
----@return number # The green component
----@return number b The blue component
+---@return number # Componente verde
+---@return number b Componente azul
 function hexToRGB(hex) end
 ```
 
-### Type & name only
+### Solo tipos y nombres
 ```
 ---@return number x, number y
 function getCoords() end
 ```
 
-### Type only
+### Solo tipos
 ```
 ---@return string, string
-function getFirstLast() end
+function obtenPrimeroYUltimo() end
 ```
 
-### Return variable values
+### Retorno de valores variables
 ```
----@return string ... The tags of the item
-function getTags(item) end
+---@return string ... Las etiquetas del ítem
+function obtenEtiquetas(item) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#return)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#return)
 ]=]
-LUADOC_DESC_FIELD= -- TODO: needs localisation
+LUADOC_DESC_FIELD=
 [=[
-Declare a field in a class/table. This allows you to provide more in-depth
-documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
-`protected`, `public`, or `package`.
+Declaración de un campo en una clase o tabla. Esto permite proveer una
+documentación con más detalles para una tabla. Desde `v3.6.0`, se puede
+marcar un campo como privado (`private`), protegido (`protected`), público
+(`public`) o en-paquete (`package`).
 
-## Syntax
-`---@field [scope] <name> <type> [description]`
+## Sintaxis
+`---@field [alcance] <nombre> <tipo> [descripción]`
 
-## Usage
+## Uso
 ```
 ---@class HTTP_RESPONSE
 ---@field status HTTP_STATUS
----@field headers table<string, string> The headers of the response
+---@field headers table<string, string> Las cabeceras de la respuesta
 
 ---@class HTTP_STATUS
 ---@field code number The status code of the response
@@ -902,40 +903,42 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#field)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#field)
 ]=]
-LUADOC_DESC_GENERIC= -- TODO: needs localisation
+LUADOC_DESC_GENERIC=
 [=[
-Simulates generics. Generics can allow types to be re-used as they help define
-a "generic shape" that can be used with different types.
+Simulación de genéricos. Los genéricos permiten que los tipos puedan ser
+reusados dado que ayudan a definir una "figura genérica" que puede ser
+usada con otros tipos.
 
-## Syntax
-`---@generic <name> [:parent_type] [, <name> [:parent_type]]`
+## Sintaxis
+`---@generic <nombre> [:tipo_padre] [, <nombre> [:tipo_padre]]`
 
-## Usage
-### General
+## Uso
+### En general
 ```
 ---@generic T
----@param value T The value to return
----@return T value The exact same value
-function echo(value)
-    return value
+---@param valor T El valor a retornar
+---@return T valor Exactamente el mismo valor
+function eco(valor)
+    return valor
 end
 
--- Type is string
-s = echo("e")
+-- El tipo es string
+s = eco("e")
 
--- Type is number
-n = echo(10)
+-- El tipo es número (`number`)
+n = eco(10)
 
--- Type is boolean
-b = echo(true)
+-- El tipo es booleano (`boolean`)
+b = eco(true)
 
--- We got all of this info from just using
--- @generic rather than manually specifying
--- each allowed type
+-- Tenemos toda esta información con solo
+-- usar @generic sin tener que especificar
+-- manualmente cada tipo permitido
 ```
 
+### Captura del nombre de un tipo genérico
 ### Capture name of generic type
 ```
 ---@class Foo
@@ -943,193 +946,193 @@ local Foo = {}
 function Foo:Bar() end
 
 ---@generic T
----@param name `T` # the name generic type is captured here
----@return T       # generic type is returned
-function Generic(name) end
+---@param nombre `T` # aquí se captura el tipo de nombre genérico
+---@return T       # se retorna el tipo genérico
+function Generico(nombre) end
 
-local v = Generic("Foo") -- v is an object of Foo
+local v = Generico("Foo") -- v es un objeto de Foo
 ```
 
-### How Lua tables use generics
+### Uso de genéricos en Lua
 ```
 ---@class table<K, V>: { [K]: V }
 
--- This is what allows us to create a table
--- and intellisense keeps track of any type
--- we give for key (K) or value (V)
+-- Esto es lo que nos permite crear una
+-- tabla e intellisense hace seguimiento a
+-- cualquier tipo al que le proveamos para la
+-- clave (k) ó el valor
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations/#generic)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations/#generic)
 ]=]
-LUADOC_DESC_VARARG= -- TODO: needs localisation
+LUADOC_DESC_VARARG=
 [=[
-Primarily for legacy support for EmmyLua annotations. `@vararg` does not
-provide typing or allow descriptions.
+Usado principalmente para el soporte obsoleto de annotaciones de EmmyLua.
+Proveer tipos o permitir descripciones no están soportados con `@vararg`
 
-**You should instead use `@param` when documenting parameters (variable or not).**
+**Se debe usar `@param` cuando se documentan parámetros (sean variables o no).**
 
-## Syntax
-`@vararg <type>`
+## Sintaxis
+`@vararg <tipo>`
 
-## Usage
+## Uso
 ```
----Concat strings together
+---Concatena strings
 ---@vararg string
 function concat(...) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations/#vararg)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations/#vararg)
 ]=]
-LUADOC_DESC_OVERLOAD= -- TODO: needs localisation
+LUADOC_DESC_OVERLOAD=
 [=[
-Allows defining of multiple function signatures.
+Permite definir firmas múltiples para una función.
 
-## Syntax
-`---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
+## Sintaxis
+`---@overload fun(<nombre>[: <tipo>] [, <nombre>[: <tipo>]]...)[: <tipo>[, <tipo>]...]`
 
-## Usage
+## Uso
 ```
 ---@overload fun(t: table, value: any): number
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#overload)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#overload)
 ]=]
-LUADOC_DESC_DEPRECATED= -- TODO: needs localisation
+LUADOC_DESC_DEPRECATED=
 [=[
-Marks a function as deprecated. This results in any deprecated function calls
-being ~~struck through~~.
+Marca una función como obsoleta. Como consecuencia, cualquier llamado a una
+función obsoleta se ~~tarja~~
 
-## Syntax
+## Sintaxis
 `---@deprecated`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#deprecated)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
-LUADOC_DESC_META= -- TODO: needs localisation
+LUADOC_DESC_META=
 [=[
-Indicates that this is a meta file and should be used for definitions and intellisense only.
+Indica que este es un archivo meta y debe ser usado solo para definiciones e intellisense.
 
-There are 3 main distinctions to note with meta files:
-1. There won't be any context-based intellisense in a meta file
-2. Hovering a `require` filepath in a meta file shows `[meta]` instead of an absolute path
-3. The `Find Reference` function will ignore meta files
+Hay tres distinciones principales que hay que notar con los archivos meta:
+1. No hay intellisense basado en el contexto en un archivo meta
+2. El colocar el cursor sobre una ruta de un `require` en un archivo meta muestra `[meta]` en vez de una ruta absolta
+3. La función `Busca referencias` ignora los archivos meta
 
-## Syntax
+## Sintaxis
 `---@meta`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#meta)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#meta)
 ]=]
-LUADOC_DESC_VERSION= -- TODO: needs localisation
+LUADOC_DESC_VERSION=
 [=[
-Specifies Lua versions that this function is exclusive to.
+Especifica versiones de Lua en las que esta función se encuentra.
 
-Lua versions: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
+Versiones de Lua: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
 
-Requires configuring the `Diagnostics: Needed File Status` setting.
+Se requiere la configuración `Diagnostics: Needed File Status`.
 
-## Syntax
+## Sintaxis
 `---@version <version>[, <version>]...`
 
-## Usage
-### General
+## Uso
+### En general
 ```
 ---@version JIT
 function onlyWorksInJIT() end
 ```
-### Specify multiple versions
+### Especificando múltiples versiones
 ```
 ---@version <5.2,JIT
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#version)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#version)
 ]=]
-LUADOC_DESC_SEE= -- TODO: needs localisation
+LUADOC_DESC_SEE=
 [=[
-Define something that can be viewed for more information
+Define algo que puede ser revisado para más información
 
-## Syntax
+## Sintaxis
 `---@see <text>`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#see)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#see)
 ]=]
-LUADOC_DESC_DIAGNOSTIC= -- TODO: needs localisation
+LUADOC_DESC_DIAGNOSTIC=
 [=[
-Enable/disable diagnostics for error/warnings/etc.
+Habilita o deshabilita el diagnóstico para errores, advertencias, etc.
 
-Actions: `disable`, `enable`, `disable-line`, `disable-next-line`
+Acciones: deshabilita (`disable`), habilita (`enable`), deshabilita para esta línea (`disable-line`), deshabilita para la siguiente línea (`disable-next-line`)
 
-[Names](https://github.com/LuaLS/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+[Nombres](https://github.com/LuaLS/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
 
-## Syntax
-`---@diagnostic <action>[: <name>]`
+## Sintaxis
+`---@diagnostic <acción>[: <nombre>]`
 
-## Usage
-### Disable next line
+## Uso
+### Deshabilita para la siguiente línea
 ```
 ---@diagnostic disable-next-line: undefined-global
 ```
 
-### Manually toggle
+### Cambio manual
 ```
 ---@diagnostic disable: unused-local
-local unused = "hello world"
+local sinUso = "hola mundo"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#diagnostic)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
-LUADOC_DESC_MODULE= -- TODO: needs localisation
+LUADOC_DESC_MODULE=
 [=[
-Provides the semantics of `require`.
+Provee la semántica para `require`.
 
-## Syntax
-`---@module <'module_name'>`
+## Sintaxis
+`---@module <'nombre_módulo'>`
 
-## Usage
+## Uso
 ```
 ---@module 'string.utils'
 local stringUtils
--- This is functionally the same as:
-local module = require('string.utils')
+-- Esto es funcionalmente equivalente a:
+local mod = require('string.utils')
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#module)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#module)
 ]=]
-LUADOC_DESC_ASYNC= -- TODO: needs localisation
+LUADOC_DESC_ASYNC=
 [=[
-Marks a function as asynchronous.
+Marca una función como "asíncrona".
 
-## Syntax
+## Sintaxis
 `---@async`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#async)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#async)
 ]=]
-LUADOC_DESC_NODISCARD= -- TODO: needs localisation
+LUADOC_DESC_NODISCARD=
 [=[
-Prevents this function's return values from being discarded/ignored.
-This will raise the `discard-returns` warning should the return values
-be ignored.
+Previene que los valores retornados por esta función sean ignorados o descartados.
+Esto alza la advertencia `discard-returns` si se ignoran los valores retornados.
 
-## Syntax
+## Sintaxis
 `---@nodiscard`
 
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#nodiscard)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
-LUADOC_DESC_CAST= -- TODO: needs localisation
+LUADOC_DESC_CAST=
 [=[
-Allows type casting (type conversion).
+Se permite la conversión de tipo.
 
-## Syntax
-`@cast <variable> <[+|-]type>[, <[+|-]type>]...`
+## Sintaxis
+`@cast <variable> <[+|-]tipo>[, <[+|-]tipo>]...`
 
-## Usage
-### Overwrite type
+## Uso
+### Sobreescritura del tipo
 ```
 ---@type integer
 local x --> integer
@@ -1137,7 +1140,7 @@ local x --> integer
 ---@cast x string
 print(x) --> string
 ```
-### Add Type
+### Agregar un tipo
 ```
 ---@type string
 local x --> string
@@ -1145,7 +1148,7 @@ local x --> string
 ---@cast x +boolean, +number
 print(x) --> string|boolean|number
 ```
-### Remove Type
+### Remover un tipo
 ```
 ---@type string|table
 local x --> string|table
@@ -1154,17 +1157,17 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://luals.github.io/wiki/annotations#cast)
+[Revisar en la Wiki](https://luals.github.io/wiki/annotations#cast)
 ]=]
-LUADOC_DESC_OPERATOR= -- TODO: needs localisation
+LUADOC_DESC_OPERATOR=
 [=[
-Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+Provee la declaración de tipo para [metamétodos de operador](http://lua-users.org/wiki/MetatableEvents).
 
-## Syntax
-`@operator <operation>[(input_type)]:<resulting_type>`
+## Sintaxis
+`@operator <operación>[(tipo_de_entrada)]:<tipo_resultante>`
 
-## Usage
-### Vector Add Metamethod
+## Uso
+### Metamétodo para suma de Vector
 ```
 ---@class Vector
 ---@operator add(Vector):Vector
@@ -1175,7 +1178,7 @@ vB = Vector.new(10, 20, 30)
 vC = vA + vB
 --> Vector
 ```
-### Unary Minus
+### Resta unaria
 ```
 ---@class Passcode
 ---@operator unm:integer
@@ -1186,130 +1189,130 @@ pB = -pA
 ```
 [View Request](https://github.com/LuaLS/lua-language-server/issues/599)
 ]=]
-LUADOC_DESC_ENUM= -- TODO: needs localisation
+LUADOC_DESC_ENUM=
 [=[
+Marca una tabla como una enumeración. Revise [`@alias`](https://luals.github.io/wiki/annotations#alias)
+si se desea una enumeración, pero no se puede definir como una tabla de Lua.
 Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
-tag.
 
-## Syntax
-`@enum <name>`
+## Sintaxis
+`@enum <nombre>`
 
-## Usage
+## Uso
 ```
----@enum colors
-local colors = {
-	white = 0,
-	orange = 2,
-	yellow = 4,
-	green = 8,
-	black = 16,
+---@enum colores
+local colores = {
+	blanco = 0,
+	naranjo = 2,
+	amarillo = 4,
+	verde = 8,
+	negro = 16,
 }
 
----@param color colors
-local function setColor(color) end
+---@param color colores
+local function asignaColor(color) end
 
--- Completion and hover is provided for the below param
-setColor(colors.green)
+-- El completado y la información-bajo-el-cursor se provee para el siguiente parámetro
+asignaColor(colores.verde)
 ```
 ]=]
-LUADOC_DESC_SOURCE= -- TODO: needs localisation
+LUADOC_DESC_SOURCE=
 [=[
-Provide a reference to some source code which lives in another file. When
-searching for the definition of an item, its `@source` will be used.
+Provee una referencia a algún código fuente que vive en otro archivo.
+Cuando se busque por la definición de un ítem, se ocupa su `@source`.
 
-## Syntax
-`@source <path>`
+## Sintaxis
+`@source <ruta>`
 
-## Usage
+## Uso
 ```
----You can use absolute paths
+---Se pueden ocupar rutas absolutas
 ---@source C:/Users/me/Documents/program/myFile.c
 local a
 
----Or URIs
+---También URIs
 ---@source file:///C:/Users/me/Documents/program/myFile.c:10
 local b
 
----Or relative paths
+---También rutas relativas
 ---@source local/file.c
 local c
 
----You can also include line and char numbers
+---Se puede incluir los números de línea y caracter
 ---@source local/file.c:10:8
 local d
 ```
 ]=]
-LUADOC_DESC_PACKAGE= -- TODO: needs localisation
+LUADOC_DESC_PACKAGE=
 [=[
-Mark a function as private to the file it is defined in. A packaged function
-cannot be accessed from another file.
+Marca una función como privada del archivo en la que fue definida. Una función
+empacada (en un cierto paquete) no puede ser accedida desde otro archivo
 
-## Syntax
+## Sintaxis
 `@package`
 
-## Usage
+## Uso
 ```
 ---@class Animal
----@field private eyes integer
+---@field private ojos integer
 local Animal = {}
 
 ---@package
----This cannot be accessed in another file
-function Animal:eyesCount()
-    return self.eyes
+---No se puede acceder desde otro archivo
+function Animal:conteoDeOjos()
+    return self.ojos
 end
 ```
 ]=]
-LUADOC_DESC_PRIVATE= -- TODO: needs localisation
+LUADOC_DESC_PRIVATE=
 [=[
-Mark a function as private to a @class. Private functions can be accessed only
-from within their class and are not accessible from child classes.
+Marca una función como privada de una clase. Las funciones privadas pueden
+ser accedidas solo dentro de su clase y no por clases hijas.
 
-## Syntax
+## Sintaxis
 `@private`
 
-## Usage
+## Uso
 ```
 ---@class Animal
----@field private eyes integer
+---@field private ojos integer
 local Animal = {}
 
 ---@private
-function Animal:eyesCount()
-    return self.eyes
+function Animal:conteoDeOjos()
+    return self.ojos
 end
 
----@class Dog:Animal
-local myDog = {}
+---@class Perro:Animal
+local miPerro = {}
 
----NOT PERMITTED!
-myDog:eyesCount();
+---esto no está permitido
+myDog:conteoDeOjos();
 ```
 ]=]
-LUADOC_DESC_PROTECTED= -- TODO: needs localisation
+LUADOC_DESC_PROTECTED=
 [=[
-Mark a function as protected within a @class. Protected functions can be
-accessed only from within their class or from child classes.
+Marca una función como protegida de una clase. Las funciones protegidas pueden
+ser accedidas solo dentro de su clase o sus clases hijas.
 
-## Syntax
+## Sintaxis
 `@protected`
 
-## Usage
+## Uso
 ```
 ---@class Animal
----@field private eyes integer
+---@field private ojos integer
 local Animal = {}
 
 ---@protected
-function Animal:eyesCount()
-    return self.eyes
+function Animal:conteoDeOjos()
+    return self.ojos
 end
 
----@class Dog:Animal
-local myDog = {}
+---@class Perro:Animal
+local miPerro = {}
 
----Permitted because function is protected, not private.
-myDog:eyesCount();
+---Permitido dado que la función es protegida y no privada.
+myDog:conteoDeOjos();
 ```
 ]=]

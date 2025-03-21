@@ -1,137 +1,139 @@
 ---@diagnostic disable: undefined-global
 
-config.addonManager.enable        = -- TODO: needs localisation
-"Whether the addon manager is enabled or not."
-config.addonManager.repositoryBranch = -- TODO: needs localisation
-"Specifies the git branch used by the addon manager."
-config.addonManager.repositoryPath = -- TODO: needs localisation
-"Specifies the git path used by the addon manager."
-config.runtime.version            = -- TODO: needs localisation
-"Lua runtime version."
-config.runtime.path               = -- TODO: needs localisation
+config.addonManager.enable        =
+"Si el manejador de extensiones está habilitado."
+config.addonManager.repositoryBranch =
+"Especifica la rama de git usada por el manejador de extensiones."
+config.addonManager.repositoryPath =
+"Especifica la ruta git usada por el manejador de extensiones."
+
+config.runtime.version            =
+"Versión de Lua que se ejecuta."
+config.runtime.path               =
 [[
-When using `require`, how to find the file based on the input name.
-Setting this config to `?/init.lua` means that when you enter `require 'myfile'`, `${workspace}/myfile/init.lua` will be searched from the loaded files.
-if `runtime.pathStrict` is `false`, `${workspace}/**/myfile/init.lua` will also be searched.
-If you want to load files outside the workspace, you need to set `Lua.workspace.library` first.
+Cuando se ocupa un `require`, cómo se encuentra el archivo basado en el nombre de entrada.
+
+Asignar esta configuración a `?/init.lua` significa que cuando se ingresa `require 'myfile'` se busca en `${workspace}/myfile/init.lua` desde los archivos cargados.
+Si `runtime.pathStrict` es `false`, también se busca en `${workspace}/**/myfile/init.lua`.
+Si se desea cargar archivos fuera del espacio de trabajo, se debe asignar `Lua.workspace.library` primero.
 ]]
-config.runtime.pathStrict         = -- TODO: needs localisation
-'When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.'
-config.runtime.special            = -- TODO: needs localisation
-[[The custom global variables are regarded as some special built-in variables, and the language server will provide special support
-The following example shows that 'include' is treated as' require '.
+config.runtime.pathStrict         =
+'Cuando está habilitado, `runtime.path` sólo buscará en el primer nivel de directorios, vea la descripción de `runtime.path`.'
+config.runtime.special            =
+[[Las variables globales personalizadas son consideradas variables intrínsecas, y el servidor de lenguage proveerá un soporte especial.
+El siguiente ejemplo muestra que 'include' es tratado como 'require'.
 ```json
 "Lua.runtime.special" : {
     "include" : "require"
 }
 ```
 ]]
-config.runtime.unicodeName        = -- TODO: needs localisation
-"Allows Unicode characters in name."
-config.runtime.nonstandardSymbol  = -- TODO: needs localisation
-"Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
-config.runtime.plugin             = -- TODO: needs localisation
-"Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
-config.runtime.pluginArgs         = -- TODO: needs localisation
-"Additional arguments for the plugin."
-config.runtime.fileEncoding       = -- TODO: needs localisation
-"File encoding. The `ansi` option is only available under the `Windows` platform."
-config.runtime.builtin            = -- TODO: needs localisation
+config.runtime.unicodeName        =
+"Se permiten los caracteres unicode en los nombres."
+config.runtime.nonstandardSymbol  =
+"Soporte de símbolos no estándar. Asegúrese que la versión de Lua que se ejecuta soporte estos símbolos."
+config.runtime.plugin             =
+"Ruta de plugin. Revise [la wiki](https://luals.github.io/wiki/plugins) para más información."
+config.runtime.pluginArgs         =
+"Argumentos adicionals al plugin."
+config.runtime.fileEncoding       =
+"Codificación de archivo. La opción `ansi` solo está disponible en la plataforma `Windows`."
+config.runtime.builtin            =
 [[
-Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
+Ajuste de la habilitación de biblioteca interna provista. Puede deshabilitar (o redefinir) las bibliotecas inexistentes de acuerdo al ambiente de ejecución.
 
-* `default`: Indicates that the library will be enabled or disabled according to the runtime version
-* `enable`: always enable
-* `disable`: always disable
+* `default`: Indica que la biblioteca será habilitada o deshabilitada de acuerdo a la versión que se ejecuta.
+* `enable`: Habilitada
+* `disable`: Deshabilitada
 ]]
-config.runtime.meta               = -- TODO: needs localisation
-'Format of the directory name of the meta files.'
-config.diagnostics.enable         = -- TODO: needs localisation
-"Enable diagnostics."
-config.diagnostics.disable        = -- TODO: needs localisation
-"Disabled diagnostic (Use code in hover brackets)."
-config.diagnostics.globals        = -- TODO: needs localisation
-"Defined global variables."
-config.diagnostics.globalsRegex   = -- TODO: needs localisation
-"Find defined global variables using regex."
-config.diagnostics.severity       = -- TODO: needs localisation
+config.runtime.meta               =
+'Formato del nombre del directoria de los archivos meta.'
+config.diagnostics.enable         =
+"Habilita los diagnósticos."
+config.diagnostics.disable        =
+"Deshabilita los diagnósticos (Usa código en corchetes bajo el cursor)."
+config.diagnostics.globals        =
+"Variables globales definidas."
+config.diagnostics.globalsRegex   =
+"Encuentra variables globales definidas usando esta expresión regular."
+config.diagnostics.severity       =
 [[
-Modify the diagnostic severity.
+Modifica el la severirad de los diagnósticos.
 
-End with `!` means override the group setting `diagnostics.groupSeverity`.
+Agregue `!` al final para descartar la configuración `diagnostics.groupSeverity`.
 ]]
-config.diagnostics.neededFileStatus = -- TODO: needs localisation
+config.diagnostics.neededFileStatus =
 [[
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  Solo diagnostica los archivos abiertos
+* Any:     diagnostica todos los archivos
+* None:    deshabilita este diagnóstico
 
-End with `!` means override the group setting `diagnostics.groupFileStatus`.
+Agregue `!` al final para descartar la configuración `diagnostics.groupFileStatus`.
 ]]
-config.diagnostics.groupSeverity  = -- TODO: needs localisation
+config.diagnostics.groupSeverity  =
 [[
-Modify the diagnostic severity in a group.
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
-Other settings will override individual settings without end of `!`.
+Modifica el la severirad de los diagnósticos en un grupo.
+`Fallback` significa que los diagnósticos en este grupo son controlados con una severida separada de `diagnostics.severity`.
+Otras configuraciones descartan las configuraciones individuales que no terminen en `!`.
 ]]
-config.diagnostics.groupFileStatus = -- TODO: needs localisation
+config.diagnostics.groupFileStatus =
 [[
-Modify the diagnostic needed file status in a group.
+Modifica los diagnósticos de archivos requeridos en un grupo.
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  solo diagnostica los archivos abiertos
+* Any:     diagnostica todos los archivos
+* None:    deshabilita este diagnóstico
 
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
-Other settings will override individual settings without end of `!`.
+`Fallback` significa que los diagnósticos en este grupo son controlados con una severida separada de `diagnostics.neededFileStatus`.
+Otras configuraciones descartan las configuraciones individuales que no terminen en `!`.
 ]]
-config.diagnostics.workspaceEvent = -- TODO: needs localisation
-"Set the time to trigger workspace diagnostics."
-config.diagnostics.workspaceEvent.OnChange = -- TODO: needs localisation
-"Trigger workspace diagnostics when the file is changed."
-config.diagnostics.workspaceEvent.OnSave = -- TODO: needs localisation
-"Trigger workspace diagnostics when the file is saved."
-config.diagnostics.workspaceEvent.None = -- TODO: needs localisation
-"Disable workspace diagnostics."
-config.diagnostics.workspaceDelay = -- TODO: needs localisation
-"Latency (milliseconds) for workspace diagnostics."
-config.diagnostics.workspaceRate  = -- TODO: needs localisation
-"Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
-config.diagnostics.libraryFiles   = -- TODO: needs localisation
-"How to diagnose files loaded via `Lua.workspace.library`."
-config.diagnostics.libraryFiles.Enable   = -- TODO: needs localisation
-"Always diagnose these files."
-config.diagnostics.libraryFiles.Opened   = -- TODO: needs localisation
-"Only when these files are opened will it be diagnosed."
-config.diagnostics.libraryFiles.Disable  = -- TODO: needs localisation
-"These files are not diagnosed."
-config.diagnostics.ignoredFiles   = -- TODO: needs localisation
-"How to diagnose ignored files."
-config.diagnostics.ignoredFiles.Enable   = -- TODO: needs localisation
-"Always diagnose these files."
-config.diagnostics.ignoredFiles.Opened   = -- TODO: needs localisation
-"Only when these files are opened will it be diagnosed."
-config.diagnostics.ignoredFiles.Disable  = -- TODO: needs localisation
-"These files are not diagnosed."
-config.diagnostics.disableScheme  = -- TODO: needs localisation
-'Do not diagnose Lua files that use the following scheme.'
-config.diagnostics.unusedLocalExclude = -- TODO: needs localisation
-'Do not diagnose `unused-local` when the variable name matches the following pattern.'
-config.workspace.ignoreDir        = -- TODO: needs localisation
-"Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
-config.workspace.ignoreSubmodules = -- TODO: needs localisation
-"Ignore submodules."
-config.workspace.useGitIgnore     = -- TODO: needs localisation
-"Ignore files list in `.gitignore` ."
-config.workspace.maxPreload       = -- TODO: needs localisation
-"Max preloaded files."
-config.workspace.preloadFileSize  = -- TODO: needs localisation
-"Skip files larger than this value (KB) when preloading."
-config.workspace.library          = -- TODO: needs localisation
-"In addition to the current workspace, which directories will load files from. The files in these directories will be treated as externally provided code libraries, and some features (such as renaming fields) will not modify these files."
-config.workspace.checkThirdParty  = -- TODO: needs localisation
+config.diagnostics.workspaceEvent =
+"Fija el tiempo para lanzar los diagnósticos del espacio de trabajo."
+config.diagnostics.workspaceEvent.OnChange =
+"Lanza los diagnósticos del espacio de trabajo cuando se cambie el archivo."
+config.diagnostics.workspaceEvent.OnSave =
+"Lanza los diagnósticos del espacio de trabajo cuando se guarde el archivo."
+config.diagnostics.workspaceEvent.None =
+"Deshabilita los diagnósticos del espacio de trabajo."
+config.diagnostics.workspaceDelay =
+"Latencia en milisegundos para diagnósticos del espacio de trabajo."
+config.diagnostics.workspaceRate  =
+"Tasa porcentual de diagnósticos del espacio de trabajo. Decremente este valor para reducir el uso de CPU, también reduciendo la velocidad de los diagnósticos del espacio de trabajo. El diagnóstico del archivo que esté editando siempre se hace a toda velocidad y no es afectado por esta configuración."
+config.diagnostics.libraryFiles   =
+"Cómo diagnosticar los archivos cargados via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   =
+"Estos archivos siempre se diagnostican."
+config.diagnostics.libraryFiles.Opened   =
+"Estos archivos se diagnostican solo cuando se abren."
+config.diagnostics.libraryFiles.Disable  =
+"Estos archivos no se diagnostican."
+config.diagnostics.ignoredFiles   =
+"Cómo diagnosticar los archivos ignorados."
+config.diagnostics.ignoredFiles.Enable   =
+"Estos archivos siempre se diagnostican."
+config.diagnostics.ignoredFiles.Opened   =
+"Estos archivos se diagnostican solo cuando se abren."
+config.diagnostics.ignoredFiles.Disable  =
+"Estos archivos no se diagnostican."
+config.diagnostics.disableScheme  =
+'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
+config.diagnostics.unusedLocalExclude =
+'Las variables que calcen con el siguiente patrón no se diagnostican con `unused-local`.'
+config.workspace.ignoreDir        =
+"Directorios y archivos ignorados (se usa la misma gramática que en `.gitignore`)"
+config.workspace.ignoreSubmodules =
+"Ignora submódulos."
+config.workspace.useGitIgnore     =
+"Ignora los archivos enlistados en `gitignore` ."
+config.workspace.maxPreload       =
+"Máxima pre-carga de archivos."
+config.workspace.preloadFileSize  =
+"Cuando se pre-carga, se omiten los archivos más grandes que este valor (en KB)."
+config.workspace.library          =
+"Además de los del espacio de trabajo actual, se cargan archivos de estos directorios. Los archivos en estos directorios serán tratados como bibliotecas con código externo y algunas características (como renombrar campos) no modificarán estos archivos."
+config.workspace.checkThirdParty  =
 [[
-Automatic detection and adaptation of third-party libraries, currently supported libraries are:
+Detección y adaptación automática de bibliotecas externas. Actualmente soportadas:
 
 * OpenResty
 * Cocos4.0
@@ -140,121 +142,121 @@ Automatic detection and adaptation of third-party libraries, currently supported
 * skynet
 * Jass
 ]]
-config.workspace.userThirdParty          = -- TODO: needs localisation
-'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)'
-config.workspace.supportScheme           = -- TODO: needs localisation
-'Provide language server for the Lua files of the following scheme.'
-config.completion.enable                 = -- TODO: needs localisation
-'Enable completion.'
-config.completion.callSnippet            = -- TODO: needs localisation
-'Shows function call snippets.'
-config.completion.callSnippet.Disable    = -- TODO: needs localisation
-"Only shows `function name`."
-config.completion.callSnippet.Both       = -- TODO: needs localisation
-"Shows `function name` and `call snippet`."
-config.completion.callSnippet.Replace    = -- TODO: needs localisation
-"Only shows `call snippet.`"
-config.completion.keywordSnippet         = -- TODO: needs localisation
-'Shows keyword syntax snippets.'
-config.completion.keywordSnippet.Disable = -- TODO: needs localisation
-"Only shows `keyword`."
-config.completion.keywordSnippet.Both    = -- TODO: needs localisation
-"Shows `keyword` and `syntax snippet`."
-config.completion.keywordSnippet.Replace = -- TODO: needs localisation
-"Only shows `syntax snippet`."
-config.completion.displayContext         = -- TODO: needs localisation
-"Previewing the relevant code snippet of the suggestion may help you understand the usage of the suggestion. The number set indicates the number of intercepted lines in the code fragment. If it is set to `0`, this feature can be disabled."
-config.completion.workspaceWord          = -- TODO: needs localisation
-"Whether the displayed context word contains the content of other files in the workspace."
-config.completion.showWord               = -- TODO: needs localisation
-"Show contextual words in suggestions."
-config.completion.showWord.Enable        = -- TODO: needs localisation
-"Always show context words in suggestions."
-config.completion.showWord.Fallback      = -- TODO: needs localisation
-"Contextual words are only displayed when suggestions based on semantics cannot be provided."
-config.completion.showWord.Disable       = -- TODO: needs localisation
-"Do not display context words."
-config.completion.autoRequire            = -- TODO: needs localisation
-"When the input looks like a file name, automatically `require` this file."
-config.completion.showParams             = -- TODO: needs localisation
-"Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
-config.completion.requireSeparator       = -- TODO: needs localisation
-"The separator used when `require`."
-config.completion.postfix                = -- TODO: needs localisation
-"The symbol used to trigger the postfix suggestion."
-config.color.mode                        = -- TODO: needs localisation
-"Color mode."
-config.color.mode.Semantic               = -- TODO: needs localisation
-"Semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect."
-config.color.mode.SemanticEnhanced       = -- TODO: needs localisation
-"Enhanced semantic color. Like `Semantic`, but with additional analysis which might be more computationally expensive."
-config.color.mode.Grammar                = -- TODO: needs localisation
-"Grammar color."
-config.semantic.enable                   = -- TODO: needs localisation
-"Enable semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect."
-config.semantic.variable                 = -- TODO: needs localisation
-"Semantic coloring of variables/fields/parameters."
-config.semantic.annotation               = -- TODO: needs localisation
-"Semantic coloring of type annotations."
-config.semantic.keyword                  = -- TODO: needs localisation
-"Semantic coloring of keywords/literals/operators. You only need to enable this feature if your editor cannot do syntax coloring."
-config.signatureHelp.enable              = -- TODO: needs localisation
-"Enable signature help."
-config.hover.enable                      = -- TODO: needs localisation
-"Enable hover."
-config.hover.viewString                  = -- TODO: needs localisation
-"Hover to view the contents of a string (only if the literal contains an escape character)."
-config.hover.viewStringMax               = -- TODO: needs localisation
-"The maximum length of a hover to view the contents of a string."
-config.hover.viewNumber                  = -- TODO: needs localisation
-"Hover to view numeric content (only if literal is not decimal)."
-config.hover.fieldInfer                  = -- TODO: needs localisation
-"When hovering to view a table, type infer will be performed for each field. When the accumulated time of type infer reaches the set value (MS), the type infer of subsequent fields will be skipped."
-config.hover.previewFields               = -- TODO: needs localisation
-"When hovering to view a table, limits the maximum number of previews for fields."
-config.hover.enumsLimit                  = -- TODO: needs localisation
-"When the value corresponds to multiple types, limit the number of types displaying."
-config.hover.expandAlias                 = -- TODO: needs localisation
+config.workspace.userThirdParty          =
+'Rutas archivos de configuración para bibliotecas externas privadas. Revise [el archivo de configuración](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd) provisto.'
+config.workspace.supportScheme           =
+'El servidor de lenguage será provisto para los archivos de Lua del siguiente esquema.'
+config.completion.enable                 =
+'Habilita la completación.'
+config.completion.callSnippet            =
+'Muestra snippets para llamadas de funciones.'
+config.completion.callSnippet.Disable    =
+"Solo muestra `función nombre`."
+config.completion.callSnippet.Both       =
+"Muestra `función nombre` y `llamar al snippet`."
+config.completion.callSnippet.Replace    =
+"Solo muestra `llamar al snippet`."
+config.completion.keywordSnippet         =
+'Muestra snippets con sintaxis de palabras clave.'
+config.completion.keywordSnippet.Disable =
+"Solo muestra `palabra clave`."
+config.completion.keywordSnippet.Both    =
+"Muestra `palabra clave` y `snippet de sintaxis`."
+config.completion.keywordSnippet.Replace =
+"Solo muestra `snippet de sintaxis`."
+config.completion.displayContext         =
+"La prevista de la sugerencia del snippet de código relevante ayuda a entender el uso de la sugerenecia. El número fijado indica el número de líneas interceptadas en el fragmento de código. Fijando en `0` se deshabilita esta característica."
+config.completion.workspaceWord          =
+"Si es que el la palabra contextual presentada contiene contenido de otros archivos en el espacio de trabajo."
+config.completion.showWord               =
+"Muestra palabras contextuales en las sugerencias."
+config.completion.showWord.Enable        =
+"Siempre muestra palabras contextuales en las sugerencias."
+config.completion.showWord.Fallback      =
+"Las palabras contextuales solo se muestran si las sugerencias basadas en la semántica no están provistas."
+config.completion.showWord.Disable       =
+"Sin presentar las palabras contextuales."
+config.completion.autoRequire            =
+"Agrega automáticamente el `require` correspondiente cuando la entrada se parece a un nombre de archivo."
+config.completion.showParams             =
+"Muestra los parámetros en la lista de completado. Cuando la función tiene múltiples definiciones, se mostrarán por separado."
+config.completion.requireSeparator       =
+"Separador usado en `require`."
+config.completion.postfix                =
+"El símbolo usado para lanzar la sugerencia posfija."
+config.color.mode                        =
+"Modo de coloración."
+config.color.mode.Semantic               =
+"Coloración semántica. Puede ser necesario asignar `editor.semanticHighlighting.enabled` a `true` para que tenga efecto."
+config.color.mode.SemanticEnhanced       =
+"Coloración de semántica avanzada. Igual que `Semántica`, pero con análisis adicional que hace que se requira computación más cara."
+config.color.mode.Grammar                =
+"Coloración de la gramática."
+config.semantic.enable                   =
+"Habilita la coloración semántica. Puede ser necesario asignar `editor.semanticHighlighting.enabled`  a `true` para que tenga efecto."
+config.semantic.variable                 =
+"Coloración semántica de variables, campos y parámetros."
+config.semantic.annotation               =
+"Coloración de las anotaciones de tipo."
+config.semantic.keyword                  =
+"Coloración semántica de palabras clave, literales y operadores. Se necesita habilitar esta característica si su editor no puede hacer coloración sintáctica."
+config.signatureHelp.enable              =
+"Habilita la ayuda de firma."
+config.hover.enable                      =
+"Habilita la información bajo el cursor."
+config.hover.viewString                  =
+"Ubica el cursor bajo un string para ver su contenido (solo si el literal contiene un caracter de escape)."
+config.hover.viewStringMax               =
+"Largo máximo de la información bajo el cursor para ver el contenido de un string."
+config.hover.viewNumber                  =
+"Ubica el cursor para ver el contenido numérico (solo si el literal no es decimal)."
+config.hover.fieldInfer                  =
+"Cuando se ubica el cursor para ver una tabla, la inferencia de tipo se realizará para cada campo. Cuando el tiempo acumulado de la inferencia de tipo alcanza el valor fijado (en MS), la inferencia de tipo para los campos subsecuentes será omitida."
+config.hover.previewFields               =
+"Cuando se ubica el cursor para ver una tabla, fija el máximo numero de previstas para los campos."
+config.hover.enumsLimit                  =
+"Cuando el valor corresponde a múltiples tipos, fija el límite de tipos en despliegue."
+config.hover.expandAlias                 =
 [[
-Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+Expandir o no los alias. Por ejemplo, la expansión de `---@alias miTipo boolean|number` aparece como `boolean|number`, caso contrarior, aparece como `miTipo`.
 ]]
-config.develop.enable                    = -- TODO: needs localisation
-'Developer mode. Do not enable, performance will be affected.'
-config.develop.debuggerPort              = -- TODO: needs localisation
-'Listen port of debugger.'
-config.develop.debuggerWait              = -- TODO: needs localisation
-'Suspend before debugger connects.'
-config.intelliSense.searchDepth          = -- TODO: needs localisation
-'Set the search depth for IntelliSense. Increasing this value increases accuracy, but decreases performance. Different workspace have different tolerance for this setting. Please adjust it to the appropriate value.'
-config.intelliSense.fastGlobal           = -- TODO: needs localisation
-'In the global variable completion, and view `_G` suspension prompt. This will slightly reduce the accuracy of type speculation, but it will have a significant performance improvement for projects that use a lot of global variables.'
-config.window.statusBar                  = -- TODO: needs localisation
-'Show extension status in status bar.'
-config.window.progressBar                = -- TODO: needs localisation
-'Show progress bar in status bar.'
-config.hint.enable                       = -- TODO: needs localisation
-'Enable inlay hint.'
-config.hint.paramType                    = -- TODO: needs localisation
-'Show type hints at the parameter of the function.'
-config.hint.setType                      = -- TODO: needs localisation
-'Show hints of type at assignment operation.'
-config.hint.paramName                    = -- TODO: needs localisation
-'Show hints of parameter name at the function call.'
-config.hint.paramName.All                = -- TODO: needs localisation
-'All types of parameters are shown.'
-config.hint.paramName.Literal            = -- TODO: needs localisation
-'Only literal type parameters are shown.'
-config.hint.paramName.Disable            = -- TODO: needs localisation
-'Disable parameter hints.'
-config.hint.arrayIndex                   = -- TODO: needs localisation
-'Show hints of array index when constructing a table.'
-config.hint.arrayIndex.Enable            = -- TODO: needs localisation
-'Show hints in all tables.'
-config.hint.arrayIndex.Auto              = -- TODO: needs localisation
-'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
-config.hint.arrayIndex.Disable           = -- TODO: needs localisation
-'Disable hints of array index.'
-config.hint.await                        = -- TODO: needs localisation
+config.develop.enable                    =
+'Modo de desarrollador. No debe habilitarlo, el rendimiento se verá afectado.'
+config.develop.debuggerPort              =
+'Puerto en que el depurador escucha.'
+config.develop.debuggerWait              =
+'Suspender después de que el depurador se conecte.'
+config.intelliSense.searchDepth          =
+'Fija la profundidad de búsqueda para IntelliSense. El incrementar este valor aumenta la precisión, pero empeora el rendimiento. Diferentes espacios de trabajo tienen diferente tolerancia para esta configuración. Ajústese al valor apropiado.'
+config.intelliSense.fastGlobal           =
+'En la completación de variable global, y entrada de suspensión de vista `_G`. Esto reduce levemente la precisión de la especulación de tipo, pero tiene una mejora de rendimiento notable para proyectos que ocupan harto las variables globales.'
+config.window.statusBar                  =
+'Muestra el estado de la extensión en la barra de estado.'
+config.window.progressBar                =
+'Muestra la barra de progreso en la barra de estado.'
+config.hint.enable                       =
+'Habilita pistas en línea.'
+config.hint.paramType                    =
+'Muestra las pistas de tipo al parámetro de las funciones.'
+config.hint.setType                      =
+'Muestra las pistas de tipo en las asignación.'
+config.hint.paramName                    =
+'Muestra las pistas de tipo en las llamadas a funciones.'
+config.hint.paramName.All                =
+'Se muestran odos los tipos de los parámetros.'
+config.hint.paramName.Literal            =
+'Se muestran solo los parámetros de tipos literales.'
+config.hint.paramName.Disable            =
+'Deshabilita las pistas de los parámetros.'
+config.hint.arrayIndex                   =
+'Muestra las pistas de los índices de arreglos cuando se construye una tabla.'
+config.hint.arrayIndex.Enable            =
+'Muestra las pistas en todas las tablas.'
+config.hint.arrayIndex.Auto              =
+'Muestra las pistas solo cuando la tabla tiene más de 3 ítemes, o cuando la tabla es mixta.'
+config.hint.arrayIndex.Disable           =
+'Deshabilita las pistas en de los índices de arreglos.'
+config.hint.await                        =
 'If the called function is marked `---@async`, prompt `await` at the call.'
 config.hint.semicolon                    = -- TODO: needs localisation
 'If there is no semicolon at the end of the statement, display a virtual semicolon.'

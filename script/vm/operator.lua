@@ -23,6 +23,9 @@ vm.BINARY_OP = {
     'shl',
     'shr',
     'concat',
+    'eq',
+    'lt',
+    'le',
 }
 vm.OTHER_OP = {
     'call',
@@ -48,6 +51,9 @@ local binaryMap = {
     ['<<'] = 'shl',
     ['>>'] = 'shr',
     ['..'] = 'concat',
+    ['=='] = 'eq',
+    ['<='] = 'le',
+    ['<']  = 'lt',
 }
 
 local otherMap = {

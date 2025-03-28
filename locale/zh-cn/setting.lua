@@ -404,6 +404,8 @@ config.diagnostics['missing-return-value']  =
 '函数无值返回但函数使用`@return`标记了返回值'
 config.diagnostics['need-check-nil']        =
 '变量之前被赋值为`nil`或可选值(可能为 `nil`)'
+config.diagnostics['unnecessary-assert']    =
+'启用对冗余断言(针对始终为真值的表达式)的诊断'
 config.diagnostics['no-unknown']            =
 '变量的未知类型无法推断'
 config.diagnostics['not-yieldable']         =

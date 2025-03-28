@@ -406,6 +406,8 @@ config.diagnostics['missing-return-value']  = -- TODO: need translate!
 'Enable diagnostics for return statements without values although the containing function declares returns.'
 config.diagnostics['need-check-nil']        = -- TODO: need translate!
 'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
+config.diagnostics['unnecessary-assert']    = -- TODO: need translate!
+'Enable diagnostics for redundant assertions on truthy values.'
 config.diagnostics['no-unknown']            = -- TODO: need translate!
 'Enable diagnostics for cases in which the type cannot be inferred.'
 config.diagnostics['not-yieldable']         = -- TODO: need translate!

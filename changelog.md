@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` return no completions if completion is disabled
 
 ## 3.13.9
 `2025-3-13`

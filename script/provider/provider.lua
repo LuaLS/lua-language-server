@@ -618,6 +618,9 @@ m.register 'textDocument/completion' {
     ---@async
     function (params)
         local uri  = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.completion.enable') then
+            return
+        end
         if not workspace.isReady(uri) then
             return nil
         end

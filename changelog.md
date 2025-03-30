@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` prevent unnecessary edits by LSP formatting when content did not change
 
 ## 3.13.9
 `2025-3-13`

@@ -2,6 +2,8 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` `unnecessary-assert` diagnostic warns when asserting values that are always truthy
+* `NEW` locale `es-419`, thanks [Felipe Lema](https://codeberg.org/FelipeLema)
 * `FIX` prevent unnecessary edits by LSP formatting when content did not change
 
 ## 3.13.9

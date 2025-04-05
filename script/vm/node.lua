@@ -119,6 +119,32 @@ function mt:hasFalsy()
     return false
 end
 
+---Almost an inverse of hasFalsy, but stricter about "any" and "unknown" types.
+---@return boolean
+function mt:alwaysTruthy()
+    if self.optional then
+        return false
+    end
+    if #self == 0 then
+        return false
+    end
+    for _, c in ipairs(self) do
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'any')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'doc.type.boolean')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'unknown')
+        or not self:hasKnownType()
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
+            return false
+        end
+    end
+    return true
+end
+
 ---@return boolean
 function mt:hasKnownType()
     for _, c in ipairs(self) do

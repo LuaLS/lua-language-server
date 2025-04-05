@@ -36,6 +36,8 @@ DIAG_OVER_MAX_ARGS      =
 'この関数は最大で {:d} 個の引数を受け取りますが、{:d} 個の引数が渡されています。'
 DIAG_MISS_ARGS          =
 'この関数は少なくとも {:d} 個の引数を必要としますが、{:d} 個しか渡されていません。'
+DIAG_UNNECESSARY_ASSERT =
+'不要なアサーション: この式は常に真です。'
 DIAG_OVER_MAX_VALUES    =
 '変数は {} 個しかありませんが、{} 個の値が設定されています。'
 DIAG_AMBIGUITY_1        =

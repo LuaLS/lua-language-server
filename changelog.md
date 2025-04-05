@@ -2,7 +2,12 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+<<
 * `FIX` cannot debug in Linux due to lua-debug expecting host process to have lua54 symbols available
+* `NEW` `unnecessary-assert` diagnostic warns when asserting values that are always truthy
+* `NEW` locale `es-419`, thanks [Felipe Lema](https://codeberg.org/FelipeLema)
+* `FIX` prevent unnecessary edits by LSP formatting when content did not change
+* `FIX` return no completions if completion is disabled
 
 ## 3.13.9
 `2025-3-13`

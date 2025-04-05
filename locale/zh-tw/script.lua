@@ -36,6 +36,8 @@ DIAG_OVER_MAX_ARGS      =
 '函式最多接收 {:d} 個引數，但獲得了 {:d} 個。'
 DIAG_MISS_ARGS          =
 '函式最少接收 {:d} 個引數，但獲得了 {:d} 個。'
+DIAG_UNNECESSARY_ASSERT =
+'不必要的斷言：此表達式始終為真值。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 個變數，但你設定了 {} 個值。'
 DIAG_AMBIGUITY_1        =

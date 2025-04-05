@@ -36,6 +36,8 @@ DIAG_OVER_MAX_ARGS      =
 '函数最多接收 {:d} 个参数，但获得了 {:d} 个。'
 DIAG_MISS_ARGS          =
 '函数最少接收 {:d} 个参数，但获得了 {:d} 个。'
+DIAG_UNNECESSARY_ASSERT =
+'不必要的断言：此表达式始终为真值。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 个变量，但你设置了 {} 个值。'
 DIAG_AMBIGUITY_1        =

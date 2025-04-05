@@ -5,6 +5,7 @@
 * `NEW` `unnecessary-assert` diagnostic warns when asserting values that are always truthy
 * `NEW` locale `es-419`, thanks [Felipe Lema](https://codeberg.org/FelipeLema)
 * `FIX` prevent unnecessary edits by LSP formatting when content did not change
+* `FIX` return no completions if completion is disabled
 
 ## 3.13.9
 `2025-3-13`

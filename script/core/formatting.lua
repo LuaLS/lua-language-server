@@ -21,6 +21,10 @@ return function(uri, options)
         return
     end
 
+    if text == formattedText then
+        return
+    end
+
     return {
         {
             start = state.ast.start,

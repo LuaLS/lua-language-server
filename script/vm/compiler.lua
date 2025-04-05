@@ -174,36 +174,77 @@ local function searchFieldByGlobalID(suri, source, key, pushResult)
     end
 end
 
+local VARARGKEY = {'<VARARGKEY>'}
+local function searchLiteralFieldFromTable(source, key, callback)
+    local cache = source._literalFieldsCache
+    local cache2 = source._literalFieldsCache2
+    if not cache then
+        cache = {}
+        cache2 = {}
+        source._literalFieldsCache = cache
+        source._literalFieldsCache2 = cache2
+
+        for _, field in ipairs(source) do
+            local fkey
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                fkey = guide.getKeyName(field)
+            end
+            if field.type == 'tableexp' then
+                fkey = field.tindex
+            end
+            if field.type == 'varargs' then
+                fkey = VARARGKEY
+            end
+            if fkey ~= nil then
+                if cache[fkey] == nil then
+                    cache[fkey] = field
+                else
+                    if cache2[fkey] == nil then
+                        cache2[fkey] = {}
+                    end
+                    cache2[fkey][#cache2[fkey]+1] = field
+                end
+            end
+        end
+    end
+    local value = cache[key]
+    if value ~= nil then
+        callback(value)
+        if cache2[key] then
+            for _, field in ipairs(cache2[key]) do
+                callback(field)
+            end
+        end
+        return
+    end
+    if type(key) == 'number'
+    and key >= 1
+    and math.tointeger(key) then
+        value = cache[VARARGKEY]
+    end
+    if value ~= nil then
+        callback(value)
+        if cache2[VARARGKEY] then
+            for _, field in ipairs(cache2[VARARGKEY]) do
+                callback(field)
+            end
+        end
+    end
+end
+
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (_suri, source, key, pushResult)
-        local hasFiled = false
-        for _, field in ipairs(source) do
-            if field.type == 'tablefield'
-            or field.type == 'tableindex' then
-                local fieldKey = guide.getKeyName(field)
-                if key == vm.ANY
-                or key == fieldKey then
-                    hasFiled = true
-                    pushResult(field)
-                end
-            end
-            if field.type == 'tableexp' then
-                if key == vm.ANY
-                or key == field.tindex then
-                    hasFiled = true
-                    pushResult(field)
-                end
-            end
-            if field.type == 'varargs' then
-                if not hasFiled
-                and type(key) == 'number'
-                and key >= 1
-                and math.tointeger(key) then
-                    hasFiled = true
-                    pushResult(field)
-                end
-                if key == vm.ANY then
+        if type(key) == 'string'
+        or type(key) == 'number' then
+            searchLiteralFieldFromTable(source, key, pushResult)
+        elseif key == vm.ANY then
+            for _, field in ipairs(source) do
+                if field.type == 'tablefield'
+                or field.type == 'tableindex'
+                or field.type == 'tableexp'
+                or field.type == 'varargs' then
                     pushResult(field)
                 end
             end
@@ -232,7 +273,6 @@ local searchFieldSwitch = util.switch()
                                 local fieldKey = guide.getKeyName(field)
                                 if key == vm.ANY
                                 or key == fieldKey then
-                                    hasFiled = true
                                     pushResult(field)
                                 end
                                 ::CONTINUE::

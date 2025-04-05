@@ -78,7 +78,7 @@ m.register {
     'cast-type-mismatch',
     'return-type-mismatch',
     'inject-field',
-    'unnecessary-assert',
+    --'unnecessary-assert',
 } {
     group    = 'type-check',
     severity = 'Warning',

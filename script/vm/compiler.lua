@@ -74,7 +74,7 @@ function vm.bindDocs(source)
 end
 
 ---@param source parser.object | vm.variable
----@param key string|vm.global|vm.ANY
+---@param key string|vm.global|vm.ANY|vm.ANYDOC
 ---@param pushResult fun(res: parser.object, markDoc?: boolean)
 local function searchFieldByLocalID(source, key, pushResult)
     local fields
@@ -142,7 +142,7 @@ end
 
 ---@param suri uri
 ---@param source parser.object
----@param key string|vm.global|vm.ANY
+---@param key string|vm.global|vm.ANY|vm.ANYDOC
 ---@param pushResult fun(res: parser.object, markDoc?: boolean)
 local function searchFieldByGlobalID(suri, source, key, pushResult)
     local node = vm.getGlobalNode(source)
@@ -150,7 +150,7 @@ local function searchFieldByGlobalID(suri, source, key, pushResult)
         return
     end
     if node.cate == 'variable' then
-        if key ~= vm.ANY then
+        if key ~= vm.ANY and key ~= vm.ANYDOC then
             if type(key) ~= 'string' then
                 return
             end
@@ -272,6 +272,7 @@ local searchFieldSwitch = util.switch()
                                 end
                                 local fieldKey = guide.getKeyName(field)
                                 if key == vm.ANY
+                                or key == vm.ANYDOC
                                 or key == fieldKey then
                                     pushResult(field)
                                 end
@@ -320,6 +321,7 @@ local searchFieldSwitch = util.switch()
                 for fn in fieldNode:eachObject() do
                     if fn.type == 'global' and fn.cate == 'type' then
                         if key == vm.ANY
+                        or key == vm.ANYDOC
                         or fn.name == 'any'
                         or (fn.name == 'boolean' and type(key) == 'boolean')
                         or (fn.name == 'number'  and type(key) == 'number')
@@ -331,6 +333,7 @@ local searchFieldSwitch = util.switch()
                     or     fn.type == 'doc.type.integer'
                     or     fn.type == 'doc.type.boolean' then
                         if key == vm.ANY
+                        or key == vm.ANYDOC
                         or fn[1] == key then
                             pushResult(field, true)
                         end
@@ -338,7 +341,7 @@ local searchFieldSwitch = util.switch()
                 end
             end
             if fieldKey.type == 'doc.field.name' then
-                if key == vm.ANY or fieldKey[1] == key then
+                if key == vm.ANY or key == vm.ANYDOC or fieldKey[1] == key then
                     pushResult(field, true)
                 end
             end
@@ -358,7 +361,7 @@ local searchFieldSwitch = util.switch()
     : case 'global'
     : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
-            if key ~= vm.ANY then
+            if key ~= vm.ANY and key ~= vm.ANYDOC then
                 if type(key) ~= 'string' then
                     return
                 end
@@ -388,7 +391,7 @@ local searchFieldSwitch = util.switch()
 
 ---@param suri uri
 ---@param object vm.global
----@param key string|number|integer|boolean|vm.global|vm.ANY
+---@param key string|number|integer|boolean|vm.global|vm.ANY|vm.ANYDOC
 ---@param pushResult fun(field: vm.object, isMark?: boolean)
 function vm.getClassFields(suri, object, key, pushResult)
     local mark = {}
@@ -418,6 +421,7 @@ function vm.getClassFields(suri, object, key, pushResult)
                     if fieldKey then
                         -- ---@field x boolean -> class.x
                         if key == vm.ANY
+                        or key == vm.ANYDOC
                         or fieldKey == key then
                             if not searchedFields[fieldKey] then
                                 pushResult(field, true)
@@ -426,7 +430,7 @@ function vm.getClassFields(suri, object, key, pushResult)
                         end
                         goto CONTINUE
                     end
-                    if key == vm.ANY then
+                    if key == vm.ANY or key == vm.ANYDOC then
                         pushResult(field, true)
                         goto CONTINUE
                     end
@@ -771,7 +775,7 @@ function vm.bindAs(source)
 end
 
 ---@param source parser.object | vm.variable
----@param key string|vm.global|vm.ANY
+---@param key string|vm.global|vm.ANY|vm.ANYDOC
 ---@return parser.object[] docedResults
 ---@return parser.object[] commonResults
 function vm.getNodesOfParentNode(source, key)
@@ -832,7 +836,7 @@ end
 
 -- 遍历所有字段（按照优先级）
 ---@param source parser.object | vm.variable
----@param key string|vm.global|vm.ANY
+---@param key string|vm.global|vm.ANY|vm.ANYDOC
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNode(source, key, pushResult)
     local docedResults, commonResults = vm.getNodesOfParentNode(source, key)
@@ -851,7 +855,7 @@ end
 
 -- 遍历所有字段（无视优先级）
 ---@param source parser.object | vm.variable
----@param key string|vm.global|vm.ANY
+---@param key string|vm.global|vm.ANY|vm.ANYDOC
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNodeAll(source, key, pushResult)
     local docedResults, commonResults = vm.getNodesOfParentNode(source, key)
@@ -1724,7 +1728,7 @@ local compilerSwitch = util.switch()
         end
 
         if not hasMarkDoc and source.type == 'tableindex' then
-            vm.compileByParentNode(source.node, vm.ANY, function (src)
+            vm.compileByParentNode(source.node, vm.ANYDOC, function (src)
                 if src.type == 'doc.field'
                 or src.type == 'doc.type.field' then
                     if vm.isSubType(guide.getUri(source), vm.compileNode(source.index), vm.compileNode(src.field or src.name)) then

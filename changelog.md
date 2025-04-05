@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 `2025-3-13`
 * `NEW` `unnecessary-assert` diagnostic warns when asserting values that are always truthy
+* `NEW` locale `es-419`, thanks [Felipe Lema](https://codeberg.org/FelipeLema)
 
 ## 3.13.9
 `2025-3-13`

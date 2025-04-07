@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.14.0
+`2025-4-7`
 * `NEW` locale `es-419`, thanks [Felipe Lema](https://codeberg.org/FelipeLema)
 * `FIX` prevent unnecessary edits by LSP formatting when content did not change
 * `FIX` return no completions if completion is disabled

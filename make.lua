@@ -51,6 +51,7 @@ lm:executable "lua-language-server" {
     },
     linux = {
         crt = "static",
+        ldflags = { "-rdynamic" },
     }
 }
 

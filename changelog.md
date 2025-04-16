@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` cannot debug in Linux due to lua-debug expecting host process to have lua54 symbols available
+* `NEW` support custom addons path for enhanced editor flexibility
 
 ## 3.14.0
 `2025-4-7`

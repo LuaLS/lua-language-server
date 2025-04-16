@@ -6,6 +6,8 @@ config.addonManager.repositoryBranch =
 "Especifica la rama de git usada por el manejador de extensiones."
 config.addonManager.repositoryPath =
 "Especifica la ruta git usada por el manejador de extensiones."
+config.addonRepositoryPath        = -- TODO: need translate!
+"Specifies the addon repository path (not related to the addon manager)."
 
 config.runtime.version            =
 "Versión de Lua que se ejecuta."

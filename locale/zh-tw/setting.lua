@@ -6,6 +6,8 @@ config.addonManager.repositoryBranch = -- TODO: need translate!
 "Specifies the git branch used by the addon manager."
 config.addonManager.repositoryPath = -- TODO: need translate!
 "Specifies the git path used by the addon manager."
+config.addonRepositoryPath        = -- TODO: need translate!
+"Specifies the addon repository path (not related to the addon manager)."
 config.runtime.version            =
 "Lua執行版本。"
 config.runtime.path               =

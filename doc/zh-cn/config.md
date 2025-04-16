@@ -14,6 +14,16 @@ boolean
 true
 ```
 
+# addonRepositoryPath
+
+指定插件仓库的路径（与 Addon Manager 无关）。
+
+## type
+
+```ts
+string
+```
+
 # codeLens.enable
 
 启用代码度量。

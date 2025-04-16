@@ -908,6 +908,25 @@ end
 
 local addonsPath
 
+---Updates the variable 'addonsPath' with the user's configuration.
+---The path is only updated if 'addonsPath' is not set and the provided path is a valid string.
+---It first expands the input path and then verifies its existence via fs.exists.
+---@param path string
+function m.updateAddonsPath(path)
+    if addonsPath then
+        return
+    end
+    if not (path and type(path) == "string") then
+        return
+    end
+
+    path = util.expandPath(fs.path(path):string())
+    if fs.exists(fs.path(path)) then
+        addonsPath = path
+        log.info('Updating addon repository path to: ', path)
+    end
+end
+
 ---Resolve path variables/placeholders like ${3rd} and ${addons}
 ---@param path string
 ---@return string resolvedPath

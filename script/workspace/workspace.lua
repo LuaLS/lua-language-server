@@ -131,6 +131,7 @@ local globInteferFace = {
     end
 }
 
+local addonRepositoryPathUpdated = false
 --- 创建排除文件匹配器
 ---@param scp scope
 function m.getNativeMatcher(scp)
@@ -175,6 +176,11 @@ function m.getNativeMatcher(scp)
         end
     end
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+        if not addonRepositoryPathUpdated then
+            addonRepositoryPathUpdated = true
+            local addonRepositoryPath = config.get(scp.uri, 'Lua.addonRepositoryPath')
+            files.updateAddonsPath(addonRepositoryPath)
+        end
         path = m.getAbsolutePath(scp.uri, path)
         if path then
             log.debug('Ignore by library:', path)

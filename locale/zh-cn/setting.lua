@@ -6,6 +6,8 @@ config.addonManager.repositoryBranch =
 "指定插件管理器(Addon Manager)使用的git仓库分支"
 config.addonManager.repositoryPath =
 "指定插件管理器(Addon Manager)使用的git仓库路径"
+config.addonRepositoryPath        =
+"指定插件仓库的路径（与 Addon Manager 无关）"
 config.runtime.version            =
 "Lua运行版本。"
 config.runtime.path               =

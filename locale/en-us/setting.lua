@@ -289,7 +289,7 @@ config.misc.parameters                   =
 config.misc.executablePath               =
 'Specify the executable path in VSCode.'
 config.language.fixIndent                =
-'(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function."'
+'(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function".'
 config.language.completeAnnotation       =
 '(VSCode only) Automatically insert "---@ " after a line break following a annotation.'
 config.type.castNumberToInteger          =

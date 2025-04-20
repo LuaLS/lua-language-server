@@ -53,7 +53,7 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "已定义的全局变量。"
 config.diagnostics.globalsRegex   =
-"启用诊断以检测尝试关闭非对象的变量。"
+"已定义的全局变量符合的正则表达式。"
 config.diagnostics.severity       =
 [[
 修改诊断等级。

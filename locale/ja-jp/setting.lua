@@ -316,12 +316,22 @@ config.type.checkTableShape              = -- TODO: need translate!
 [[
 Strictly check the shape of the table.
 ]]
+config.type.inferTableSize               = -- TODO: need translate!
+'Maximum number of table fields analyzed during type inference.'
 config.doc.privateName                   = -- TODO: need translate!
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 = -- TODO: need translate!
 'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
 config.doc.packageName                   = -- TODO: need translate!
 'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
+config.doc.regengine                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine.glob                = -- TODO: need translate!
+'The default lightweight pattern syntax.'
+config.doc.regengine.lua                 = -- TODO: need translate!
+'Full Lua-style regular expressions.'
+config.docScriptPath                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
 config.diagnostics['unused-local']          = -- TODO: need translate!
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       = -- TODO: need translate!

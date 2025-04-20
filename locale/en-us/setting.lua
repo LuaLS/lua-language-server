@@ -316,12 +316,22 @@ config.type.checkTableShape              =
 [[
 Strictly check the shape of the table.
 ]]
+config.type.inferTableSize               =
+'Maximum number of table fields analyzed during type inference.'
 config.doc.privateName                   =
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 =
 'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
 config.doc.packageName                   =
 'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
+config.doc.regengine                     =
+'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine.glob                =
+'The default lightweight pattern syntax.'
+config.doc.regengine.lua                 =
+'Full Lua-style regular expressions.'
+config.docScriptPath                     =
+'The regular expression engine used for matching documentation scope names.'
 config.diagnostics['unused-local']          =
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       =
@@ -339,7 +349,7 @@ config.diagnostics['trailing-space']        =
 config.diagnostics['redefined-local']       =
 'Enable redefined local variable diagnostics.'
 config.diagnostics['newline-call']          =
-'Enable newline call diagnostics. Is\'s raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.'
+'Enable newline call diagnostics. It\'s raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.'
 config.diagnostics['newfield-call']         =
 'Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.'
 config.diagnostics['redundant-parameter']   =

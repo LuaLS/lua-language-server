@@ -317,12 +317,22 @@ config.type.checkTableShape              =
 [[
 Chequea estrictamente la forma de la tabla.
 ]]
+config.type.inferTableSize               = -- TODO: need translate!
+'Maximum number of table fields analyzed during type inference.'
 config.doc.privateName                   =
 'Trata los nombres específicos de campo como privados. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase.'
 config.doc.protectedName                 =
 'Trata los nombres específicos de campo como protegidos. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase y sus subclases.'
 config.doc.packageName                   =
 'Trata los nombres específicos de campo como del paquete. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son de paquete, por lo que solo pueden ser accedidos en el archivo donde son definidos.'
+config.doc.regengine                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine.glob                = -- TODO: need translate!
+'The default lightweight pattern syntax.'
+config.doc.regengine.lua                 = -- TODO: need translate!
+'Full Lua-style regular expressions.'
+config.docScriptPath                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
 config.diagnostics['unused-local']          =
 'Habilita el diagnóstico de variables local sin uso.'
 config.diagnostics['unused-function']       =

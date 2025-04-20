@@ -314,12 +314,22 @@ config.type.checkTableShape              =
 [[
 对表的形状进行严格检查。
 ]]
+config.type.inferTableSize               =
+'类型推断期间分析的表字段的最大数量。'
 config.doc.privateName                   =
 '将特定名称的字段视为私有，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 是私有字段，只能在定义所在的类中访问。'
 config.doc.protectedName                 =
 '将特定名称的字段视为受保护，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 是受保护的字段，只能在定义所在的类极其子类中访问。'
 config.doc.packageName                   =
 '将特定名称的字段视为package，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 只能在定义所在的文件中访问。'
+config.doc.regengine                     =
+'用于匹配文档作用域名称的正则表达式引擎。'
+config.doc.regengine.glob                =
+'默认轻量级模式语法。'
+config.doc.regengine.lua                 =
+'完整的 Lua 风格正则表达式。'
+config.docScriptPath                     =
+'自定义 Lua 脚本路径，覆盖默认文档生成行为。'
 config.diagnostics['unused-local']          =
 '未使用的局部变量'
 config.diagnostics['unused-function']       =

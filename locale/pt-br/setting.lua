@@ -279,7 +279,10 @@ Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/doc
 config.spell.dict                        = -- TODO: need translate!
 'Custom words for spell checking.'
 config.nameStyle.config                  = -- TODO: need translate!
-'Set name style config'
+[[
+Set name style config.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
 config.telemetry.enable                  = -- TODO: need translate!
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://luals.github.io/privacy/#language-server).

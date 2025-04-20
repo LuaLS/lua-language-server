@@ -277,7 +277,10 @@ config.format.defaultConfig              =
 config.spell.dict                        =
 '拼寫檢查的自訂單詞。'
 config.nameStyle.config                  = -- TODO: need translate!
-'Set name style config'
+[[
+Set name style config.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
 config.telemetry.enable                  =
 [[
 啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://luals.github.io/privacy/#language-server)閱讀我們的隱私聲明。

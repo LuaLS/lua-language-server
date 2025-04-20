@@ -277,7 +277,10 @@ config.format.defaultConfig              =
 config.spell.dict                        =
 '拼写检查的自定义单词。'
 config.nameStyle.config                  =
-'设定命名风格检查的配置'
+[[
+设定命名风格检查的配置。
+请查阅[格式化文档](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+]]
 config.telemetry.enable                  =
 [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://luals.github.io/privacy/#language-server)阅读我们的隐私声明。

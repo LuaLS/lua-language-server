@@ -280,7 +280,11 @@ para aprender más sobre su uso.
 config.spell.dict                        =
 'Palabras extra para el corrector ortográfico.'
 config.nameStyle.config                  =
-'Configuración de estilo para nombres.'
+[[
+Configuración de estilo para nombres.
+Revise [la documentación del formateador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)
+para aprender más sobre su uso.
+]]
 config.telemetry.enable                  =
 [[
 Habilita la telemetría para enviar información del editor y registros de errores por la red. Lea nuestra política de privacidad [aquí (en inglés)](https://luals.github.io/privacy#language-server).

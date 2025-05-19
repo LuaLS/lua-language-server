@@ -70,8 +70,8 @@ return function (uri, callback)
 
                 for _, field in ipairs(fields) do
                     if  not field.optional
-                    and not vm.compileNode(field):isNullable()
-                    and field.type == "doc.field" then
+                    and field.type == "doc.field"
+                    and not vm.compileNode(field):isNullable() then
                         local key = vm.getKeyName(field)
                         if not key then
                             local fieldnode = vm.compileNode(field.field)[1]

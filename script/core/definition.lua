@@ -157,6 +157,8 @@ return function (uri, offset)
     checkSee(source, results)
 
     local defs = vm.getDefs(source)
+    ---@type table<parser.object, boolean>
+    local results_set = {}
 
     for _, src in ipairs(defs) do
         if src.type == 'global' then
@@ -218,6 +220,19 @@ return function (uri, offset)
             goto CONTINUE
         end
 
+        results_set[src] = true
+        ::CONTINUE::
+    end
+    for src, _ in pairs(results_set) do
+        -- If the node is a child of the same line, canonicalize the definition to the parent node.
+        if results_set[src.parent] then
+            local parent_line = math.floor(src.parent.start / 10000)
+            local src_line = math.floor(src.start / 10000)
+            if parent_line == src_line then
+                goto CONTINUE
+            end
+        end
+        local root = guide.getRoot(src)
         results[#results+1] = {
             target = src,
             uri    = root.uri,

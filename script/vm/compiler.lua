@@ -669,6 +669,8 @@ local function getReturnOfGetMetaTable(args)
     local obj = args[1]
     local node = vm.createNode()
     if not obj then
+        -- 如果没有对象，返回nil类型
+        node:merge(vm.declareGlobal('type', 'nil'))
         return node
     end
     
@@ -727,14 +729,9 @@ local function getReturnOfGetMetaTable(args)
         end
     end
     
-    -- 如果没有找到任何元表信息，创建一个空表类型
+    -- 如果没有找到任何元表信息，返回nil类型
     if not foundMetatable then
-        local tableObj = {
-            type   = 'table',
-            start  = obj.start or 0,
-            finish = obj.finish or 0,
-        }
-        node:merge(tableObj)
+        node:merge(vm.declareGlobal('type', 'nil'))
     end
     
     node:remove 'nil'
@@ -1795,7 +1792,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'tablefield'
     : case 'tableindex'
-    : call(function (source)
+    : call(function (source, lastKey, pushResult)
         local hasMarkDoc
         if source.bindDocs then
             hasMarkDoc = vm.bindDocs(source)
@@ -2083,6 +2080,50 @@ local compilerSwitch = util.switch()
     end)
     : case 'call'
     : call(function (source)
+        -- 检查是否是getmetatable函数引用的方法调用
+        if source.node and source.node.type == 'getmethod' and source.args then
+            local method = source.node
+            local node = method.node
+            
+            -- 检查是否是通过引用调用getmetatable
+            if node then
+                local methodName = method.method and method.method[1]
+                if methodName then
+                    -- 使用compileByParentNode直接查找属性
+                    vm.compileByParentNode(node, methodName, function (field)
+                        if field.value and field.value.special == 'getmetatable' then
+                            -- 是getmetatable的引用，安全处理
+                            -- 创建一个新节点避免guide.getRoot错误
+                            vm.setNode(source, getReturnOfGetMetaTable({node}))
+                            return
+                        end
+                    end)
+                end
+            end
+        end
+        
+        -- 检查常规函数调用中直接调用getmetatable的情况
+        if source.node and source.node.special == 'getmetatable' then
+            -- 直接使用getReturnOfGetMetaTable处理
+            if source.args and source.args[1] then
+                vm.setNode(source, getReturnOfGetMetaTable(source.args))
+                return
+            end
+        end
+        
+        -- 检查方法内部直接调用getmetatable(self)的情况
+        if source.node and source.node.type == 'getlocal' and source.node[1] == 'getmetatable' then
+            if source.args and source.args[1] and source.args[1].type == 'getlocal' and source.args[1][1] == 'self' then
+                -- 获取self对象引用
+                local selfNode = guide.getSelfNode(source.args[1])
+                if selfNode then
+                    -- 处理元表，但不直接传递可能导致guide.getRoot错误的对象
+                    vm.setNode(source, getReturnOfGetMetaTable({selfNode}))
+                    return
+                end
+            end
+        end
+        
         -- ignore rawset
         if source.node.special == 'rawset' then
             return

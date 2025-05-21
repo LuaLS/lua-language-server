@@ -588,9 +588,21 @@ local function getReturnOfSetMetaTable(args)
     local mt   = args[2]
     local node = vm.createNode()
     if tbl then
-        node:merge(vm.compileNode(tbl))
+        local tblNode = vm.compileNode(tbl)
+        node:merge(tblNode)
+        
+        -- 存储元表信息，将mt节点作为源节点的元表
+        if mt then
+            local mtNode = vm.compileNode(mt)
+            -- 为节点添加metatable属性
+            for n in tblNode:eachObject() do
+                n.metatable = mtNode
+            end
+        end
     end
+    
     if mt then
+        -- 合并__index属性到返回节点
         vm.compileByParentNodeAll(mt, '__index', function (src)
             for n in vm.compileNode(src):eachObject() do
                 if n.type == 'global'
@@ -602,8 +614,49 @@ local function getReturnOfSetMetaTable(args)
             end
         end)
     end
+    
     --过滤nil
-   node:remove 'nil'
+    node:remove 'nil'
+    return node
+end
+
+---@param args parser.object[]
+---@return vm.node
+local function getReturnOfGetMetaTable(args)
+    local obj = args[1]
+    local node = vm.createNode()
+    if not obj then
+        return node
+    end
+    
+    local objNode = vm.compileNode(obj)
+    -- 尝试遍历对象的所有可能类型
+    for n in objNode:eachObject() do
+        -- 检查是否有metatable属性
+        if n.metatable then
+            node:merge(n.metatable)
+        end
+        
+        -- 检查是否有setmetatable调用
+        if n.value and n.value.type == 'call' and n.value.node and n.value.node.special == 'setmetatable' and n.value.args and n.value.args[2] then
+            -- 直接返回setmetatable的第二个参数
+            node:merge(vm.compileNode(n.value.args[2]))
+        end
+        
+        -- 如果是__metatable字段的处理，优先使用它
+        vm.compileByParentNodeAll(obj, '__metatable', function (src)
+            for metaObj in vm.compileNode(src):eachObject() do
+                node:merge(metaObj)
+            end
+        end)
+    end
+    
+    -- 如果没有找到任何元表信息，创建一个空表类型
+    if node:isEmpty() then
+        node:addTable()
+    end
+    
+    node:remove 'nil'
     return node
 end
 
@@ -1819,6 +1872,13 @@ local compilerSwitch = util.switch()
                 return
             end
             vm.setNode(source, getReturnOfSetMetaTable(args))
+            return
+        end
+        if func.special == 'getmetatable' then
+            if not args then
+                return
+            end
+            vm.setNode(source, getReturnOfGetMetaTable(args))
             return
         end
         if func.special == 'pcall' and index > 1 then

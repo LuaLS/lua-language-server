@@ -632,9 +632,21 @@ local function getReturnOfSetMetaTable(args)
     local mt   = args[2]
     local node = vm.createNode()
     if tbl then
-        node:merge(vm.compileNode(tbl))
+        local tblNode = vm.compileNode(tbl)
+        node:merge(tblNode)
+        
+        -- 存储元表信息，将mt节点作为源节点的元表
+        if mt then
+            local mtNode = vm.compileNode(mt)
+            -- 为节点添加metatable属性
+            for n in tblNode:eachObject() do
+                n.metatable = mtNode
+            end
+        end
     end
+    
     if mt then
+        -- 合并__index属性到返回节点
         vm.compileByParentNodeAll(mt, '__index', function (src)
             for n in vm.compileNode(src):eachObject() do
                 if n.type == 'global'
@@ -647,7 +659,85 @@ local function getReturnOfSetMetaTable(args)
         end)
     end
     --过滤nil
-   node:remove 'nil'
+    node:remove 'nil'
+    return node
+end
+
+---@param args parser.object[]
+---@return vm.node
+local function getReturnOfGetMetaTable(args)
+    local obj = args[1]
+    local node = vm.createNode()
+    if not obj then
+        return node
+    end
+    
+    local objNode = vm.compileNode(obj)
+    local foundMetatable = false
+    
+    -- 尝试遍历对象的所有可能类型
+    for n in objNode:eachObject() do
+        -- 检查是否有metatable属性
+        if n.metatable then
+            -- 先检查元表中是否有__metatable字段
+            local hasMetaField = false
+            for mt in n.metatable:eachObject() do
+                if mt.type == 'table' then
+                    -- 尝试从元表中查找__metatable字段
+                    vm.compileByParentNodeAll(mt, '__metatable', function (src)
+                        hasMetaField = true
+                        -- 使用__metatable字段的值作为返回值
+                        for metaObj in vm.compileNode(src):eachObject() do
+                            node:merge(metaObj)
+                        end
+                    end)
+                end
+            end
+            
+            -- 如果没有__metatable字段，则返回元表本身
+            if not hasMetaField then
+                node:merge(n.metatable)
+            end
+            
+            foundMetatable = true
+        end
+        
+        -- 检查是否有setmetatable调用
+        if not foundMetatable and n.value and n.value.type == 'call' and n.value.node and n.value.node.special == 'setmetatable' and n.value.args and n.value.args[2] then
+            local mtArg = n.value.args[2]
+            local mtNode = vm.compileNode(mtArg)
+            
+            -- 检查元表参数中是否有__metatable字段
+            local hasMetaField = false
+            -- 尝试从元表参数中查找__metatable字段
+            vm.compileByParentNodeAll(mtArg, '__metatable', function (src)
+                hasMetaField = true
+                -- 使用__metatable字段的值作为返回值
+                for metaObj in vm.compileNode(src):eachObject() do
+                    node:merge(metaObj)
+                end
+            end)
+            
+            -- 如果没有__metatable字段，则返回元表本身
+            if not hasMetaField then
+                node:merge(mtNode)
+            end
+            
+            foundMetatable = true
+        end
+    end
+    
+    -- 如果没有找到任何元表信息，创建一个空表类型
+    if not foundMetatable then
+        local tableObj = {
+            type   = 'table',
+            start  = obj.start or 0,
+            finish = obj.finish or 0,
+        }
+        node:merge(tableObj)
+    end
+    
+    node:remove 'nil'
     return node
 end
 
@@ -1863,6 +1953,13 @@ local compilerSwitch = util.switch()
                 return
             end
             vm.setNode(source, getReturnOfSetMetaTable(args))
+            return
+        end
+        if func.special == 'getmetatable' then
+            if not args then
+                return
+            end
+            vm.setNode(source, getReturnOfGetMetaTable(args))
             return
         end
         if func.special == 'pcall' and index > 1 then

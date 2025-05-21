@@ -2,15 +2,21 @@ local files = require "files"
 local guide = require "parser.guide"
 
 local colorPattern = string.rep('%x', 8)
+local hex6Pattern = string.format("^#%s", string.rep('%x', 6))
 ---@param source parser.object
 ---@return boolean
 local function isColor(source)
     ---@type string
     local text = source[1]
-    if text:len() ~= 8 then
-        return false
+    if text:len() == 8 then
+        return text:match(colorPattern)
     end
-    return text:match(colorPattern)
+
+    if text:len() == 7 then
+        return text:match(hex6Pattern)
+    end
+
+    return false
 end
 
 
@@ -25,6 +31,16 @@ local function textToColor(colorText)
     }
 end
 
+---@param colorText string
+---@return Color
+local function hexTextToColor(colorText)
+    return {
+        alpha = 255,
+        red   = tonumber(colorText:sub(2, 3), 16) / 255,
+        green = tonumber(colorText:sub(4, 5), 16) / 255,
+        blue  = tonumber(colorText:sub(6, 7), 16) / 255,
+    }
+end
 
 ---@param color Color
 ---@return string
@@ -63,10 +79,12 @@ local function colors(uri)
             ---@type string
             local colorText = source[1]
 
+            local color = colorText:match(colorPattern) and textToColor(colorText) or hexTextToColor(colorText)
+
             colorValues[#colorValues+1] = {
                 start  = source.start + 1,
                 finish = source.finish - 1,
-                color  = textToColor(colorText)
+                color  = color
             }
         end
     end)

@@ -149,7 +149,6 @@ function string.sub(s, i, j) end
 ---@param s    string
 ---@param pos? integer
 ---@return any ...
----@return integer offset
 ---@nodiscard
 function string.unpack(fmt, s, pos) end
 

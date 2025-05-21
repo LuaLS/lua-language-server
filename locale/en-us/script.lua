@@ -36,6 +36,8 @@ DIAG_OVER_MAX_ARGS      =
 'This function expects a maximum of {:d} argument(s) but instead it is receiving {:d}.'
 DIAG_MISS_ARGS          =
 'This function requires {:d} argument(s) but instead it is receiving {:d}.'
+DIAG_UNNECESSARY_ASSERT =
+'Unnecessary assert: this expression is always truthy.'
 DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =

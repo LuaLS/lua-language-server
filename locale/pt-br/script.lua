@@ -36,6 +36,8 @@ DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
 DIAG_MISS_ARGS          =
 'A função recebe pelo menos {:d} argumentos, mas há {:d}.'
+DIAG_UNNECESSARY_ASSERT =
+'Asserção desnecessária: esta expressão é sempre verdadeira.'
 DIAG_OVER_MAX_VALUES    =
 'Apenas há {} variáveis, mas você declarou {} valores.'
 DIAG_AMBIGUITY_1        =

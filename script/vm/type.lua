@@ -6,8 +6,9 @@ local util      = require 'utility'
 local lang      = require 'language'
 
 ---@class vm.ANY
----@diagnostic disable-next-line: assign-type-mismatch
-vm.ANY = debug.upvalueid(require, 1)
+vm.ANY = {'<VM.ANY>'}
+---@class vm.ANYDOC
+vm.ANYDOC = {'<VM.ANYDOC>'}
 
 ---@alias typecheck.err vm.node.object|string|vm.node
 

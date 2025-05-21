@@ -632,9 +632,21 @@ local function getReturnOfSetMetaTable(args)
     local mt   = args[2]
     local node = vm.createNode()
     if tbl then
-        node:merge(vm.compileNode(tbl))
+        local tblNode = vm.compileNode(tbl)
+        node:merge(tblNode)
+        
+        -- 存储元表信息，将mt节点作为源节点的元表
+        if mt then
+            local mtNode = vm.compileNode(mt)
+            -- 为节点添加metatable属性
+            for n in tblNode:eachObject() do
+                n.metatable = mtNode
+            end
+        end
     end
+    
     if mt then
+        -- 合并__index属性到返回节点
         vm.compileByParentNodeAll(mt, '__index', function (src)
             for n in vm.compileNode(src):eachObject() do
                 if n.type == 'global'
@@ -647,7 +659,82 @@ local function getReturnOfSetMetaTable(args)
         end)
     end
     --过滤nil
-   node:remove 'nil'
+    node:remove 'nil'
+    return node
+end
+
+---@param args parser.object[]
+---@return vm.node
+local function getReturnOfGetMetaTable(args)
+    local obj = args[1]
+    local node = vm.createNode()
+    if not obj then
+        -- 如果没有对象，返回nil类型
+        node:merge(vm.declareGlobal('type', 'nil'))
+        return node
+    end
+    
+    local objNode = vm.compileNode(obj)
+    local foundMetatable = false
+    
+    -- 尝试遍历对象的所有可能类型
+    for n in objNode:eachObject() do
+        -- 检查是否有metatable属性
+        if n.metatable then
+            -- 先检查元表中是否有__metatable字段
+            local hasMetaField = false
+            for mt in n.metatable:eachObject() do
+                if mt.type == 'table' then
+                    -- 尝试从元表中查找__metatable字段
+                    vm.compileByParentNodeAll(mt, '__metatable', function (src)
+                        hasMetaField = true
+                        -- 使用__metatable字段的值作为返回值
+                        for metaObj in vm.compileNode(src):eachObject() do
+                            node:merge(metaObj)
+                        end
+                    end)
+                end
+            end
+            
+            -- 如果没有__metatable字段，则返回元表本身
+            if not hasMetaField then
+                node:merge(n.metatable)
+            end
+            
+            foundMetatable = true
+        end
+        
+        -- 检查是否有setmetatable调用
+        if not foundMetatable and n.value and n.value.type == 'call' and n.value.node and n.value.node.special == 'setmetatable' and n.value.args and n.value.args[2] then
+            local mtArg = n.value.args[2]
+            local mtNode = vm.compileNode(mtArg)
+            
+            -- 检查元表参数中是否有__metatable字段
+            local hasMetaField = false
+            -- 尝试从元表参数中查找__metatable字段
+            vm.compileByParentNodeAll(mtArg, '__metatable', function (src)
+                hasMetaField = true
+                -- 使用__metatable字段的值作为返回值
+                for metaObj in vm.compileNode(src):eachObject() do
+                    node:merge(metaObj)
+                end
+            end)
+            
+            -- 如果没有__metatable字段，则返回元表本身
+            if not hasMetaField then
+                node:merge(mtNode)
+            end
+            
+            foundMetatable = true
+        end
+    end
+    
+    -- 如果没有找到任何元表信息，返回nil类型
+    if not foundMetatable then
+        node:merge(vm.declareGlobal('type', 'nil'))
+    end
+    
+    node:remove 'nil'
     return node
 end
 
@@ -1705,7 +1792,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'tablefield'
     : case 'tableindex'
-    : call(function (source)
+    : call(function (source, lastKey, pushResult)
         local hasMarkDoc
         if source.bindDocs then
             hasMarkDoc = vm.bindDocs(source)
@@ -1865,6 +1952,13 @@ local compilerSwitch = util.switch()
             vm.setNode(source, getReturnOfSetMetaTable(args))
             return
         end
+        if func.special == 'getmetatable' then
+            if not args then
+                return
+            end
+            vm.setNode(source, getReturnOfGetMetaTable(args))
+            return
+        end
         if func.special == 'pcall' and index > 1 then
             if not args then
                 return
@@ -1986,6 +2080,50 @@ local compilerSwitch = util.switch()
     end)
     : case 'call'
     : call(function (source)
+        -- 检查是否是getmetatable函数引用的方法调用
+        if source.node and source.node.type == 'getmethod' and source.args then
+            local method = source.node
+            local node = method.node
+            
+            -- 检查是否是通过引用调用getmetatable
+            if node then
+                local methodName = method.method and method.method[1]
+                if methodName then
+                    -- 使用compileByParentNode直接查找属性
+                    vm.compileByParentNode(node, methodName, function (field)
+                        if field.value and field.value.special == 'getmetatable' then
+                            -- 是getmetatable的引用，安全处理
+                            -- 创建一个新节点避免guide.getRoot错误
+                            vm.setNode(source, getReturnOfGetMetaTable({node}))
+                            return
+                        end
+                    end)
+                end
+            end
+        end
+        
+        -- 检查常规函数调用中直接调用getmetatable的情况
+        if source.node and source.node.special == 'getmetatable' then
+            -- 直接使用getReturnOfGetMetaTable处理
+            if source.args and source.args[1] then
+                vm.setNode(source, getReturnOfGetMetaTable(source.args))
+                return
+            end
+        end
+        
+        -- 检查方法内部直接调用getmetatable(self)的情况
+        if source.node and source.node.type == 'getlocal' and source.node[1] == 'getmetatable' then
+            if source.args and source.args[1] and source.args[1].type == 'getlocal' and source.args[1][1] == 'self' then
+                -- 获取self对象引用
+                local selfNode = guide.getSelfNode(source.args[1])
+                if selfNode then
+                    -- 处理元表，但不直接传递可能导致guide.getRoot错误的对象
+                    vm.setNode(source, getReturnOfGetMetaTable({selfNode}))
+                    return
+                end
+            end
+        end
+        
         -- ignore rawset
         if source.node.special == 'rawset' then
             return

@@ -108,6 +108,7 @@ local Specials = {
     ['rawset']       = true,
     ['rawget']       = true,
     ['setmetatable'] = true,
+    ['getmetatable'] = true,
     ['require']      = true,
     ['dofile']       = true,
     ['loadfile']     = true,

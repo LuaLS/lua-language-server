@@ -14,7 +14,7 @@ local function getColorMode(source)
     ---@type string
     local text = source[1]
 
-    for k,v in next,colorPattern do
+    for k,v in pairs(colorPattern) do
         if text:match(v) then
             return k
         end

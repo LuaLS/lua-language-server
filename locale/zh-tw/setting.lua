@@ -452,12 +452,12 @@ config.typeFormat.config.format_line        =
 '是否格式化某一行'
 
 command.exportDocument =
-'Lua: 輸出文件...'
+'Lua：輸出文件…'
 command.addon_manager.open =
-'Lua: 打開插件管理器(Addon Manager)...'
+'Lua：打開插件管理器（Addon Manager）…'
 command.reloadFFIMeta =
-'Lua: 重新生成luajit的FFI模組C語言中繼資料'
+'Lua：重新生成luajit的FFI模組C語言中繼資料'
 command.startServer =
-'Lua: (除錯) 重新啟動語言伺服'
+'Lua：（除錯）重新啟動語言伺服'
 command.stopServer =
-'Lua: (除錯) 停止語言伺服'
+'Lua：（除錯）停止語言伺服'

@@ -73,7 +73,7 @@ DIAG_DUPLICATE_SET_FIELD=
 DIAG_SET_CONST          =
 '不能對常數賦值。'
 DIAG_SET_FOR_STATE      =
-'修改了循環變數。'
+'修改了迴圈變數。'
 DIAG_CODE_AFTER_BREAK   =
 '無法執行到 `break` 後的程式碼。'
 DIAG_UNBALANCED_ASSIGNMENTS =
@@ -180,13 +180,13 @@ DIAG_INJECT_FIELD_FIX_TABLE           =
 '如果要允許注入，請在定義中添加 `{fix}` 。'
 
 MWS_NOT_SUPPORT         =
-'{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
+'{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄…'
 MWS_RESTART             =
 '重新啟動'
 MWS_NOT_COMPLETE        =
-'工作目錄還沒有準備好，你可以稍後再試一下...'
+'工作目錄還沒有準備好，你可以稍後再試一下…'
 MWS_COMPLETE            =
-'工作目錄準備好了，你可以再試一下了...'
+'工作目錄準備好了，你可以再試一下了'
 MWS_MAX_PRELOAD         =
 '預載入檔案數已達上限（{}），你需要手動打開需要載入的檔案。'
 MWS_UCONFIG_FAILED      =
@@ -212,7 +212,7 @@ WORKSPACE_SCAN_TOO_MUCH   =
 PARSER_CRASH            =
 '語法解析崩潰了！遺言：{}'
 PARSER_UNKNOWN          =
-'未知語法錯誤...'
+'未知語法錯誤…'
 PARSER_MISS_NAME        =
 '缺少名稱。'
 PARSER_UNKNOWN_SYMBOL   =
@@ -238,7 +238,7 @@ PARSER_MISS_FIELD       =
 PARSER_MISS_METHOD      =
 '缺少方法名。'
 PARSER_ARGS_AFTER_DOTS  =
-'`...`必須是最後一個引數。'
+'`...` 必須是最後一個引數。'
 PARSER_KEYWORD          =
 '關鍵字無法作為名稱。'
 PARSER_EXP_IN_ACTION    =
@@ -258,7 +258,7 @@ PARSER_REDEFINE_LABEL   =
 PARSER_UNSUPPORT_SYMBOL =
 '{version} 不支援該符號。'
 PARSER_UNEXPECT_DOTS    =
-'`...`只能在不定參函式中使用。'
+'`...` 只能在不定參函式中使用。'
 PARSER_UNEXPECT_SYMBOL  =
 '未知的符號 `{symbol}` 。'
 PARSER_UNKNOWN_TAG      =
@@ -501,31 +501,31 @@ WINDOW_COMPILING                 =
 WINDOW_DIAGNOSING                =
 '正在診斷'
 WINDOW_INITIALIZING              =
-'正在初始化...'
+'正在初始化…'
 WINDOW_PROCESSING_HOVER          =
-'正在處理懸浮提示...'
+'正在處理懸浮提示…'
 WINDOW_PROCESSING_DEFINITION     =
-'正在處理轉到定義...'
+'正在處理轉到定義…'
 WINDOW_PROCESSING_REFERENCE      =
-'正在處理轉到引用...'
+'正在處理轉到引用…'
 WINDOW_PROCESSING_RENAME         =
-'正在處理重新命名...'
+'正在處理重新命名…'
 WINDOW_PROCESSING_COMPLETION     =
-'正在處理自動完成...'
+'正在處理自動完成…'
 WINDOW_PROCESSING_SIGNATURE      =
-'正在處理參數提示...'
+'正在處理參數提示…'
 WINDOW_PROCESSING_SYMBOL         =
-'正在處理檔案符號...'
+'正在處理檔案符號…'
 WINDOW_PROCESSING_WS_SYMBOL      =
-'正在處理工作區符號...'
+'正在處理工作區符號…'
 WINDOW_PROCESSING_SEMANTIC_FULL  =
-'正在處理全量語義著色...'
+'正在處理全量語義著色…'
 WINDOW_PROCESSING_SEMANTIC_RANGE =
-'正在處理差量語義著色...'
+'正在處理差量語義著色…'
 WINDOW_PROCESSING_HINT           =
-'正在處理內嵌提示...'
+'正在處理內嵌提示…'
 WINDOW_PROCESSING_BUILD_META     =
-'正在處理編譯器中繼資料...'
+'正在處理編譯器中繼資料…'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =
@@ -582,7 +582,7 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要將你的工作環境配置為 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =
-'正在檔案中搜尋...'
+'正在檔案中搜尋…'
 WINDOW_CONFIG_LUA_DEPRECATED     =
 '`config.lua` 已棄用，請改用 `config.json` 。'
 WINDOW_CONVERT_CONFIG_LUA        =
@@ -645,7 +645,7 @@ CLI_CHECK_ERROR_URI =
 CLI_CHECK_ERROR_LEVEL =
 'checklevel 必須是這些值之一：{}'
 CLI_CHECK_INITING =
-'正在初始化...'
+'正在初始化…'
 CLI_CHECK_SUCCESS =
 '診斷完成，沒有發現問題'
 CLI_CHECK_PROGRESS =
@@ -657,11 +657,11 @@ CLI_CHECK_RESULTS_PRETTY =
 CLI_CHECK_MULTIPLE_WORKERS =
 '開始 {} 個工作任務，將會停用進度輸出。這可能會花費幾分鐘。'
 CLI_DOC_INITING   =
-'文件載入中...'
+'文件載入中…'
 CLI_DOC_DONE      =
 '文件輸出完成！'
 CLI_DOC_WORKING   =
-'正在產生文件...'
+'正在產生文件…'
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
 '類型 `{child}` 不符合 `{parent}` 的列舉類型'

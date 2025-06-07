@@ -1,28 +1,33 @@
 local files = require "files"
 local guide = require "parser.guide"
 
-local colorPattern = string.rep('%x', 8)
-local hex6Pattern = string.format("^#%s", string.rep('%x', 6))
+---@enum (key) ColorMode
+local colorPattern = {
+    argb8   = "^%x%x%x%x%x%x%x%x$",
+    hexrgb6 = "^#%x%x%x%x%x%x$",
+    rgb6    = "^%x%x%x%x%x%x$",
+}
+
 ---@param source parser.object
----@return boolean
-local function isColor(source)
+---@return ColorMode | false
+local function getColorMode(source)
     ---@type string
     local text = source[1]
-    if text:len() == 8 then
-        return text:match(colorPattern)
-    end
 
-    if text:len() == 7 then
-        return text:match(hex6Pattern)
+    for k,v in next,colorPattern do
+        if text:match(v) then
+            return k
+        end
     end
 
     return false
 end
 
+local textToColor = {}
 
 ---@param colorText string
 ---@return Color
-local function textToColor(colorText)
+function textToColor.argb8(colorText)
     return {
         alpha = tonumber(colorText:sub(1, 2), 16) / 255,
         red   = tonumber(colorText:sub(3, 4), 16) / 255,
@@ -33,12 +38,23 @@ end
 
 ---@param colorText string
 ---@return Color
-local function hexTextToColor(colorText)
+function textToColor.hexrgb6(colorText)
     return {
-        alpha = 255,
+        alpha = 1,
         red   = tonumber(colorText:sub(2, 3), 16) / 255,
         green = tonumber(colorText:sub(4, 5), 16) / 255,
         blue  = tonumber(colorText:sub(6, 7), 16) / 255,
+    }
+end
+
+---@param colorText string
+---@return Color
+function textToColor.rgb6(colorText)
+    return {
+        alpha = 1,
+        red   = tonumber(colorText:sub(1, 2), 16) / 255,
+        green = tonumber(colorText:sub(3, 4), 16) / 255,
+        blue  = tonumber(colorText:sub(5, 6), 16) / 255,
     }
 end
 
@@ -75,17 +91,19 @@ local function colors(uri)
     local colorValues = {}
 
     guide.eachSource(state.ast, function (source) ---@async
-        if source.type == 'string' and isColor(source) then
-            ---@type string
-            local colorText = source[1]
+        if source.type == 'string' then
+            local colorMode = getColorMode(source)
+            if colorMode then
+                ---@type string
+                local colorText = source[1]
+                local color = textToColor[colorMode](colorText)
 
-            local color = colorText:match(colorPattern) and textToColor(colorText) or hexTextToColor(colorText)
-
-            colorValues[#colorValues+1] = {
-                start  = source.start + 1,
-                finish = source.finish - 1,
-                color  = color
-            }
+                colorValues[#colorValues+1] = {
+                    start  = source.start + 1,
+                    finish = source.finish - 1,
+                    color  = color,
+                }
+            end
         end
     end)
     return colorValues

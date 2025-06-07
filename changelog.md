@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` cannot debug in Linux due to lua-debug expecting host process to have lua54 symbols available
 * `FIX` support hex color codes with `#` in `textDocument/documentColor`
+* `ADD` missing locale
 * `FIX` updates the EmmyLuaCodeStyle submodule reference to a newer commit, ensuring compatibility with GCC 15
 
 ## 3.14.0

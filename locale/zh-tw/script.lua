@@ -37,7 +37,7 @@ DIAG_OVER_MAX_ARGS      =
 DIAG_MISS_ARGS          =
 '函式最少接收 {:d} 個引數，但獲得了 {:d} 個。'
 DIAG_UNNECESSARY_ASSERT =
-'不必要的斷言：此表達式始終為真值。'
+'不必要的斷言：此陳述式始終為真。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 個變數，但你設定了 {} 個值。'
 DIAG_AMBIGUITY_1        =
@@ -77,7 +77,7 @@ DIAG_SET_FOR_STATE      =
 DIAG_CODE_AFTER_BREAK   =
 '無法執行到 `break` 後的程式碼。'
 DIAG_UNBALANCED_ASSIGNMENTS =
-'由於值的數量不夠而被賦值為了 `nil` 。在Lua中, `x, y = 1` 等價於 `x, y = 1, nil` 。'
+'由於值的數量不夠而賦值了 `nil` 。在Lua中, `x, y = 1` 等價於 `x, y = 1, nil` 。'
 DIAG_REQUIRE_LIKE       =
 '你可以在設定中將 `{}` 視為 `require`。'
 DIAG_COSE_NON_OBJECT    =
@@ -116,22 +116,22 @@ DIAG_UNDEFINED_DOC_NAME               =
 '未定義的類型或別名 `{}`。'
 DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定義的參數 `{}`。'
-DIAG_MISSING_GLOBAL_DOC_COMMENT       = -- TODO: need translate!
-'Missing comment for global function `{}`.'
-DIAG_MISSING_GLOBAL_DOC_PARAM         = -- TODO: need translate!
-'Missing @param annotation for parameter `{}` in global function `{}`.'
-DIAG_MISSING_GLOBAL_DOC_RETURN        = -- TODO: need translate!
-'Missing @return annotation at index `{}` in global function `{}`.'
-DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT = -- TODO: need translate!
-'Missing comment for exported local function `{}`.'
-DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   = -- TODO: need translate!
-'Missing @param annotation for parameter `{}` in exported local function `{}`.'
-DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN  = -- TODO: need translate!
-'Missing @return annotation at index `{}` in exported local function `{}`.'
-DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
-'Incomplete signature. Missing @param annotation for parameter `{}`.'
-DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!
-'Incomplete signature. Missing @return annotation at index `{}`.'
+DIAG_MISSING_GLOBAL_DOC_COMMENT       =
+'全域函式 `{}` 缺少註解。'
+DIAG_MISSING_GLOBAL_DOC_PARAM         =
+'全域函式 `{2}` 的參數 `{1}` 缺少 @param 標註。'
+DIAG_MISSING_GLOBAL_DOC_RETURN        =
+'全域函式 `{2}` 的第 `{1}` 個回傳值缺少 @return 標註。'
+DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT =
+'輸出的區域函式 `{}` 缺少註解。'
+DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   =
+'輸出的區域函式 `{2}` 的參數 `{1}` 缺少 @param 標註。'
+DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN  =
+'輸出的區域函式 `{2}` 的第 {1} 個回傳值缺少 @return 標註。'
+DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
+'簽名不完整。參數 `{1}` 缺少 @param 標註。'
+DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
+'簽名不完整。第 {1} 個回傳值缺少 @return 標註。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的診斷代碼 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =
@@ -158,26 +158,26 @@ DIAG_MISSING_RETURN                   =
 '此處需要回傳值。'
 DIAG_RETURN_TYPE_MISMATCH             =
 '第 {index} 個回傳值的類型為 `{def}` ，但實際回傳的是 `{ref}`。\n{err}'
-DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
-'Unknown operator `{}`.'
-DIAG_UNREACHABLE_CODE                 = -- TODO: need translate!
-'Unreachable code.'
-DIAG_INVISIBLE_PRIVATE                = -- TODO: need translate!
-'Field `{field}` is private, it can only be accessed in class `{class}`.'
-DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
-'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
-DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
-'Field `{field}` can only be accessed in same file `{uri}`.'
-DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
-'Element is global.'
-DIAG_MISSING_FIELDS                   = -- TODO: need translate!
-'Missing required fields in type `{1}`: {2}'
-DIAG_INJECT_FIELD                     = -- TODO: need translate!
-'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
-DIAG_INJECT_FIELD_FIX_CLASS           = -- TODO: need translate!
-'To do so, use `---@class` for `{node}`.'
-DIAG_INJECT_FIELD_FIX_TABLE           = -- TODO: need translate!
-'如要允许注入，请在定义中添加 `{fix}` 。'
+DIAG_UNKNOWN_OPERATOR                 =
+'未知的運算子 `{}`。'
+DIAG_UNREACHABLE_CODE                 =
+'無法到達的程式碼。'
+DIAG_INVISIBLE_PRIVATE                =
+'欄位 `{field}` 是私有層級，只能在 `{class}` 類別中才能存取。'
+DIAG_INVISIBLE_PROTECTED              =
+'欄位 `{field}` 是保護層級，只能在 `{class}` 類別及其子類別中才能存取。'
+DIAG_INVISIBLE_PACKAGE                =
+'欄位 `{field}` 只能在同樣的檔案 `{uri}` 中存取。'
+DIAG_GLOBAL_ELEMENT                   =
+'全域元素。'
+DIAG_MISSING_FIELDS                   =
+'缺少類型 `{1}` 的必要欄位： {2}'
+DIAG_INJECT_FIELD                     =
+'不能在 `{class}` 的引用中注入欄位 `{field}` 。{fix}'
+DIAG_INJECT_FIELD_FIX_CLASS           =
+'如果要允許注入，請對 `{node}` 使用 `{fix}` 。'
+DIAG_INJECT_FIELD_FIX_TABLE           =
+'如果要允許注入，請在定義中添加 `{fix}` 。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
@@ -206,8 +206,8 @@ WORKSPACE_SKIP_HUGE_FILE  =
 '出於效能考慮，已停止對此檔案解析：{}'
 WORKSPACE_NOT_ALLOWED     =
 '你的工作目錄被設定為了 `{}` ，Lua語言伺服拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
-WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`. Please see the [FAQ](https://luals.github.io/wiki/faq#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
+WORKSPACE_SCAN_TOO_MUCH   =
+'已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`。請檢視[FAQ](https://luals.github.io/wiki/faq#how-can-i-improve-startup-speeds)以便了解你要如何引入更少檔案。也有可能你的[組態是錯的](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)。'
 
 PARSER_CRASH            =
 '語法解析崩潰了！遺言：{}'
@@ -244,7 +244,7 @@ PARSER_KEYWORD          =
 PARSER_EXP_IN_ACTION    =
 '該表達式不能作為敘述。'
 PARSER_BREAK_OUTSIDE    =
-'`break`必須在循環內部。'
+'`break`必須在迴圈內部。'
 PARSER_MALFORMED_NUMBER =
 '無法構成有效數字。'
 PARSER_ACTION_AFTER_RETURN =
@@ -303,14 +303,14 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函式的名稱中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
 '區域變數屬性應該是 `const` 或 `close` 。'
-PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
-'在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
-PARSER_NEED_PAREN         = -- TODO: need translate!
-'需要添加一对括号。'
-PARSER_NESTING_LONG_MARK  = -- TODO: need translate!
-'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
-PARSER_LOCAL_LIMIT        = -- TODO: need translate!
-'Only 200 active local variables and upvalues can be existed at the same time.'
+PARSER_AMBIGUOUS_SYNTAX   =
+'在 Lua 5.1 中，呼叫函式的左括號和函式必須在同一行。'
+PARSER_NEED_PAREN         =
+'需要添加一對括號。'
+PARSER_NESTING_LONG_MARK  =
+'Lua 5.1 不允許使用巢狀的 `[[...]]` 。'
+PARSER_LOCAL_LIMIT        =
+'只能同時存在200個活躍的區域變數與上值。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -456,10 +456,10 @@ ACTION_MARK_ASYNC       =
 '將目前函式標記為非同步。'
 ACTION_ADD_DICT         =
 '添加 \'{}\' 到工作區字典'
-ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
-'添加括号。'
-ACTION_AUTOREQUIRE      = -- TODO: need translate!
-"Import '{}' as {}"
+ACTION_FIX_ADD_PAREN    =
+'添加括號。'
+ACTION_AUTOREQUIRE      =
+"引入 '{}' 作為 {}"
 
 COMMAND_DISABLE_DIAG       =
 '停用診斷'
@@ -481,8 +481,8 @@ COMMAND_JSON_TO_LUA_FAILED =
 'JSON 轉 Lua 失敗：{}'
 COMMAND_ADD_DICT           =
 '添加單字到字典裡'
-COMMAND_REFERENCE_COUNT    = -- TODO: need translate!
-'{} references'
+COMMAND_REFERENCE_COUNT    =
+'{} 個參考'
 
 COMPLETION_IMPORT_FROM           =
 '從 {} 中匯入'
@@ -524,8 +524,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在處理差量語義著色...'
 WINDOW_PROCESSING_HINT           =
 '正在處理內嵌提示...'
-WINDOW_PROCESSING_BUILD_META     = -- TODO: need translate!
-'Processing build meta...'
+WINDOW_PROCESSING_BUILD_META     =
+'正在處理編譯器中繼資料...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =
@@ -583,14 +583,14 @@ WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要將你的工作環境配置為 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =
 '正在檔案中搜尋...'
-WINDOW_CONFIG_LUA_DEPRECATED     = -- TODO: need translate!
-'`config.lua` is deprecated, please use `config.json` instead.'
-WINDOW_CONVERT_CONFIG_LUA        = -- TODO: need translate!
-'Convert to `config.json`'
-WINDOW_MODIFY_REQUIRE_PATH       = -- TODO: need translate!
-'Do you want to modify the require path?'
-WINDOW_MODIFY_REQUIRE_OK         = -- TODO: need translate!
-'Modify'
+WINDOW_CONFIG_LUA_DEPRECATED     =
+'`config.lua` 已棄用，請改用 `config.json` 。'
+WINDOW_CONVERT_CONFIG_LUA        =
+'轉換為 `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH       =
+'你想要修改 `require` 的路徑嗎？'
+WINDOW_MODIFY_REQUIRE_OK         =
+'修改'
 
 CONFIG_LOAD_FAILED               =
 '無法讀取設定檔案：{}'
@@ -598,22 +598,22 @@ CONFIG_LOAD_ERROR                =
 '設定檔案載入錯誤：{}'
 CONFIG_TYPE_ERROR                =
 '設定檔案必須是lua或json格式：{}'
-CONFIG_MODIFY_FAIL_SYNTAX_ERROR  = -- TODO: need translate!
-'Failed to modify settings, there are syntax errors in the settings file: {}'
-CONFIG_MODIFY_FAIL_NO_WORKSPACE  = -- TODO: need translate!
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
+'修改設定失敗，設定檔中有語法錯誤：{}'
+CONFIG_MODIFY_FAIL_NO_WORKSPACE  =
 [[
-Failed to modify settings:
-* The current mode is single-file mode, server cannot create `.luarc.json` without workspace.
-* The language client dose not support modifying settings from the server side.
+修改設定失敗：
+* 目前模式為單一檔案模式，伺服器只能在工作區中新增 `.luarc.json` 檔案。
+* 語言用戶端不支援從伺服端修改設定。
 
-Please modify following settings manually:
+請手動修改以下設定：
 {}
 ]]
-CONFIG_MODIFY_FAIL               = -- TODO: need translate!
+CONFIG_MODIFY_FAIL               =
 [[
-Failed to modify settings
+修改設定失敗
 
-Please modify following settings manually:
+請手動修改以下設定：
 {}
 ]]
 
@@ -648,55 +648,55 @@ CLI_CHECK_INITING =
 '正在初始化...'
 CLI_CHECK_SUCCESS =
 '診斷完成，沒有發現問題'
-CLI_CHECK_PROGRESS = -- TODO: need translate!
-'Found {} problems in {} files'
+CLI_CHECK_PROGRESS =
+'在檔案 {2} 中檢測到問題 {1}'
 CLI_CHECK_RESULTS_OUTPATH =
 '診斷完成，共有 {} 個問題，請查看 {}'
 CLI_CHECK_RESULTS_PRETTY =
 '診斷完成，共有 {} 個問題'
-CLI_CHECK_MULTIPLE_WORKERS = -- TODO: need translate!
-'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
-CLI_DOC_INITING   = -- TODO: need translate!
-'Loading documents ...'
-CLI_DOC_DONE      = -- TODO: need translate!
-'Document exporting completed!'
+CLI_CHECK_MULTIPLE_WORKERS =
+'開始 {} 個工作任務，將會停用進度輸出。這可能會花費幾分鐘。'
+CLI_DOC_INITING   =
+'文件載入中...'
+CLI_DOC_DONE      =
+'文件輸出完成！'
 CLI_DOC_WORKING   =
 '正在產生文件...'
 
-TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
-'Type `{child}` cannot match enumeration type of `{parent}`'
-TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED = -- TODO: need translate!
-'Cannot use generic `{child}` in enumeration'
-TYPE_ERROR_ENUM_LITERAL_DISMATCH = -- TODO: need translate!
-'Literal `{child}` cannot match the enumeration value of `{parent}`'
-TYPE_ERROR_ENUM_OBJECT_DISMATCH = -- TODO: need translate!
-'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
-TYPE_ERROR_ENUM_NO_OBJECT = -- TODO: need translate!
-'The passed in enumeration value `{child}` is not recognized'
-TYPE_ERROR_INTEGER_DISMATCH = -- TODO: need translate!
-'Literal `{child}` cannot match integer `{parent}`'
-TYPE_ERROR_STRING_DISMATCH = -- TODO: need translate!
-'Literal `{child}` cannot match string `{parent}`'
-TYPE_ERROR_BOOLEAN_DISMATCH = -- TODO: need translate!
-'Literal `{child}` cannot match boolean `{parent}`'
-TYPE_ERROR_TABLE_NO_FIELD = -- TODO: need translate!
-'Field `{key}` does not exist in the table'
-TYPE_ERROR_TABLE_FIELD_DISMATCH = -- TODO: need translate!
-'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
-TYPE_ERROR_CHILD_ALL_DISMATCH = -- TODO: need translate!
-'All subtypes in `{child}` cannot match `{parent}`'
-TYPE_ERROR_PARENT_ALL_DISMATCH = -- TODO: need translate!
-'`{child}` cannot match any subtypes in `{parent}`'
-TYPE_ERROR_UNION_DISMATCH = -- TODO: need translate!
-'`{child}` cannot match `{parent}`'
-TYPE_ERROR_OPTIONAL_DISMATCH = -- TODO: need translate!
-'Optional type cannot match `{parent}`'
-TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER = -- TODO: need translate!
-'The number `{child}` cannot be converted to an integer'
-TYPE_ERROR_NUMBER_TYPE_TO_INTEGER = -- TODO: need translate!
-'Cannot convert number type to integer type'
-TYPE_ERROR_DISMATCH = -- TODO: need translate!
-'Type `{child}` cannot match `{parent}`'
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
+'類型 `{child}` 不符合 `{parent}` 的列舉類型'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED =
+'無法在列舉中使用泛型 `{child}`'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH =
+'字面常數 `{child}` 不符合 `{parent}` 的列舉值'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH =
+'物件 `{child}` 不符合 `{parent}` 的列舉值，它們必須是同一個物件'
+TYPE_ERROR_ENUM_NO_OBJECT =
+'無法識別傳入的列舉值 `{child}`'
+TYPE_ERROR_INTEGER_DISMATCH =
+'字面常數 `{child}` 不符合整數 `{parent}`'
+TYPE_ERROR_STRING_DISMATCH =
+'字面常數 `{child}` 不符合字串 `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH =
+'字面常數 `{child}` 不符合布林值 `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD =
+'表中不存在欄位 `{key}`'
+TYPE_ERROR_TABLE_FIELD_DISMATCH =
+'欄位 `{key}` 的類型是 `{child}`，無法匹配 `{parent}`'
+TYPE_ERROR_CHILD_ALL_DISMATCH =
+'`{child}` 的所有子類型皆無法匹配 `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH =
+'`{child}` 無法匹配 `{parent}` 中的任何子類型'
+TYPE_ERROR_UNION_DISMATCH =
+'`{child}` 無法匹配 `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH =
+'可選類型不符合 `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =
+'無法將數字 `{child}` 轉換成整數'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
+'無法將數字類型轉換為整數類型'
+TYPE_ERROR_DISMATCH =
+'類型 `{child}` 無法匹配 `{parent}`'
 
 LUADOC_DESC_CLASS =
 [=[
@@ -980,7 +980,7 @@ function concat(...) end
 ]=]
 LUADOC_DESC_OVERLOAD =
 [=[
-允許定義多個函數簽章。
+允許定義多個函式簽章。
 
 ## 語法
 `---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
@@ -1152,15 +1152,15 @@ print(x) --> table
 ---
 [檢視文件](https://luals.github.io/wiki/annotations#cast)
 ]=]
-LUADOC_DESC_OPERATOR = -- TODO: need translate!
+LUADOC_DESC_OPERATOR =
 [=[
-Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+為 [運算子元方法](http://lua-users.org/wiki/MetatableEvents) 提供類型聲明
 
-## Syntax
+## 語法
 `@operator <operation>[(input_type)]:<resulting_type>`
 
-## Usage
-### Vector Add Metamethod
+## 用法
+### 向量加法元方法
 ```
 ---@class Vector
 ---@operator add(Vector):Vector
@@ -1171,7 +1171,7 @@ vB = Vector.new(10, 20, 30)
 vC = vA + vB
 --> Vector
 ```
-### Unary Minus
+### 一元減法
 ```
 ---@class Passcode
 ---@operator unm:integer
@@ -1180,18 +1180,17 @@ pA = Passcode.new(1234)
 pB = -pA
 --> integer
 ```
-[View Request](https://github.com/LuaLS/lua-language-server/issues/599)
+[檢視請求](https://github.com/LuaLS/lua-language-server/issues/599)
 ]=]
-LUADOC_DESC_ENUM = -- TODO: need translate!
+LUADOC_DESC_ENUM =
 [=[
-Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
-tag.
+將表標記為列舉。如果你想要一個列舉但是無法將其定義為 Lua 表，看一眼 [`@alias`](https://luals.github.io/wiki/annotations#alias)
+標籤。
 
-## Syntax
+## 語法
 `@enum <name>`
 
-## Usage
+## 用法
 ```
 ---@enum colors
 local colors = {
@@ -1209,15 +1208,14 @@ local function setColor(color) end
 setColor(colors.green)
 ```
 ]=]
-LUADOC_DESC_SOURCE = -- TODO: need translate!
+LUADOC_DESC_SOURCE =
 [=[
-Provide a reference to some source code which lives in another file. When
-searching for the definition of an item, its `@source` will be used.
+提供一個其他檔案中原始碼的引用。當查找某一項的定義時，將會使用它的 `@source`。
 
-## Syntax
+## 語法
 `@source <path>`
 
-## Usage
+## 用法
 ```
 ---You can use absolute paths
 ---@source C:/Users/me/Documents/program/myFile.c
@@ -1236,15 +1234,14 @@ local c
 local d
 ```
 ]=]
-LUADOC_DESC_PACKAGE = -- TODO: need translate!
+LUADOC_DESC_PACKAGE =
 [=[
-Mark a function as private to the file it is defined in. A packaged function
-cannot be accessed from another file.
+將函式標註為其所處檔案的私有成員。一個打包的函式不可以被其他檔案存取。
 
-## Syntax
+## 語法
 `@package`
 
-## Usage
+## 用法
 ```
 ---@class Animal
 ---@field private eyes integer
@@ -1257,15 +1254,14 @@ function Animal:eyesCount()
 end
 ```
 ]=]
-LUADOC_DESC_PRIVATE = -- TODO: need translate!
+LUADOC_DESC_PRIVATE =
 [=[
-Mark a function as private to a @class. Private functions can be accessed only
-from within their class and are not accessible from child classes.
+將欄位標註為類別的私有成員。私有欄位僅可在其所屬的類別中存取，並且不能被子類別存取。
 
-## Syntax
+## 語法
 `@private`
 
-## Usage
+## 用法
 ```
 ---@class Animal
 ---@field private eyes integer
@@ -1283,15 +1279,14 @@ local myDog = {}
 myDog:eyesCount();
 ```
 ]=]
-LUADOC_DESC_PROTECTED = -- TODO: need translate!
+LUADOC_DESC_PROTECTED =
 [=[
-Mark a function as protected within a @class. Protected functions can be
-accessed only from within their class or from child classes.
+將欄位標註為類別的保護成員。保護欄位僅可在其所屬的類別或子類別中存取。
 
-## Syntax
+## 語法
 `@protected`
 
-## Usage
+## 用法
 ```
 ---@class Animal
 ---@field private eyes integer

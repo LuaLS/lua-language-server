@@ -282,7 +282,11 @@ para aprender más sobre su uso.
 config.spell.dict                        =
 'Palabras extra para el corrector ortográfico.'
 config.nameStyle.config                  =
-'Configuración de estilo para nombres.'
+[[
+Configuración de estilo para nombres.
+Revise [la documentación del formateador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)
+para aprender más sobre su uso.
+]]
 config.telemetry.enable                  =
 [[
 Habilita la telemetría para enviar información del editor y registros de errores por la red. Lea nuestra política de privacidad [aquí (en inglés)](https://luals.github.io/privacy#language-server).
@@ -319,12 +323,22 @@ config.type.checkTableShape              =
 [[
 Chequea estrictamente la forma de la tabla.
 ]]
+config.type.inferTableSize               = -- TODO: need translate!
+'Maximum number of table fields analyzed during type inference.'
 config.doc.privateName                   =
 'Trata los nombres específicos de campo como privados. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase.'
 config.doc.protectedName                 =
 'Trata los nombres específicos de campo como protegidos. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase y sus subclases.'
 config.doc.packageName                   =
 'Trata los nombres específicos de campo como del paquete. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son de paquete, por lo que solo pueden ser accedidos en el archivo donde son definidos.'
+config.doc.regengine                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine.glob                = -- TODO: need translate!
+'The default lightweight pattern syntax.'
+config.doc.regengine.lua                 = -- TODO: need translate!
+'Full Lua-style regular expressions.'
+config.docScriptPath                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
 config.diagnostics['unused-local']          =
 'Habilita el diagnóstico de variables local sin uso.'
 config.diagnostics['unused-function']       =

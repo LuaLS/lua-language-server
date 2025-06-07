@@ -55,7 +55,7 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "已定义的全局变量。"
 config.diagnostics.globalsRegex   =
-"启用诊断以检测尝试关闭非对象的变量。"
+"已定义的全局变量符合的正则表达式。"
 config.diagnostics.severity       =
 [[
 修改诊断等级。
@@ -279,7 +279,10 @@ config.format.defaultConfig              =
 config.spell.dict                        =
 '拼写检查的自定义单词。'
 config.nameStyle.config                  =
-'设定命名风格检查的配置'
+[[
+设定命名风格检查的配置。
+请查阅[格式化文档](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+]]
 config.telemetry.enable                  =
 [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://luals.github.io/privacy/#language-server)阅读我们的隐私声明。
@@ -316,12 +319,22 @@ config.type.checkTableShape              =
 [[
 对表的形状进行严格检查。
 ]]
+config.type.inferTableSize               =
+'类型推断期间分析的表字段的最大数量。'
 config.doc.privateName                   =
 '将特定名称的字段视为私有，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 是私有字段，只能在定义所在的类中访问。'
 config.doc.protectedName                 =
 '将特定名称的字段视为受保护，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 是受保护的字段，只能在定义所在的类极其子类中访问。'
 config.doc.packageName                   =
 '将特定名称的字段视为package，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 只能在定义所在的文件中访问。'
+config.doc.regengine                     =
+'用于匹配文档作用域名称的正则表达式引擎。'
+config.doc.regengine.glob                =
+'默认轻量级模式语法。'
+config.doc.regengine.lua                 =
+'完整的 Lua 风格正则表达式。'
+config.docScriptPath                     =
+'自定义 Lua 脚本路径，覆盖默认文档生成行为。'
 config.diagnostics['unused-local']          =
 '未使用的局部变量'
 config.diagnostics['unused-function']       =

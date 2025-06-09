@@ -6,6 +6,8 @@ config.addonManager.repositoryBranch =
 "Specifies the git branch used by the addon manager."
 config.addonManager.repositoryPath =
 "Specifies the git path used by the addon manager."
+config.addonRepositoryPath        =
+"Specifies the addon repository path (not related to the addon manager)."
 config.runtime.version            =
 "Lua runtime version."
 config.runtime.path               =

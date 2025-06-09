@@ -14,6 +14,16 @@ boolean
 true
 ```
 
+# addonRepositoryPath
+
+Specifies the addon repository path (not related to the addon manager).
+
+## type
+
+```ts
+string
+```
+
 # codeLens.enable
 
 Enable code lens.

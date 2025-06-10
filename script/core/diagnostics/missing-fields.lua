@@ -31,7 +31,7 @@ return function (uri, callback)
                     local class = vm.getGlobal('type', className)
                     ---@cast class -nil
                     for _, set in ipairs(class:getSets(uri)) do
-                        if set.type == 'doc.class'
+                        if  set.type == 'doc.class'
                         and vm.docHasAttr(set, 'partial')
                         then
                             sortedDefs[className].isPartial = true
@@ -70,6 +70,7 @@ return function (uri, callback)
 
                 for _, field in ipairs(fields) do
                     if  not field.optional
+                    and field.type == "doc.field"
                     and not vm.compileNode(field):isNullable() then
                         local key = vm.getKeyName(field)
                         if not key then

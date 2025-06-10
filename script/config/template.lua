@@ -414,6 +414,7 @@ local template = {
                                             },
     --testma
     ["Lua.docScriptPath"]                   = Type.String,
+    ["Lua.addonRepositoryPath"]             = Type.String,
     -- VSCode
     ["Lua.addonManager.enable"]             = Type.Boolean >> true,
     ["Lua.addonManager.repositoryPath"]     = Type.String,

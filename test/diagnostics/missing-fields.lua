@@ -57,6 +57,97 @@ TEST [[
 ---@field x number
 ---@field y? number
 ---@field z number
+local A = {}
+
+function A:fun()
+end
+
+---@type A
+local t = {
+    x = 1,
+    y = 2,
+    z = 3,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Parent
+---@field a number
+local Parent = {}
+
+function Parent:fun2()
+end
+
+---@class A : Parent
+---@field x number
+---@field y? number
+---@field z number
+local A = {}
+
+function A:fun()
+end
+
+---@type A
+local t = <!{
+    x = 1,
+    y = 2,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Parent
+---@field a number
+local Parent = {}
+
+function Parent:fun2()
+end
+
+---@class A : Parent
+---@field x number
+---@field y? number
+---@field z number
+local A = {}
+
+function A:fun()
+end
+
+---@type A
+local t = {
+    x = 1,
+    y = 2,
+    z = 3,
+    a = 1,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+local A = {}
+
+function A:fun()
+end
+
+---@type A
+local t = <!{
+    x = 1,
+    y = 2,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
 
 ---@type A
 local t = {
@@ -336,7 +427,7 @@ local x = <!{
 }!>
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field [1] string
 ---@field x number
@@ -345,7 +436,7 @@ TEST[[
 local t = {x = 1, ""}
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field [1] string
 ---@field x number
@@ -356,7 +447,7 @@ local t = <!{x = 1}!>
 
 -- Inheritance
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 
@@ -366,7 +457,7 @@ TEST[[
 local t = <!{}!>
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 ---@field y number
@@ -377,7 +468,7 @@ TEST[[
 local t = <!{y = 1}!>
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 
@@ -390,7 +481,7 @@ local t = <!{y = 1}!>
 
 -- Inheritance + optional
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x? number
 
@@ -400,7 +491,7 @@ TEST[[
 local t = {}
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x? number
 ---@field y number
@@ -411,7 +502,7 @@ TEST[[
 local t = {y = 1}
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x? number
 
@@ -424,7 +515,7 @@ local t = {y = 1}
 
 -- Inheritance + function call
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 
@@ -436,7 +527,7 @@ local function f(b) end
 f <!{}!>
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 ---@field y number
@@ -449,7 +540,7 @@ local function f(b) end
 f <!{y = 1}!>
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 
@@ -464,7 +555,7 @@ f <!{y = 1}!>
 
 -- partial class
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 
@@ -474,7 +565,7 @@ TEST[[
 local t = {}
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 
@@ -485,7 +576,7 @@ TEST[[
 local t = <!{}!>
 ]]
 
-TEST[[
+TEST [[
 ---@class A
 ---@field x number
 

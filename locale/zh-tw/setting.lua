@@ -6,6 +6,8 @@ config.addonManager.repositoryBranch =
 "指定插件管理器（Addon Manager）使用的git branch。"
 config.addonManager.repositoryPath =
 "指定插件管理器（Addon Manager）使用的git path。"
+config.addonRepositoryPath        = -- TODO: need translate!
+"Specifies the addon repository path (not related to the addon manager)."
 config.runtime.version            =
 "Lua執行版本。"
 config.runtime.path               =
@@ -276,8 +278,11 @@ config.format.defaultConfig              =
 ]]
 config.spell.dict                        =
 '拼寫檢查的自訂單詞。'
-config.nameStyle.config                  =
-'設定檢查命名風格的組態'
+config.nameStyle.config                  = -- TODO: need translate!
+[[
+設定檢查命名風格的組態。
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
 config.telemetry.enable                  =
 [[
 啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://luals.github.io/privacy/#language-server)閱讀我們的隱私聲明。
@@ -314,12 +319,22 @@ config.type.checkTableShape              =
 [[
 對表的形狀進行嚴格檢查。
 ]]
+config.type.inferTableSize               = -- TODO: need translate!
+'Maximum number of table fields analyzed during type inference.'
 config.doc.privateName                   =
 '將特定名稱的欄位視為private，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 會是私有層級，只能在定義所在的類別內存取'
 config.doc.protectedName                 =
 '將特定名稱的欄位視為protected，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 會是保護層級，只能在定義所在的類別和其子類別內存取'
 config.doc.packageName                   =
 '將特定名稱的欄位視為package，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 只能在定義所在的檔案內存取'
+config.doc.regengine                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine.glob                = -- TODO: need translate!
+'The default lightweight pattern syntax.'
+config.doc.regengine.lua                 = -- TODO: need translate!
+'Full Lua-style regular expressions.'
+config.docScriptPath                     = -- TODO: need translate!
+'The regular expression engine used for matching documentation scope names.'
 config.diagnostics['unused-local']          =
 '未使用的區域變數'
 config.diagnostics['unused-function']       =

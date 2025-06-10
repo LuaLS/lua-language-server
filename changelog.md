@@ -8,6 +8,7 @@
 * `FIX` Prevent class methods from triggering missing-fields diagnostics
 * `ADD` missing locale
 * `FIX` updates the EmmyLuaCodeStyle submodule reference to a newer commit, ensuring compatibility with GCC 15
+* `CHG` fulfill zh-tw translations
 
 ## 3.14.0
 `2025-4-7`

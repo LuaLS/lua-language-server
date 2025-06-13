@@ -148,6 +148,22 @@ string
 "@"
 ```
 
+# completion.requireFunction
+
+The function to insert when an auto-require is triggered.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+"require"
+```
+
 # completion.requireSeparator
 
 `require` 時使用的分隔符。

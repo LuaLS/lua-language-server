@@ -346,6 +346,7 @@ local template = {
                                             },
     ['Lua.completion.autoRequire']          = Type.Boolean >> true,
     ['Lua.completion.showParams']           = Type.Boolean >> true,
+    ['Lua.completion.requireFunction']      = Type.String  >> 'require',
     ['Lua.completion.requireSeparator']     = Type.String  >> '.',
     ['Lua.completion.postfix']              = Type.String  >> '@',
     ['Lua.signatureHelp.enable']            = Type.Boolean >> true,

@@ -179,6 +179,8 @@ config.completion.autoRequire            =
 "輸入內容看起來是個檔名時，自動 `require` 此檔案。"
 config.completion.showParams             =
 "在建議列表中顯示函式的參數資訊，函式擁有多個定義時會分開顯示。"
+config.completion.requireFunction        = -- TODO: need translate!
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "`require` 時使用的分隔符。"
 config.completion.postfix                =

@@ -8,6 +8,7 @@
 * `FIX` Prevent class methods from triggering missing-fields diagnostics
 * `ADD` missing locale
 * `FIX` updates the EmmyLuaCodeStyle submodule reference to a newer commit, ensuring compatibility with GCC 15
+* `NEW` Setting: `Lua.completion.requireFunction`: What the auto-require completion should add (e.g. `import` instead of `require`)
 
 ## 3.14.0
 `2025-4-7`

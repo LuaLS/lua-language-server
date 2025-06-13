@@ -182,6 +182,8 @@ config.completion.autoRequire            =
 "Agrega automáticamente el `require` correspondiente cuando la entrada se parece a un nombre de archivo."
 config.completion.showParams             =
 "Muestra los parámetros en la lista de completado. Cuando la función tiene múltiples definiciones, se mostrarán por separado."
+config.completion.requireFunction        = -- TODO: need translate!
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "Separador usado en `require`."
 config.completion.postfix                =

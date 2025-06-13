@@ -180,6 +180,8 @@ config.completion.autoRequire            = -- TODO: need translate!
 "When the input looks like a file name, automatically `require` this file."
 config.completion.showParams             = -- TODO: need translate!
 "Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
+config.completion.requireFunction        = -- TODO: need translate!
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       = -- TODO: need translate!
 "The separator used when `require`."
 config.completion.postfix                = -- TODO: need translate!

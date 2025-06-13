@@ -180,6 +180,8 @@ config.completion.autoRequire            =
 "When the input looks like a file name, automatically `require` this file."
 config.completion.showParams             =
 "Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
+config.completion.requireFunction        =
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "The separator used when `require`."
 config.completion.postfix                =

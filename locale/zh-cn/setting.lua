@@ -179,6 +179,8 @@ config.completion.autoRequire            =
 "输入内容看起来是个文件名时，自动 `require` 此文件。"
 config.completion.showParams             =
 "在建议列表中显示函数的参数信息，函数拥有多个定义时会分开显示。"
+config.completion.requireFunction        = -- TODO: need translate!
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "`require` 时使用的分隔符。"
 config.completion.postfix                =

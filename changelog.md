@@ -2,15 +2,18 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` cannot debug in Linux due to lua-debug expecting host process to have lua54 symbols available
-* `NEW` support custom addons path for enhanced editor flexibility
-* `FIX` support hex color codes with `#` in `textDocument/documentColor`
+
+## 3.15.0
+`2025-6-25`
+* `NEW` Support custom addons path for enhanced editor flexibility
+* `NEW` Add `Lua.type.maxUnionVariants` which can be set to limit how many union variants are checked against
+* `CHG` Add missing locale
+* `CHG` Fulfill zh-tw translations
+* `FIX` Cannot debug in Linux due to lua-debug expecting host process to have lua54 symbols available
+* `FIX` Support hex color codes with `#` in `textDocument/documentColor`
 * `FIX` Prevent class methods from triggering missing-fields diagnostics
-* `ADD` missing locale
-* `FIX` updates the EmmyLuaCodeStyle submodule reference to a newer commit, ensuring compatibility with GCC 15
-* `CHG` fulfill zh-tw translations
-* `FIX` large unions will no longer erroneously fail to match later variants
-* `ADD` Lua.type.maxUnionVariants which can be set to limit how many union variants are checked against
+* `FIX` Updates the EmmyLuaCodeStyle submodule reference to a newer commit, ensuring compatibility with GCC 15
+* `FIX` Large unions will no longer erroneously fail to match later variants
 
 ## 3.14.0
 `2025-4-7`

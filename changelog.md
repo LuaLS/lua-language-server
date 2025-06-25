@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `CHG` Update bee.lua submodule to latest version
 
 ## 3.15.0
 `2025-6-25`

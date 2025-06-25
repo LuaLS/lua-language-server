@@ -9,6 +9,8 @@
 * `ADD` missing locale
 * `FIX` updates the EmmyLuaCodeStyle submodule reference to a newer commit, ensuring compatibility with GCC 15
 * `CHG` fulfill zh-tw translations
+* `FIX` large unions will no longer erroneously fail to match later variants
+* `ADD` Lua.type.maxUnionVariants which can be set to limit how many union variants are checked against
 
 ## 3.14.0
 `2025-4-7`

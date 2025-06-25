@@ -401,6 +401,7 @@ local template = {
     ['Lua.language.completeAnnotation']     = Type.Boolean >> true,
     ['Lua.type.castNumberToInteger']        = Type.Boolean >> true,
     ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
+    ['Lua.type.maxUnionVariants']           = Type.Integer >> 0,
     ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
     ['Lua.type.inferParamType']             = Type.Boolean >> false,
     ['Lua.type.checkTableShape']            = Type.Boolean >> false,

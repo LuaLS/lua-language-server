@@ -134,7 +134,7 @@ return function (uri, callback)
             end
             local message = lang.script('DIAG_INJECT_FIELD', {
                 class = vm.getInfer(src):view(uri),
-                field = guide.getKeyName(src),
+                field = guide.getKeyName(field),
                 fix   = '',
             })
             callback {

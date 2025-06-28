@@ -293,7 +293,7 @@ print(v1.<?bar1?>)
 TEST [[
 ---@class Foo
 local Foo = {}
-function Foo:bar1() end
+function Foo:<!bar1!>() end
 
 ---@generic T
 ---@param arg1 `T`
@@ -403,6 +403,43 @@ print(v1.<?bar1?>)
 ]]
 
 TEST [[
+---@class n.Foo.2
+local nFoo2 = {}
+function nFoo2:<!bar1!>() end
+
+---@class Foo
+local Foo = {}
+
+---@generic T
+---@param arg1 n.`T`.2
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic(Foo)
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class n.Foo.2
+local nFoo2 = {}
+function nFoo2:<!bar1!>() end
+
+---@class Foo
+local Foo = {}
+
+---@return Foo
+function returnsFoo() print("") end
+
+---@generic T
+---@param arg1 n.`T`.2
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic(returnsFoo())
+print(v1.<?bar1?>)
+]]
+
+TEST [[
 ---@class n-Foo-2
 local Foo = {}
 function Foo:bar1() end
@@ -427,6 +464,23 @@ function Foo:<!bar1!>() end
 function Generic(arg1) print(arg1) end
 
 local v1 = Generic({"Foo"})
+print(v1.<?bar1?>)
+]]
+
+TEST [[
+---@class n-Foo-2
+local nFoo2 = {}
+function nFoo2:<!bar1!>() end
+
+---@class Foo
+local Foo = {}
+
+---@generic T
+---@param arg1 n-`T`-2[]
+---@return T
+function Generic(arg1) print(arg1) end
+
+local v1 = Generic({Foo})
 print(v1.<?bar1?>)
 ]]
 

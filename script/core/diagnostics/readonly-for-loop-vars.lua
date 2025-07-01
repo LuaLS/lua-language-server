@@ -2,6 +2,7 @@ local files = require 'files'
 local guide = require 'parser.guide'
 local lang  = require 'language'
 local await = require 'await'
+local config = require 'config'
 
 ---@param source parser.object
 ---@return boolean
@@ -41,7 +42,8 @@ return function (uri, callback)
     end
     
     -- Only check for Lua 5.5
-    if state.version ~= 'Lua 5.5' then
+    local version = config.get(uri, 'Lua.runtime.version')
+    if version ~= 'Lua 5.5' then
         return
     end
 

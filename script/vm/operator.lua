@@ -362,14 +362,14 @@ vm.binarySwitch = util.switch()
                 local uri     = guide.getUri(source)
                 local version = config.get(uri, 'Lua.runtime.version')
                 if math.tointeger(a) and math.type(a) == 'float' then
-                    if version == 'Lua 5.3' or version == 'Lua 5.4' then
+                    if version == 'Lua 5.3' or version == 'Lua 5.4' or version == 'Lua 5.5' then
                         a = ('%.1f'):format(a)
                     else
                         a = ('%.0f'):format(a)
                     end
                 end
                 if math.tointeger(b) and math.type(b) == 'float' then
-                    if version == 'Lua 5.3' or version == 'Lua 5.4' then
+                    if version == 'Lua 5.3' or version == 'Lua 5.4' or version == 'Lua 5.5' then
                         b = ('%.1f'):format(b)
                     else
                         b = ('%.0f'):format(b)

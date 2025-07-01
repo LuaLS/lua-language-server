@@ -14,7 +14,7 @@ The Lua language server provides various language features for Lua to make devel
 
 ## Features
 
-- ⚙️ Supports `Lua 5.4`, `Lua 5.3`, `Lua 5.2`, `Lua 5.1`, and `LuaJIT`
+- ⚙️ Supports `Lua 5.5`, `Lua 5.4`, `Lua 5.3`, `Lua 5.2`, `Lua 5.1`, and `LuaJIT`
 - 📄 Over 20 supported [annotations](https://luals.github.io/wiki/annotations/) for documenting your code
 - ↪ Go to definition
 - 🦺 Dynamic [type checking](https://luals.github.io/wiki/type-checking/)

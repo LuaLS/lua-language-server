@@ -291,6 +291,8 @@ PARSER_MISS_SEP_IN_TABLE =
 'Falta el símbolo `,` ó `;` .'
 PARSER_SET_CONST         =
 'Asignación de valor a una variable constante.'
+PARSER_SET_FOR_LOOP_VAR  =
+'No se puede asignar a la variable de bucle for `{}` (solo lectura en Lua 5.5).'
 PARSER_UNICODE_NAME      =
 'Contiene caracteres Unicode.'
 PARSER_ERR_NONSTANDARD_SYMBOL =

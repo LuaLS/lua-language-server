@@ -293,6 +293,8 @@ PARSER_MISS_SEP_IN_TABLE =
 '区切りには `,` または `;` が必要です。'
 PARSER_SET_CONST         =
 '定数に値を代入できません。'
+PARSER_SET_FOR_LOOP_VAR  =
+'forループ変数`{}`に代入できません（Lua 5.5では読み取り専用）。'
 PARSER_UNICODE_NAME      =
 'Unicode 文字が含まれています。'
 PARSER_ERR_NONSTANDARD_SYMBOL =

@@ -293,6 +293,8 @@ PARSER_MISS_SEP_IN_TABLE =
 '需要用 `,` 或 `;` 進行分割。'
 PARSER_SET_CONST         =
 '不能對常數賦值。'
+PARSER_SET_FOR_LOOP_VAR  =
+'不能對for迴圈變數`{}`賦值（在Lua 5.5中唯讀）。'
 PARSER_UNICODE_NAME      =
 '包含了 Unicode 字元。'
 PARSER_ERR_NONSTANDARD_SYMBOL =

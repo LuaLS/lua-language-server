@@ -263,6 +263,36 @@ local function addSpecial(name, obj)
     obj.special = name
 end
 
+---@param local parser.object
+---@return boolean
+local function isForLoopVariable(local_)
+    -- Check if this local is a for-loop variable
+    if not local_ or local_.type ~= 'local' then
+        return false
+    end
+    
+    local parent = local_.parent
+    if not parent then
+        return false
+    end
+    
+    -- Check if parent is a numeric for-loop
+    if parent.type == 'loop' and parent.loc == local_ then
+        return true
+    end
+    
+    -- Check if parent is a for-in loop
+    if parent.type == 'in' and parent.keys then
+        for i = 1, #parent.keys do
+            if parent.keys[i] == local_ then
+                return true
+            end
+        end
+    end
+    
+    return false
+end
+
 ---@param offset integer
 ---@param leftOrRight '"left"'|'"right"'
 local function getPosition(offset, leftOrRight)
@@ -2921,6 +2951,15 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
                     start  = n.start,
                     finish = n.finish,
                 }
+            elseif State.version == 'Lua 5.5' and isForLoopVariable(loc) then
+                pushError {
+                    type   = 'SET_FOR_LOOP_VAR',
+                    start  = n.start,
+                    finish = n.finish,
+                    info   = {
+                        name = loc[1],
+                    },
+                }
             end
         end
     end
@@ -4010,6 +4049,15 @@ function parseAction()
                         type   = 'SET_CONST',
                         start  = name.start,
                         finish = name.finish,
+                    }
+                elseif State.version == 'Lua 5.5' and isForLoopVariable(loc) then
+                    pushError {
+                        type   = 'SET_FOR_LOOP_VAR',
+                        start  = name.start,
+                        finish = name.finish,
+                        info   = {
+                            name = loc[1],
+                        },
                     }
                 end
             end

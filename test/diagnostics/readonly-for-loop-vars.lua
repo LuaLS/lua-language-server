@@ -1,17 +1,18 @@
 -- Test for readonly for-loop variables in Lua 5.5
+-- Note: These now produce parser errors instead of diagnostics
 
 TEST [[
 ---@language Lua 5.5
 for i = 1, 10 do
-    <!i!> = 5  -- Error: Cannot assign to for-loop variable
+    i = 5  -- This is now a parser error, so no diagnostic
 end
 ]]
 
 TEST [[
 ---@language Lua 5.5
 for k, v in pairs(t) do
-    <!k!> = "new"  -- Error: Cannot assign to for-loop variable
-    <!v!> = 123    -- Error: Cannot assign to for-loop variable
+    k = "new"  -- This is now a parser error, so no diagnostic
+    v = 123    -- This is now a parser error, so no diagnostic
 end
 ]]
 
@@ -19,8 +20,8 @@ TEST [[
 ---@language Lua 5.5
 for i = 1, 10 do
     for j = 1, 5 do
-        <!i!> = j  -- Error: Cannot assign to outer for-loop variable
-        <!j!> = i  -- Error: Cannot assign to inner for-loop variable
+        i = j  -- This is now a parser error, so no diagnostic
+        j = i  -- This is now a parser error, so no diagnostic
     end
 end
 ]]

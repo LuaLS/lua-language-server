@@ -24,8 +24,6 @@ DIAG_UNUSED_VARARG      =
 'Unused vararg.'
 DIAG_REDEFINED_LOCAL    =
 'Redefined local `{}`.'
-DIAG_READONLY_FOR_LOOP_VAR =
-'Cannot assign to for-loop variable `{}` (read-only in Lua 5.5).'
 DIAG_DUPLICATE_INDEX    =
 'Duplicate index `{}`.'
 DIAG_DUPLICATE_METHOD   =
@@ -295,6 +293,8 @@ PARSER_MISS_SEP_IN_TABLE =
 'Miss symbol `,` or `;` .'
 PARSER_SET_CONST         =
 'Assignment to const variable.'
+PARSER_SET_FOR_LOOP_VAR  =
+'Cannot assign to for-loop variable `{}` (read-only in Lua 5.5).'
 PARSER_UNICODE_NAME      =
 'Contains Unicode characters.'
 PARSER_ERR_NONSTANDARD_SYMBOL =

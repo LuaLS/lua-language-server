@@ -79,6 +79,7 @@ local NLMap = {
 local LineMulti = 10000
 
 -- goto 单独处理
+-- global 单独处理
 local KeyWord = {
     ['and']      = true,
     ['break']    = true,
@@ -89,7 +90,6 @@ local KeyWord = {
     ['false']    = true,
     ['for']      = true,
     ['function'] = true,
-    ['global']   = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
@@ -209,7 +209,6 @@ local ChunkStartMap = {
     ['elseif']   = true,
     ['for']      = true,
     ['function'] = true,
-    ['global']   = true,
     ['if']       = true,
     ['local']    = true,
     ['repeat']   = true,
@@ -1424,6 +1423,18 @@ local function isKeyWord(word, nextToken)
             return false
         end
         return true
+    end
+    if word == 'global' then
+        if State.version ~= 'Lua 5.5' then
+            return false
+        end
+        if not nextToken then
+            return false
+        end
+        if CharMapWord[ssub(nextToken, 1, 1)] then
+            return true
+        end
+        return false
     end
     return false
 end
@@ -3139,12 +3150,6 @@ end
 local function parseGlobal()
     local globalPos = getPosition(Tokens[Index], 'left')
     
-    -- Global declarations are only supported in Lua 5.5
-    if State.version ~= 'Lua 5.5' then
-        -- Return nil, true to indicate failed parse so it falls back to treating 'global' as identifier
-        return nil, true
-    end
-    
     Index = Index + 2
     skipSpace()
 
@@ -3946,7 +3951,7 @@ function parseAction()
         return parseLocal()
     end
 
-    if token == 'global' then
+    if token == 'global' and isKeyWord('global', Tokens[Index + 3]) then
         return parseGlobal()
     end
 

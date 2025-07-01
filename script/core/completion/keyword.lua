@@ -242,27 +242,7 @@ end"
         if version ~= 'Lua 5.5' then
             return false
         end
-        if info.hasSpace then
-            results[#results+1] = {
-                label            = 'global function',
-                kind             = define.CompletionItemKind.Snippet,
-                insertTextFormat = 2,
-                insertText       = "\z
-function $1($2)\
-\t$0\
-end"
-            }
-        else
-            results[#results+1] = {
-                label            = 'global function',
-                kind             = define.CompletionItemKind.Snippet,
-                insertTextFormat = 2,
-                insertText       = "\z
-global function $1($2)\
-\t$0\
-end"
-            }
-        end
+        -- Note: No special completion for 'global function' syntax as it doesn't exist in Lua 5.5
         return false
     end },
     { 'nil' },

@@ -3141,44 +3141,12 @@ local function parseGlobal()
     
     -- Global declarations are only supported in Lua 5.5
     if State.version ~= 'Lua 5.5' then
-        pushError {
-            type    = 'UNSUPPORT_SYMBOL',
-            start   = globalPos,
-            finish  = getPosition(Tokens[Index] + 5, 'right'),
-            version = 'Lua 5.5',
-            info    = {
-                version = State.version,
-            }
-        }
+        -- Return nil, true to indicate failed parse so it falls back to treating 'global' as identifier
+        return nil, true
     end
     
     Index = Index + 2
     skipSpace()
-    local word = peekWord()
-    if not word then
-        missName()
-        return nil
-    end
-
-    if word == 'function' then
-        local func = parseFunction(false, true)
-        local name = func.name
-        if name then
-            func.name    = nil
-            name.type    = GetToSetMap[name.type]
-            name.value   = func
-            name.vstart  = func.start
-            name.range   = func.finish
-            name.globPos = globalPos
-            func.parent  = name
-            pushActionIntoCurrentChunk(name)
-            return name
-        else
-            missName(func.keyword[2])
-            pushActionIntoCurrentChunk(func)
-            return func
-        end
-    end
 
     local name = parseName(true)
     if not name then

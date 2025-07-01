@@ -24,6 +24,8 @@ DIAG_UNUSED_VARARG      =
 'Unused vararg.'
 DIAG_REDEFINED_LOCAL    =
 'Redefined local `{}`.'
+DIAG_READONLY_FOR_LOOP_VAR =
+'Cannot assign to for-loop variable `{}` (read-only in Lua 5.5).'
 DIAG_DUPLICATE_INDEX    =
 'Duplicate index `{}`.'
 DIAG_DUPLICATE_METHOD   =

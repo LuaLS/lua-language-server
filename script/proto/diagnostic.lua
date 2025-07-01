@@ -175,6 +175,14 @@ m.register {
 }
 
 m.register {
+    'readonly-for-loop-vars',
+} {
+    group    = 'readonly',
+    severity = 'Error',
+    status   = 'Opened',
+}
+
+m.register {
     'undefined-global',
     'global-in-nil-env',
 } {

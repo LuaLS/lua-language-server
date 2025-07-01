@@ -89,6 +89,7 @@ local KeyWord = {
     ['false']    = true,
     ['for']      = true,
     ['function'] = true,
+    ['global']   = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
@@ -208,6 +209,7 @@ local ChunkStartMap = {
     ['elseif']   = true,
     ['for']      = true,
     ['function'] = true,
+    ['global']   = true,
     ['if']       = true,
     ['local']    = true,
     ['repeat']   = true,
@@ -749,6 +751,19 @@ local function createLocal(obj, attrs)
             }
         end
     end
+    return obj
+end
+
+---@param obj table
+local function createGlobal(obj, attrs)
+    obj.type   = 'setglobal'
+    obj.effect = obj.finish
+
+    if attrs then
+        obj.attrs = attrs
+        attrs.parent = obj
+    end
+
     return obj
 end
 
@@ -3121,6 +3136,65 @@ local function parseLocal()
     return loc
 end
 
+local function parseGlobal()
+    local globalPos = getPosition(Tokens[Index], 'left')
+    
+    -- Global declarations are only supported in Lua 5.5
+    if State.version ~= 'Lua 5.5' then
+        pushError {
+            type    = 'UNSUPPORT_SYMBOL',
+            start   = globalPos,
+            finish  = getPosition(Tokens[Index] + 5, 'right'),
+            version = 'Lua 5.5',
+            info    = {
+                version = State.version,
+            }
+        }
+    end
+    
+    Index = Index + 2
+    skipSpace()
+    local word = peekWord()
+    if not word then
+        missName()
+        return nil
+    end
+
+    if word == 'function' then
+        local func = parseFunction(false, true)
+        local name = func.name
+        if name then
+            func.name    = nil
+            name.type    = GetToSetMap[name.type]
+            name.value   = func
+            name.vstart  = func.start
+            name.range   = func.finish
+            name.globPos = globalPos
+            func.parent  = name
+            pushActionIntoCurrentChunk(name)
+            return name
+        else
+            missName(func.keyword[2])
+            pushActionIntoCurrentChunk(func)
+            return func
+        end
+    end
+
+    local name = parseName(true)
+    if not name then
+        missName()
+        return nil
+    end
+    local glob = createGlobal(name)
+    glob.globPos = globalPos
+    glob.effect = maxinteger
+    pushActionIntoCurrentChunk(glob)
+    skipSpace()
+    parseMultiVars(glob, parseName, false)
+
+    return glob
+end
+
 local function parseDo()
     local doLeft  = getPosition(Tokens[Index], 'left')
     local doRight = getPosition(Tokens[Index] + 1, 'right')
@@ -3902,6 +3976,10 @@ function parseAction()
 
     if token == 'local' then
         return parseLocal()
+    end
+
+    if token == 'global' then
+        return parseGlobal()
     end
 
     if token == 'if'

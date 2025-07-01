@@ -237,6 +237,34 @@ end"
         end
         return false
     end },
+    { 'global', function(info, results)
+        local version = config.get(info.uri, 'Lua.runtime.version')
+        if version ~= 'Lua 5.5' then
+            return false
+        end
+        if info.hasSpace then
+            results[#results+1] = {
+                label            = 'global function',
+                kind             = define.CompletionItemKind.Snippet,
+                insertTextFormat = 2,
+                insertText       = "\z
+function $1($2)\
+\t$0\
+end"
+            }
+        else
+            results[#results+1] = {
+                label            = 'global function',
+                kind             = define.CompletionItemKind.Snippet,
+                insertTextFormat = 2,
+                insertText       = "\z
+global function $1($2)\
+\t$0\
+end"
+            }
+        end
+        return false
+    end },
     { 'nil' },
     { 'not' },
     { 'or' },

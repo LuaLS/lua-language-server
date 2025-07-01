@@ -237,6 +237,14 @@ end"
         end
         return false
     end },
+    { 'global', function(info, results)
+        local version = config.get(info.uri, 'Lua.runtime.version')
+        if version ~= 'Lua 5.5' then
+            return false
+        end
+        -- Note: No special completion for 'global function' syntax as it doesn't exist in Lua 5.5
+        return false
+    end },
     { 'nil' },
     { 'not' },
     { 'or' },

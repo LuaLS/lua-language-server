@@ -1898,7 +1898,8 @@ local compilerSwitch = util.switch()
                 local uri = guide.getUri(source)
                 local version = config.get(uri, 'Lua.runtime.version')
                 if version == 'Lua 5.3'
-                or version == 'Lua 5.4' then
+                or version == 'Lua 5.4' 
+                or version == 'Lua 5.5' then
                     vm.setNode(source, vm.declareGlobal('type', 'unknown'))
                 else
                     vm.setNode(source, vm.declareGlobal('type', 'nil'))

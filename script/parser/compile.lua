@@ -79,6 +79,7 @@ local NLMap = {
 local LineMulti = 10000
 
 -- goto 单独处理
+-- global 单独处理
 local KeyWord = {
     ['and']      = true,
     ['break']    = true,
@@ -260,6 +261,36 @@ local function addSpecial(name, obj)
     end
     State.specials[name][#State.specials[name]+1] = obj
     obj.special = name
+end
+
+---@param local parser.object
+---@return boolean
+local function isForLoopVariable(local_)
+    -- Check if this local is a for-loop variable
+    if not local_ or local_.type ~= 'local' then
+        return false
+    end
+    
+    local parent = local_.parent
+    if not parent then
+        return false
+    end
+    
+    -- Check if parent is a numeric for-loop
+    if parent.type == 'loop' and parent.loc == local_ then
+        return true
+    end
+    
+    -- Check if parent is a for-in loop
+    if parent.type == 'in' and parent.keys then
+        for i = 1, #parent.keys do
+            if parent.keys[i] == local_ then
+                return true
+            end
+        end
+    end
+    
+    return false
 end
 
 ---@param offset integer
@@ -706,12 +737,12 @@ local function parseLocalAttrs()
         else
             missSymbol '>'
         end
-        if State.version ~= 'Lua 5.4' then
+        if State.version ~= 'Lua 5.4' and State.version ~= 'Lua 5.5' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 start   = attr.start,
                 finish  = attr.finish,
-                version = 'Lua 5.4',
+                version = {'Lua 5.4', 'Lua 5.5'},
                 info    = {
                     version = State.version
                 }
@@ -749,6 +780,19 @@ local function createLocal(obj, attrs)
             }
         end
     end
+    return obj
+end
+
+---@param obj table
+local function createGlobal(obj, attrs)
+    obj.type   = 'setglobal'
+    obj.effect = obj.finish
+
+    if attrs then
+        obj.attrs = attrs
+        attrs.parent = obj
+    end
+
     return obj
 end
 
@@ -906,13 +950,14 @@ local function parseStringUnicode()
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
+    and State.version ~= 'Lua 5.5'
     and State.version ~= 'LuaJIT'
     then
         pushError {
             type    = 'ERR_ESC',
             start   = leftPos - 2,
             finish  = rightPos,
-            version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
             info = {
                 version = State.version,
             }
@@ -932,7 +977,7 @@ local function parseStringUnicode()
         end
         return nil, offset
     end
-    if State.version == 'Lua 5.4' then
+    if State.version == 'Lua 5.4' or State.version == 'Lua 5.5' then
         if byte < 0 or byte > 0x7FFFFFFF then
             pushError {
                 type   = 'UTF8_MAX',
@@ -951,7 +996,7 @@ local function parseStringUnicode()
                 type    = 'UTF8_MAX',
                 start   = leftPos,
                 finish  = rightPos,
-                version = byte <= 0x7FFFFFFF and 'Lua 5.4' or nil,
+                version = (byte <= 0x7FFFFFFF and {'Lua 5.4', 'Lua 5.5'}) or nil,
                 info = {
                     min = '000000',
                     max = '10FFFF',
@@ -1095,7 +1140,7 @@ local function parseShortString()
                         type    = 'ERR_ESC',
                         start   = left,
                         finish  = left + 4,
-                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
                         info = {
                             version = State.version,
                         }
@@ -1274,7 +1319,7 @@ local function parseNumber2(start)
             finish  = getPosition(offset - 1, 'right'),
             version = 'LuaJIT',
             info    = {
-                version = 'Lua 5.4',
+                version = {'Lua 5.4', 'Lua 5.5'},
             }
         }
     end
@@ -1408,6 +1453,18 @@ local function isKeyWord(word, nextToken)
             return false
         end
         return true
+    end
+    if word == 'global' then
+        if State.version ~= 'Lua 5.5' then
+            return false
+        end
+        if not nextToken then
+            return false
+        end
+        if CharMapWord[ssub(nextToken, 1, 1)] then
+            return true
+        end
+        return false
     end
     return false
 end
@@ -2673,10 +2730,11 @@ local function parseBinaryOP(asAction, level)
     or token == '<<'
     or token == '>>' then
         if  State.version ~= 'Lua 5.3'
-        and State.version ~= 'Lua 5.4' then
+        and State.version ~= 'Lua 5.4'
+        and State.version ~= 'Lua 5.5' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
-                version = {'Lua 5.3', 'Lua 5.4'},
+                version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
                 start   = op.start,
                 finish  = op.finish,
                 info    = {
@@ -2892,6 +2950,15 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
                     type   = 'SET_CONST',
                     start  = n.start,
                     finish = n.finish,
+                }
+            elseif State.version == 'Lua 5.5' and isForLoopVariable(loc) then
+                pushError {
+                    type   = 'SET_FOR_LOOP_VAR',
+                    start  = n.start,
+                    finish = n.finish,
+                    info   = {
+                        name = loc[1],
+                    },
                 }
             end
         end
@@ -3119,6 +3186,27 @@ local function parseLocal()
     return loc
 end
 
+local function parseGlobal()
+    local globalPos = getPosition(Tokens[Index], 'left')
+    
+    Index = Index + 2
+    skipSpace()
+
+    local name = parseName(true)
+    if not name then
+        missName()
+        return nil
+    end
+    local glob = createGlobal(name)
+    glob.globPos = globalPos
+    glob.effect = maxinteger
+    pushActionIntoCurrentChunk(glob)
+    skipSpace()
+    parseMultiVars(glob, parseName, false)
+
+    return glob
+end
+
 local function parseDo()
     local doLeft  = getPosition(Tokens[Index], 'left')
     local doRight = getPosition(Tokens[Index] + 1, 'right')
@@ -3229,7 +3317,7 @@ local function parseLabel()
         local name = label[1]
         local olabel = guide.getLabel(block, name)
         if olabel then
-            if State.version == 'Lua 5.4'
+            if (State.version == 'Lua 5.4' or State.version == 'Lua 5.5')
             or block == guide.getBlock(olabel) then
                 pushError {
                     type   = 'REDEFINED_LABEL',
@@ -3252,7 +3340,7 @@ local function parseLabel()
             type   = 'UNSUPPORT_SYMBOL',
             start  = left,
             finish = lastRightPosition(),
-            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
             info = {
                 version = State.version,
             }
@@ -3634,7 +3722,7 @@ local function parseFor()
             missExp()
         end
 
-        if State.version == 'Lua 5.4' then
+        if State.version == 'Lua 5.4' or State.version == 'Lua 5.5' then
             forStateVars = 4
         else
             forStateVars = 3
@@ -3902,6 +3990,10 @@ function parseAction()
         return parseLocal()
     end
 
+    if token == 'global' and isKeyWord('global', Tokens[Index + 3]) then
+        return parseGlobal()
+    end
+
     if token == 'if'
     or token == 'elseif'
     or token == 'else' then
@@ -3957,6 +4049,15 @@ function parseAction()
                         type   = 'SET_CONST',
                         start  = name.start,
                         finish = name.finish,
+                    }
+                elseif State.version == 'Lua 5.5' and isForLoopVariable(loc) then
+                    pushError {
+                        type   = 'SET_FOR_LOOP_VAR',
+                        start  = name.start,
+                        finish = name.finish,
+                        info   = {
+                            name = loc[1],
+                        },
                     }
                 end
             end

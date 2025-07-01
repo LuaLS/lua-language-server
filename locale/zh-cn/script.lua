@@ -24,6 +24,8 @@ DIAG_UNUSED_VARARG      =
 '未使用的不定参数。'
 DIAG_REDEFINED_LOCAL    =
 '重定义局部变量 `{}`。'
+DIAG_READONLY_FOR_LOOP_VAR =
+'无法给 for 循环变量 `{}` 赋值（在 Lua 5.5 中为只读）。'
 DIAG_DUPLICATE_INDEX    =
 '重复的索引 `{}`。'
 DIAG_DUPLICATE_METHOD   =
@@ -293,6 +295,8 @@ PARSER_MISS_SEP_IN_TABLE =
 '需要用`,`或`;`进行分割。'
 PARSER_SET_CONST         =
 '不能对常量赋值。'
+PARSER_SET_FOR_LOOP_VAR  =
+'不能对for循环变量`{}`赋值（在Lua 5.5中只读）。'
 PARSER_UNICODE_NAME      =
 '包含了 Unicode 字符。'
 PARSER_ERR_NONSTANDARD_SYMBOL =

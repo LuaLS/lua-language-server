@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Add support for Lua 5.5 runtime version
+* `NEW` Support `global` keyword syntax for Lua 5.5
+* `NEW` Add diagnostic for read-only for-loop variables in Lua 5.5
 
 ## 3.15.0
 `2025-6-25`

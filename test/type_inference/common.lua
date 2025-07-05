@@ -3608,6 +3608,25 @@ local t
 local <?x?> = t.n
 ]]
 
+TEST 'function' [[
+---@class A
+---@field [string] boolean
+local t
+function t.f() end
+
+local <?f?> = t.f
+]]
+
+TEST 'function' [[
+---@class A
+---@field [string] boolean
+local t = {
+    f = function () end
+}
+
+local <?f?> = t.f
+]]
+
 TEST 'string' [[
 ---@class string
 ---@operator mod: string

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Typed `@field` (eg `---@field [string] boolean`) should not override other defined field [#2171](https://github.com/LuaLS/lua-language-server/issues/2171), [#2711](https://github.com/LuaLS/lua-language-server/issues/2711)
 
 ## 3.15.0
 `2025-6-25`

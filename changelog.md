@@ -2,6 +2,16 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Support per library settings in ignoreDir
+```jsonc
+{
+  "workspace.library": [ "/path/to/lib", "/path/to/lib2" ],
+  "workspace.ignoreDir": [
+    "/path/to/lib/**/lib-ignore", // extracted pattern will be "/**/lib-ignore" and only applies to "/path/to/lib"
+    "global-ignore" // this will still apply to all of "/path/to/lib", "/path/to/lib2", current workspace
+  ]
+}
+```
 
 ## 3.15.0
 `2025-6-25`

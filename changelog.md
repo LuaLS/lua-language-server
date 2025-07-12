@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* adds the `|lambda|` operator to the `Lua.runtime.nonstandardSymbol` configuration template, which allows the use of that option. Previously, support for it existed in the parser, but we could not actually use the option because it is not recognised in the configuration.
 
 ## 3.15.0
 `2025-6-25`

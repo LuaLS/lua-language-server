@@ -434,44 +434,6 @@ function vm.getClassFields(suri, object, key, pushResult)
                         pushResult(field, true)
                         goto CONTINUE
                     end
-                    if hasFounded[key] then
-                        goto CONTINUE
-                    end
-                    local keyType = type(key)
-                    if keyType == 'table' then
-                        -- ---@field [integer] boolean -> class[integer]
-                        local fieldNode = vm.compileNode(field.field)
-                        if vm.isSubType(suri, key.name, fieldNode) then
-                            local nkey = '|' .. key.name
-                            if not searchedFields[nkey] then
-                                pushResult(field, true)
-                                hasFounded[nkey] = true
-                            end
-                        end
-                    else
-                        local keyObject
-                        if keyType == 'number' then
-                            if math.tointeger(key) then
-                                keyObject = { type = 'integer', [1] = key }
-                            else
-                                keyObject = { type = 'number', [1] = key }
-                            end
-                        elseif keyType == 'boolean'
-                        or     keyType == 'string' then
-                            keyObject = { type = keyType, [1] = key }
-                        end
-                        if keyObject and field.field.type ~= 'doc.field.name' then
-                            -- ---@field [integer] boolean -> class[1]
-                            local fieldNode = vm.compileNode(field.field)
-                            if vm.isSubType(suri, keyObject, fieldNode) then
-                                local nkey = '|' .. keyType
-                                if not searchedFields[nkey] then
-                                    pushResult(field, true)
-                                    hasFounded[nkey] = true
-                                end
-                            end
-                        end
-                    end
                     ::CONTINUE::
                 end
             end
@@ -546,6 +508,59 @@ function vm.getClassFields(suri, object, key, pushResult)
             end
         end
         copyToSearched()
+
+        -- search for typed @field, eg: ---@field [string] boolean
+        -- only if type for this field key is not found
+        if not searchedFields[key] and key ~= vm.ANY and key ~= vm.ANYDOC then
+            for _, set in ipairs(sets) do
+                if set.type == 'doc.class' then
+                    for _, field in ipairs(set.fields) do
+                        local fieldKey = guide.getKeyName(field)
+                        if fieldKey then
+                            -- already processed above
+                            goto CONTINUE
+                        end
+                        local keyType = type(key)
+                        if keyType == 'table' then
+                            -- ---@field [integer] boolean -> class[integer]
+                            local fieldNode = vm.compileNode(field.field)
+                            if vm.isSubType(suri, key.name, fieldNode) then
+                                local nkey = '|' .. key.name
+                                if not searchedFields[nkey] then
+                                    pushResult(field, true)
+                                    hasFounded[nkey] = true
+                                end
+                            end
+                        else
+                            local keyObject
+                            if keyType == 'number' then
+                                if math.tointeger(key) then
+                                    keyObject = { type = 'integer', [1] = key }
+                                else
+                                    keyObject = { type = 'number', [1] = key }
+                                end
+                            elseif keyType == 'boolean'
+                            or     keyType == 'string' then
+                                keyObject = { type = keyType, [1] = key }
+                            end
+                            if keyObject and field.field.type ~= 'doc.field.name' then
+                                -- ---@field [integer] boolean -> class[1]
+                                local fieldNode = vm.compileNode(field.field)
+                                if vm.isSubType(suri, keyObject, fieldNode) then
+                                    local nkey = '|' .. keyType
+                                    if not searchedFields[nkey] then
+                                        pushResult(field, true)
+                                        hasFounded[nkey] = true
+                                    end
+                                end
+                            end
+                        end
+                        ::CONTINUE::
+                    end
+                end
+            end
+            copyToSearched()
+        end
 
         for _, set in ipairs(sets) do
             if set.type == 'doc.class' then

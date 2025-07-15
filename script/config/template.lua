@@ -223,6 +223,7 @@ local template = {
                                                 '|=', '&=', '<<=', '>>=',
                                                 '||', '&&', '!', '!=',
                                                 'continue',
+                                                '|lambda|',
                                             }),
     ['Lua.runtime.plugin']                  = Type.Or(Type.String, Type.Array(Type.String)) ,
     ['Lua.runtime.pluginArgs']              = Type.Or(Type.Array(Type.String), Type.Hash(Type.String, Type.String)),

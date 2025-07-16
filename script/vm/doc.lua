@@ -95,6 +95,7 @@ function vm.getValidVersions(doc)
         ['Lua 5.2'] = false,
         ['Lua 5.3'] = false,
         ['Lua 5.4'] = false,
+        ['Lua 5.5'] = false,
         ['LuaJIT']  = false,
     }
     for _, version in ipairs(doc.versions) do

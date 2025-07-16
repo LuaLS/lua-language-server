@@ -31,6 +31,8 @@ local function getDocFormater(uri)
             return 'HOVER_NATIVE_DOCUMENT_LUA53'
         elseif version == 'Lua 5.4' then
             return 'HOVER_NATIVE_DOCUMENT_LUA54'
+        elseif version == 'Lua 5.5' then
+            return 'HOVER_NATIVE_DOCUMENT_LUA55'
         elseif version == 'LuaJIT' then
             return 'HOVER_NATIVE_DOCUMENT_LUAJIT'
         end
@@ -43,6 +45,8 @@ local function getDocFormater(uri)
             return 'HOVER_DOCUMENT_LUA53'
         elseif version == 'Lua 5.4' then
             return 'HOVER_DOCUMENT_LUA54'
+        elseif version == 'Lua 5.5' then
+            return 'HOVER_DOCUMENT_LUA55'
         elseif version == 'LuaJIT' then
             return 'HOVER_DOCUMENT_LUAJIT'
         end

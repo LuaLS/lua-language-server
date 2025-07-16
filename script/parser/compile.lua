@@ -706,12 +706,13 @@ local function parseLocalAttrs()
         else
             missSymbol '>'
         end
-        if State.version ~= 'Lua 5.4' then
+        if  State.version ~= 'Lua 5.4'
+        and State.version ~= 'Lua 5.5' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 start   = attr.start,
                 finish  = attr.finish,
-                version = 'Lua 5.4',
+                version = {'Lua 5.4', 'Lua 5.5'},
                 info    = {
                     version = State.version
                 }
@@ -906,13 +907,14 @@ local function parseStringUnicode()
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
+    and State.version ~= 'Lua 5.5'
     and State.version ~= 'LuaJIT'
     then
         pushError {
             type    = 'ERR_ESC',
             start   = leftPos - 2,
             finish  = rightPos,
-            version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
             info = {
                 version = State.version,
             }
@@ -932,7 +934,7 @@ local function parseStringUnicode()
         end
         return nil, offset
     end
-    if State.version == 'Lua 5.4' then
+    if State.version == 'Lua 5.4' or State.version == 'Lua 5.5' then
         if byte < 0 or byte > 0x7FFFFFFF then
             pushError {
                 type   = 'UTF8_MAX',
@@ -951,7 +953,7 @@ local function parseStringUnicode()
                 type    = 'UTF8_MAX',
                 start   = leftPos,
                 finish  = rightPos,
-                version = byte <= 0x7FFFFFFF and 'Lua 5.4' or nil,
+                version = byte <= 0x7FFFFFFF and {'Lua 5.4', 'Lua 5.5'} or nil,
                 info = {
                     min = '000000',
                     max = '10FFFF',
@@ -1095,7 +1097,7 @@ local function parseShortString()
                         type    = 'ERR_ESC',
                         start   = left,
                         finish  = left + 4,
-                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
                         info = {
                             version = State.version,
                         }
@@ -1274,7 +1276,7 @@ local function parseNumber2(start)
             finish  = getPosition(offset - 1, 'right'),
             version = 'LuaJIT',
             info    = {
-                version = 'Lua 5.4',
+                version = State.version,
             }
         }
     end
@@ -2672,18 +2674,15 @@ local function parseBinaryOP(asAction, level)
     if token == '//'
     or token == '<<'
     or token == '>>' then
-        if  State.version ~= 'Lua 5.3'
-        and State.version ~= 'Lua 5.4' then
-            pushError {
-                type    = 'UNSUPPORT_SYMBOL',
-                version = {'Lua 5.3', 'Lua 5.4'},
-                start   = op.start,
-                finish  = op.finish,
-                info    = {
-                    version = State.version,
-                }
+        pushError {
+            type    = 'UNSUPPORT_SYMBOL',
+            version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
+            start   = op.start,
+            finish  = op.finish,
+            info    = {
+                version = State.version,
             }
-        end
+        }
     end
     Index = Index + 2
     return op, myLevel
@@ -3230,6 +3229,7 @@ local function parseLabel()
         local olabel = guide.getLabel(block, name)
         if olabel then
             if State.version == 'Lua 5.4'
+            or State.version == 'Lua 5.5'
             or block == guide.getBlock(olabel) then
                 pushError {
                     type   = 'REDEFINED_LABEL',
@@ -3252,7 +3252,7 @@ local function parseLabel()
             type   = 'UNSUPPORT_SYMBOL',
             start  = left,
             finish = lastRightPosition(),
-            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
             info = {
                 version = State.version,
             }
@@ -3634,7 +3634,8 @@ local function parseFor()
             missExp()
         end
 
-        if State.version == 'Lua 5.4' then
+        if State.version == 'Lua 5.4'
+        or State.version == 'Lua 5.5' then
             forStateVars = 4
         else
             forStateVars = 3

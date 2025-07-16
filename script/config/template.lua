@@ -189,6 +189,7 @@ local template = {
                                                 'Lua 5.2',
                                                 'Lua 5.3',
                                                 'Lua 5.4',
+                                                'Lua 5.5',
                                                 'LuaJIT',
                                             },
     ['Lua.runtime.path']                    = Type.Array(Type.String) >> {

@@ -57,7 +57,7 @@ mt.__newindex = function () end
 mt.__call     = function () end
 mt.__pairs    = function () end
 mt.__ipairs   = function () end
-if _VERSION == 'Lua 5.3' or _VERSION == 'Lua 5.4' then
+if _VERSION == 'Lua 5.3' or _VERSION == 'Lua 5.4' or _VERSION == 'Lua 5.5' then
     mt.__idiv      = load[[
         local a, b = ...
         if a == nil then a = 0 end

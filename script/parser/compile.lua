@@ -2674,15 +2674,19 @@ local function parseBinaryOP(asAction, level)
     if token == '//'
     or token == '<<'
     or token == '>>' then
-        pushError {
-            type    = 'UNSUPPORT_SYMBOL',
-            version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
-            start   = op.start,
-            finish  = op.finish,
-            info    = {
-                version = State.version,
+        if  State.version ~= 'Lua 5.3'
+        and State.version ~= 'Lua 5.4'
+        and State.version ~= 'Lua 5.5' then
+            pushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
+                start   = op.start,
+                finish  = op.finish,
+                info    = {
+                    version = State.version,
+                }
             }
-        }
+        end
     end
     Index = Index + 2
     return op, myLevel

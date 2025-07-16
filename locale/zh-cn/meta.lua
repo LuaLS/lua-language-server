@@ -671,6 +671,8 @@ table                       =
 ''
 table.concat                =
 '提供一个列表，其所有元素都是字符串或数字，返回字符串 `list[i]..sep..list[i+1] ··· sep..list[j]`。'
+table.create                =
+'创建一个新的空表，预分配内存。当您预先知道表将有多少元素时，这种预分配可能有助于性能和节省内存。参数 `nseq` 是表作为序列将有多少元素的提示。可选参数 `nrec` 是表将有多少其他元素的提示；默认值为零。'
 table.insert                =
 '在 `list` 的位置 `pos` 处插入元素 `value`。'
 table.maxn                  =

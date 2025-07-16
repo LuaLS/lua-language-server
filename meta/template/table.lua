@@ -13,6 +13,14 @@ table = {}
 ---@nodiscard
 function table.concat(list, sep, i, j) end
 
+---@version >5.5
+---#DES 'table.create'
+---@param nseq integer
+---@param nrec? integer
+---@return table
+---@nodiscard
+function table.create(nseq, nrec) end
+
 ---#DES 'table.insert'
 ---@overload fun(list: table, value: any)
 ---@param list table

@@ -676,6 +676,8 @@ table                       =
 ''
 table.concat                =
 '提供一個列表，其所有元素都是字串或數字，回傳字串 `list[i]..sep..list[i+1] ··· sep..list[j]`。'
+table.create                =
+'建立一個新的空表，預先配置記憶體。當您預先知道表將有多少元素時，這種預先配置可能有助於效能和節省記憶體。參數 `nseq` 是表作為序列將有多少元素的提示。可選參數 `nrec` 是表將有多少其他元素的提示；預設值為零。'
 table.insert                =
 '在 `list` 的位置 `pos` 處插入元素 `value`。'
 table.maxn                  =

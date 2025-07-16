@@ -693,6 +693,8 @@ table                       =
 ''
 table.concat                =
 'Dada uma lista onde todos os elementos são strings ou números, retorna a string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
+table.create                =
+'Cria uma nova tabela vazia, pré-alocando memória. Esta pré-alocação pode ajudar no desempenho e economizar memória quando você souber com antecedência quantos elementos a tabela terá. O parâmetro `nseq` é uma dica para quantos elementos a tabela terá como sequência. O parâmetro opcional `nrec` é uma dica para quantos outros elementos a tabela terá; seu padrão é zero.'
 table.insert                =
 'Insere o elemento `value` na posição `pos` de `list`.'
 table.maxn                  =

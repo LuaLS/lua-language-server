@@ -712,6 +712,8 @@ table                       =
 ''
 table.concat                =
 'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
+table.create                =
+'Creates a new empty table, preallocating memory. This preallocation may help performance and save memory when you know in advance how many elements the table will have. Parameter `nseq` is a hint for how many elements the table will have as a sequence. Optional parameter `nrec` is a hint for how many other elements the table will have; its default is zero.'
 table.insert                =
 'Inserts element `value` at position `pos` in `list`.'
 table.maxn                  =

@@ -306,6 +306,8 @@ _VERSION = "Lua 5.2"
 _VERSION = "Lua 5.3"
 ---#elseif VERSION == 5.4 then
 _VERSION = "Lua 5.4"
+---#elseif VERSION == 5.5 then
+_VERSION = "Lua 5.5"
 ---#end
 
 ---@version >5.4

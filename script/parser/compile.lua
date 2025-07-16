@@ -3548,7 +3548,22 @@ local function parseFor()
         LocalCount = LocalCount + forStateVars
         if name then
             ---@cast name parser.object
-            local loc = createLocal(name)
+            -- In Lua 5.5, for loop variables are treated as constants
+            local attrs
+            if State.version == 'Lua 5.5' then
+                attrs = {
+                    type = 'localattrs',
+                    [1] = {
+                        type = 'localattr',
+                        start = name.start,
+                        finish = name.finish,
+                        parent = nil, -- will be set by createLocal
+                        [1] = 'const',
+                    }
+                }
+                attrs[1].parent = attrs
+            end
+            local loc = createLocal(name, attrs)
             loc.parent    = action
             action.finish = name.finish
             action.bstart = action.finish
@@ -3653,7 +3668,22 @@ local function parseFor()
             for i = 1, #list do
                 local obj = list[i]
                 ---@cast obj parser.object
-                local loc = createLocal(obj)
+                -- In Lua 5.5, for loop variables are treated as constants
+                local attrs
+                if State.version == 'Lua 5.5' then
+                    attrs = {
+                        type = 'localattrs',
+                        [1] = {
+                            type = 'localattr',
+                            start = obj.start,
+                            finish = obj.finish,
+                            parent = nil, -- will be set by createLocal
+                            [1] = 'const',
+                        }
+                    }
+                    attrs[1].parent = attrs
+                end
+                local loc = createLocal(obj, attrs)
                 loc.parent = action
                 loc.effect = action.finish
             end

@@ -23,7 +23,11 @@ function assert(v, message, ...) end
 ---#if VERSION >= 5.4 then
 ---| "incremental"  # ---#DESTAIL 'cgopt.incremental'
 ---| "generational" # ---#DESTAIL 'cgopt.generational'
----#else
+---#end
+---#if VERSION >= 5.5 then
+---| "param"        # ---#DESTAIL 'cgopt.param'
+---#end
+---#if VERSION < 5.4 then
 ---| "setpause"     # ---#DESTAIL 'cgopt.setpause'
 ---| "setstepmul"   # ---#DESTAIL 'cgopt.setstepmul'
 ---#end

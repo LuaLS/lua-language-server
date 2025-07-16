@@ -24,6 +24,8 @@ cgopt.incremental   =
 'Cambia el modo de recolección a incremental.'
 cgopt.generational  =
 'Cambia el modo de recolección a generacional.'
+cgopt.param         =
+'Cambia y/o recupera los valores de un parámetro del recolector. Esta opción debe ser seguida por uno o dos argumentos extra: El nombre del parámetro y un nuevo valor opcional.'
 cgopt.isrunning     =
 'Retorna si el recolector está corriendo.'
 

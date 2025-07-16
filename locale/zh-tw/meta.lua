@@ -24,6 +24,8 @@ cgopt.incremental   =
 '改變回收器模式為增量模式。'
 cgopt.generational  =
 '改變回收器模式為分代模式。'
+cgopt.param         =
+'更改和/或檢索回收器參數的值。此選項必須後跟一個或兩個額外參數：參數名稱和可選的新值。'
 cgopt.isrunning     =
 '回傳表示回收器是否在工作的布林值。'
 

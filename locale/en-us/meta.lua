@@ -24,6 +24,8 @@ cgopt.incremental   =
 'Change the collector mode to incremental.'
 cgopt.generational  =
 'Change the collector mode to generational.'
+cgopt.param         =
+'Changes and/or retrieves the values of a parameter of the collector. This option must be followed by one or two extra arguments: The name of the parameter and an optional new value.'
 cgopt.isrunning     =
 'Returns whether the collector is running.'
 

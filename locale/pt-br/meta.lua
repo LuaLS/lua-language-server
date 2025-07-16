@@ -24,6 +24,8 @@ cgopt.incremental   =
 'Altera o modo do coletor para incremental.'
 cgopt.generational  =
 'Altera o modo do coletor para geracional.'
+cgopt.param         =
+'Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras: O nome do parâmetro e um novo valor opcional.'
 cgopt.isrunning     =
 'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
 

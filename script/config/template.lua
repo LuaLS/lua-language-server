@@ -294,7 +294,7 @@ local template = {
                                                 }
                                             )
                                             >> util.deepCopy(define.DiagnosticDefaultGroupFileStatus),
-    ['Lua.diagnostics.disableScheme']       = Type.Array(Type.String) >> { 'git' },
+    ['Lua.diagnostics.enableScheme']        = Type.Array(Type.String) >> { 'file' },
     ['Lua.diagnostics.workspaceEvent']      = Type.String >> 'OnSave' << {
                                                 'OnChange',
                                                 'OnSave',

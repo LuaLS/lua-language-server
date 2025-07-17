@@ -114,8 +114,8 @@ config.diagnostics.ignoredFiles.Opened   =
 "只有打开这些文件时才会诊断。"
 config.diagnostics.ignoredFiles.Disable  =
 "不诊断这些文件。"
-config.diagnostics.disableScheme  =
-'不诊断使用以下 scheme 的lua文件。'
+config.diagnostics.validScheme  =
+'对使用以下 scheme 的lua文件启用诊断。'
 config.diagnostics.unusedLocalExclude =
 '如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。'
 config.workspace.ignoreDir        =

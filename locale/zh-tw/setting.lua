@@ -114,10 +114,10 @@ config.diagnostics.ignoredFiles.Opened   =
 "只有打開這些檔案時才會診斷。"
 config.diagnostics.ignoredFiles.Disable  =
 "不診斷這些檔案。"
-config.diagnostics.disableScheme  =
-'不診斷使用以下 scheme 的lua檔案。'
 config.diagnostics.unusedLocalExclude =
 '如果變數名符合以下規則，則不對其進行 `unused-local` 診斷。'
+config.diagnostics.validScheme  =
+'對使用以下 scheme 的lua檔案啟用診斷。'
 config.workspace.ignoreDir        =
 "忽略的檔案與目錄（使用 `.gitignore` 語法）。"
 config.workspace.ignoreSubmodules =

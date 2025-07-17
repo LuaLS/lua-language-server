@@ -369,9 +369,13 @@ m.register 'textDocument/hover' {
         if not hover or not source then
             return nil
         end
+        local value = tostring(hover)
+        if #value == 0 then
+            return nil
+        end
         return {
             contents = {
-                value = tostring(hover),
+                value = value,
                 kind  = 'markdown',
             },
             range = converter.packRange(state, source.start, source.finish),

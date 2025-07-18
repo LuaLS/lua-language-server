@@ -6,6 +6,7 @@
 * `CHG` Rename configuration option `Lua.diagnostics.disableScheme` to `Lua.diagnostics.validScheme` and improve its description. Now it enables diagnostics for Lua files that use the specified scheme.
 * `FIX` adds the `|lambda|` operator to the `Lua.runtime.nonstandardSymbol` configuration template, which allows the use of that option. Previously, support for it existed in the parser, but we could not actually use the option because it is not recognised in the configuration.
 * `FIX` Typed `@field` (eg `---@field [string] boolean`) should not override other defined field [#2171](https://github.com/LuaLS/lua-language-server/issues/2171), [#2711](https://github.com/LuaLS/lua-language-server/issues/2711)
+* `FIX` don't return empty hover doc when luals failed to find definition
 
 ## 3.15.0
 `2025-6-25`

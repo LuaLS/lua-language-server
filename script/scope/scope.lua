@@ -52,6 +52,15 @@ function M:getDocument(uri)
     return document
 end
 
+---@return Uri[]
+function M:scan()
+    local uris = {}
+    local scanner = ls.scope.createScanner()
+    
+
+    return uris
+end
+
 function M:remove()
     Delete(self)
 end

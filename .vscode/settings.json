@@ -8,4 +8,8 @@
         //"--shownode",
         //"--lazy",
     ],
+    "files.associations": {
+        "filesystem": "cpp",
+        "system_error": "cpp"
+    },
 }

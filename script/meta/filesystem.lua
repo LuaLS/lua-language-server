@@ -31,7 +31,9 @@ end
 ---@class fs.status
 local fsStatus = {}
 
----@return 'none' | 'not_found' | 'regular' | 'directory' | 'symlink' | 'block' | 'character' | 'fifo' | 'junction' | 'unknown'
+---@alias fs.status.typenames 'none' | 'not_found' | 'regular' | 'directory' | 'symlink' | 'block' | 'character' | 'fifo' | 'junction' | 'unknown'
+
+---@return fs.status.typenames
 function fsStatus:type()
 end
 
@@ -90,6 +92,16 @@ end
 ---@param path fs.path
 ---@return fs.status
 function fs.symlink_status(path)
+end
+
+---@param path fs.path
+---@return fs.status
+function fs.status(path)
+end
+
+---@param path fs.path
+---@return fs.status.typenames
+function fs.type(path)
 end
 
 ---@param path fs.path

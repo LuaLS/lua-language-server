@@ -1,6 +1,7 @@
 local tableSort    = table.sort
 local stringRep    = string.rep
 local stringByte   = string.byte
+local stringFormat = string.format
 local tableConcat  = table.concat
 local tostring     = tostring
 local type         = type
@@ -81,6 +82,7 @@ local RESERVED = {
     ['while']    = true,
 }
 
+---@class Utility
 local m = {}
 
 --- 打印表的结构
@@ -714,6 +716,21 @@ function m.sort(tbl, sorter, ...)
     end)
 end
 
+---@param datas any[]
+---@param scores integer[]
+---@return SortByScoreCallback
+function m.sortCallbackOfScore(datas, scores)
+    local map = {}
+    for i = 1, #datas do
+        local data = datas[i]
+        local score = scores[i]
+        map[data] = score
+    end
+    return function (v)
+        return map[v]
+    end
+end
+
 ---裁剪字符串
 ---@param str string
 ---@param mode? '"left"'|'"right"'
@@ -747,6 +764,9 @@ function m.expandPath(path, env)
     return path
 end
 
+---@generic T
+---@param l T[]
+---@return { [T]: true }
 function m.arrayToHash(l)
     local t = {}
     for i = 1, #l do
@@ -855,37 +875,31 @@ function m.defaultTable(default)
     end })
 end
 
-function m.multiTable(count, default)
-    local current
-    if default then
-        current = setmetatable({}, { __index = function (t, k)
-            if k == nil then
-                return nil
-            end
-            local v = default(k)
-            t[k] = v
-            return v
-        end })
-    else
-        current = setmetatable({}, { __index = function (t, k)
-            if k == nil then
-                return nil
-            end
-            local v = {}
-            t[k] = v
-            return v
-        end })
+function m.multiTable(max, default)
+    local mts = {}
+    for i = 1, max - 1 do
+        if i < max - 1 then
+            mts[i] = { __index = function (t, k)
+                local v = setmetatable({}, mts[i + 1])
+                t[k] = v
+                return v
+            end }
+        elseif default then
+            mts[i] = { __index = function (t, k)
+                local v = default(k)
+                t[k] = v
+                return v
+            end }
+        else
+            mts[i] = { __index = function (t, k)
+                local v = {}
+                t[k] = v
+                return v
+            end }
+        end
     end
-    for _ = 3, count do
-        current = setmetatable({}, { __index = function (t, k)
-            if k == nil then
-                return nil
-            end
-            t[k] = current
-            return current
-        end })
-    end
-    return current
+
+    return setmetatable({}, mts[1])
 end
 
 ---@param t table
@@ -935,6 +949,21 @@ function m.arrayRemove(array, value)
             return
         end
     end
+end
+
+---@param a1 any[]
+---@param a2 any[]
+---@return any[]
+function m.arrayOverlap(a1, a2)
+    local result = {}
+    local set = m.arrayToHash(a2)
+    for i = 1, #a1 do
+        local v = a1[i]
+        if set[v] then
+            result[#result+1] = v
+        end
+    end
+    return result
 end
 
 m.MODE_K  = { __mode = 'k' }
@@ -1058,6 +1087,112 @@ function m.stringLess(a, b)
         end
     end
     return true
+end
+
+---@param v any
+---@param d any
+---@return any
+function m.default(v, d)
+    if v == nil then
+        return d
+    end
+    return v
+end
+
+---@generic T
+---@param arr T[]
+---@param k integer
+---@param sorter? fun(a: T, b: T): boolean
+---@return T[]
+function m.sortK(arr, k, sorter)
+    if not sorter then
+        sorter = function (a, b)
+            return a < b
+        end
+    end
+    if k <= 0 then
+        return arr
+    end
+    if k >= (#arr // 2) then
+        tableSort(arr, sorter)
+        return arr
+    end
+
+    local offset = 1
+
+    local function sort(left, right)
+        if left >= right then
+            return
+        end
+        if left > k then
+            return
+        end
+        -- 对这部分进行快排
+        local index = left + offset % (right - left)
+        local pivot = arr[index]
+        offset = offset << 1
+        if offset == 0 then
+            offset = 1
+        end
+        arr[index], arr[right] = arr[right], arr[index]
+        local i = left
+        for j = left, right - 1 do
+            if sorter(arr[j], pivot) then
+                arr[i], arr[j] = arr[j], arr[i]
+                i = i + 1
+            end
+        end
+        arr[i], arr[right] = arr[right], arr[i]
+        sort(i + 1, right)
+        sort(left, i - 1)
+    end
+
+    sort(1, #arr)
+    return arr
+end
+
+---@class string
+---@operator mod(table): string
+---@operator div(string): string
+
+function m.enableFormatString()
+    local mt = getmetatable('')
+    mt.__mod = function (str, args)
+        local count = 0
+        return str:gsub('%{(.-)%}', function (key)
+            local k, fmt = key:match('^(.-):(.+)$')
+            if not k then
+                k = key
+            end
+            local value
+            if k == '' then
+                count = count + 1
+                value = args[count]
+            else
+                value = args[k]
+            end
+            if fmt then
+                value = stringFormat('%' .. fmt, value)
+            else
+                value = tostring(value)
+            end
+            return value
+        end)
+    end
+end
+
+function m.enableDividStringAsPath()
+    local mt = getmetatable('')
+    mt.__div = function (str, path)
+        assert(type(path) == 'string', 'Path must be a string')
+        if path:sub(1, 1) == '/' then
+            path = path:sub(2)
+        end
+        if str:sub(-1) == '/' then
+            str = str:sub(1, -2)
+        end
+        return str .. '/' .. path
+    end
 end
 
 return m

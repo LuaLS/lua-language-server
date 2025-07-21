@@ -9,6 +9,9 @@ Extends = require 'class'.extends
 ls = {}
 
 ls.util    = require 'utility'
+ls.util.enableCloseFunction()
+ls.util.enableFormatString()
+ls.util.enableDividStringAsPath()
 ls.fsu     = require 'tools.fs-utility'
 ls.inspect = require 'tools.inspect'
 ls.encoder = require 'tools.encoder'

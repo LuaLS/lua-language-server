@@ -4,5 +4,5 @@ do
 
     local uris = scope:scan()
 
-    print(#uris)
+    print('已加载 {} 个路径' % { #uris })
 end

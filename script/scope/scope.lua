@@ -57,12 +57,64 @@ function M:initGlob()
         return
     end
     self.glob = ls.glob.gitignore()
+    self.glob:setOption('root', self.uri)
+    self.glob:setOption('ignoreCase', true)
     self.glob:setInterface('type', function (uri)
         return ls.fs.getType(uri)
     end)
     self.glob:setInterface('list', function (uri)
         return ls.fs.getChilds(uri)
     end)
+    self.glob:setInterface('patterns', function (uri)
+        local patterns = {}
+        do
+            local ignoreUri = uri / '.gitignore'
+            local content = ls.fs.read(ignoreUri)
+            if content then
+                for line in ls.util.eachLine(content) do
+                    local path = ls.util.trim(line)
+                    if  #path > 0
+                    and not ls.util.stringStartWith(path, '#') then
+                        patterns[#patterns+1] = path
+                    end
+                end
+            end
+        end
+        do
+            local submoduleUri = uri / '.gitmodules'
+            local content = ls.fs.read(submoduleUri)
+            if content then
+                for line in ls.util.eachLine(content) do
+                    local trimmedLine = ls.util.trim(line)
+                    if ls.util.stringStartWith(trimmedLine, 'path = ') then
+                        local path = trimmedLine:sub(8)
+                        if #path > 0 then
+                            patterns[#patterns+1] = path
+                        end
+                    end
+                end
+            end
+        end
+        return patterns
+    end)
+end
+
+---@param uri Uri
+---@return boolean
+function M:isIgnored(uri)
+    self:initGlob()
+    return self.glob:check(uri)
+end
+
+---@param uri Uri
+---@return boolean
+function M:isValidUri(uri)
+    for _, ext in ipairs { '.lua' } do
+        if ls.util.stringEndWith(uri, ext) then
+            return true
+        end
+    end
+    return false
 end
 
 ---@return Uri[]
@@ -70,9 +122,9 @@ function M:scan()
     self:initGlob()
 
     local uris = {}
-    self.glob:scan(self.uri, function (path)
-        if ls.util.stringEndWith(path, '.lua') then
-            uris[#uris+1] = ls.uri.encode(path)
+    self.glob:scan(self.uri, function (uri)
+        if self:isValidUri(uri) then
+            uris[#uris+1] = uri
         end
     end)
 

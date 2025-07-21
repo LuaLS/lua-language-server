@@ -42,3 +42,9 @@ function ls.fs.getType(uri)
     end
     return nil
 end
+
+---@param uri Uri
+---@return string?
+function ls.fs.read(uri)
+    return ls.util.loadFile(ls.uri.decode(uri))
+end

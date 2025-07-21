@@ -10,6 +10,7 @@ M.__index = M
 ---@class Glob.Interface
 ---@field type? fun(path: string):('file'|'directory'|nil)
 ---@field list? fun(path: string):string[]?
+---@field patterns? fun(path: string):string[]?
 
 local function parsePatternRangePart(pat, start)
     local pack = {
@@ -134,6 +135,17 @@ function M:parsePatternOr(pat)
 end
 
 ---@private
+---@param a string
+---@param b string
+---@return boolean
+function M:pathEqual(a, b)
+    if self.options.ignoreCase then
+        return a:lower() == b:lower()
+    end
+    return a == b
+end
+
+---@private
 ---@param pat string
 ---@return table
 ---@return integer
@@ -204,8 +216,17 @@ function M:parsePattern(pat)
 end
 
 ---@param pat string
-function M:addPattern(pat)
-    self.patterns[#self.patterns+1] = self:parsePattern(pat)
+---@param base? string
+function M:addPattern(pat, base)
+    base = base or ''
+    if self.options.ignoreCase then
+        base = base:lower()
+    end
+    if not self.patternMap[base] then
+        self.patternMap[base] = {}
+    end
+    local pattern = self:parsePattern(pat)
+    table.insert(self.patternMap[base], pattern)
 end
 
 ---@param op string
@@ -219,6 +240,7 @@ end
 
 ---@overload fun(self: Glob, key: 'type', func: fun(path: string):('file'|'directory'|nil))
 ---@overload fun(self: Glob, key: 'list', func: fun(path: string):string[]?)
+---@overload fun(self: Glob, key: 'patterns', func: fun(path: string):string[]?)
 function M:setInterface(key, func)
     if type(func) ~= 'function' then
         return
@@ -228,13 +250,9 @@ end
 
 ---@private
 function M:checkPatternByBrace(path, pat)
-    local ignoreCase = self.options.ignoreCase
     if pat.singles then
         for _, single in ipairs(pat.singles) do
-            if ignoreCase then
-                single = single:lower()
-            end
-            if path:sub(1, #single) == single then
+            if self:pathEqual(path:sub(1, #single), single) then
                 return true, path:sub(#single + 1)
             end
         end
@@ -243,7 +261,7 @@ function M:checkPatternByBrace(path, pat)
     if pat.alphaRange then
         local first = pat.alphaRange[1]
         local last  = pat.alphaRange[2]
-        if ignoreCase then
+        if self.options.ignoreCase then
             first = first:lower()
             last  = last:lower()
         end
@@ -293,7 +311,6 @@ end
 
 ---@private
 function M:checkPatternWord(path, pattern, patIndex)
-    local ignoreCase = self.options.ignoreCase
     for i = patIndex, #pattern.symbols do
         local pat = pattern.symbols[i]
         if pat == '*' then
@@ -329,10 +346,7 @@ function M:checkPatternWord(path, pattern, patIndex)
         elseif path == nil then
             return false
         elseif type(pat) == 'string' then
-            if ignoreCase then
-                pat = pat:lower()
-            end
-            if path:sub(1, #pat) ~= pat then
+            if not self:pathEqual(path:sub(1, #pat), pat) then
                 return false
             end
             path = path:sub(#pat + 1)
@@ -405,16 +419,17 @@ end
 ---@private
 ---@param paths string[]
 ---@param pattern table
+---@param start integer
 ---@return boolean
-function M:checkPattern(paths, pattern)
+function M:checkPattern(paths, pattern, start)
     if pattern.kind == 'base' then
         if #pattern.symbols == 0 then
             return false
         end
         if pattern.root then
-            return self:checkPatternSlice(paths, 1, pattern, 1)
+            return self:checkPatternSlice(paths, start, pattern, 1)
         else
-            for i = 1, #paths do
+            for i = start, #paths do
                 if self:checkPatternSlice(paths, i, pattern, 1) then
                     return true
                 end
@@ -423,7 +438,7 @@ function M:checkPattern(paths, pattern)
         end
     elseif pattern.kind == 'or' then
         for _, child in ipairs(pattern.childs) do
-            if self:checkPattern(paths, child) then
+            if self:checkPattern(paths, child, start) then
                 return true
             end
         end
@@ -436,32 +451,62 @@ end
 ---@return 'accepted'|'refused'|'unknown'
 function M:status(paths)
     local status = 'unknown'
-    for _, pattern in ipairs(self.patterns) do
-        if status ~= 'refused' and pattern.refused then
-            if self:checkPattern(paths, pattern) then
-                status = 'refused'
-            end
-        elseif status ~= 'accepted' and not pattern.refused then
-            if self:checkPattern(paths, pattern) then
-                status = 'accepted'
+
+    local function statusWithPatterns(patterns, start)
+        for _, pattern in ipairs(patterns) do
+            if status ~= 'refused' and pattern.refused then
+                if self:checkPattern(paths, pattern, start) then
+                    status = 'refused'
+                end
+            elseif status ~= 'accepted' and not pattern.refused then
+                if self:checkPattern(paths, pattern, start) then
+                    status = 'accepted'
+                end
             end
         end
     end
+
+    if self.options.asGitIgnore then
+        for i = 1, #paths do
+            local base = table.concat(paths, '/', 1, i - 1)
+            if self.options.root then
+                base = self.options.root / base
+            end
+            local patternKey = base
+            if self.options.ignoreCase then
+                patternKey = patternKey:lower()
+            end
+            local patterns = self.patternMap[patternKey]
+            if not patterns then
+                patterns = {}
+                self.patternMap[patternKey] = patterns
+                if self.interface.patterns then
+                    local newPatterns = self.interface.patterns(base)
+                    if type(newPatterns) == 'table' then
+                        for _, pat in ipairs(newPatterns) do
+                            self:addPattern(pat, base)
+                        end
+                    end
+                end
+            end
+            if #patterns > 0 then
+                statusWithPatterns(patterns, i)
+            end
+        end
+    else
+        local patterns = self.patternMap[''] or {}
+        statusWithPatterns(patterns, 1)
+    end
+
     return status
 end
 
 ---@param path string
 ---@return boolean
 function M:check(path)
-    if self.options.ignoreCase then
-        path = path:lower()
-    end
     local root = self.options.root
     if root then
-        if self.options.ignoreCase then
-            root = root:lower()
-        end
-        if path:sub(1, #root) == root then
+        if self:pathEqual(path:sub(1, #root), root) then
             path = path:sub(#root + 1)
         else
             return false
@@ -491,16 +536,12 @@ function M:check(path)
 end
 
 ---@private
+---@param path string
+---@return string[]
 function M:toPaths(path)
-    if self.options.ignoreCase then
-        path = path:lower()
-    end
     local root = self.options.root
     if root then
-        if self.options.ignoreCase then
-            root = root:lower()
-        end
-        if path:sub(1, #root) == root then
+        if self:pathEqual(path:sub(1, #root), root) then
             path = path:sub(#root + 1)
         else
             return {}
@@ -521,10 +562,14 @@ function M:scan(root, callback)
     local checked = {}
 
     local function check(path)
-        if checked[path] then
+        local checkedPath = path
+        if self.options.ignoreCase then
+            checkedPath = checkedPath:lower()
+        end
+        if checked[checkedPath] then
             return
         end
-        checked[path] = true
+        checked[checkedPath] = true
         if #path ~= root and self:status(self:toPaths(path)) == 'accepted' then
             return
         end
@@ -568,7 +613,8 @@ end
 local function createGlob(pattern, options, interface)
     ---@class Glob
     local glob = setmetatable({
-        patterns = {},
+        ---@type table<string, table[]?>
+        patternMap = {},
         ---@type Glob.Options
         options = {},
         ---@type Glob.Interface

@@ -856,12 +856,40 @@ function m.getUpvalue(f, name)
     return nil, false
 end
 
-function m.stringStartWith(str, head)
-    return str:sub(1, #head) == head
+---@param str string
+---@param head string
+---@param ignoreCase? boolean
+---@return boolean
+function m.stringStartWith(str, head, ignoreCase)
+    if ignoreCase then
+        return str:sub(1, #head):lower() == head:lower()
+    else
+        return str:sub(1, #head) == head
+    end
 end
 
-function m.stringEndWith(str, tail)
-    return str:sub(-#tail) == tail
+---@param str string
+---@param tail string
+---@param ignoreCase? boolean
+---@return boolean
+function m.stringEndWith(str, tail, ignoreCase)
+    if ignoreCase then
+        return str:sub(-#tail):lower() == tail:lower()
+    else
+        return str:sub(-#tail) == tail
+    end
+end
+
+---@param str1 string
+---@param str2 string
+---@param ignoreCase? boolean
+---@return boolean
+function m.stringEqual(str1, str2, ignoreCase)
+    if ignoreCase then
+        return str1:lower() == str2:lower()
+    else
+        return str1 == str2
+    end
 end
 
 function m.defaultTable(default)
@@ -1185,6 +1213,12 @@ function m.enableDividStringAsPath()
     local mt = getmetatable('')
     mt.__div = function (str, path)
         assert(type(path) == 'string', 'Path must be a string')
+        if str == '' then
+            return path
+        end
+        if path == '' then
+            return str
+        end
         if path:sub(1, 1) == '/' then
             path = path:sub(2)
         end

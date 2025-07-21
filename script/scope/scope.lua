@@ -52,11 +52,29 @@ function M:getDocument(uri)
     return document
 end
 
+function M:initGlob()
+    if self.glob then
+        return
+    end
+    self.glob = ls.glob.gitignore()
+    self.glob:setInterface('type', function (uri)
+        return ls.fs.getType(uri)
+    end)
+    self.glob:setInterface('list', function (uri)
+        return ls.fs.getChilds(uri)
+    end)
+end
+
 ---@return Uri[]
 function M:scan()
+    self:initGlob()
+
     local uris = {}
-    local scanner = ls.scope.createScanner()
-    
+    self.glob:scan(self.uri, function (path)
+        if ls.util.stringEndWith(path, '.lua') then
+            uris[#uris+1] = ls.uri.encode(path)
+        end
+    end)
 
     return uris
 end

@@ -8,6 +8,8 @@ function M:__init(uri)
 
     ---@type Uri[]
     self.includeUris = {}
+    ---@type Config
+    self.config = ls.config.create(self)
 
     self.node = ls.node.createManager(self)
     self.node:reset()
@@ -94,6 +96,9 @@ function M:initGlob()
                     end
                 end
             end
+        end
+        do
+            local rcUri = uri / '.luarc.json'
         end
         return patterns
     end)

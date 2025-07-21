@@ -29,6 +29,8 @@ ls.uri           = require 'tools.uri'
 ls.task          = require 'tools.task'
 ls.timer         = require 'tools.timer'
 ls.parser        = require 'parser'
+
+require 'config'
 require 'file'
 require 'node'
 require 'vm'

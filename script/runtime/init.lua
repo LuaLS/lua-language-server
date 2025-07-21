@@ -1,6 +1,7 @@
 
 local argparser = require 'runtime.argparser'
 local version   = require 'runtime.version'
+local platform  = require 'bee.platform'
 
 ---@class LuaLS.Runtime
 local M = {}
@@ -8,38 +9,40 @@ local M = {}
 --启动时的命令行参数
 ---@class LuaLS.Runtime.Args
 M.args = {
-    --指定日志输出目录，默认为 `./log`
+    -- 指定日志输出目录，默认为 `./log`
     LOGPATH = '$LUALSPATH/log',
-    --指定meta文件的生成目录，默认为 `./meta`
+    -- 指定meta文件的生成目录，默认为 `./meta`
     METAPATH = '$LUALSPATH/meta',
-    --是否为开发模式
+    -- 是否为开发模式
     DEVELOP = false,
-    --调试器端口号，默认为 11411
+    -- 调试器端口号，默认为 11411
     DBGPORT = 11411,
-    --调试器地址，默认为 '127.0.0.1'
+    -- 调试器地址，默认为 '127.0.0.1'
     DBGADDRESS = '127.0.0.1',
-    --等待调试器连接
+    -- 等待调试器连接
     DBGWAIT = false,
-    --显示语言
+    -- 显示语言
     LOCALE = 'en-us',
-    --全局配置文件的路径
+    -- 全局配置文件的路径
     CONFIGPATH = '',
-    --在日志中记录RPC信息
+    -- 在日志中记录RPC信息
     RPCLOG = false,
-    --使用socket来连接客户端，指定端口号
+    -- 使用socket来连接客户端，指定端口号
     SOCKET = 0,
-    --强制接受工作区。默认情况下会拒绝根目录与Home目录作为工作区
+    -- 强制接受工作区。默认情况下会拒绝根目录与Home目录作为工作区
     FORCE_ACCEPT_WORKSPACE = false,
+    -- 文件名是否区分大小写
+    IGNORE_CASE = platform.os == 'windows' or platform.os == 'macos',
 
-    --命令行：诊断指定工作区
+    -- 命令行：诊断指定工作区
     CHECK = '',
-    --诊断工作区时需要报告的诊断等级
+    -- 诊断工作区时需要报告的诊断等级
     ---@type 'Error' | 'Warning' | 'Information' | 'Hint'
     CHECKLEVEL = 'Warning',
-    --诊断报告生成的文件路径（json），默认为 `$LOGPATH/check.json`
+    -- 诊断报告生成的文件路径（json），默认为 `$LOGPATH/check.json`
     CHECK_OUT_PATH = '$LOGPATH/check.json',
 
-    --命令行：生成文档
+    -- 命令行：生成文档
     DOC = '',
 }
 ls.util.tableMerge(M.args, argparser.parse(arg, true))

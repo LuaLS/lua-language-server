@@ -1,3 +1,1 @@
-local config = require 'config.config'
-
-return config
+require 'config.config'

@@ -32,7 +32,9 @@ M.args = {
     -- 强制接受工作区。默认情况下会拒绝根目录与Home目录作为工作区
     FORCE_ACCEPT_WORKSPACE = false,
     -- 文件名是否区分大小写
-    IGNORE_CASE = platform.os == 'windows' or platform.os == 'macos',
+    IGNORE_CASE = platform.os == 'windows'
+               or platform.os == 'macos'
+               or false,
 
     -- 命令行：诊断指定工作区
     CHECK = '',
@@ -69,15 +71,16 @@ end
 --环境变量
 M.env = {}
 --语言服务器根路径
-M.rootPath      = ls.util.expandPath(findRoot())
-M.env.LUALSPATH = M.rootPath
-M.logPath       = ls.util.expandPath(M.args.LOGPATH, M.env)
-M.env.LOGPATH   = M.logPath
-M.metaPath      = ls.util.expandPath(M.args.METAPATH, M.env)
-M.env.METAPATH  = M.metaPath
-M.rootUri       = ls.uri.encode(M.rootPath)
-M.logUri        = ls.uri.encode(M.logPath)
-M.metaUri       = ls.uri.encode(M.metaPath)
+M.rootPath        = ls.util.expandPath(findRoot())
+M.env.LUALSPATH   = M.rootPath
+M.logPath         = ls.util.expandPath(M.args.LOGPATH, M.env)
+M.env.LOGPATH     = M.logPath
+M.metaPath        = ls.util.expandPath(M.args.METAPATH, M.env)
+M.env.METAPATH    = M.metaPath
+M.rootUri         = ls.uri.encode(M.rootPath)
+M.logUri          = ls.uri.encode(M.logPath)
+M.metaUri         = ls.uri.encode(M.metaPath)
+M.env.IGNORE_CASE = M.args.IGNORE_CASE
 
 --启动时的版本号
 M.version = version.getVersion(M.rootPath)

@@ -9,7 +9,7 @@ function M:__init(uri)
     ---@type Uri[]
     self.includeUris = {}
     ---@type Config
-    self.config = ls.config.create(self)
+    self.config = ls.config.create(self.uri)
 
     self.node = ls.node.createManager(self)
     self.node:reset()
@@ -65,11 +65,22 @@ function M:initGlob()
         return ls.fs.getType(uri)
     end)
     self.glob:setInterface('list', function (uri)
+        do -- 顺便加载该目录下的 `.luarc.json` 配置文件
+            local rcUri = uri / '.luarc.json'
+            self.config:loadRC(rcUri)
+        end
         return ls.fs.getChilds(uri)
     end)
     self.glob:setInterface('patterns', function (uri)
         local patterns = {}
-        do
+        do -- 忽略配置 `Lua.workspace.ignoreDir` 中定义的文件
+            local ignoreDirs = self.config:getRaw(uri, 'Lua.workspace.ignoreDir')
+            if ignoreDirs then
+                ls.util.arrayMerge(patterns, ignoreDirs)
+            end
+        end
+        -- 应用 .gitignore 中定义的规则
+        if self.config:get(uri, 'Lua.workspace.useGitIgnore') then
             local ignoreUri = uri / '.gitignore'
             local content = ls.fs.read(ignoreUri)
             if content then
@@ -82,7 +93,8 @@ function M:initGlob()
                 end
             end
         end
-        do
+        -- 忽略子模块
+        if self.config:get(uri, 'Lua.workspace.ignoreSubmodules') then
             local submoduleUri = uri / '.gitmodules'
             local content = ls.fs.read(submoduleUri)
             if content then
@@ -96,9 +108,6 @@ function M:initGlob()
                     end
                 end
             end
-        end
-        do
-            local rcUri = uri / '.luarc.json'
         end
         return patterns
     end)

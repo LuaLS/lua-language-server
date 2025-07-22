@@ -48,3 +48,12 @@ end
 function ls.fs.read(uri)
     return ls.util.loadFile(ls.uri.decode(uri))
 end
+
+---@param uri Uri
+---@return Uri
+function ls.fs.parent(uri)
+    local parent = uri
+        : gsub('[^/]+$', '')
+        : gsub('/$', '')
+    return parent
+end

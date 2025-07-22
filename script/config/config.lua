@@ -1,11 +1,11 @@
 ---@class Config
 local M = Class 'Config'
 
----@param scope Scope
-function M:__init(scope)
-    self.scope = scope
+---@param root Uri
+function M:__init(root)
+    self.root = root
     ---@type table<string, table<string, any>?>
-    self.configMap = ls.runtime.args.IGNORE_CASE
+    self.configMap = ls.runtime.env.IGNORE_CASE
                  and ls.caselessTable.create()
                   or {}
 end
@@ -29,13 +29,41 @@ end
 ---@param uri Uri
 ---@param data table
 function M:applyRC(uri, data)
-    
+    local dirUri = ls.fs.parent(uri)
+    local keys = {}
+
+    local function lookInto(field)
+        local key = table.concat(keys, '.')
+        if not ls.util.stringStartWith(key, 'Lua.') then
+            key = 'Lua.' .. key
+        end
+        if type(field) ~= 'table' then
+            self:set(dirUri, key, field)
+            return
+        end
+        -- TODO 以后改成校验template
+        local _, dotCount = key:gsub('%.', '')
+        if dotCount >= 2 then
+            self:set(dirUri, key, field)
+            return
+        end
+        for k, v in pairs(field) do
+            keys[#keys+1] = k
+            lookInto(v)
+            keys[#keys] = nil
+        end
+    end
+
+    lookInto(data)
 end
 
 ---@param uri Uri
 ---@param key string
 ---@param value any
 function M:set(uri, key, value)
+    if not ls.util.stringStartWith(key, 'Lua.') then
+        key = 'Lua.' .. key
+    end
     local pack = self.configMap[uri]
     if not pack then
         pack = {}
@@ -47,11 +75,41 @@ function M:set(uri, key, value)
     pack[key] = value
 end
 
+---@param uri Uri
+---@param key string
+---@return any
+function M:getRaw(uri, key)
+    local pack = self.configMap[uri]
+    if not pack then
+        return nil
+    end
+    return pack[key]
+end
+
+---@param uri Uri
+---@param key string
+---@return any
+function M:get(uri, key)
+    local ignoreCase = ls.runtime.env.IGNORE_CASE
+    if not ls.util.stringStartWith(uri, self.root, ignoreCase) then
+        return nil
+    end
+    local currentUri = uri
+    while #currentUri >= #self.root do
+        local value = self:getRaw(currentUri, key)
+        if value ~= nil then
+            return value
+        end
+        currentUri = ls.fs.parent(currentUri)
+    end
+    return nil
+end
+
 ---@class Config.API
 ls.config = {}
 
----@param scope Scope
+---@param root Uri
 ---@return Config
-function ls.config.create(scope)
-    return New 'Config' (scope)
+function ls.config.create(root)
+    return New 'Config' (root)
 end

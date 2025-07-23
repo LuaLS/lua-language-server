@@ -4,19 +4,26 @@ collectgarbage('generational', 10, 50)
 
 package.path = package.path.. ';./?.lua;./?/init.lua'
 
+
 require 'luals'
+require 'runtime'
+require 'worker'
 
---语言服务器自身的状态
----@class LuaLS.Runtime
-ls.runtime = require 'runtime'
+---@class Log
+log = New 'Log' {
+    level = 'verb',
+    print = function (level, message, timeStamp)
+        print('[{}][{}]: {}' % { timeStamp, level, message })
+    end
+}
 
-fs.create_directories(fs.path(ls.runtime.logPath))
+fs.create_directories(fs.path(ls.env.logPath))
 
 ---@class Test
 test = {}
 test.catch = require 'test.catch'
 
-test.rootPath = ls.runtime.rootPath .. '/test_root'
+test.rootPath = ls.env.rootPath .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create()

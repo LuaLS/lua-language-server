@@ -2,4 +2,5 @@
 ls.scope = {}
 
 require 'scope.scope'
-require 'scope.fs'
+require 'scope.load'
+require 'scope.document'

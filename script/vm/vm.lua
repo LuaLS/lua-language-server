@@ -4,7 +4,7 @@ local M = Class 'VM'
 ---@param scope Scope
 function M:__init(scope)
     self.scope = scope
-    self.vfiles = {}
+    self.vfiles = ls.fs.newMap()
 end
 
 ---@param uri Uri

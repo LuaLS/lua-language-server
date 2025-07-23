@@ -2,8 +2,10 @@
 local M = Class 'Scope'
 
 ---@param uri? Uri
-function M:__init(uri)
+---@param fs? FileSystem
+function M:__init(uri, fs)
     self.uri = uri
+    self.fs  = fs or ls.fs
     table.insert(ls.scope.all, self)
 
     ---@type Uri[]
@@ -54,65 +56,6 @@ function M:getDocument(uri)
     return document
 end
 
-function M:initGlob()
-    if self.glob then
-        return
-    end
-    self.glob = ls.glob.gitignore()
-    self.glob:setOption('root', self.uri)
-    self.glob:setOption('ignoreCase', true)
-    self.glob:setInterface('type', function (uri)
-        return ls.fs.getType(uri)
-    end)
-    self.glob:setInterface('list', function (uri)
-        do -- 顺便加载该目录下的 `.luarc.json` 配置文件
-            local rcUri = uri / '.luarc.json'
-            self.config:loadRC(rcUri)
-        end
-        return ls.fs.getChilds(uri)
-    end)
-    self.glob:setInterface('patterns', function (uri)
-        local patterns = {}
-        do -- 忽略配置 `Lua.workspace.ignoreDir` 中定义的文件
-            local ignoreDirs = self.config:getRaw(uri, 'Lua.workspace.ignoreDir')
-            if ignoreDirs then
-                ls.util.arrayMerge(patterns, ignoreDirs)
-            end
-        end
-        -- 应用 .gitignore 中定义的规则
-        if self.config:get(uri, 'Lua.workspace.useGitIgnore') then
-            local ignoreUri = uri / '.gitignore'
-            local content = ls.fs.read(ignoreUri)
-            if content then
-                for line in ls.util.eachLine(content) do
-                    local path = ls.util.trim(line)
-                    if  #path > 0
-                    and not ls.util.stringStartWith(path, '#') then
-                        patterns[#patterns+1] = path
-                    end
-                end
-            end
-        end
-        -- 忽略子模块
-        if self.config:get(uri, 'Lua.workspace.ignoreSubmodules') then
-            local submoduleUri = uri / '.gitmodules'
-            local content = ls.fs.read(submoduleUri)
-            if content then
-                for line in ls.util.eachLine(content) do
-                    local trimmedLine = ls.util.trim(line)
-                    if ls.util.stringStartWith(trimmedLine, 'path = ') then
-                        local path = trimmedLine:sub(8)
-                        if #path > 0 then
-                            patterns[#patterns+1] = path
-                        end
-                    end
-                end
-            end
-        end
-        return patterns
-    end)
-end
-
 ---@param uri Uri
 ---@return boolean
 function M:isIgnored(uri)
@@ -131,20 +74,6 @@ function M:isValidUri(uri)
     return false
 end
 
----@return Uri[]
-function M:scan()
-    self:initGlob()
-
-    local uris = {}
-    self.glob:scan(self.uri, function (uri)
-        if self:isValidUri(uri) then
-            uris[#uris+1] = uri
-        end
-    end)
-
-    return uris
-end
-
 function M:remove()
     Delete(self)
 end
@@ -154,9 +83,10 @@ end
 ls.scope.all = {}
 
 ---@param uri? Uri
+---@param fs? FileSystem
 ---@return Scope
-function ls.scope.create(uri)
-    return New 'Scope' (uri)
+function ls.scope.create(uri, fs)
+    return New 'Scope' (uri, fs)
 end
 
 ---@param uri Uri

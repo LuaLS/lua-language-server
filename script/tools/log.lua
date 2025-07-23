@@ -3,12 +3,14 @@
 ---@field private option Log.Option
 ---@field private logLevel table<Log.Level, integer>
 ---@field private needTraceBack table<Log.Level, boolean>
+---@field verb  fun(...): string, string
 ---@field trace fun(...): string, string
 ---@field debug fun(...): string, string
 ---@field info  fun(...): string, string
 ---@field warn  fun(...): string, string
 ---@field error fun(...): string, string
 ---@field fatal fun(...): string, string
+---@field print fun(...): string, string
 ---@overload fun(option: Log.Option): Log
 local M = Class 'Log'
 
@@ -29,6 +31,7 @@ M.messageFormat = '[%s][%5s][%s]: %s\n'
 
 ---@enum (key) Log.Level
 M.logLevel = {
+    verb  = 0,
     trace = 1,
     debug = 2,
     info  = 3,
@@ -122,8 +125,11 @@ function M:__init(option)
 
     for level in pairs(self.logLevel) do
         self[level] = function (...)
-            return self:build(level, ...)
+            return self:build(level, 0, ...)
         end
+    end
+    self.print = function (...)
+        return self:build('debug', 1, ...)
     end
     ---@private
     self.startClock = self.clock()
@@ -162,10 +168,11 @@ end
 
 ---@private
 ---@param level string
+---@param exStack integer
 ---@param ... any
 ---@return string message
 ---@return string timestamp
-function M:build(level, ...)
+function M:build(level, exStack, ...)
     local t = table.pack(...)
     for i = 1, t.n do
         t[i] = tostring(t[i])
@@ -174,9 +181,9 @@ function M:build(level, ...)
 
     if self.needTraceBack[level] then
         if debug.getinfo(1, "t").istailcall then
-            message = (self.option.traceback or debug.traceback)(message, 2)
+            message = (self.option.traceback or debug.traceback)(message, 2 + exStack)
         else
-            message = (self.option.traceback or debug.traceback)(message, 3)
+            message = (self.option.traceback or debug.traceback)(message, 3 + exStack)
         end
     end
 
@@ -196,7 +203,7 @@ function M:build(level, ...)
         return message, timeStamp
     end
 
-    local info = debug.getinfo(2, 'Sl')
+    local info = debug.getinfo(2 + exStack, 'Sl')
     local sourceStr
     if info.currentline == -1 then
         sourceStr = '?'

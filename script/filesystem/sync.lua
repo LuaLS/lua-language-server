@@ -1,7 +1,10 @@
 local fs = require 'bee.filesystem'
 
----@class Filesystem
-ls.fs = {}
+---@class FileSystem
+ls.fs = Class 'FileSystem'
+
+---@type 'sync' | 'async'
+ls.fs.mode = 'sync'
 
 ---@param uri Uri
 ---@return Uri[]?
@@ -56,4 +59,13 @@ function ls.fs.parent(uri)
         : gsub('[^/]+$', '')
         : gsub('/$', '')
     return parent
+end
+
+---@return table<string, any>
+function ls.fs.newMap()
+    if ls.env.ignoreCase then
+        return ls.caselessTable.create()
+    else
+        return {}
+    end
 end

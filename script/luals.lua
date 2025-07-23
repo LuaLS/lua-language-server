@@ -5,6 +5,8 @@ Type    = require 'class'.type
 IsValid = require 'class'.isValid
 Extends = require 'class'.extends
 
+require 'tools.log'
+
 ---@class LuaLS
 ls = {}
 
@@ -29,11 +31,5 @@ ls.uri           = require 'tools.uri'
 ls.task          = require 'tools.task'
 ls.timer         = require 'tools.timer'
 ls.parser        = require 'parser'
-
-require 'config'
-require 'file'
-require 'node'
-require 'vm'
-require 'scope'
 
 return ls

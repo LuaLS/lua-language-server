@@ -4,7 +4,7 @@ local parser = require 'parser'
 thread.newchannel 'TEST'
 
 local function performTest()
-    local targetPath = ls.runtime.rootPath
+    local targetPath = ls.env.rootPath
     local files = {}
     local size = 0
     ls.fsu.scanDirectory(targetPath, function (fullPath)
@@ -35,7 +35,7 @@ local function performTest()
 end
 
 local function test(path)
-    local buf = ls.util.loadFile(ls.runtime.rootPath .. '/test/parser/perform/' .. path)
+    local buf = ls.util.loadFile(ls.env.rootPath .. '/test/parser/perform/' .. path)
     if not buf then
         return
     end

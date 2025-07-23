@@ -1,8 +1,16 @@
 do
-    local root = ls.runtime.rootUri
+    local root = ls.env.rootUri
     local scope = ls.scope.create(root)
 
-    local uris = scope:scan()
-
-    print('已加载 {} 个路径' % { #uris })
+    scope:load(function (event, status, uri)
+        if event == 'found' then
+            print('已发现 {found} 个文件' % status)
+        end
+        if event == 'loaded' then
+            print('已加载 {loaded} 个文件' % status)
+        end
+        if event == 'indexed' then
+            print('已索引 {indexed} 个文件' % status)
+        end
+    end)
 end

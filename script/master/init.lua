@@ -9,7 +9,7 @@ ls.runtime = require 'runtime'
 ls.API = require 'master.api'
 ls.eventLoop = require 'master.eventLoop'
 
-fs.create_directories(fs.path(ls.runtime.logPath))
+fs.create_directories(fs.path(ls.env.logPath))
 
 ---@diagnostic disable-next-line: lowercase-global
 log = New 'Log' {
@@ -19,22 +19,22 @@ log = New 'Log' {
     time  = function ()
         return time.time() // 1000
     end,
-    path = ls.uri.decode(ls.runtime.logUri) .. '/service.log',
+    path = ls.uri.decode(ls.env.logUri) .. '/service.log',
 }
 
 log.info('Lua Lsp startup!')
-log.info('LUALS:', ls.runtime.rootUri)
-log.info('LOGPATH:', ls.runtime.logUri)
-log.info('METAPATH:', ls.runtime.metaUri)
-log.info('VERSION:', ls.runtime.version)
+log.info('LUALS:', ls.env.rootUri)
+log.info('LOGPATH:', ls.env.logUri)
+log.info('METAPATH:', ls.env.metaUri)
+log.info('VERSION:', ls.env.version)
 
 xpcall(function ()
-    if not ls.runtime.args.DEVELOP then
+    if not ls.args.DEVELOP then
         return
     end
     local dbg = require 'debugger'
-    dbg:start(ls.runtime.args.DBGADDRESS .. ':' .. ls.runtime.args.DBGPORT)
-    if ls.runtime.args.DBGWAIT then
+    dbg:start(ls.args.DBGADDRESS .. ':' .. ls.args.DBGPORT)
+    if ls.args.DBGWAIT then
         dbg:event 'wait'
     end
 end, log.warn)

@@ -54,7 +54,7 @@ function M:remove()
 end
 
 ---@type table<Uri, File>
-ls.file.all = {}
+ls.file.all = ls.fs.newMap()
 
 ---@param uri Uri
 ---@return File

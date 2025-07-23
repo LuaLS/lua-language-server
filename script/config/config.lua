@@ -5,9 +5,7 @@ local M = Class 'Config'
 function M:__init(root)
     self.root = root
     ---@type table<string, table<string, any>?>
-    self.configMap = ls.runtime.env.IGNORE_CASE
-                 and ls.caselessTable.create()
-                  or {}
+    self.configMap = ls.fs.newMap()
 end
 
 ---@param uri Uri
@@ -90,8 +88,7 @@ end
 ---@param key string
 ---@return any
 function M:get(uri, key)
-    local ignoreCase = ls.runtime.env.IGNORE_CASE
-    if not ls.util.stringStartWith(uri, self.root, ignoreCase) then
+    if not ls.util.stringStartWith(uri, self.root, ls.env.ignoreCase) then
         return nil
     end
     local currentUri = uri

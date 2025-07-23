@@ -3,12 +3,9 @@ local argparser = require 'runtime.argparser'
 local version   = require 'runtime.version'
 local platform  = require 'bee.platform'
 
----@class LuaLS.Runtime
-local M = {}
-
 --启动时的命令行参数
----@class LuaLS.Runtime.Args
-M.args = {
+---@class LuaLS.Args
+ls.args = {
     -- 指定日志输出目录，默认为 `./log`
     LOGPATH = '$LUALSPATH/log',
     -- 指定meta文件的生成目录，默认为 `./meta`
@@ -47,7 +44,7 @@ M.args = {
     -- 命令行：生成文档
     DOC = '',
 }
-ls.util.tableMerge(M.args, argparser.parse(arg, true))
+ls.util.tableMerge(ls.args, argparser.parse(arg, true))
 
 ---@return string
 local function findRoot()
@@ -69,20 +66,16 @@ local function findRoot()
 end
 
 --环境变量
-M.env = {}
+---@class LuaLS.Env
+ls.env = {}
 --语言服务器根路径
-M.rootPath        = ls.util.expandPath(findRoot())
-M.env.LUALSPATH   = M.rootPath
-M.logPath         = ls.util.expandPath(M.args.LOGPATH, M.env)
-M.env.LOGPATH     = M.logPath
-M.metaPath        = ls.util.expandPath(M.args.METAPATH, M.env)
-M.env.METAPATH    = M.metaPath
-M.rootUri         = ls.uri.encode(M.rootPath)
-M.logUri          = ls.uri.encode(M.logPath)
-M.metaUri         = ls.uri.encode(M.metaPath)
-M.env.IGNORE_CASE = M.args.IGNORE_CASE
+ls.env.rootPath   = ls.util.expandPath(findRoot())
+ls.env.logPath    = ls.util.expandPath(ls.args.LOGPATH, ls.env)
+ls.env.metaPath   = ls.util.expandPath(ls.args.METAPATH, ls.env)
+ls.env.rootUri    = ls.uri.encode(ls.env.rootPath)
+ls.env.logUri     = ls.uri.encode(ls.env.logPath)
+ls.env.metaUri    = ls.uri.encode(ls.env.metaPath)
+ls.env.ignoreCase = ls.args.IGNORE_CASE
 
 --启动时的版本号
-M.version = version.getVersion(M.rootPath)
-
-return M
+ls.env.version = version.getVersion(ls.env.rootPath)

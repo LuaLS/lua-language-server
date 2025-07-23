@@ -1,6 +1,6 @@
 do
     local root = ls.env.rootUri
-    local scope = ls.scope.create(root)
+    local scope = ls.scope.create(root, ls.afs)
 
     scope:load(function (event, status, uri)
         if event == 'found' then

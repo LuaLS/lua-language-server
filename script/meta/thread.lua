@@ -1,33 +1,25 @@
 ---@meta bee.thread
 
 ---@class bee.thread
-local thread = {}
-
----@param time number
-function thread.sleep(time) end
-
----@param name string
-function thread.newchannel(name) end
-
----@param name string
----@return bee.thread.channel
-function thread.channel(name) end
+---@field id integer
+local M = {}
 
 ---@param script string
+---@param ... string
 ---@return bee.thread.thread
-function thread.thread(script) end
+function M.create(script, ...) end
 
----@class bee.thread.channel
-local channel = {}
+---@param time number
+function M.sleep(time) end
 
-function channel:push(...) end
+---@param thd bee.thread.thread
+function M.wait(thd)
+end
 
----@return ...
-function channel:pop() end
-
----@return ...
-function channel:bpop() end
+---@return string?
+function M.errlog()
+end
 
 ---@class bee.thread.thread
 
-return thread
+return M

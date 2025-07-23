@@ -53,6 +53,13 @@ function ls.fs.read(uri)
 end
 
 ---@param uri Uri
+---@param content string
+---@return boolean
+function ls.fs.write(uri, content)
+    return ls.util.saveFile(ls.uri.decode(uri), content)
+end
+
+---@param uri Uri
 ---@return Uri
 function ls.fs.parent(uri)
     local parent = uri

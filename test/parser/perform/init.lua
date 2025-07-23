@@ -1,8 +1,6 @@
 local thread = require 'bee.thread'
 local parser = require 'parser'
 
-thread.newchannel 'TEST'
-
 local function performTest()
     local targetPath = ls.env.rootPath
     local files = {}

@@ -116,7 +116,6 @@ function M:loadFiles(callback, status)
 
     local loadedUris = ls.linkedTable.create()
     local loadTasks = {}
-    local loadFinished = false
 
     for _, uri in ipairs(self.uris) do
         loadTasks[#loadTasks+1] = function ()
@@ -132,7 +131,6 @@ function M:loadFiles(callback, status)
     ---@async
     ls.await.call(function ()
         ls.await.waitAll(loadTasks)
-        loadFinished = true
         xpcall(callback, log.error, 'loaded', status)
     end)
 
@@ -149,6 +147,6 @@ function M:loadFiles(callback, status)
             ls.await.sleep(0)
         end
         ls.await.sleep(0.1)
-    until loadFinished
+    until status.indexed >= status.found
     xpcall(callback, log.error, 'indexed', status)
 end

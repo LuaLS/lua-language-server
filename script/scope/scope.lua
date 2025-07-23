@@ -56,6 +56,7 @@ function M:getDocument(uri)
     return document
 end
 
+---@async
 ---@param uri Uri
 ---@return boolean
 function M:isIgnored(uri)

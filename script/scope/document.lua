@@ -13,9 +13,12 @@ end
 M.ast = nil
 
 ---@param self Document
----@return LuaParser.Ast
+---@return LuaParser.Ast | false
 ---@return true
 M.__getter.ast = function (self)
-    local ast = ls.parser.compile(self.text)
+    local suc, ast = xpcall(ls.parser.compile, log.error, self.text)
+    if not suc then
+        return false, true
+    end
     return ast, true
 end

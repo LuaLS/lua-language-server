@@ -9,10 +9,15 @@ end
 
 ---@param uri Uri
 function M:indexFile(uri)
-    local document = self.scope:getDocument(uri)
-    if not document then
-        return
-    end
+    local file = self:getFile(uri)
+              or self:createFile(uri)
+    file:indexAst()
+end
+
+---@param uri Uri
+---@return VM.Vfile?
+function M:getFile(uri)
+    return self.vfiles[uri]
 end
 
 ---@param uri Uri

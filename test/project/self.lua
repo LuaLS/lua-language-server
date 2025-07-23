@@ -6,6 +6,12 @@ do
         if event == 'found' then
             print('已发现 {found} 个文件' % status)
         end
+        if event == 'loading' then
+            local ast = scope:getDocument(uri).ast
+            assert(ast)
+            local err = ast.errors[1]
+            assert(err == nil)
+        end
         if event == 'loaded' then
             print('已加载 {loaded} 个文件' % status)
         end

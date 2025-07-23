@@ -36,7 +36,7 @@ function M:resetRunners()
     end
 end
 
----@param ast LuaParser.Ast
+---@param ast? LuaParser.Ast
 ---@param mode any
 function M:indexAst(ast, mode)
     if self.indexedVersion == self.version then
@@ -44,8 +44,21 @@ function M:indexAst(ast, mode)
     end
     self.indexedVersion = self.version
 
-    local runner = self:getRunner(ast.main)
-    runner:index()
+    if not ast then
+        local document = self.scope:getDocument(self.uri)
+        if not document then
+            return
+        end
+        ast = document.ast
+        if not ast then
+            return
+        end
+    end
+
+    xpcall(function ()
+        local runner = self:getRunner(ast.main)
+        runner:index()
+    end, log.error)
 end
 
 ---@param block LuaParser.Node.Block

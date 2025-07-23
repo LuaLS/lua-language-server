@@ -66,6 +66,7 @@ end
 ---| 'found'
 ---| 'loading'
 ---| 'loaded'
+---| 'indexing'
 ---| 'indexed'
 ---| 'finish'
 
@@ -106,7 +107,6 @@ end
 function M:loadFiles(callback, status)
     self.glob:scan(self.uri, function (uri)
         if self:isValidUri(uri) then
-            self.vm:createFile(uri)
             self.uris[#self.uris+1] = uri
             status.found = status.found + 1
             xpcall(callback, log.error, 'finding', status, uri)

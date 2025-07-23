@@ -175,7 +175,7 @@ function Ast:parseCatCall(head)
     call.symbolPos2 = self:assertSymbol '>'
     call.finish = self:getLastPos()
 
-    if head.kind ~= 'CatID' then
+    if head.kind ~= 'catid' then
         self:throw('UNEXPECT_CAT_CALL', pos1, call.finish)
     end
 

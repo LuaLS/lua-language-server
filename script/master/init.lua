@@ -1,5 +1,5 @@
-local fs   = require 'bee.filesystem'
-local time = require 'bee.time'
+local fs     = require 'bee.filesystem'
+local time   = require 'bee.time'
 
 ls.threadName = 'master'
 
@@ -7,7 +7,6 @@ ls.threadName = 'master'
 ---@class LuaLS.Runtime
 ls.runtime = require 'runtime'
 ls.API = require 'master.api'
-ls.eventLoop = require 'master.eventLoop'
 
 fs.create_directories(fs.path(ls.env.logPath))
 
@@ -41,8 +40,4 @@ end, log.warn)
 
 print = log.debug
 
-ls.eventLoop.addTask(ls.timer.update)
-
-ls.task.setTimer(ls.timer.wait)
-
-ls.eventLoop.startEventLoop()
+ls.eventLoop.start()

@@ -28,9 +28,18 @@ test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create()
 
-print('开始测试')
-require 'test.parser'
-require 'test.node'
-require 'test.vm'
-require 'test.project'
-print('测试完成')
+---@async
+ls.await.call(function ()
+    print('开始测试')
+    require 'test.parser'
+    require 'test.node'
+    require 'test.vm'
+    dofile 'test/project/init.lua'
+    print('测试完成')
+    ls.await.sleep(1)
+    ls.eventLoop.stop()
+end)
+
+ls.eventLoop.start(function ()
+    ls.timer.update(1000)
+end)

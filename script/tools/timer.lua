@@ -262,8 +262,12 @@ end
 local desk = {}
 
 local startMS = beeTime.monotonic()
-function M.update()
-    local targetMS = beeTime.monotonic() - startMS
+local fixMS = 0
+function M.update(deltaMS)
+    if deltaMS then
+        fixMS = fixMS + deltaMS
+    end
+    local targetMS = beeTime.monotonic() - startMS + fixMS
     for ti = curMS, targetMS do
         local queue = timerQueues[ti]
         if queue then

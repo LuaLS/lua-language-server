@@ -1,1 +1,1 @@
-require 'test.project.self'
+dofile 'test/project/self.lua'

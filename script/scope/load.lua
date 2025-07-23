@@ -74,6 +74,7 @@ end
 ---@field loaded integer
 ---@field indexed integer
 
+---@async
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
 ---@return Scope.Load.Status
 function M:load(callback)
@@ -91,17 +92,18 @@ function M:load(callback)
 
     xpcall(callback, log.error, 'start', status)
 
-    self:loadSync(callback, status)
+    self:loadFiles(callback, status)
 
     xpcall(callback, log.error, 'finish', status)
 
     return status
 end
 
----@private
+---@package
+---@async
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
 ---@param status Scope.Load.Status
-function M:loadSync(callback, status)
+function M:loadFiles(callback, status)
     self.glob:scan(self.uri, function (uri)
         if self:isValidUri(uri) then
             self.vm:createFile(uri)
@@ -112,20 +114,41 @@ function M:loadSync(callback, status)
     end)
     xpcall(callback, log.error, 'found', status)
 
-    for _, uri in ipairs(self.uris) do
-        local content = self.fs.read(uri)
-        if content then
-            ls.file.setText(uri, content)
-        end
-        status.loaded = status.loaded + 1
-        xpcall(callback, log.error, 'loading', status, uri)
-    end
-    xpcall(callback, log.error, 'loaded', status)
+    local loadedUris = ls.linkedTable.create()
+    local loadTasks = {}
+    local loadFinished = false
 
     for _, uri in ipairs(self.uris) do
-        self.vm:indexFile(uri)
-        status.indexed = status.indexed + 1
-        xpcall(callback, log.error, 'indexing', status, uri)
+        loadTasks[#loadTasks+1] = function ()
+            local content = self.fs.read(uri)
+            if content then
+                ls.file.setText(uri, content)
+            end
+            status.loaded = status.loaded + 1
+            loadedUris:pushTail(uri)
+            xpcall(callback, log.error, 'loading', status, uri)
+        end
     end
+    ---@async
+    ls.await.call(function ()
+        ls.await.waitAll(loadTasks)
+        loadFinished = true
+        xpcall(callback, log.error, 'loaded', status)
+    end)
+
+    repeat
+        while true do
+            local uri = loadedUris:getHead()
+            if not uri then
+                break
+            end
+            loadedUris:pop(uri)
+            self.vm:indexFile(uri)
+            status.indexed = status.indexed + 1
+            xpcall(callback, log.error, 'indexing', status, uri)
+            ls.await.sleep(0)
+        end
+        ls.await.sleep(0.1)
+    until loadFinished
     xpcall(callback, log.error, 'indexed', status)
 end

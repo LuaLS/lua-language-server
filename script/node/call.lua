@@ -1,11 +1,11 @@
----@class Node.Typecall: Node
+---@class Node.Call: Node
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, name: string, args: Node[]): Node.Typecall
-local M = ls.node.register 'Node.Typecall'
+---@overload fun(scope: Scope, name: string, args: Node[]): Node.Call
+local M = ls.node.register 'Node.Call'
 
-M.kind = 'typecall'
+M.kind = 'call'
 
 ---@param scope Scope
 ---@param name string
@@ -18,7 +18,7 @@ function M:__init(scope, name, args)
     self.head:flushMe(self, true)
 end
 
----@param self Node.Typecall
+---@param self Node.Call
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
@@ -29,7 +29,7 @@ function M:resolveGeneric(map)
     local args = ls.util.map(self.args, function (arg)
         return arg:resolveGeneric(map)
     end)
-    return self.scope.node.typecall(self.head.typeName, args)
+    return self.scope.node.call(self.head.typeName, args)
 end
 
 function M:view(skipLevel)

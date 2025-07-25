@@ -119,9 +119,9 @@ function M:fillAPIs()
 
     ---@param name string
     ---@param args Node[]
-    ---@return Node.Typecall
-    function self.typecall(name, args)
-        return New 'Node.Typecall' (scope, name, args)
+    ---@return Node.Call
+    function self.call(name, args)
+        return New 'Node.Call' (scope, name, args)
     end
 
     ---@overload fun(nodes?: Node[]): Node

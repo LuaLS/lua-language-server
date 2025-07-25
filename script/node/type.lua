@@ -107,7 +107,7 @@ function M:removeClass(location)
     self:flushCache()
 end
 
----@param extends Node.Type | Node.Typecall | Node.Table
+---@param extends Node.Type | Node.Call | Node.Table
 ---@return Node.Type
 function M:addExtends(extends)
     if not self.extends then
@@ -218,12 +218,12 @@ function M:removeVariable(variable)
     return self
 end
 
----@type (Node.Type | Node.Typecall | Node.Table)[]
+---@type (Node.Type | Node.Call | Node.Table)[]
 M.fullExtends = nil
 
 ---获取所有继承（广度优先）
 ---@param self Node.Type
----@return (Node.Type | Node.Typecall | Node.Table)[]
+---@return (Node.Type | Node.Call | Node.Table)[]
 ---@return true
 M.__getter.fullExtends = function (self)
     local result = {}
@@ -537,7 +537,7 @@ function M:getValueWithArgs(args)
 end
 
 ---@param map table<Node.Generic, Node>
----@return Node.Type | Node.Typecall
+---@return Node.Type | Node.Call
 function M:resolveGeneric(map)
     if not self.paramPacks then
         return self
@@ -551,7 +551,7 @@ function M:resolveGeneric(map)
 end
 
 ---@param nodes? Node[]
----@return Node.Type | Node.Typecall
+---@return Node.Type | Node.Call
 function M:call(nodes)
     if not self.paramPacks then
         return self
@@ -559,35 +559,34 @@ function M:call(nodes)
     if not nodes then
         nodes = {}
     end
-    local typecall
+    local call
     if #nodes == 0 then
-        typecall = self.typecallWithNoArgs
+        call = self.callWithNoArgs
     else
-        typecall = self.typecallPool:get(nodes)
+        call = self.callCache:get(nodes)
     end
-    if not typecall then
-        typecall = self.scope.node.typecall(self.typeName, nodes)
+    if not call then
+        call = self.scope.node.call(self.typeName, nodes)
         if #nodes == 0 then
-            self.typecallWithNoArgs = typecall
+            self.callWithNoArgs = call
         else
-            self.typecallPool:set(nodes, typecall)
+            self.callCache:set(nodes, call)
         end
     end
-    return typecall
+    return call
 end
 
 ---@private
----@type Node.Typecall?
-M.typecallWithNoArgs = nil
+---@type Node.Call?
+M.callWithNoArgs = nil
 
 ---@private
 ---@type PathTable
-M.typecallPool = nil
-
+M.callCache = nil
 
 ---@param self Node.Type
 ---@return PathTable
 ---@return true
-M.__getter.typecallPool = function (self)
+M.__getter.callCache = function (self)
     return ls.pathTable.create(true, true), true
 end

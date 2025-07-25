@@ -14,7 +14,7 @@ require 'node.intersection'
 require 'node.unsolve'
 require 'node.generic'
 require 'node.generic_pack'
-require 'node.typecall'
+require 'node.call'
 require 'node.variable'
 require 'node.template'
 

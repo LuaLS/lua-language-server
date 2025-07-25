@@ -117,7 +117,7 @@ local rowcolMulti = 10000
 ---@return integer
 ---@return true
 Base.__getter.left = function (self)
-    local row, col = self.ast.lexer:rowcol(self.start)
+    local row, col = self.startRow, self.startCol
     local start = row * rowcolMulti + col
     return start, true
 end
@@ -126,7 +126,7 @@ end
 ---@return integer
 ---@return true
 Base.__getter.right = function (self)
-    local row, col = self.ast.lexer:rowcol(self.finish)
+    local row, col = self.finishRow, self.finishCol
     local finish = row * rowcolMulti + col
     return finish, true
 end
@@ -135,44 +135,44 @@ end
 ---@return integer
 ---@return true
 Base.__getter.startRow = function (self)
-    local startRow = self.left // rowcolMulti
-    return startRow, true
+    self.startRow, self.startCol = self.ast.lexer:rowcol(self.start)
+    return self.startRow, true
 end
 
 ---@param self LuaParser.Node.Base
 ---@return integer
 ---@return true
 Base.__getter.startCol = function (self)
-    local startCol = self.left % rowcolMulti
-    return startCol, true
+    self.startRow, self.startCol = self.ast.lexer:rowcol(self.start)
+    return self.startCol, true
 end
 
 ---@param self LuaParser.Node.Base
 ---@return integer
 ---@return true
 Base.__getter.finishRow = function (self)
-    local finishRow = self.right // rowcolMulti
-    return finishRow, true
+    self.finishRow, self.finishCol = self.ast.lexer:rowcol(self.finish)
+    return self.finishRow, true
 end
 
 ---@param self LuaParser.Node.Base
 ---@return integer
 ---@return true
 Base.__getter.finishCol = function (self)
-    local finishCol = self.right % rowcolMulti
-    return finishCol, true
+    self.finishRow, self.finishCol = self.ast.lexer:rowcol(self.finish)
+    return self.finishCol, true
 end
 
 ---@param self LuaParser.Node.Base
 ---@return string
 ---@return true
 Base.__getter.where = function (self)
-    return string.format('%s:%s - %s:%s @ %s = %s'
-        , self.startRow + 1
-        , self.startCol + 1
-        , self.finishRow + 1
-        , self.finishCol + 1
+    return string.format('%s:(%s:%s-%s:%s) %s'
         , self.ast.source
+        , self.startRow + 1
+        , self.startCol
+        , self.finishRow + 1
+        , self.finishCol
         , self.code
     ), true
 end

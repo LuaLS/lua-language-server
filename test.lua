@@ -31,16 +31,20 @@ test.scope    = ls.scope.create()
 
 ---@async
 ls.await.call(function ()
-    pcall(function ()
+    local suc, err = pcall(function ()
         print('开始测试')
         require 'test.parser'
         require 'test.node'
         require 'test.vm'
         dofile 'test/project/init.lua'
-        print('测试完成')
     end)
     ls.await.sleep(1)
     ls.eventLoop.stop()
+    if suc then
+        print('测试完成')
+    else
+        print('测试失败：\n' .. err)
+    end
 end)
 
 ls.eventLoop.start(function ()

@@ -1,7 +1,10 @@
----@class LuaParser.Node.CatAlias: LuaParser.Node.Base
+---@class LuaParser.Node.CatAlias: LuaParser.Node.Base, LuaParser.Node.CatGenericMaster, LuaParser.Node.Block
 ---@field aliasID LuaParser.Node.CatID
 ---@field extends? LuaParser.Node.CatExp
 local CatAlias = Class('LuaParser.Node.CatAlias', 'LuaParser.Node.Base')
+
+Extends('LuaParser.Node.CatAlias', 'LuaParser.Node.CatGenericMaster')
+Extends('LuaParser.Node.CatAlias', 'LuaParser.Node.Block')
 
 CatAlias.kind = 'catalias'
 
@@ -23,6 +26,10 @@ function Ast:parseCatAlias()
 
     aliasID.parent = catAlias
 
+    self:blockStart(catAlias)
+    self:parseCatGenericDef(catAlias, catAlias)
+
+    self:skipSpace()
     local extends = self:parseCatExp(true)
     if extends then
         catAlias.extends = extends
@@ -30,6 +37,7 @@ function Ast:parseCatAlias()
     end
 
     catAlias.finish = self:getLastPos()
+    self:blockFinish(catAlias)
 
     return catAlias
 end

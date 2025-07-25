@@ -279,3 +279,26 @@ TEST [[
         },
     }
 }
+
+TEST [[
+---@alias A<T> `T`
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catalias',
+                aliasID = {
+                    kind = 'catid',
+                    id   = 'A',
+                },
+                extends = {
+                    kind = 'catid',
+                    id   = '`T`',
+                    genericTemplate = { T = {} },
+                }
+            }
+        }
+    }
+}

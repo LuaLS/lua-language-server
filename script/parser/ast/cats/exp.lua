@@ -60,7 +60,7 @@ function Ast:parseCatTerm(required)
             or   self:parseCatBoolean()
             or   self:parseCatInteger()
             or   self:parseCatString()
-            or   self:parseCatID()
+            or   self:parseCatID(true)
 
     if not head then
         if required then

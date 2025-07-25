@@ -11,8 +11,9 @@ CatID.kind = 'catid'
 local Ast = Class 'LuaParser.Ast'
 
 ---@private
+---@param asExp? boolean
 ---@return LuaParser.Node.CatID?
-function Ast:parseCatID()
+function Ast:parseCatID(asExp)
     local _, _, pos = self.lexer:peek()
     if not pos then
         return nil
@@ -34,18 +35,20 @@ function Ast:parseCatID()
     })
 
     local block = self.curBlock
-    if block then
+    if block and asExp then
         local generic = block.genericMap[id]
-        res.generic = generic
+        if generic then
+            res.generic = generic
+        end
         if id:find('`', 1, true) then
             local templates = {}
             for start, template in id:gmatch('()`([^`]+)`') do
                 ---@cast start any
                 local tempGeneric = block.genericMap[template]
                 if tempGeneric then
-                    self:throw('UNDEFINED_GENERIC', pos + start, pos + start + #template)
-                else
                     templates[template] = tempGeneric
+                else
+                    self:throw('UNDEFINED_GENERIC', pos + start, pos + start + #template)
                 end
             end
             res.genericTemplate = templates

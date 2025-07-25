@@ -1,4 +1,5 @@
 
+require 'parser.ast.cats.generic-master'
 require 'parser.ast.cats.id'
 require 'parser.ast.cats.class'
 require 'parser.ast.cats.exp'

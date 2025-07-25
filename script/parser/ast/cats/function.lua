@@ -1,11 +1,8 @@
 
----@class LuaParser.Node.CatFunction: LuaParser.Node.Base
+---@class LuaParser.Node.CatFunction: LuaParser.Node.Base, LuaParser.Node.CatGenericMaster, LuaParser.Node.Block
 ---@field params? LuaParser.Node.CatFuncParam[]
 ---@field returns? LuaParser.Node.CatFuncReturn[]
----@field generics? LuaParser.Node.CatGeneric[]
 ---@field funPos      integer # `fun` 的位置
----@field genericPos1? integer # `<` 的位置
----@field genericPos2? integer # `>` 的位置
 ---@field symbolPos1? integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 ---@field symbolPos3? integer # 冒号的位置
@@ -13,6 +10,9 @@
 ---@field symbolPos5? integer # 返回值右括号的位置
 ---@field async? boolean # 是否异步
 local CatFunction = Class('LuaParser.Node.CatFunction', 'LuaParser.Node.Base')
+
+Extends('LuaParser.Node.CatFunction', 'LuaParser.Node.CatGenericMaster')
+Extends('LuaParser.Node.CatFunction', 'LuaParser.Node.Block')
 
 CatFunction.kind = 'catfunction'
 
@@ -82,24 +82,8 @@ function Ast:parseCatFunction()
         funPos  = funPos,
     })
 
-    self:skipSpace()
-    funNode.genericPos1 = self.lexer:consume '<'
-    if funNode.genericPos1 then
-
-        self:skipSpace()
-        local block = self.curBlock
-        funNode.generics = self:parseCatGenericList()
-        for _, generic in ipairs(funNode.generics) do
-            generic.parent = funNode
-            if block then
-                block.generics[#block.generics+1] = generic
-                block.genericMap[generic.id.id] = generic
-            end
-        end
-
-        self:skipSpace()
-        funNode.genericPos2 = self:assertSymbol '>'
-    end
+    self:blockStart(funNode)
+    self:parseCatGenericDef(funNode, funNode)
 
     self:skipSpace()
     funNode.symbolPos1 = self.lexer:consume '('
@@ -135,6 +119,7 @@ function Ast:parseCatFunction()
     end
 
     funNode.finish = self:getLastPos()
+    self:blockFinish(funNode)
 
     return funNode
 end
@@ -250,43 +235,6 @@ end
 ---@return LuaParser.Node.CatFuncReturn[]
 function Ast:parseCatReturnList()
     local list = self:parseList(false, false, self.parseCatFuncReturn)
-
-    return list
-end
-
----@private
----@return LuaParser.Node.CatGeneric?
-function Ast:parseCatGeneric()
-    local id = self:parseID('LuaParser.Node.CatID', true, true)
-    if not id then
-        return nil
-    end
-
-    local generic = self:createNode('LuaParser.Node.CatGeneric', {
-        id = id,
-        start = id.start,
-    })
-
-    self:skipSpace()
-    generic.symbolPos = self.lexer:consume ':'
-    if generic.symbolPos then
-
-        self:skipSpace()
-        generic.extends = self:parseCatExp()
-        if generic.extends then
-            generic.extends.parent = generic
-        end
-    end
-
-    generic.finish = self:getLastPos()
-
-    return generic
-end
-
----@private
----@return LuaParser.Node.CatGeneric[]
-function Ast:parseCatGenericList()
-    local list = self:parseList(true, true, self.parseCatGeneric)
 
     return list
 end

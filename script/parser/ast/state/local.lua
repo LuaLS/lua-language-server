@@ -140,7 +140,6 @@ Ast.hasThrowedLocalLimit = false
 ---@private
 ---@param loc LuaParser.Node.Local
 function Ast:initLocal(loc)
-    ---@class LuaParser.Node.Block
     local block = self.curBlock
     if not block then
         block = New 'LuaParser.Node.Block' ()
@@ -166,7 +165,6 @@ end
 ---@param name string
 ---@return LuaParser.Node.Local?
 function Ast:getLocal(name)
-    ---@class LuaParser.Node.Block
     local block = self.curBlock
     if not block then
         return nil

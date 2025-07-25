@@ -1,8 +1,16 @@
 ---@class LuaParser.Node.CatGenericMaster: LuaParser.Node.Base
----@field params? LuaParser.Node.CatGeneric[]
+---@field typeParams? LuaParser.Node.CatGeneric[]
 ---@field genericPos1? integer # `<` 的位置
 ---@field genericPos2? integer # `>` 的位置
 local M = Class('LuaParser.Node.CatGenericMaster', 'LuaParser.Node.Base')
+
+---@class LuaParser.Node.CatGeneric: LuaParser.Node.Base
+---@field id LuaParser.Node.CatID
+---@field extends? LuaParser.Node.CatExp
+---@field symbolPos? integer # 冒号的位置
+local CatGeneric = Class('LuaParser.Node.CatGeneric', 'LuaParser.Node.Base')
+
+CatGeneric.kind = 'catgeneric'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -47,16 +55,19 @@ end
 ---@private
 ---@param node LuaParser.Node.CatGenericMaster
 ---@param block LuaParser.Node.Block?
-function Ast:parseCatGenericDef(node, block)
-    self:skipSpace()
-    node.genericPos1 = self.lexer:consume '<'
-    if not node.genericPos1 then
-        return
+---@param skipBrackets? boolean
+function Ast:parseCatGenericDef(node, block, skipBrackets)
+    if not skipBrackets then
+        self:skipSpace()
+        node.genericPos1 = self.lexer:consume '<'
+        if not node.genericPos1 then
+            return
+        end
     end
 
     self:skipSpace()
-    node.params = self:parseCatGenericList()
-    for _, generic in ipairs(node.params) do
+    node.typeParams = self:parseCatGenericList()
+    for _, generic in ipairs(node.typeParams) do
         generic.parent = node
         if block then
             block.generics[#block.generics+1] = generic
@@ -64,6 +75,8 @@ function Ast:parseCatGenericDef(node, block)
         end
     end
 
-    self:skipSpace()
-    node.genericPos2 = self:assertSymbol '>'
+    if not skipBrackets then
+        self:skipSpace()
+        node.genericPos2 = self:assertSymbol '>'
+    end
 end

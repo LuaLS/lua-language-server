@@ -1,25 +1,25 @@
----@class LuaParser.Node.CatAlias: LuaParser.Node.Base, LuaParser.Node.CatGenericMaster, LuaParser.Node.Block
+---@class LuaParser.Node.CatStateAlias: LuaParser.Node.Base, LuaParser.Node.CatGenericMaster, LuaParser.Node.Block
 ---@field aliasID LuaParser.Node.CatID
 ---@field extends? LuaParser.Node.CatExp
-local CatAlias = Class('LuaParser.Node.CatAlias', 'LuaParser.Node.Base')
+local CatStateAlias = Class('LuaParser.Node.CatStateAlias', 'LuaParser.Node.Base')
 
-Extends('LuaParser.Node.CatAlias', 'LuaParser.Node.CatGenericMaster')
-Extends('LuaParser.Node.CatAlias', 'LuaParser.Node.Block')
+Extends('LuaParser.Node.CatStateAlias', 'LuaParser.Node.CatGenericMaster')
+Extends('LuaParser.Node.CatStateAlias', 'LuaParser.Node.Block')
 
-CatAlias.kind = 'catalias'
+CatStateAlias.kind = 'catstatealias'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
 ---@private
----@return LuaParser.Node.CatAlias?
-function Ast:parseCatAlias()
+---@return LuaParser.Node.CatStateAlias?
+function Ast:parseCatStateAlias()
     local aliasID = self:parseCatID()
     if not aliasID then
         return nil
     end
 
-    local catAlias = self:createNode('LuaParser.Node.CatAlias', {
+    local catAlias = self:createNode('LuaParser.Node.CatStateAlias', {
         aliasID = aliasID,
         start = aliasID.start,
     })

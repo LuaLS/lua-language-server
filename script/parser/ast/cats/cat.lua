@@ -1,6 +1,7 @@
 
 require 'parser.ast.cats.generic-master'
 require 'parser.ast.cats.id'
+require 'parser.ast.cats.generic'
 require 'parser.ast.cats.class'
 require 'parser.ast.cats.exp'
 require 'parser.ast.cats.field'
@@ -32,12 +33,12 @@ local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 Cat.kind = 'cat'
 
 ---@alias LuaParser.Node.CatValue
----| LuaParser.Node.CatClass
+---| LuaParser.Node.CatStateClass
 ---| LuaParser.Node.CatExp
----| LuaParser.Node.CatField
----| LuaParser.Node.CatAlias
----| LuaParser.Node.CatParam
----| LuaParser.Node.CatReturn
+---| LuaParser.Node.CatStateField
+---| LuaParser.Node.CatStateAlias
+---| LuaParser.Node.CatStateParam
+---| LuaParser.Node.CatStateReturn
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
@@ -65,26 +66,30 @@ end
 
 Ast:registerCatParser('class', {
     asState = true,
-    parser = Ast.parseCatClass,
+    parser = Ast.parseCatStateClass,
 })
 Ast:registerCatParser('type',  {
-    parser = Ast.parseCatType,
+    parser = Ast.parseCatStateType,
 })
 Ast:registerCatParser('field', {
     asState = true,
-    parser = Ast.parseCatField,
+    parser = Ast.parseCatStateField,
 })
 Ast:registerCatParser('alias', {
     asState = true,
-    parser = Ast.parseCatAlias,
+    parser = Ast.parseCatStateAlias,
 })
 Ast:registerCatParser('param', {
     asState = true,
-    parser = Ast.parseCatParam,
+    parser = Ast.parseCatStateParam,
 })
 Ast:registerCatParser('return', {
     asState = true,
-    parser = Ast.parseCatReturn,
+    parser = Ast.parseCatStateReturn,
+})
+Ast:registerCatParser('generic', {
+    asState = true,
+    parser = Ast.parseCatStateGeneric,
 })
 
 ---@private

@@ -90,8 +90,8 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
     if source.async then
         func:setAsync()
     end
-    if source.generics then
-        func:bindGenerics(ls.util.map(source.generics, function (g, k)
+    if source.typeParams then
+        func:bindGenerics(ls.util.map(source.typeParams, function (g, k)
             return runner:makeGeneric(g)
         end))
     end
@@ -119,7 +119,7 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
 end)
 
 ls.vm.registerRunnerParser('catclass', function (runner, source)
-    ---@cast source LuaParser.Node.CatClass
+    ---@cast source LuaParser.Node.CatStateClass
 
     local class = runner.node.type(source.classID.id)
     runner.context.lastClass = class
@@ -151,7 +151,7 @@ ls.vm.registerRunnerParser('catclass', function (runner, source)
 end)
 
 ls.vm.registerRunnerParser('catfield', function (runner, source)
-    ---@cast source LuaParser.Node.CatField
+    ---@cast source LuaParser.Node.CatStateField
 
     local field = {
         key      = runner.node.value(source.key.id),
@@ -171,7 +171,7 @@ ls.vm.registerRunnerParser('catfield', function (runner, source)
 end)
 
 ls.vm.registerRunnerParser('catalias', function (runner, source)
-    ---@cast source LuaParser.Node.CatAlias
+    ---@cast source LuaParser.Node.CatStateAlias
 
     local alias = runner.node.type(source.aliasID.id)
 
@@ -185,19 +185,19 @@ ls.vm.registerRunnerParser('catalias', function (runner, source)
 end)
 
 ls.vm.registerRunnerParser('catparam', function (runner, source)
-    ---@cast source LuaParser.Node.CatParam
+    ---@cast source LuaParser.Node.CatStateParam
 
     runner:addToCatGroup(source.parent, true)
 end)
 
 ls.vm.registerRunnerParser('catreturn', function (runner, source)
-    ---@cast source LuaParser.Node.CatReturn
+    ---@cast source LuaParser.Node.CatStateReturn
 
     runner:addToCatGroup(source.parent, true)
 end)
 
 ls.vm.registerRunnerParser('cattype', function (runner, source)
-    ---@cast source LuaParser.Node.CatType
+    ---@cast source LuaParser.Node.CatStateType
 
     local node = runner:parse(source.exp)
 

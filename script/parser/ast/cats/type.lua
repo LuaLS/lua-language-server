@@ -1,21 +1,21 @@
----@class LuaParser.Node.CatType: LuaParser.Node.Base
+---@class LuaParser.Node.CatStateType: LuaParser.Node.Base
 ---@field exp LuaParser.Node.CatExp
-local CatType = Class('LuaParser.Node.CatType', 'LuaParser.Node.Base')
+local CatStateType = Class('LuaParser.Node.CatStateType', 'LuaParser.Node.Base')
 
-CatType.kind = 'cattype'
+CatStateType.kind = 'catstatetype'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
 ---@private
----@return LuaParser.Node.CatType?
-function Ast:parseCatType()
+---@return LuaParser.Node.CatStateType?
+function Ast:parseCatStateType()
     local exp = self:parseCatExp(true)
     if not exp then
         return nil
     end
 
-    local catType = self:createNode('LuaParser.Node.CatType', {
+    local catType = self:createNode('LuaParser.Node.CatStateType', {
         exp = exp,
         start = exp.start,
     })

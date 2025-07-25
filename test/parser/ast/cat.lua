@@ -17,7 +17,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'catclass',
+                kind = 'catstateclass',
                 classID = {
                     kind = 'catid',
                     id   = 'A',
@@ -27,7 +27,7 @@ TEST [[
         [2] = {
             kind  = 'cat',
             value = {
-                kind = 'catfield',
+                kind = 'catstatefield',
                 key  = {
                     kind = 'catfieldname',
                     id   = 'a',
@@ -41,7 +41,7 @@ TEST [[
         [3] = {
             kind  = 'cat',
             value = {
-                kind = 'catfield',
+                kind = 'catstatefield',
                 key  = {
                     kind = 'catfieldname',
                     id   = 'b',
@@ -63,7 +63,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'catalias',
+                kind = 'catstatealias',
                 aliasID = {
                     kind = 'catid',
                     id   = 'A',
@@ -85,7 +85,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattype',
+                kind = 'catstatetype',
                 exp  = {
                     kind = 'catid',
                     id   = 'A',
@@ -107,7 +107,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattype',
+                kind = 'catstatetype',
                 exp  = {
                     kind = 'cattable',
                     fields = {
@@ -141,7 +141,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattype',
+                kind = 'catstatetype',
                 exp  = {
                     kind = 'cattuple',
                     exps = {
@@ -163,7 +163,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattype',
+                kind = 'catstatetype',
                 exp  = {
                     kind = 'catarray',
                     size = {
@@ -195,7 +195,7 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattype',
+                kind = 'catstatetype',
                 exp  = {
                     kind = 'catcall',
                     node = { kind = 'catid', id = 'A' },
@@ -220,11 +220,11 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'cattype',
+                kind = 'catstatetype',
                 exp  = {
                     kind  = 'catfunction',
                     async = true,
-                    generics = {
+                    typeParams = {
                         [1] = {
                             kind = 'catgeneric',
                             id   = { kind = 'catid', id = 'T1' },
@@ -288,16 +288,97 @@ TEST [[
         [1] = {
             kind  = 'cat',
             value = {
-                kind = 'catalias',
+                kind = 'catstatealias',
                 aliasID = {
                     kind = 'catid',
                     id   = 'A',
+                },
+                typeParams = {
+                    [1] = {
+                        kind = 'catgeneric',
+                        id   = { kind = 'catid', id = 'T' },
+                    }
                 },
                 extends = {
                     kind = 'catid',
                     id   = '`T`',
                     genericTemplate = { T = {} },
                 }
+            }
+        }
+    }
+}
+
+TEST [[
+---@class A<T>: { x: T }
+---@field y T
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstateclass',
+                classID = {
+                    kind = 'catid',
+                    id   = 'A',
+                },
+                typeParams = {
+                    [1] = {
+                        kind = 'catgeneric',
+                        id   = { kind = 'catid', id = 'T' },
+                    }
+                },
+                extends = {
+                    [1] = {
+                        kind  = 'cattable',
+                        fields = {
+                            [1] = {
+                                subtype = 'field',
+                                key    = { id = 'x' },
+                                value  = { id = 'T', generic = {} },
+                            }
+                        }
+
+                    }
+                }
+            }
+        },
+        [2] = {
+            kind  = 'cat',
+            value = {
+                kind  = 'catstatefield',
+                key   = { id = 'y' },
+                value = { id = 'T', generic = {} },
+            }
+        }
+    }
+}
+
+TEST [[
+---@generic T
+---@param x T
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstategeneric',
+                typeParams = {
+                    [1] = {
+                        kind = 'catgeneric',
+                        id   = { kind = 'catid', id = 'T' },
+                    }
+                },
+            }
+        },
+        [2] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstateparam',
+                key   = { id = 'x' },
+                value = { id = 'T', generic = {} },
             }
         }
     }

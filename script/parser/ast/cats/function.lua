@@ -16,14 +16,6 @@ Extends('LuaParser.Node.CatFunction', 'LuaParser.Node.Block')
 
 CatFunction.kind = 'catfunction'
 
----@class LuaParser.Node.CatGeneric: LuaParser.Node.Base
----@field id LuaParser.Node.CatID
----@field extends? LuaParser.Node.CatExp
----@field symbolPos? integer # 冒号的位置
-local CatGeneric = Class('LuaParser.Node.CatGeneric', 'LuaParser.Node.Base')
-
-CatGeneric.kind = 'catgeneric'
-
 ---@class LuaParser.Node.CatFuncParam: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatFuncParamName

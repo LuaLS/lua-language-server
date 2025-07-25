@@ -51,8 +51,8 @@ function Match(result, expect)
     end
     error(string.format('结果不一致！路径：`%s`，期望：`%s`，结果：`%s`'
         , table.concat(fullPath)
-        , exp
-        , res
+        , ls.inspect(exp)
+        , ls.inspect(res)
     ))
 end
 

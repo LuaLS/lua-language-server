@@ -1,13 +1,13 @@
 
----@class LuaParser.Node.CatField: LuaParser.Node.Base
+---@class LuaParser.Node.CatStateField: LuaParser.Node.Base
 ---@field key LuaParser.Node.CatFieldName
 ---@field value? LuaParser.Node.CatExp
-local CatField = Class('LuaParser.Node.CatField', 'LuaParser.Node.Base')
+local CatStateField = Class('LuaParser.Node.CatStateField', 'LuaParser.Node.Base')
 
-CatField.kind = 'catfield'
+CatStateField.kind = 'catstatefield'
 
 ---@class LuaParser.Node.CatFieldName: LuaParser.Node.Base
----@field parent LuaParser.Node.CatField
+---@field parent LuaParser.Node.CatStateField
 ---@field id string
 local CatFieldName = Class('LuaParser.Node.CatFieldName', 'LuaParser.Node.Base')
 
@@ -17,14 +17,14 @@ CatFieldName.kind = 'catfieldname'
 local Ast = Class 'LuaParser.Ast'
 
 ---@private
----@return LuaParser.Node.CatField?
-function Ast:parseCatField()
+---@return LuaParser.Node.CatStateField?
+function Ast:parseCatStateField()
     local key = self:parseID('LuaParser.Node.CatFieldName', true, true)
     if not key then
         return nil
     end
 
-    local catField = self:createNode('LuaParser.Node.CatField', {
+    local catField = self:createNode('LuaParser.Node.CatStateField', {
         key = key,
         start = key.start,
     })

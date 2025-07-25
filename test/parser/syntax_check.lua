@@ -5,7 +5,6 @@ local util   = require 'utility'
 ---@class Test.SyntaxExpect
 ---@field code? string
 ---@field multi? integer
----@field version? LuaParser.LuaVersion
 ---@field optional? LuaParser.CompileOptions
 ---@field extra? table
 
@@ -13,10 +12,9 @@ local util   = require 'utility'
 ---@return fun(expect: Test.SyntaxExpect|nil)
 local function TEST(script)
     return function (expect)
-        local version = expect and expect.version
         local optional = expect and expect.optional
         local newScript, list = catch(script, '!')
-        local ast = parser.compile(newScript, version, optional)
+        local ast = parser.compile(newScript, nil, optional)
         assert(ast)
         local errs = ast.errors
         local first = errs[1]
@@ -32,7 +30,7 @@ local function TEST(script)
             assert(#errs == 1)
         end
         assert(first)
-        assert(first.code == expect.code)
+        assert(first.errorCode == expect.code)
         assert(first.left == target[1])
         assert(first.right == target[2])
         assert(util.equal(first.extra, expect.extra))
@@ -137,7 +135,9 @@ s = '\u{<!ffffff!>}'
 ]]
 {
     code = 'UTF8_MAX',
-    version = 'Lua 5.3',
+    optional = {
+        version = 'Lua 5.3',
+    },
     extra = {
         min = '000000',
         max = '10FFFF',
@@ -1364,14 +1364,18 @@ TEST[[
 ]]
 {
     code = 'UNSUPPORT_SYMBOL',
-    version = 'Lua 5.1'
+    optional = {
+        version = 'Lua 5.1',
+    }
 }
 
 TEST[[
 local goto = 1
 ]]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    }
 }
 
 TEST[[
@@ -1379,7 +1383,9 @@ local x = '<!\u{1000}!>'
 ]]
 {
     code = 'ERR_ESC',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    }
 }
 
 TEST[[
@@ -1387,7 +1393,9 @@ local x = '<!\xff!>'
 ]]
 {
     code = 'ERR_ESC',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    }
 }
 
 TEST[[
@@ -1395,7 +1403,9 @@ local x = 1 <!//!> 2
 ]]
 {
     code = 'UNSUPPORT_SYMBOL',
-    version = 'Lua 5.2',
+    optional = {
+        version = 'Lua 5.2',
+    }
 }
 
 TEST[[
@@ -1403,7 +1413,9 @@ local x = 1 <!>>!> 2
 ]]
 {
     code = 'UNSUPPORT_SYMBOL',
-    version = 'Lua 5.2',
+    optional = {
+        version = 'Lua 5.2',
+    }
 }
 
 TEST[[
@@ -1411,7 +1423,9 @@ local x = '<!\u{1000}!>'
 ]]
 {
     code = 'ERR_ESC',
-    version = 'Lua 5.2',
+    optional = {
+        version = 'Lua 5.2',
+    }
 }
 
 TEST[[
@@ -1422,7 +1436,9 @@ end
 ]]
 {
     code = nil,
-    version = 'Lua 5.2',
+    optional = {
+        version = 'Lua 5.2',
+    }
 }
 
 TEST[[
@@ -1430,7 +1446,9 @@ local x <!<close>!> = 1
 ]]
 {
     code = 'UNSUPPORT_SYMBOL',
-    version = 'Lua 5.2',
+    optional = {
+        version = 'Lua 5.2',
+    }
 }
 
 TEST[[
@@ -1794,7 +1812,9 @@ if true then
 end
 ]]
 {
-    version = 'Lua 5.3'
+    optional = {
+        version = 'Lua 5.3',
+    }
 }
 
 TEST[[
@@ -1922,7 +1942,9 @@ for <!x!> in _ do end
 ]]
 {
     code = 'LOCAL_LIMIT',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -1931,7 +1953,9 @@ local l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16, l17
 for x in _ do end
 ]]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -1940,7 +1964,9 @@ local l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16, l17
 _ENV = nil
 ]]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -1950,7 +1976,9 @@ local <!_ENV!> = nil
 ]]
 {
     code = 'LOCAL_LIMIT',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -1988,7 +2016,9 @@ TEST [[
 goto = 1
 ]]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -1997,7 +2027,9 @@ return {
 }
 ]]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -2006,7 +2038,9 @@ print(1)
 ]]
 {
     code = 'ACTION_AFTER_RETURN',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -2015,7 +2049,9 @@ return 1
 ]]
 {
     code = 'ACTION_AFTER_RETURN',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -2024,7 +2060,9 @@ f
 ]]
 {
     code = 'AMBIGUOUS_SYNTAX',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -2033,7 +2071,9 @@ f:xx
 ]]
 {
     code = 'AMBIGUOUS_SYNTAX',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [[
@@ -2043,7 +2083,9 @@ f
 ]]
 {
     code = 'AMBIGUOUS_SYNTAX',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [===[
@@ -2053,7 +2095,9 @@ print [[
 ]===]
 {
     code = 'NESTING_LONG_MARK',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [===[
@@ -2063,7 +2107,9 @@ print [[
 ]===]
 {
     code = 'NESTING_LONG_MARK',
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [===[
@@ -2072,7 +2118,9 @@ print [=[
 ]=]
 ]===]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [===[
@@ -2081,7 +2129,9 @@ print [=[
 ]=]
 ]===]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [===[
@@ -2089,7 +2139,9 @@ print [[]]
 print [[]]
 ]===]
 {
-    version = 'Lua 5.1',
+    optional = {
+        version = 'Lua 5.1',
+    },
 }
 
 TEST [===[
@@ -2179,8 +2231,8 @@ goto LABEL
 ]]
 {
     code = nil,
-    version = 'Lua 5.1',
     optional = {
+        version = 'Lua 5.1',
         jit = true,
     }
 }
@@ -2190,8 +2242,8 @@ local goto = 1
 ]]
 {
     code = nil,
-    version = 'Lua 5.1',
     optional = {
+        version = 'Lua 5.1',
         jit = true,
     }
 }
@@ -2200,8 +2252,8 @@ TEST [[
 local goto]]
 {
     code = nil,
-    version = 'Lua 5.1',
     optional = {
+        version = 'Lua 5.1',
         jit = true,
     }
 }
@@ -2211,8 +2263,8 @@ f(1, goto, 2)
 ]]
 {
     code = nil,
-    version = 'Lua 5.1',
     optional = {
+        version = 'Lua 5.1',
         jit = true,
     }
 }
@@ -2222,8 +2274,8 @@ local function f(x, goto, y) end
 ]]
 {
     code = nil,
-    version = 'Lua 5.1',
     optional = {
+        version = 'Lua 5.1',
         jit = true,
     }
 }

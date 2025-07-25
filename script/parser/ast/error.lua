@@ -4,7 +4,7 @@
 local Error = Class('LuaParser.Node.Error', 'LuaParser.Node.Base')
 
 Error.kind = 'error'
-Error.code = 'UNKNOWN'
+Error.errorCode = 'UNKNOWN'
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -16,10 +16,10 @@ local Ast = Class 'LuaParser.Ast'
 ---@param extra table?
 function Ast:throw(errorCode, start, finish, extra)
     self.errors[#self.errors+1] = self:createNode('LuaParser.Node.Error', {
-        code   = errorCode,
-        start  = start,
-        finish = finish or start,
-        extra  = extra,
+        errorCode = errorCode,
+        start     = start,
+        finish    = finish or start,
+        extra     = extra,
     })
 end
 

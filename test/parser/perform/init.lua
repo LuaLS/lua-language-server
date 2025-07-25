@@ -18,7 +18,9 @@ local function performTest()
     ))
     local clock = os.clock()
     for path, buf in pairs(files) do
-        local ast = parser.compile(buf, 'Lua 5.4')
+        local ast = parser.compile(buf, path:string(), {
+            version = 'Lua 5.4',
+        })
         if not ast then
             error(('文件解析失败：%s'):format(path:string()))
         end
@@ -41,7 +43,9 @@ local function test(path)
     local ast
     local clock = os.clock()
     for i = 1, testTimes do
-        ast = parser.compile(buf, 'Lua 5.4')
+        ast = parser.compile(buf, path:string(), {
+            version = 'Lua 5.4',
+        })
         if not ast then
             error(('文件解析失败：%s'):format(path:string()))
         end

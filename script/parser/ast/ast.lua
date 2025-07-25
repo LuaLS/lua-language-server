@@ -37,14 +37,15 @@ local M = Class 'LuaParser.Ast'
 ---| 'LongLua' # 多行注释内的Lua代码
 
 ---@param code string # lua代码
----@param version? LuaParser.LuaVersion
+---@param source? string # 来源
 ---@param options? LuaParser.CompileOptions
-function M:__init(code, version, options)
+function M:__init(code, source, options)
     -- 代码内容
     self.code        = code
+    self.source      = source or ('=' .. code:sub(1, 20) .. '...')
     -- Lua版本
     ---@type LuaParser.LuaVersion
-    self.version     = version or 'Lua 5.4'
+    self.version     = options and options.version or 'Lua 5.4'
     -- 非标准符号的映射表
     ---@type table<string, true>
     self.nssymbolMap = {}

@@ -16,7 +16,7 @@ M.ast = nil
 ---@return LuaParser.Ast | false
 ---@return true
 M.__getter.ast = function (self)
-    local suc, ast = xpcall(ls.parser.compile, log.error, self.text)
+    local suc, ast = xpcall(ls.parser.compile, log.error, self.text, self.uri)
     if not suc then
         return false, true
     end

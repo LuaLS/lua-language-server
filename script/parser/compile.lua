@@ -18,6 +18,7 @@ local LuaParser = Class 'LuaParser'
 ---|'continue',
 
 ---@class LuaParser.CompileOptions
+---@field version? LuaParser.LuaVersion # Lua版本，默认为 'Lua 5.4'
 ---@field jit? boolean # 是否为LuaJIT，默认为 false
 ---@field nonestandardSymbols? LuaParser.NonestandardSymbol[] # 支持的非标准符号
 ---@field unicodeName? boolean # 是否支持Unicode标识符，默认为 false
@@ -25,11 +26,11 @@ local LuaParser = Class 'LuaParser'
 
 -- 编译lua代码
 ---@param code string # lua代码
----@param version? LuaParser.LuaVersion # 默认为 '5.4'
+---@param source? string # 来源
 ---@param options? LuaParser.CompileOptions
 ---@return LuaParser.Ast
-function LuaParser.compile(code, version, options)
-    local ast = New 'LuaParser.Ast' (code, version, options)
+function LuaParser.compile(code, source, options)
+    local ast = New 'LuaParser.Ast' (code, source, options)
     ast.main = ast:parseMain()
 
     ---@diagnostic disable-next-line: invisible

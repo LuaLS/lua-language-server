@@ -9,7 +9,9 @@ M.started = false
 ---@param sleeper? fun(seconds: number)
 function M.start(sleeper)
     if not sleeper then
-        sleeper = thread.sleep
+        sleeper = function (seconds)
+            thread.sleep(math.floor(seconds * 1000))
+        end
     end
     M.started = true
     while M.started do

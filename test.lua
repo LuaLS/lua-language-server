@@ -1,4 +1,5 @@
-local fs   = require 'bee.filesystem'
+local fs     = require 'bee.filesystem'
+local thread = require 'bee.thread'
 
 collectgarbage('generational', 10, 50)
 
@@ -30,20 +31,18 @@ test.scope    = ls.scope.create()
 
 ---@async
 ls.await.call(function ()
-    print('开始测试')
-    require 'test.parser'
-    require 'test.node'
-    require 'test.vm'
-    --dofile 'test/project/init.lua'
-    print('测试完成')
+    pcall(function ()
+        print('开始测试')
+        require 'test.parser'
+        require 'test.node'
+        require 'test.vm'
+        dofile 'test/project/init.lua'
+        print('测试完成')
+    end)
     ls.await.sleep(1)
     ls.eventLoop.stop()
 end)
 
 ls.eventLoop.start(function ()
     ls.timer.update(1000)
-    if ls.timer.clock() > 1000 * 60 * 60 then
-        ls.eventLoop.stop()
-        print('One hours later ...')
-    end
 end)

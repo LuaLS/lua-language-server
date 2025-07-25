@@ -5,6 +5,7 @@
 ---@field finish integer # 结束位置（偏移）
 ---@field left integer # 开始位置（行号与列号合并，仅用于测试）
 ---@field right integer # 结束位置（行号与列号合并，仅用于测试）
+---@field where string # 位置描述（仅用于测试）
 ---@field startRow integer # 开始行号
 ---@field startCol integer # 开始列号
 ---@field finishRow integer # 结束行号
@@ -160,6 +161,20 @@ end
 Base.__getter.finishCol = function (self)
     local finishCol = self.right % rowcolMulti
     return finishCol, true
+end
+
+---@param self LuaParser.Node.Base
+---@return string
+---@return true
+Base.__getter.where = function (self)
+    return string.format('%s:%s - %s:%s @ %s = %s'
+        , self.startRow + 1
+        , self.startCol + 1
+        , self.finishRow + 1
+        , self.finishCol + 1
+        , self.ast.source
+        , self.code
+    ), true
 end
 
 ---@param self LuaParser.Node.Base

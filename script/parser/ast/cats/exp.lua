@@ -84,6 +84,10 @@ function Ast:parseCatTerm(required)
         end
     end
 
+    if self.lexer:consume '?' then
+        current.optional = true
+    end
+
     return current
 end
 

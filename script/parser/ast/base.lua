@@ -25,6 +25,7 @@
 ---@field toInteger? integer
 ---@field isTruly? boolean
 ---@field dummy? boolean
+---@field optional? boolean
 ---@field index? integer
 local Base = Class 'LuaParser.Node.Base'
 

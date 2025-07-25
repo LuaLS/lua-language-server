@@ -290,5 +290,8 @@ function M.update(deltaMS)
     curMS = targetMS
 end
 
+function M.clock()
+    return curMS
+end
 
 return M

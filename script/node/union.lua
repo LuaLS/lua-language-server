@@ -84,16 +84,20 @@ M.sortScore = {
     ['nil'] = -1000,
 }
 
-function M:view(skipLevel)
+function M:view(skipLevel, needParentheses)
+    local values = self.values
+    if #values == 0 then
+        return 'never'
+    end
+    if #values == 1 then
+        return values[1]:view(skipLevel, needParentheses)
+    end
     ---@type string[]
     local view = {}
-    for _, v in ipairs(self.values) do
-        local thisView = v:view(skipLevel and skipLevel + 1 or nil)
+    for _, v in ipairs(values) do
+        local thisView = v:view(skipLevel and skipLevel + 1 or nil, true)
         if not thisView then
             goto continue
-        end
-        if v.kind == 'intersection' then
-            thisView = '(' .. thisView .. ')'
         end
         view[#view+1] = thisView
         ::continue::
@@ -104,7 +108,11 @@ function M:view(skipLevel)
         end,
         ls.util.sortCallbackOfIndex(view),
     })
-    return table.concat(view, ' | ')
+    local result = table.concat(view, ' | ')
+    if needParentheses then
+        return '(' .. result .. ')'
+    end
+    return result
 end
 
 function M:get(key)

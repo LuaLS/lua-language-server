@@ -173,6 +173,13 @@ function M:fillAPIs()
     function self.variable(name, parent)
         return New 'Node.Variable' (scope, name, parent)
     end
+
+    ---@param name string
+    ---@param params table<string, Node.Generic?>
+    ---@return Node.Template
+    function self.template(name, params)
+        return New 'Node.Template' (scope, name, params)
+    end
 end
 
 ---@private

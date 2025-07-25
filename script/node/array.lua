@@ -80,7 +80,7 @@ function M:onCanCast(other)
 end
 
 function M:view(skipLevel)
-    return string.format('%s[%s]', self.head:view(skipLevel), self.len == math.huge and '' or self.len)
+    return string.format('%s[%s]', self.head:view(skipLevel, true), self.len == math.huge and '' or self.len)
 end
 
 ---@param self Node.Array

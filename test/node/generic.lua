@@ -1,11 +1,13 @@
+local node = test.scope.node
+
 do
-    local N = test.scope.node.generic('N', test.scope.node.NUMBER)
-    local U = test.scope.node.generic 'U'
-    local pack = test.scope.node.genericPack { N, U }
-    local array = test.scope.node.array(N)
-    local tuple = test.scope.node.tuple { N, U }
-    local table = test.scope.node.table { [N] = U }
-    local func  = test.scope.node.func()
+    local N = node.generic('N', node.NUMBER)
+    local U = node.generic 'U'
+    local pack = node.genericPack { N, U }
+    local array = node.array(N)
+    local tuple = node.tuple { N, U }
+    local table = node.table { [N] = U }
+    local func  = node.func()
         : addParam('a', N)
         : addVarargParam(U)
         : addReturn(nil, tuple)
@@ -31,7 +33,7 @@ do
 
     assert(intersection:view() == '<N:number> & <U>')
 
-    local resolve = { [N] = test.scope.node.INTEGER }
+    local resolve = { [N] = node.INTEGER }
 
     local newPack = pack:resolve(resolve)
     assert(newPack:view() == '<integer, U>')
@@ -56,45 +58,45 @@ do
 end
 
 do
-    test.scope.node.TYPE_POOL['Alias'] = nil
+    node.TYPE_POOL['Alias'] = nil
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local pack = test.scope.node.genericPack { K, V }
-    local alias = test.scope.node.type 'Alias'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local pack = node.genericPack { K, V }
+    local alias = node.type 'Alias'
     alias:addParams { K, V }
 
-    local aliasValue = K | V | test.scope.node.BOOLEAN
+    local aliasValue = K | V | node.BOOLEAN
     alias:addAlias(aliasValue)
     assert(aliasValue.value:view() == '<K> | <V> | boolean')
 
     assert(alias:view() == 'Alias<K, V>')
 
     local newAlias = alias:resolveGeneric {
-        [K] = test.scope.node.STRING,
-        [V] = test.scope.node.NUMBER,
+        [K] = node.STRING,
+        [V] = node.NUMBER,
     }
     assert(newAlias:view() == 'Alias<string, number>')
 
-    newAlias = alias:call { test.scope.node.NUMBER, test.scope.node.STRING }
+    newAlias = alias:call { node.NUMBER, node.STRING }
     assert(newAlias:view() == 'Alias<number, string>')
 
     assert(newAlias.value:view() == 'number | string | boolean')
 end
 
 do
-    test.scope.node.TYPE_POOL['Alias'] = nil
+    node.TYPE_POOL['Alias'] = nil
 
     --[[
     ---@alias Alias<K, V:number> K | V | boolean
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local alias = test.scope.node.type 'Alias'
+    local K = node.generic 'K'
+    local V = node.generic('V', node.NUMBER)
+    local alias = node.type 'Alias'
     alias:addParams { K, V }
 
-    local aliasValue = K | V | test.scope.node.BOOLEAN
+    local aliasValue = K | V | node.BOOLEAN
     alias:addAlias(aliasValue)
     assert(aliasValue:view() == '<K> | <V:number> | boolean')
 
@@ -105,32 +107,32 @@ do
     assert(alias0:view() == 'Alias<any, number>')
     assert(alias0.value:view() == 'any | number | boolean')
 
-    local alias1 = alias:call { test.scope.node.STRING }
+    local alias1 = alias:call { node.STRING }
     assert(alias1:view() == 'Alias<string, number>')
     assert(alias1.value:view() == 'string | number | boolean')
 
-    local alias2 = alias:call { test.scope.node.STRING, test.scope.node.INTEGER }
+    local alias2 = alias:call { node.STRING, node.INTEGER }
     assert(alias2:view() == 'Alias<string, integer>')
     assert(alias2.value:view() == 'string | integer | boolean')
 
-    local alias3 = alias:call { test.scope.node.STRING, test.scope.node.INTEGER, test.scope.node.TABLE }
+    local alias3 = alias:call { node.STRING, node.INTEGER, node.TABLE }
     assert(alias3:view() == 'Alias<string, integer>')
     assert(alias3.value:view() == 'string | integer | boolean')
 end
 
 do
-    test.scope.node.TYPE_POOL['Alias'] = nil
+    node.TYPE_POOL['Alias'] = nil
 
     --[[
     ---@alias Alias<K, V:number> { [K]: V }
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local alias = test.scope.node.type 'Alias'
+    local K = node.generic 'K'
+    local V = node.generic('V', node.NUMBER)
+    local alias = node.type 'Alias'
     alias:addParams { K, V }
 
-    local aliasValue = test.scope.node.table { [K] = V }
+    local aliasValue = node.table { [K] = V }
     alias:addAlias(aliasValue)
     assert(aliasValue:view() == '{ [<K>]: <V:number> }')
 
@@ -143,13 +145,13 @@ do
     assert(alias0:get(1):view() == 'number')
     assert(alias0:get('x'):view() == 'number')
 
-    local alias1 = alias:call { test.scope.node.STRING }
+    local alias1 = alias:call { node.STRING }
     assert(alias1:view() == 'Alias<string, number>')
     assert(alias1.value:view() == '{ [string]: number }')
     assert(alias1:get(1):view() == 'nil')
     assert(alias1:get('x'):view() == 'number')
 
-    local alias2 = alias:call { test.scope.node.STRING, test.scope.node.INTEGER }
+    local alias2 = alias:call { node.STRING, node.INTEGER }
     assert(alias2:view() == 'Alias<string, integer>')
     assert(alias2.value:view() == '{ [string]: integer }')
     assert(alias2:get(1):view() == 'nil')
@@ -157,16 +159,53 @@ do
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['Alias'] = nil
+
+    --[[
+    ---@alias Alias<A, B> xyz`A`.`B`.xyz | `A`[]
+    ]]
+
+    local A = node.generic 'A'
+    local B = node.generic 'B'
+    local alias = node.type 'Alias'
+    alias:addParams { A, B }
+
+    local aliasValue = node.union {
+        node.template('xyz`A`.`B`.xyz', {
+            A = A,
+            B = B,
+        }),
+        node.array(
+            node.template('`A`', {
+                A = A,
+            })
+        ),
+    }
+    alias:addAlias(aliasValue)
+    assert(aliasValue:view() == 'unknown | unknown[]')
+
+    local alias1 = alias:call { node.value 'X' }
+    assert(alias1:view() == 'Alias<"X", any>')
+    assert(alias1.value:view() == 'unknown | X[]')
+
+    local alias2 = alias:call { node.value 'X', node.value 'Y' }
+    assert(alias2.value:view() == 'xyzX.Y.xyz | X[]')
+
+    local alias3 = alias:call { node.value 'X1' | node.value 'X2', node.value 'Y1' | node.value 'Y2' }
+    assert(alias3.value:view() == 'xyzX1.Y1.xyz | xyzX1.Y2.xyz | xyzX2.Y1.xyz | xyzX2.Y2.xyz | (X1 | X2)[]')
+end
+
+do
+    node.TYPE_POOL['Map'] = nil
 
     --[[
     ---@class Map<K, V:number>
     ---@field [K] V
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic('V', node.NUMBER)
+    local map = node.type 'Map'
     map:addParams { K, V }
 
     map:addField {
@@ -177,7 +216,7 @@ do
     assert(map:view() == 'Map<K, V:number>')
     assert(map.value:view() == '{ [<K>]: <V:number> }')
 
-    local map2 = map:call { test.scope.node.STRING, test.scope.node.INTEGER }
+    local map2 = map:call { node.STRING, node.INTEGER }
     assert(map2:view() == 'Map<string, integer>')
     assert(map2.value:view() == '{ [string]: integer }')
     assert(map2:get(1):view() == 'nil')
@@ -185,7 +224,7 @@ do
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['Map'] = nil
 
     --[[
     ---@class Map<K, V:number>
@@ -193,20 +232,20 @@ do
     ---@field get fun(key: K): V
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic('V', test.scope.node.NUMBER)
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic('V', node.NUMBER)
+    local map = node.type 'Map'
     map:addParams { K, V }
 
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : addParam('key', K)
             : addParam('value', V),
     }
     map:addField {
-        key   = test.scope.node.value 'get',
-        value = test.scope.node.func()
+        key   = node.value 'get',
+        value = node.func()
             : addParam('key', K)
             : addReturn(nil, V),
     }
@@ -215,28 +254,28 @@ do
     assert(map.value:get('set'):view() == 'fun(key: <K>, value: <V:number>)')
     assert(map:get('set'):view() == 'fun(key: any, value: number)')
 
-    local map2 = map:call { test.scope.node.STRING, test.scope.node.INTEGER }
+    local map2 = map:call { node.STRING, node.INTEGER }
     assert(map2.value:view() == '{ get: fun(key: string):integer, set: fun(key: string, value: integer) }')
     assert(map2:get('set'):view() == 'fun(key: string, value: integer)')
     assert(map2.value:get('set'):view() == 'fun(key: string, value: integer)')
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['Map'] = nil
 
     --[[
     ---@class Map<K>
     ---@field set fun<V>(key: K, value: V)
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local map = node.type 'Map'
     map:addParams { K }
 
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : bindGenerics { V }
             : addParam('key', K)
             : addParam('value', V),
@@ -246,7 +285,7 @@ do
     assert(map.value:get('set'):view() == 'fun<V>(key: <K>, value: <V>)')
     assert(map:get('set'):view() == 'fun<V>(key: any, value: <V>)')
 
-    local map1 = map:call { test.scope.node.STRING }
+    local map1 = map:call { node.STRING }
     assert(map1.value:view() == '{ set: fun<V>(key: string, value: <V>) }')
     assert(map1:get('set'):view() == 'fun<V>(key: string, value: <V>)')
     assert(map1.value:get('set'):view() == 'fun<V>(key: string, value: <V>)')
@@ -254,13 +293,13 @@ do
     local func = map1:get('set')
     ---@cast func Node.Function
     assert(func:view() == 'fun<V>(key: string, value: <V>)')
-    local rfunc = func:resolveGeneric { [V] = test.scope.node.INTEGER }
+    local rfunc = func:resolveGeneric { [V] = node.INTEGER }
     assert(rfunc:view() == 'fun<integer>(key: string, value: integer)')
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
-    test.scope.node.TYPE_POOL['Unit'] = nil
+    node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['Unit'] = nil
 
     --[[
     ---@class Map<K, V>
@@ -270,22 +309,22 @@ do
     ---@field childs Map<integer, Unit>
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local map = node.type 'Map'
     map:addParams { K, V }
 
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : addParam('key', K)
             : addParam('value', V),
     }
 
-    local unit = test.scope.node.type 'Unit'
+    local unit = node.type 'Unit'
     unit:addField {
-        key   = test.scope.node.value 'childs',
-        value = map:call { test.scope.node.INTEGER, unit },
+        key   = node.value 'childs',
+        value = map:call { node.INTEGER, unit },
     }
 
     assert(unit.value:view() == '{ childs: Map<integer, Unit> }')
@@ -294,8 +333,8 @@ do
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
-    test.scope.node.TYPE_POOL['Unit'] = nil
+    node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['Unit'] = nil
 
     --[[
     ---@class Map<K, V>
@@ -305,23 +344,23 @@ do
     ---@field childs Map<T, string>
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local map = node.type 'Map'
     map:addParams { K, V }
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : addParam('key', K)
             : addParam('value', V),
     }
 
-    local T = test.scope.node.generic 'T'
-    local unit = test.scope.node.type 'Unit'
+    local T = node.generic 'T'
+    local unit = node.type 'Unit'
     unit:addParams { T }
     unit:addField {
-        key   = test.scope.node.value 'childs',
-        value = map:call { T, test.scope.node.STRING },
+        key   = node.value 'childs',
+        value = map:call { T, node.STRING },
     }
 
     assert(unit.value:view() == '{ childs: Map<<T>, string> }')
@@ -330,7 +369,7 @@ do
     assert(unit:get('childs'):view() == 'Map<any, string>')
     assert(unit:get('childs').value:view() == '{ set: fun(key: any, value: string) }')
 
-    local unit2 = unit:call { test.scope.node.NUMBER }
+    local unit2 = unit:call { node.NUMBER }
     assert(unit2.value:view() == '{ childs: Map<number, string> }')
     assert(unit2.value:get('childs'):view() == 'Map<number, string>')
     assert(unit2.value:get('childs').value:view() == '{ set: fun(key: number, value: string) }')
@@ -339,8 +378,8 @@ do
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
-    test.scope.node.TYPE_POOL['OrderMap'] = nil
+    node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['OrderMap'] = nil
 
     --[[
     ---@class Map<K, V>
@@ -349,26 +388,26 @@ do
     ---@class OrderMap: Map<number, string>
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local map = node.type 'Map'
     map:addParams { K, V }
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : addParam('key', K)
             : addParam('value', V),
     }
 
-    local omap = test.scope.node.type 'OrderMap'
-    omap:addExtends(map:call { test.scope.node.NUMBER, test.scope.node.STRING })
+    local omap = node.type 'OrderMap'
+    omap:addExtends(map:call { node.NUMBER, node.STRING })
 
     assert(omap:get('set'):view() == 'fun(key: number, value: string)')
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
-    test.scope.node.TYPE_POOL['OrderMap'] = nil
+    node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['OrderMap'] = nil
 
     --[[
     ---@class Map<K, V>
@@ -377,26 +416,26 @@ do
     ---@class OrderMap: Map<number, string>
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local map = node.type 'Map'
     map:addParams { K, V }
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : addParam('key', K)
             : addParam('value', V),
     }
 
-    local omap = test.scope.node.type 'OrderMap'
-    omap:addExtends(map:call { test.scope.node.NUMBER, test.scope.node.STRING })
+    local omap = node.type 'OrderMap'
+    omap:addExtends(map:call { node.NUMBER, node.STRING })
 
     assert(omap:get('set'):view() == 'fun(key: number, value: string)')
 end
 
 do
-    test.scope.node.TYPE_POOL['Map'] = nil
-    test.scope.node.TYPE_POOL['OrderMap'] = nil
+    node.TYPE_POOL['Map'] = nil
+    node.TYPE_POOL['OrderMap'] = nil
 
     --[[
     ---@class Map<K, V>
@@ -405,26 +444,26 @@ do
     ---@class OrderMap<OK:number, OV>: Map<OK, OV>
     ]]
 
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    local map = test.scope.node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    local map = node.type 'Map'
     map:addParams { K, V }
     map:addField {
-        key   = test.scope.node.value 'set',
-        value = test.scope.node.func()
+        key   = node.value 'set',
+        value = node.func()
             : addParam('key', K)
             : addParam('value', V),
     }
 
-    local OK = test.scope.node.generic('OK', test.scope.node.NUMBER)
-    local OV = test.scope.node.generic 'OV'
-    local omap = test.scope.node.type 'OrderMap'
+    local OK = node.generic('OK', node.NUMBER)
+    local OV = node.generic 'OV'
+    local omap = node.type 'OrderMap'
     omap:addParams { OK, OV }
     omap:addExtends(map:call { OK, OV })
 
     assert(omap:get('set'):view() == 'fun(key: number, value: any)')
 
-    local omap2 = omap:call { test.scope.node.INTEGER, test.scope.node.STRING }
+    local omap2 = omap:call { node.INTEGER, node.STRING }
 
     assert(omap2:get('set'):view() == 'fun(key: integer, value: string)')
 end

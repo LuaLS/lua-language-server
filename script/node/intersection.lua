@@ -240,7 +240,7 @@ function M:onCanCast(other)
     return self.value:canCast(other.value)
 end
 
-function M:view(skipLevel)
+function M:view(skipLevel, needParentheses)
     local values = self.values
     if #values == 0 then
         return 'never'
@@ -250,13 +250,14 @@ function M:view(skipLevel)
     end
     local elements = {}
     for _, v in ipairs(self.rawNodes) do
-        local view = v:view(skipLevel)
-        if v.kind == 'union' then
-            view = '(' .. view .. ')'
-        end
+        local view = v:view(skipLevel, true)
         elements[#elements+1] = view
     end
-    return table.concat(elements, ' & ')
+    local result = table.concat(elements, ' & ')
+    if needParentheses then
+        return '(' .. result .. ')'
+    end
+    return result
 end
 
 ---@param self Node.Intersection

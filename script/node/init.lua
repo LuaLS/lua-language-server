@@ -16,5 +16,6 @@ require 'node.generic'
 require 'node.generic_pack'
 require 'node.typecall'
 require 'node.variable'
+require 'node.template'
 
 require 'node.manager'

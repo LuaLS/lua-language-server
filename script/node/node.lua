@@ -69,13 +69,14 @@ end
 
 ---展示节点内容
 ---@param skipLevel? integer
+---@param needParentheses? boolean
 ---@return string?
-function M:view(skipLevel)
+function M:view(skipLevel, needParentheses)
     local value = self.value
     if value == self then
         error('Not implemented')
     end
-    return value:view(skipLevel)
+    return value:view(skipLevel, needParentheses)
 end
 
 function M:viewAsKey(skipLevel)

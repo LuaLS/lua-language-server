@@ -8,7 +8,7 @@ local function findParamType(catGroup, key)
     for _, cat in ipairs(catGroup) do
         local cvalue = cat.value
         ---@cast cvalue -?
-        if cvalue.kind == 'catparam' then
+        if cvalue.kind == 'catstateparam' then
             ---@cast cvalue LuaParser.Node.CatStateParam
             if cvalue.key.id == key then
                 return cvalue.value
@@ -99,7 +99,7 @@ ls.vm.registerRunnerParser('function', function (runner, source)
         for _, cat in ipairs(catGroup) do
             local cvalue = cat.value
             ---@cast cvalue -?
-            if cvalue.kind == 'catreturn' then
+            if cvalue.kind == 'catstatereturn' then
                 ---@cast cvalue LuaParser.Node.CatStateReturn
                 func:addReturn(cvalue.key and cvalue.key.id, subRunner:lazyParse(cvalue.value, node.ANY))
             end

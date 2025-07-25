@@ -19,9 +19,18 @@ local Ast = Class 'LuaParser.Ast'
 ---@param nodeType `T`
 ---@param required? boolean
 ---@param canBeKeyword? boolean
+---@param includeVarargs? boolean
 ---@return T?
-function Ast:parseID(nodeType, required, canBeKeyword)
+function Ast:parseID(nodeType, required, canBeKeyword, includeVarargs)
     local token, tp, pos = self.lexer:peek()
+    if token == '...' and includeVarargs then
+        self.lexer:next()
+        return self:createNode(nodeType or 'LuaParser.Node.Var', {
+            id     = token,
+            start  = pos,
+            finish = pos + #token,
+        })
+    end
     if tp ~= 'Word' then
         if required then
             self:throw('MISS_NAME', self:getLastPos())

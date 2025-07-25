@@ -118,7 +118,7 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
     return func
 end)
 
-ls.vm.registerRunnerParser('catclass', function (runner, source)
+ls.vm.registerRunnerParser('catstateclass', function (runner, source)
     ---@cast source LuaParser.Node.CatStateClass
 
     local class = runner.node.type(source.classID.id)
@@ -150,7 +150,7 @@ ls.vm.registerRunnerParser('catclass', function (runner, source)
     return class
 end)
 
-ls.vm.registerRunnerParser('catfield', function (runner, source)
+ls.vm.registerRunnerParser('catstatefield', function (runner, source)
     ---@cast source LuaParser.Node.CatStateField
 
     local field = {
@@ -170,7 +170,7 @@ ls.vm.registerRunnerParser('catfield', function (runner, source)
     end)
 end)
 
-ls.vm.registerRunnerParser('catalias', function (runner, source)
+ls.vm.registerRunnerParser('catstatealias', function (runner, source)
     ---@cast source LuaParser.Node.CatStateAlias
 
     local alias = runner.node.type(source.aliasID.id)
@@ -184,19 +184,19 @@ ls.vm.registerRunnerParser('catalias', function (runner, source)
     end)
 end)
 
-ls.vm.registerRunnerParser('catparam', function (runner, source)
+ls.vm.registerRunnerParser('catstateparam', function (runner, source)
     ---@cast source LuaParser.Node.CatStateParam
 
     runner:addToCatGroup(source.parent, true)
 end)
 
-ls.vm.registerRunnerParser('catreturn', function (runner, source)
+ls.vm.registerRunnerParser('catstatereturn', function (runner, source)
     ---@cast source LuaParser.Node.CatStateReturn
 
     runner:addToCatGroup(source.parent, true)
 end)
 
-ls.vm.registerRunnerParser('cattype', function (runner, source)
+ls.vm.registerRunnerParser('catstatetype', function (runner, source)
     ---@cast source LuaParser.Node.CatStateType
 
     local node = runner:parse(source.exp)

@@ -34,6 +34,9 @@ function Ast:parseList(atLeastOne, greedy, parser)
             if not greedy then
                 break
             end
+            if tp == 'NL' then
+                break
+            end
             if tp == 'Word' and self:isKeyWord(token) then
                 break
             end

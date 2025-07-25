@@ -4,6 +4,7 @@ local function TEST(code)
         local node = ast:parseMain()
         assert(node)
         Match(node, expect)
+        assert(#ast.errors == 0)
     end
 end
 
@@ -98,7 +99,7 @@ TEST [[
 TEST [[
 ---@type {
 --- x: number,
---- y: number,
+--- y?: number,
 --- [number]: boolean,
 ---}
 ]]
@@ -119,6 +120,7 @@ TEST [[
                         [2] = {
                             subtype = 'field',
                             key = { id = 'y' },
+                            optional = true,
                             value = { id = 'number' },
                         },
                         [3] = {
@@ -356,8 +358,14 @@ TEST [[
 }
 
 TEST [[
----@generic T
----@param x T
+---@generic A
+---@generic B: string
+---@param x A
+---@param y? B
+---@param ... string
+---@return A
+---@return ...
+---@return ... B
 ]]
 {
     childs = {
@@ -368,7 +376,7 @@ TEST [[
                 typeParams = {
                     [1] = {
                         kind = 'catgeneric',
-                        id   = { kind = 'catid', id = 'T' },
+                        id   = { kind = 'catid', id = 'A' },
                     }
                 },
             }
@@ -376,9 +384,61 @@ TEST [[
         [2] = {
             kind  = 'cat',
             value = {
+                kind = 'catstategeneric',
+                typeParams = {
+                    [1] = {
+                        kind = 'catgeneric',
+                        id   = { kind = 'catid', id = 'B' },
+                        extends = { kind = 'catid', id = 'string' },
+                    }
+                },
+            }
+        },
+        [3] = {
+            kind  = 'cat',
+            value = {
                 kind = 'catstateparam',
                 key   = { id = 'x' },
-                value = { id = 'T', generic = {} },
+                value = { id = 'A', generic = {} },
+            }
+        },
+        [4] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstateparam',
+                key   = { id = 'y' },
+                optional = true,
+                value = { id = 'B', generic = {} },
+            }
+        },
+        [5] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstateparam',
+                key   = { id = '...' },
+                value = { id = 'string' },
+            }
+        },
+        [6] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatereturn',
+                value = { id = 'A', generic = {} },
+            }
+        },
+        [7] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatereturn',
+                varargs = true,
+            }
+        },
+        [8] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatereturn',
+                varargs = true,
+                value = { id = 'B', generic = {} },
             }
         }
     }

@@ -7,6 +7,7 @@ CatTable.kind = 'cattable'
 ---@class LuaParser.Node.CatTableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index'
 ---@field key? LuaParser.Node.CatTableFieldID | LuaParser.Node.CatExp
+---@field optional? boolean
 ---@field value? LuaParser.Node.CatExp
 ---@field symbolPos? integer
 ---@field symbolPos2? integer
@@ -103,6 +104,7 @@ function Ast:parseCatTableFieldAsField()
     if not key then
         return nil
     end
+    local optional = self.lexer:consume '?' and true or nil
 
     local value
     self:skipSpace()
@@ -112,11 +114,12 @@ function Ast:parseCatTableFieldAsField()
     end
 
     local tfield = self:createNode('LuaParser.Node.CatTableField', {
-        subtype = 'field',
-        key     = key,
-        value   = value,
-        start   = key.start,
-        finish  = self:getLastPos(),
+        subtype  = 'field',
+        key      = key,
+        optional = optional,
+        value    = value,
+        start    = key.start,
+        finish   = self:getLastPos(),
     })
     key.parent = tfield
     if value then
@@ -137,6 +140,7 @@ function Ast:parseCatTableFieldAsIndex()
     local key = self:parseCatExp(true)
     self:skipSpace()
     local pos2 = self:assertSymbol ']'
+    local optional = self.lexer:consume '?' and true or nil
     self:skipSpace()
 
     local value
@@ -145,11 +149,12 @@ function Ast:parseCatTableFieldAsIndex()
         value = self:parseCatExp(true)
     end
     local tfield = self:createNode('LuaParser.Node.CatTableField', {
-        subtype = 'index',
-        key     = key,
-        value   = value,
-        start   = pos,
-        finish  = self:getLastPos(),
+        subtype    = 'index',
+        key        = key,
+        optional   = optional,
+        value      = value,
+        start      = pos,
+        finish     = self:getLastPos(),
         symbolPos  = pos,
         symbolPos2 = pos2,
     })

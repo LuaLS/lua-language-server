@@ -16,7 +16,7 @@ local function bindVariableWithClass(runner, source, variable)
         return nil
     end
     local first = catGroup[1]
-    if first.value.kind ~= 'catclass' then
+    if first.value.kind ~= 'catstateclass' then
         return nil
     end
     local class = runner:parse(first)
@@ -43,7 +43,7 @@ local function bindVariableWithType(runner, source, variable)
     end
     local tnode
     for _, cat in ipairs(catGroup) do
-        if cat.value.kind == 'cattype' then
+        if cat.value.kind == 'catstatetype' then
             tnode = runner:parse(cat)
         end
     end

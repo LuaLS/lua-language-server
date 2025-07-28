@@ -148,8 +148,11 @@ function Ast:resolveGoto(gotoNode)
     labelNode.gotos[#labelNode.gotos+1] = gotoNode
 
     -- 检查是否进入局部变量的作用域
+    -- 必须同时满足2个条件：
+    -- 1. 标签不是block的最后一个语句
+    -- 2. goto 与 标签之间有局部变量的定义
     local labelBlock = labelNode.parentBlock
-    if labelBlock then
+    if labelBlock and labelBlock.childs[#labelBlock.childs] ~= labelNode then
         for _, loc in ipairs(labelBlock.locals) do
             if  loc.start > gotoNode.start
             and loc.start < labelNode.start then

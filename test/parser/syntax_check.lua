@@ -1681,18 +1681,12 @@ end
 (nil)
 
 TEST[[
-<!goto label!>
+goto label
 local x = 1
 x = 2
 ::label::
 ]]
 {
-    code = 'JUMP_LOCAL_SCOPE',
-    extra = {
-        loc = 'x',
-        start = 17,
-        finish = 18,
-    }
 }
 
 TEST[[
@@ -1736,6 +1730,22 @@ end
 ]]
 {
     code = 'NO_VISIBLE_LABEL',
+}
+
+TEST[[
+<!goto label!>
+local x = 1
+x = 2
+::label::
+local y = 1
+]]
+{
+    code = 'JUMP_LOCAL_SCOPE',
+    extra = {
+        loc = 'x',
+        start = 17,
+        finish = 18,
+    },
 }
 
 TEST[[

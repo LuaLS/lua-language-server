@@ -178,6 +178,18 @@ function M:fastForward(pos)
     self.ci = #self.poses + 1
 end
 
+---回退导某个光标位置
+---@param pos integer
+function M:rewind(pos)
+    for i = self.ci - 1, 1, -1 do
+        if self.poses[i] < pos then
+            self.ci = i + 1
+            return
+        end
+    end
+    self.ci = 1
+end
+
 -- 根据偏移量获取行列
 ---@param offset integer
 ---@return integer row # 第一行是0

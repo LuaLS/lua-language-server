@@ -185,6 +185,7 @@ function Ast:parseTail()
     local startOffset = self:getLastPos() + 1
     local tail = self.code:match('^[^\r\n]+', startOffset)
     if not tail then
+        self.lexer:rewind(startOffset)
         return nil
     end
 

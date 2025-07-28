@@ -48,7 +48,7 @@ function Ast:parseFunction(isLocal)
         if nextToken == '.' or nextToken == ':' then
             ---@cast nextPos -?
             local endPos = self.code:match('^[%s%w_%.%:]+()', pos + 1)
-            self.lexer:fastForward(endPos - 1)
+            self.lexer:moveTo(endPos - 1)
             self:throw('UNEXPECT_LFUNC_NAME', nextPos, endPos - 1)
         end
     else

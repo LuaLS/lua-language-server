@@ -121,18 +121,7 @@ end
 ---@param required? boolean
 ---@return LuaParser.Node.CatFuncParam?
 function Ast:parseCatFuncParam(required)
-    local name
-
-    local pos = self.lexer:consume '...'
-    if pos then
-        name = self:createNode('LuaParser.Node.CatFuncParamName', {
-            start  = pos,
-            finish = pos + #'...',
-            id     = '...',
-        })
-    else
-        name = self:parseID('LuaParser.Node.CatFuncParamName', required, 'warn')
-    end
+    local name = self:parseID('LuaParser.Node.CatFuncParamName', required, 'warn', true)
 
     if not name then
         return nil

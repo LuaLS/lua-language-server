@@ -31,7 +31,7 @@ function Ast:parseCatID(asExp)
     ---@cast id string
 
     local finish = pos + #id
-    self.lexer:fastForward(finish)
+    self.lexer:moveTo(finish)
 
     local res = self:createNode('LuaParser.Node.CatID', {
         id     = id,

@@ -128,7 +128,7 @@ function Ast:parseCat()
     end
 
     local nextPos = symbolPos + #subtype
-    self.lexer:fastForward(nextPos)
+    self.lexer:moveTo(nextPos)
 
     local cat = self:createNode('LuaParser.Node.Cat', {
         start = pos,
@@ -138,7 +138,7 @@ function Ast:parseCat()
 
     if self.code:sub(nextPos + 1, nextPos + 1) == '(' then
         cat.attrPos1 = nextPos
-        self.lexer:fastForward(nextPos + 1)
+        self.lexer:moveTo(nextPos + 1)
         cat.attrs = self:parseIDList('LuaParser.Node.CatAttr', true, false)
         for _, attr in ipairs(cat.attrs) do
             attr.parent = cat

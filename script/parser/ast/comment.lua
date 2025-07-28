@@ -49,7 +49,7 @@ function Ast:parseShortComment(inExp)
             self:throw('ERR_COMMENT_PREFIX', pos, pos + 2)
         end
         local offset = self.code:find('[\r\n]', pos + 2) or (#self.code + 1)
-        self.lexer:fastForward(offset)
+        self.lexer:moveTo(offset)
         return self:createNode('LuaParser.Node.Comment', {
             subtype = 'short',
             start   = pos,
@@ -84,10 +84,10 @@ function Ast:parseLongComment()
     end
     local offset = self.code:find(finishQuo, pos + 3, true)
     if offset then
-        self.lexer:fastForward(offset + #finishQuo - 1)
+        self.lexer:moveTo(offset + #finishQuo - 1)
     else
         self:throwMissSymbol(#self.code, finishQuo)
-        self.lexer:fastForward(#self.code)
+        self.lexer:moveTo(#self.code)
     end
 
     local finish = offset and (offset + #finishQuo - 1) or #self.code

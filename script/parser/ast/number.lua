@@ -153,11 +153,11 @@ end
 function Ast:fastForwardNumber(curOffset)
     local word = self.code:match('^[%.%w_\x80-\xff]+', curOffset)
     if not word then
-        self.lexer:fastForward(curOffset - 1)
+        self.lexer:moveTo(curOffset - 1)
         return
     end
     self:throw('MALFORMED_NUMBER', curOffset - 1, curOffset - 1 + #word)
-    self.lexer:fastForward(curOffset - 1 + #word)
+    self.lexer:moveTo(curOffset - 1 + #word)
 end
 
 ---@private

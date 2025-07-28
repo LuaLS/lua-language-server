@@ -140,7 +140,7 @@ function M:skipNL()
         if p1 + 2 ~= p2 then
             return false
         end
-        self.lexer:fastForward(p2 + 1)
+        self.lexer:moveTo(p2 + 1)
         return true
     else
         return false

@@ -97,21 +97,21 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
     end
     if source.params then
         for _, param in ipairs(source.params) do
-            local name = param.name
-            if name == '...' then
-                func:addVarargParam(runner:parse(param.value))
+            local id = param.name and param.name.id
+            if id == '...' then
+                func:addVarargParam(param.value and runner:parse(param.value) or runner.node.ANY)
             else
-                func:addParam(name.id, runner:parse(param.value))
+                func:addParam(id, runner:parse(param.value))
             end
         end
     end
     if source.returns then
         for _, ret in ipairs(source.returns) do
-            local name = ret.name and ret.name.id
-            if name == '...' then
-                func:addVarargReturn(runner:parse(ret.value))
+            local id = ret.name and ret.name.id
+            if id == '...' then
+                func:addVarargReturn(ret.value and runner:parse(ret.value) or runner.node.ANY)
             else
-                func:addReturn(name, runner:parse(ret.value))
+                func:addReturn(id, runner:parse(ret.value))
             end
         end
     end

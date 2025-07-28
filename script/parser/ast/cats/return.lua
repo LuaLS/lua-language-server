@@ -19,16 +19,14 @@ local Ast = Class 'LuaParser.Ast'
 ---@private
 ---@return LuaParser.Node.CatStateReturn?
 function Ast:parseCatStateReturn()
-    local varargsPos = self.lexer:consume '...'
-    local value = self:parseCatExp(not varargsPos)
-    if not varargsPos and not value then
+    local value = self:parseCatExp(true)
+    if not value then
         return nil
     end
 
     local catReturn = self:createNode('LuaParser.Node.CatStateReturn', {
         value = value,
-        start = varargsPos or (value and value.start) or self:getLastPos(),
-        varargs = varargsPos and true or nil,
+        start = value.start,
     })
 
     if value then
@@ -40,6 +38,7 @@ function Ast:parseCatStateReturn()
     local key = self:parseID('LuaParser.Node.CatReturnName', false, 'yes')
 
     if key then
+        catReturn.key = key
         key.parent = catReturn
     end
 

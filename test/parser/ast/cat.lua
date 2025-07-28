@@ -448,16 +448,16 @@ TEST [[
         [7] = {
             kind  = 'cat',
             value = {
-                kind = 'catstatereturn',
-                varargs = true,
+                kind  = 'catstatereturn',
+                value = { id = '...' },
             }
         },
         [8] = {
             kind  = 'cat',
             value = {
-                kind = 'catstatereturn',
-                varargs = true,
-                value = { id = 'B', generic = {} },
+                kind  = 'catstatereturn',
+                key   = { id = 'B' },
+                value = { id = '...' },
             }
         }
     }

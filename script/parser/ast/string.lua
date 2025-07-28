@@ -123,7 +123,7 @@ function Ast:parseShortString(stringType)
         end
         if char == '\\' then
             pieces[#pieces+1] = self.code:sub(curOffset, offset - 2)
-            self.lexer:fastForward(offset - 1)
+            self.lexer:moveTo(offset - 1)
             local curToken, curType, curPos = self.lexer:peek()
             if not curToken then
                 pushEsc('err', offset - 2, offset - 1)
@@ -156,7 +156,7 @@ function Ast:parseShortString(stringType)
             local escChar = self.code:sub(offset, offset)
             if escChar == 'z' then
                 pushEsc('normal', offset - 2, offset)
-                self.lexer:fastForward(offset)
+                self.lexer:moveTo(offset)
                 repeat until not self.lexer:consumeType 'NL'
                 local _, _, afterPos = self.lexer:peek()
                 curOffset = afterPos and (afterPos + 1) or (#self.code + 1)
@@ -243,7 +243,7 @@ function Ast:parseShortString(stringType)
     end
 
     local finishPos = curOffset - 1
-    self.lexer:fastForward(finishPos)
+    self.lexer:moveTo(finishPos)
     if quo == '`' then
         quo = '"'
     end
@@ -286,7 +286,7 @@ function Ast:parseLongString()
         end
     end
 
-    self.lexer:fastForward(finishPos)
+    self.lexer:moveTo(finishPos)
 
     return self:createNode('LuaParser.Node.String', {
         start   = pos,

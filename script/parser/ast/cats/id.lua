@@ -1,6 +1,7 @@
 
 ---@class LuaParser.Node.CatID: LuaParser.Node.Base
 ---@field id string
+---@field asCode? boolean # 作为自动完成使用的代码。废弃特性
 ---@field generic? LuaParser.Node.CatGeneric
 ---@field genericTemplate? table<string, LuaParser.Node.CatGeneric?>
 local CatID = Class('LuaParser.Node.CatID', 'LuaParser.Node.Base')
@@ -35,7 +36,15 @@ function Ast:parseCatID(asExp)
     })
 
     local block = self.curBlock
-    if block and asExp then
+
+    if id:sub(1, 1) == '`' and id:sub(-1) == '`' then
+        local generic = block and block.genericMap[id:sub(2, -2)]
+        if not generic then
+            res.asCode = true
+        end
+    end
+
+    if not res.asCode and block and asExp then
         local generic = block.genericMap[id]
         if generic then
             res.generic = generic

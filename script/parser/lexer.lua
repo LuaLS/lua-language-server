@@ -190,6 +190,18 @@ function M:rewind(pos)
     self.ci = 1
 end
 
+function M:moveTo(pos)
+    local curPos = self.poses[self.ci]
+    if curPos == pos then
+        return
+    end
+    if curPos < pos then
+        self:fastForward(pos)
+    else
+        self:rewind(pos)
+    end
+end
+
 -- 根据偏移量获取行列
 ---@param offset integer
 ---@return integer row # 第一行是0

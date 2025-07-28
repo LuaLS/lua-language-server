@@ -185,11 +185,11 @@ function Ast:parseTail()
     local startOffset = self:getLastPos() + 1
     local tail = self.code:match('^[^\r\n]+', startOffset)
     if not tail then
-        self.lexer:rewind(startOffset)
+        self.lexer:moveTo(startOffset)
         return nil
     end
 
-    self.lexer:fastForward(startOffset + #tail)
+    self.lexer:moveTo(startOffset + #tail)
 
     tail = tail:gsub('^%s*[@#]?%s*', '')
 

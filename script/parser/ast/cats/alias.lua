@@ -30,6 +30,9 @@ function Ast:parseCatStateAlias()
     self:parseCatGenericDef(catAlias, catAlias)
 
     self:skipSpace()
+    if self.lexer:consume '|' then
+        self:skipSpace()
+    end
     local extends = self:parseCatExp(true)
     if extends then
         catAlias.extends = extends

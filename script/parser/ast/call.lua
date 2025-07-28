@@ -20,6 +20,7 @@ function Ast:parseCall(last)
             return nil
         end
         self.lexer:next()
+        self:skipSpace()
         local exps = self:parseExpList(false, true)
         self:assertSymbol ')'
         local call = self:createNode('LuaParser.Node.Call', {

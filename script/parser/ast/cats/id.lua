@@ -22,7 +22,11 @@ function Ast:parseCatID(asExp)
 
     local id = self.code:match('^[%a\x80-\xff_%`][%w\x80-\xff_%.%*%-%`]*', pos + 1)
     if not id then
-        return nil
+        if self.code:sub(pos + 1, pos + 3) == '...' then
+            id = '...'
+        else
+            return nil
+        end
     end
     ---@cast id string
 

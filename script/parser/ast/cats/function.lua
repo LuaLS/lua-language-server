@@ -19,6 +19,7 @@ CatFunction.kind = 'catfunction'
 ---@class LuaParser.Node.CatFuncParam: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatFuncParamName
+---@field optional? boolean
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatExp
 local CatFuncParam = Class('LuaParser.Node.CatFuncParam', 'LuaParser.Node.Base')
@@ -137,9 +138,12 @@ function Ast:parseCatFuncParam(required)
         return nil
     end
 
+    local optional = self.lexer:consume '?' and true or nil
+
     local param = self:createNode('LuaParser.Node.CatFuncParam', {
         start = name.start,
         name  = name,
+        optional = optional,
     })
     name.parent = param
 

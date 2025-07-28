@@ -99,7 +99,7 @@ end
 ---@private
 ---@return LuaParser.Node.CatTableField?
 function Ast:parseCatTableFieldAsField()
-    local key = self:parseID('LuaParser.Node.CatTableFieldID', false, true)
+    local key = self:parseID('LuaParser.Node.CatTableFieldID', false, 'yes')
 
     if not key then
         return nil

@@ -18,7 +18,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@private
 ---@return LuaParser.Node.CatGeneric?
 function Ast:parseCatGeneric()
-    local id = self:parseID('LuaParser.Node.CatID', true, true)
+    local id = self:parseID('LuaParser.Node.CatID', true, 'yes')
     if not id then
         return nil
     end

@@ -130,7 +130,7 @@ function Ast:parseCatFuncParam(required)
             id     = '...',
         })
     else
-        name = self:parseID('LuaParser.Node.CatFuncParamName', required, true)
+        name = self:parseID('LuaParser.Node.CatFuncParamName', required, 'warn')
     end
 
     if not name then
@@ -183,7 +183,7 @@ function Ast:parseCatFuncReturn(required)
     else
         local _, curType = self.lexer:peek()
         if curType == 'Word' and self.lexer:peek(1) == ':' then
-            name = self:parseID('LuaParser.Node.CatFuncReturnName', required, true)
+            name = self:parseID('LuaParser.Node.CatFuncReturnName', required, 'yes')
         end
     end
 

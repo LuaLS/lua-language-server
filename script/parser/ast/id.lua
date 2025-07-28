@@ -18,7 +18,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param required? boolean
----@param canBeKeyword? boolean
+---@param canBeKeyword? 'yes' | 'no' | 'warn'
 ---@param includeVarargs? boolean
 ---@return T?
 function Ast:parseID(nodeType, required, canBeKeyword, includeVarargs)
@@ -40,9 +40,9 @@ function Ast:parseID(nodeType, required, canBeKeyword, includeVarargs)
     ---@cast token -?
     ---@cast pos -?
     if self:isKeyWord(token) then
-        if canBeKeyword then
+        if canBeKeyword == 'warn' then
             self:throw('KEYWORD', pos, pos + #token)
-        else
+        elseif canBeKeyword == 'no' or canBeKeyword == nil then
             if required then
                 self:throw('MISS_NAME', self:getLastPos())
             end

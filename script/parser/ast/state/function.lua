@@ -193,7 +193,7 @@ function Ast:parseParam(required)
             id     = '...',
         })
     end
-    local param = self:parseID('LuaParser.Node.Param', required, true)
+    local param = self:parseID('LuaParser.Node.Param', required, 'warn')
     if param then
         return param
     end

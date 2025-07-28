@@ -20,7 +20,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@private
 ---@return LuaParser.Node.CatStateParam?
 function Ast:parseCatStateParam()
-    local key = self:parseID('LuaParser.Node.CatParamName', true, true, true)
+    local key = self:parseID('LuaParser.Node.CatParamName', true, 'warn', true)
     if not key then
         return nil
     end

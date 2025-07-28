@@ -32,7 +32,7 @@ function Ast:parseCatStateClass()
     local symbolPos = self.lexer:consume ':'
     if symbolPos then
         catClass.symbolPos = symbolPos
-        catClass.extends = self:parseList(true, true, self.parseCatExp)
+        catClass.extends = self:parseCatTypeList(true)
         for _, extend in ipairs(catClass.extends) do
             extend.parent = catClass
         end

@@ -34,16 +34,7 @@ function Ast:parseList(atLeastOne, greedy, parser)
             if not greedy then
                 break
             end
-            if tp == 'NL' then
-                break
-            end
             if tp == 'Word' and self:isKeyWord(token) then
-                break
-            end
-            ---@type LuaParser.Node.Cat
-            local last = list[#list]
-            if last.finishRow ~= self.lexer:rowcol(pos) then
-                -- 如果不在同一行，则认为与本行无关
                 break
             end
             self:throwMissSymbol(self:getLastPos(), ',')

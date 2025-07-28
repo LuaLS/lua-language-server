@@ -47,7 +47,7 @@ end
 ---@private
 ---@return LuaParser.Node.CatGeneric[]
 function Ast:parseCatGenericList()
-    local list = self:parseList(true, true, self.parseCatGeneric)
+    local list = self:parseList(true, false, self.parseCatGeneric)
 
     return list
 end

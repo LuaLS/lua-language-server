@@ -17,28 +17,31 @@ function M:__del()
     self:resetRunners()
 end
 
+---@return boolean
 function M:update()
     local document = self.scope:getDocument(self.uri)
     if not document then
-        return
+        return false
     end
     if self.version == document.serverVersion then
-        return
+        return false
     end
     self.version = document.serverVersion
     self:resetRunners()
+    return true
 end
 
 function M:resetRunners()
-    for block, runner in pairs(self.runners) do
+    for _, runner in pairs(self.runners) do
         Delete(runner)
-        self.runners[block] = nil
     end
+    self.runners = {}
 end
 
 ---@param ast? LuaParser.Ast
 ---@param mode any
 function M:indexAst(ast, mode)
+    self:update()
     if self.indexedVersion == self.version then
         return
     end

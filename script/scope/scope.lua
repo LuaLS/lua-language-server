@@ -16,6 +16,7 @@ function M:__init(uri, fs)
     self.node = ls.node.createManager(self)
     self.node:reset()
 
+    ---@type table<Uri, Document>
     self.documents = setmetatable({}, ls.util.MODE_V)
 
     self.vm = ls.vm.create(self)

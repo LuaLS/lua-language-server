@@ -226,7 +226,11 @@ function M:getChild(key1, key2, ...)
         key = node.value(key)
     end
     local child = current.childs and current.childs[key]
-                or node.variable(key, current)
+    if not child then
+        child = node.variable(key, current)
+        current.childs = current.childs or {}
+        current.childs[key] = child
+    end
     return child
 end
 

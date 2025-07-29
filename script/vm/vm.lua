@@ -8,10 +8,12 @@ function M:__init(scope)
 end
 
 ---@param uri Uri
+---@return VM.Vfile
 function M:indexFile(uri)
     local file = self:getFile(uri)
               or self:createFile(uri)
     file:indexAst()
+    return file
 end
 
 ---@param uri Uri

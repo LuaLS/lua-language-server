@@ -2,11 +2,11 @@ local providers = {}
 
 ---@param uri Uri
 ---@param offset integer
----@return Range[]?
+---@return Range[]
 function ls.core.definition(uri, offset)
     local sources = ls.scope.findSources(uri, offset)
     if not sources then
-        return nil
+        return {}
     end
 
     local result = {}
@@ -28,3 +28,7 @@ function ls.core.provider.definition(callback)
         ls.util.arrayRemove(providers, callback)
     end
 end
+
+ls.core.provider.definition(function (uri, offset, sources)
+    
+end)

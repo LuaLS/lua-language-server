@@ -31,8 +31,8 @@ local function TEST(script)
         end
         assert(first)
         assert(first.errorCode == expect.code)
-        assert(first.left == target[1])
-        assert(first.right == target[2])
+        assert(first.start == target[1])
+        assert(first.finish == target[2])
         assert(util.equal(first.extra, expect.extra))
     end
 end

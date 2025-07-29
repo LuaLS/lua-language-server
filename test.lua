@@ -27,7 +27,7 @@ test.catch = require 'test.catch'
 test.rootPath = ls.env.rootPath .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
-test.scope    = ls.scope.create()
+test.scope    = ls.scope.create(test.rootUri)
 
 ---@async
 ls.await.call(function ()
@@ -36,6 +36,7 @@ ls.await.call(function ()
         require 'test.parser'
         require 'test.node'
         require 'test.vm'
+        require 'test.feature'
         dofile 'test/project/init.lua'
     end)
     ls.await.sleep(1)

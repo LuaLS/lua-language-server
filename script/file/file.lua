@@ -18,6 +18,10 @@ function M:__del()
     ls.file.all[self.uri] = nil
 end
 
+function M:__close()
+    self:remove()
+end
+
 function M:openByClient()
     self.openedByClient = true
 end

@@ -97,12 +97,11 @@ return function (script, seps)
         if mode == 'NL' then
             newBuf[#newBuf+1] = text
             line = line + 1
-            lineOffset = offset + #text - skipOffset
         end
         if mode == 'ML' then
             marks[#marks+1] = {
                 char     = text,
-                position = line * 10000 + offset - skipOffset - lineOffset,
+                offset   = offset - skipOffset - 1,
             }
             skipOffset = skipOffset + 1 + #text
         end
@@ -110,8 +109,7 @@ return function (script, seps)
             for j = #marks, 1, -1 do
                 local mark = marks[j]
                 if mark.char == text then
-                    local position = line * 10000 + offset - skipOffset - lineOffset
-                    result[text][#result[text]+1] = { mark.position, position }
+                    result[text][#result[text]+1] = { mark.offset, offset - skipOffset - 1 }
                     table.remove(marks, j)
                     break
                 end

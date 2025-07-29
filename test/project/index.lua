@@ -1,7 +1,7 @@
 do
-    local scope = ls.scope.create()
+    local scope <close> = ls.scope.create()
 
-    ls.file.setText(test.fileUri, [[
+    local file <close> = ls.file.setText(test.fileUri, [[
 GlobalA = 1
 ]])
 

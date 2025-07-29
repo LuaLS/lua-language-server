@@ -26,6 +26,10 @@ function M:__del()
     ls.util.arrayRemove(ls.scope.all, self)
 end
 
+function M:__close()
+    self:remove()
+end
+
 ---@param uri Uri
 ---@return 'workspace' | 'include' | nil
 function M:testUri(uri)
@@ -115,5 +119,8 @@ function ls.scope.findSources(uri, offset)
         return nil
     end
     local sources = doc:findSources(offset)
+    if #sources == 0 then
+        return nil
+    end
     return sources
 end

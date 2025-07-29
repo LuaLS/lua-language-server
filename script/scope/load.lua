@@ -74,6 +74,7 @@ end
 ---@field found integer
 ---@field loaded integer
 ---@field indexed integer
+---@field uris Uri[]
 
 ---@async
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
@@ -89,6 +90,7 @@ function M:load(callback)
         found = 0,
         loaded = 0,
         indexed = 0,
+        uris = self.uris,
     }
 
     xpcall(callback, log.error, 'start', status)

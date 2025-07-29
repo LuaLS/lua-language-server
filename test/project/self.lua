@@ -2,7 +2,10 @@ do
     local root = ls.env.rootUri
     local scope = ls.scope.create(root, ls.afs)
 
-    scope:load(function (event, status, uri)
+    collectgarbage()
+    print('加载项目前的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+
+    local result = scope:load(function (event, status, uri)
         if event == 'found' then
             print('已发现 {found} 个文件' % status)
         end
@@ -19,4 +22,29 @@ do
             print('已索引 {indexed} 个文件' % status)
         end
     end)
+
+    collectgarbage()
+    print('索引后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+
+    local c1 = os.clock()
+    local count = 0
+    for _, uri in ipairs(result.uris) do
+        local doc = scope:getDocument(uri)
+        local vfile = scope.vm:getFile(uri)
+        ---@cast doc -?
+        ---@cast vfile -?
+        for _, nodes in pairs(doc.ast.nodesMap) do
+            for _, src in ipairs(nodes) do
+                vfile:getNode(src)
+                count = count + 1
+            end
+        end
+    end
+    local c2 = os.clock()
+
+    local duration = c2 - c1
+    print('解析 {} 个token耗时: {:.2f} 秒' % { count, duration })
+
+    collectgarbage()
+    print('全量解析后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
 end

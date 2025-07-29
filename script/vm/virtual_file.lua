@@ -39,7 +39,7 @@ function M:resetRunners()
 end
 
 ---@param ast? LuaParser.Ast
----@param mode any
+---@param mode? any
 function M:indexAst(ast, mode)
     self:update()
     if self.indexedVersion == self.version then

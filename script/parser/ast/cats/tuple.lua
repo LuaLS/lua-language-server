@@ -7,6 +7,7 @@ CatTuple.kind = 'cattuple'
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
+---@private
 function Ast:parseCatTuple()
     local pos = self.lexer:consume '['
     if not pos then

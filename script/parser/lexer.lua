@@ -237,6 +237,33 @@ function M:rowcol(offset)
     return 0, offset
 end
 
+--- 根据行列获取偏移量
+---@param row integer # 第一行是0
+---@param col integer # 第一列是0
+---@return integer
+function M:offset(row, col)
+    local nls = self.nls
+
+    if row < 0 then
+        return 0
+    end
+
+    if row >= #nls then
+        return self.len
+    end
+
+    -- 不得超出行的长度
+    local start = nls[row - 1] or 0
+    if col <= 0 then
+        return start
+    end
+    local nextStart = nls[row] or self.len
+    if start + col >= nextStart then
+        return nextStart
+    end
+    return start + col
+end
+
 -- 设置保存点
 ---@return fun()
 function M:savePoint()

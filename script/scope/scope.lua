@@ -101,3 +101,19 @@ function ls.scope.find(uri)
     end
     return nil
 end
+
+---@param uri Uri
+---@param offset integer
+---@return LuaParser.Node.Base[]?
+function ls.scope.findSources(uri, offset)
+    local scope = ls.scope.find(uri)
+    if not scope then
+        return nil
+    end
+    local doc = scope:getDocument(uri)
+    if not doc then
+        return nil
+    end
+    local sources = doc:findSources(offset)
+    return sources
+end

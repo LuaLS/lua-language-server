@@ -217,8 +217,13 @@ function M:getChild(key1, key2, ...)
                 ---@cast k -Node
                 k = node.value(k)
             end
-            current = current.childs and current.childs[k]
-                    or node.variable(k, current)
+            local child = current.childs and current.childs[k]
+            if not child then
+                child = node.variable(k, current)
+                current.childs = current.childs or {}
+                current.childs[k] = child
+            end
+            current = child
         end
     end
     if type(key) ~= 'table' then

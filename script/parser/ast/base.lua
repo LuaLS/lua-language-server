@@ -121,20 +121,18 @@ local rowcolMulti = 10000
 
 ---@param self LuaParser.Node.Base
 ---@return integer
----@return true
 Base.__getter.left = function (self)
     local row, col = self.startRow, self.startCol
     local start = row * rowcolMulti + col
-    return start, true
+    return start
 end
 
 ---@param self LuaParser.Node.Base
 ---@return integer
----@return true
 Base.__getter.right = function (self)
     local row, col = self.finishRow, self.finishCol
     local finish = row * rowcolMulti + col
-    return finish, true
+    return finish
 end
 
 ---@param self LuaParser.Node.Base
@@ -171,7 +169,6 @@ end
 
 ---@param self LuaParser.Node.Base
 ---@return string
----@return true
 Base.__getter.where = function (self)
     return string.format('%s:(%s:%s-%s:%s) %s'
         , self.ast.source
@@ -180,15 +177,14 @@ Base.__getter.where = function (self)
         , self.finishRow + 1
         , self.finishCol
         , self.code
-    ), true
+    )
 end
 
 ---@param self LuaParser.Node.Base
 ---@return string
----@return true
 Base.__getter.code = function (self)
     local code = self.ast.code:sub(self.start + 1, self.finish)
-    return code, true
+    return code
 end
 
 ---@param self LuaParser.Node.Base

@@ -3,8 +3,7 @@ local M = Class 'Document'
 
 ---@param file File
 function M:__init(file)
-    self.uri = file.uri
-    self.text = file:getText()
+    self.file = file
     self.serverVersion = file.serverVersion
     self.clientVersion = file.clientVersion
 end
@@ -16,7 +15,7 @@ M.ast = nil
 ---@return LuaParser.Ast | false
 ---@return true
 M.__getter.ast = function (self)
-    local suc, ast = xpcall(ls.parser.compile, log.error, self.text, self.uri)
+    local suc, ast = xpcall(ls.parser.compile, log.error, self.file:getText(), self.file.uri)
     if not suc then
         return false, true
     end

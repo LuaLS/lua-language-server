@@ -21,7 +21,10 @@ function TEST(script)
     local file <close> = ls.file.setText(test.fileUri, newScript)
 
     local results = ls.core.definition(test.fileUri, catched['?'][1][1])
-    assert(founded(catched['!'], results))
+    local ranges = ls.util.map(results, function (v, k)
+        return v.range
+    end)
+    assert(founded(catched['!'], ranges))
 end
 
 require 'test.feature.definition.local'

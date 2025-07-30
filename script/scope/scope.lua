@@ -16,7 +16,7 @@ function M:__init(uri, fs)
     self.node = ls.node.createManager(self)
     self.node:reset()
 
-    ---@type table<Uri, Document>
+    ---@type table<Uri, Document?>
     self.documents = setmetatable({}, ls.util.MODE_V)
 
     self.vm = ls.vm.create(self)
@@ -54,6 +54,12 @@ function M:getDocument(uri)
         return nil
     end
     local document = self.documents[file.uri]
+    if document then
+        if document.serverVersion ~= file.serverVersion
+        or document.file ~= file then
+            document = nil
+        end
+    end
     if not document then
         document = New 'Document' (file)
         self.documents[file.uri] = document

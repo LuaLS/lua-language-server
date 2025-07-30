@@ -172,37 +172,33 @@ do
     assert(d.fields == nil)
     assert(A.value:view() == '{}')
 
-    d:addField {
+    local dx = {
         key = node.value 'x',
         value = node.value(1),
     }
+    d:addField(dx)
     assert(d:view() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ x: 1 }')
     assert(A.value:view() == '{ x: 1 }')
 
-    a:addField({
+    local dy = {
         key = node.value 'y',
         value = node.value(2),
-    }, {'b', 'c', 'd'})
+    }
+    a:addField(dy, {'b', 'c', 'd'})
     assert(d:view() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ x: 1, y: 2 }')
     assert(A.value:view() == '{ x: 1, y: 2 }')
 
-    a:removeField({
-        key = node.value 'x',
-        value = node.value(1),
-    }, {'b', 'c', 'd'})
+    a:removeField(dx, {'b', 'c', 'd'})
     assert(d:view() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ y: 2 }')
     assert(A.value:view() == '{ y: 2 }')
 
-    d:removeField {
-        key = node.value 'y',
-        value = node.value(2),
-    }
+    d:removeField(dy)
     assert(d:view() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields == nil)

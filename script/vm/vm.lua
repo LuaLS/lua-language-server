@@ -12,7 +12,7 @@ end
 function M:indexFile(uri)
     local file = self:getFile(uri)
               or self:createFile(uri)
-    file:indexAst()
+    file:index()
     return file
 end
 
@@ -38,6 +38,28 @@ function M:removeFile(uri)
     end
     self.vfiles[uri] = nil
     vfile:remove()
+end
+
+---@param source LuaParser.Node.Base
+---@return Node?
+function M:getNode(source)
+    local uri = source.ast.source
+    local vfile = self:getFile(uri)
+    if not vfile then
+        return nil
+    end
+    return vfile:getNode(source)
+end
+
+---@param source LuaParser.Node.Base
+---@return Node.Variable?
+function M:getVariable(source)
+    local uri = source.ast.source
+    local vfile = self:getFile(uri)
+    if not vfile then
+        return nil
+    end
+    return vfile:getVariable(source)
 end
 
 ---@param scope Scope

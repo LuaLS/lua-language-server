@@ -49,7 +49,13 @@ function M:index()
     self.state = 'indexing'
     self:parse(self.block)
     for _, state in ipairs(self.block.childs) do
-        self:parse(state)
+        if state.isBlock then
+            ---@diagnostic disable-next-line: cast-type-mismatch
+            ---@cast state LuaParser.Node.Block
+            self:getSubRunner(state):index()
+        else
+            self:parse(state)
+        end
     end
     self.state = 'indexed'
 end

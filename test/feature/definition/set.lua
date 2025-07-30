@@ -23,7 +23,7 @@ x = 1
 do
     local <!x!> = 1
     do
-        <!x!> = 2
+        x = 2
     end
     <?x?>()
 end

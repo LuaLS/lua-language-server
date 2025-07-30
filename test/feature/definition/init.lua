@@ -19,6 +19,7 @@ function TEST(script)
     local newScript, catched = test.catch(script, '!?')
 
     local file <close> = ls.file.setText(test.fileUri, newScript)
+    test.scope.vm:indexFile(test.fileUri)
 
     local results = ls.core.definition(test.fileUri, catched['?'][1][1])
     local ranges = ls.util.map(results, function (v, k)

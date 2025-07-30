@@ -1,8 +1,10 @@
----@class File: Class.Base
+---@class File: Class.Base, GCHost
 ---@field text string
 ---@field clientVersion? integer
 ---@overload fun(uri:string): self
 local M = Class 'File'
+
+Extends('File', 'GCHost')
 
 M.openedByClient = false
 M.serverVersion = 0

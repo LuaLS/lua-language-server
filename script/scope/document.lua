@@ -1,11 +1,15 @@
----@class Document: Class.Base
+---@class Document: Class.Base, GCHost
 local M = Class 'Document'
+
+Extends('Document', 'GCHost')
 
 ---@param file File
 function M:__init(file)
     self.file = file
     self.serverVersion = file.serverVersion
     self.clientVersion = file.clientVersion
+
+    file:bindGC(self)
 end
 
 ---@type LuaParser.Ast
@@ -20,6 +24,10 @@ M.__getter.ast = function (self)
         return false, true
     end
     return ast, true
+end
+
+function M:remove()
+    Delete(self)
 end
 
 ---@param offset integer

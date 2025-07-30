@@ -2,7 +2,8 @@
 local M = Class 'VM.Vfile'
 
 M.version = 0
-M.indexedVersion = -1
+---@type Document?
+M.document = nil
 
 ---@param scope Scope
 ---@param uri Uri
@@ -17,20 +18,6 @@ function M:__del()
     self:resetRunners()
 end
 
----@return boolean
-function M:update()
-    local document = self.scope:getDocument(self.uri)
-    if not document then
-        return false
-    end
-    if self.version == document.serverVersion then
-        return false
-    end
-    self.version = document.serverVersion
-    self:resetRunners()
-    return true
-end
-
 function M:resetRunners()
     for _, runner in pairs(self.runners) do
         Delete(runner)
@@ -38,26 +25,30 @@ function M:resetRunners()
     self.runners = {}
 end
 
----@param ast? LuaParser.Ast
 ---@param mode? any
-function M:indexAst(ast, mode)
-    self:update()
-    if self.indexedVersion == self.version then
+function M:index(mode)
+    local document = self.scope:getDocument(self.uri)
+    if not document then
         return
     end
-    self.indexedVersion = self.version
-
-    if not ast then
-        local document = self.scope:getDocument(self.uri)
-        if not document then
-            return
-        end
-        ast = document.ast
-        if not ast then
-            return
-        end
+    if self.document == document then
+        return
     end
+    self.document = document
+    self.version = self.version + 1
 
+    document:bindGC(function ()
+        self.document = nil
+        self:resetRunners()
+    end)
+
+    self:indexAst(document.ast, mode)
+end
+
+---@param ast LuaParser.Ast
+---@param mode? any
+function M:indexAst(ast, mode)
+    self:resetRunners()
     xpcall(function ()
         local runner = self:getRunner(ast.main)
         runner:index()

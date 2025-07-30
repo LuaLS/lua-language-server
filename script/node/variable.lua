@@ -55,25 +55,25 @@ end
 ---@type LinkedTable
 M.assigns = nil
 
----@param node Node
+---@param field Node.Field
 ---@return Node.Variable
-function M:addAssign(node)
+function M:addAssign(field)
     if not self.assigns then
         self.assigns = ls.linkedTable.create()
     end
-    self.assigns:pushTail(node)
+    self.assigns:pushTail(field)
     self:flushCache()
 
     return self
 end
 
----@param node Node
+---@param field Node.Field
 ---@return Node.Variable
-function M:removeAssign(node)
+function M:removeAssign(field)
     if not self.assigns then
         return self
     end
-    self.assigns:pop(node)
+    self.assigns:pop(field)
     if self.assigns:getSize() == 0 then
         self.assigns = nil
 
@@ -269,7 +269,9 @@ function M:addField(field, path)
         current.childs[field.key] = node.variable(field.key, current)
     end
     current = current.childs[field.key]
-    current:addAssign(field.value)
+    if field.value then
+        current:addAssign(field)
+    end
     current.parent:flushCache()
 
     return current
@@ -307,7 +309,7 @@ function M:removeField(field, path)
     if not current then
         return self
     end
-    current:removeAssign(field.value)
+    current:removeAssign(field)
     current.parent:flushCache()
 
     return current
@@ -330,7 +332,9 @@ M.__getter.value = function (self)
         return union, true
     end
     if self.assigns then
-        local union = node.union(self.assigns:toArray())
+        local union = node.union(ls.util.map(self.assigns:toArray(), function (v, k)
+            return v.value
+        end))
         return union, true
     end
     return self.scope.node.UNKNOWN, true

@@ -1,7 +1,7 @@
 
----@class LuaParser.Node.If: LuaParser.Node.Base
+---@class LuaParser.Node.If: LuaParser.Node.Block
 ---@field childs LuaParser.Node.IfChild[]
-local If = Class('LuaParser.Node.If', 'LuaParser.Node.Base')
+local If = Class('LuaParser.Node.If', 'LuaParser.Node.Block')
 
 If.kind = 'if'
 

@@ -57,12 +57,17 @@ function M:getDocument(uri)
     if document then
         if document.serverVersion ~= file.serverVersion
         or document.file ~= file then
+            document:remove()
             document = nil
         end
     end
     if not document then
+        ---@type Document
         document = New 'Document' (file)
         self.documents[file.uri] = document
+        document:bindGC(function ()
+            self.documents[file.uri] = nil
+        end)
     end
     return document
 end
@@ -115,6 +120,7 @@ end
 ---@param uri Uri
 ---@param offset integer
 ---@return LuaParser.Node.Base[]?
+---@return Scope?
 function ls.scope.findSources(uri, offset)
     local scope = ls.scope.find(uri)
     if not scope then
@@ -128,5 +134,5 @@ function ls.scope.findSources(uri, offset)
     if #sources == 0 then
         return nil
     end
-    return sources
+    return sources, scope
 end

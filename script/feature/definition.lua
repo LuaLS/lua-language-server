@@ -99,7 +99,10 @@ ls.feature.provider.definition(function (param, push)
     end
 
     ---@cast field LuaParser.Node.Field
-    local results = param.scope.vm:findDefOfField(field)
+    local results = param.scope.vm:findFields(field.last, param.scope.vm:getKey(field))
+    if not results then
+        return
+    end
     for _, result in ipairs(results) do
         if result.location then
             push {

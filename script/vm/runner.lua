@@ -15,6 +15,7 @@ M.state = 'ready'
 function M:__init(block, vfile)
     self.block = block
     self.vfile = vfile
+    self.vm = vfile.scope.vm
     self.node  = vfile.scope.node
     ---@type table<LuaParser.Node.Base, Node?>
     self.nodeMap = {}
@@ -133,31 +134,6 @@ function M:makeLocation(source)
     }
 end
 
----@param field LuaParser.Node.Term
----@return Node.Key
-function M:getKey(field)
-    if field.kind == 'field' then
-        ---@cast field LuaParser.Node.Field
-        local key = field.key
-        if key.kind == 'fieldid' then
-            ---@cast key LuaParser.Node.FieldID
-            return key.id
-        else
-            ---@cast key LuaParser.Node.Exp
-            if key.isLiteral then
-                ---@cast key LuaParser.Node.Literal
-                return key.value or self.node.UNKNOWN
-            end
-            return self.node.UNKNOWN
-        end
-    elseif field.kind == 'var' then
-        ---@cast field LuaParser.Node.Var
-        return field.id
-    else
-        return self.node.UNKNOWN
-    end
-end
-
 ---@param field LuaParser.Node.Field
 ---@return Node.Key[]
 function M:getFullPath(field)
@@ -168,7 +144,7 @@ function M:getFullPath(field)
         if not current then
             break
         end
-        path[#path+1] = self:getKey(current)
+        path[#path+1] = self.vm:getKey(current)
         if current.kind == 'var' then
             break
         end
@@ -325,6 +301,31 @@ function M:indexSubRunner(block)
     local runner = self:getSubRunner(block)
     runner:index()
     return runner
+end
+
+---@param source LuaParser.Node.Base
+---@param key Node.Key
+---@return Node.Field[]?
+function M:findFields(source, key)
+    -- TODO 添加缓存
+    local function findByVariable(src, results)
+        local variable = self:getVariable(src)
+        if not variable then
+            return
+        end
+        local child = variable:getChild(key)
+        if child.assigns then
+            ---@param assign Node.Field
+            for assign in child.assigns:pairsFast() do
+                results[#results+1] = assign
+            end
+        end
+    end
+
+    local results = {}
+    findByVariable(source, results)
+
+    return results
 end
 
 ---@param context VM.Runner.Context

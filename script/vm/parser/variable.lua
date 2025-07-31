@@ -138,10 +138,27 @@ ls.vm.registerRunnerParser('param', function (runner, source)
     return runner.node.ANY
 end)
 
+---@param runner VM.Runner
+---@param last LuaParser.Node.Base
+---@param key Node.Key
+---@return Node.Unsolve
+local function unsolveField(runner, last, key)
+    return runner.node.unsolve(runner.node.UNKNOWN, nil, function (unsolve, context)
+        local fields = runner:findFields(last, key)
+        if not fields then
+            return runner.node.UNKNOWN
+        end
+        local values = ls.util.map(fields, function (v, k)
+            return v.value
+        end)
+        return runner.node.union(values)
+    end)
+end
+
 ls.vm.registerRunnerParser('field', function (runner, source)
     ---@cast source LuaParser.Node.Field
 
-    local key = runner:getKey(source)
+    local key = runner.vm:getKey(source)
 
     local var = runner:getFirstVar(source)
     if not var then
@@ -192,5 +209,5 @@ ls.vm.registerRunnerParser('field', function (runner, source)
         end
     end
 
-    return field.value
+    return field.value or unsolveField(runner, source.last, key)
 end)

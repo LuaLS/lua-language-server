@@ -71,27 +71,46 @@ function M:getRunner(block, context)
 end
 
 ---@param source LuaParser.Node.Base
----@return Node?
-function M:getNode(source)
+---@return VM.Runner?
+function M:prepareRunner(source)
     local block = source.parentBlock
     if not block then
         return nil
     end
     local runner = self:getRunner(block)
     runner:index()
+    return runner
+end
+
+---@param source LuaParser.Node.Base
+---@return Node?
+function M:getNode(source)
+    local runner = self:prepareRunner(source)
+    if not runner then
+        return nil
+    end
     return runner:parse(source)
 end
 
 ---@param source LuaParser.Node.Base
 ---@return Node.Variable?
 function M:getVariable(source)
-    local block = source.parentBlock
-    if not block then
+    local runner = self:prepareRunner(source)
+    if not runner then
         return nil
     end
-    local runner = self:getRunner(block)
-    runner:index()
     return runner:getVariable(source)
+end
+
+---@param source LuaParser.Node.Base
+---@param key Node.Key
+---@return Node.Field[]?
+function M:findFields(source, key)
+    local runner = self:prepareRunner(source)
+    if not runner then
+        return nil
+    end
+    return runner:findFields(source, key)
 end
 
 function M:remove()

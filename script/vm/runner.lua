@@ -25,6 +25,7 @@ function M:__init(block, vfile)
     ---@type function[]
     self.disposes = {}
     self.resolve = function (unsolve, source)
+        self.nodeMap[source] = nil
         local node = self:parse(source)
         self.nodeMap[source] = node
         return node
@@ -73,10 +74,13 @@ end
 function M:parse(source)
     local node = self.nodeMap[source]
     if node then
-        if node.kind ~= 'unsolve' then
+        if node.kind == 'unsolve' then
+            ---@cast node Node.Unsolve
+            node = node.solve()
+            self.nodeMap[source] = node
             return node
         else
-            self.nodeMap[source] = nil
+            return node
         end
     end
     if source.isLiteral then

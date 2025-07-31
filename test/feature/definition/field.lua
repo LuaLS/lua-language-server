@@ -1,6 +1,19 @@
 TEST [[
 X.<!y!> = 1
 
+print(X.<?y?>)
+]]
+
+TEST [[
+local x = {}
+x.<!y!> = 1
+
+print(x.<?y?>)
+]]
+
+TEST [[
+X.<!y!> = 1
+
 local t = X
 
 print(t.<?y?>)

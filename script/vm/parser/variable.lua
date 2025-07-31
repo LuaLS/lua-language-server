@@ -149,7 +149,7 @@ ls.vm.registerRunnerParser('field', function (runner, source)
     end
 
     local value = source.value
-    local field = runner:makeNodeField(var, key, value)
+    local field = runner:makeNodeField(source.key, key, value)
 
     if var.loc then
         -- 局部变量的字段

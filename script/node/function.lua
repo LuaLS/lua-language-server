@@ -35,6 +35,13 @@ function M:setAsync()
     return self
 end
 
+---@param location Node.Location
+---@return Node.Function
+function M:setLocation(location)
+    self.location = location
+    return self
+end
+
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)

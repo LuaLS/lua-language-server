@@ -73,6 +73,7 @@ ls.vm.registerRunnerParser('function', function (runner, source)
     bindSelf(subRunner, source)
 
     local func = node.func()
+    func:setLocation(runner:makeLocation(source))
     for _, param in ipairs(source.params) do
         local variable = subRunner:getVariable(param)
         if not variable then

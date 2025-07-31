@@ -15,9 +15,9 @@ function ls.feature.definition(uri, offset)
         return {}
     end
 
-    local result = {}
+    local results = {}
     local function push(loc)
-        result[#result+1] = loc
+        results[#results+1] = loc
     end
 
     local param = {
@@ -31,7 +31,7 @@ function ls.feature.definition(uri, offset)
         xpcall(provider, log.error, param, push)
     end
 
-    return result
+    return ls.feature.organizeResults(results)
 end
 
 ---@param callback fun(param: Feature.Definition.Param, push: fun(loc: Location))
@@ -134,5 +134,17 @@ end)
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
     local node = param.scope.vm:getNode(first)
-    print(node)
+    if not node then
+        return
+    end
+    if node.kind == 'function' then
+        ---@cast node Node.Function
+        if node.location then
+            push {
+                uri = node.location.uri,
+                range = { node.location.offset, node.location.offset + node.location.length },
+                originRange = { first.start, first.finish },
+            }
+        end
+    end
 end)

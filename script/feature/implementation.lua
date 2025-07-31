@@ -15,9 +15,9 @@ function ls.feature.implementation(uri, offset)
         return {}
     end
 
-    local result = {}
+    local results = {}
     local function push(loc)
-        result[#result+1] = loc
+        results[#results+1] = loc
     end
 
     local param = {
@@ -31,7 +31,7 @@ function ls.feature.implementation(uri, offset)
         xpcall(provider, log.error, param, push)
     end
 
-    return result
+    return ls.feature.organizeResults(results)
 end
 
 ---@param callback fun(param: Feature.Implementation.Param, push: fun(loc: Location))

@@ -42,7 +42,9 @@ function M:findSources(offset, accepts)
 
     for _, nodes in pairs(ast.nodesMap) do
         for _, node in ipairs(nodes) do
-            if node.start <= offset and node.finish >= offset then
+            if  node.start <= offset
+            and node.finish >= offset
+            and not node.dummy then
                 if accepts and not accepts[node.kind] then
                     goto continue
                 end

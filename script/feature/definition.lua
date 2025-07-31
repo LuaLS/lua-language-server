@@ -46,16 +46,32 @@ end
 -- 局部变量的定义位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
-    if first.kind == 'var' then
-        ---@cast first LuaParser.Node.Var
-        if first.loc then
-            push {
-                uri = first.ast.source,
-                range = { first.loc.start, first.loc.finish },
-                originRange = { first.start, first.finish },
-            }
+    if first.kind ~= 'var' then
+        return
+    end
+    ---@cast first LuaParser.Node.Var
+    local loc = first.loc
+    if not loc then
+        return
+    end
+    if not loc.value and loc.kind ~= 'param' then
+        local results = ls.feature.implementation(param.uri, loc.start)
+        ls.util.map(results, push)
+        return
+    end
+    if loc.kind == 'param' then
+        ---@cast loc LuaParser.Node.Param
+        if loc.isSelf then
+            local results = ls.feature.definition(param.uri, loc.parent.name.last.finish)
+            ls.util.map(results, push)
+            return
         end
     end
+    push {
+        uri = first.ast.source,
+        range = { first.loc.start, first.loc.finish },
+        originRange = { first.start, first.finish },
+    }
 end)
 
 -- 全局变量的赋值位置
@@ -112,4 +128,11 @@ ls.feature.provider.definition(function (param, push)
             }
         end
     end
+end)
+
+-- 函数值的位置
+ls.feature.provider.definition(function (param, push)
+    local first = param.sources[1]
+    local node = param.scope.vm:getNode(first)
+    print(node)
 end)

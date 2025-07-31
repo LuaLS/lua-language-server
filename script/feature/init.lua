@@ -5,3 +5,4 @@ ls.feature = {}
 ls.feature.provider = {}
 
 require 'feature.definition'
+require 'feature.implementation'

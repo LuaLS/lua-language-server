@@ -3,6 +3,7 @@
 ---@field parent LuaParser.Node.Function
 ---@field index integer
 ---@field id string
+---@field isSelf? boolean
 local Param = Class('LuaParser.Node.Param', 'LuaParser.Node.Local')
 
 Param.kind = 'param'
@@ -76,6 +77,8 @@ function Ast:parseFunction(isLocal)
         table.insert(params, 1, self:createNode('LuaParser.Node.Param', {
             start  = name.last.start,
             finish = name.last.finish,
+            dummy  = true,
+            isSelf = true,
             id     = 'self',
         }))
     end

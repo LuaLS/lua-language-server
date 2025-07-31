@@ -75,14 +75,7 @@ end
 function M:parse(source)
     local node = self.nodeMap[source]
     if node then
-        if node.kind == 'unsolve' then
-            ---@cast node Node.Unsolve
-            node = node.solve()
-            self.nodeMap[source] = node
-            return node
-        else
-            return node
-        end
+        return node
     end
     if source.isLiteral then
         ---@cast source LuaParser.Node.Literal
@@ -187,13 +180,15 @@ function M:makeNodeField(source, key, value)
         ---@cast key Node
         nkey = key
     end
-    local nvalue
+    local nvalue, var
     if value ~= nil then
         nvalue = self:lazyParse(value)
+        var = self:getVariable(value)
     end
     local field = {
         key = nkey,
         value = nvalue,
+        valueVar = var,
         location = self:makeLocation(source),
     }
     return field
@@ -305,25 +300,61 @@ end
 
 ---@param source LuaParser.Node.Base
 ---@param key Node.Key
----@return Node.Field[]?
+---@return Node.Field[]
 function M:findFields(source, key)
     -- TODO 添加缓存
-    local function findByVariable(src, results)
-        local variable = self:getVariable(src)
-        if not variable then
+    local found = {}
+
+    ---@param variable Node.Variable
+    ---@param results Node.Field[]
+    ---@param ... Node.Key
+    local function findByVar(variable, results, ...)
+        if found[variable] then
             return
         end
-        local child = variable:getChild(key)
-        if child.assigns then
+        found[variable] = true
+        local child = variable:getChild(...)
+        if child.assigns and not found[child] then
+            found[child] = true
             ---@param assign Node.Field
             for assign in child.assigns:pairsFast() do
                 results[#results+1] = assign
             end
         end
+
+        if variable.assigns then
+            ---@param assign Node.Field
+            for assign in variable.assigns:pairsFast() do
+                local var = assign.valueVar
+                if var then
+                    findByVar(var, results, ...)
+                end
+            end
+        end
+
+        local parent = variable.parent
+        if parent then
+            findByVar(parent, results, variable.key, ...)
+        end
     end
 
+    ---@param src LuaParser.Node.Base
+    ---@param results Node.Field[]
+    ---@param ... Node.Key
+    local function find(src, results, ...)
+        if found[src] then
+            return
+        end
+        found[src] = true
+        local variable = self:getVariable(src)
+        if variable then
+            findByVar(variable, results, ...)
+        end
+    end
+
+    ---@type Node.Field[]
     local results = {}
-    findByVariable(source, results)
+    find(source, results, key)
 
     return results
 end

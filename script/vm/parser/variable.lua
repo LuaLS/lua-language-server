@@ -125,6 +125,8 @@ ls.vm.registerRunnerParser('local', function (runner, source)
             end
         end
 
+        variable:addAssign(runner:makeNodeField(source, source.id, source.value))
+
         return vnode
     end
 end)

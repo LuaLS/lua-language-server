@@ -119,9 +119,10 @@ end
 
 ---@param uri Uri
 ---@param offset integer
+---@param accepts? table<string, true>
 ---@return LuaParser.Node.Base[]?
 ---@return Scope?
-function ls.scope.findSources(uri, offset)
+function ls.scope.findSources(uri, offset, accepts)
     local scope = ls.scope.find(uri)
     if not scope then
         return nil
@@ -130,7 +131,7 @@ function ls.scope.findSources(uri, offset)
     if not doc then
         return nil
     end
-    local sources = doc:findSources(offset)
+    local sources = doc:findSources(offset, accepts)
     if #sources == 0 then
         return nil
     end

@@ -10,7 +10,7 @@ ls.vm.registerRunnerParser('table', function (runner, source)
         else
             key = runner:lazyParse(field.key)
         end
-        local nfield = runner:makeNodeField(field, key, field.value)
+        local nfield = runner:makeNodeField(field.key, key, field.value)
         t:addField(nfield)
     end
 

@@ -115,6 +115,7 @@ function Ast:parseTableFieldAsField()
     end
     self:skipSpace()
     if not self.lexer:consume '=' then
+        self:removeNode(key)
         savePoint()
         return nil
     end

@@ -224,6 +224,19 @@ function M:createNode(kind, data)
     return node
 end
 
+---@private
+---@param node LuaParser.Node.Base
+function M:removeNode(node)
+    local kind = node.kind
+    local nodeMap = self.nodesMap[kind]
+    for i = #nodeMap, 1, -1 do
+        if nodeMap[i] == node then
+            table.remove(nodeMap, i)
+            break
+        end
+    end
+end
+
 -- 获取当前函数
 ---@private
 ---@return LuaParser.Node.Function | LuaParser.Node.Main | nil

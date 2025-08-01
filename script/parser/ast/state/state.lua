@@ -27,6 +27,7 @@ SingleExp.kind = 'singleexp'
 
 ---@class LuaParser.Node.Select: LuaParser.Node.Base
 ---@field index integer
+---@field value LuaParser.Node.Exp
 local Select = Class('LuaParser.Node.Select', 'LuaParser.Node.Base')
 
 Select.kind = 'select'
@@ -220,8 +221,8 @@ end
 ---@private
 ---@param value LuaParser.Node.Exp
 ---@param index integer
----@return LuaParser.Node.Exp?
-function Ast:convertSelect(value, index)
+---@return LuaParser.Node.Select?
+function Ast:convertToSelect(value, index)
     if value.kind ~= 'call' and value.kind ~= 'varargs' then
         return nil
     end
@@ -241,7 +242,7 @@ end
 function Ast:convertValuesToSelect(values, varCount)
     local lastValue
     for i, value in ipairs(values) do
-        local sel = self:convertSelect(value, i)
+        local sel = self:convertToSelect(value, i)
         if sel then
             lastValue = value
             values[i] = sel
@@ -254,7 +255,7 @@ function Ast:convertValuesToSelect(values, varCount)
         return
     end
     for i = #values + 1, varCount do
-        local sel = self:convertSelect(lastValue, i)
+        local sel = self:convertToSelect(lastValue, i)
         values[i] = sel
     end
 end

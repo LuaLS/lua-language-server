@@ -185,7 +185,7 @@ function Ast:parseParen()
         start  = pos,
     })
     if exp then
-        paren.exp = self:convertSelect(exp, 1) or exp
+        paren.exp = self:convertToSelect(exp, 1) or exp
         exp.parent = paren
     end
     self:skipSpace()

@@ -94,22 +94,6 @@ function M:onCanCast(other)
                 return false
             end
         end
-        if other.varargReturnDef then
-            for i = #other.returnsDef + 1, #self.returnsDef do
-                local ret = self:getReturn(i)
-                if not ret then
-                    return false
-                end
-                if not ret:canCast(other.varargReturnDef) then
-                    return false
-                end
-            end
-            if self.varargReturnDef then
-                if not self.varargReturnDef:canCast(other.varargReturnDef) then
-                    return false
-                end
-            end
-        end
         return true
     end
     return false
@@ -124,6 +108,8 @@ function M:addParamDef(key, value)
     return self
 end
 
+M.returnCount = 0
+
 ---@param key? string
 ---@param value Node
 ---@return Node.Function
@@ -132,17 +118,18 @@ function M:addReturnDef(key, value)
     if key then
         self.returnDefMap[key] = value
     end
+    if self.returnCount < #self.returnsDef then
+        self.returnCount = #self.returnsDef
+    end
     return self
 end
-
-M.returnNodeMax = 0
 
 ---@param index integer
 ---@param node Node
 function M:setReturnNode(index, node)
     self.returnNode[index] = self.returnNode[index] | node
-    if index > self.returnNodeMax then
-        self.returnNodeMax = index
+    if index > self.returnCount then
+        self.returnCount = index
     end
 end
 
@@ -152,20 +139,6 @@ function M:addVarargParamDef(value)
     ---@type Node?
     self.varargParamDef = value
     return self
-end
-
----@param value Node
----@return Node.Function
-function M:addVarargReturnDef(value)
-    ---@type Node?
-    self.varargReturnDef = value
-    return self
-end
-
----@param node Node
-function M:setVarargReturnNode(node)
-    ---@type Node?
-    self.varargReturnNode = node
 end
 
 ---@param index integer
@@ -189,13 +162,32 @@ function M:getReturn(index)
     if self.returnNode[index] then
         return self.returnNode[index]
     end
-    if self.varargReturnDef then
-        return self.varargReturnDef
-    end
-    if self.varargReturnNode then
-        return self.varargReturnNode
-    end
     return nil
+end
+
+---@return integer min
+---@return integer? max
+function M:getReturnCount()
+    local count = self.returnCount
+    local lastValue = self.returnsDef[count]
+                  and self.returnsDef[count].value
+                   or self.returnNode[count]
+    if not lastValue then
+        return 0, 0
+    end
+    if lastValue.kind == 'vararg' then
+        ---@cast lastValue Node.Vararg
+        local min = count + lastValue.min
+        ---@type integer?
+        local max = count
+        if lastValue.max then
+            max = max + lastValue.max
+        else
+            max = nil
+        end
+        return min, max
+    end
+    return count, count
 end
 
 ---@param index integer
@@ -222,12 +214,8 @@ function M:getReturnStartFrom(index)
     for i = index, #self.returnsDef do
         nodes[#nodes+1] = self.returnsDef[i].value
     end
-    if self.varargReturnDef then
-        nodes[#nodes+1] = self.varargReturnDef
-    else
-        for i = #self.returnsDef + 1, self.returnNodeMax do
-            nodes[#nodes+1] = self.returnNode[i] or self.scope.node.NIL
-        end
+    for i = #self.returnsDef + 1, self.returnCount do
+        nodes[#nodes+1] = self.returnNode[i] or self.scope.node.NIL
     end
     if #nodes == 0 then
         return nil
@@ -257,9 +245,6 @@ function M:view(skipLevel)
         else
             returns[i] = v.value:view()
         end
-    end
-    if self.varargReturnDef then
-        returns[#returns+1] = string.format('(...: %s)', self.varargReturnDef:view())
     end
 
     if #returns > 0 then
@@ -297,9 +282,6 @@ M.__getter.hasGeneric = function (self)
         end
     end
     if self.varargParamDef and self.varargParamDef.hasGeneric then
-        return true, true
-    end
-    if self.varargReturnDef and self.varargReturnDef.hasGeneric then
         return true, true
     end
     return false, true
@@ -351,13 +333,6 @@ function M:resolveGeneric(map)
             newFunc.varargParamDef = self.varargParamDef
         end
     end
-    if self.varargReturnDef then
-        if self.varargReturnDef.hasGeneric then
-            newFunc.varargReturnDef = self.varargReturnDef:resolveGeneric(map)
-        else
-            newFunc.varargReturnDef = self.varargReturnDef
-        end
-    end
     return newFunc
 end
 
@@ -399,12 +374,6 @@ function M:inferGeneric(other, result)
         local otherParam = value:getParamStartFrom(#self.paramsDef + 1)
         if otherParam then
             self.varargParamDef:inferGeneric(otherParam, result)
-        end
-    end
-    if self.varargReturnDef and self.varargReturnDef.hasGeneric then
-        local otherReturn = value:getReturnStartFrom(#self.returnsDef + 1)
-        if otherReturn then
-            self.varargReturnDef:inferGeneric(otherReturn, result)
         end
     end
 end

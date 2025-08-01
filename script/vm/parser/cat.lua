@@ -110,11 +110,7 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
         for _, ret in ipairs(source.returns) do
             local id = ret.name and ret.name.id
             local value = ret.value and runner:parse(ret.value) or runner.node.ANY
-            if id == '...' then
-                func:addVarargReturnDef(value)
-            else
-                func:addReturnDef(id, value)
-            end
+            func:addReturnDef(id, value)
         end
     end
     return func

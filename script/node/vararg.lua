@@ -14,7 +14,7 @@ M.kind = 'vararg'
 function M:__init(scope, values, min, max)
     self.scope = scope
     self.values = values or {}
-    self.min = min
+    self.min = min or #self.values
     self.max = max
 end
 
@@ -74,7 +74,7 @@ function M:view(skipLevel)
         return '...'
     end
     for i, v in ipairs(self.values) do
-        if self.max and i > self.max then
+        if self.min and i > self.min then
             break
         end
         buf[#buf+1] = v:view(skipLevel and skipLevel + 1 or nil)
@@ -82,7 +82,7 @@ function M:view(skipLevel)
 
     local view = table.concat(buf, ', ')
 
-    if not self.min or self.min > #buf then
+    if not self.max or self.max > #buf then
        view = view .. '...'
     end
 

@@ -19,7 +19,7 @@ function M:__init(block, vfile)
     self.node  = vfile.scope.node
     ---@type table<LuaParser.Node.Base, Node?>
     self.nodeMap = {}
-    ---@type table<LuaParser.Node.Base, Node.Variable?>
+    ---@type table<LuaParser.Node.Base, Node.Variable|false>
     self.variableMap = {}
     ---@type VM.Runner.Context
     self.context = {}
@@ -279,8 +279,17 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Node.Variable?
 function M:getVariable(source)
-    self:parse(source)
-    return self.variableMap[source]
+    if self.variableMap[source] then
+        return self.variableMap[source] or nil
+    end
+    self.variableMap[source] = false
+    local parser = M.variableParsers[source.kind]
+    if not parser then
+        return nil
+    end
+    local variable = parser(self, source)
+    self.variableMap[source] = variable or false
+    return variable
 end
 
 ---@param block LuaParser.Node.Block
@@ -365,16 +374,28 @@ function M:setContext(context)
 end
 
 ---@alias VM.RunnerParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node?
+---@alias VM.VariableParser fun(runner: VM.Runner, source: LuaParser.Node.Base): Node.Variable?
 
 ---@private
 ---@type table<string, VM.RunnerParser>
 M.parsers = {}
+
+---@private
+---@type table<string, VM.VariableParser>
+M.variableParsers = {}
 
 ---@param kind string
 ---@param parser VM.RunnerParser
 function ls.vm.registerRunnerParser(kind, parser)
     M.parsers[kind] = parser
 end
+
+---@param kind string
+---@param parser VM.VariableParser
+function ls.vm.registerVariableParser(kind, parser)
+    M.variableParsers[kind] = parser
+end
+
 
 ---@param block LuaParser.Node.Block
 ---@param vfile VM.Vfile

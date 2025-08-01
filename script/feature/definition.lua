@@ -137,6 +137,7 @@ ls.feature.provider.definition(function (param, push)
     if not node then
         return
     end
+    node = node.solve
     if node.kind == 'function' then
         ---@cast node Node.Function
         if node.location then

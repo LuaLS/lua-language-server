@@ -62,6 +62,18 @@ function M:addAssign(field)
         self.assigns = ls.linkedTable.create()
     end
     self.assigns:pushTail(field)
+
+    local value = field.value and field.value.solve
+    if value and value.kind == 'table' then
+        ---@cast value Node.Table
+        if value.fields then
+            ---@param vfield Node.Field
+            for vfield in value.fields:pairsFast() do
+                self:addField(vfield)
+            end
+        end
+    end
+
     self:flushCache()
 
     return self
@@ -74,6 +86,18 @@ function M:removeAssign(field)
         return self
     end
     self.assigns:pop(field)
+
+    local value = field.value and field.value.solve
+    if value and value.kind == 'table' then
+        ---@cast value Node.Table
+        if value.fields then
+            ---@param vfield Node.Field
+            for vfield in value.fields:pairsFast() do
+                self:removeField(vfield)
+            end
+        end
+    end
+
     if self.assigns:getSize() == 0 then
         self.assigns = nil
 

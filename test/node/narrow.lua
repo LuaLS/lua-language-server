@@ -66,12 +66,12 @@ end
 
 do
     local t = test.scope.node.func()
-        : addParam('x', test.scope.node.NUMBER)
+        : addParamDef('x', test.scope.node.NUMBER)
     | test.scope.node.func()
-        : addParam('x', test.scope.node.STRING)
+        : addParamDef('x', test.scope.node.STRING)
 
     local r = t:narrow(test.scope.node.func()
-        : addParam('x', test.scope.node.NUMBER)
+        : addParamDef('x', test.scope.node.NUMBER)
     )
 
     assert(r:view() == 'fun(x: number)')

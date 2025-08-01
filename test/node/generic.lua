@@ -8,9 +8,9 @@ do
     local tuple = node.tuple { N, U }
     local table = node.table { [N] = U }
     local func  = node.func()
-        : addParam('a', N)
-        : addVarargParam(U)
-        : addReturn(nil, tuple)
+        : addParamDef('a', N)
+        : addVarargParamDef(U)
+        : addReturnDef(nil, tuple)
     local union = N | U
     local intersection = N & U
 
@@ -240,14 +240,14 @@ do
     map:addField {
         key   = node.value 'set',
         value = node.func()
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
     map:addField {
         key   = node.value 'get',
         value = node.func()
-            : addParam('key', K)
-            : addReturn(nil, V),
+            : addParamDef('key', K)
+            : addReturnDef(nil, V),
     }
 
     assert(map.value:view() == '{ get: fun(key: <K>):<V:number>, set: fun(key: <K>, value: <V:number>) }')
@@ -277,8 +277,8 @@ do
         key   = node.value 'set',
         value = node.func()
             : bindGenerics { V }
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
 
     assert(map.value:view() == '{ set: fun<V>(key: <K>, value: <V>) }')
@@ -317,8 +317,8 @@ do
     map:addField {
         key   = node.value 'set',
         value = node.func()
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
 
     local unit = node.type 'Unit'
@@ -351,8 +351,8 @@ do
     map:addField {
         key   = node.value 'set',
         value = node.func()
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
 
     local T = node.generic 'T'
@@ -395,8 +395,8 @@ do
     map:addField {
         key   = node.value 'set',
         value = node.func()
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
 
     local omap = node.type 'OrderMap'
@@ -423,8 +423,8 @@ do
     map:addField {
         key   = node.value 'set',
         value = node.func()
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
 
     local omap = node.type 'OrderMap'
@@ -451,8 +451,8 @@ do
     map:addField {
         key   = node.value 'set',
         value = node.func()
-            : addParam('key', K)
-            : addParam('value', V),
+            : addParamDef('key', K)
+            : addParamDef('value', V),
     }
 
     local OK = node.generic('OK', node.NUMBER)

@@ -25,7 +25,7 @@ end
 M.__getter.solve = function (self)
     self.value = self.baseNode
     local value = self:onResolve(self.context)
-    return value, true
+    return value.solve, true
 end
 
 function M:view(skipLevel)

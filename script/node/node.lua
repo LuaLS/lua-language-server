@@ -236,6 +236,21 @@ function M:inferGeneric(other, result)
     self.value:inferGeneric(other, result)
 end
 
+---@param kind string
+---@return fun(...): Node?
+function M:each(kind)
+    if self.kind == kind then
+        return function (_, last)
+            if last then
+                return nil
+            end
+            return self
+        end
+    else
+        return function () end
+    end
+end
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

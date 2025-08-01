@@ -150,10 +150,10 @@ end
 
 do
     local func = test.scope.node.func()
-        : addParam('a', test.scope.node.value(1))
-        : addParam('b', test.scope.node.value(2))
-        : addReturn('suc', test.scope.node.value(true))
-        : addReturn(nil, test.scope.node.value(false))
+        : addParamDef('a', test.scope.node.value(1))
+        : addParamDef('b', test.scope.node.value(2))
+        : addReturnDef('suc', test.scope.node.value(true))
+        : addReturnDef(nil, test.scope.node.value(false))
 
     assert(func:view() == 'fun(a: 1, b: 2):((suc: true), false)')
 end

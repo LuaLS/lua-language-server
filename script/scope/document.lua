@@ -40,7 +40,10 @@ function M:findSources(offset, accepts)
     end
     local sources = {}
 
-    for _, nodes in pairs(ast.nodesMap) do
+    for kind, nodes in pairs(ast.nodesMap) do
+        if kind == 'error' then
+            goto continue
+        end
         for _, node in ipairs(nodes) do
             if  node.start <= offset
             and node.finish >= offset
@@ -52,6 +55,7 @@ function M:findSources(offset, accepts)
             end
             ::continue::
         end
+        ::continue::
     end
 
     ---@param source LuaParser.Node.Base

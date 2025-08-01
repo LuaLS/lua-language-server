@@ -74,6 +74,7 @@ ls.vm.registerRunnerParser('function', function (runner, source)
 
     local func = node.func()
     func:setLocation(runner:makeLocation(source))
+    runner:setNode(source, func)
     for _, param in ipairs(source.params) do
         local variable = subRunner:getVariable(param)
         if not variable then
@@ -90,9 +91,9 @@ ls.vm.registerRunnerParser('function', function (runner, source)
             tp = subRunner:parse(param)
         end
         if param.id == '...' then
-            func:addVarargParam(tp)
+            func:addVarargParamDef(tp)
         else
-            func:addParam(param.id, tp)
+            func:addParamDef(param.id, tp)
         end
         ::continue::
     end
@@ -102,10 +103,30 @@ ls.vm.registerRunnerParser('function', function (runner, source)
             ---@cast cvalue -?
             if cvalue.kind == 'catstatereturn' then
                 ---@cast cvalue LuaParser.Node.CatStateReturn
-                func:addReturn(cvalue.key and cvalue.key.id, subRunner:lazyParse(cvalue.value, node.ANY))
+                func:addReturnDef(cvalue.key and cvalue.key.id, subRunner:lazyParse(cvalue.value, node.ANY))
             end
         end
     end
 
     return func
+end)
+
+ls.vm.registerRunnerParser('return', function (runner, source)
+    ---@cast source LuaParser.Node.Return
+
+    local node = runner.node
+    local func = source.parentFunction
+    if not func then
+        return
+    end
+
+    local funcNode = runner.vfile:getNode(func)
+    if not funcNode or funcNode.kind ~= 'function' then
+        return
+    end
+    ---@cast funcNode Node.Function
+
+    for i, exp in ipairs(source.exps) do
+        funcNode:setReturnNode(i, runner:lazyParse(exp, node.UNKNOWN))
+    end
 end)

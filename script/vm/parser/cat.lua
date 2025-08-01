@@ -100,9 +100,9 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
             local id = param.name and param.name.id
             local value = param.value and runner:parse(param.value) or runner.node.ANY
             if id == '...' then
-                func:addVarargParam(value)
+                func:addVarargParamDef(value)
             else
-                func:addParam(id, value)
+                func:addParamDef(id, value)
             end
         end
     end
@@ -111,9 +111,9 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
             local id = ret.name and ret.name.id
             local value = ret.value and runner:parse(ret.value) or runner.node.ANY
             if id == '...' then
-                func:addVarargReturn(value)
+                func:addVarargReturnDef(value)
             else
-                func:addReturn(id, value)
+                func:addReturnDef(id, value)
             end
         end
     end

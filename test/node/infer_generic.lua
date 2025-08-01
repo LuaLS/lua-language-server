@@ -315,11 +315,11 @@ do
     local T1 = test.scope.node.generic 'T1'
     local T2 = test.scope.node.generic 'T2'
     local funG = test.scope.node.func()
-        : addParam('x', T1)
-        : addReturn(nil, T2)
+        : addParamDef('x', T1)
+        : addReturnDef(nil, T2)
     local target = test.scope.node.func()
-        : addParam('x', test.scope.node.NUMBER)
-        : addReturn(nil, test.scope.node.STRING)
+        : addParamDef('x', test.scope.node.NUMBER)
+        : addReturnDef(nil, test.scope.node.STRING)
 
     local result = {}
     funG:inferGeneric(target, result)
@@ -337,11 +337,11 @@ do
     local T1 = test.scope.node.generic 'T1'
     local T2 = test.scope.node.generic 'T2'
     local funG = test.scope.node.func()
-        : addParam('x', T1)
-        : addParam('y', T2)
+        : addParamDef('x', T1)
+        : addParamDef('y', T2)
     local target = test.scope.node.func()
-        : addParam('x', test.scope.node.NUMBER)
-        : addVarargParam(test.scope.node.STRING)
+        : addParamDef('x', test.scope.node.NUMBER)
+        : addVarargParamDef(test.scope.node.STRING)
 
     local result = {}
     funG:inferGeneric(target, result)
@@ -359,12 +359,12 @@ do
     local T1 = test.scope.node.generic 'T1'
     local T2 = test.scope.node.generic 'T2'
     local funG = test.scope.node.func()
-        : addParam('x', T1)
-        : addVarargParam(T2)
+        : addParamDef('x', T1)
+        : addVarargParamDef(T2)
     local target = test.scope.node.func()
-        : addParam('x', test.scope.node.NUMBER)
-        : addParam('y', test.scope.node.BOOLEAN)
-        : addVarargParam(test.scope.node.STRING)
+        : addParamDef('x', test.scope.node.NUMBER)
+        : addParamDef('y', test.scope.node.BOOLEAN)
+        : addVarargParamDef(test.scope.node.STRING)
 
     local result = {}
     funG:inferGeneric(target, result)

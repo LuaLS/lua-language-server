@@ -206,3 +206,19 @@ function M:inferGeneric(other, result)
         v:inferGeneric(other, result)
     end
 end
+
+---@param kind string
+---@return fun(...): Node?
+function M:each(kind)
+    local i = 0
+    local values = self.values
+    return function ()
+        while i < #values do
+            i = i + 1
+            local v = values[i]
+            if v.kind == kind then
+                return v
+            end
+        end
+    end
+end

@@ -19,15 +19,17 @@ M.kind = 'function'
 function M:__init(scope)
     self.scope = scope
     ---@type Node.Function.Param[]
-    self.params = {}
+    self.paramsDef = {}
     ---@type Node.Function.Return[]
-    self.returns = {}
+    self.returnsDef = {}
+    ---@type Node[]
+    self.returnNode = {}
 
     ---@type table<string, Node>
-    self.paramMap = {}
+    self.paramDefMap = {}
 
     ---@type table<string, Node>
-    self.returnMap = {}
+    self.returnDefMap = {}
 end
 
 function M:setAsync()
@@ -58,7 +60,7 @@ function M:onCanCast(other)
     end
     if other.kind == 'function' then
         ---@cast other Node.Function
-        for i, oparam in ipairs(other.params) do
+        for i, oparam in ipairs(other.paramsDef) do
             local param = self:getParam(i)
             if not param then
                 return false
@@ -67,23 +69,23 @@ function M:onCanCast(other)
                 return false
             end
         end
-        if other.varargParam then
-            for i = #other.params + 1, #self.params do
+        if other.varargParamDef then
+            for i = #other.paramsDef + 1, #self.paramsDef do
                 local param = self:getParam(i)
                 if not param then
                     return false
                 end
-                if not param:canCast(other.varargParam) then
+                if not param:canCast(other.varargParamDef) then
                     return false
                 end
             end
-            if self.varargParam then
-                if not self.varargParam:canCast(other.varargParam) then
+            if self.varargParamDef then
+                if not self.varargParamDef:canCast(other.varargParamDef) then
                     return false
                 end
             end
         end
-        for i, oreturn in ipairs(other.returns) do
+        for i, oreturn in ipairs(other.returnsDef) do
             local ret = self:getReturn(i)
             if not ret then
                 return false
@@ -92,18 +94,18 @@ function M:onCanCast(other)
                 return false
             end
         end
-        if other.varargReturn then
-            for i = #other.returns + 1, #self.returns do
+        if other.varargReturnDef then
+            for i = #other.returnsDef + 1, #self.returnsDef do
                 local ret = self:getReturn(i)
                 if not ret then
                     return false
                 end
-                if not ret:canCast(other.varargReturn) then
+                if not ret:canCast(other.varargReturnDef) then
                     return false
                 end
             end
-            if self.varargReturn then
-                if not self.varargReturn:canCast(other.varargReturn) then
+            if self.varargReturnDef then
+                if not self.varargReturnDef:canCast(other.varargReturnDef) then
                     return false
                 end
             end
@@ -116,47 +118,64 @@ end
 ---@param key string
 ---@param value Node
 ---@return Node.Function
-function M:addParam(key, value)
-    self.params[#self.params+1] = { key = key, value = value }
-    self.paramMap[key] = value
+function M:addParamDef(key, value)
+    self.paramsDef[#self.paramsDef+1] = { key = key, value = value }
+    self.paramDefMap[key] = value
     return self
 end
 
 ---@param key? string
 ---@param value Node
 ---@return Node.Function
-function M:addReturn(key, value)
-    self.returns[#self.returns+1] = { key = key, value = value }
+function M:addReturnDef(key, value)
+    self.returnsDef[#self.returnsDef+1] = { key = key, value = value }
     if key then
-        self.returnMap[key] = value
+        self.returnDefMap[key] = value
     end
     return self
 end
 
+M.returnNodeMax = 0
+
+---@param index integer
+---@param node Node
+function M:setReturnNode(index, node)
+    self.returnNode[index] = self.returnNode[index] | node
+    if index > self.returnNodeMax then
+        self.returnNodeMax = index
+    end
+end
+
 ---@param value Node
 ---@return Node.Function
-function M:addVarargParam(value)
+function M:addVarargParamDef(value)
     ---@type Node?
-    self.varargParam = value
+    self.varargParamDef = value
     return self
 end
 
 ---@param value Node
 ---@return Node.Function
-function M:addVarargReturn(value)
+function M:addVarargReturnDef(value)
     ---@type Node?
-    self.varargReturn = value
+    self.varargReturnDef = value
     return self
+end
+
+---@param node Node
+function M:setVarargReturnNode(node)
+    ---@type Node?
+    self.varargReturnNode = node
 end
 
 ---@param index integer
 ---@return Node?
 function M:getParam(index)
-    if self.params[index] then
-        return self.params[index].value
+    if self.paramsDef[index] then
+        return self.paramsDef[index].value
     end
-    if self.varargParam then
-        return self.varargParam
+    if self.varargParamDef then
+        return self.varargParamDef
     end
     return nil
 end
@@ -164,23 +183,29 @@ end
 ---@param index integer
 ---@return Node?
 function M:getReturn(index)
-    if self.returns[index] then
-        return self.returns[index].value
+    if self.returnsDef[index] then
+        return self.returnsDef[index].value
     end
-    if self.varargReturn then
-        return self.varargReturn
+    if self.returnNode[index] then
+        return self.returnNode[index]
+    end
+    if self.varargReturnDef then
+        return self.varargReturnDef
+    end
+    if self.varargReturnNode then
+        return self.varargReturnNode
     end
     return nil
 end
 
 ---@param index integer
 ---@return Node?
-function M:getParamFrom(index)
+function M:getParamStartFrom(index)
     local nodes = {}
-    for i = index, #self.params do
-        nodes[#nodes+1] = self.params[i].value
+    for i = index, #self.paramsDef do
+        nodes[#nodes+1] = self.paramsDef[i].value
     end
-    nodes[#nodes+1] = self.varargParam
+    nodes[#nodes+1] = self.varargParamDef
     if #nodes == 0 then
         return nil
     end
@@ -192,12 +217,18 @@ end
 
 ---@param index integer
 ---@return Node?
-function M:getReturnFrom(index)
+function M:getReturnStartFrom(index)
     local nodes = {}
-    for i = index, #self.returns do
-        nodes[#nodes+1] = self.returns[i].value
+    for i = index, #self.returnsDef do
+        nodes[#nodes+1] = self.returnsDef[i].value
     end
-    nodes[#nodes+1] = self.varargReturn
+    if self.varargReturnDef then
+        nodes[#nodes+1] = self.varargReturnDef
+    else
+        for i = #self.returnsDef + 1, self.returnNodeMax do
+            nodes[#nodes+1] = self.returnNode[i] or self.scope.node.NIL
+        end
+    end
     if #nodes == 0 then
         return nil
     end
@@ -209,26 +240,26 @@ end
 
 function M:view(skipLevel)
     local params = {}
-    for i, v in ipairs(self.params) do
+    for i, v in ipairs(self.paramsDef) do
         params[i] = string.format('%s: %s'
             , v.key
             , v.value:view()
         )
     end
-    if self.varargParam then
-        params[#params+1] = string.format('...: %s', self.varargParam:view())
+    if self.varargParamDef then
+        params[#params+1] = string.format('...: %s', self.varargParamDef:view())
     end
 
     local returns = {}
-    for i, v in ipairs(self.returns) do
+    for i, v in ipairs(self.returnsDef) do
         if v.key then
             returns[i] = string.format('(%s: %s)', v.key, v.value:view())
         else
             returns[i] = v.value:view()
         end
     end
-    if self.varargReturn then
-        returns[#returns+1] = string.format('(...: %s)', self.varargReturn:view())
+    if self.varargReturnDef then
+        returns[#returns+1] = string.format('(...: %s)', self.varargReturnDef:view())
     end
 
     if #returns > 0 then
@@ -255,20 +286,20 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    for _, v in ipairs(self.params) do
+    for _, v in ipairs(self.paramsDef) do
         if v.value.hasGeneric then
             return true, true
         end
     end
-    for _, v in ipairs(self.returns) do
+    for _, v in ipairs(self.returnsDef) do
         if v.value.hasGeneric then
             return true, true
         end
     end
-    if self.varargParam and self.varargParam.hasGeneric then
+    if self.varargParamDef and self.varargParamDef.hasGeneric then
         return true, true
     end
-    if self.varargReturn and self.varargReturn.hasGeneric then
+    if self.varargReturnDef and self.varargReturnDef.hasGeneric then
         return true, true
     end
     return false, true
@@ -289,42 +320,42 @@ function M:resolveGeneric(map)
     if self.genericPack then
         newFunc.genericPack = self.genericPack:resolve(map)
     end
-    for i, param in ipairs(self.params) do
+    for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then
             local newValue = param.value:resolveGeneric(map)
-            newFunc.params[i] = { key = param.key, value = newValue }
-            newFunc.paramMap[param.key] = newValue
+            newFunc.paramsDef[i] = { key = param.key, value = newValue }
+            newFunc.paramDefMap[param.key] = newValue
         else
-            newFunc.params[i] = param
-            newFunc.paramMap[param.key] = param.value
+            newFunc.paramsDef[i] = param
+            newFunc.paramDefMap[param.key] = param.value
         end
     end
-    for i, ret in ipairs(self.returns) do
+    for i, ret in ipairs(self.returnsDef) do
         if ret.value.hasGeneric then
             local newValue = ret.value:resolveGeneric(map)
-            newFunc.returns[i] = { key = ret.key, value = newValue }
+            newFunc.returnsDef[i] = { key = ret.key, value = newValue }
             if ret.key then
-                newFunc.returnMap[ret.key] = newValue
+                newFunc.returnDefMap[ret.key] = newValue
             end
         else
-            newFunc.returns[i] = ret
+            newFunc.returnsDef[i] = ret
             if ret.key then
-                newFunc.returnMap[ret.key] = ret.value
+                newFunc.returnDefMap[ret.key] = ret.value
             end
         end
     end
-    if self.varargParam then
-        if self.varargParam.hasGeneric then
-            newFunc.varargParam = self.varargParam:resolveGeneric(map)
+    if self.varargParamDef then
+        if self.varargParamDef.hasGeneric then
+            newFunc.varargParamDef = self.varargParamDef:resolveGeneric(map)
         else
-            newFunc.varargParam = self.varargParam
+            newFunc.varargParamDef = self.varargParamDef
         end
     end
-    if self.varargReturn then
-        if self.varargReturn.hasGeneric then
-            newFunc.varargReturn = self.varargReturn:resolveGeneric(map)
+    if self.varargReturnDef then
+        if self.varargReturnDef.hasGeneric then
+            newFunc.varargReturnDef = self.varargReturnDef:resolveGeneric(map)
         else
-            newFunc.varargReturn = self.varargReturn
+            newFunc.varargReturnDef = self.varargReturnDef
         end
     end
     return newFunc
@@ -346,7 +377,7 @@ function M:inferGeneric(other, result)
         return
     end
     ---@cast value Node.Function
-    for i, param in ipairs(self.params) do
+    for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then
             local otherParam = value:getParam(i)
             if not otherParam then
@@ -355,7 +386,7 @@ function M:inferGeneric(other, result)
             param.value:inferGeneric(otherParam, result)
         end
     end
-    for i, ret in ipairs(self.returns) do
+    for i, ret in ipairs(self.returnsDef) do
         if ret.value.hasGeneric then
             local otherReturn = value:getReturn(i)
             if not otherReturn then
@@ -364,16 +395,16 @@ function M:inferGeneric(other, result)
             ret.value:inferGeneric(otherReturn, result)
         end
     end
-    if self.varargParam and self.varargParam.hasGeneric then
-        local otherParam = value:getParamFrom(#self.params + 1)
+    if self.varargParamDef and self.varargParamDef.hasGeneric then
+        local otherParam = value:getParamStartFrom(#self.paramsDef + 1)
         if otherParam then
-            self.varargParam:inferGeneric(otherParam, result)
+            self.varargParamDef:inferGeneric(otherParam, result)
         end
     end
-    if self.varargReturn and self.varargReturn.hasGeneric then
-        local otherReturn = value:getReturnFrom(#self.returns + 1)
+    if self.varargReturnDef and self.varargReturnDef.hasGeneric then
+        local otherReturn = value:getReturnStartFrom(#self.returnsDef + 1)
         if otherReturn then
-            self.varargReturn:inferGeneric(otherReturn, result)
+            self.varargReturnDef:inferGeneric(otherReturn, result)
         end
     end
 end

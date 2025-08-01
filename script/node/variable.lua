@@ -209,12 +209,6 @@ M.__getter.fields = function (self)
     end
     local t = self.scope.node.table()
     self:mergeFields(t, self)
-    local subVariables = self.subVariables
-    if subVariables then
-        for sub in subVariables:pairsFast() do
-            self:mergeFields(t, sub)
-        end
-    end
     return t, true
 end
 

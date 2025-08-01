@@ -149,3 +149,22 @@ ls.feature.provider.definition(function (param, push)
         end
     end
 end)
+
+-- 标签
+ls.feature.provider.definition(function (param, push)
+    local source = param.sources[2]
+    if not source or source.kind ~= 'goto' then
+        return
+    end
+    ---@cast source LuaParser.Node.Goto
+    local label = source.label
+    if not label then
+        return
+    end
+
+    push {
+        uri = label.ast.source,
+        range = { label.name.start, label.name.finish },
+        originRange = { source.name.start, source.name.finish },
+    }
+end)

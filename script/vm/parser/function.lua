@@ -44,6 +44,12 @@ local function bindSelf(runner, source)
     if not headVar then
         return
     end
+    variable:addSubVariable(headVar)
+    headVar:addSubVariable(variable)
+    runner:addDispose(function ()
+        variable:removeSubVariable(headVar)
+        headVar:removeSubVariable(variable)
+    end)
     local classes = headVar.classes
     if not classes then
         return

@@ -341,6 +341,12 @@ function M:findFields(source, key)
             end
         end
 
+        if variable.subVariables then
+            for subVar in variable.subVariables:pairsFast() do
+                findByVar(subVar, results, ...)
+            end
+        end
+
         local parent = variable.parent
         if parent then
             findByVar(parent, results, variable.key, ...)

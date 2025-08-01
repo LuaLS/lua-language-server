@@ -117,6 +117,14 @@ function M:fillAPIs()
         return New 'Node.Tuple' (scope, values)
     end
 
+    ---@param values? Node[]
+    ---@param min? integer
+    ---@param max? integer
+    ---@return Node.Vararg
+    function self.vararg(values, min, max)
+        return New 'Node.Vararg' (scope, values, min, max)
+    end
+
     ---@param name string
     ---@param args Node[]
     ---@return Node.Call

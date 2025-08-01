@@ -534,7 +534,7 @@ TEST '(...)[1]'
     },
     last    = {
         exp = {
-            __class__ = 'LuaParser.Node.Varargs',
+            __class__ = 'LuaParser.Node.Select',
         }
     }
 }

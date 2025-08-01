@@ -143,6 +143,16 @@ do
 end
 
 do
+    local v1 = test.scope.node.vararg()
+
+    assert(v1:view() == '...')
+
+    local v2 = test.scope.node.vararg({test.scope.node.BOOLEAN})
+
+    assert(v2:view() == 'boolean...')
+end
+
+do
     local a = test.scope.node.array(test.scope.node.type('number'))
 
     assert(a:view() == 'number[]')

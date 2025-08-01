@@ -197,7 +197,7 @@ function Ast:parseAssign(first)
         assign.symbolPos = eqPos
         self:skipSpace()
         local values = self:parseExpList(true)
-        self:extendsAssignValues(values, #exps)
+        self:convertValuesToSelect(values, #exps)
         assign.values = values
 
         for i = 1, #values do
@@ -218,25 +218,43 @@ function Ast:parseAssign(first)
 end
 
 ---@private
+---@param value LuaParser.Node.Exp
+---@param index integer
+---@return LuaParser.Node.Exp?
+function Ast:convertSelect(value, index)
+    if value.kind ~= 'call' and value.kind ~= 'varargs' then
+        return nil
+    end
+    local sel = self:createNode('LuaParser.Node.Select', {
+        start  = value.start,
+        finish = value.finish,
+        index  = index,
+        value  = value,
+        dummy  = true,
+    })
+    return sel
+end
+
+---@private
 ---@param values LuaParser.Node.Exp[]
 ---@param varCount integer
-function Ast:extendsAssignValues(values, varCount)
-    if #values >= varCount then
-        return
+function Ast:convertValuesToSelect(values, varCount)
+    local lastValue
+    for i, value in ipairs(values) do
+        local sel = self:convertSelect(value, i)
+        if sel then
+            lastValue = value
+            values[i] = sel
+            value.parent = sel
+        else
+            lastValue = nil
+        end
     end
-    local lastValue = values[#values]
-    if not lastValue then
-        return
-    end
-    if lastValue.kind ~= 'call' and lastValue.kind ~= 'varargs' then
+    if #values >= varCount or not lastValue then
         return
     end
     for i = #values + 1, varCount do
-        local sel = self:createNode('LuaParser.Node.Select', {
-            start  = lastValue.start,
-            finish = lastValue.finish,
-            value  = lastValue,
-        })
+        local sel = self:convertSelect(lastValue, i)
         values[i] = sel
     end
 end

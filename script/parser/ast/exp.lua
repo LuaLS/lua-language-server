@@ -183,9 +183,9 @@ function Ast:parseParen()
     local exp = self:parseExp(true)
     local paren = self:createNode('LuaParser.Node.Paren', {
         start  = pos,
-        exp    = exp,
     })
     if exp then
+        paren.exp = self:convertSelect(exp, 1) or exp
         exp.parent = paren
     end
     self:skipSpace()

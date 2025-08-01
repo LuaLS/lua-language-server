@@ -140,7 +140,11 @@ TEST [[local x, y = call()]]
 {
     values = {
         [1] = {
-            kind = 'call',
+            kind = 'select',
+            index = 1,
+            value = {
+                kind = 'call'
+            },
         },
         [2] = {
             kind  = 'select',
@@ -156,7 +160,11 @@ TEST [[x, y = call()]]
 {
     values = {
         [1] = {
-            kind = 'call',
+            kind  = 'select',
+            index = 1,
+            value = {
+                kind = 'call',
+            },
         },
         [2] = {
             kind  = 'select',
@@ -172,7 +180,10 @@ TEST [[x, y = (call())]]
 {
     values = {
         [1] = {
-            kind = 'paren'
+            kind = 'paren',
+            exp = {
+                kind = 'select',
+            }
         },
         [2] = NIL,
     }
@@ -182,7 +193,7 @@ TEST [[x, y, z = call(), nil]]
 {
     values = {
         [1] = {
-            kind = 'call'
+            kind = 'select'
         },
         [2] = {
             kind = 'nil'
@@ -194,7 +205,11 @@ TEST [[x, y = ...]]
 {
     values = {
         [1] = {
-            kind = 'varargs'
+            kind = 'select',
+            index = 1,
+            value = {
+                kind = 'varargs',
+            }
         },
         [2] = {
             kind = 'select',
@@ -210,7 +225,7 @@ TEST [[x, y = ..., nil]]
 {
     values = {
         [1] = {
-            kind = 'varargs'
+            kind = 'select'
         },
         [2] = {
             kind = 'nil',
@@ -224,7 +239,7 @@ TEST [[x, y = (...)]]
         [1] = {
             kind = 'paren',
             exp = {
-                kind = 'varargs',
+                kind = 'select',
             },
         },
         [2] = NIL,

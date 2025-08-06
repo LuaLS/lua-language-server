@@ -7,6 +7,7 @@
 * `FIX` adds the `|lambda|` operator to the `Lua.runtime.nonstandardSymbol` configuration template, which allows the use of that option. Previously, support for it existed in the parser, but we could not actually use the option because it is not recognised in the configuration.
 * `FIX` Typed `@field` (eg `---@field [string] boolean`) should not override other defined field [#2171](https://github.com/LuaLS/lua-language-server/issues/2171), [#2711](https://github.com/LuaLS/lua-language-server/issues/2711)
 * `FIX` don't return empty hover doc when luals failed to find definition
+* `FIX` Prevent stack overflow when attempting to resolve function return values. [#3246](https://github.com/LuaLS/lua-language-server/issues/3246)
 
 ## 3.15.0
 `2025-6-25`

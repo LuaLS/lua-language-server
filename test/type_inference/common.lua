@@ -4881,3 +4881,25 @@ end
 
 local a, b, <?c?>, d = unpack(t)
 ]]
+
+-- Test for overflow in circular resolve, only pass requirement is no overflow
+TEST 'Callback<<T>>|fun():fun():fun():Success, string' [[
+--- @alias Success fun(): Success
+--- @alias Callback<T> fun(): Success, T
+
+--- @return Success
+local function success()
+    return success
+end
+
+--- @generic T
+--- @param callback Callback<T>
+--- @return Callback<T>
+local function make_callback(callback)
+    return callback
+end
+
+local <?callback?> = make_callback(function()
+    return success, ""
+end)
+]]

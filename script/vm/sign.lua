@@ -30,10 +30,17 @@ function mt:resolve(uri, args)
 
     ---@type table<string, vm.node>
     local resolved = {}
+    ---@type table<string, boolean>
+    local visited = {}
 
     ---@param object vm.node|vm.node.object
     ---@param node   vm.node
     local function resolve(object, node)
+        local visitedHash = ("%s|%s"):format(object, node)
+        if visited[visitedHash] then
+            return -- prevent circular resolve calls by only visiting each pair once
+        end
+        visited[visitedHash] = true
         if object.type == 'vm.node' then
             for o in object:eachObject() do
                 resolve(o, node)

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Incorrect generation of function signatures with tuple-parameters
 * `FIX` Incorrect inject-field message for extra table field in exact class
 * `CHG` Rename configuration option `Lua.diagnostics.disableScheme` to `Lua.diagnostics.validScheme` and improve its description. Now it enables diagnostics for Lua files that use the specified scheme.
 * `FIX` adds the `|lambda|` operator to the `Lua.runtime.nonstandardSymbol` configuration template, which allows the use of that option. Previously, support for it existed in the parser, but we could not actually use the option because it is not recognised in the configuration.

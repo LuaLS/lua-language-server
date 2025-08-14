@@ -235,6 +235,39 @@ end)(<??>)
 {'function (<!a: any!>, b: any)'}
 
 TEST [[
+---@param a [any, any]
+---@param b any
+function X(a, b) end
+
+X({ 1, 2 }, <?3?>)
+]]
+{
+'function X(a: [any, any], <!b: any!>)'
+}
+
+TEST [[
+---@param a any
+---@param b [any, any]
+---@param c any
+function X(a, b, c) end
+
+X(1, { 2, 3 }<??>, 4)
+]]
+{
+'function X(a: any, <!b: [any, any]!>, c: any)'
+}
+
+TEST [[
+---@param a [table<any>, {[1]:any,[2]:any}]
+function X(a) end
+
+X({ { 1 }, { 2, 3 } }<??>)
+]]
+{
+'function X(<!a: [table<any>, { [1]: any, [2]: any }]!>)'
+}
+
+TEST [[
 ---@overload fun()
 ---@overload fun(a:number)
 ---@param a number

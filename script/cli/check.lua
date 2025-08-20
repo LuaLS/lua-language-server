@@ -11,10 +11,10 @@ local function logFileForThread(threadId)
     return LOGPATH .. '/check-partial-' .. threadId .. '.json'
 end
 
-local function buildArgs(exe, numThreads, threadId, format, quiet)
-    local args = {exe}
+local function buildArgs(minIndex, numThreads, threadId, format, quiet)
+    local args = {}
     local skipNext = false
-    for i = 1, #arg do
+    for i = minIndex, #arg do
         local arg = arg[i]
         -- --check needs to be transformed into --check_worker
         if arg:lower():match('^%-%-check$') or arg:lower():match('^%-%-check=') then
@@ -56,9 +56,10 @@ function export.runCLI()
         exe = arg[minIndex]
         minIndex = minIndex - 1
     end
+    minIndex = minIndex + 1
     -- TODO: is this necessary? got it from the shell.lua helper in bee.lua tests
     if platform.os == 'windows' and not exe:match('%.[eE][xX][eE]$') then
-        exe = exe..'.exe'
+        arg[minIndex] = exe..'.exe'
     end
 
     if not QUIET and numThreads > 1 then
@@ -67,7 +68,7 @@ function export.runCLI()
 
     local procs = {}
     for i = 1, numThreads do
-        local process, err = subprocess.spawn({buildArgs(exe, numThreads, i, CHECK_FORMAT, QUIET)})
+        local process, err = subprocess.spawn({buildArgs(minIndex, numThreads, i, CHECK_FORMAT, QUIET)})
         if err then
             print(err)
         end

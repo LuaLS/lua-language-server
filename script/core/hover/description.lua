@@ -507,7 +507,7 @@ local function tryDocEnum(source)
                 end
                 if field.value.type == 'integer'
                 or field.value.type == 'string' then
-                    md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
+                    md:add('lua', ('    %s: %s = %q,'):format(key, field.value.type, field.value[1]))
                 end
                 if field.value.type == 'binary'
                 or field.value.type == 'unary' then

@@ -570,7 +570,7 @@ TEST {
 
             function mt:<!add!>(a, b)
             end
-            
+
             return function ()
                 return setmetatable({}, mt)
             end
@@ -650,10 +650,10 @@ TEST {
             function lib:fn1()
                 return self
             end
-            
+
             function lib:<!fn2!>()
             end
-            
+
             return lib:fn1()
         ]]
     },

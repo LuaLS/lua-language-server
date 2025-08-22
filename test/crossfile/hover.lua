@@ -431,7 +431,7 @@ function f(x: string|"选项1"|"选项2")
 
 ---
 
-**x**:
+#### x:
   - `"选项1"` — 注释1
   - `"选项2"` (default) — 注释2]]
 }
@@ -458,7 +458,7 @@ function f(x: "选项1"|"选项2")
 
 ---
 
-**x**:
+#### x:
   - `"选项1"` — 注释1
   - `"选项2"` (default) — 注释2]]
 }
@@ -486,7 +486,7 @@ function f()
 
 ---
 
-**x**:
+#### x:
   - `"选项1"` — 注释1
   - `"选项2"` (default) — 注释2]]
 }
@@ -514,7 +514,7 @@ function f()
 
 ---
 
-**return #1**:
+#### return #1:
   - `"选项1"` — 注释1
   - `"选项2"` (default) — 注释2]]
 }
@@ -740,7 +740,7 @@ function f(a: boolean)
 
 @*param* `a` — xxx
 
-**a**:
+#### a:
   - `true` — ttt
   - `false` — fff]]}
 
@@ -1041,7 +1041,7 @@ function f(p: 'a'|'b')
 
 ---
 
-**p**:
+#### p:
   - `'a'` — comment 1
              comment 2
   - `'b'` — comment 3
@@ -1262,19 +1262,19 @@ function f(p: 'a1'|'a2', ...'a3'|'a4')
 
 ---
 
-**p**:
+#### p:
   - `'a1'`
   - `'a2'`
 
-**...(param)**:
+#### ...(param):
   - `'a3'`
   - `'a4'`
 
-**ret1**:
+#### ret1:
   - `'r1'`
   - `'r2'`
 
-**...(return)**:
+#### ...(return):
   - `'r3'`
   - `'r4'`]]
 }
@@ -1527,7 +1527,7 @@ local x: 1|2
 
 ---
 
-**A**:
+#### A:
   - `1` — comment1
   - `2` — comment2]]
 }
@@ -1659,7 +1659,7 @@ local someValue: "#"
 
 ---
 
-**someType**:
+#### someType:
   - `"#"` — description]]
 }
 

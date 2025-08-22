@@ -274,7 +274,7 @@ TEST {
 
             function mt:add(a, b)
             end
-            
+
             return function ()
                 return setmetatable({}, mt)
             end
@@ -431,11 +431,9 @@ function f(x: string|"选项1"|"选项2")
 
 ---
 
-```lua
-x:
-    | "选项1" -- 注释1
-   -> "选项2" -- 注释2
-```]]
+#### x:
+  - `"选项1"` — 注释1
+  - `"选项2"` (default) — 注释2]]
 }
 
 TEST {
@@ -460,11 +458,9 @@ function f(x: "选项1"|"选项2")
 
 ---
 
-```lua
-x:
-    | "选项1" -- 注释1
-   -> "选项2" -- 注释2
-```]]
+#### x:
+  - `"选项1"` — 注释1
+  - `"选项2"` (default) — 注释2]]
 }
 
 TEST {
@@ -490,11 +486,9 @@ function f()
 
 ---
 
-```lua
-x:
-    | "选项1" -- 注释1
-   -> "选项2" -- 注释2
-```]]
+#### x:
+  - `"选项1"` — 注释1
+  - `"选项2"` (default) — 注释2]]
 }
 
 TEST {
@@ -520,11 +514,9 @@ function f()
 
 ---
 
-```lua
-return #1:
-    | "选项1" -- 注释1
-   -> "选项2" -- 注释2
-```]]
+#### return #1:
+  - `"选项1"` — 注释1
+  - `"选项2"` (default) — 注释2]]
 }
 
 TEST {
@@ -748,11 +740,9 @@ function f(a: boolean)
 
 @*param* `a` — xxx
 
-```lua
-a:
-    | true -- ttt
-    | false -- fff
-```]]}
+#### a:
+  - `true` — ttt
+  - `false` — fff]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
     path = 'b.lua',
@@ -1051,13 +1041,11 @@ function f(p: 'a'|'b')
 
 ---
 
-```lua
-p:
-    | 'a' -- comment 1
-          -- comment 2
-    | 'b' -- comment 3
-          -- comment 4
-```]]}
+#### p:
+  - `'a'` — comment 1
+             comment 2
+  - `'b'` — comment 3
+             comment 4]]}
 
 --TEST {{ path = 'a.lua', content = '', }, {
 --    path = 'b.lua',
@@ -1274,23 +1262,21 @@ function f(p: 'a1'|'a2', ...'a3'|'a4')
 
 ---
 
-```lua
-p:
-    | 'a1'
-    | 'a2'
+#### p:
+  - `'a1'`
+  - `'a2'`
 
-...(param):
-    | 'a3'
-    | 'a4'
+#### ...(param):
+  - `'a3'`
+  - `'a4'`
 
-ret1:
-    | 'r1'
-    | 'r2'
+#### ret1:
+  - `'r1'`
+  - `'r2'`
 
-...(return):
-    | 'r3'
-    | 'r4'
-```]]
+#### ...(return):
+  - `'r3'`
+  - `'r4'`]]
 }
 
 TEST {
@@ -1541,11 +1527,9 @@ local x: 1|2
 
 ---
 
-```lua
-A:
-    | 1 -- comment1
-    | 2 -- comment2
-```]]
+#### A:
+  - `1` — comment1
+  - `2` — comment2]]
 }
 
 TEST {
@@ -1663,7 +1647,7 @@ TEST {
         content = [[
             ---@alias someType
             ---| "#" # description
-            
+
             ---@type someType
             local <?someValue?>
         ]]
@@ -1675,10 +1659,8 @@ local someValue: "#"
 
 ---
 
-```lua
-someType:
-    | "#" -- description
-```]]
+#### someType:
+  - `"#"` — description]]
 }
 
 TEST { { path = 'a.lua', content = [[

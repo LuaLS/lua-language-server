@@ -250,20 +250,24 @@ local function buildEnumChunk(docType, name, uri)
         local comment = tryDocClassComment(tp)
         if comment then
             for line in util.eachLine(comment) do
-                lines[#lines+1] = ('-- %s'):format(line)
+                lines[#lines+1] = line
             end
         end
     end
     if #enums == 0 then
         return nil
     end
-    lines[#lines+1] = ('%s:'):format(name)
+    if #lines > 0 and lines[#lines] ~= "" then
+        lines[#lines+1] = ""
+    end
+    lines[#lines+1] = ('#### %s:'):format(name)
     for _, enum in ipairs(enums) do
-        local enumDes = ('   %s %s'):format(
-                (enum.default    and '->')
-            or  (enum.additional and '+>')
-            or  ' |',
-            vm.getInfer(enum):view(uri)
+        local suffix = (enum.default and ' (default)')
+            or (enum.additional and ' (additional)')
+            or ''
+        local enumDes = ('  - `%s`%s'):format(
+            vm.getInfer(enum):view(uri),
+            suffix
         )
         if enum.comment then
             local first = true
@@ -271,9 +275,9 @@ local function buildEnumChunk(docType, name, uri)
             for comm in enum.comment:gmatch '[^\r\n]+' do
                 if first then
                     first = false
-                    enumDes = ('%s -- %s'):format(enumDes, comm)
+                    enumDes = ('%s — %s'):format(enumDes, comm)
                 else
-                    enumDes = ('%s\n%s -- %s'):format(enumDes, (' '):rep(len), comm)
+                    enumDes = ('%s\n%s %s'):format(enumDes, (' '):rep(len + 3), comm)
                 end
             end
         end
@@ -391,7 +395,7 @@ local function getFunctionCommentMarkdown(source, raw)
     end
 
     local enums = getBindEnums(source, docGroup)
-    md:add('lua', enums)
+    md:add('md', enums)
 
     return md
 end
@@ -410,11 +414,11 @@ local function tryDocComment(source, raw)
     md:add('md', comment)
     if source.type == 'doc.alias' then
         local enums = buildEnumChunk(source, source.alias[1], guide.getUri(source))
-        md:add('lua', enums)
+        md:add('md', enums)
     end
     if source.type == 'doc.enum' then
         local enums = buildEnumChunk(source, source.enum[1], guide.getUri(source))
-        md:add('lua', enums)
+        md:add('md', enums)
     end
     local result = md:string()
     if result == '' then

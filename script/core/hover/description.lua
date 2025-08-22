@@ -257,7 +257,10 @@ local function buildEnumChunk(docType, name, uri)
     if #enums == 0 then
         return nil
     end
-    lines[#lines+1] = ('**%s**:'):format(name)
+    if #lines > 0 and lines[#lines] ~= "" then
+        lines[#lines+1] = ""
+    end
+    lines[#lines+1] = ('#### %s:'):format(name)
     for _, enum in ipairs(enums) do
         local suffix = (enum.default and ' (default)')
             or (enum.additional and ' (additional)')

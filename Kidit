@@ -1,0 +1,52 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Remote untuk request mastery boost
+local Remote = ReplicatedStorage:FindFirstChild("RequestMasteryBoost")
+if not Remote then
+    Remote = Instance.new("RemoteEvent")
+    Remote.Name = "RequestMasteryBoost"
+    Remote.Parent = ReplicatedStorage
+end
+
+-- Setup leaderstats mastery
+local function setupPlayer(plr)
+    local stats = Instance.new("Folder")
+    stats.Name = "leaderstats"
+    stats.Parent = plr
+
+    local masteryFolder = Instance.new("Folder")
+    masteryFolder.Name = "FruitMastery"
+    masteryFolder.Parent = stats
+
+    for _, fruit in pairs({"Flame","Dragon","Rumble","Dark"}) do
+        local v = Instance.new("IntValue")
+        v.Name = fruit
+        v.Value = 0
+        v.Parent = masteryFolder
+    end
+end
+
+game.Players.PlayerAdded:Connect(setupPlayer)
+
+-- Mode 1: Player request manual (pakai tombol GUI)
+Remote.OnServerEvent:Connect(function(player, fruitName, amount)
+    local masteryFolder = player:FindFirstChild("leaderstats"):FindFirstChild("FruitMastery")
+    if not masteryFolder then return end
+    local fruit = masteryFolder:FindFirstChild(fruitName)
+    if fruit then
+        fruit.Value = math.min(fruit.Value + amount, 600) -- max 600
+    end
+end)
+
+-- Mode 2: Auto Time Farm (contoh nambah mastery tiap 10 detik)
+while true do
+    task.wait(10)
+    for _, player in pairs(game.Players:GetPlayers()) do
+        local masteryFolder = player:FindFirstChild("leaderstats"):FindFirstChild("FruitMastery")
+        if masteryFolder then
+            for _, fruit in pairs(masteryFolder:GetChildren()) do
+                fruit.Value = math.min(fruit.Value + 5, 600) -- +5 mastery tiap 10 detik
+            end
+        end
+    end
+end

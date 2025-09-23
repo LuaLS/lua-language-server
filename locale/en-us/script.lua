@@ -604,7 +604,7 @@ CONFIG_MODIFY_FAIL_NO_WORKSPACE  =
 [[
 Failed to modify settings:
 * The current mode is single-file mode, server cannot create `.luarc.json` without workspace.
-* The language client dose not support modifying settings from the server side.
+* The language client does not support modifying settings from the server side.
 
 Please modify following settings manually:
 {}

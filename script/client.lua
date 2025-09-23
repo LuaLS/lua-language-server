@@ -480,7 +480,7 @@ local function tryModifyClientGlobal(finalChanges)
     end
     log.info('tryModifyClientGlobal', inspect(finalChanges))
     if not m.getOption 'changeConfiguration' then
-        log.info('Client dose not support modifying config')
+        log.info('Client does not support modifying config')
         return
     end
     local changes = {}

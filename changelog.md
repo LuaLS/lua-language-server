@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Doc output now contains file paths for `@alias` and `@enum` types
 * `FIX` Typos in a few error messages.
 * `FIX` Incorrect inject-field message for extra table field in exact class
 * `CHG` Rename configuration option `Lua.diagnostics.disableScheme` to `Lua.diagnostics.validScheme` and improve its description. Now it enables diagnostics for Lua files that use the specified scheme.

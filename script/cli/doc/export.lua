@@ -147,7 +147,11 @@ export.makeDocObject['INIT'] = function(source, has_seen)
 end
 
 export.makeDocObject['doc.alias'] = function(source, obj, has_seen)
+    obj.file = export.getLocalPath(guide.getUri(source))
+end
 
+export.makeDocObject['doc.enum'] = function(source, obj, has_seen)
+    obj.file = export.getLocalPath(guide.getUri(source))
 end
 
 export.makeDocObject['doc.field'] = function(source, obj, has_seen)
@@ -256,6 +260,7 @@ export.makeDocObject['variable'] = function(source, obj, has_seen)
         or set.type == 'setmethod'
         or set.type == 'setindex'
         or set.type == 'doc.alias'
+        or set.type == 'doc.enum'
         or set.type == 'doc.class'
         then
             table.insert(obj.defines, export.documentObject(set, has_seen))

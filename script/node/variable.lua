@@ -295,6 +295,22 @@ function M:addField(field, path)
     return current
 end
 
+---@param key Node.Key
+---@param variable Node.Variable
+---@return Node.Variable
+function M:setChild(key, variable)
+    if type(key) ~= 'table' then
+        ---@cast key -Node
+        key = self.scope.node.value(key)
+    end
+    if not self.childs then
+        self.childs = {}
+    end
+    self.childs[key] = variable
+    self:flushCache()
+    return self
+end
+
 ---@param field Node.Field
 ---@param path? Node.Key[]
 ---@return Node.Variable

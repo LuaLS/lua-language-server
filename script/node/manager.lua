@@ -308,6 +308,7 @@ function M:fillPresets()
             value = self.ANY,
             hideInView = true,
         }
+    self.G:setChild('_G', self.G)
 end
 
 function M:reset()

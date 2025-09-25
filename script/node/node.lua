@@ -2,6 +2,7 @@
 ---@field onCanCast? fun(self: Node, other: Node): boolean # 能否转换为另一个节点
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
+---@field hideInUnionView? boolean
 ---@field scope Scope
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
@@ -10,7 +11,7 @@ local M = Class 'Node'
 
 Extends('Node', 'Node.CacheModule')
 
----@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'call' | 'template' | 'vararg'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'call' | 'template' | 'vararg' | 'variable'
 
 ---@class Node.Location
 ---@field uri Uri

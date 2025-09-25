@@ -95,6 +95,9 @@ function M:view(skipLevel, needParentheses)
     ---@type string[]
     local view = {}
     for _, v in ipairs(values) do
+        if v.hideInUnionView then
+            goto continue
+        end
         local thisView = v:view(skipLevel and skipLevel + 1 or nil, true)
         if not thisView then
             goto continue

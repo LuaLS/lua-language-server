@@ -1,9 +1,11 @@
----@class Node.Variable: Class.Base, Node.CacheModule
+---@class Node.Variable: Node
 local M = Class 'Node.Variable'
 
-Extends('Node.Variable', 'Node.CacheModule')
+Extends('Node.Variable', 'Node')
 
 M.kind = 'variable'
+
+M.hideInUnionView = true
 
 ---@alias Node.Key string | number | boolean | Node
 
@@ -293,6 +295,24 @@ function M:addField(field, path)
     current.parent:flushCache()
 
     return current
+end
+
+---@param key string|number|boolean|Node
+---@return Node
+function M:get(key)
+    local node = self.scope.node
+    if type(key) ~= 'table' then
+        ---@cast key -Node
+        key = node.value(key)
+    end
+    if not self.childs then
+        return node.NIL
+    end
+    local child = self.childs[key]
+    if not child then
+        return node.NIL
+    end
+    return child
 end
 
 ---@param key Node.Key

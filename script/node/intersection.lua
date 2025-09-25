@@ -72,6 +72,10 @@ M.__getter.values = function (self)
         or y.kind == 'generic' then
             return false
         end
+        if x.kind == 'variable'
+        or y.kind == 'variable' then
+            return false
+        end
         if x >> y then
             return true, x
         end
@@ -250,8 +254,12 @@ function M:view(skipLevel, needParentheses)
     end
     local elements = {}
     for _, v in ipairs(self.rawNodes) do
+        if v.hideInUnionView then
+            goto continue
+        end
         local view = v:view(skipLevel, true)
         elements[#elements+1] = view
+        ::continue::
     end
     local result = table.concat(elements, ' & ')
     if needParentheses then

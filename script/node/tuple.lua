@@ -114,9 +114,6 @@ function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
         for i, v in ipairs(self.values) do
-            if i > other.len then
-                break
-            end
             if not v:canCast(other.head) then
                 return false
             end

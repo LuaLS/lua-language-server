@@ -263,23 +263,3 @@ do
     assert(t:get(test.scope.node.value(1) | test.scope.node.value(2)):view() == 'true')
     assert(t:get(test.scope.node.value(0) | test.scope.node.value(1)):view() == 'true | nil')
 end
-
-do
-    local t = test.scope.node.array(test.scope.node.value(true), 3)
-
-    assert(t:get(test.scope.node.ANY):view() == 'true')
-    assert(t:get(test.scope.node.UNKNOWN):view() == 'true')
-
-    assert(t:get(0):view() == 'nil')
-    assert(t:get(1):view() == 'true')
-    assert(t:get(test.scope.node.value(1)):view() == 'true')
-    assert(t:get(test.scope.node.value(4)):view() == 'nil')
-
-    assert(t:get(test.scope.node.type 'number'):view() == 'true')
-    assert(t:get(test.scope.node.type 'integer'):view() == 'true')
-    assert(t:get(test.scope.node.type 'boolean'):view() == 'nil')
-
-    assert(t:get(test.scope.node.value(1) | test.scope.node.value(2)):view() == 'true')
-    assert(t:get(test.scope.node.value(0) | test.scope.node.value(1)):view() == 'true | nil')
-    assert(t:get(test.scope.node.value(1) | test.scope.node.value(4)):view() == 'true | nil')
-end

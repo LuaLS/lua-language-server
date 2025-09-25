@@ -2,18 +2,16 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(value: Node, len?: integer): Node.Array
+---@overload fun(value: Node): Node.Array
 local M = ls.node.register 'Node.Array'
 
 M.kind = 'array'
 
 ---@param scope Scope
 ---@param value Node
----@param len? number
-function M:__init(scope, value, len)
+function M:__init(scope, value)
     self.scope = scope
     self.head = value
-    self.len = len or math.huge
 end
 
 function M:get(key)
@@ -35,7 +33,6 @@ function M:get(key)
     if type(key) ~= 'table' then
         if  type(key) == 'number'
         and key >= 1
-        and key <= self.len
         and key % 1 == 0 then
             return self.head
         else
@@ -71,16 +68,13 @@ end
 function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
-        if self.len < other.len then
-            return false
-        end
         return self.head:canCast(other.head)
     end
     return false
 end
 
 function M:view(skipLevel)
-    return string.format('%s[%s]', self.head:view(skipLevel, true), self.len == math.huge and '' or self.len)
+    return string.format('%s[]', self.head:view(skipLevel, true))
 end
 
 ---@param self Node.Array
@@ -98,7 +92,7 @@ function M:resolveGeneric(map)
     if newHead == self.head then
         return self
     end
-    return self.scope.node.array(newHead, self.len)
+    return self.scope.node.array(newHead)
 end
 
 function M:inferGeneric(other, result)

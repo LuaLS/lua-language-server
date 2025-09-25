@@ -166,20 +166,6 @@ do
 
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
-        ---@alias A string[3][4]
-    ]]
-    vfile:indexAst(ast, 'common')
-
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'string[3][4]')
-end
-
-do
-    local vm = ls.vm.create(test.scope)
-    node:reset()
-
-    local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
         ---@alias A table<number, boolean>
     ]]
     vfile:indexAst(ast, 'common')

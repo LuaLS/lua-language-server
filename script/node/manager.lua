@@ -75,10 +75,9 @@ function M:fillAPIs()
     end
 
     ---@param value Node
-    ---@param len? number
     ---@return Node.Array
-    function self.array(value, len)
-        return New 'Node.Array' (scope, value, len)
+    function self.array(value)
+        return New 'Node.Array' (scope, value)
     end
 
     function self.func()

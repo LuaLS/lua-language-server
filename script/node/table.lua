@@ -320,8 +320,7 @@ function M:onCanCast(other)
             if  key.kind == 'value'
             and type(key.literal) == 'number'
             and key.literal % 1 == 0
-            and key.literal >= 1
-            and key.literal <= other.len then
+            and key.literal >= 1 then
                 local v = self.valueMap[key]
                 if not v:canCast(other.head) then
                     return false

@@ -141,8 +141,6 @@ function Ast:parseCatArray(head)
     head.parent = array
 
     self:skipSpace()
-    array.size = self:parseCatInteger()
-    self:skipSpace()
 
     array.symbolPos2 = self:assertSymbol ']'
     array.finish = self:getLastPos()

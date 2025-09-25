@@ -74,7 +74,7 @@ end)
 
 ls.vm.registerRunnerParser('catarray', function (runner, source)
     ---@cast source LuaParser.Node.CatArray
-    return runner.node.array(runner:parse(source.node), source.size and source.size.value)
+    return runner.node.array(runner:parse(source.node))
 end)
 
 ls.vm.registerRunnerParser('catcall', function (runner, source)

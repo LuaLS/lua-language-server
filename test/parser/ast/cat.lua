@@ -177,38 +177,6 @@ TEST [[
 }
 
 TEST [[
----@type string[3][4]
-]]
-{
-    childs = {
-        [1] = {
-            kind  = 'cat',
-            value = {
-                kind = 'catstatetype',
-                exp  = {
-                    kind = 'catarray',
-                    size = {
-                        kind = 'catinteger',
-                        value = 4,
-                    },
-                    node = {
-                        kind = 'catarray',
-                        size = {
-                            kind = 'catinteger',
-                            value = 3,
-                        },
-                        node = {
-                            kind = 'catid',
-                            id = 'string',
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-TEST [[
 ---@type A<number, boolean>
 ]]
 {

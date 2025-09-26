@@ -245,3 +245,19 @@ do
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+        ---@alias A { x: 1, y: 2 }
+        ---@alias B A['x']
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    assert(node.type('B'):view() == 'B')
+    assert(node.type('B').value:view() == 'A["x"]')
+    assert(node.type('B').value.value:view() == '1')
+end

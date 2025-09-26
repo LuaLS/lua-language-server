@@ -263,3 +263,20 @@ do
     assert(t:get(test.scope.node.value(1) | test.scope.node.value(2)):view() == 'true')
     assert(t:get(test.scope.node.value(0) | test.scope.node.value(1)):view() == 'true | nil')
 end
+
+do
+    local index = test.scope.node.index(
+        test.scope.node.table()
+            : addField {
+                key   = test.scope.node.value 'x',
+                value = test.scope.node.value(1)
+            }
+            : addField {
+                key   = test.scope.node.value 'y',
+                value = test.scope.node.value(2)
+            },
+        test.scope.node.value 'x'
+    )
+    assert(index:view() == '{ x: 1, y: 2 }["x"]')
+    assert(index.value:view() == '1')
+end

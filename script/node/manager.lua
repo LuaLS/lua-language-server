@@ -56,15 +56,19 @@ function M:fillAPIs()
         return self.TYPE_POOL[name]
     end
 
+    ---@param name string
+    ---@param params? Node.Generic[]
+    ---@param extends? Node[]
+    ---@return Node.Class
+    function self.class(name, params, extends)
+        return New 'Node.Class' (scope, name, params, extends)
+    end
+
     ---@overload fun(v: number): Node.Value
     ---@overload fun(v: boolean): Node.Value
     ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
-    ---@overload fun(v: nil): Node.Type
     function self.value(...)
         local v, quo = ...
-        if v == nil then
-            return scope.node.NIL
-        end
         if quo == "'" then
             return self.VALUE_POOL_STR2[v]
         end
@@ -78,6 +82,13 @@ function M:fillAPIs()
     ---@return Node.Array
     function self.array(value)
         return New 'Node.Array' (scope, value)
+    end
+
+    ---@param head Node
+    ---@param index Node
+    ---@return Node.Index
+    function self.index(head, index)
+        return New 'Node.Index' (scope, head, index)
     end
 
     function self.func()
@@ -191,7 +202,7 @@ end
 
 ---@private
 function M:fillPresets()
-    self.TRUE = self.value(true)
+    self.TRUE  = self.value(true)
     self.FALSE = self.value(false)
 
     self.NEVER = self.type 'never'
@@ -244,33 +255,28 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.TABLE = self.type 'table'
         : setConfig('basicType', true)
-        : setConfig('hideEmptyArgs', true)
     self.USERDATA = self.type 'userdata'
         : setConfig('basicType', true)
     self.THREAD = self.type 'thread'
         : setConfig('basicType', true)
 
-    self.ANY:addField {
-        key   = self.ANY,
-        value = self.ANY,
-        hideInView = true,
-    }
+    local anykv = self.class 'anykv'
+        : addField {
+            key   = self.ANY,
+            value = self.ANY,
+            hideInView = true,
+        }
+
+    self.ANY:addClass(anykv)
     self.ANY.truly = self.TRULY
     self.ANY.falsy = self.FALSE | self.type 'nil'
 
-    self.UNKNOWN:addField {
-        key   = self.ANY,
-        value = self.ANY,
-        hideInView = true,
-    }
+
+    self.UNKNOWN:addClass(anykv)
     self.UNKNOWN.truly = self.TRULY
     self.UNKNOWN.falsy = self.FALSE
 
-    self.TRULY:addField {
-        key   = self.ANY,
-        value = self.ANY,
-        hideInView = true,
-    }
+    self.TRULY:addClass(anykv)
 
     self.NIL.truly = self.NEVER
     self.NIL.falsy = self.NIL
@@ -284,30 +290,51 @@ function M:fillPresets()
     do
         local K = self.generic('K', self.ANY, self.ANY)
         local V = self.generic('V', self.ANY, self.ANY)
-        self.TABLE:addParams { K, V }
-        self.TABLE:addField {
-            key   = K,
-            value = V,
-        }
+        local table0 = self.class('table0')
+            : addField {
+                key   = self.ANY,
+                value = self.ANY,
+                hideInView = true,
+            }
+
+        local table1 = self.class('table1', { K })
+            : addField {
+                key   = K,
+                value = self.TRUE,
+            }
+
+        local table2 = self.class('table2', { K, V })
+            : addField {
+                key   = K,
+                value = V,
+            }
+
+        self.TABLE:addClass(table0)
+        self.TABLE:addClass(table1)
+        self.TABLE:addClass(table2)
     end
 
-    self.USERDATA:addField {
-        key   = self.ANY,
-        value = self.ANY,
-        hideInView = true,
-    }
+    self.USERDATA:addClass(anykv)
 
-    self.G = self.variable '_G'
+    self.TYPE_G = self.type '_G'
+    self.VAR_G = self.variable '_G'
         : hideAtHead()
-        : addClass(self.type '_G')
-    self.type '_G'
-        : addVariable(self.G)
-        : addField {
-            key   = self.ANY,
-            value = self.ANY,
-            hideInView = true,
-        }
-    self.G:setChild('_G', self.G)
+        : addClass(self.TYPE_G)
+
+    do
+        local G = self.class '_G'
+            : addVariable(self.VAR_G)
+            : addField {
+                key    = self.value '_G',
+                value  = self.TYPE_G,
+            }
+            : addField {
+                key   = self.ANY,
+                value = self.ANY,
+                hideInView = true,
+            }
+        self.TYPE_G:addClass(G)
+    end
 end
 
 function M:reset()
@@ -319,21 +346,21 @@ end
 ---@param ... Node.Key
 ---@return Node.Variable
 function M:globalGet(...)
-    return self.G:getChild(...)
+    return self.VAR_G:getChild(...)
 end
 
 ---@param field Node.Field
 ---@param path? Node.Key[]
 ---@return Node.Variable
 function M:globalAdd(field, path)
-    return self.G:addField(field, path)
+    return self.VAR_G:addField(field, path)
 end
 
 ---@param field Node.Field
 ---@param path? Node.Key[]
 ---@return Node.Variable
 function M:globalRemove(field, path)
-    return self.G:removeField(field, path)
+    return self.VAR_G:removeField(field, path)
 end
 
 

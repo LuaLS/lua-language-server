@@ -109,7 +109,7 @@ do
 end
 
 do
-    local a = node.value(1) | node.G
+    local a = node.value(1) | node.VAR_G
 
     assert(a:view() == '1')
 end

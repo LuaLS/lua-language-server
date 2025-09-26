@@ -14,31 +14,6 @@ function M:__init(scope, name)
     self.scope = scope
 end
 
----@param field Node.Field
----@return Node.Type
-function M:addField(field)
-    if not self.table then
-        self.table = self.scope.node.table()
-    end
-    self.table:addField(field)
-    self:flushCache()
-    return self
-end
-
----@param field Node.Field
----@return Node.Type
-function M:removeField(field)
-    if not self.table then
-        return self
-    end
-    self.table:removeField(field)
-    if self.table:isEmpty() then
-        self.table = nil
-    end
-    self:flushCache()
-    return self
-end
-
 ---@type boolean
 M.isBasicType = nil
 
@@ -81,27 +56,27 @@ function M:isAliasLike()
     return false
 end
 
----@type Node.Location[]
-M.classLocations = nil
+---@type LinkedTable
+M.classes = nil
 
----@param location Node.Location
-function M:addClass(location)
-    if not self.classLocations then
-        self.classLocations = {}
+---@param class Node.Class
+function M:addClass(class)
+    if not self.classes then
+        self.classes = ls.linkedTable.create()
     end
-    self.classLocations[#self.classLocations+1] = location
+    self.classes:pushTail(class)
 
     self:flushCache()
 end
 
----@param location Node.Location
-function M:removeClass(location)
-    if not self.classLocations then
+---@param class Node.Class
+function M:removeClass(class)
+    if not self.classes then
         return
     end
-    ls.util.arrayRemove(self.classLocations, location)
-    if #self.classLocations == 0 then
-        self.classLocations = nil
+    self.classes:pop(class)
+    if self.classes:getSize() == 0 then
+        self.classes = nil
     end
 
     self:flushCache()
@@ -183,123 +158,6 @@ function M:removeAlias(alias, location)
     self:flushCache()
 
     return self
-end
-
----添加绑定的变量
----@param variable Node.Variable
----@return Node.Type
-function M:addVariable(variable)
-    if not self.variables then
-        self.variables = ls.linkedTable.create()
-    end
-
-    self.variables:pushTail(variable)
-
-    variable:flushMe(self, true)
-    self:flushCache()
-
-    return self
-end
-
----@param variable Node.Variable
----@return Node.Type
-function M:removeVariable(variable)
-    if not self.variables then
-        return self
-    end
-    self.variables:pop(variable)
-    if self.variables:getSize() == 0 then
-        self.variables = nil
-    end
-
-    variable:flushMe(self, false)
-    self:flushCache()
-
-    return self
-end
-
----@type (Node.Type | Node.Call | Node.Table)[]
-M.fullExtends = nil
-
----获取所有继承（广度优先）
----@param self Node.Type
----@return (Node.Type | Node.Call | Node.Table)[]
----@return true
-M.__getter.fullExtends = function (self)
-    local result = {}
-    local mark = {}
-
-    ---@param t Node.Type
-    ---@param nextQueue Node.Type[]
-    local function pushExtends(t, nextQueue)
-        if not t.extends then
-            return
-        end
-        ---@param v Node
-        for v in t.extends:pairsFast() do
-            if mark[v] then
-                goto continue
-            end
-            mark[v] = true
-            result[#result+1] = v
-            if v.kind == 'type' then
-                nextQueue[#nextQueue+1] = v
-            end
-            ::continue::
-        end
-    end
-
-    ---@param queue Node.Type[]
-    local function search(queue)
-        local nextQueue = {}
-        for _, v in ipairs(queue) do
-            pushExtends(v, nextQueue)
-        end
-        if #nextQueue == 0 then
-            return
-        end
-        search(nextQueue)
-    end
-
-    search { self }
-
-    return result, true
-end
-
----@type Node.Table
-M.extendsTable = nil
-
----获取所有继承的合并表
----@param self Node.Type
----@return Node.Table
----@return true
-M.__getter.extendsTable = function (self)
-    local table = self.scope.node.table()
-    if #self.fullExtends == 0 then
-        return table, true
-    end
-
-    ---@type Node.Table[]
-    local tables = {}
-    for _, v in ipairs(self.fullExtends) do
-        if v.kind == 'table' then
-            ---@cast v Node.Table
-            tables[#tables+1] = v
-        elseif v.kind == 'type' then
-            ---@cast v Node.Type
-            tables[#tables+1] = v.table
-        else
-            ---@cast v -Node.Table, -Node.Type
-            local vv = v.value
-            if vv.kind == 'table' then
-                ---@cast vv Node.Table
-                tables[#tables+1] = vv
-            end
-        end
-    end
-    table:extends(tables)
-
-    return table, true
 end
 
 ---@type Node
@@ -487,37 +345,6 @@ end
 ---@return true
 M.__getter.hasGeneric = function (self)
     return self.paramPacks ~= nil, true
-end
-
----@type Node.GenericPack[]?
-M.paramPacks = nil
-
----@param generics Node.Generic[]
----@return Node.Type
-function M:addParams(generics)
-    if not self.paramPacks then
-        self.paramPacks = {}
-    end
-    self.paramPacks[#self.paramPacks+1] = self.scope.node.genericPack(generics)
-    return self
-end
-
----@param generics Node.Generic[]
----@return Node.Type
-function M:removeParams(generics)
-    if not self.paramPacks then
-        return self
-    end
-    for i, pack in ipairs(self.paramPacks) do
-        if pack.generics == generics then
-            table.remove(self.paramPacks, i)
-            break
-        end
-    end
-    if #self.paramPacks == 0 then
-        self.paramPacks = nil
-    end
-    return self
 end
 
 ---@param args Node[]

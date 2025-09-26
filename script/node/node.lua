@@ -11,7 +11,7 @@ local M = Class 'Node'
 
 Extends('Node', 'Node.CacheModule')
 
----@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'call' | 'template' | 'vararg' | 'variable'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'index' | 'function' | 'union' | 'intersection' | 'unsolve' | 'generic' | 'call' | 'template' | 'vararg' | 'variable'
 
 ---@class Node.Location
 ---@field uri Uri

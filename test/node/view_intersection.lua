@@ -49,7 +49,7 @@ do
 end
 
 do
-    local a = node.type('table') & node.G
+    local a = node.type('table') & node.VAR_G
 
     assert(a:view() == 'table')
 end

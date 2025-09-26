@@ -77,6 +77,13 @@ ls.vm.registerRunnerParser('catarray', function (runner, source)
     return runner.node.array(runner:parse(source.node))
 end)
 
+ls.vm.registerRunnerParser('catindex', function (runner, source)
+    ---@cast source LuaParser.Node.CatIndex
+    local node = runner:parse(source.node)
+    local index = runner:parse(source.index)
+    return runner.node.index(node, index)
+end)
+
 ls.vm.registerRunnerParser('catcall', function (runner, source)
     ---@cast source LuaParser.Node.CatCall
     return runner.node.type(source.node.id):call(ls.util.map(source.args, function (v, k)
@@ -172,6 +179,16 @@ ls.vm.registerRunnerParser('catstatealias', function (runner, source)
     ---@cast source LuaParser.Node.CatStateAlias
 
     local alias = runner.node.type(source.aliasID.id)
+
+    if source.typeParams then
+        local params = ls.util.map(source.typeParams, function (g, k)
+            return runner:makeGeneric(g)
+        end)
+        alias:addParams(params)
+        runner:addDispose(function ()
+            alias:removeParams(params)
+        end)
+    end
 
     local value = runner:parse(source.extends)
     local location = runner:makeLocation(source)

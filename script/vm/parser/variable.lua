@@ -120,7 +120,7 @@ ls.vm.registerVariableParser('local', function (runner, source)
 
     -- TODO: Lua 5.1?
     if source.dummy and source.id == '_ENV' then
-        return runner.node.G
+        return runner.node.VAR_G
     end
     local variable = runner.node.variable(source.id)
     return variable

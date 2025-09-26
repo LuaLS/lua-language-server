@@ -3,6 +3,7 @@
 ---| LuaParser.Node.CatID
 ---| LuaParser.Node.CatParen
 ---| LuaParser.Node.CatArray
+---| LuaParser.Node.CatIndex
 ---| LuaParser.Node.CatCall
 ---| LuaParser.Node.CatUnion
 ---| LuaParser.Node.CatIntersection
@@ -22,12 +23,20 @@ CatParen.kind = 'catparen'
 
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatExp
----@field size? LuaParser.Node.CatInteger
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 local CatArray = Class('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
 
 CatArray.kind = 'catarray'
+
+---@class LuaParser.Node.CatIndex: LuaParser.Node.Base
+---@field node LuaParser.Node.CatExp
+---@field symbolPos1 integer # 左括号的位置
+---@field symbolPos2? integer # 右括号的位置
+---@field index? LuaParser.Node.CatExp
+local CatIndex = Class('LuaParser.Node.CatIndex', 'LuaParser.Node.Base')
+
+CatIndex.kind = 'catindex'
 
 ---@class LuaParser.Node.CatCall: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatID
@@ -75,6 +84,7 @@ function Ast:parseCatTerm(required)
         self:skipSpace()
 
         local chain = self:parseCatArray(current)
+                or    self:parseCatIndex(current)
                 or    self:parseCatCall(current)
 
         if chain then
@@ -128,6 +138,10 @@ end
 ---@param head LuaParser.Node.CatExp
 ---@return LuaParser.Node.CatArray?
 function Ast:parseCatArray(head)
+    if self.lexer:peek(0) ~= '['
+    or self.lexer:peek(1) ~= ']' then
+        return nil
+    end
     local pos1 = self.lexer:consume '['
     if not pos1 then
         return nil
@@ -140,12 +154,35 @@ function Ast:parseCatArray(head)
 
     head.parent = array
 
-    self:skipSpace()
-
     array.symbolPos2 = self:assertSymbol ']'
     array.finish = self:getLastPos()
 
     return array
+end
+
+---@private
+---@param head LuaParser.Node.CatExp
+---@return LuaParser.Node.CatIndex?
+function Ast:parseCatIndex(head)
+    local pos1 = self.lexer:consume '['
+    if not pos1 then
+        return nil
+    end
+    local index = self:createNode('LuaParser.Node.CatIndex', {
+        start = head.start,
+        node = head,
+        symbolPos1 = pos1,
+    })
+
+    head.parent = index
+
+    self:skipSpace()
+    index.index = self:parseCatExp(true)
+
+    index.symbolPos2 = self:assertSymbol ']'
+    index.finish = self:getLastPos()
+
+    return index
 end
 
 ---@private

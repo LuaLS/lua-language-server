@@ -177,6 +177,43 @@ TEST [[
 }
 
 TEST [[
+---@type string[]
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatetype',
+                exp  = {
+                    kind = 'catarray',
+                    node = { kind = 'catid', id = 'string' },
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+---@type T['__index']
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatetype',
+                exp  = {
+                    kind = 'catindex',
+                    node = { kind = 'catid', id = 'T' },
+                    index = { kind = 'catstring', value = '__index' },
+                }
+            }
+        }
+    }
+}
+
+TEST [[
 ---@type A<number, boolean>
 ]]
 {

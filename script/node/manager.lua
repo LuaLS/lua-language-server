@@ -64,6 +64,14 @@ function M:fillAPIs()
         return New 'Node.Class' (scope, name, params, extends)
     end
 
+    ---@param name string
+    ---@param params? Node.Generic[]
+    ---@param extends? Node[]
+    ---@return Node.Alias
+    function self.alias(name, params, extends)
+        return New 'Node.Alias' (scope, name, params, extends)
+    end
+
     ---@overload fun(v: number): Node.Value
     ---@overload fun(v: boolean): Node.Value
     ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value

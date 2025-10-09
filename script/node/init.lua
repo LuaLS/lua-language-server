@@ -4,6 +4,7 @@ ls.node = {}
 require 'node.cache_module'
 require 'node.node'
 require 'node.class'
+require 'node.alias'
 require 'node.type'
 require 'node.value'
 require 'node.union'

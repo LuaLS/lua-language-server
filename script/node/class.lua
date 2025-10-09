@@ -2,7 +2,6 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(name: string): Node.Class
 local M = ls.node.register 'Node.Class'
 
 M.kind = 'class'
@@ -72,13 +71,6 @@ function M:addVariable(variable)
     return self
 end
 
-function M:get(key)
-    if self.value == self then
-        return self.scope.node.NEVER
-    end
-    return self.value:get(key)
-end
-
 --- 所有绑定的变量
 ---@type LinkedTable?
 M.variables = nil
@@ -98,123 +90,6 @@ function M:removeVariable(variable)
     self:flushCache()
 
     return self
-end
-
---- 获取所有继承（广度优先）
----@type (Node.Type | Node.Table)[]
-M.fullExtends = nil
-
----@param self Node.Type
----@return (Node.Type | Node.Table)[]
----@return true
-M.__getter.fullExtends = function (self)
-    local result = {}
-    local mark = {}
-
-    ---@param t Node.Type
-    ---@param nextQueue Node.Type[]
-    local function pushExtends(t, nextQueue)
-        if not t.extends then
-            return
-        end
-        ---@param v Node
-        for v in t.extends:pairsFast() do
-            if mark[v] then
-                goto continue
-            end
-            mark[v] = true
-            result[#result+1] = v
-            if v.kind == 'type' then
-                nextQueue[#nextQueue+1] = v
-            end
-            ::continue::
-        end
-    end
-
-    ---@param queue Node.Type[]
-    local function search(queue)
-        local nextQueue = {}
-        for _, v in ipairs(queue) do
-            pushExtends(v, nextQueue)
-        end
-        if #nextQueue == 0 then
-            return
-        end
-        search(nextQueue)
-    end
-
-    search { self }
-
-    return result, true
-end
-
---- 所有继承的合并表
----@type Node.Table
-M.extendsTable = nil
-
----@param self Node.Type
----@return Node.Table
----@return true
-M.__getter.extendsTable = function (self)
-    local table = self.scope.node.table()
-    if #self.fullExtends == 0 then
-        return table, true
-    end
-
-    ---@type Node.Table[]
-    local tables = {}
-    for _, v in ipairs(self.fullExtends) do
-        if v.kind == 'table' then
-            ---@cast v Node.Table
-            tables[#tables+1] = v
-        elseif v.kind == 'type' then
-            ---@cast v Node.Type
-            tables[#tables+1] = v.table
-        else
-            ---@cast v -Node.Table, -Node.Type
-            local vv = v.value
-            if vv.kind == 'table' then
-                ---@cast vv Node.Table
-                tables[#tables+1] = vv
-            end
-        end
-    end
-    table:extends(tables)
-
-    return table, true
-end
-
----@type Node
-M.value = nil
-
----@param self Node.Class
----@return Node
----@return true
-M.__getter.value = function (self)
-    local value = self.scope.node.table()
-    self.value = value
-
-    local merging = {}
-    -- 1. 使用 ---@field 定义的字段
-    merging[#merging+1] = self.fields
-    -- 2. 绑定的变量里的字段
-    if self.variables then
-        ---@param variable Node.Variable
-        for variable in self.variables:pairsFast() do
-            merging[#merging+1] = variable.fields
-        end
-    end
-    -- 3. 继承来的字段
-    if not self.extendsTable:isEmpty() then
-        merging[#merging+1] = self.extendsTable
-    end
-
-    if #merging == 1 then
-        return merging[1], true
-    end
-
-    value:extends(merging)
-    return value, true
 end
 
 function M:view(skipLevel)

@@ -38,22 +38,11 @@ end
 
 ---@return boolean
 function M:isClassLike()
-    if self.classLocations
-    or self.table
-    or self.extends
-    or self.variables then
-        return true
-    end
-    return false
+    return self.classes ~= nil
 end
 
 function M:isAliasLike()
-    if  self.alias
-    and not self.table
-    and not self.extends then
-        return true
-    end
-    return false
+    return self.aliases ~= nil
 end
 
 ---@type LinkedTable
@@ -82,53 +71,31 @@ function M:removeClass(class)
     self:flushCache()
 end
 
----@param extends Node.Type | Node.Call | Node.Table
----@return Node.Type
-function M:addExtends(extends)
-    if not self.extends then
-        self.extends = ls.linkedTable.create()
-    end
-    self.extends:pushTail(extends)
+---@type LinkedTable
+M.aliases = nil
 
-    extends:flushMe(self, true)
+---@param alias Node.Alias
+---@return Node.Type
+function M:addAlias(alias)
+    if not self.aliases then
+        self.aliases = ls.linkedTable.create()
+    end
+    self.aliases:pushTail(alias)
+
     self:flushCache()
+
     return self
 end
 
----@param extends Node
----@return self
-function M:removeExtends(extends)
-    if not self.extends then
+---@param alias Node.Alias
+---@return Node.Type
+function M:removeAlias(alias)
+    if not self.aliases then
         return self
     end
-    self.extends:pop(extends)
-    if self.extends:getSize() == 0 then
-        self.extends = nil
-    end
-
-    extends:flushMe(self, false)
-    self:flushCache()
-
-    return self
-end
-
----@type Node.Location[]
-M.aliasLocations = nil
-
----@param alias Node
----@param location? Node.Location
----@return Node.Type
-function M:addAlias(alias, location)
-    if not self.alias then
-        self.alias = ls.linkedTable.create()
-    end
-    self.alias:pushTail(alias)
-
-    if location then
-        if not self.aliasLocations then
-            self.aliasLocations = {}
-        end
-        self.aliasLocations[#self.aliasLocations+1] = location
+    self.aliases:pop(alias)
+    if self.aliases:getSize() == 0 then
+        self.aliases = nil
     end
 
     self:flushCache()
@@ -136,28 +103,121 @@ function M:addAlias(alias, location)
     return self
 end
 
----@param alias Node
----@param location? Node.Location
----@return Node.Type
-function M:removeAlias(alias, location)
-    if not self.alias then
-        return self
-    end
-    self.alias:pop(alias)
-    if self.alias:getSize() == 0 then
-        self.alias = nil
-    end
+--- 获取所有继承（广度优先）
+---@type (Node.Type | Node.Table)[]
+M.fullExtends = nil
 
-    if location and self.aliasLocations then
-        ls.util.arrayRemove(self.aliasLocations, location)
-        if #self.aliasLocations == 0 then
-            self.aliasLocations = nil
+---@param self Node.Type
+---@return (Node.Type | Node.Table)[]
+---@return true
+M.__getter.fullExtends = function (self)
+    local result = {}
+    local visitedTypes = {}
+    local visitedResults = {}
+
+    ---@param t Node.Type
+    ---@param nextQueue Node.Type[]
+    local function searchClasses(t, nextQueue)
+        if visitedTypes[t] then
+            return
+        end
+        visitedTypes[t] = true
+        if not t.classes then
+            return
+        end
+        ---@param class Node.Class
+        for class in t.classes:pairsFast() do
+            if class.extends and not class.params then
+                for _, ext in ipairs(class.extends) do
+                    if visitedResults[ext] then
+                        goto continue
+                    end
+                    visitedResults[ext] = true
+                    result[#result+1] = class
+                    if ext.kind == 'type' then
+                        ---@cast ext Node.Type
+                        nextQueue[#nextQueue+1] = ext
+                    end
+                    ::continue::
+                end
+            end
         end
     end
 
-    self:flushCache()
+    ---@param queue Node.Type[]
+    local function search(queue)
+        local nextQueue = {}
+        for _, v in ipairs(queue) do
+            searchClasses(v, nextQueue)
+        end
+        if #nextQueue == 0 then
+            return
+        end
+        search(nextQueue)
+    end
 
-    return self
+    search { self }
+
+    return result, true
+end
+
+--- 所有继承的合并表
+---@type Node.Table
+M.extendsTable = nil
+
+---@param self Node.Type
+---@return Node.Table
+---@return true
+M.__getter.extendsTable = function (self)
+    local table = self.scope.node.table()
+    if #self.fullExtends == 0 then
+        return table, true
+    end
+
+    ---@type Node.Table[]
+    local tables = {}
+    for _, v in ipairs(self.fullExtends) do
+        if v.kind == 'table' then
+            ---@cast v Node.Table
+            tables[#tables+1] = v
+        elseif v.kind == 'type' then
+            ---@cast v Node.Type
+            tables[#tables+1] = v.table
+        else
+            ---@cast v -Node.Table, -Node.Type
+            local vv = v.value
+            if vv.kind == 'table' then
+                ---@cast vv Node.Table
+                tables[#tables+1] = vv
+            end
+        end
+    end
+    table:extends(tables)
+
+    return table, true
+end
+
+--- 类型自身的字段（一般是通过 ---@field 添加）
+---@type Node.Table
+M.table = nil
+
+---@param self Node.Type
+---@return Node.Table
+---@return true
+M.__getter.table = function (self)
+    local table = self.scope.node.table()
+    if self.classes then
+        ---@type Node.Table[]
+        local fields = {}
+        ---@param class Node.Class
+        for class in self.classes:pairsFast() do
+            if not class.params then
+                fields[#fields+1] = class.fields
+            end
+        end
+        table:extends(fields)
+    end
+    return table, true
 end
 
 ---@type Node
@@ -176,10 +236,12 @@ M.__getter.value = function (self)
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.table
         -- 2. 绑定的变量里的字段
-        if self.variables then
-            ---@param variable Node.Variable
-            for variable in self.variables:pairsFast() do
-                merging[#merging+1] = variable.fields
+        for class in self.classes:pairsFast() do
+            ---@cast class Node.Class
+            if class.variables and not class.params then
+                for variable in class.variables:pairsFast() do
+                    merging[#merging+1] = variable.fields
+                end
             end
         end
         -- 3. 继承来的字段
@@ -196,12 +258,15 @@ M.__getter.value = function (self)
         return value, true
     end
     if self:isAliasLike() then
-        if self.alias:getSize() == 1 then
-            local head = self.alias:getHead()
-            return head, true
+        ---@type Node[]
+        local aliases = {}
+        ---@param alias Node.Alias
+        for alias in self.aliases do
+            if alias.extends and not alias.params then
+                ls.util.arrayMerge(aliases, alias.extends)
+            end
         end
-        local alias = self.alias:toArray()
-        local union = self.scope.node.union(alias)
+        local union = self.scope.node.union(aliases)
         return union.value, true
     end
     return self, true
@@ -228,11 +293,7 @@ M.__getter.falsy = function (self)
 end
 
 function M:view(skipLevel)
-    if self.paramPacks and not self._hideEmptyArgs then
-        return self.typeName .. self.paramPacks[1]:view(skipLevel)
-    else
-        return self.typeName
-    end
+    return self.typeName
 end
 
 ---@type fun(self: Node.Type, other: Node): boolean?
@@ -331,81 +392,24 @@ function M:onCanCast(other)
 end
 
 function M:get(key)
-    if self.paramPacks then
-        return self:call():get(key)
-    end
     if self.value == self then
         return self.scope.node.NEVER
     end
     return self.value:get(key)
 end
 
----@param self Node.Type
----@return boolean
----@return true
-M.__getter.hasGeneric = function (self)
-    return self.paramPacks ~= nil, true
-end
+M.hasGeneric = false
 
----@param args Node[]
----@return Node
-function M:getValueWithArgs(args)
-    if not self.paramPacks then
-        return self.value
-    end
-    local map = {}
-    for _, pack in ipairs(self.paramPacks) do
-        for i, param in ipairs(pack.generics) do
-            map[param] = args[i] or param.value
-        end
-    end
-    local resolvedValue = self.value:resolveGeneric(map)
-    return resolvedValue
-end
-
----@param map table<Node.Generic, Node>
----@return Node.Type | Node.Call
-function M:resolveGeneric(map)
-    if not self.paramPacks then
-        return self
-    end
-    local pack = self.paramPacks[1]
-    local nodes = {}
-    for _, param in ipairs(pack.generics) do
-        nodes[#nodes+1] = map[param] or param
-    end
-    return self:call(nodes)
-end
-
----@param nodes? Node[]
+---@param nodes Node[]
 ---@return Node.Type | Node.Call
 function M:call(nodes)
-    if not self.paramPacks then
-        return self
-    end
-    if not nodes then
-        nodes = {}
-    end
-    local call
-    if #nodes == 0 then
-        call = self.callWithNoArgs
-    else
-        call = self.callCache:get(nodes)
-    end
+    local call = self.callCache:get(nodes)
     if not call then
         call = self.scope.node.call(self.typeName, nodes)
-        if #nodes == 0 then
-            self.callWithNoArgs = call
-        else
-            self.callCache:set(nodes, call)
-        end
+        self.callCache:set(nodes, call)
     end
     return call
 end
-
----@private
----@type Node.Call?
-M.callWithNoArgs = nil
 
 ---@private
 ---@type PathTable

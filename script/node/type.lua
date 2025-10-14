@@ -49,6 +49,7 @@ end
 M.classes = nil
 
 ---@param class Node.Class
+---@return Node.Type
 function M:addClass(class)
     if not self.classes then
         self.classes = ls.linkedTable.create()
@@ -56,6 +57,8 @@ function M:addClass(class)
     self.classes:pushTail(class)
 
     self:flushCache()
+
+    return self
 end
 
 ---@param class Node.Class
@@ -103,6 +106,54 @@ function M:removeAlias(alias)
     return self
 end
 
+---@param n integer
+---@return Node.Class[]
+function M:getProtoClassesWithNParams(n)
+    ---@type Node.Class[]
+    local results = {}
+
+    if not self.classes then
+        return results
+    end
+
+    ---@param class Node.Class
+    for class in self.classes:pairsFast() do
+        if class.params then
+            if #class.params == n then
+                results[#results+1] = class
+            end
+        elseif n == 0 then
+            results[#results+1] = class
+        end
+    end
+
+    return results
+end
+
+---@param n integer
+---@return Node.Alias[]
+function M:getProtoAliasesWithNParams(n)
+    ---@type Node.Alias[]
+    local results = {}
+
+    if not self.aliases then
+        return results
+    end
+
+    ---@param alias Node.Alias
+    for alias in self.aliases:pairsFast() do
+        if alias.params then
+            if #alias.params == n then
+                results[#results+1] = alias
+            end
+        elseif n == 0 then
+            results[#results+1] = alias
+        end
+    end
+
+    return results
+end
+
 --- 获取所有继承（广度优先）
 ---@type (Node.Type | Node.Table)[]
 M.fullExtends = nil
@@ -125,15 +176,14 @@ M.__getter.fullExtends = function (self)
         if not t.classes then
             return
         end
-        ---@param class Node.Class
-        for class in t.classes:pairsFast() do
-            if class.extends and not class.params then
+        for _, class in ipairs(t:getProtoClassesWithNParams(0)) do
+            if class.extends then
                 for _, ext in ipairs(class.extends) do
                     if visitedResults[ext] then
                         goto continue
                     end
                     visitedResults[ext] = true
-                    result[#result+1] = class
+                    result[#result+1] = ext
                     if ext.kind == 'type' then
                         ---@cast ext Node.Type
                         nextQueue[#nextQueue+1] = ext
@@ -207,14 +257,9 @@ M.table = nil
 M.__getter.table = function (self)
     local table = self.scope.node.table()
     if self.classes then
-        ---@type Node.Table[]
-        local fields = {}
-        ---@param class Node.Class
-        for class in self.classes:pairsFast() do
-            if not class.params then
-                fields[#fields+1] = class.fields
-            end
-        end
+        local fields = ls.util.map(self:getProtoClassesWithNParams(0), function (class)
+            return class.fields
+        end)
         table:extends(fields)
     end
     return table, true
@@ -236,9 +281,8 @@ M.__getter.value = function (self)
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.table
         -- 2. 绑定的变量里的字段
-        for class in self.classes:pairsFast() do
-            ---@cast class Node.Class
-            if class.variables and not class.params then
+        for _, class in ipairs(self:getProtoClassesWithNParams(0)) do
+            if class.variables then
                 for variable in class.variables:pairsFast() do
                     merging[#merging+1] = variable.fields
                 end
@@ -261,8 +305,8 @@ M.__getter.value = function (self)
         ---@type Node[]
         local aliases = {}
         ---@param alias Node.Alias
-        for alias in self.aliases do
-            if alias.extends and not alias.params then
+        for _, alias in ipairs(self:getProtoAliasesWithNParams(0)) do
+            if alias.extends then
                 ls.util.arrayMerge(aliases, alias.extends)
             end
         end

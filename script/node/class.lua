@@ -17,6 +17,17 @@ function M:__init(scope, name, params, extends)
     self.extends = extends
 end
 
+---@param extends Node
+---@return Node.Class
+function M:addExtends(extends)
+    if not self.extends then
+        self.extends = {}
+    end
+    table.insert(self.extends, extends)
+    self:flushCache()
+    return self
+end
+
 --- 所有使用 ---@field 定义的字段
 ---@type Node.Table?
 M.fields = nil

@@ -254,7 +254,7 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.INTEGER = self.type 'integer'
         : setConfig('basicType', true)
-        : addExtends(self.NUMBER)
+        : addClass(self.class('integer', nil, { self.NUMBER }))
     self.STRING = self.type 'string'
         : setConfig('basicType', true)
     self.BOOLEAN = self.type 'boolean'

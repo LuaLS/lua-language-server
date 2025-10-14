@@ -1,129 +1,140 @@
+local node = test.scope.node
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    local a = test.scope.node.type('A')
+    node:reset()
+
+    local a = node.type('A')
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'A')
 end
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    local a = test.scope.node.type('A')
-        : addField {
-            key   = test.scope.node.value 'x',
-            value = test.scope.node.value 'x'
-        }
-        : addField {
-            key   = test.scope.node.value 'y',
-            value = test.scope.node.value 'y'
-        }
+    node:reset()
+
+    local a = node.type('A')
+        : addClass(node.class('A')
+            : addField {
+                key   = node.value 'x',
+                value = node.value 'x'
+            }
+            : addField {
+                key   = node.value 'y',
+                value = node.value 'y'
+            }
+        )
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: "x", y: "y" }')
 end
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    test.scope.node.TYPE_POOL['B'] = nil
-    test.scope.node.TYPE_POOL['C'] = nil
-    test.scope.node.TYPE_POOL['D'] = nil
-    local a = test.scope.node.type('A')
-    local b = test.scope.node.type('B')
-        : addField {
-            key   = test.scope.node.value 'x',
-            value = test.scope.node.value 'x'
-        }
-    local c = test.scope.node.type('C')
-        : addField {
-            key   = test.scope.node.value 'y',
-            value = test.scope.node.value 'y'
-        }
-    local d = test.scope.node.type('D')
-        : addField {
-            key   = test.scope.node.value 'z',
-            value = test.scope.node.value 'z'
-        }
+    node:reset()
 
-    a:addExtends(b)
-    a:addExtends(c)
-    a:addExtends(d)
+    local a = node.type('A')
+    local b = node.type('B')
+        : addClass(node.class('B')
+            : addField {
+                key   = node.value 'x',
+                value = node.value 'x'
+            }
+        )
+    local c = node.type('C')
+        : addClass(node.class('C')
+            : addField {
+                key   = node.value 'y',
+                value = node.value 'y'
+            }
+        )
+    local d = node.type('D')
+        : addClass(node.class('D')
+            : addField {
+                key   = node.value 'z',
+                value = node.value 'z'
+            }
+        )
+
+    a:addClass(node.class('A', nil, { b, c, d }))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: "x", y: "y", z: "z" }')
 end
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    test.scope.node.TYPE_POOL['B'] = nil
-    test.scope.node.TYPE_POOL['C'] = nil
-    test.scope.node.TYPE_POOL['D'] = nil
-    local a = test.scope.node.type('A')
-        : addField {
-            key   = test.scope.node.value 'w',
-            value = test.scope.node.value '1'
-        }
-        : addField {
-            key   = test.scope.node.value 'x',
-            value = test.scope.node.value '2'
-        }
-        : addField {
-            key   = test.scope.node.value 'y',
-            value = test.scope.node.value '3'
-        }
-    local b = test.scope.node.type('B')
-        : addField {
-            key   = test.scope.node.value 'x',
-            value = test.scope.node.value 'x'
-        }
-    local c = test.scope.node.type('C')
-        : addField {
-            key   = test.scope.node.value 'y',
-            value = test.scope.node.value 'y'
-        }
-    local d = test.scope.node.type('D')
-        : addField {
-            key   = test.scope.node.value 'z',
-            value = test.scope.node.value 'z'
-        }
+    node:reset()
 
-    a:addExtends(b)
-    a:addExtends(c)
-    a:addExtends(d)
+    local a = node.type('A')
+        : addClass(node.class('A')
+            : addField {
+                key   = node.value 'w',
+                value = node.value '1'
+            }
+            : addField {
+                key   = node.value 'x',
+                value = node.value '2'
+            }
+            : addField {
+                key   = node.value 'y',
+                value = node.value '3'
+            }
+            : addExtends(node.type 'B')
+            : addExtends(node.type 'C')
+            : addExtends(node.type 'D')
+        )
+    local b = node.type('B')
+        : addClass(node.class('B')
+            : addField {
+                key   = node.value 'x',
+                value = node.value 'x'
+            }
+        )
+    local c = node.type('C')
+        : addClass(node.class('C')
+            : addField {
+                key   = node.value 'y',
+                value = node.value 'y'
+            }
+        )
+    local d = node.type('D')
+        : addClass(node.class('D')
+            : addField {
+                key   = node.value 'z',
+                value = node.value 'z'
+            }
+        )
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ w: "1", x: "2", y: "3", z: "z" }')
 end
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    local a = test.scope.node.type('A')
-        : addAlias(test.scope.node.value(1))
-        : addAlias(test.scope.node.value(2))
-        : addAlias(test.scope.node.value(3))
+    node:reset()
+
+    local a = node.type('A')
+        : addAlias(node.alias('A', nil, { node.value(1) }))
+        : addAlias(node.alias('A', nil, { node.value(2) }))
+        : addAlias(node.alias('A', nil, { node.value(3) }))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '1 | 2 | 3')
 end
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    test.scope.node.TYPE_POOL['B'] = nil
-    test.scope.node.TYPE_POOL['C'] = nil
-    test.scope.node.TYPE_POOL['D'] = nil
-    local a = test.scope.node.type('A')
-        : addAlias(test.scope.node.type 'B')
-        : addAlias(test.scope.node.type 'C')
-        : addAlias(test.scope.node.type 'D')
-    test.scope.node.type('B')
-        : addAlias(test.scope.node.value(1))
-        : addAlias(test.scope.node.value(2))
-    test.scope.node.type('C')
-        : addAlias(test.scope.node.value(2))
-        : addAlias(test.scope.node.value(3))
-    test.scope.node.type('D')
-        : addAlias(test.scope.node.value(3))
-        : addAlias(test.scope.node.value(4))
+    node:reset()
+
+    local a = node.type('A')
+        : addAlias(node.alias('A', nil, { node.type 'B' }))
+        : addAlias(node.alias('A', nil, { node.type 'C' }))
+        : addAlias(node.alias('A', nil, { node.type 'D' }))
+    node.type('B')
+        : addAlias(node.alias('B', nil, { node.value(1) }))
+        : addAlias(node.alias('B', nil, { node.value(2) }))
+    node.type('C')
+        : addAlias(node.alias('C', nil, { node.value(2) }))
+        : addAlias(node.alias('C', nil, { node.value(3) }))
+    node.type('D')
+        : addAlias(node.alias('D', nil, { node.value(3) }))
+        : addAlias(node.alias('D', nil, { node.value(4) }))
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'B | C | D')

@@ -40,9 +40,8 @@ M.__getter.fullExtends = function (self)
         if not t.classes then
             return
         end
-        ---@param class Node.Class
-        for class in t.classes:pairsFast() do
-            if class.extends and class.params and #class.params == #self.args then
+        for _, class in ipairs(t:getProtoClassesWithNParams(#self.args)) do
+            if class.extends then
                 for _, ext in ipairs(class.extends) do
                     if visitedResults[ext] then
                         goto continue
@@ -122,14 +121,9 @@ M.table = nil
 M.__getter.table = function (self)
     local table = self.scope.node.table()
     if self.head.classes then
-        ---@type Node.Table[]
-        local fields = {}
-        ---@param class Node.Class
-        for class in self.head.classes:pairsFast() do
-            if class.params and #class.params == #self.args then
-                fields[#fields+1] = class.fields
-            end
-        end
+        local fields = ls.util.map(self.head:getProtoClassesWithNParams(#self.args), function (class)
+            return class.fields
+        end)
         table:extends(fields)
     end
     return table, true
@@ -151,9 +145,8 @@ M.__getter.value = function (self)
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.table
         -- 2. 绑定的变量里的字段
-        for class in self.head.classes:pairsFast() do
-            ---@cast class Node.Class
-            if class.variables and class.params and #class.params == #self.args then
+        for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
+            if class.variables then
                 for variable in class.variables:pairsFast() do
                     merging[#merging+1] = variable.fields
                 end
@@ -176,8 +169,8 @@ M.__getter.value = function (self)
         ---@type Node[]
         local aliases = {}
         ---@param alias Node.Alias
-        for alias in self.head.aliases do
-            if alias.extends and alias.params and #alias.params == #self.args then
+        for _, alias in ipairs(self.head:getProtoAliasesWithNParams(#self.args)) do
+            if alias.extends then
                 ls.util.arrayMerge(aliases, alias.extends)
             end
         end

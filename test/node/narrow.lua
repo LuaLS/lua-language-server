@@ -1,33 +1,33 @@
-do
-    test.scope.node.TYPE_POOL['A'] = nil
-    test.scope.node.TYPE_POOL['B'] = nil
-    test.scope.node.TYPE_POOL['C'] = nil
+local node = test.scope.node
 
-    local u = test.scope.node.type 'A' | test.scope.node.type 'B' | test.scope.node.type 'C'
-    local r = u:narrow(test.scope.node.type 'B')
+do
+    node.TYPE_POOL['A'] = nil
+    node.TYPE_POOL['B'] = nil
+    node.TYPE_POOL['C'] = nil
+
+    local u = node.type 'A' | node.type 'B' | node.type 'C'
+    local r = u:narrow(node.type 'B')
 
     assert(r:view() == 'B')
 end
 
 do
-    test.scope.node.TYPE_POOL['A'] = nil
-    test.scope.node.TYPE_POOL['B'] = nil
-    test.scope.node.TYPE_POOL['C'] = nil
+    node:reset()
 
-    test.scope.node.type 'A'
-        : addExtends(test.scope.node.type 'B')
+    node.type 'A'
+        : addClass(node.class('A', nil, { node.type 'B' }))
 
-    local u = test.scope.node.type 'A' | test.scope.node.type 'B' | test.scope.node.type 'C'
-    local r = u:narrow(test.scope.node.type 'B')
+    local u = node.type 'A' | node.type 'B' | node.type 'C'
+    local r = u:narrow(node.type 'B')
 
     assert(r:view() == 'A | B')
 end
 
 do
-    local u = test.scope.node.value(1) | test.scope.node.value(true) | test.scope.node.value('x')
-    local r1 = u:narrow(test.scope.node.NUMBER)
-    local r2 = u:narrow(test.scope.node.STRING)
-    local r3 = u:narrow(test.scope.node.BOOLEAN)
+    local u = node.value(1) | node.value(true) | node.value('x')
+    local r1 = u:narrow(node.NUMBER)
+    local r2 = u:narrow(node.STRING)
+    local r3 = u:narrow(node.BOOLEAN)
 
     assert(r1:view() == '1')
     assert(r2:view() == '"x"')
@@ -35,21 +35,21 @@ do
 end
 
 do
-    local t = test.scope.node.table {
+    local t = node.table {
         x = 1,
-    } | test.scope.node.table {
+    } | node.table {
         y = 2,
-    } | test.scope.node.table {
+    } | node.table {
         z = 3,
     }
 
-    local r1 = t:narrow(test.scope.node.table {
+    local r1 = t:narrow(node.table {
         x = 1,
     })
-    local r2 = t:narrow(test.scope.node.table {
+    local r2 = t:narrow(node.table {
         y = 2,
     })
-    local r3 = t:narrow(test.scope.node.table {
+    local r3 = t:narrow(node.table {
         z = 3,
     })
     local r4 = t:narrowByField('x', 1)
@@ -65,13 +65,13 @@ do
 end
 
 do
-    local t = test.scope.node.func()
-        : addParamDef('x', test.scope.node.NUMBER)
-    | test.scope.node.func()
-        : addParamDef('x', test.scope.node.STRING)
+    local t = node.func()
+        : addParamDef('x', node.NUMBER)
+    | node.func()
+        : addParamDef('x', node.STRING)
 
-    local r = t:narrow(test.scope.node.func()
-        : addParamDef('x', test.scope.node.NUMBER)
+    local r = t:narrow(node.func()
+        : addParamDef('x', node.NUMBER)
     )
 
     assert(r:view() == 'fun(x: number)')

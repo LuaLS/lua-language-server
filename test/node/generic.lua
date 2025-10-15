@@ -58,7 +58,7 @@ do
 end
 
 do
-    node.TYPE_POOL['Alias'] = nil
+    node:reset()
 
     local K = node.generic 'K'
     local V = node.generic 'V'

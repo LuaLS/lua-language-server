@@ -205,3 +205,36 @@ do
     assert(a:view() == 'A')
     assert(a.value:view() == '{ [string]: boolean }')
 end
+
+do
+    node:reset()
+    --[[
+    ---@class A: B
+    ---@field x 1
+
+    ---@class B: A
+    ---@field y 2
+    ]]
+
+    local a = node.type('A')
+        : addClass(node.class('A', nil, { node.type 'B' })
+            : addField {
+                key   = node.value('x'),
+                value = node.value(1)
+            }
+        )
+
+    local b = node.type('B')
+        : addClass(node.class('B', nil, { node.type 'A' })
+            : addField {
+                key   = node.value('y'),
+                value = node.value(2)
+            }
+        )
+
+    assert(a:view() == 'A')
+    assert(a.value:view() == '{ x: 1, y: 2 }')
+
+    assert(b:view() == 'B')
+    assert(b.value:view() == '{ x: 1, y: 2 }')
+end

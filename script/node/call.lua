@@ -46,9 +46,7 @@ M.fullExtends = nil
 ---@return Node.Class.ExtendAble[]
 ---@return true
 M.__getter.fullExtends = function (self)
-    local result = {}
-
-    return result, true
+    return ls.node.calcFullExtends(self), true
 end
 
 --- 所有继承的合并表

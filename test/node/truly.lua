@@ -101,10 +101,10 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, { node.value(1) }))
-        : addAlias(node.alias('A', nil, { node.value(2) }))
-        : addAlias(node.alias('A', nil, { node.value(true) }))
-        : addAlias(node.alias('A', nil, { node.value(false) }))
+        : addAlias(node.alias('A', nil, node.value(1)))
+        : addAlias(node.alias('A', nil, node.value(2)))
+        : addAlias(node.alias('A', nil, node.value(true)))
+        : addAlias(node.alias('A', nil, node.value(false)))
 
     assert(a:view() == 'A')
     assert(a.truly:view() == '1 | 2 | true')

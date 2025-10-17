@@ -1,8 +1,8 @@
----@class Node.GenericPack: Class.Base
----@overload fun(scope: Scope, generics?: Node.Generic[]): Node.GenericPack
-local M = Class 'Node.GenericPack'
+---@class Node.GenericContext: Class.Base
+---@overload fun(scope: Scope, generics?: Node.Generic[]): Node.GenericContext
+local M = Class 'Node.GenericContext'
 
-M.kind = 'genericPack'
+M.kind = 'genericContext'
 
 ---@param scope Scope
 ---@param generics? Node.Generic[]
@@ -20,9 +20,9 @@ function M:getGeneric(generic)
 end
 
 ---@param map table<Node.Generic, Node>
----@return Node.GenericPack
+---@return Node.GenericContext
 function M:resolve(map)
-    local new = self.scope.node.genericPack(self.generics)
+    local new = self.scope.node.genericContext(self.generics)
     for _, generic in ipairs(self.generics) do
         local value = map[generic]
         if value then
@@ -35,7 +35,7 @@ end
 ---@type boolean
 M.allResolved = nil
 
----@param self Node.GenericPack
+---@param self Node.GenericContext
 ---@return boolean
 ---@return true
 M.__getter.allResolved = function (self)

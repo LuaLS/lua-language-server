@@ -66,10 +66,10 @@ function M:fillAPIs()
 
     ---@param name string
     ---@param params? Node.Generic[]
-    ---@param extends? Node[]
+    ---@param value? Node
     ---@return Node.Alias
-    function self.alias(name, params, extends)
-        return New 'Node.Alias' (scope, name, params, extends)
+    function self.alias(name, params, value)
+        return New 'Node.Alias' (scope, name, params, value)
     end
 
     ---@overload fun(v: number): Node.Value
@@ -112,9 +112,9 @@ function M:fillAPIs()
     end
 
     ---@param generics? Node.Generic[]
-    ---@return Node.GenericPack
-    function self.genericPack(generics)
-        return New 'Node.GenericPack' (scope, generics)
+    ---@return Node.GenericContext
+    function self.genericContext(generics)
+        return New 'Node.GenericContext' (scope, generics)
     end
 
     ---@param nodes? Node[]

@@ -122,7 +122,7 @@ M.__getter.table = function (self)
     local table = self.scope.node.table()
     if self.head.classes then
         local fields = ls.util.map(self.head:getProtoClassesWithNParams(#self.args), function (class)
-            return class.fields
+            return class.fields:resolveGeneric(class:makeGenericMap(self.args))
         end)
         table:extends(fields)
     end
@@ -148,6 +148,7 @@ M.__getter.value = function (self)
         for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
             if class.variables then
                 for variable in class.variables:pairsFast() do
+                    ---@cast variable Node.Variable
                     merging[#merging+1] = variable.fields
                 end
             end
@@ -170,8 +171,8 @@ M.__getter.value = function (self)
         local aliases = {}
         ---@param alias Node.Alias
         for _, alias in ipairs(self.head:getProtoAliasesWithNParams(#self.args)) do
-            if alias.extends then
-                ls.util.arrayMerge(aliases, alias.extends)
+            if alias.value then
+                aliases[#aliases+1] = alias.value:resolveGeneric(alias:makeGenericMap(self.args))
             end
         end
         local union = self.scope.node.union(aliases)

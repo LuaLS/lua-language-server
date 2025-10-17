@@ -1,9 +1,32 @@
 local node = test.scope.node
 
 do
+    local K = node.generic('K')
+    local V = node.generic('V')
+
+    assert(K:view() == '<K>')
+    assert(V:view() == '<V>')
+
+    local table = node.table { [K] = V }
+
+    assert(table:view() == '{ [<K>]: <V> }')
+
+    local t1 = table:resolveGeneric {}
+    assert(t1:view() == '{ [<K>]: <V> }')
+
+    local t2 = table:resolveGeneric { [K] = node.INTEGER }
+    assert(t2:view() == '{ [integer]: <V> }')
+
+    local t3 = table:resolveGeneric { [V] = node.BOOLEAN }
+    assert(t3:view() == '{ [<K>]: boolean }')
+
+    local t4 = table:resolveGeneric { [K] = node.STRING, [V] = node.NUMBER }
+    assert(t4:view() == '{ [string]: number }')
+end
+
+do
     local N = node.generic('N', node.NUMBER)
     local U = node.generic 'U'
-    local pack = node.genericPack { N, U }
     local array = node.array(N)
     local tuple = node.tuple { N, U }
     local table = node.table { [N] = U }
@@ -16,8 +39,6 @@ do
 
     assert(N:view() == '<N:number>')
     assert(U:view() == '<U>')
-
-    assert(pack:view() == '<N:number, U>')
 
     assert(array:view() == '<N:number>[]')
 
@@ -34,9 +55,6 @@ do
     assert(intersection:view() == '<N:number> & <U>')
 
     local resolve = { [N] = node.INTEGER }
-
-    local newPack = pack:resolve(resolve)
-    assert(newPack:view() == '<integer, U>')
 
     local newArray = array:resolveGeneric(resolve)
     assert(newArray:view() == 'integer[]')
@@ -60,96 +78,52 @@ end
 do
     node:reset()
 
+    --[[
+    ---@alias Alias<K, V> K | V | boolean
+    ]]
+
     local K = node.generic 'K'
     local V = node.generic 'V'
-    local pack = node.genericPack { K, V }
     local alias = node.type 'Alias'
-    alias:addParams { K, V }
-
     local aliasValue = K | V | node.BOOLEAN
-    alias:addAlias(aliasValue)
+
+    alias:addAlias(node.alias('Alias', { K, V }, aliasValue))
+
+    assert(alias:view() == 'Alias')
     assert(aliasValue.value:view() == '<K> | <V> | boolean')
 
-    assert(alias:view() == 'Alias<K, V>')
+    local call = alias:call { node.NUMBER, node.STRING }
+    assert(call:view() == 'Alias<number, string>')
 
-    local newAlias = alias:resolveGeneric {
-        [K] = node.STRING,
-        [V] = node.NUMBER,
-    }
-    assert(newAlias:view() == 'Alias<string, number>')
-
-    newAlias = alias:call { node.NUMBER, node.STRING }
-    assert(newAlias:view() == 'Alias<number, string>')
-
-    assert(newAlias.value:view() == 'number | string | boolean')
+    assert(call.value:view() == 'number | string | boolean')
 end
 
 do
-    node.TYPE_POOL['Alias'] = nil
+    node:reset()
 
     --[[
-    ---@alias Alias<K, V:number> K | V | boolean
+    ---@alias Alias { [any]: any }
+    ---@alias Alias<T> { [T]: boolean }
+    ---@alias Alias<K, V> { [K]: V }
     ]]
 
+    local T = node.generic 'T'
     local K = node.generic 'K'
-    local V = node.generic('V', node.NUMBER)
+    local V = node.generic('V')
     local alias = node.type 'Alias'
-    alias:addParams { K, V }
 
-    local aliasValue = K | V | node.BOOLEAN
-    alias:addAlias(aliasValue)
-    assert(aliasValue:view() == '<K> | <V:number> | boolean')
+    alias:addAlias(node.alias('Alias', nil, node.table { [node.ANY] = node.ANY }))
+    alias:addAlias(node.alias('Alias', { T }, node.table { [T] = node.BOOLEAN }))
+    alias:addAlias(node.alias('Alias', { K, V }, node.table { [K] = V }))
 
-    assert(alias:view() == 'Alias<K, V:number>')
-    assert(alias.value:view() == '<K> | <V:number> | boolean')
-
-    local alias0 = alias:call()
-    assert(alias0:view() == 'Alias<any, number>')
-    assert(alias0.value:view() == 'any | number | boolean')
+    assert(alias:view() == 'Alias')
+    assert(alias.value:view() == '{ [any]: any }')
 
     local alias1 = alias:call { node.STRING }
-    assert(alias1:view() == 'Alias<string, number>')
-    assert(alias1.value:view() == 'string | number | boolean')
-
-    local alias2 = alias:call { node.STRING, node.INTEGER }
-    assert(alias2:view() == 'Alias<string, integer>')
-    assert(alias2.value:view() == 'string | integer | boolean')
-
-    local alias3 = alias:call { node.STRING, node.INTEGER, node.TABLE }
-    assert(alias3:view() == 'Alias<string, integer>')
-    assert(alias3.value:view() == 'string | integer | boolean')
-end
-
-do
-    node.TYPE_POOL['Alias'] = nil
-
-    --[[
-    ---@alias Alias<K, V:number> { [K]: V }
-    ]]
-
-    local K = node.generic 'K'
-    local V = node.generic('V', node.NUMBER)
-    local alias = node.type 'Alias'
-    alias:addParams { K, V }
-
-    local aliasValue = node.table { [K] = V }
-    alias:addAlias(aliasValue)
-    assert(aliasValue:view() == '{ [<K>]: <V:number> }')
-
-    assert(alias:view() == 'Alias<K, V:number>')
-    assert(alias.value:view() == '{ [<K>]: <V:number> }')
-
-    local alias0 = alias:call()
-    assert(alias0:view() == 'Alias<any, number>')
-    assert(alias0.value:view() == '{ [any]: number }')
-    assert(alias0:get(1):view() == 'number')
-    assert(alias0:get('x'):view() == 'number')
-
-    local alias1 = alias:call { node.STRING }
-    assert(alias1:view() == 'Alias<string, number>')
-    assert(alias1.value:view() == '{ [string]: number }')
+    assert(alias1:view() == 'Alias<string>')
+    assert(alias1.value:view() == '{ [string]: boolean }')
     assert(alias1:get(1):view() == 'nil')
-    assert(alias1:get('x'):view() == 'number')
+    assert(alias1:get('x'):view() == 'boolean')
 
     local alias2 = alias:call { node.STRING, node.INTEGER }
     assert(alias2:view() == 'Alias<string, integer>')
@@ -159,7 +133,7 @@ do
 end
 
 do
-    node.TYPE_POOL['Alias'] = nil
+    node:reset()
 
     --[[
     ---@alias Alias<A, B> xyz`A`.`B`.xyz | `A`[]
@@ -168,7 +142,6 @@ do
     local A = node.generic 'A'
     local B = node.generic 'B'
     local alias = node.type 'Alias'
-    alias:addParams { A, B }
 
     local aliasValue = node.union {
         node.template('xyz`A`.`B`.xyz', {
@@ -181,10 +154,10 @@ do
             })
         ),
     }
-    alias:addAlias(aliasValue)
+    alias:addAlias(node.alias('Alias', { A, B }, aliasValue))
     assert(aliasValue:view() == 'unknown | unknown[]')
 
-    local alias1 = alias:call { node.value 'X' }
+    local alias1 = alias:call { node.value 'X', node.ANY }
     assert(alias1:view() == 'Alias<"X", any>')
     assert(alias1.value:view() == 'unknown | X[]')
 
@@ -196,10 +169,10 @@ do
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
+    node:reset()
 
     --[[
-    ---@class Map<K, V:number>
+    ---@class Map<K, V>
     ---@field [K] V
     ]]
 
@@ -213,8 +186,8 @@ do
         value = V,
     }
 
-    assert(map:view() == 'Map<K, V:number>')
-    assert(map.value:view() == '{ [<K>]: <V:number> }')
+    assert(map:view() == 'Map<K, V>')
+    assert(map.value:view() == '{ [<K>]: <V> }')
 
     local map2 = map:call { node.STRING, node.INTEGER }
     assert(map2:view() == 'Map<string, integer>')

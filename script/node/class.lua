@@ -131,3 +131,16 @@ function M:resolveGeneric(map)
     end
     return self.value:resolveGeneric(map)
 end
+
+---@param args Node[]
+---@return table<Node.Generic, Node>
+function M:makeGenericMap(args)
+    local map = {}
+    if not self.params then
+        return map
+    end
+    for i, param in ipairs(self.params) do
+        map[param] = args[i]
+    end
+    return map
+end

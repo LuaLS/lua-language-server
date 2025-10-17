@@ -9,12 +9,12 @@ M.kind = 'alias'
 ---@param scope Scope
 ---@param name string
 ---@param params? Node.Generic[]
----@param extends? Node[]
-function M:__init(scope, name, params, extends)
+---@param value? Node
+function M:__init(scope, name, params, value)
     self.aliasName = name
     self.scope = scope
     self.params = params
-    self.extends = extends
+    self.value = value
 end
 
 ---@type Node.Location?
@@ -52,4 +52,17 @@ function M:resolveGeneric(map)
         return self
     end
     return self.value:resolveGeneric(map)
+end
+
+---@param args Node[]
+---@return table<Node.Generic, Node>
+function M:makeGenericMap(args)
+    local map = {}
+    if not self.params then
+        return map
+    end
+    for i, param in ipairs(self.params) do
+        map[param] = args[i]
+    end
+    return map
 end

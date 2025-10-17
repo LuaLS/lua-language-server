@@ -254,14 +254,14 @@ function M:view(skipLevel)
         end
         return string.format('%sfun%s(%s):%s'
             , self.async and 'async ' or ''
-            , self.genericPack and self.genericPack:view(skipLevel) or ''
+            , self.genericContext and self.genericContext:view(skipLevel) or ''
             , table.concat(params, ', ')
             , returnPart
         )
     else
         return string.format('%sfun%s(%s)'
             , self.async and 'async ' or ''
-            , self.genericPack and self.genericPack:view(skipLevel) or ''
+            , self.genericContext and self.genericContext:view(skipLevel) or ''
             , table.concat(params, ', ')
         )
     end
@@ -290,7 +290,7 @@ end
 ---@param generics Node.Generic[]
 ---@return Node.Function
 function M:bindGenerics(generics)
-    self.genericPack = self.scope.node.genericPack(generics)
+    self.genericContext = self.scope.node.genericContext(generics)
     return self
 end
 
@@ -299,8 +299,8 @@ function M:resolveGeneric(map)
         return self
     end
     local newFunc = self.scope.node.func()
-    if self.genericPack then
-        newFunc.genericPack = self.genericPack:resolve(map)
+    if self.genericContext then
+        newFunc.genericContext = self.genericContext:resolve(map)
     end
     for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then

@@ -306,8 +306,8 @@ M.__getter.value = function (self)
         local aliases = {}
         ---@param alias Node.Alias
         for _, alias in ipairs(self:getProtoAliasesWithNParams(0)) do
-            if alias.extends then
-                ls.util.arrayMerge(aliases, alias.extends)
+            if alias.value then
+                aliases[#aliases+1] = alias.value
             end
         end
         local union = self.scope.node.union(aliases)

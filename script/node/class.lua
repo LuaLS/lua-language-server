@@ -6,10 +6,12 @@ local M = ls.node.register 'Node.Class'
 
 M.kind = 'class'
 
+---@alias Node.Class.ExtendAble Node.Type | Node.Call | Node.Table
+
 ---@param scope Scope
 ---@param name string
 ---@param params? Node.Generic[]
----@param extends? Node[]
+---@param extends? Node.Class.ExtendAble[]
 function M:__init(scope, name, params, extends)
     self.className = name
     self.scope = scope

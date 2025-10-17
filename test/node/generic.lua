@@ -177,17 +177,18 @@ do
     ]]
 
     local K = node.generic 'K'
-    local V = node.generic('V', node.NUMBER)
+    local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K, V }
 
-    map:addField {
-        key   = K,
-        value = V,
-    }
+    map:addClass(node.class('Map', { K, V })
+        : addField {
+            key   = K,
+            value = V,
+        }
+    )
 
-    assert(map:view() == 'Map<K, V>')
-    assert(map.value:view() == '{ [<K>]: <V> }')
+    assert(map:view() == 'Map')
+    assert(map.value:view() == '{}')
 
     local map2 = map:call { node.STRING, node.INTEGER }
     assert(map2:view() == 'Map<string, integer>')
@@ -197,35 +198,54 @@ do
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
+    node:reset()
 
     --[[
-    ---@class Map<K, V:number>
+    ---@class Map<K, V>: { [K]: V }
+    ]]
+
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+
+    local map = node.type 'Map'
+        : addClass(node.class('Map', { K, V }, {
+            node.table { [K] = V }
+        }))
+
+    local map2 = map:call { node.STRING, node.INTEGER }
+    assert(map2:view() == 'Map<string, integer>')
+    assert(map2.value:view() == '{ [string]: integer }')
+    assert(map2:get(1):view() == 'nil')
+    assert(map2:get('x'):view() == 'integer')
+end
+
+do
+    node:reset()
+
+    --[[
+    ---@class Map<K, V>
     ---@field set fun(key: K, value: V)
     ---@field get fun(key: K): V
     ]]
 
     local K = node.generic 'K'
-    local V = node.generic('V', node.NUMBER)
+    local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K, V }
 
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
-    map:addField {
-        key   = node.value 'get',
-        value = node.func()
-            : addParamDef('key', K)
-            : addReturnDef(nil, V),
-    }
-
-    assert(map.value:view() == '{ get: fun(key: <K>):<V:number>, set: fun(key: <K>, value: <V:number>) }')
-    assert(map.value:get('set'):view() == 'fun(key: <K>, value: <V:number>)')
-    assert(map:get('set'):view() == 'fun(key: any, value: number)')
+    map:addClass(node.class('Map', { K, V })
+        : addField {
+            key   = node.value 'set',
+            value = node.func()
+                : addParamDef('key', K)
+                : addParamDef('value', V),
+        }
+        : addField {
+            key   = node.value 'get',
+            value = node.func()
+                : addParamDef('key', K)
+                : addReturnDef(nil, V),
+        }
+    )
 
     local map2 = map:call { node.STRING, node.INTEGER }
     assert(map2.value:view() == '{ get: fun(key: string):integer, set: fun(key: string, value: integer) }')
@@ -234,7 +254,7 @@ do
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
+    node:reset()
 
     --[[
     ---@class Map<K>

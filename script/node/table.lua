@@ -370,7 +370,7 @@ end
 
 ---越靠前的字段越优先。
 ---@param childs Node.Table[]
-function M:extends(childs)
+function M:addChilds(childs)
     local node = self.scope.node
     node:lockCache()
 

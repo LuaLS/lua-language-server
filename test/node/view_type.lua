@@ -11,6 +11,11 @@ end
 
 do
     node:reset()
+    --[[
+    ---@class A
+    ---@field x 'x'
+    ---@field y 'y'
+    ]]
 
     local a = node.type('A')
         : addClass(node.class('A')
@@ -30,6 +35,18 @@ end
 
 do
     node:reset()
+    --[[
+    ---@class A: B, C, D
+
+    ---@class B
+    ---@field x 'x'
+
+    ---@class C
+    ---@field y 'y'
+
+    ---@class D
+    ---@field z 'z'
+    ]]
 
     local a = node.type('A')
     local b = node.type('B')
@@ -62,6 +79,21 @@ end
 
 do
     node:reset()
+    --[[
+    ---@class A: B, C, D
+    ---@field w 1
+    ---@field x 2
+    ---@field y 3
+
+    ---@class B
+    ---@field field x 'x'
+
+    ---@class C
+    ---@field field y 'y'
+
+    ---@class D
+    ---@field field z 'z'
+    ]]
 
     local a = node.type('A')
         : addClass(node.class('A')
@@ -109,6 +141,11 @@ end
 
 do
     node:reset()
+    --[[
+    ---@alias A 1
+    ---@alias A 2
+    ---@alias A 3
+    ]]
 
     local a = node.type('A')
         : addAlias(node.alias('A', nil, node.value(1)))
@@ -121,6 +158,20 @@ end
 
 do
     node:reset()
+    --[[
+    ---@alias A B
+    ---@alias A C
+    ---@alias A D
+
+    ---@alias B 1
+    ---@alias B 2
+
+    ---@alias C 2
+    ---@alias C 3
+
+    ---@alias D 3
+    ---@alias D 4
+    ]]
 
     local a = node.type('A')
         : addAlias(node.alias('A', nil, node.type 'B'))
@@ -138,4 +189,19 @@ do
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'B | C | D')
+end
+
+do
+    node:reset()
+    --[[
+    ---@class A: { [string]: boolean }
+    ]]
+
+    local a = node.type('A')
+        : addClass(node.class('A', nil, { node.table {
+            [node.STRING] = node.BOOLEAN,
+        }}))
+
+    assert(a:view() == 'A')
+    assert(a.value:view() == '{ [string]: boolean }')
 end

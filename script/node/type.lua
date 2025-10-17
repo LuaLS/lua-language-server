@@ -154,12 +154,31 @@ function M:getProtoAliasesWithNParams(n)
     return results
 end
 
+--- 获取我的继承
+---@type Node.Class.ExtendAble[]
+M.extends = nil
+
+---@param self Node.Type
+---@return Node.Class.ExtendAble[]
+---@return true
+M.__getter.extends = function (self)
+    local results = {}
+    for _, class in ipairs(self:getProtoClassesWithNParams(0)) do
+        if class.extends then
+            for _, ext in ipairs(class.extends) do
+                results[#results+1] = ext
+            end
+        end
+    end
+    return results, true
+end
+
 --- 获取所有继承（广度优先）
----@type (Node.Type | Node.Table)[]
+---@type Node.Class.ExtendAble[]
 M.fullExtends = nil
 
 ---@param self Node.Type
----@return (Node.Type | Node.Table)[]
+---@return Node.Class.ExtendAble[]
 ---@return true
 M.__getter.fullExtends = function (self)
     local result = {}
@@ -242,7 +261,7 @@ M.__getter.extendsTable = function (self)
             end
         end
     end
-    table:extends(tables)
+    table:addChilds(tables)
 
     return table, true
 end
@@ -257,10 +276,13 @@ M.table = nil
 M.__getter.table = function (self)
     local table = self.scope.node.table()
     if self.classes then
-        local fields = ls.util.map(self:getProtoClassesWithNParams(0), function (class)
-            return class.fields
-        end)
-        table:extends(fields)
+        local fields = {}
+        for _, class in ipairs(self:getProtoClassesWithNParams(0)) do
+            if class.fields then
+                fields[#fields+1] = class.fields
+            end
+        end
+        table:addChilds(fields)
     end
     return table, true
 end
@@ -298,7 +320,7 @@ M.__getter.value = function (self)
         end
 
         local value = self.scope.node.table()
-        value:extends(merging)
+        value:addChilds(merging)
         return value, true
     end
     if self:isAliasLike() then

@@ -58,7 +58,7 @@ function M:fillAPIs()
 
     ---@param name string
     ---@param params? Node.Generic[]
-    ---@param extends? Node[]
+    ---@param extends? Node.Class.ExtendAble[]
     ---@return Node.Class
     function self.class(name, params, extends)
         return New 'Node.Class' (scope, name, params, extends)

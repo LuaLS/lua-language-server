@@ -18,59 +18,35 @@ function M:__init(scope, name, args)
     self.head:flushMe(self, true)
 end
 
---- 获取所有继承（广度优先）
----@type (Node.Type | Node.Table)[]
-M.fullExtends = nil
+--- 获取我的继承
+---@type Node.Class.ExtendAble[]
+M.extends = nil
 
 ---@param self Node.Call
----@return (Node.Type | Node.Table)[]
+---@return Node.Class.ExtendAble[]
 ---@return true
-M.__getter.fullExtends = function (self)
-    local result = {}
-    local visitedTypes = {}
-    local visitedResults = {}
-
-    ---@param t Node.Type
-    ---@param nextQueue Node.Type[]
-    local function searchClasses(t, nextQueue)
-        if visitedTypes[t] then
-            return
-        end
-        visitedTypes[t] = true
-        if not t.classes then
-            return
-        end
-        for _, class in ipairs(t:getProtoClassesWithNParams(#self.args)) do
-            if class.extends then
-                for _, ext in ipairs(class.extends) do
-                    if visitedResults[ext] then
-                        goto continue
-                    end
-                    visitedResults[ext] = true
-                    result[#result+1] = class
-                    if ext.kind == 'type' then
-                        ---@cast ext Node.Type
-                        nextQueue[#nextQueue+1] = ext
-                    end
-                    ::continue::
-                end
+M.__getter.extends = function (self)
+    local results = {}
+    for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
+        if class.extends then
+            local genericMap = class:makeGenericMap(self.args)
+            for _, ext in ipairs(class.extends) do
+                results[#results+1] = ext:resolveGeneric(genericMap)
             end
         end
     end
+    return results, true
+end
 
-    ---@param queue Node.Type[]
-    local function search(queue)
-        local nextQueue = {}
-        for _, v in ipairs(queue) do
-            searchClasses(v, nextQueue)
-        end
-        if #nextQueue == 0 then
-            return
-        end
-        search(nextQueue)
-    end
+--- 获取所有继承（广度优先）
+---@type Node.Class.ExtendAble[]
+M.fullExtends = nil
 
-    search { self.head }
+---@param self Node.Call
+---@return Node.Class.ExtendAble[]
+---@return true
+M.__getter.fullExtends = function (self)
+    local result = {}
 
     return result, true
 end
@@ -84,7 +60,7 @@ M.extendsTable = nil
 ---@return true
 M.__getter.extendsTable = function (self)
     local table = self.scope.node.table()
-    if #self.head.fullExtends == 0 then
+    if #self.fullExtends == 0 then
         return table, true
     end
 
@@ -106,7 +82,7 @@ M.__getter.extendsTable = function (self)
             end
         end
     end
-    table:extends(tables)
+    table:addChilds(tables)
 
     return table, true
 end
@@ -121,10 +97,13 @@ M.table = nil
 M.__getter.table = function (self)
     local table = self.scope.node.table()
     if self.head.classes then
-        local fields = ls.util.map(self.head:getProtoClassesWithNParams(#self.args), function (class)
-            return class.fields:resolveGeneric(class:makeGenericMap(self.args))
-        end)
-        table:extends(fields)
+        local fields = {}
+        for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
+            if class.fields then
+                fields[#fields+1] = class.fields:resolveGeneric(class:makeGenericMap(self.args))
+            end
+        end
+        table:addChilds(fields)
     end
     return table, true
 end
@@ -163,7 +142,7 @@ M.__getter.value = function (self)
         end
 
         local value = self.scope.node.table()
-        value:extends(merging)
+        value:addChilds(merging)
         return value, true
     end
     if self.head:isAliasLike() then

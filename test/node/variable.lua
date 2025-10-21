@@ -31,7 +31,7 @@ do
     var:addType(node.type 'string')
     assert(var.value:view() == 'number | string')
 
-    var:addClass(node.type 'A')
+    var:addClass(node.class 'A')
     assert(var.value:view() == 'A')
 end
 
@@ -65,7 +65,7 @@ do
     assert(var.fields:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, self: A }')
 
-    var:addClass(node.type 'A')
+    var:addClass(ca)
     assert(var.value:view() == 'A')
     assert(var.fields:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, self: A }')
@@ -100,7 +100,7 @@ do
 
     local m = node.variable 'M'
     ca:addVariable(m)
-    m:addClass(a)
+    m:addClass(ca)
 
     m:addField {
         key = node.value '__index',
@@ -172,7 +172,7 @@ do
     local CA = node.class 'A'
     A:addClass(CA)
     CA:addVariable(d)
-    d:addClass(A)
+    d:addClass(CA)
     assert(d:view() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields == nil)

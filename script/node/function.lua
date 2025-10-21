@@ -252,7 +252,7 @@ function M:view(skipLevel)
         typeParams = '<' .. table.concat(ls.util.map(self.typeParams, function (v)
             if v.kind == 'generic' then
                 ---@cast v Node.Generic
-                return v:rawView(skipLevel)
+                return v:viewAsParam(skipLevel)
             end
             return v:view(skipLevel)
         end), ', ') .. '>'

@@ -188,7 +188,7 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: T1, ...: T2):(T2[], (desc: string), (...: T1))')
+    assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, ...: <T2>):(<T2>[], (desc: string), (...: <T1>))')
 end
 
 do

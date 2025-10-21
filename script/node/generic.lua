@@ -23,10 +23,10 @@ end
 ---@param skipLevel? integer
 ---@return string
 function M:view(skipLevel)
-    return '<' .. self:rawView(skipLevel) .. '>'
+    return '<' .. self.name .. '>'
 end
 
-function M:rawView(skipLevel)
+function M:viewAsParam(skipLevel)
     local buf = {}
     buf[#buf+1] = self.name
     if self.extends ~= self.scope.node.ANY then

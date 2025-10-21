@@ -17,6 +17,23 @@ function M:__init(scope, name, params, value)
     self.value = value
 end
 
+---@param param Node.Generic
+---@return Node.Alias
+function M:addTypeParam(param)
+    if not self.params then
+        self.params = {}
+    end
+    table.insert(self.params, param)
+    return self
+end
+
+---@param value Node
+---@return Node.Alias
+function M:setValue(value)
+    self.value = value
+    return self
+end
+
 ---@type Node.Location?
 M.location = nil
 

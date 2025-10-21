@@ -20,7 +20,7 @@ local function bindVariableWithClass(runner, source, variable)
         return nil
     end
     local class = runner:parse(first)
-    ---@cast class Node.Type
+    ---@cast class Node.Class
     class:addVariable(variable)
     variable:addClass(class)
 

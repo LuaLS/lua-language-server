@@ -11,6 +11,9 @@ end)
 ls.vm.registerRunnerParser('catid', function (runner, source)
     ---@cast source LuaParser.Node.CatID
 
+    if source.generic then
+        return runner:makeGeneric(source.generic)
+    end
     return runner.node.type(source.id)
 end)
 
@@ -126,15 +129,24 @@ end)
 ls.vm.registerRunnerParser('catstateclass', function (runner, source)
     ---@cast source LuaParser.Node.CatStateClass
 
-    local class = runner.node.type(source.classID.id)
+    local type = runner.node.type(source.classID.id)
+    local class = runner.node.class(source.classID.id)
     runner.context.lastClass = class
 
     local location = runner:makeLocation(source)
-    class:addClass(location)
+    class:setLocation(location)
 
+    type:addClass(class)
     runner:addDispose(function ()
-        class:removeClass(location)
+        type:removeClass(class)
     end)
+
+    if source.typeParams then
+        for _, g in ipairs(source.typeParams) do
+            local param = runner:makeGeneric(g)
+            class:addTypeParam(param)
+        end
+    end
 
     if source.extends then
         for _, extend in ipairs(source.extends) do
@@ -142,9 +154,6 @@ ls.vm.registerRunnerParser('catstateclass', function (runner, source)
             if value.kind == 'type' then
                 ---@cast value Node.Type
                 class:addExtends(value)
-                runner:addDispose(function ()
-                    class:removeExtends(value)
-                end)
             end
         end
     end
@@ -178,24 +187,24 @@ end)
 ls.vm.registerRunnerParser('catstatealias', function (runner, source)
     ---@cast source LuaParser.Node.CatStateAlias
 
-    local alias = runner.node.type(source.aliasID.id)
+    local type = runner.node.type(source.aliasID.id)
+    local alias = runner.node.alias(source.aliasID.id)
 
     if source.typeParams then
-        local params = ls.util.map(source.typeParams, function (g, k)
-            return runner:makeGeneric(g)
-        end)
-        alias:addParams(params)
-        runner:addDispose(function ()
-            alias:removeParams(params)
-        end)
+        for _, g in ipairs(source.typeParams) do
+            local param = runner:makeGeneric(g)
+            alias:addTypeParam(param)
+        end
     end
 
     local value = runner:parse(source.extends)
     local location = runner:makeLocation(source)
+    alias:setValue(value)
+    alias:setLocation(location)
 
-    alias:addAlias(value, location)
+    type:addAlias(alias)
     runner:addDispose(function ()
-        alias:removeAlias(value, location)
+        type:removeAlias(alias)
     end)
 end)
 

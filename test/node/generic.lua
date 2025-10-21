@@ -37,22 +37,22 @@ do
     local union = N | U
     local intersection = N & U
 
-    assert(N:view() == '<N:number>')
+    assert(N:view() == '<N>')
     assert(U:view() == '<U>')
 
-    assert(array:view() == '<N:number>[]')
+    assert(array:view() == '<N>[]')
 
-    assert(tuple:view() == '[<N:number>, <U>]')
+    assert(tuple:view() == '[<N>, <U>]')
 
-    assert(table:view() == '{ [<N:number>]: <U> }')
+    assert(table:view() == '{ [<N>]: <U> }')
 
-    assert(func:view() == 'fun(a: <N:number>, ...: <U>):[<N:number>, <U>]')
+    assert(func:view() == 'fun(a: <N>, ...: <U>):[<N>, <U>]')
     func:bindTypeParams { N, U }
-    assert(func:view() == 'fun<N:number, U>(a: <N:number>, ...: <U>):[<N:number>, <U>]')
+    assert(func:view() == 'fun<N:number, U>(a: <N>, ...: <U>):[<N>, <U>]')
 
-    assert(union:view() == '<N:number> | <U>')
+    assert(union:view() == '<N> | <U>')
 
-    assert(intersection:view() == '<N:number> & <U>')
+    assert(intersection:view() == '<N> & <U>')
 
     local resolve = { [N] = node.INTEGER }
 

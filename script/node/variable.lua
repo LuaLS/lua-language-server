@@ -125,7 +125,7 @@ end
 ---@type LinkedTable
 M.classes = nil
 
----@param node Node.Type
+---@param node Node.Class
 ---@return Node.Variable
 function M:addClass(node)
     if not self.classes then
@@ -137,7 +137,7 @@ function M:addClass(node)
     return self
 end
 
----@param node Node.Type
+---@param node Node.Class
 ---@return Node.Variable
 function M:removeClass(node)
     if not self.classes then
@@ -378,7 +378,10 @@ M.value = nil
 M.__getter.value = function (self)
     local node = self.scope.node
     if self.classes then
-        local union = node.union(self.classes:toArray())
+        local union = node.union(ls.util.map(self.classes:toArray(), function (v, k)
+            ---@cast v Node.Class
+            return node.type(v.className)
+        end))
         return union, true
     end
     if self.nodes then

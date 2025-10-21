@@ -321,7 +321,6 @@ function M:fillPresets()
     self.TYPE_G = self.type '_G'
     self.VAR_G = self.variable '_G'
         : hideAtHead()
-        : addClass(self.TYPE_G)
 
     do
         local G = self.class '_G'
@@ -336,6 +335,7 @@ function M:fillPresets()
                 hideInView = true,
             }
         self.TYPE_G:addClass(G)
+        self.VAR_G:addClass(G)
     end
 end
 

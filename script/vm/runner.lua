@@ -5,7 +5,7 @@ local M = Class 'VM.Runner'
 M.state = 'ready'
 
 ---@class VM.Runner.Context
----@field lastClass? Node.Type
+---@field lastClass? Node.Class
 ---@field generics? table<LuaParser.Node.CatGeneric, Node.Generic>
 ---@field catGroup? LuaParser.Node.Cat[]
 ---@field catGroupMap? table<LuaParser.Node.Cat, LuaParser.Node.Cat[]>

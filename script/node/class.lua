@@ -19,6 +19,16 @@ function M:__init(scope, name, params, extends)
     self.extends = extends
 end
 
+---@param param Node.Generic
+---@return Node.Class
+function M:addTypeParam(param)
+    if not self.params then
+        self.params = {}
+    end
+    table.insert(self.params, param)
+    return self
+end
+
 ---@param extends Node
 ---@return Node.Class
 function M:addExtends(extends)

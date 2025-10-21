@@ -291,7 +291,7 @@ M.__getter.value = function (self)
             end
         end
         local union = self.scope.node.union(aliases)
-        return union.value, true
+        return union, true
     end
     return self, true
 end

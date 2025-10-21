@@ -98,7 +98,7 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
         func:setAsync()
     end
     if source.typeParams then
-        func:bindGenerics(ls.util.map(source.typeParams, function (g, k)
+        func:bindTypeParams(ls.util.map(source.typeParams, function (g, k)
             return runner:makeGeneric(g)
         end))
     end

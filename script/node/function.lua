@@ -247,6 +247,17 @@ function M:view(skipLevel)
         end
     end
 
+    local typeParams = ''
+    if self.typeParams and #self.typeParams > 0 then
+        typeParams = '<' .. table.concat(ls.util.map(self.typeParams, function (v)
+            if v.kind == 'generic' then
+                ---@cast v Node.Generic
+                return v:rawView(skipLevel)
+            end
+            return v:view(skipLevel)
+        end), ', ') .. '>'
+    end
+
     if #returns > 0 then
         local returnPart = table.concat(returns, ', ')
         if #returns > 1 then
@@ -254,14 +265,14 @@ function M:view(skipLevel)
         end
         return string.format('%sfun%s(%s):%s'
             , self.async and 'async ' or ''
-            , self.genericContext and self.genericContext:view(skipLevel) or ''
+            , typeParams
             , table.concat(params, ', ')
             , returnPart
         )
     else
         return string.format('%sfun%s(%s)'
             , self.async and 'async ' or ''
-            , self.genericContext and self.genericContext:view(skipLevel) or ''
+            , typeParams
             , table.concat(params, ', ')
         )
     end
@@ -287,10 +298,13 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
+---@type Node[]?
+M.typeParams = nil
+
 ---@param generics Node.Generic[]
 ---@return Node.Function
-function M:bindGenerics(generics)
-    self.genericContext = self.scope.node.genericContext(generics)
+function M:bindTypeParams(generics)
+    self.typeParams = generics
     return self
 end
 
@@ -299,9 +313,6 @@ function M:resolveGeneric(map)
         return self
     end
     local newFunc = self.scope.node.func()
-    if self.genericContext then
-        newFunc.genericContext = self.genericContext:resolve(map)
-    end
     for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then
             local newValue = param.value:resolveGeneric(map)
@@ -332,6 +343,11 @@ function M:resolveGeneric(map)
         else
             newFunc.varargParamDef = self.varargParamDef
         end
+    end
+    if self.typeParams then
+        newFunc.typeParams = ls.util.map(self.typeParams, function (v)
+            return map[v] or v
+        end)
     end
     return newFunc
 end

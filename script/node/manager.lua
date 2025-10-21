@@ -111,12 +111,6 @@ function M:fillAPIs()
         return New 'Node.Generic' (scope, name, extends, default)
     end
 
-    ---@param generics? Node.Generic[]
-    ---@return Node.GenericContext
-    function self.genericContext(generics)
-        return New 'Node.GenericContext' (scope, generics)
-    end
-
     ---@param nodes? Node[]
     ---@return Node.Intersection
     function self.intersection(nodes)

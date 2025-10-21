@@ -23,8 +23,11 @@ end
 ---@param skipLevel? integer
 ---@return string
 function M:view(skipLevel)
+    return '<' .. self:rawView(skipLevel) .. '>'
+end
+
+function M:rawView(skipLevel)
     local buf = {}
-    buf[#buf+1] = '<'
     buf[#buf+1] = self.name
     if self.extends ~= self.scope.node.ANY then
         buf[#buf+1] = ':'
@@ -34,7 +37,6 @@ function M:view(skipLevel)
         buf[#buf+1] = '='
         buf[#buf+1] = self.default:view(skipLevel)
     end
-    buf[#buf+1] = '>'
     return table.concat(buf)
 end
 

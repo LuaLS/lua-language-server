@@ -47,7 +47,7 @@ do
     assert(table:view() == '{ [<N:number>]: <U> }')
 
     assert(func:view() == 'fun(a: <N:number>, ...: <U>):[<N:number>, <U>]')
-    func:bindGenerics { N, U }
+    func:bindTypeParams { N, U }
     assert(func:view() == 'fun<N:number, U>(a: <N:number>, ...: <U>):[<N:number>, <U>]')
 
     assert(union:view() == '<N:number> | <U>')
@@ -264,19 +264,15 @@ do
     local K = node.generic 'K'
     local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K }
-
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : bindGenerics { V }
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
-
-    assert(map.value:view() == '{ set: fun<V>(key: <K>, value: <V>) }')
-    assert(map.value:get('set'):view() == 'fun<V>(key: <K>, value: <V>)')
-    assert(map:get('set'):view() == 'fun<V>(key: any, value: <V>)')
+    map:addClass(node.class('Map', { K })
+        : addField {
+            key   = node.value 'set',
+            value = node.func()
+                : bindTypeParams { V }
+                : addParamDef('key', K)
+                : addParamDef('value', V),
+        }
+    )
 
     local map1 = map:call { node.STRING }
     assert(map1.value:view() == '{ set: fun<V>(key: string, value: <V>) }')
@@ -291,8 +287,7 @@ do
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
-    node.TYPE_POOL['Unit'] = nil
+    node:reset()
 
     --[[
     ---@class Map<K, V>
@@ -305,20 +300,22 @@ do
     local K = node.generic 'K'
     local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K, V }
-
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
+    map:addClass(node.class('Map', { K, V })
+        : addField {
+            key   = node.value 'set',
+            value = node.func()
+                : addParamDef('key', K)
+                : addParamDef('value', V),
+        }
+    )
 
     local unit = node.type 'Unit'
-    unit:addField {
-        key   = node.value 'childs',
-        value = map:call { node.INTEGER, unit },
-    }
+    unit:addClass(node.class('Unit')
+        : addField {
+            key   = node.value 'childs',
+            value = map:call { node.INTEGER, unit },
+        }
+    )
 
     assert(unit.value:view() == '{ childs: Map<integer, Unit> }')
     assert(unit:get('childs'):view() == 'Map<integer, Unit>')
@@ -326,8 +323,7 @@ do
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
-    node.TYPE_POOL['Unit'] = nil
+    node:reset()
 
     --[[
     ---@class Map<K, V>
@@ -340,27 +336,23 @@ do
     local K = node.generic 'K'
     local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K, V }
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
+    map:addClass(node.class('Map', { K, V })
+        :addField {
+            key   = node.value 'set',
+            value = node.func()
+                : addParamDef('key', K)
+                : addParamDef('value', V),
+        }
+    )
 
     local T = node.generic 'T'
     local unit = node.type 'Unit'
-    unit:addParams { T }
-    unit:addField {
-        key   = node.value 'childs',
-        value = map:call { T, node.STRING },
-    }
-
-    assert(unit.value:view() == '{ childs: Map<<T>, string> }')
-    assert(unit.value:get('childs'):view() == 'Map<<T>, string>')
-    assert(unit.value:get('childs').value:view() == '{ set: fun(key: <T>, value: string) }')
-    assert(unit:get('childs'):view() == 'Map<any, string>')
-    assert(unit:get('childs').value:view() == '{ set: fun(key: any, value: string) }')
+    unit:addClass(node.class('Unit', { T })
+        :addField {
+            key   = node.value 'childs',
+            value = map:call { T, node.STRING },
+        }
+    )
 
     local unit2 = unit:call { node.NUMBER }
     assert(unit2.value:view() == '{ childs: Map<number, string> }')
@@ -371,8 +363,7 @@ do
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
-    node.TYPE_POOL['OrderMap'] = nil
+    node:reset()
 
     --[[
     ---@class Map<K, V>
@@ -384,77 +375,47 @@ do
     local K = node.generic 'K'
     local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K, V }
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
+    map:addClass(node.class('Map', { K, V })
+        : addField {
+            key   = node.value 'set',
+            value = node.func()
+                : addParamDef('key', K)
+                : addParamDef('value', V),
+        }
+    )
 
     local omap = node.type 'OrderMap'
-    omap:addExtends(map:call { node.NUMBER, node.STRING })
+    omap:addClass(node.class('OrderMap', nil, { map:call { node.NUMBER, node.STRING } }))
 
     assert(omap:get('set'):view() == 'fun(key: number, value: string)')
 end
 
 do
-    node.TYPE_POOL['Map'] = nil
-    node.TYPE_POOL['OrderMap'] = nil
+    node:reset()
 
     --[[
     ---@class Map<K, V>
     ---@field set fun(key: K, value: V)
 
-    ---@class OrderMap: Map<number, string>
+    ---@class OrderMap<OK, OV>: Map<OK, OV>
     ]]
 
     local K = node.generic 'K'
     local V = node.generic 'V'
     local map = node.type 'Map'
-    map:addParams { K, V }
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
-
-    local omap = node.type 'OrderMap'
-    omap:addExtends(map:call { node.NUMBER, node.STRING })
-
-    assert(omap:get('set'):view() == 'fun(key: number, value: string)')
-end
-
-do
-    node.TYPE_POOL['Map'] = nil
-    node.TYPE_POOL['OrderMap'] = nil
-
-    --[[
-    ---@class Map<K, V>
-    ---@field set fun(key: K, value: V)
-
-    ---@class OrderMap<OK:number, OV>: Map<OK, OV>
-    ]]
-
-    local K = node.generic 'K'
-    local V = node.generic 'V'
-    local map = node.type 'Map'
-    map:addParams { K, V }
-    map:addField {
-        key   = node.value 'set',
-        value = node.func()
-            : addParamDef('key', K)
-            : addParamDef('value', V),
-    }
+    map:addClass(node.class('Map', { K, V })
+        : addField {
+            key   = node.value 'set',
+            value = node.func()
+                : addParamDef('key', K)
+                : addParamDef('value', V),
+        }
+    )
 
     local OK = node.generic('OK', node.NUMBER)
     local OV = node.generic 'OV'
     local omap = node.type 'OrderMap'
-    omap:addParams { OK, OV }
-    omap:addExtends(map:call { OK, OV })
-
-    assert(omap:get('set'):view() == 'fun(key: number, value: any)')
+    omap:addClass(node.class('OrderMap', { OK, OV }, { map:call { OK, OV } }))
 
     local omap2 = omap:call { node.INTEGER, node.STRING }
 

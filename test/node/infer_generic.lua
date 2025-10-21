@@ -1,9 +1,11 @@
-do
-    local T = test.scope.node.generic 'T'
-    local map = {}
-    T:inferGeneric(test.scope.node.NUMBER, map)
+local node = test.scope.node
 
-    assert(map[T] == test.scope.node.NUMBER)
+do
+    local T = node.generic 'T'
+    local map = {}
+    T:inferGeneric(node.NUMBER, map)
+
+    assert(map[T] == node.NUMBER)
 end
 
 do
@@ -11,13 +13,13 @@ do
     T[] @ number[]
     T -> number
     ]]
-    local T = test.scope.node.generic 'T'
+    local T = node.generic 'T'
     local map = {}
-    local arrayT = test.scope.node.array(T)
-    local arrayNumber = test.scope.node.array(test.scope.node.NUMBER)
+    local arrayT = node.array(T)
+    local arrayNumber = node.array(node.NUMBER)
     arrayT:inferGeneric(arrayNumber, map)
 
-    assert(map[T] == test.scope.node.NUMBER)
+    assert(map[T] == node.NUMBER)
 end
 
 do
@@ -25,10 +27,10 @@ do
     T[] @ {}
     T -> T
     ]]
-    local T = test.scope.node.generic 'T'
+    local T = node.generic 'T'
     local map = {}
-    local arrayT = test.scope.node.array(T)
-    local table = test.scope.node.table()
+    local arrayT = node.array(T)
+    local table = node.table()
     arrayT:inferGeneric(table, map)
 
     assert(map[T] == nil)
@@ -39,15 +41,15 @@ do
     T[] @ { [integer]: string }
     T -> string
     ]]
-    local T = test.scope.node.generic 'T'
+    local T = node.generic 'T'
     local map = {}
-    local arrayT = test.scope.node.array(T)
-    local table = test.scope.node.table {
-        [test.scope.node.INTEGER] = test.scope.node.STRING,
+    local arrayT = node.array(T)
+    local table = node.table {
+        [node.INTEGER] = node.STRING,
     }
     arrayT:inferGeneric(table, map)
 
-    assert(map[T] == test.scope.node.STRING)
+    assert(map[T] == node.STRING)
 end
 
 do
@@ -55,15 +57,15 @@ do
     T[] @ { [number]: string }
     T -> string
     ]]
-    local T = test.scope.node.generic 'T'
+    local T = node.generic 'T'
     local map = {}
-    local arrayT = test.scope.node.array(T)
-    local table = test.scope.node.table {
-        [test.scope.node.NUMBER] = test.scope.node.STRING,
+    local arrayT = node.array(T)
+    local table = node.table {
+        [node.NUMBER] = node.STRING,
     }
     arrayT:inferGeneric(table, map)
 
-    assert(map[T] == test.scope.node.STRING)
+    assert(map[T] == node.STRING)
 end
 
 do
@@ -71,12 +73,12 @@ do
     T[] @ [number, string]
     T -> number|string
     ]]
-    local T = test.scope.node.generic 'T'
+    local T = node.generic 'T'
     local map = {}
-    local arrayT = test.scope.node.array(T)
-    local table = test.scope.node.tuple {
-        test.scope.node.NUMBER,
-        test.scope.node.STRING,
+    local arrayT = node.array(T)
+    local table = node.tuple {
+        node.NUMBER,
+        node.STRING,
     }
     arrayT:inferGeneric(table, map)
 
@@ -89,18 +91,18 @@ do
     T1 -> number
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tupleT1T2 = test.scope.node.tuple { T1, T2 }
-    local tuple = test.scope.node.tuple {
-        test.scope.node.NUMBER,
-        test.scope.node.STRING,
+    local tupleT1T2 = node.tuple { T1, T2 }
+    local tuple = node.tuple {
+        node.NUMBER,
+        node.STRING,
     }
     tupleT1T2:inferGeneric(tuple, map)
 
-    assert(map[T1] == test.scope.node.NUMBER)
-    assert(map[T2] == test.scope.node.STRING)
+    assert(map[T1] == node.NUMBER)
+    assert(map[T2] == node.STRING)
 end
 
 do
@@ -109,15 +111,15 @@ do
     T1 -> number
     T2 -> number
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tupleT1T2 = test.scope.node.tuple { T1, T2 }
-    local target = test.scope.node.array(test.scope.node.NUMBER)
+    local tupleT1T2 = node.tuple { T1, T2 }
+    local target = node.array(node.NUMBER)
     tupleT1T2:inferGeneric(target, map)
 
-    assert(map[T1] == test.scope.node.NUMBER)
-    assert(map[T2] == test.scope.node.NUMBER)
+    assert(map[T1] == node.NUMBER)
+    assert(map[T2] == node.NUMBER)
 end
 
 do
@@ -126,18 +128,18 @@ do
     T1 -> number
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tupleT1T2 = test.scope.node.tuple { T1, T2 }
-    local target = test.scope.node.table {
-        [1] = test.scope.node.NUMBER,
-        [test.scope.node.NUMBER] = test.scope.node.STRING,
+    local tupleT1T2 = node.tuple { T1, T2 }
+    local target = node.table {
+        [1] = node.NUMBER,
+        [node.NUMBER] = node.STRING,
     }
     tupleT1T2:inferGeneric(target, map)
 
-    assert(map[T1] == test.scope.node.NUMBER)
-    assert(map[T2] == test.scope.node.STRING)
+    assert(map[T1] == node.NUMBER)
+    assert(map[T2] == node.STRING)
 end
 
 do
@@ -146,19 +148,19 @@ do
     K -> number
     V -> string
     ]]
-    local K = test.scope.node.generic 'V'
-    local V = test.scope.node.generic 'V'
+    local K = node.generic 'V'
+    local V = node.generic 'V'
     local map = {}
-    local tableKV = test.scope.node.table {
+    local tableKV = node.table {
         [K] = V,
     }
-    local target = test.scope.node.table {
-        [test.scope.node.NUMBER] = test.scope.node.STRING,
+    local target = node.table {
+        [node.NUMBER] = node.STRING,
     }
     tableKV:inferGeneric(target, map)
 
-    assert(map[K] == test.scope.node.NUMBER)
-    assert(map[V] == test.scope.node.STRING)
+    assert(map[K] == node.NUMBER)
+    assert(map[V] == node.STRING)
 end
 
 do
@@ -167,17 +169,17 @@ do
     K -> integer
     V -> string
     ]]
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
     local map = {}
-    local tableKV = test.scope.node.table {
+    local tableKV = node.table {
         [K] = V,
     }
-    local target = test.scope.node.array(test.scope.node.STRING)
+    local target = node.array(node.STRING)
     tableKV:inferGeneric(target, map)
 
-    assert(map[K] == test.scope.node.INTEGER)
-    assert(map[V] == test.scope.node.STRING)
+    assert(map[K] == node.INTEGER)
+    assert(map[V] == node.STRING)
 end
 
 do
@@ -186,15 +188,15 @@ do
     K -> 1 | 2
     V -> string | boolean
     ]]
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
     local map = {}
-    local tableKV = test.scope.node.table {
+    local tableKV = node.table {
         [K] = V,
     }
-    local target = test.scope.node.tuple {
-        test.scope.node.STRING,
-        test.scope.node.BOOLEAN,
+    local target = node.tuple {
+        node.STRING,
+        node.BOOLEAN,
     }
     tableKV:inferGeneric(target, map)
 
@@ -208,16 +210,16 @@ do
     T1 -> number
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tableKV = test.scope.node.table {
+    local tableKV = node.table {
         x = T1,
         y = T2,
     }
-    local target = test.scope.node.table {
-        x = test.scope.node.NUMBER,
-        y = test.scope.node.STRING,
+    local target = node.table {
+        x = node.NUMBER,
+        y = node.STRING,
     }
     tableKV:inferGeneric(target, map)
 
@@ -231,11 +233,11 @@ do
     T1 -> number
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tupleG = test.scope.node.tuple { T1, T2 }
-    local target = test.scope.node.tuple { test.scope.node.NUMBER, test.scope.node.STRING }
+    local tupleG = node.tuple { T1, T2 }
+    local target = node.tuple { node.NUMBER, node.STRING }
     tupleG:inferGeneric(target, map)
 
     assert(map[T1]:view() == 'number')
@@ -248,11 +250,11 @@ do
     T1 -> string
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tupleG = test.scope.node.tuple { T1, T2 }
-    local target = test.scope.node.array(test.scope.node.STRING)
+    local tupleG = node.tuple { T1, T2 }
+    local target = node.array(node.STRING)
     tupleG:inferGeneric(target, map)
 
     assert(map[T1]:view() == 'string')
@@ -265,13 +267,13 @@ do
     T1 -> string
     T2 -> boolean
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local map = {}
-    local tupleG = test.scope.node.tuple { T1, T2 }
-    local target = test.scope.node.table {
-        [test.scope.node.INTEGER] = test.scope.node.STRING,
-        [2] = test.scope.node.BOOLEAN,
+    local tupleG = node.tuple { T1, T2 }
+    local target = node.table {
+        [node.INTEGER] = node.STRING,
+        [2] = node.BOOLEAN,
     }
     tupleG:inferGeneric(target, map)
 
@@ -288,19 +290,23 @@ do
     T1 -> number
     T2 -> string
     ]]
-    test.scope.node.TYPE_POOL['Map'] = nil
+    node:reset()
 
-    local map = test.scope.node.type 'Map'
-    local K = test.scope.node.generic 'K'
-    local V = test.scope.node.generic 'V'
-    map:addParams { K, V }
-    map:addField { key = K, value = V }
+    local map = node.type 'Map'
+    local K = node.generic 'K'
+    local V = node.generic 'V'
+    map:addClass(node.class('Map', { K, V })
+        : addField {
+            key   = K,
+            value = V,
+        }
+    )
 
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
     local result = {}
-    map:call { T1, T2 } :inferGeneric(test.scope.node.table {
-        [test.scope.node.NUMBER] = test.scope.node.STRING
+    map:call { T1, T2 } :inferGeneric(node.table {
+        [node.NUMBER] = node.STRING
     }, result)
     assert(result[T1]:view() == 'number')
     assert(result[T2]:view() == 'string')
@@ -312,14 +318,14 @@ do
     T1 -> number
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
-    local funG = test.scope.node.func()
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
+    local funG = node.func()
         : addParamDef('x', T1)
         : addReturnDef(nil, T2)
-    local target = test.scope.node.func()
-        : addParamDef('x', test.scope.node.NUMBER)
-        : addReturnDef(nil, test.scope.node.STRING)
+    local target = node.func()
+        : addParamDef('x', node.NUMBER)
+        : addReturnDef(nil, node.STRING)
 
     local result = {}
     funG:inferGeneric(target, result)
@@ -334,14 +340,14 @@ do
     T1 -> number
     T2 -> string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
-    local funG = test.scope.node.func()
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
+    local funG = node.func()
         : addParamDef('x', T1)
         : addParamDef('y', T2)
-    local target = test.scope.node.func()
-        : addParamDef('x', test.scope.node.NUMBER)
-        : addVarargParamDef(test.scope.node.STRING)
+    local target = node.func()
+        : addParamDef('x', node.NUMBER)
+        : addVarargParamDef(node.STRING)
 
     local result = {}
     funG:inferGeneric(target, result)
@@ -356,15 +362,15 @@ do
     T1 -> number
     T2 -> boolean | string
     ]]
-    local T1 = test.scope.node.generic 'T1'
-    local T2 = test.scope.node.generic 'T2'
-    local funG = test.scope.node.func()
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
+    local funG = node.func()
         : addParamDef('x', T1)
         : addVarargParamDef(T2)
-    local target = test.scope.node.func()
-        : addParamDef('x', test.scope.node.NUMBER)
-        : addParamDef('y', test.scope.node.BOOLEAN)
-        : addVarargParamDef(test.scope.node.STRING)
+    local target = node.func()
+        : addParamDef('x', node.NUMBER)
+        : addParamDef('y', node.BOOLEAN)
+        : addVarargParamDef(node.STRING)
 
     local result = {}
     funG:inferGeneric(target, result)
@@ -378,11 +384,11 @@ do
     T | number @ number
     T -> number
     ]]
-    local T = test.scope.node.generic 'T'
-    local u = test.scope.node.union { T, test.scope.node.NUMBER }
+    local T = node.generic 'T'
+    local u = node.union { T, node.NUMBER }
 
     local result = {}
-    u:inferGeneric(test.scope.node.NUMBER, result)
+    u:inferGeneric(node.NUMBER, result)
 
     assert(result[T]:view() == 'number')
 end
@@ -392,11 +398,11 @@ do
     T & number @ number
     T -> number
     ]]
-    local T = test.scope.node.generic 'T'
-    local i = test.scope.node.intersection { T, test.scope.node.NUMBER }
+    local T = node.generic 'T'
+    local i = node.intersection { T, node.NUMBER }
 
     local result = {}
-    i:inferGeneric(test.scope.node.NUMBER, result)
+    i:inferGeneric(node.NUMBER, result)
 
     assert(result[T]:view() == 'number')
 end

@@ -96,7 +96,7 @@ do
     local F = node.variable 'f'
     local T = node.generic 'T'
     local FUN = node.func()
-        : bindTypeParams { T }
+        : addTypeParam(T)
         : addParamDef('x', T)
         : addReturnDef(nil, node.index(T, node.value '__index'))
 
@@ -177,6 +177,8 @@ R = F()
     ]]
     vfile:indexAst(ast, 'common')
 
+    local F = node:globalGet('F')
+    assert(F.value:view() == 'fun():number')
     local R = node:globalGet('R')
     assert(R.value:view() == 'number')
 end
@@ -195,6 +197,8 @@ R = F(1)
     ]]
     vfile:indexAst(ast, 'common')
 
+    local F = node:globalGet('F')
+    assert(F.value:view() == 'fun<T>(x: <T>):<T>[]')
     local R = node:globalGet('R')
     assert(R.value:view() == '1[]')
 end
@@ -211,7 +215,7 @@ do
 ---@return T & MT['__index']
 function setmetatable(t, mt) return end
 
----@class A6
+---@class A
 local mt = {}
 mt.__index = mt
 
@@ -219,5 +223,5 @@ obj = setmetatable({}, mt)
     ]]
     vfile:indexAst(ast, 'common')
 
-    assert(node:globalGet('obj').value:view() == 'A')
+    assert(node:globalGet('obj').value:view() == 'A["__index"]')
 end

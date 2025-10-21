@@ -416,7 +416,8 @@ do
     local T1 = node.generic 'T1'
     local T2 = node.generic 'T2'
     local funG = node.func()
-        : bindTypeParams { T1, T2 }
+        : addTypeParam(T1)
+        : addTypeParam(T2)
         : addParamDef('x', T1)
         : addParamDef('y', T2)
 

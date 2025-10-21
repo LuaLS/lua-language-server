@@ -110,6 +110,13 @@ ls.vm.registerRunnerParser('function', function (runner, source)
             if cvalue.kind == 'catstatereturn' then
                 ---@cast cvalue LuaParser.Node.CatStateReturn
                 func:addReturnDef(cvalue.key and cvalue.key.id, subRunner:parse(cvalue.value))
+            elseif cvalue.kind == 'catstategeneric' then
+                ---@cast cvalue LuaParser.Node.CatStateGeneric
+                for _, generic in ipairs(cvalue.typeParams) do
+                    local gnode = subRunner:parse(generic)
+                    ---@cast gnode Node.Generic
+                    func:addTypeParam(gnode)
+                end
             end
         end
     end

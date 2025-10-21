@@ -12,7 +12,7 @@ ls.vm.registerRunnerParser('catid', function (runner, source)
     ---@cast source LuaParser.Node.CatID
 
     if source.generic then
-        return runner:makeGeneric(source.generic)
+        return runner:getGeneric(source.generic)
     end
     return runner.node.type(source.id)
 end)
@@ -101,9 +101,10 @@ ls.vm.registerRunnerParser('catfunction', function (runner, source)
         func:setAsync()
     end
     if source.typeParams then
-        func:bindTypeParams(ls.util.map(source.typeParams, function (g, k)
-            return runner:makeGeneric(g)
-        end))
+        for _, g in ipairs(source.typeParams) do
+            local tp = runner:getGeneric(g)
+            func:addTypeParam(tp)
+        end
     end
     if source.params then
         for _, param in ipairs(source.params) do
@@ -143,7 +144,7 @@ ls.vm.registerRunnerParser('catstateclass', function (runner, source)
 
     if source.typeParams then
         for _, g in ipairs(source.typeParams) do
-            local param = runner:makeGeneric(g)
+            local param = runner:getGeneric(g)
             class:addTypeParam(param)
         end
     end
@@ -192,7 +193,7 @@ ls.vm.registerRunnerParser('catstatealias', function (runner, source)
 
     if source.typeParams then
         for _, g in ipairs(source.typeParams) do
-            local param = runner:makeGeneric(g)
+            local param = runner:getGeneric(g)
             alias:addTypeParam(param)
         end
     end
@@ -229,4 +230,16 @@ ls.vm.registerRunnerParser('catstatetype', function (runner, source)
     runner:addToCatGroup(source.parent)
 
     return node
+end)
+
+ls.vm.registerRunnerParser('catstategeneric', function (runner, source)
+    ---@cast source LuaParser.Node.CatStateGeneric
+
+    runner:addToCatGroup(source.parent, true)
+end)
+
+ls.vm.registerRunnerParser('catgeneric', function (runner, source)
+    ---@cast source LuaParser.Node.CatGeneric
+
+    return runner:getGeneric(source)
 end)

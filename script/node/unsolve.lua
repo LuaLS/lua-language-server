@@ -25,6 +25,7 @@ end
 M.__getter.solve = function (self)
     self.value = self.baseNode
     local value = self:onResolve(self.context)
+    self.value = value
     return value.solve, true
 end
 

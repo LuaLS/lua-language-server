@@ -301,10 +301,13 @@ end
 ---@type Node[]?
 M.typeParams = nil
 
----@param generics Node.Generic[]
+---@param generic Node.Generic
 ---@return Node.Function
-function M:bindTypeParams(generics)
-    self.typeParams = generics
+function M:addTypeParam(generic)
+    if not self.typeParams then
+        self.typeParams = {}
+    end
+    table.insert(self.typeParams, generic)
     return self
 end
 

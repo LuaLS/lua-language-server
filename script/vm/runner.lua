@@ -195,7 +195,7 @@ end
 
 ---@param generic LuaParser.Node.CatGeneric
 ---@return Node.Generic
-function M:makeGeneric(generic)
+function M:getGeneric(generic)
     local generics = self.context.generics
     if not generics then
         generics = {}

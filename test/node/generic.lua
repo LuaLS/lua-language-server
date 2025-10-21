@@ -47,7 +47,8 @@ do
     assert(table:view() == '{ [<N>]: <U> }')
 
     assert(func:view() == 'fun(a: <N>, ...: <U>):[<N>, <U>]')
-    func:bindTypeParams { N, U }
+    func:addTypeParam(N)
+    func:addTypeParam(U)
     assert(func:view() == 'fun<N:number, U>(a: <N>, ...: <U>):[<N>, <U>]')
 
     assert(union:view() == '<N> | <U>')
@@ -268,7 +269,7 @@ do
         : addField {
             key   = node.value 'set',
             value = node.func()
-                : bindTypeParams { V }
+                : addTypeParam(V)
                 : addParamDef('key', K)
                 : addParamDef('value', V),
         }

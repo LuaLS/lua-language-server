@@ -115,6 +115,91 @@ do
 end
 
 do
+    node:reset()
+    --[[
+    ---@type fun(): boolean
+    F = xxx
+
+    R = F()
+    ]]
+
+    local F = node:globalAdd({
+        key = node.value 'F',
+    })
+    F:addType(node.func()
+        : addReturnDef(nil, node.BOOLEAN)
+    )
+    local R = node.call(F, {}).value
+    assert(R:view() == 'boolean')
+end
+
+do
+    node:reset()
+    local vm = ls.vm.create(test.scope)
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+---@type fun(): boolean
+F = xxx
+
+R = F()
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    local R = node:globalGet('R')
+    assert(R.value:view() == 'boolean')
+end
+
+do
+    node:reset()
+    local vm = ls.vm.create(test.scope)
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+---@type fun<T>(x: T): T[]
+F = xxx
+
+R = F(1)
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    local R = node:globalGet('R')
+    assert(R.value:view() == '1[]')
+end
+
+do
+    node:reset()
+    local vm = ls.vm.create(test.scope)
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+---@return number
+function F() end
+
+R = F()
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    local R = node:globalGet('R')
+    assert(R.value:view() == 'number')
+end
+
+do
+    node:reset()
+    local vm = ls.vm.create(test.scope)
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+---@generic T
+---@param x T
+---@return T[]
+function F(x) end
+
+R = F(1)
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    local R = node:globalGet('R')
+    assert(R.value:view() == '1[]')
+end
+
+do
     local vm = ls.vm.create(test.scope)
     node:reset()
 

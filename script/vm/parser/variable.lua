@@ -58,13 +58,16 @@ end
 
 ls.vm.registerVariableParser('var', function (runner, source)
     ---@cast source LuaParser.Node.Var
+    local field = runner:makeNodeField(source, source.id, source.value)
 
     if source.loc then
         local variable = runner:getVariable(source.loc)
+        if variable then
+            variable:addAssign(field)
+        end
         return variable
     else
         -- 全局变量
-        local field = runner:makeNodeField(source, source.id, source.value)
         local variable = runner.node:globalAdd(field)
 
         runner:addDispose(function ()
@@ -82,22 +85,14 @@ ls.vm.registerRunnerParser('var', function (runner, source)
 
     if source.loc then
         -- 局部变量
-        local locNode = runner:parse(source.loc)
-        if variable then
-            if source.value then
-                local field = runner:makeNodeField(source, source.id, source.value)
-                variable:addAssign(field)
-            end
-        end
-        return locNode
+        runner:parse(source.loc)
     else
         -- 全局变量
         bindVariableWithClass(runner, source, variable)
-
-        if source.value then
-            return runner:lazyParse(source.value)
-        end
+        bindVariableWithType(runner, source, variable)
     end
+
+    return variable
 end)
 
 ls.vm.registerRunnerParser('localdef', function (runner, source)
@@ -108,6 +103,7 @@ ls.vm.registerRunnerParser('localdef', function (runner, source)
     local firstVariable = runner:getVariable(firstVar)
     if firstVariable then
         bindVariableWithClass(runner, source, firstVariable)
+        bindVariableWithType(runner, source, firstVariable)
     end
 
     for _, var in ipairs(source.vars) do
@@ -123,6 +119,10 @@ ls.vm.registerVariableParser('local', function (runner, source)
         return runner.node.VAR_G
     end
     local variable = runner.node.variable(source.id)
+    if source.value then
+        local field = runner:makeNodeField(source, source.id, source.value)
+        variable:addAssign(field)
+    end
     return variable
 end)
 
@@ -130,20 +130,12 @@ ls.vm.registerRunnerParser('local', function (runner, source)
     ---@cast source LuaParser.Node.Local
 
     local variable = runner:getVariable(source)
-    ---@cast variable -?
-
-    local bindType = bindVariableWithType(runner, source, variable)
-    if bindType then
-        return bindType
-    end
 
     if source.value then
-        local field = runner:makeNodeField(source, source.id, source.value)
-
-        variable:addAssign(field)
-
-        return field.value
+        return runner:lazyParse(source.value)
     end
+
+    return variable
 end)
 
 ls.vm.registerVariableParser('param', function (runner, source)
@@ -231,11 +223,13 @@ ls.vm.registerRunnerParser('field', function (runner, source)
         if value then
             -- 局部变量的字段赋值
             bindVariableWithClass(runner, source, variable)
+            bindVariableWithType(runner, source, variable)
         end
     else
         if value then
             -- 全局变量的字段赋值
             bindVariableWithClass(runner, source, variable)
+            bindVariableWithType(runner, source, variable)
         end
     end
 

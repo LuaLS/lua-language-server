@@ -109,7 +109,7 @@ ls.vm.registerRunnerParser('function', function (runner, source)
             ---@cast cvalue -?
             if cvalue.kind == 'catstatereturn' then
                 ---@cast cvalue LuaParser.Node.CatStateReturn
-                func:addReturnDef(cvalue.key and cvalue.key.id, subRunner:lazyParse(cvalue.value, node.ANY))
+                func:addReturnDef(cvalue.key and cvalue.key.id, subRunner:parse(cvalue.value))
             end
         end
     end

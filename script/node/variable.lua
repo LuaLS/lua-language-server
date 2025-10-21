@@ -407,7 +407,7 @@ end
 
 ---@param skipLevel? integer
 ---@return string
-function M:view(skipLevel)
+function M:viewVariable(skipLevel)
     ---@type Node.Variable[]
     local path = {}
     local current = self

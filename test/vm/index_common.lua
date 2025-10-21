@@ -13,7 +13,7 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == '1')
-    assert(node:globalGet('A'):view() == 'A')
+    assert(node:globalGet('A'):viewVariable() == 'A')
     assert(node:globalGet('A').value:view() == '1')
 end
 
@@ -30,7 +30,7 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == 'unknown')
-    assert(node:globalGet('A', 'B', 'C'):view() == 'A.B.C')
+    assert(node:globalGet('A', 'B', 'C'):viewVariable() == 'A.B.C')
     assert(node:globalGet('A', 'B', 'C').value:view() == '1')
 end
 
@@ -47,7 +47,7 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == 'unknown')
-    assert(node:globalGet('A', 1, 'C'):view() == 'A[1].C')
+    assert(node:globalGet('A', 1, 'C'):viewVariable() == 'A[1].C')
     assert(node:globalGet('A', 1, 'C').value:view() == '1')
 end
 
@@ -64,7 +64,7 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == 'unknown')
-    assert(node:globalGet('A', node.UNKNOWN, 'C'):view() == 'A[unknown].C')
+    assert(node:globalGet('A', node.UNKNOWN, 'C'):viewVariable() == 'A[unknown].C')
     assert(node:globalGet('A', node.UNKNOWN, 'C').value:view() == '1')
 end
 
@@ -82,7 +82,7 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(g:get('A'):view() == '1')
-    assert(node:globalGet('A'):view() == 'A')
+    assert(node:globalGet('A'):viewVariable() == 'A')
     assert(node:globalGet('A').value:view() == 'unknown')
 end
 

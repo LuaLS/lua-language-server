@@ -150,6 +150,15 @@ function M:canCast(other)
     return false
 end
 
+---@return Node
+function M:finalValue()
+    local value = self
+    while value ~= value.value do
+        value = value.value
+    end
+    return value
+end
+
 ---@type Node
 M.value = nil
 

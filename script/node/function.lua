@@ -308,6 +308,19 @@ function M:bindTypeParams(generics)
     return self
 end
 
+---@param args Node[]
+---@return table<Node.Generic, Node>
+function M:makeGenericMap(args)
+    local map = {}
+    if not self.typeParams then
+        return map
+    end
+    for i, param in ipairs(self.typeParams) do
+        map[param] = args[i] or self.scope.node.UNKNOWN
+    end
+    return map
+end
+
 function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
@@ -349,6 +362,7 @@ function M:resolveGeneric(map)
             newFunc.varargParamDef = self.varargParamDef
         end
     end
+    newFunc.returnCount = self.returnCount
     return newFunc
 end
 

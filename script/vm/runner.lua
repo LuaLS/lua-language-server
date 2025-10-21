@@ -180,15 +180,14 @@ function M:makeNodeField(source, key, value)
         ---@cast key Node
         nkey = key
     end
-    local nvalue, var
+    local nvalue
     if value ~= nil then
-        nvalue = self:lazyParse(value)
-        var = self:getVariable(value)
+        nvalue = self:getVariable(value)
+            or   self:lazyParse(value)
     end
     local field = {
         key = nkey,
         value = nvalue,
-        valueVar = var,
         location = self:makeLocation(source),
     }
     return field
@@ -334,8 +333,9 @@ function M:findFields(source, key)
         if variable.assigns then
             ---@param assign Node.Field
             for assign in variable.assigns:pairsFast() do
-                local var = assign.valueVar
-                if var then
+                local var = assign.value
+                if var and var.kind == 'variable' then
+                    ---@cast var Node.Variable
                     findByVar(var, results, ...)
                 end
             end

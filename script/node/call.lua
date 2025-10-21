@@ -2,17 +2,24 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, name: string, args: Node[]): Node.Call
+---@overload fun(scope: Scope, head: string | Node, args: Node[]): Node.Call
 local M = ls.node.register 'Node.Call'
 
 M.kind = 'call'
 
+---@type Node
+M.head = nil
+
 ---@param scope Scope
----@param name string
+---@param head string | Node
 ---@param args Node[]
-function M:__init(scope, name, args)
+function M:__init(scope, head, args)
     self.scope = scope
-    self.head = scope.node.type(name)
+    if type(head) == 'string' then
+        self.head = scope.node.type(head)
+    else
+        self.head = head
+    end
     self.args = args
 
     self.head:registerFlushChain(self)
@@ -27,7 +34,12 @@ M.extends = nil
 ---@return true
 M.__getter.extends = function (self)
     local results = {}
-    for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
+    local head = self.head
+    if head.kind ~= 'type' then
+        return results, true
+    end
+    ---@cast head Node.Type
+    for _, class in ipairs(head:getProtoClassesWithNParams(#self.args)) do
         if class.extends then
             local genericMap = class:makeGenericMap(self.args)
             for _, ext in ipairs(class.extends) do
@@ -94,9 +106,14 @@ M.table = nil
 ---@return true
 M.__getter.table = function (self)
     local table = self.scope.node.table()
-    if self.head.classes then
+    local head = self.head
+    if head.kind ~= 'type' then
+        return table, true
+    end
+    ---@cast head Node.Type
+    if head.classes then
         local fields = {}
-        for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
+        for _, class in ipairs(head:getProtoClassesWithNParams(#self.args)) do
             if class.fields then
                 fields[#fields+1] = class.fields:resolveGeneric(class:makeGenericMap(self.args))
             end
@@ -114,15 +131,27 @@ M.value = nil
 ---@return true
 M.__getter.value = function (self)
     self.value = self.scope.node.NEVER
-    if not self.head:isComplex() then
-        return self, true
+    local head = self.head
+    if head.kind == 'type' then
+        return self:getTypeValue(), true
+    else
+        return self.returns:get(1), true
     end
-    if self.head:isClassLike() then
+end
+
+---@return Node
+function M:getTypeValue()
+    local head = self.head
+    ---@cast head Node.Type
+    if not head:isComplex() then
+        return self
+    end
+    if head:isClassLike() then
         local merging = {}
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.table
         -- 2. 绑定的变量里的字段
-        for _, class in ipairs(self.head:getProtoClassesWithNParams(#self.args)) do
+        for _, class in ipairs(head:getProtoClassesWithNParams(#self.args)) do
             if class.variables then
                 for variable in class.variables:pairsFast() do
                     ---@cast variable Node.Variable
@@ -136,26 +165,65 @@ M.__getter.value = function (self)
         end
 
         if #merging == 1 then
-            return merging[1], true
+            return merging[1]
         end
 
         local value = self.scope.node.table()
         value:addChilds(merging)
-        return value, true
+        return value
     end
-    if self.head:isAliasLike() then
+    if head:isAliasLike() then
         ---@type Node[]
         local aliases = {}
         ---@param alias Node.Alias
-        for _, alias in ipairs(self.head:getProtoAliasesWithNParams(#self.args)) do
+        for _, alias in ipairs(head:getProtoAliasesWithNParams(#self.args)) do
             if alias.value then
                 aliases[#aliases+1] = alias.value:resolveGeneric(alias:makeGenericMap(self.args))
             end
         end
         local union = self.scope.node.union(aliases)
-        return union.value, true
+        return union.value
     end
-    return self, true
+    return self
+end
+
+---@type Node
+M.returns = nil
+
+---@param self Node.Call
+---@return Node
+---@return true
+M.__getter.returns = function (self)
+    local returns = {}
+    local allMin = 0
+    ---@type integer?
+    local allMax = 0
+    local hasDef
+
+    for f in self.head:finalValue():each 'function' do
+        hasDef = true
+        ---@cast f Node.Function
+        f = f:resolveGeneric(f:makeGenericMap(self.args))
+        local min, max = f:getReturnCount()
+        for i = 1, min do
+            returns[i] = returns[i] | f:getReturn(i)
+        end
+        if not allMin or allMin > min then
+            allMin = min
+        end
+        if not max then
+            allMax = nil
+        elseif allMax and allMax < max then
+            allMax = max
+        end
+    end
+
+    if not hasDef then
+        return self.scope.node.UNKNOWN, true
+    end
+
+    local vararg = self.scope.node.vararg(returns, allMin, allMax)
+    return vararg, true
 end
 
 function M:resolveGeneric(map)

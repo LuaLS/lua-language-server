@@ -47,44 +47,44 @@ end
 
 ---@param action VM.Contribute.Action
 function M:commit(action)
-    local kind = action.kind
-    if kind == 'classfield' then
-        ---@cast action VM.Contribute.ClassField
-        local tp = self.scope.node.type(action.className)
-        tp:addField(action.field)
-    elseif kind == 'global' then
-        ---@cast action VM.Contribute.Global
-        local variable = self.scope.node:globalAdd(action.field, action.path)
-        if action.className then
-            local class = self.scope.node.type(action.className)
-        end
-    elseif kind == 'class' then
-        ---@cast action VM.Contribute.Class
-        self.scope.node.type(action.name):addClass(action.location)
-    elseif kind == 'alias' then
-        ---@cast action VM.Contribute.Alias
-        self.scope.node.type(action.name):addAlias(action.value, action.location)
-    end
-    self.history[#self.history+1] = action
+    -- local kind = action.kind
+    -- if kind == 'classfield' then
+    --     ---@cast action VM.Contribute.ClassField
+    --     local tp = self.scope.node.type(action.className)
+    --     tp:addField(action.field)
+    -- elseif kind == 'global' then
+    --     ---@cast action VM.Contribute.Global
+    --     local variable = self.scope.node:globalAdd(action.field, action.path)
+    --     if action.className then
+    --         local class = self.scope.node.type(action.className)
+    --     end
+    -- elseif kind == 'class' then
+    --     ---@cast action VM.Contribute.Class
+    --     self.scope.node.type(action.name):addClass(action.location)
+    -- elseif kind == 'alias' then
+    --     ---@cast action VM.Contribute.Alias
+    --     self.scope.node.type(action.name):addAlias(action.value, action.location)
+    -- end
+    -- self.history[#self.history+1] = action
 end
 
 ---@param action VM.Contribute.Action
 function M:revert(action)
-    local kind = action.kind
-    if kind == 'classfield' then
-        ---@cast action VM.Contribute.ClassField
-        local tp = self.scope.node.type(action.className)
-        tp:removeField(action.field)
-    elseif kind == 'global' then
-        ---@cast action VM.Contribute.Global
-        self.scope.node:globalRemove(action.field, action.path)
-    elseif kind == 'class' then
-        ---@cast action VM.Contribute.Class
-        self.scope.node.type(action.name):removeClass(action.location)
-    elseif kind == 'alias' then
-        ---@cast action VM.Contribute.Alias
-        self.scope.node.type(action.name):removeAlias(action.value, action.location)
-    end
+    -- local kind = action.kind
+    -- if kind == 'classfield' then
+    --     ---@cast action VM.Contribute.ClassField
+    --     local tp = self.scope.node.type(action.className)
+    --     tp:removeField(action.field)
+    -- elseif kind == 'global' then
+    --     ---@cast action VM.Contribute.Global
+    --     self.scope.node:globalRemove(action.field, action.path)
+    -- elseif kind == 'class' then
+    --     ---@cast action VM.Contribute.Class
+    --     self.scope.node.type(action.name):removeClass(action.location)
+    -- elseif kind == 'alias' then
+    --     ---@cast action VM.Contribute.Alias
+    --     self.scope.node.type(action.name):removeAlias(action.value, action.location)
+    -- end
 end
 
 ---@param actions VM.Contribute.Action[]

@@ -57,6 +57,7 @@ function M:addClass(class)
     self.classes:pushTail(class)
 
     self:flushCache()
+    class:registerFlushChain(self)
 
     return self
 end
@@ -71,6 +72,7 @@ function M:removeClass(class)
         self.classes = nil
     end
 
+    class:unregisterFlushChain(self)
     self:flushCache()
 end
 
@@ -86,6 +88,7 @@ function M:addAlias(alias)
     self.aliases:pushTail(alias)
 
     self:flushCache()
+    alias:registerFlushChain(self)
 
     return self
 end
@@ -101,6 +104,7 @@ function M:removeAlias(alias)
         self.aliases = nil
     end
 
+    alias:unregisterFlushChain(self)
     self:flushCache()
 
     return self

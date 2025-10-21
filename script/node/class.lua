@@ -27,6 +27,9 @@ function M:addExtends(extends)
     end
     table.insert(self.extends, extends)
     self:flushCache()
+    for _, v in ipairs(self.extends) do
+        v:registerFlushChain(self)
+    end
     return self
 end
 
@@ -78,7 +81,7 @@ function M:addVariable(variable)
 
     self.variables:pushTail(variable)
 
-    variable:flushMe(self, true)
+    variable:registerFlushChain(self)
     self:flushCache()
 
     return self
@@ -99,7 +102,7 @@ function M:removeVariable(variable)
         self.variables = nil
     end
 
-    variable:flushMe(self, false)
+    variable:unregisterFlushChain(self)
     self:flushCache()
 
     return self

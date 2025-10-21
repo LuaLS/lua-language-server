@@ -28,8 +28,7 @@ do
 end
 
 do
-    node.TYPE_POOL['A'] = nil
-    node.TYPE_POOL['B'] = nil
+    node:reset()
 
     local a = node.type 'A'
 
@@ -43,43 +42,52 @@ do
         key = node.value 'x',
         value = node.STRING
     }
-    a:addField(field1)
+    local ca = node.class 'A'
+    a:addClass(ca)
+    assert(a:get 'x' == node.NIL)
+
+    ca:addField(field1)
     assert(a:get 'x' == node.NUMBER)
 
     local b = node.type 'B'
     assert(b:get 'x' == node.NEVER)
 
-    b:addExtends(a)
+    local cb = node.class 'B'
+    b:addClass(cb)
+
+    cb:addExtends(a)
     assert(b:get 'x' == node.NUMBER)
     assert(b:get 'y' == node.NIL)
 
-    a:removeField(field1)
-    a:addField(field2)
+    ca:removeField(field1)
+    ca:addField(field2)
     assert(a:get 'x' == node.STRING)
     assert(b:get 'x' == node.STRING)
 end
 
 do
+    node:reset()
     --[[
     ---@class A<T>
     ---@field x T
     ]]
-    node.TYPE_POOL['A'] = nil
 
     local a = node.type 'A'
     local T = node.generic 'T'
-    a:addParams { T }
-    a:addField {
-        key = node.value 'x',
-        value = T,
-    }
+
+    local ca = node.class('A', { T })
+        : addField {
+            key = node.value 'x',
+            value = T,
+        }
+    a:addClass(ca)
 
     local an = a:call { node.NUMBER }
     assert(an.value:view() == '{ x: number }')
     assert(an:get('x'):view() == 'number')
     assert(an:get('y'):view() == 'nil')
 
-    a:addField {
+    ca:addField {
         key = node.value 'y',
         value = node.STRING,
     }

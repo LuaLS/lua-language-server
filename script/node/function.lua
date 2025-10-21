@@ -313,6 +313,11 @@ function M:resolveGeneric(map)
         return self
     end
     local newFunc = self.scope.node.func()
+    if self.typeParams then
+        newFunc.typeParams = ls.util.map(self.typeParams, function (v)
+            return map[v] or v
+        end)
+    end
     for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then
             local newValue = param.value:resolveGeneric(map)
@@ -343,11 +348,6 @@ function M:resolveGeneric(map)
         else
             newFunc.varargParamDef = self.varargParamDef
         end
-    end
-    if self.typeParams then
-        newFunc.typeParams = ls.util.map(self.typeParams, function (v)
-            return map[v] or v
-        end)
     end
     return newFunc
 end
@@ -390,6 +390,16 @@ function M:inferGeneric(other, result)
         local otherParam = value:getParamStartFrom(#self.paramsDef + 1)
         if otherParam then
             self.varargParamDef:inferGeneric(otherParam, result)
+        end
+    end
+    if self.typeParams then
+        for _, param in ipairs(self.typeParams) do
+            if param.kind == 'generic' then
+                ---@cast param Node.Generic
+                if not result[param] then
+                    result[param] = self.scope.node.UNKNOWN
+                end
+            end
         end
     end
 end

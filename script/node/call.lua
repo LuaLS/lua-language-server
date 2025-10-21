@@ -15,7 +15,7 @@ function M:__init(scope, name, args)
     self.head = scope.node.type(name)
     self.args = args
 
-    self.head:flushMe(self, true)
+    self.head:registerFlushChain(self)
 end
 
 --- 获取我的继承

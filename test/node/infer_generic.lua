@@ -406,3 +406,26 @@ do
 
     assert(result[T]:view() == 'number')
 end
+
+do
+    --[[
+    fun<T1, T2>(x: T1, y: T2) @ fun(x: number)
+    T1 -> number
+    T2 -> unknown
+    ]]
+    local T1 = node.generic 'T1'
+    local T2 = node.generic 'T2'
+    local funG = node.func()
+        : bindTypeParams { T1, T2 }
+        : addParamDef('x', T1)
+        : addParamDef('y', T2)
+
+    local target = node.func()
+        : addParamDef('x', node.NUMBER)
+
+    local result = {}
+    funG:inferGeneric(target, result)
+
+    assert(result[T1]:view() == 'number')
+    assert(result[T2]:view() == 'unknown')
+end

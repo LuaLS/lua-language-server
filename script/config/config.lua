@@ -88,7 +88,7 @@ end
 ---@param key string
 ---@return any
 function M:get(uri, key)
-    if not ls.util.stringStartWith(uri, self.root, ls.env.ignoreCase) then
+    if not ls.util.stringStartWith(uri, self.root, ls.env.IGNORE_CASE) then
         return nil
     end
     local currentUri = uri

@@ -10,21 +10,23 @@ require 'luals'
 require 'runtime'
 require 'worker'
 
+fs.create_directories(fs.path(ls.env.LOG_PATH))
+
 ---@class Log
 log = New 'Log' {
     level = 'verb',
     print = function (level, message, timeStamp)
         print('[{}][{}]: {}' % { timeStamp, level, message })
-    end
+    end,
+    path = ls.uri.decode(ls.env.LOG_URI) .. '/test.log',
 }
 
-fs.create_directories(fs.path(ls.env.logPath))
 
 ---@class Test
 test = {}
 test.catch = require 'test.catch'
 
-test.rootPath = ls.env.rootPath .. '/test_root'
+test.rootPath = ls.env.ROOT_PATH .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create(test.rootUri)
@@ -35,7 +37,8 @@ ls.await.call(function ()
         print('开始测试')
         require 'test.parser'
         require 'test.node'
-        require 'test.vm'
+        require 'test.coder'
+        --require 'test.vm'
         require 'test.feature'
         dofile 'test/project/init.lua'
     end)

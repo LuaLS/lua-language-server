@@ -18,6 +18,14 @@ function M:__del()
     self:resetRunners()
 end
 
+---@param ast LuaParser.Ast
+---@return VM.Coder
+function M:makeCoder(ast)
+    local coder = ls.vm.createCoder(self)
+    coder:makeFromAst(ast)
+    return coder
+end
+
 function M:resetRunners()
     for _, runner in pairs(self.runners) do
         Delete(runner)

@@ -1187,10 +1187,10 @@ function m.enableFormatString()
     local mt = getmetatable('')
     mt.__mod = function (str, args)
         local count = 0
-        return str:gsub('%{(.-)%}', function (key)
-            local k, fmt = key:match('^(.-):(.+)$')
+        return str:gsub('%b{}', function (key)
+            local k, fmt = key:match('^{(.-):(.+)}$')
             if not k then
-                k = key
+                k = key:sub(2, -2)
             end
             local value
             if k == '' then
@@ -1198,6 +1198,9 @@ function m.enableFormatString()
                 value = args[count]
             else
                 value = args[k]
+            end
+            if value == nil then
+                return '{' .. k % args .. '}'
             end
             if fmt then
                 value = stringFormat('%' .. fmt, value)

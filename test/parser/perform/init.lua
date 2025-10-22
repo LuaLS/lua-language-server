@@ -2,7 +2,7 @@ local thread = require 'bee.thread'
 local parser = require 'parser'
 
 local function performTest()
-    local targetPath = ls.env.rootPath
+    local targetPath = ls.env.ROOT_PATH
     local files = {}
     local size = 0
     ls.fsu.scanDirectory(targetPath, function (fullPath)
@@ -35,7 +35,7 @@ local function performTest()
 end
 
 local function test(path)
-    local buf = ls.util.loadFile(ls.env.rootPath .. '/test/parser/perform/' .. path)
+    local buf = ls.util.loadFile(ls.env.ROOT_PATH .. '/test/parser/perform/' .. path)
     if not buf then
         return
     end

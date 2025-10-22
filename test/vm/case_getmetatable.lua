@@ -299,6 +299,7 @@ obj = setmetatable({}, mt)
     vfile:indexAst(ast, 'common')
 
     assert(node:globalGet('obj'):view() == 'A')
+    assert(node:globalGet('obj'):finalValue():view() == '{ __index: A }')
 end
 
 do

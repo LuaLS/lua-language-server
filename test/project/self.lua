@@ -1,5 +1,5 @@
 do
-    local root = ls.env.rootUri
+    local root = ls.env.ROOT_URI
     local scope <close> = ls.scope.create(root, ls.afs)
 
     collectgarbage()

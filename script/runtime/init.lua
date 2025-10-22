@@ -7,9 +7,9 @@ local platform  = require 'bee.platform'
 ---@class LuaLS.Args
 ls.args = {
     -- 指定日志输出目录，默认为 `./log`
-    LOGPATH = '$LUALSPATH/log',
+    LOGPATH = '$ROOT_PATH/log',
     -- 指定meta文件的生成目录，默认为 `./meta`
-    METAPATH = '$LUALSPATH/meta',
+    METAPATH = '$ROOT_PATH/meta',
     -- 是否为开发模式
     DEVELOP = false,
     -- 调试器端口号，默认为 11411
@@ -69,13 +69,13 @@ end
 ---@class LuaLS.Env
 ls.env = {}
 --语言服务器根路径
-ls.env.rootPath   = ls.util.expandPath(findRoot())
-ls.env.logPath    = ls.util.expandPath(ls.args.LOGPATH, ls.env)
-ls.env.metaPath   = ls.util.expandPath(ls.args.METAPATH, ls.env)
-ls.env.rootUri    = ls.uri.encode(ls.env.rootPath)
-ls.env.logUri     = ls.uri.encode(ls.env.logPath)
-ls.env.metaUri    = ls.uri.encode(ls.env.metaPath)
-ls.env.ignoreCase = ls.args.IGNORE_CASE
+ls.env.ROOT_PATH   = ls.util.expandPath(findRoot())
+ls.env.LOG_PATH    = ls.util.expandPath(ls.args.LOGPATH, ls.env)
+ls.env.META_PATH   = ls.util.expandPath(ls.args.METAPATH, ls.env)
+ls.env.ROOT_URI    = ls.uri.encode(ls.env.ROOT_PATH)
+ls.env.LOG_URI     = ls.uri.encode(ls.env.LOG_PATH)
+ls.env.META_URI    = ls.uri.encode(ls.env.META_PATH)
+ls.env.IGNORE_CASE = ls.args.IGNORE_CASE
 
 --启动时的版本号
-ls.env.version = version.getVersion(ls.env.rootPath)
+ls.env.version = version.getVersion(ls.env.ROOT_PATH)

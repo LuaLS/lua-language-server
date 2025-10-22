@@ -8,7 +8,7 @@ ls.threadName = 'master'
 ls.runtime = require 'runtime'
 ls.API = require 'master.api'
 
-fs.create_directories(fs.path(ls.env.logPath))
+fs.create_directories(fs.path(ls.env.LOG_PATH))
 
 ---@diagnostic disable-next-line: lowercase-global
 log = New 'Log' {
@@ -18,13 +18,13 @@ log = New 'Log' {
     time  = function ()
         return time.time() // 1000
     end,
-    path = ls.uri.decode(ls.env.logUri) .. '/service.log',
+    path = ls.uri.decode(ls.env.LOG_URI) .. '/service.log',
 }
 
 log.info('Lua Lsp startup!')
-log.info('LUALS:', ls.env.rootUri)
-log.info('LOGPATH:', ls.env.logUri)
-log.info('METAPATH:', ls.env.metaUri)
+log.info('LUALS:', ls.env.ROOT_URI)
+log.info('LOGPATH:', ls.env.LOG_URI)
+log.info('METAPATH:', ls.env.META_URI)
 log.info('VERSION:', ls.env.version)
 
 xpcall(function ()

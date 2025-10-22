@@ -84,15 +84,6 @@ function M:get(key)
     return self.scope.node.NIL
 end
 
-function M:view(skipLevel)
-    local buf = {}
-    for _, v in ipairs(self.values) do
-        buf[#buf+1] = v:view(skipLevel and skipLevel + 1 or nil)
-    end
-
-    return '[' .. table.concat(buf, ', ') .. ']'
-end
-
 ---@param other Node
 ---@return boolean
 function M:onCanBeCast(other)
@@ -154,3 +145,13 @@ function M:inferGeneric(other, result)
         v:inferGeneric(other:get(i), result)
     end
 end
+
+ls.node.registerView('tuple', function (viewer, node, needParentheses)
+    ---@cast node Node.Tuple
+    local buf = {}
+    for _, v in ipairs(node.values) do
+        buf[#buf+1] = viewer:view(v)
+    end
+
+    return '[' .. table.concat(buf, ', ') .. ']'
+end)

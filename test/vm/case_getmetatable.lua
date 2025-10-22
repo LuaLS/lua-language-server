@@ -183,7 +183,7 @@ do
 
     local CALL = node.call(F, { MT })
     local R = CALL.value
-    assert(R:view() == '1')
+    assert(R:view() == '{ x: 1, __index: {...} }')
 
     local V = R:get 'x'
     assert(V:view() == '1')
@@ -323,6 +323,6 @@ value = obj.xxx
     ]]
     vfile:indexAst(ast, 'common')
 
-    assert(node:globalGet('obj'):view() == '')
+    assert(node:globalGet('obj'):view() == '1')
     assert(node:globalGet('value'):view() == '1')
 end

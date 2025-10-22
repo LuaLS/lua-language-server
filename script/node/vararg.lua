@@ -68,27 +68,6 @@ function M:get(key)
     return self.scope.node.NIL
 end
 
-function M:view(skipLevel)
-    local buf = {}
-    if #self.values == 0 then
-        return '...'
-    end
-    for i, v in ipairs(self.values) do
-        if self.min and i > self.min then
-            break
-        end
-        buf[#buf+1] = v:view(skipLevel and skipLevel + 1 or nil)
-    end
-
-    local view = table.concat(buf, ', ')
-
-    if not self.max or self.max > #buf then
-       view = view .. '...'
-    end
-
-    return view
-end
-
 ---@param other Node
 ---@return boolean
 function M:onCanBeCast(other)
@@ -132,3 +111,25 @@ function M:inferGeneric(other, result)
         v:inferGeneric(other:get(i), result)
     end
 end
+
+ls.node.registerView('vararg', function (viewer, node, needParentheses)
+    ---@cast node Node.Vararg
+    local buf = {}
+    if #node.values == 0 then
+        return '...'
+    end
+    for i, v in ipairs(node.values) do
+        if node.min and i > node.min then
+            break
+        end
+        buf[#buf+1] = viewer:view(v)
+    end
+
+    local view = table.concat(buf, ', ')
+
+    if not node.max or node.max > #buf then
+       view = view .. '...'
+    end
+
+    return view
+end)

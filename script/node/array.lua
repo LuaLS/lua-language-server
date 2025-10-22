@@ -73,10 +73,6 @@ function M:onCanCast(other)
     return false
 end
 
-function M:view(skipLevel)
-    return string.format('%s[]', self.head:view(skipLevel, true))
-end
-
 ---@param self Node.Array
 ---@return boolean
 ---@return true
@@ -106,3 +102,8 @@ function M:inferGeneric(other, result)
     end
     self.head:inferGeneric(value, result)
 end
+
+ls.node.registerView('array', function(viewer, node, needParentheses)
+    ---@cast node Node.Array
+    return viewer:format('%s[]', node.head, 0, true)
+end)

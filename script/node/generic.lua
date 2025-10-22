@@ -20,26 +20,6 @@ function M:__init(scope, name, extends, default)
     self.default = default
 end
 
----@param skipLevel? integer
----@return string
-function M:view(skipLevel)
-    return '<' .. self.name .. '>'
-end
-
-function M:viewAsParam(skipLevel)
-    local buf = {}
-    buf[#buf+1] = self.name
-    if self.extends ~= self.scope.node.ANY then
-        buf[#buf+1] = ':'
-        buf[#buf+1] = self.extends:view(skipLevel)
-    end
-    if self.default then
-        buf[#buf+1] = '='
-        buf[#buf+1] = self.default:view(skipLevel)
-    end
-    return table.concat(buf)
-end
-
 ---@param self Node.Generic
 ---@return Node
 ---@return true
@@ -57,3 +37,8 @@ function M:inferGeneric(other, result)
     end
     result[self] = other
 end
+
+ls.node.registerView('generic', function (viewer, node, needParentheses)
+    ---@cast node Node.Generic
+    return '<' .. node.name .. '>'
+end)

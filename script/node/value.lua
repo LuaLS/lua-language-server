@@ -25,23 +25,6 @@ function M:__init(scope, v, quo)
     self.scope = scope
 end
 
-function M:view(skipLevel)
-    if self.typeName == 'string' then
-        return ls.util.viewString(self.literal, self.quo)
-    else
-        return ls.util.viewLiteral(self.literal)
-    end
-end
-
-function M:viewAsKey(skipLevel)
-    local literal = self.literal
-    if type(literal) == 'string' and literal:match '^[%a_][%w_]*$' then
-        return self.literal
-    else
-        return '[' .. self:view(skipLevel) .. ']'
-    end
-end
-
 function M:onCanCast(other)
     if other.kind == 'value' then
         ---@cast other Node.Value
@@ -59,3 +42,22 @@ M.nodeType = nil
 M.__getter.nodeType = function (self)
     return self.scope.node.type(self.typeName), true
 end
+
+ls.node.registerView('value', function (viewer, node, needParentheses)
+    ---@cast node Node.Value
+    if node.typeName == 'string' then
+        return ls.util.viewString(node.literal, node.quo)
+    else
+        return ls.util.viewLiteral(node.literal) or ''
+    end
+end)
+
+ls.node.registerViewAsKey('value', function (viewer, node)
+    ---@cast node Node.Value
+    local literal = node.literal
+    if type(literal) == 'string' and literal:match '^[%a_][%w_]*$' then
+        return literal
+    else
+        return '[' .. viewer:view(node) .. ']'
+    end
+end)

@@ -331,42 +331,6 @@ function M:onCanCast(other)
     return false
 end
 
-function M:view(skipLevel)
-    if #self.keys == 0 then
-        return '{}'
-    end
-
-    local fields = {}
-
-    local childSkipLevel = skipLevel and skipLevel + 1 or nil
-    for _, key in ipairs(self.keys) do
-        local field = self.fieldMap[key]
-        if #field == 0 then
-            if field.hideInView then
-                goto continue
-            end
-        else
-            for _, f in ipairs(field) do
-                if f.hideInView then
-                    goto continue
-                end
-            end
-        end
-        local value = self.valueMap[key]
-        fields[#fields+1] = string.format('%s: %s'
-            , key:viewAsKey(childSkipLevel)
-            , value:view(childSkipLevel)
-        )
-        ::continue::
-    end
-
-    if #fields == 0 then
-        return '{}'
-    end
-
-    return '{ ' .. table.concat(fields, ', ') .. ' }'
-end
-
 ---越靠前的字段越优先。
 ---@param childs Node.Table[]
 function M:addChilds(childs)
@@ -447,3 +411,43 @@ function M:inferGeneric(other, result)
         end
     end
 end
+
+ls.node.registerView('table', function (viewer, node, needParentheses)
+    ---@cast node Node.Table
+    if #node.keys == 0 then
+        return '{}'
+    end
+
+    if viewer.visited[node] > 1 then
+        return '{...}'
+    end
+
+    local fields = {}
+
+    for _, key in ipairs(node.keys) do
+        local field = node.fieldMap[key]
+        if #field == 0 then
+            if field.hideInView then
+                goto continue
+            end
+        else
+            for _, f in ipairs(field) do
+                if f.hideInView then
+                    goto continue
+                end
+            end
+        end
+        local value = node.valueMap[key]
+        fields[#fields+1] = string.format('%s: %s'
+            , viewer:viewAsKey(key)
+            , viewer:view(value)
+        )
+        ::continue::
+    end
+
+    if #fields == 0 then
+        return '{}'
+    end
+
+    return '{ ' .. table.concat(fields, ', ') .. ' }'
+end)

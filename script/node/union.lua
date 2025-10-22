@@ -80,44 +80,6 @@ M.__getter.values = function (self)
     return values, true
 end
 
-M.sortScore = {
-    ['nil'] = -1000,
-}
-
-function M:view(skipLevel, needParentheses)
-    local values = self.values
-    if #values == 0 then
-        return 'never'
-    end
-    if #values == 1 then
-        return values[1]:view(skipLevel, needParentheses)
-    end
-    ---@type string[]
-    local view = {}
-    for _, v in ipairs(values) do
-        if v.hideInUnionView then
-            goto continue
-        end
-        local thisView = v:view(skipLevel and skipLevel + 1 or nil, true)
-        if not thisView then
-            goto continue
-        end
-        view[#view+1] = thisView
-        ::continue::
-    end
-    ls.util.sortByScore(view, {
-        function (v)
-            return self.sortScore[v] or 0
-        end,
-        ls.util.sortCallbackOfIndex(view),
-    })
-    local result = table.concat(view, ' | ')
-    if needParentheses then
-        return '(' .. result .. ')'
-    end
-    return result
-end
-
 function M:get(key)
     local value
     for _, v in ipairs(self.values) do
@@ -225,3 +187,42 @@ function M:each(kind)
         end
     end
 end
+
+local sortScore = {
+    ['nil'] = -1000,
+}
+
+ls.node.registerView('union', function(viewer, node, needParentheses)
+    ---@cast node Node.Union
+    local values = node.values
+    if #values == 0 then
+        return 'never'
+    end
+    if #values == 1 then
+        return viewer:view(values[1], 0, needParentheses)
+    end
+    ---@type string[]
+    local view = {}
+    for _, v in ipairs(values) do
+        if v.hideInUnionView then
+            goto continue
+        end
+        local thisView = viewer:view(v, 1, true)
+        if not thisView then
+            goto continue
+        end
+        view[#view+1] = thisView
+        ::continue::
+    end
+    ls.util.sortByScore(view, {
+        function (v)
+            return sortScore[v] or 0
+        end,
+        ls.util.sortCallbackOfIndex(view),
+    })
+    local result = table.concat(view, ' | ')
+    if needParentheses then
+        return '(' .. result .. ')'
+    end
+    return result
+end)

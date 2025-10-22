@@ -28,8 +28,3 @@ M.__getter.solve = function (self)
     self.value = value
     return value.solve, true
 end
-
-function M:view(skipLevel)
-    local view = self.solve:view(skipLevel)
-    return view
-end

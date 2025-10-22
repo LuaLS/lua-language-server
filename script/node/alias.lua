@@ -42,19 +42,6 @@ function M:setLocation(location)
     self.location = location
 end
 
-function M:view(skipLevel)
-    if self.params then
-        return '{}<{}>' % {
-            self.aliasName,
-            table.concat(ls.util.map(self.params, function (param)
-                return param:view(skipLevel)
-            end), ', '),
-        }
-    else
-        return self.aliasName
-    end
-end
-
 ---@param self Node.Class
 ---@return boolean
 ---@return true
@@ -83,3 +70,17 @@ function M:makeGenericMap(args)
     end
     return map
 end
+
+ls.node.registerView('alias', function(viewer, node)
+    ---@cast node Node.Alias
+    if node.params then
+        return '{}<{}>' % {
+            node.aliasName,
+            table.concat(ls.util.map(node.params, function (param)
+                return viewer:view(param)
+            end), ', ')
+        }
+    else
+        return node.aliasName
+    end
+end)

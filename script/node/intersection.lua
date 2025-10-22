@@ -244,30 +244,6 @@ function M:onCanCast(other)
     return self.value:canCast(other.value)
 end
 
-function M:view(skipLevel, needParentheses)
-    local values = self.values
-    if #values == 0 then
-        return 'never'
-    end
-    if #values == 1 then
-        return values[1]:view(skipLevel)
-    end
-    local elements = {}
-    for _, v in ipairs(self.rawNodes) do
-        if v.hideInUnionView then
-            goto continue
-        end
-        local view = v:view(skipLevel, true)
-        elements[#elements+1] = view
-        ::continue::
-    end
-    local result = table.concat(elements, ' & ')
-    if needParentheses then
-        return '(' .. result .. ')'
-    end
-    return result
-end
-
 ---@param self Node.Intersection
 ---@return boolean
 ---@return true
@@ -303,3 +279,28 @@ function M:inferGeneric(other, result)
         v:inferGeneric(other, result)
     end
 end
+
+ls.node.registerView('intersection', function(viewer, node, needParentheses)
+    ---@cast node Node.Intersection
+    local values = node.values
+    if #values == 0 then
+        return 'never'
+    end
+    if #values == 1 then
+        return viewer:view(values[1], 0, needParentheses)
+    end
+    local elements = {}
+    for _, v in ipairs(node.rawNodes) do
+        if v.hideInUnionView then
+            goto continue
+        end
+        local view = viewer:view(v, 1, true)
+        elements[#elements+1] = view
+        ::continue::
+    end
+    local result = table.concat(elements, ' & ')
+    if needParentheses then
+        return '(' .. result .. ')'
+    end
+    return result
+end)

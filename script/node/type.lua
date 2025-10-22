@@ -316,10 +316,6 @@ M.__getter.falsy = function (self)
     return self.scope.node.NEVER, true
 end
 
-function M:view(skipLevel)
-    return self.typeName
-end
-
 ---@type fun(self: Node.Type, other: Node): boolean?
 M._onCanCast = nil
 
@@ -445,3 +441,8 @@ M.callCache = nil
 M.__getter.callCache = function (self)
     return ls.pathTable.create(true, true), true
 end
+
+ls.node.registerView('type', function (viewer, node, needParentheses)
+    ---@cast node Node.Type
+    return node.typeName
+end)

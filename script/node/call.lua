@@ -233,11 +233,12 @@ function M:resolveGeneric(map)
     return self.scope.node.call(self.head.typeName, args)
 end
 
-function M:view(skipLevel)
-    return string.format('%s<%s>'
-        , self.head.typeName
-        , table.concat(ls.util.map(self.args, function (arg, i)
-            return arg:view(skipLevel)
-        end), ', ')
-    )
-end
+ls.node.registerView('call', function(viewer, node)
+    ---@cast node Node.Call
+    return '{}<{}>' % {
+        node.head.typeName,
+        table.concat(ls.util.map(node.args, function (arg)
+            return viewer:view(arg)
+        end), ', '),
+    }
+end)

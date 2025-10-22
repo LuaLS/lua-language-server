@@ -226,58 +226,6 @@ function M:getReturnStartFrom(index)
     return self.scope.node.union(nodes)
 end
 
-function M:view(skipLevel)
-    local params = {}
-    for i, v in ipairs(self.paramsDef) do
-        params[i] = string.format('%s: %s'
-            , v.key
-            , v.value:view()
-        )
-    end
-    if self.varargParamDef then
-        params[#params+1] = string.format('...: %s', self.varargParamDef:view())
-    end
-
-    local returns = {}
-    for i, v in ipairs(self.returnsDef) do
-        if v.key then
-            returns[i] = string.format('(%s: %s)', v.key, v.value:view())
-        else
-            returns[i] = v.value:view()
-        end
-    end
-
-    local typeParams = ''
-    if self.typeParams and #self.typeParams > 0 then
-        typeParams = '<' .. table.concat(ls.util.map(self.typeParams, function (v)
-            if v.kind == 'generic' then
-                ---@cast v Node.Generic
-                return v:viewAsParam(skipLevel)
-            end
-            return v:view(skipLevel)
-        end), ', ') .. '>'
-    end
-
-    if #returns > 0 then
-        local returnPart = table.concat(returns, ', ')
-        if #returns > 1 then
-            returnPart = '(' .. returnPart .. ')'
-        end
-        return string.format('%sfun%s(%s):%s'
-            , self.async and 'async ' or ''
-            , typeParams
-            , table.concat(params, ', ')
-            , returnPart
-        )
-    else
-        return string.format('%sfun%s(%s)'
-            , self.async and 'async ' or ''
-            , typeParams
-            , table.concat(params, ', ')
-        )
-    end
-end
-
 ---@param self Node.Function
 ---@return boolean
 ---@return true
@@ -420,3 +368,56 @@ function M:inferGeneric(other, result)
         end
     end
 end
+
+ls.node.registerView('function', function (viewer, node, needParentheses)
+    ---@cast node Node.Function
+    local params = {}
+    for i, v in ipairs(node.paramsDef) do
+        params[i] = string.format('%s: %s'
+            , v.key
+            , v.value:view()
+        )
+    end
+    if node.varargParamDef then
+        params[#params+1] = string.format('...: %s', node.varargParamDef:view())
+    end
+
+    local returns = {}
+    for i, v in ipairs(node.returnsDef) do
+        if v.key then
+            returns[i] = string.format('(%s: %s)', v.key, v.value:view())
+        else
+            returns[i] = v.value:view()
+        end
+    end
+
+    local typeParams = ''
+    if node.typeParams and #node.typeParams > 0 then
+        typeParams = '<' .. table.concat(ls.util.map(node.typeParams, function (v)
+            if v.kind == 'generic' then
+                ---@cast v Node.Generic
+                return viewer:viewAsParam(v)
+            end
+            return viewer:view(v)
+        end), ', ') .. '>'
+    end
+
+    if #returns > 0 then
+        local returnPart = table.concat(returns, ', ')
+        if #returns > 1 then
+            returnPart = '(' .. returnPart .. ')'
+        end
+        return string.format('%sfun%s(%s):%s'
+            , node.async and 'async ' or ''
+            , typeParams
+            , table.concat(params, ', ')
+            , returnPart
+        )
+    else
+        return string.format('%sfun%s(%s)'
+            , node.async and 'async ' or ''
+            , typeParams
+            , table.concat(params, ', ')
+        )
+    end
+end)

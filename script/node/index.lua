@@ -41,7 +41,3 @@ function M:resolveGeneric(map)
     end
     return self.scope.node.index(head, index)
 end
-
-function M:view(skipLevel)
-    return string.format('%s[%s]', self.head:view(skipLevel), self.index:view(skipLevel and skipLevel + 1 or nil))
-end

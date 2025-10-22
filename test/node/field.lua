@@ -283,6 +283,5 @@ do
             },
         node.value 'x'
     )
-    assert(index:view() == '{ x: 1, y: 2 }["x"]')
-    assert(index.value:view() == '1')
+    assert(index:view() == '1')
 end

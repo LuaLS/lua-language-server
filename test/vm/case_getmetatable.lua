@@ -57,6 +57,9 @@ do
 
     local r = A:get 'x'
     assert(r:view() == 'A')
+
+    local I = node.index(A, node.value 'x')
+    assert(I:view() == 'A')
 end
 
 do
@@ -223,5 +226,5 @@ obj = setmetatable({}, mt)
     ]]
     vfile:indexAst(ast, 'common')
 
-    assert(node:globalGet('obj').value:view() == 'A["__index"]')
+    assert(node:globalGet('obj'):view() == 'A')
 end

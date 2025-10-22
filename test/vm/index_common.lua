@@ -258,6 +258,5 @@ do
     vfile:indexAst(ast, 'common')
 
     assert(node.type('B'):view() == 'B')
-    assert(node.type('B').value:view() == 'A["x"]')
-    assert(node.type('B').value.value:view() == '1')
+    assert(node.type('B').value:view() == '1')
 end

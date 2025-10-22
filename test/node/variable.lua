@@ -45,7 +45,7 @@ do
     }
 
     assert(var:viewVariable() == 'x')
-    assert(var.value:view() == 'unknown')
+    assert(var.value:view() == '{ n: number }')
     assert(var.fields:view() == '{ n: number }')
 
     local a = node.type 'A'
@@ -61,8 +61,7 @@ do
         key = node.value 'self',
         value = a,
     }
-    assert(var.value:view() == 'unknown')
-    assert(var.fields:view() == '{ n: number, self: A }')
+    assert(var.value:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, self: A }')
 
     var:addClass(ca)
@@ -130,23 +129,22 @@ do
         value = node.value(1),
     }, {'b', 'c'})
     assert(a:viewVariable() == 'a')
-    assert(a.value:view() == 'unknown')
+    assert(a:view() == '{ b: { c: { d: 1 } } }')
 
     local b = a:getChild('b')
     assert(b)
     assert(b:viewVariable() == 'a.b')
-    assert(b.value:view() == 'unknown')
+    assert(b:view() == '{ c: { d: 1 } }')
 
     local c = a:getChild('b', 'c')
     assert(c)
     assert(c:viewVariable() == 'a.b.c')
-    assert(c.value:view() == 'unknown')
-    assert(c.fields:view() == '{ d: 1 }')
+    assert(c:view() == '{ d: 1 }')
 
     local d = a:getChild('b', 'c', 'd')
     assert(d)
     assert(d:viewVariable() == 'a.b.c.d')
-    assert(d.value:view() == '1')
+    assert(d:view() == '1')
 end
 
 do

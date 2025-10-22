@@ -305,14 +305,13 @@ function M:get(key)
         ---@cast key -Node
         key = node.value(key)
     end
-    if not self.childs then
-        return node.NIL
+    if self.childs then
+        local child = self.childs[key]
+        if child then
+            return child
+        end
     end
-    local child = self.childs[key]
-    if not child then
-        return node.NIL
-    end
-    return child
+    return self.value:get(key)
 end
 
 ---@param key Node.Key
@@ -394,7 +393,7 @@ M.__getter.value = function (self)
         end))
         return union, true
     end
-    return self.scope.node.UNKNOWN, true
+    return self.fields or self.scope.node.UNKNOWN, true
 end
 
 ---@private

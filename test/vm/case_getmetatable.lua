@@ -89,11 +89,7 @@ do
     ---@type fun<T>(x: T): T['__index']
     local f
 
-    local t = {
-        __index = 1
-    }
-
-    local r = f(t)
+    local r = f({ __index = 1 })
     ]]
 
     local F = node.variable 'f'
@@ -114,7 +110,83 @@ do
     local CALL = node.call(F, { TABLE })
     local R = CALL.value
 
-    assert(R.value:view() == '1')
+    assert(R:view() == '1')
+end
+
+do
+    node:reset()
+    --[[
+    ---@type fun<T>(x: T): T['__index']
+    local f
+
+    local mt
+
+    mt.__index = 1
+
+    local r = f(mt)
+    ]]
+
+    local F = node.variable 'f'
+    local T = node.generic 'T'
+    local FUN = node.func()
+        : addTypeParam(T)
+        : addParamDef('x', T)
+        : addReturnDef(nil, node.index(T, node.value '__index'))
+
+    F:addType(FUN)
+
+    local MT = node.variable 'mt'
+    MT:addField {
+        key   = node.value '__index',
+        value = node.value(1),
+    }
+
+    local CALL = node.call(F, { MT })
+    local R = CALL.value
+
+    assert(R:view() == '1')
+end
+
+do
+    node:reset()
+    --[[
+    ---@type fun<T>(x: T): T['__index']
+    local f
+
+    local mt
+
+    mt.__index = mt
+    mt.x = 1
+
+    local r = f(mt)
+    local v = r.x
+    ]]
+
+    local F = node.variable 'f'
+    local T = node.generic 'T'
+    local FUN = node.func()
+        : addTypeParam(T)
+        : addParamDef('x', T)
+        : addReturnDef(nil, node.index(T, node.value '__index'))
+
+    F:addType(FUN)
+
+    local MT = node.variable 'mt'
+    MT:addField {
+        key   = node.value '__index',
+        value = MT,
+    }
+    MT:addField {
+        key   = node.value 'x',
+        value = node.value(1),
+    }
+
+    local CALL = node.call(F, { MT })
+    local R = CALL.value
+    assert(R:view() == '1')
+
+    local V = R:get 'x'
+    assert(V:view() == '1')
 end
 
 do
@@ -227,4 +299,30 @@ obj = setmetatable({}, mt)
     vfile:indexAst(ast, 'common')
 
     assert(node:globalGet('obj'):view() == 'A')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
+---@generic T, MT
+---@param t T
+---@param mt MT
+---@return T & MT['__index']
+function setmetatable(t, mt) return end
+
+local mt = {}
+mt.__index = mt
+
+mt.xxx = 1
+
+obj = setmetatable({}, mt)
+value = obj.xxx
+    ]]
+    vfile:indexAst(ast, 'common')
+
+    assert(node:globalGet('obj'):view() == '')
+    assert(node:globalGet('value'):view() == '1')
 end

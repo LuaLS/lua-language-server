@@ -11,6 +11,21 @@ local Field = Class('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
 Field.kind = 'field'
 
+---@return LuaParser.Node.Var?
+function Field:getFirstVar()
+    local current = self.last
+    for _ = 1, 1000 do
+        if not current then
+            return nil
+        end
+        if current.kind == 'var' then
+            ---@cast current LuaParser.Node.Var
+            return current
+        end
+        current = current.last
+    end
+end
+
 ---@class LuaParser.Node.FieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.Field

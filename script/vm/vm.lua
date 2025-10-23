@@ -100,6 +100,28 @@ function M:getKey(field)
     end
 end
 
+---@param field LuaParser.Node.Field
+---@return Node.Key[]
+function M:getFullPath(field)
+    local path = {}
+
+    local current = field.last
+    for _ = 1, 1000 do
+        if not current then
+            break
+        end
+        path[#path+1] = self:getKey(current)
+        if current.kind == 'var' then
+            break
+        end
+        current = current.last
+    end
+
+    ls.util.revertArray(path)
+
+    return path
+end
+
 ---@param scope Scope
 ---@return VM
 function ls.vm.create(scope)

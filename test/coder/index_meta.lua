@@ -32,7 +32,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A').value:view() == '{ x: 1, y: 2 }')

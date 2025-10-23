@@ -399,6 +399,7 @@ end
 ---@private
 M._hideAtHead = false
 
+---@return Node.Variable
 function M:hideAtHead()
     self._hideAtHead = true
     return self

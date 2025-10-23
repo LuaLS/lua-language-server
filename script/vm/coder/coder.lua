@@ -33,7 +33,7 @@ function M:makeFromAst(ast)
     self:addLine 'local coder = ...'
     self:addLine 'local node  = coder.scope.node'
     self:addLine 'local uri   = coder.vfile.uri'
-    self:addLine 'local r     = {}'
+    self:addLine 'local r     = coder.map'
     self:addLine 'node:lockCache()'
     self:addLine ''
 
@@ -97,6 +97,7 @@ end
 
 function M:run()
     self:dispose()
+    self.map = {}
     self.disposer = self.func(self)
 end
 
@@ -218,6 +219,25 @@ function M:makeLocationCode(source)
         , source.start
         , source.finish - source.start
     )
+end
+
+---@param source LuaParser.Node.Base
+---@return string
+function M:makeFieldCode(source)
+    if source.kind == 'var' then
+        ---@cast source LuaParser.Node.Var
+        return ('node.value %q'):format(source.id)
+    end
+    if source.kind == 'field' then
+        ---@cast source LuaParser.Node.Field
+        return self:makeFieldCode(source.key)
+    end
+    if source.kind == 'fieldid' then
+        ---@cast source LuaParser.Node.FieldID
+        return ('node.value %q'):format(source.id)
+    end
+
+    return 'node.UNKNOWN'
 end
 
 ---@param source LuaParser.Node.Base

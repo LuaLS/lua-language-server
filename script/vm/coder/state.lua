@@ -1,41 +1,42 @@
 ---@param coder VM.Coder
 ---@param var LuaParser.Node.Exp
----@param varKey string
 ---@param index integer
-local function tryBindCat(coder, var, varKey, index)
+local function tryBindCat(coder, var, index)
     local catGroup = coder:getCatGroup(var)
     if not catGroup then
         return
     end
     for _, cat in ipairs(catGroup) do
-        if cat.kind == 'catstateclass' then
+        if cat.value.kind == 'catstateclass' then
             -- class 只能绑定第一个变量
             if index == 1 then
-                coder:addLine('')
+                coder:addLine('{var}:addClass({class})\n{class}:addVariable({var})' % {
+                    var   = coder:getKey(var),
+                    class = coder:getKey(cat),
+                })
             end
         end
     end
 end
 
 ---@param coder VM.Coder
----@param var LuaParser.Node.Var
+---@param var LuaParser.Node.Exp
 ---@param index integer
 ---@param valueKey? string
-local function assignGlobalVariable(coder, var, index, valueKey)
-    local varKey = coder:getKey(var)
+local function assign(coder, var, index, valueKey)
     coder:addLine([[
-{varKey} = node:globalAdd {
-    key = {key},
-    value = {value},
-    location = {location}
+{varKey}:addAssign {
+    key      = {key},
+    value    = {value},
+    location = {location},
 }
 ]] % {
-        varKey = varKey,
-        key = ('node.value %q'):format(var.id),
-        value = valueKey or 'node.NIL',
+        varKey   = coder:getKey(var),
+        key      = coder:makeFieldCode(var),
+        value    = valueKey or 'node.NIL',
         location = coder:makeLocationCode(var),
     })
-    tryBindCat(coder, var, varKey, index)
+    tryBindCat(coder, var, index)
 end
 
 ls.vm.registerCoderProvider('assign', function (coder, source)
@@ -48,13 +49,8 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
             coder:compile(value)
         end
         for i, exp in ipairs(source.exps) do
-            if exp.kind == 'var' then
-                ---@cast exp LuaParser.Node.Var
-                if exp.loc then
-                else
-                    assignGlobalVariable(coder, exp, i, valueKeys[i])
-                end
-            end
+            coder:compile(exp)
+            assign(coder, exp, i, valueKeys[i])
         end
     end, source.code)
 end)

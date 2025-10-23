@@ -232,7 +232,9 @@ M.__getter.values = function (self)
     return values, true
 end
 
----@param key string|number|boolean|Node
+---@alias Node.TableKey string|number|boolean|Node
+
+---@param key Node.TableKey
 ---@return Node
 function M:get(key)
     local node = self.scope.node

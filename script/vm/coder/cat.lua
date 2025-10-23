@@ -107,3 +107,49 @@ ls.vm.registerCoderProvider('catstatereturn', function (coder, source)
 
     coder:addToCatGroup(source.parent, true)
 end)
+
+ls.vm.registerCoderProvider('catstatealias', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateAlias
+
+    coder:withIndentation(function ()
+        if source.extends then
+            coder:compile(source.extends)
+        end
+
+        coder:addLine('{alias} = node.alias({name:q})' % {
+            alias = coder:getKey(source.parent),
+            name  = source.aliasID.id,
+        })
+        coder:addLine('node.type({name:q}):addAlias({alias})' % {
+            alias = coder:getKey(source.parent),
+            name  = source.aliasID.id,
+        })
+
+        if source.extends then
+            coder:addLine('{alias}:setValue({value})' % {
+                alias = coder:getKey(source.parent),
+                value = coder:getKey(source.extends),
+            })
+        end
+
+        coder:addDisposer('node.type({name:q}):removeAlias({alias})' % {
+            alias = coder:getKey(source.parent),
+            name  = source.aliasID.id,
+        })
+    end, source.parent.code)
+
+    coder:addToCatGroup(source.parent, true)
+end)
+
+ls.vm.registerCoderProvider('catinteger', function (coder, source)
+    ---@cast source LuaParser.Node.CatInteger
+
+    coder:addLine('{key} = node.value({value})' % {
+        key = coder:getKey(source),
+        value = source.value,
+    })
+end)
+
+ls.vm.registerCoderProvider('catunion', function (coder, source)
+    
+end)

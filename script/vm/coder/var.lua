@@ -22,11 +22,19 @@ ls.vm.registerCoderProvider('field', function (coder, source)
 
     coder:compile(last)
     coder:compile(source.key)
-    coder:addLine('{var} = {last}:getChild({field})' % {
-        var   = coder:getKey(source),
-        last  = coder:getKey(last),
-        field = coder:getKey(source.key),
-    })
+    if source.subtype == 'index' and not source.key.isLiteral then
+        coder:addLine('{var} = {last}:getChild({field})' % {
+            var   = coder:getKey(source),
+            last  = coder:getKey(last),
+            field = 'node.UNKNOWN',
+        })
+    else
+        coder:addLine('{var} = {last}:getChild({field})' % {
+            var   = coder:getKey(source),
+            last  = coder:getKey(last),
+            field = coder:getKey(source.key),
+        })
+    end
 end)
 
 ls.vm.registerCoderProvider('fieldid', function (coder, source)

@@ -69,7 +69,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
@@ -90,7 +89,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(g:get('A'):view() == '1')
@@ -108,7 +106,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')

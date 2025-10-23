@@ -5,7 +5,7 @@ M.code = '-- Not made yet --'
 ---@type function?
 M.func = nil
 
----@alias VM.CoderProvider fun(coder: VM.Coder, source: LuaParser.Node.Base, saveKey?: string)
+---@alias VM.CoderProvider fun(coder: VM.Coder, source: LuaParser.Node.Base)
 
 ---@type table<string, VM.CoderProvider?>
 M.providers = {}
@@ -106,14 +106,13 @@ function M:addIndentation(delta)
 end
 
 ---@param source LuaParser.Node.Base
----@param saveKey? string
-function M:compile(source, saveKey)
+function M:compile(source)
     local provider = M.providers[source.kind]
     if not provider then
         self:addLine('--[[Unsupported node kind: ' .. source.kind .. ']]')
         return
     end
-    provider(self, source, saveKey)
+    provider(self, source)
 end
 
 function M:pushBlock()
@@ -129,12 +128,15 @@ function M:currentBlock()
 end
 
 ---@param callback function
-function M:withNewBlock(callback)
-    self:addLine 'do'
+---@param comment? string
+function M:withNewBlock(callback, comment)
+    if comment then
+        self:addLine('do -- ' .. comment:match('[^\r\n]*'))
+    else
+        self:addLine 'do'
+    end
     self:addIndentation(1)
-    self:pushBlock()
     callback()
-    self:popBlock()
     self:addIndentation(-1)
     self:addLine 'end'
 end
@@ -153,20 +155,75 @@ function M:getBlockKV(k)
     end
 end
 
-function M:makeLocationCode(start, finish)
+function M:clearCatGroup()
+    self:setBlockKV('catGroup', nil)
+end
+
+---@param group LuaParser.Node.Cat[]
+---@param cat LuaParser.Node.Cat
+---@return boolean
+local function isNearby(group, cat)
+    local last = group[#group]
+    if not last then
+        return true
+    end
+    return (last.finishRow + 1) == cat.startRow
+end
+
+---@param cat LuaParser.Node.Cat
+---@param nearby? boolean
+function M:addToCatGroup(cat, nearby)
+    local group = self:getBlockKV('catGroup')
+
+    if not group
+    or (nearby and not isNearby(group, cat)) then
+        group = {}
+        self:setBlockKV('catGroup', group)
+    end
+    group[#group+1] = cat
+
+    local map = self:getBlockKV('catGroupMap')
+    if not map then
+        map = {}
+        self:setBlockKV('catGroupMap', map)
+    end
+    map[cat] = group
+end
+
+---@param nearbySource? LuaParser.Node.Base
+---@return LuaParser.Node.Cat[]?
+function M:getCatGroup(nearbySource)
+    local group = self:getBlockKV('catGroup')
+    if not group then
+        return nil
+    end
+    local first = group[1]
+    if not first then
+        return nil
+    end
+    if nearbySource then
+        local sourceLine = nearbySource.startRow
+        local catLine = group[#group].finishRow
+        if (sourceLine - 1) ~= catLine then
+            return nil
+        end
+    end
+    return group
+end
+
+---@param source { start: integer, finish: integer }
+---@return string
+function M:makeLocationCode(source)
     return string.format('{ uri = uri, offset = %d, length = %d }'
-        , start
-        , finish - start
+        , source.start
+        , source.finish - source.start
     )
 end
 
----@param kind string
----@param name string
----@param row integer
----@param col integer
+---@param source LuaParser.Node.Base
 ---@return string
-function M:makeKeyCode(kind, name, row, col)
-    return string.format('r[%q]', table.concat {kind, ':', name, '@', row, ':', col })
+function M:getKey(source)
+    return string.format('r[%q]', table.concat {source.kind, '@', source.startRow + 1, ':', source.startCol + 1})
 end
 
 ---@param vfile VM.Vfile

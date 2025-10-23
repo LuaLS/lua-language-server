@@ -15,8 +15,6 @@ do
     local coder = vfile:makeCoder(ast)
     coder:run()
 
-    log.debug(coder.code)
-
     assert(node.type('A').value:view() == '{ x: number, y: number, z: number }')
 end
 
@@ -33,7 +31,9 @@ do
         A.y = 2
     ]]
 
-    vfile:indexAst(ast, 'meta')
+    local coder = vfile:makeCoder(ast)
+    log.debug(coder.code)
+    coder:run()
 
     assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
 end

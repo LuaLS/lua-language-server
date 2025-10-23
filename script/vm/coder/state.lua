@@ -26,6 +26,18 @@ end
 ---@param index integer
 ---@param valueKey? string
 function M:compileAssign(var, index, valueKey)
+    local key = 'node.UNKNOWN'
+    if var.kind == 'var' then
+        ---@cast var LuaParser.Node.Var
+        key = ('node.value %q'):format(var.id)
+    elseif var.kind == 'local' then
+        ---@cast var LuaParser.Node.Local
+        key = ('node.value %q'):format(var.id)
+    elseif var.kind == 'field' then
+        ---@cast var LuaParser.Node.Field
+        self:compile(var.key)
+        key = self:getKey(var.key)
+    end
     self:addLine([[
 {varKey}:addAssign {
     key      = {key},
@@ -34,7 +46,7 @@ function M:compileAssign(var, index, valueKey)
 }
 ]] % {
         varKey   = self:getKey(var),
-        key      = self:makeFieldCode(var),
+        key      = key,
         value    = valueKey or 'node.NIL',
         location = self:makeLocationCode(var),
     })

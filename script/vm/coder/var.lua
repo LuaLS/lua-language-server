@@ -21,10 +21,19 @@ ls.vm.registerCoderProvider('field', function (coder, source)
     end
 
     coder:compile(last)
+    coder:compile(source.key)
     coder:addLine('{var} = {last}:getChild({field})' % {
         var   = coder:getKey(source),
         last  = coder:getKey(last),
-        field = coder:makeFieldCode(source),
+        field = coder:getKey(source.key),
+    })
+end)
+
+ls.vm.registerCoderProvider('fieldid', function (coder, source)
+    ---@cast source LuaParser.Node.FieldID
+    coder:addLine('{key} = node.value {name:q}' % {
+        key = coder:getKey(source),
+        name = source.id,
     })
 end)
 

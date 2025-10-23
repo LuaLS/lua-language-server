@@ -125,7 +125,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node:globalGet('type').value:view() == 'fun(o: table):string')

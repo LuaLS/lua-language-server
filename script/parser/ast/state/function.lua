@@ -15,7 +15,7 @@ Param.kind = 'param'
 
 ---@class LuaParser.Node.Function: LuaParser.Node.Block
 ---@field name? LuaParser.Node.FuncName
----@field params? LuaParser.Node.Local[]
+---@field params? LuaParser.Node.Param[]
 ---@field symbolPos1? integer # 左括号
 ---@field symbolPos2? integer # 右括号
 ---@field symbolPos3? integer # `end`

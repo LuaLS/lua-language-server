@@ -107,7 +107,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node:globalGet('type').value:view() == 'fun(o: any)')
@@ -124,7 +123,10 @@ do
         function type(o)
         end
     ]]
-    vfile:indexAst(ast, 'meta')
+
+    local coder = vfile:makeCoder(ast)
+    log.debug(coder.code)
+    coder:run()
 
     assert(node:globalGet('type').value:view() == 'fun(o: table):string')
 end

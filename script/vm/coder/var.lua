@@ -35,3 +35,21 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         name = source.id,
     })
 end)
+
+ls.vm.registerCoderProvider('param', function (coder, source)
+    ---@cast source LuaParser.Node.Param
+    coder:addLine('{key} = node.variable {name:q}' % {
+        key = coder:getKey(source),
+        name = source.id,
+    })
+
+    local type = 'node.ANY'
+    local cat = coder:findMatchedCatParam(source)
+    if cat and cat.value then
+        type = coder:getKey(cat.value)
+    end
+    coder:addLine('{key}:addType({type})' % {
+        key  = coder:getKey(source),
+        type = type,
+    })
+end)

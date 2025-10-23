@@ -449,20 +449,16 @@ function f(x, y)
 end
 ]]
 {
-    kind   = 'var',
-    id     = 'f',
-    value  = {
-        kind = 'function',
-        name = {
-            id = 'f',
+    kind = 'function',
+    name = {
+        id = 'f',
+    },
+    params = {
+        [1] = {
+            id = 'x'
         },
-        params = {
-            [1] = {
-                id = 'x'
-            },
-            [2] = {
-                id = 'y'
-            }
+        [2] = {
+            id = 'y'
         }
     }
 }
@@ -472,26 +468,16 @@ function f.n(x, y)
 end
 ]]
 {
-    kind   = 'field',
-    key    = {
-        kind = 'fieldid',
-        id = 'n',
+    kind   = 'function',
+    name   = {
+        kind = 'field',
     },
-    last = {
-        id = 'f'
-    },
-    value  = {
-        kind   = 'function',
-        name   = {
-            kind = 'field',
+    params = {
+        [1] = {
+            id = 'x'
         },
-        params = {
-            [1] = {
-                id = 'x'
-            },
-            [2] = {
-                id = 'y'
-            }
+        [2] = {
+            id = 'y'
         }
     }
 }

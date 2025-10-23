@@ -1,3 +1,6 @@
+---@class VM.Coder
+local M = Class 'VM.Coder'
+
 ---@param coder VM.Coder
 ---@param var LuaParser.Node.AssignAble
 ---@param index integer
@@ -19,24 +22,23 @@ local function tryBindCat(coder, var, index)
     end
 end
 
----@param coder VM.Coder
 ---@param var LuaParser.Node.AssignAble
 ---@param index integer
 ---@param valueKey? string
-local function assign(coder, var, index, valueKey)
-    coder:addLine([[
+function M:compileAssign(var, index, valueKey)
+    self:addLine([[
 {varKey}:addAssign {
     key      = {key},
     value    = {value},
     location = {location},
 }
 ]] % {
-        varKey   = coder:getKey(var),
-        key      = coder:makeFieldCode(var),
+        varKey   = self:getKey(var),
+        key      = self:makeFieldCode(var),
         value    = valueKey or 'node.NIL',
-        location = coder:makeLocationCode(var),
+        location = self:makeLocationCode(var),
     })
-    tryBindCat(coder, var, index)
+    tryBindCat(self, var, index)
 end
 
 ls.vm.registerCoderProvider('assign', function (coder, source)
@@ -50,7 +52,7 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
         end
         for i, exp in ipairs(source.exps) do
             coder:compile(exp)
-            assign(coder, exp, i, valueKeys[i])
+            coder:compileAssign(exp, i, valueKeys[i])
         end
     end, source.code)
 end)
@@ -66,7 +68,7 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
         end
         for i, var in ipairs(source.vars) do
             coder:compile(var)
-            assign(coder, var, i, valueKeys[i])
+            coder:compileAssign(var, i, valueKeys[i])
         end
     end, source.code)
 end)

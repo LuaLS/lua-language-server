@@ -85,3 +85,25 @@ ls.vm.registerCoderProvider('catid', function (coder, source)
         name = source.id,
     })
 end)
+
+ls.vm.registerCoderProvider('catstateparam', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateParam
+
+    coder:withIndentation(function ()
+        if source.value then
+            coder:compile(source.value)
+        end
+    end, source.parent.code)
+
+    coder:addToCatGroup(source.parent, true)
+end)
+
+ls.vm.registerCoderProvider('catstatereturn', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateReturn
+
+    coder:withIndentation(function ()
+        coder:compile(source.value)
+    end, source.parent.code)
+
+    coder:addToCatGroup(source.parent, true)
+end)

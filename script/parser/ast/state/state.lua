@@ -92,10 +92,7 @@ Ast:registerStateParser('function', function (ast)
         self:throw('MISS_NAME', self:getLastPos())
         return nil
     end
-    if func.name then
-        func.parent = func.name
-        return func.name
-    else
+    if not func.name then
         self:throw('MISS_NAME', func.symbolPos1)
     end
     return func

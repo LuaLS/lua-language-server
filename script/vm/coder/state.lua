@@ -1,5 +1,5 @@
 ---@param coder VM.Coder
----@param var LuaParser.Node.Exp
+---@param var LuaParser.Node.AssignAble
 ---@param index integer
 local function tryBindCat(coder, var, index)
     local catGroup = coder:getCatGroup(var)
@@ -20,7 +20,7 @@ local function tryBindCat(coder, var, index)
 end
 
 ---@param coder VM.Coder
----@param var LuaParser.Node.Exp
+---@param var LuaParser.Node.AssignAble
 ---@param index integer
 ---@param valueKey? string
 local function assign(coder, var, index, valueKey)
@@ -42,7 +42,7 @@ end
 ls.vm.registerCoderProvider('assign', function (coder, source)
     ---@cast source LuaParser.Node.Assign
 
-    coder:withNewBlock(function ()
+    coder:withIndentation(function ()
         local valueKeys = {}
         for i, value in ipairs(source.values) do
             valueKeys[i] = coder:getKey(value)
@@ -51,6 +51,22 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
         for i, exp in ipairs(source.exps) do
             coder:compile(exp)
             assign(coder, exp, i, valueKeys[i])
+        end
+    end, source.code)
+end)
+
+ls.vm.registerCoderProvider('localdef', function (coder, source)
+    ---@cast source LuaParser.Node.LocalDef
+
+    coder:withIndentation(function ()
+        local valueKeys = {}
+        for i, value in ipairs(source.values) do
+            valueKeys[i] = coder:getKey(value)
+            coder:compile(value)
+        end
+        for i, var in ipairs(source.vars) do
+            coder:compile(var)
+            assign(coder, var, i, valueKeys[i])
         end
     end, source.code)
 end)

@@ -110,7 +110,7 @@ end
 function M:compile(source)
     local provider = M.providers[source.kind]
     if not provider then
-        self:addLine('--[[Unsupported node kind: ' .. source.kind .. ']]')
+        self:addLine('--[[!!! ' .. source.kind .. ' !!!]]')
         return
     end
     provider(self, source)
@@ -130,7 +130,7 @@ end
 
 ---@param callback function
 ---@param comment? string
-function M:withNewBlock(callback, comment)
+function M:withIndentation(callback, comment)
     if comment then
         self:addLine('do -- ' .. comment:match('[^\r\n]*'))
     else

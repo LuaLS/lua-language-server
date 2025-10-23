@@ -50,7 +50,8 @@ do
         A.B.y = 2
     ]]
 
-    vfile:indexAst(ast, 'meta')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
 end
@@ -68,7 +69,8 @@ do
         A.y = 2
     ]]
 
-    vfile:indexAst(ast, 'meta')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
 end
@@ -88,7 +90,8 @@ do
         A.B.y = 2
     ]]
 
-    vfile:indexAst(ast, 'meta')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
 end
@@ -102,7 +105,10 @@ do
         function type(o)
         end
     ]]
-    vfile:indexAst(ast, 'meta')
+
+    local coder = vfile:makeCoder(ast)
+    log.debug(coder.code)
+    coder:run()
 
     assert(node:globalGet('type').value:view() == 'fun(o: any)')
 end

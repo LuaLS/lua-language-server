@@ -12,7 +12,7 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
         location = coder:makeLocationCode(source),
     }
 
-    coder:withNewBlock(function ()
+    coder:withIndentation(function ()
         coder:addLine('{class} = node.class {qid}' % classParams)
         coder:addLine('node.type({qid}):addClass({class})' % classParams)
         coder:addLine('{class}:setLocation {location}' % classParams)
@@ -31,7 +31,7 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
 
     local classParams = coder:getBlockKV('lastClass')
 
-    coder:withNewBlock(function ()
+    coder:withIndentation(function ()
         local key = coder:getKey(source.key)
         coder:compile(source.key)
 

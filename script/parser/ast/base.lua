@@ -105,6 +105,11 @@ local Base = Class 'LuaParser.Node.Base'
 ---| 'labelname'
 ---| 'main'
 
+---@alias LuaParser.Node.AssignAble
+---| LuaParser.Node.Local
+---| LuaParser.Node.Var
+---| LuaParser.Node.Field
+
 ---@type LuaParser.StateKind | LuaParser.ExpKind | LuaParser.CatKind | LuaParser.OtherKind
 Base.kind = nil
 

@@ -1,10 +1,23 @@
+---@param coder VM.Coder
+---@param source LuaParser.Node.Base
+---@param value string | number | boolean
+local function makeValue(coder, source, value)
+    coder:addLine('{key} = node.value({value:q})' % {
+        key   = coder:getKey(source),
+        value = value,
+    })
+end
+
 ls.vm.registerCoderProvider('integer', function (coder, source)
     ---@cast source LuaParser.Node.Integer
 
-    coder:addLine('{key} = node.value({value})' % {
-        key = coder:getKey(source),
-        value = source.value,
-    })
+    makeValue(coder, source, source.value)
+end)
+
+ls.vm.registerCoderProvider('string', function (coder, source)
+    ---@cast source LuaParser.Node.String
+
+    makeValue(coder, source, source.value)
 end)
 
 ls.vm.registerCoderProvider('table', function (coder, source)
@@ -15,6 +28,39 @@ ls.vm.registerCoderProvider('table', function (coder, source)
     })
 
     coder:addIndentation(1)
-    --TODO
+    for _, field in ipairs(source.fields) do
+        coder:compile(field)
+        coder:addLine('{key}:addField({field})' % {
+            key   = coder:getKey(source),
+            field = coder:getKey(field),
+        })
+        coder:addLine('')
+    end
     coder:addIndentation(-1)
+end)
+
+ls.vm.registerCoderProvider('tablefield', function (coder, source)
+    ---@cast source LuaParser.Node.TableField
+
+    coder:compile(source.key)
+    coder:compile(source.value)
+
+    coder:addLine([[
+{field} = {
+    key      = {key},
+    value    = {value},
+    location = {location},
+}
+]] % {
+        field    = coder:getKey(source),
+        key      = coder:getKey(source.key),
+        value    = coder:getKey(source.value),
+        location = coder:makeLocationCode(source),
+    })
+end)
+
+ls.vm.registerCoderProvider('tablefieldid', function (coder, source)
+    ---@cast source LuaParser.Node.TableFieldID
+
+    makeValue(coder, source, source.id)
 end)

@@ -1,6 +1,6 @@
 
 ---@class LuaParser.Node.Table: LuaParser.Node.Base
----@field fields LuaParser.Node.Field[]
+---@field fields LuaParser.Node.TableField[]
 local Table = Class('LuaParser.Node.Table', 'LuaParser.Node.Base')
 
 Table.kind = 'table'

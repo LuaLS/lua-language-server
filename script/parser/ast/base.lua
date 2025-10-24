@@ -196,7 +196,11 @@ end
 ---@return string
 ---@return true
 Base.__getter.uniqueKey = function (self)
-    return string.format('%s@%d:%d', self.kind, self.startRow + 1, self.startCol), true
+    if self.dummy then
+        return string.format('dummy@%d:%d', self.startRow + 1, self.startCol + 1), true
+    else
+        return string.format('%s@%d:%d', self.kind, self.startRow + 1, self.startCol + 1), true
+    end
 end
 
 ---@param self LuaParser.Node.Base

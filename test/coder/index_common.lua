@@ -299,7 +299,6 @@ do
     ]]
 
     local CA = node.class 'A'
-    node.type('A'):addClass(CA)
     local M = node.variable 'm'
     M:addClass(CA)
     CA:addVariable(M)

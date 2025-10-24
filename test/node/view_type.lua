@@ -18,16 +18,15 @@ do
     ]]
 
     local a = node.type('A')
-        : addClass(node.class('A')
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x'
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y'
-            }
-        )
+    node.class('A')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x'
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y'
+        }
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: "x", y: "y" }')
@@ -50,28 +49,25 @@ do
 
     local a = node.type('A')
     local b = node.type('B')
-        : addClass(node.class('B')
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x'
-            }
-        )
+    node.class('B')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x'
+        }
     local c = node.type('C')
-        : addClass(node.class('C')
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y'
-            }
-        )
+    node.class('C')
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y'
+        }
     local d = node.type('D')
-        : addClass(node.class('D')
-            : addField {
-                key   = node.value 'z',
-                value = node.value 'z'
-            }
-        )
+    node.class('D')
+        : addField {
+            key   = node.value 'z',
+            value = node.value 'z'
+        }
 
-    a:addClass(node.class('A', nil, { b, c, d }))
+    node.class('A', nil, { b, c, d })
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: "x", y: "y", z: "z" }')
@@ -96,44 +92,40 @@ do
     ]]
 
     local a = node.type('A')
-        : addClass(node.class('A')
-            : addField {
-                key   = node.value 'w',
-                value = node.value '1'
-            }
-            : addField {
-                key   = node.value 'x',
-                value = node.value '2'
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value '3'
-            }
-            : addExtends(node.type 'B')
-            : addExtends(node.type 'C')
-            : addExtends(node.type 'D')
-        )
-    local b = node.type('B')
-        : addClass(node.class('B')
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x'
-            }
-        )
-    local c = node.type('C')
-        : addClass(node.class('C')
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y'
-            }
-        )
-    local d = node.type('D')
-        : addClass(node.class('D')
-            : addField {
-                key   = node.value 'z',
-                value = node.value 'z'
-            }
-        )
+    node.class('A')
+        : addField {
+            key   = node.value 'w',
+            value = node.value '1'
+        }
+        : addField {
+            key   = node.value 'x',
+            value = node.value '2'
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value '3'
+        }
+        : addExtends(node.type 'B')
+        : addExtends(node.type 'C')
+        : addExtends(node.type 'D')
+
+    node.class('B')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x'
+        }
+
+    node.class('C')
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y'
+        }
+
+    node.class('D')
+        : addField {
+            key   = node.value 'z',
+            value = node.value 'z'
+        }
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ w: "1", x: "2", y: "3", z: "z" }')
@@ -148,9 +140,9 @@ do
     ]]
 
     local a = node.type('A')
-        : addAlias(node.alias('A', nil, node.value(1)))
-        : addAlias(node.alias('A', nil, node.value(2)))
-        : addAlias(node.alias('A', nil, node.value(3)))
+    node.alias('A', nil, node.value(1))
+    node.alias('A', nil, node.value(2))
+    node.alias('A', nil, node.value(3))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '1 | 2 | 3')
@@ -174,18 +166,18 @@ do
     ]]
 
     local a = node.type('A')
-        : addAlias(node.alias('A', nil, node.type 'B'))
-        : addAlias(node.alias('A', nil, node.type 'C'))
-        : addAlias(node.alias('A', nil, node.type 'D'))
+    node.alias('A', nil, node.type 'B')
+    node.alias('A', nil, node.type 'C')
+    node.alias('A', nil, node.type 'D')
     node.type('B')
-        : addAlias(node.alias('B', nil, node.value(1)))
-        : addAlias(node.alias('B', nil, node.value(2)))
+    node.alias('B', nil, node.value(1))
+    node.alias('B', nil, node.value(2))
     node.type('C')
-        : addAlias(node.alias('C', nil, node.value(2)))
-        : addAlias(node.alias('C', nil, node.value(3)))
+    node.alias('C', nil, node.value(2))
+    node.alias('C', nil, node.value(3))
     node.type('D')
-        : addAlias(node.alias('D', nil, node.value(3)))
-        : addAlias(node.alias('D', nil, node.value(4)))
+    node.alias('D', nil, node.value(3))
+    node.alias('D', nil, node.value(4))
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'B | C | D')
@@ -198,9 +190,9 @@ do
     ]]
 
     local a = node.type('A')
-        : addClass(node.class('A', nil, { node.table {
-            [node.STRING] = node.BOOLEAN,
-        }}))
+    node.class('A', nil, { node.table {
+        [node.STRING] = node.BOOLEAN,
+    }})
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ [string]: boolean }')
@@ -217,20 +209,20 @@ do
     ]]
 
     local a = node.type('A')
-        : addClass(node.class('A', nil, { node.type 'B' })
-            : addField {
-                key   = node.value('x'),
-                value = node.value(1)
-            }
-        )
+    node.class('A', nil, { node.type 'B' })
+        : addField {
+            key   = node.value('x'),
+            value = node.value(1)
+        }
+
 
     local b = node.type('B')
-        : addClass(node.class('B', nil, { node.type 'A' })
-            : addField {
-                key   = node.value('y'),
-                value = node.value(2)
-            }
-        )
+    node.class('B', nil, { node.type 'A' })
+        : addField {
+            key   = node.value('y'),
+            value = node.value(2)
+        }
+
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: 1, y: 2 }')

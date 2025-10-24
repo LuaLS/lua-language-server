@@ -86,12 +86,11 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addClass(node.class('A')
-            : addField {
-                key   = node.value('x'),
-                value = node.value(1)
-            }
-        )
+    node.class('A')
+        : addField {
+            key   = node.value('x'),
+            value = node.value(1)
+        }
 
     assert(a.truly:view() == 'A')
     assert(a.falsy:view() == 'never')
@@ -101,10 +100,10 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.value(1)))
-        : addAlias(node.alias('A', nil, node.value(2)))
-        : addAlias(node.alias('A', nil, node.value(true)))
-        : addAlias(node.alias('A', nil, node.value(false)))
+    node.alias('A', nil, node.value(1))
+    node.alias('A', nil, node.value(2))
+    node.alias('A', nil, node.value(true))
+    node.alias('A', nil, node.value(false))
 
     assert(a:view() == 'A')
     assert(a.truly:view() == '1 | 2 | true')

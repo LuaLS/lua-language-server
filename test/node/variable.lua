@@ -91,7 +91,6 @@ do
 
     local a = node.type 'A'
     local ca = node.class 'A'
-    a:addClass(ca)
     ca:addField {
         key = node.value 'x',
         value = node.type 'number',
@@ -168,7 +167,6 @@ do
 
     local A = node.type 'A'
     local CA = node.class 'A'
-    A:addClass(CA)
     CA:addVariable(d)
     d:addClass(CA)
     assert(d:viewVariable() == 'a.b.c.d')

@@ -15,6 +15,17 @@ function M:__init(scope, name, params, value)
     self.scope = scope
     self.params = params
     self.value = value
+
+    self.masterType = scope.node.type(name)
+    self.masterType:addAlias(self)
+end
+
+function M:__del()
+    self.masterType:removeAlias(self)
+end
+
+function M:dispose()
+    Delete(self)
 end
 
 ---@param param Node.Generic

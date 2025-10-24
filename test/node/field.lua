@@ -92,7 +92,6 @@ do
         node.TYPE_POOL[name] = nil
         t[name] = node.type(name)
         c[name] = node.class(name)
-        t[name]:addClass(c[name])
     end
 
     c.A:addExtends(t.A1)

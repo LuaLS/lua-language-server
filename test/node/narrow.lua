@@ -15,7 +15,7 @@ do
     node:reset()
 
     node.type 'A'
-        : addClass(node.class('A', nil, { node.type 'B' }))
+    node.class('A', nil, { node.type 'B' })
 
     local u = node.type 'A' | node.type 'B' | node.type 'C'
     local r = u:narrow(node.type 'B')

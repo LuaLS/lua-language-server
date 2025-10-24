@@ -65,15 +65,15 @@ ls.vm.registerCoderProvider('tablefieldid', function (coder, source)
     makeValue(coder, source, source.id)
 end)
 
--- ls.vm.registerCoderProvider('catindex', function (coder, source)
---     ---@cast source LuaParser.Node.CatIndex
+ls.vm.registerCoderProvider('catindex', function (coder, source)
+    ---@cast source LuaParser.Node.CatIndex
 
---     coder:compile(source.node)
---     coder:compile(source.index)
+    coder:compile(source.node)
+    coder:compile(source.index)
 
---     coder:addLine('{key} = node.index({node}, {index})' % {
---         key   = coder:getKey(source),
---         node  = coder:getKey(source.node),
---         index = coder:getKey(source.index),
---     })
--- end)
+    coder:addLine('{key} = node.index({node}, {index})' % {
+        key   = coder:getKey(source),
+        node  = coder:getKey(source.node),
+        index = coder:getKey(source.index),
+    })
+end)

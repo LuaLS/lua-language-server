@@ -295,12 +295,11 @@ do
     local map = node.type 'Map'
     local K = node.generic 'K'
     local V = node.generic 'V'
-    map:addClass(node.class('Map', { K, V })
+    node.class('Map', { K, V })
         : addField {
             key   = K,
             value = V,
         }
-    )
 
     local T1 = node.generic 'T1'
     local T2 = node.generic 'T2'

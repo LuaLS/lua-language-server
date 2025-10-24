@@ -15,7 +15,8 @@ do
 
     local a = node.type 'A'
     local b = node.type 'B'
-        : addClass(node.class('B', nil, { a }))
+
+    node.class('B', nil, { a })
 
     assert(a >> b == false)
     assert(b >> a == true)
@@ -26,11 +27,11 @@ do
 
     local a = node.type 'A'
     local b = node.type 'B'
-        : addClass(node.class('B', nil, { a }))
+    node.class('B', nil, { a })
     local c = node.type 'C'
-        : addClass(node.class('C', nil, { b }))
+    node.class('C', nil, { b })
     local d = node.type 'D'
-        : addClass(node.class('D', nil, { c }))
+    node.class('D', nil, { c })
 
     assert(a >> d == false)
     assert(d >> a == true)
@@ -40,9 +41,9 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('B', nil, node.type 'B'))
+    node.alias('B', nil, node.type 'B')
     local b = node.type 'B'
-        : addAlias(node.alias('A', nil, node.type 'A'))
+    node.alias('A', nil, node.type 'A')
 
     assert(a >> b == false)
     assert(b >> a == false)
@@ -52,16 +53,16 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addClass(node.class('A')
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-        )
+    node.class('A')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+
     local ta = node.table()
         : addField {
             key   = node.value 'x',
@@ -97,11 +98,11 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.value(1) | node.value(2) | node.value(3)))
+    node.alias('A', nil, node.value(1) | node.value(2) | node.value(3))
     local b = node.type 'B'
-        : addAlias(node.alias('B', nil, node.value(1)))
-        : addAlias(node.alias('B', nil, node.value(2)))
-        : addAlias(node.alias('B', nil, node.value(3)))
+    node.alias('B', nil, node.value(1))
+    node.alias('B', nil, node.value(2))
+    node.alias('B', nil, node.value(3))
 
     assert(a >> b == true)
     assert(b >> a == true)
@@ -111,10 +112,10 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.value(1) | node.value(2) | node.value(3)))
+    node.alias('A', nil, node.value(1) | node.value(2) | node.value(3))
     local b = node.type 'B'
-        : addAlias(node.alias('B', nil, node.value(1)))
-        : addAlias(node.alias('B', nil, node.value(2)))
+    node.alias('B', nil, node.value(1))
+    node.alias('B', nil, node.value(2))
 
     assert(a >> b == false)
     assert(b >> a == true)
@@ -124,84 +125,7 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.table()
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-        ))
-    local b = node.type 'B'
-        : addAlias(node.alias('B', nil, node.table()
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-            : addField {
-                key   = node.value 'z',
-                value = node.value 'z',
-            }
-        ))
-
-    assert(a >> b == false)
-    assert(b >> a == true)
-end
-
-do
-    node:reset()
-
-    local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.table()
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-        ))
-    local b = node.type 'B'
-        : addClass(node.class('B')
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-        )
-
-    assert(a >> b == false)
-    assert(b >> a == true)
-end
-
-do
-    node:reset()
-
-    local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.table()
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-        ))
-    local b = node.type 'B'
-        : addClass(node.class('B', nil, { node.type 'C' }))
-
-    node.type('C'):addClass(node.class 'C'
+    node.alias('A', nil, node.table()
         : addField {
             key   = node.value 'x',
             value = node.value 'x',
@@ -209,6 +133,21 @@ do
         : addField {
             key   = node.value 'y',
             value = node.value 'y',
+        }
+    )
+    local b = node.type 'B'
+    node.alias('B', nil, node.table()
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+        : addField {
+            key   = node.value 'z',
+            value = node.value 'z',
         }
     )
 
@@ -220,24 +159,7 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.table()
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-            : addField {
-                key   = node.value 'z',
-                value = node.value 'z',
-            }
-        ))
-    local b = node.type 'B'
-        : addClass(node.class('B', nil, { node.type 'C' }))
-
-    node.type('C'):addClass(node.class('C')
+    node.alias('A', nil, node.table()
         : addField {
             key   = node.value 'x',
             value = node.value 'x',
@@ -247,6 +169,83 @@ do
             value = node.value 'y',
         }
     )
+    local b = node.type 'B'
+    node.class('B')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+
+    assert(a >> b == false)
+    assert(b >> a == true)
+end
+
+do
+    node:reset()
+
+    local a = node.type 'A'
+    node.alias('A', nil, node.table()
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+    )
+    local b = node.type 'B'
+    node.class('B', nil, { node.type 'C' })
+
+    node.class 'C'
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+
+
+    assert(a >> b == false)
+    assert(b >> a == true)
+end
+
+do
+    node:reset()
+
+    local a = node.type 'A'
+    node.alias('A', nil, node.table()
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+        : addField {
+            key   = node.value 'z',
+            value = node.value 'z',
+        }
+    )
+    local b = node.type 'B'
+    node.class('B', nil, { node.type 'C' })
+
+    node.class('C')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
 
     assert(a >> b == false)
     assert(b >> a == false)
@@ -256,39 +255,37 @@ do
     node:reset()
 
     local a = node.type 'A'
-        : addAlias(node.alias('A', nil, node.table()
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-            : addField {
-                key   = node.value 'z',
-                value = node.value 'z',
-            }
-        ))
-    local b = node.type 'B'
-        : addClass(node.class('B', nil, { node.type 'C' })
-            : addField {
-                key   = node.value 'z',
-                value = node.value 'z',
-            }
-        )
+    node.alias('A', nil, node.table()
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
+        : addField {
+            key   = node.value 'z',
+            value = node.value 'z',
+        }
+    )
 
-    node.type 'C'
-        : addClass(node.class('C')
-            : addField {
-                key   = node.value 'x',
-                value = node.value 'x',
-            }
-            : addField {
-                key   = node.value 'y',
-                value = node.value 'y',
-            }
-        )
+    local b = node.type 'B'
+    node.class('B', nil, { node.type 'C' })
+        : addField {
+            key   = node.value 'z',
+            value = node.value 'z',
+        }
+
+    node.class('C')
+        : addField {
+            key   = node.value 'x',
+            value = node.value 'x',
+        }
+        : addField {
+            key   = node.value 'y',
+            value = node.value 'y',
+        }
 
     assert(a >> b == false)
     assert(b >> a == true)

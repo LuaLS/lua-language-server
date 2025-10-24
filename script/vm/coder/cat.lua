@@ -14,10 +14,9 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
 
     coder:withIndentation(function ()
         coder:addLine('{class} = node.class {qid}' % classParams)
-        coder:addLine('node.type({qid}):addClass({class})' % classParams)
         coder:addLine('{class}:setLocation {location}' % classParams)
 
-        coder:addDisposer('node.type({qid}):removeClass({class})' % classParams)
+        coder:addDisposer('{class}:dispose()' % classParams)
     end, source.parent.code)
 
     coder:setBlockKV('lastClass', classParams)
@@ -140,10 +139,6 @@ ls.vm.registerCoderProvider('catstatealias', function (coder, source)
             alias = coder:getKey(source),
             name  = source.aliasID.id,
         })
-        coder:addLine('node.type({name:q}):addAlias({alias})' % {
-            alias = coder:getKey(source),
-            name  = source.aliasID.id,
-        })
 
         if source.extends then
             coder:addLine('{alias}:setValue({value})' % {
@@ -152,7 +147,7 @@ ls.vm.registerCoderProvider('catstatealias', function (coder, source)
             })
         end
 
-        coder:addDisposer('node.type({name:q}):removeAlias({alias})' % {
+        coder:addDisposer('{alias}:dispose()' % {
             alias = coder:getKey(source),
             name  = source.aliasID.id,
         })

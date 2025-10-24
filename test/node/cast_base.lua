@@ -141,9 +141,9 @@ do
     local b = node.type 'B'
     local c = node.type 'C'
 
-    a:addClass(node.class('A', nil, { b }))
-    b:addClass(node.class('B', nil, { c }))
-    c:addClass(node.class('C', nil, { a }))
+    node.class('A', nil, { b })
+    node.class('B', nil, { c })
+    node.class('C', nil, { a })
 
     assert(a >> b == true)
     assert(a >> c == true)

@@ -44,7 +44,6 @@ do
 
     local A = node.type 'A'
     local CA = node.class 'A'
-    A:addClass(CA)
 
     local V = node.variable 't'
     CA:addVariable(V)

@@ -43,7 +43,6 @@ do
         value = node.STRING
     }
     local ca = node.class 'A'
-    a:addClass(ca)
     assert(a:get 'x' == node.NIL)
 
     ca:addField(field1)
@@ -53,7 +52,6 @@ do
     assert(b:get 'x' == node.NEVER)
 
     local cb = node.class 'B'
-    b:addClass(cb)
 
     cb:addExtends(a)
     assert(b:get 'x' == node.NUMBER)
@@ -80,7 +78,6 @@ do
             key = node.value 'x',
             value = T,
         }
-    a:addClass(ca)
 
     local an = a:call { node.NUMBER }
     assert(an.value:view() == '{ x: number }')

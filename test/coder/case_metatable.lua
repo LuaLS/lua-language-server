@@ -1,30 +1,20 @@
 local node = test.scope.node
 
 do
-    local vm = ls.vm.create(test.scope)
-    node:reset()
-
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@alias f<T> T[]
 ---@alias A f<number>
-    ]])
-    vfile:index()
+    ]]
 
     assert(node.type('A').value:view() == 'f<number>')
     assert(node.type('A').value.value:view() == 'number[]')
 end
 
 do
-    local vm = ls.vm.create(test.scope)
-    node:reset()
-
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@alias f<T> T['__index']
 ---@alias A f<{ __index: 1 }>
-    ]])
-    vfile:index()
+    ]]
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'f<{ __index: 1 }>')
@@ -208,48 +198,36 @@ do
 end
 
 do
-    node:reset()
-    local vm = ls.vm.create(test.scope)
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@type fun(): boolean
 F = xxx
 
 R = F()
-    ]])
-    vfile:index()
+    ]]
 
     local R = node:globalGet('R')
     assert(R.value:view() == 'boolean')
 end
 
 do
-    node:reset()
-    local vm = ls.vm.create(test.scope)
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@type fun<T>(x: T): T[]
 F = xxx
 
 R = F(1)
-    ]])
-    vfile:index()
+    ]]
 
     local R = node:globalGet('R')
     assert(R.value:view() == '1[]')
 end
 
 do
-    node:reset()
-    local vm = ls.vm.create(test.scope)
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@return number
 function F() end
 
 R = F()
-    ]])
-    vfile:index()
+    ]]
 
     local F = node:globalGet('F')
     assert(F.value:view() == 'fun():number')
@@ -258,18 +236,14 @@ R = F()
 end
 
 do
-    node:reset()
-    local vm = ls.vm.create(test.scope)
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@generic T
 ---@param x T
 ---@return T[]
 function F(x) end
 
 R = F(1)
-    ]])
-    vfile:index()
+    ]]
 
     local F = node:globalGet('F')
     assert(F.value:view() == 'fun<T>(x: <T>):<T>[]')
@@ -278,11 +252,7 @@ R = F(1)
 end
 
 do
-    local vm = ls.vm.create(test.scope)
-    node:reset()
-
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@generic T, MT
 ---@param t T
 ---@param mt MT
@@ -294,19 +264,14 @@ local mt = {}
 mt.__index = mt
 
 obj = setmetatable({}, mt)
-    ]])
-    vfile:index()
+    ]]
 
     assert(node:globalGet('obj'):view() == 'A')
     assert(node:globalGet('obj'):finalValue():view() == '{ __index: A }')
 end
 
 do
-    local vm = ls.vm.create(test.scope)
-    node:reset()
-
-    local vfile = vm:createFile('test.lua')
-    ls.file.setText('test.lua', [[
+    TEST_INDEX [[
 ---@generic T, MT
 ---@param t T
 ---@param mt MT
@@ -320,8 +285,7 @@ mt.xxx = 1
 
 obj = setmetatable({}, mt)
 value = obj.xxx
-    ]])
-    vfile:index()
+    ]]
 
     assert(node:globalGet('obj'):view() == '1')
     assert(node:globalGet('value'):view() == '1')

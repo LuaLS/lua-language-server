@@ -34,12 +34,12 @@ Cat.kind = 'cat'
 
 ---@alias LuaParser.Node.CatValue
 ---| LuaParser.Node.CatStateClass
----| LuaParser.Node.CatExp
 ---| LuaParser.Node.CatStateField
 ---| LuaParser.Node.CatStateAlias
 ---| LuaParser.Node.CatStateParam
 ---| LuaParser.Node.CatStateReturn
 ---| LuaParser.Node.CatStateGeneric
+---| LuaParser.Node.CatStateType
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string

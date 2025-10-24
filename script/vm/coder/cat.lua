@@ -331,22 +331,22 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
         coder:addLine('{func}:setAsync()' % {
             func = coder:getKey(source),
         })
-        coder:addLine('')
     end
 
     if source.typeParams then
+        coder:addLine('')
         for _, typeParam in ipairs(source.typeParams) do
             coder:compile(typeParam)
             coder:addLine('{func}:addTypeParam({param})' % {
                 func  = coder:getKey(source),
                 param = coder:getKey(typeParam),
             })
-            coder:addLine('')
         end
     end
 
     if source.params then
         for _, param in ipairs(source.params) do
+            coder:addLine('')
             coder:compile(param.value)
             coder:addLine('{func}:addParamDef({name:q}, {param}, {optional:q})' % {
                 func     = coder:getKey(source),
@@ -354,12 +354,12 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
                 param    = coder:getKey(param.value),
                 optional = param.optional,
             })
-            coder:addLine('')
         end
     end
 
     if source.returns then
         for _, ret in ipairs(source.returns) do
+            coder:addLine('')
             coder:compile(ret.value)
             coder:addLine('{func}:addReturnDef({name:q}, {param}, {optional:q})' % {
                 func     = coder:getKey(source),
@@ -367,7 +367,6 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
                 param    = coder:getKey(ret.value),
                 optional = ret.optional,
             })
-            coder:addLine('')
         end
     end
 end)
@@ -401,4 +400,14 @@ ls.vm.registerCoderProvider('catindex', function (coder, source)
         node  = coder:getKey(source.node),
         index = coder:getKey(source.index),
     })
+end)
+
+ls.vm.registerCoderProvider('catstatetype', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateType
+
+    coder:withIndentation(function ()
+        coder:compile(source.exp)
+
+        coder:addToCatGroup(source.parent, true)
+    end, source.parent.code)
 end)

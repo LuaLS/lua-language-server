@@ -9,20 +9,35 @@ local function tryBindCat(coder, var, index)
     if not catGroup then
         return
     end
-    for _, cat in ipairs(catGroup) do
-        if cat.value.kind == 'catstateclass' then
+    for _, catState in ipairs(catGroup) do
+        local cat = catState.value
+        if not cat then
+            goto continue
+        end
+        if cat.kind == 'catstateclass' then
+            ---@cast cat LuaParser.Node.CatStateClass
             -- class 只能绑定第一个变量
             if index == 1 then
                 coder:addLine('{var}:addClass({class})\n{class}:addVariable({var})' % {
                     var   = coder:getKey(var),
-                    class = coder:getKey(cat.value),
+                    class = coder:getKey(cat),
                 })
                 coder:addDisposer('{class}:removeVariable({var})\n{var}:removeClass({class})' % {
                     var   = coder:getKey(var),
-                    class = coder:getKey(cat.value),
+                    class = coder:getKey(cat),
+                })
+            end
+        elseif cat.kind == 'catstatetype' then
+            ---@cast cat LuaParser.Node.CatStateType
+            -- type 目前只支持绑定第一个变量
+            if index == 1 then
+                coder:addLine('{var}:addType({type})' % {
+                    var  = coder:getKey(var),
+                    type = coder:getKey(cat.exp),
                 })
             end
         end
+        ::continue::
     end
 end
 

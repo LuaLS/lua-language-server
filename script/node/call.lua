@@ -22,6 +22,12 @@ function M:__init(scope, head, args)
     end
     self.args = args
 
+    for i, arg in ipairs(self.args) do
+        if arg.kind == 'variable' then
+            self.args[i] = arg.value
+        end
+    end
+
     self.head:registerFlushChain(self)
 end
 
@@ -200,6 +206,8 @@ M.__getter.returns = function (self)
     local allMax = 0
     local hasDef
 
+    local node = self.scope.node
+
     for f in self.head:finalValue():each 'function' do
         hasDef = true
         ---@cast f Node.Function
@@ -219,10 +227,10 @@ M.__getter.returns = function (self)
     end
 
     if not hasDef then
-        return self.scope.node.UNKNOWN, true
+        return node.UNKNOWN, true
     end
 
-    local vararg = self.scope.node.vararg(returns, allMin, allMax)
+    local vararg = node.vararg(returns, allMin, allMax)
     return vararg, true
 end
 

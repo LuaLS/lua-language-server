@@ -50,6 +50,8 @@ function M:makeFromAst(ast)
     self:addLine 'end'
 
     self.code = table.concat(self.buf)
+    self.compiled = nil
+
     self.func = load(self.code, self.code, 't', self.env)
 end
 

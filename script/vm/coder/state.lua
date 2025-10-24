@@ -101,13 +101,19 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
 
     coder:withIndentation(function ()
         local valueKeys = {}
-        for i, value in ipairs(source.values) do
-            valueKeys[i] = coder:getKey(value)
-            coder:compile(value)
+        if source.values then
+            for i, value in ipairs(source.values) do
+                valueKeys[i] = coder:getKey(value)
+                coder:compile(value)
+            end
         end
         for i, var in ipairs(source.vars) do
             coder:compile(var)
-            coder:compileAssign(var, i, valueKeys[i])
+            if valueKeys[i] then
+                coder:compileAssign(var, i, valueKeys[i])
+            else
+                coder:compileAssign(var, i, 'node.NIL')
+            end
         end
     end, source.code)
 end)

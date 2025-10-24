@@ -22,17 +22,25 @@ ls.vm.registerCoderProvider('field', function (coder, source)
 
     coder:compile(last)
     coder:compile(source.key)
+    local isGetVariable, isComplexKey
+    if source.next or source.value then
+        isGetVariable = true
+    end
     if source.subtype == 'index' and not source.key.isLiteral then
+        isComplexKey = true
+    end
+
+    if isGetVariable then
         coder:addLine('{var} = {last}:getChild({field})' % {
-            var   = coder:getKey(source),
-            last  = coder:getKey(last),
-            field = 'node.UNKNOWN',
+            var    = coder:getKey(source),
+            last   = coder:getKey(last),
+            field  = isComplexKey and 'node.UNKNOWN' or coder:getKey(source.key),
         })
     else
-        coder:addLine('{var} = {last}:getChild({field})' % {
-            var   = coder:getKey(source),
-            last  = coder:getKey(last),
-            field = coder:getKey(source.key),
+        coder:addLine('{var} = {last}:get({field})' % {
+            var     = coder:getKey(source),
+            last    = coder:getKey(last),
+            field   = coder:getKey(source.key),
         })
     end
 end)

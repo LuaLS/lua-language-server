@@ -276,6 +276,38 @@ obj = setmetatable({}, mt)
     assert(node:globalGet('obj'):finalValue():view() == '{ __index: A }')
 end
 
+do -- 变量作为参数时要转换为类型
+    node:reset()
+
+    local T = node.generic 'T'
+    local FUNC = node.func()
+        : addTypeParam(T)
+        : addParamDef('x', T)
+        : addReturnDef(nil, T)
+
+    local A = node.variable('A')
+
+    A:addField {
+        key   = node.value 'x',
+        value = node.value(1),
+    }
+
+    local CALL = node.call(FUNC, { A })
+    local R = CALL.value
+    assert(R:view() == '{ x: 1 }')
+end
+
+do
+    TEST_INDEX [[
+    ---@type { x: number }
+    local t
+
+    B = t.x
+    ]]
+
+    assert(node:globalGet('B').value:view() == 'number')
+end
+
 do
     TEST_INDEX [[
 ---@generic T, MT
@@ -293,6 +325,6 @@ obj = setmetatable({}, mt)
 value = obj.xxx
     ]]
 
-    assert(node:globalGet('obj'):view() == '1')
+    assert(node:globalGet('obj'):view() == '{ xxx: 1, __index: {...} }')
     assert(node:globalGet('value'):view() == '1')
 end

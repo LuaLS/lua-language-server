@@ -353,12 +353,6 @@ function M:get(key)
         ---@cast key -Node
         key = node.value(key)
     end
-    if self.childs then
-        local child = self.childs[key]
-        if child then
-            return child
-        end
-    end
     return self.value:get(key)
 end
 
@@ -450,7 +444,11 @@ M.__getter.value = function (self)
         local union = node.union(ls.util.map(self.assigns:toArray(), function (v, k)
             return v.value
         end))
-        return union, true
+        if self.fields then
+            return union & self.fields, true
+        else
+            return union, true
+        end
     end
     return self.fields or self.scope.node.UNKNOWN, true
 end

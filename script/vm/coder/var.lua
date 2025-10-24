@@ -37,7 +37,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             field  = isComplexKey and 'node.UNKNOWN' or coder:getKey(source.key),
         })
     else
-        coder:addLine('{var} = {last}:get({field})' % {
+        coder:addLine('{var} = node.index({last}, {field})' % {
             var     = coder:getKey(source),
             last    = coder:getKey(last),
             field   = coder:getKey(source.key),

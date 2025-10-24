@@ -348,3 +348,81 @@ do
     assert(node.type('B'):view() == 'B')
     assert(node.type('B').value:view() == '1')
 end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    ls.file.setText('test.lua', [[
+        ---@alias A<T> T[]
+        ---@alias B A<number>
+    ]])
+
+    vfile:index()
+
+    assert(node.type('B'):view() == 'B')
+    assert(node.type('B').value:view() == 'A<number>')
+    assert(node.type('B').value.value:view() == 'number[]')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    ls.file.setText('test.lua', [[
+        ---@class A<T>
+        ---@field data T[]
+
+        ---@alias B A<number>
+    ]])
+
+    vfile:index()
+
+    assert(node.type('B'):view() == 'B')
+    assert(node.type('B').value:view() == 'A<number>')
+    assert(node.type('B').value.value:view() == '{ data: number[] }')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    ls.file.setText('test.lua', [[
+        ---@alias A<X, Y> [X, Y]
+
+        ---@alias B<T> A<T, 2>
+
+        ---@alias C B<number>
+    ]])
+
+    vfile:index()
+
+    assert(node.type('C'):view() == 'C')
+    assert(node.type('C').value:view() == 'B<number>')
+    assert(node.type('C').value.value:view() == '[number, 2]')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    ls.file.setText('test.lua', [[
+        ---@class A<X, Y>
+        ---@field data [X, Y]
+
+        ---@class B<T>: A<T, 2>
+        ---@field extra T[]
+
+        ---@alias C B<number>
+    ]])
+
+    vfile:index()
+
+    assert(node.type('C'):view() == 'C')
+    assert(node.type('C').value:view() == 'B<number>')
+    assert(node.type('C').value.value:view() == '{ data: [number, 2], extra: number[] }')
+end

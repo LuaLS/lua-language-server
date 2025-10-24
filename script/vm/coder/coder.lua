@@ -28,9 +28,9 @@ function M:makeFromAst(ast)
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'local coder, vfile = ...'
-    self:addLine 'local node  = vfile.scope.node'
-    self:addLine 'local uri   = vfile.uri'
-    self:addLine 'local r     = coder.map'
+    self:addLine 'local node = vfile.scope.node'
+    self:addLine 'local uri  = vfile.uri'
+    self:addLine 'local r    = coder.map'
     self:addLine 'node:lockCache()'
     self:addLine ''
 
@@ -98,9 +98,12 @@ function M:run(vfile)
     self.map = setmetatable({}, { __index = function (_, k)
         error('No such key in coder map: ' .. tostring(k))
     end })
-    xpcall(function (...)
+    local suc = pcall(function (...)
         self.disposer = self.func(self, vfile)
-    end, log.error)
+    end)
+    if not suc then
+        log.debug(self.code)
+    end
 end
 
 ---@param delta integer

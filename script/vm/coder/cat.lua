@@ -16,6 +16,28 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
         coder:addLine('{class} = node.class {qid}' % classParams)
         coder:addLine('{class}:setLocation {location}' % classParams)
 
+        if source.typeParams then
+            for i, param in ipairs(source.typeParams) do
+                coder:compile(param)
+                coder:addLine('{class}:addTypeParam({param})' % {
+                    class = coder:getKey(source),
+                    param = coder:getKey(param),
+                })
+                coder:addLine('')
+            end
+        end
+
+        if source.extends then
+            for i, extend in ipairs(source.extends) do
+                coder:compile(extend)
+                coder:addLine('{class}:addExtends({extend})' % {
+                    class  = coder:getKey(source),
+                    extend = coder:getKey(extend),
+                })
+                coder:addLine('')
+            end
+        end
+
         coder:addDisposer('{class}:dispose()' % classParams)
     end, source.parent.code)
 
@@ -131,16 +153,24 @@ ls.vm.registerCoderProvider('catstatealias', function (coder, source)
     ---@cast source LuaParser.Node.CatStateAlias
 
     coder:withIndentation(function ()
-        if source.extends then
-            coder:compile(source.extends)
-        end
-
         coder:addLine('{alias} = node.alias({name:q})' % {
             alias = coder:getKey(source),
             name  = source.aliasID.id,
         })
 
+        if source.typeParams then
+            for i, param in ipairs(source.typeParams) do
+                coder:compile(param)
+                coder:addLine('{alias}:addTypeParam({param})' % {
+                    alias = coder:getKey(source),
+                    param = coder:getKey(param),
+                })
+                coder:addLine('')
+            end
+        end
+
         if source.extends then
+            coder:compile(source.extends)
             coder:addLine('{alias}:setValue({value})' % {
                 alias = coder:getKey(source),
                 value = coder:getKey(source.extends),
@@ -358,4 +388,17 @@ ls.vm.registerCoderProvider('catgeneric', function (coder, source)
             name = source.id.id,
         })
     end
+end)
+
+ls.vm.registerCoderProvider('catindex', function (coder, source)
+    ---@cast source LuaParser.Node.CatIndex
+
+    coder:compile(source.node)
+    coder:compile(source.index)
+
+    coder:addLine('{key} = node.index({node}, {index})' % {
+        key   = coder:getKey(source),
+        node  = coder:getKey(source.node),
+        index = coder:getKey(source.index),
+    })
 end)

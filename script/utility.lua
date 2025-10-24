@@ -1199,7 +1199,7 @@ function m.enableFormatString()
             else
                 value = args[k]
             end
-            if value == nil then
+            if value == nil and k:find('{', 1, true) then
                 return '{' .. k % args .. '}'
             end
             if fmt then

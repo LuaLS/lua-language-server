@@ -10,10 +10,12 @@ M.kind = 'function'
 ---@class Node.Function.Param
 ---@field key string
 ---@field value Node
+---@field optional? boolean
 
 ---@class Node.Function.Return
 ---@field key? string
 ---@field value Node
+---@field optional? boolean
 
 ---@param scope Scope
 function M:__init(scope)
@@ -101,9 +103,14 @@ end
 
 ---@param key string
 ---@param value Node
+---@param optional? boolean
 ---@return Node.Function
-function M:addParamDef(key, value)
-    self.paramsDef[#self.paramsDef+1] = { key = key, value = value }
+function M:addParamDef(key, value, optional)
+    if key == '...' then
+        self:addVarargParamDef(value)
+        return self
+    end
+    self.paramsDef[#self.paramsDef+1] = { key = key, value = value, optional = optional }
     self.paramDefMap[key] = value
     return self
 end
@@ -112,9 +119,10 @@ M.returnCount = 0
 
 ---@param key? string
 ---@param value Node
+---@param optional? boolean
 ---@return Node.Function
-function M:addReturnDef(key, value)
-    self.returnsDef[#self.returnsDef+1] = { key = key, value = value }
+function M:addReturnDef(key, value, optional)
+    self.returnsDef[#self.returnsDef+1] = { key = key, value = value, optional = optional }
     if key then
         self.returnDefMap[key] = value
     end
@@ -144,8 +152,13 @@ end
 ---@param index integer
 ---@return Node?
 function M:getParam(index)
-    if self.paramsDef[index] then
-        return self.paramsDef[index].value
+    local paramDef = self.paramsDef[index]
+    if paramDef then
+        if paramDef.optional then
+            return paramDef.value | self.scope.node.NIL
+        else
+            return paramDef.value
+        end
     end
     if self.varargParamDef then
         return self.varargParamDef
@@ -156,8 +169,13 @@ end
 ---@param index integer
 ---@return Node?
 function M:getReturn(index)
-    if self.returnsDef[index] then
-        return self.returnsDef[index].value
+    local retDef = self.returnsDef[index]
+    if retDef then
+        if retDef.optional then
+            return retDef.value | self.scope.node.NIL
+        else
+            return retDef.value
+        end
     end
     if self.returnNode[index] then
         return self.returnNode[index]
@@ -373,8 +391,9 @@ ls.node.registerView('function', function (viewer, node, needParentheses)
     ---@cast node Node.Function
     local params = {}
     for i, v in ipairs(node.paramsDef) do
-        params[i] = string.format('%s: %s'
+        params[i] = string.format('%s%s: %s'
             , v.key
+            , v.optional and '?' or ''
             , v.value:view()
         )
     end
@@ -385,7 +404,11 @@ ls.node.registerView('function', function (viewer, node, needParentheses)
     local returns = {}
     for i, v in ipairs(node.returnsDef) do
         if v.key then
-            returns[i] = string.format('(%s: %s)', v.key, v.value:view())
+            returns[i] = string.format('(%s%s: %s)'
+                , v.key
+                , v.optional and '?' or ''
+                , v.value:view()
+            )
         else
             returns[i] = v.value:view()
         end

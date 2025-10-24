@@ -118,6 +118,22 @@ do
 
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
+        ---@alias A number?
+    ]]
+
+    local coder = vfile:makeCoder(ast)
+    coder:run()
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == 'number | nil')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
         ---@alias A 1 | 2 | 3
     ]]
 
@@ -150,6 +166,23 @@ do
 
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
+        ---@alias A number[]
+    ]]
+
+    local coder = vfile:makeCoder(ast)
+    log.debug(coder.code)
+    coder:run()
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == 'number[]')
+end
+
+do
+    local vm = ls.vm.create(test.scope)
+    node:reset()
+
+    local vfile = vm:createFile('test.lua')
+    local ast = ls.parser.compile [[
         ---@alias A {
         --- x: number,
         --- y: string,
@@ -158,7 +191,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
@@ -175,7 +207,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
@@ -192,7 +223,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
@@ -205,18 +235,17 @@ do
 
     local vfile = vm:createFile('test.lua')
     local ast = ls.parser.compile [[
-        ---@alias A async fun<T1: table, T2>(a: T1, ...: T2)
+        ---@alias A async fun<T1: table, T2>(a: T1, b?: string, ...: T2)
         ---: T2[]
-        ---, desc: string
+        ---, desc: string?
         ---, ...: T1
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, ...: <T2>):(<T2>[], (desc: string), (...: <T1>))')
+    assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
 end
 
 do

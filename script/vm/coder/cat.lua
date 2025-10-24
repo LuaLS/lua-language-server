@@ -68,22 +68,42 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
     end, source.parent.code)
 end)
 
-ls.vm.registerCoderProvider('catfieldname', function (coder, source)
-    ---@cast source LuaParser.Node.CatFieldName
-
+---@param coder VM.Coder
+---@param source { id: string }
+local function compileID(coder, source)
     coder:addLine('{key} = node.value {name:q}' % {
         key = coder:getKey(source),
         name = source.id,
     })
+end
+
+ls.vm.registerCoderProvider('catfieldname', function (coder, source)
+    ---@cast source LuaParser.Node.CatFieldName
+
+    compileID(coder, source)
 end)
 
 ls.vm.registerCoderProvider('catid', function (coder, source)
     ---@cast source LuaParser.Node.CatID
 
-    coder:addLine('{id} = node.type {name:q}' % {
-        id = coder:getKey(source),
-        name = source.id,
-    })
+    if source.generic then
+        coder:addLine('{id} = {generic}' % {
+            id      = coder:getKey(source),
+            generic = coder:getKey(source.generic),
+        })
+    else
+        if source.optional then
+            coder:addLine('{id} = node.type {name:q} | node.NIL' % {
+                id = coder:getKey(source),
+                name = source.id,
+            })
+        else
+            coder:addLine('{id} = node.type {name:q}' % {
+                id = coder:getKey(source),
+                name = source.id,
+            })
+        end
+    end
 end)
 
 ls.vm.registerCoderProvider('catstateparam', function (coder, source)
@@ -159,7 +179,7 @@ ls.vm.registerCoderProvider('catunion', function (coder, source)
         parts[i] = coder:getKey(v)
     end
 
-    coder:addLine('{key} = node.union {{parts}}' % {
+    coder:addLine('{key} = node.union { {parts} }' % {
         key = coder:getKey(source),
         parts = table.concat(parts, ', '),
     })
@@ -174,23 +194,164 @@ ls.vm.registerCoderProvider('catintersection', function (coder, source)
         parts[i] = coder:getKey(v)
     end
 
-    coder:addLine('{key} = node.intersection {{parts}}' % {
+    coder:addLine('{key} = node.intersection { {parts} }' % {
         key = coder:getKey(source),
         parts = table.concat(parts, ', '),
+    })
+end)
+
+ls.vm.registerCoderProvider('catarray', function (coder, source)
+    ---@cast source LuaParser.Node.CatArray
+
+    coder:compile(source.node)
+
+    coder:addLine('{key} = node.array({value})' % {
+        key   = coder:getKey(source),
+        value = coder:getKey(source.node),
     })
 end)
 
 ls.vm.registerCoderProvider('cattable', function (coder, source)
     ---@cast source LuaParser.Node.CatTable
 
-    local fields = {}
+    coder:addLine('{key} = node.table()' % {
+        key = coder:getKey(source),
+    })
+
     for i, field in ipairs(source.fields) do
         coder:compile(field)
-        fields[i] = coder:getKey(field)
+        coder:addLine('{table}:addField({field})' % {
+            table = coder:getKey(source),
+            field = coder:getKey(field),
+        })
+        coder:addLine('')
+    end
+end)
+
+ls.vm.registerCoderProvider('cattablefield', function (coder, source)
+    ---@cast source LuaParser.Node.CatTableField
+
+    coder:compile(source.key)
+    coder:compile(source.value)
+
+    coder:addLine([[
+{field} = {
+    key      = {key},
+    value    = {value},
+    location = {location},
+}
+]] % {
+        field    = coder:getKey(source),
+        key      = coder:getKey(source.key),
+        value    = coder:getKey(source.value),
+        location = coder:makeLocationCode(source.key),
+    })
+end)
+
+ls.vm.registerCoderProvider('cattablefieldid', function (coder, source)
+    ---@cast source LuaParser.Node.CatTableFieldID
+
+    compileID(coder, source)
+end)
+
+ls.vm.registerCoderProvider('cattuple', function (coder, source)
+    ---@cast source LuaParser.Node.CatTuple
+
+    local parts = {}
+    for i, item in ipairs(source.exps) do
+        coder:compile(item)
+        parts[i] = coder:getKey(item)
     end
 
-    coder:addLine('{key} = node.table {{fields}}' % {
+    coder:addLine('{key} = node.tuple { {parts} }' % {
         key = coder:getKey(source),
-        fields = table.concat(fields, ', '),
+        parts = table.concat(parts, ', '),
     })
+end)
+
+ls.vm.registerCoderProvider('catcall', function (coder, source)
+    ---@cast source LuaParser.Node.CatCall
+
+    coder:compile(source.node)
+    local args = {}
+    for i, arg in ipairs(source.args) do
+        coder:compile(arg)
+        args[i] = coder:getKey(arg)
+    end
+
+    coder:addLine('{key} = node.call({type}, { {args} })' % {
+        key  = coder:getKey(source),
+        type = coder:getKey(source.node),
+        args = table.concat(args, ', '),
+    })
+end)
+
+ls.vm.registerCoderProvider('catfunction', function (coder, source)
+    ---@cast source LuaParser.Node.CatFunction
+
+    coder:addLine('{key} = node.func()' % {
+        key = coder:getKey(source),
+    })
+
+    if source.async then
+        coder:addLine('{func}:setAsync()' % {
+            func = coder:getKey(source),
+        })
+        coder:addLine('')
+    end
+
+    if source.typeParams then
+        for _, typeParam in ipairs(source.typeParams) do
+            coder:compile(typeParam)
+            coder:addLine('{func}:addTypeParam({param})' % {
+                func  = coder:getKey(source),
+                param = coder:getKey(typeParam),
+            })
+            coder:addLine('')
+        end
+    end
+
+    if source.params then
+        for _, param in ipairs(source.params) do
+            coder:compile(param.value)
+            coder:addLine('{func}:addParamDef({name:q}, {param}, {optional:q})' % {
+                func     = coder:getKey(source),
+                name     = param.name.id,
+                param    = coder:getKey(param.value),
+                optional = param.optional,
+            })
+            coder:addLine('')
+        end
+    end
+
+    if source.returns then
+        for _, ret in ipairs(source.returns) do
+            coder:compile(ret.value)
+            coder:addLine('{func}:addReturnDef({name:q}, {param}, {optional:q})' % {
+                func     = coder:getKey(source),
+                name     = ret.name and ret.name.id or nil,
+                param    = coder:getKey(ret.value),
+                optional = ret.optional,
+            })
+            coder:addLine('')
+        end
+    end
+end)
+
+ls.vm.registerCoderProvider('catgeneric', function (coder, source)
+    ---@cast source LuaParser.Node.CatGeneric
+
+    if source.extends then
+        coder:compile(source.extends)
+        coder:addLine('{key} = node.generic({name:q}, {extends})' % {
+            key     = coder:getKey(source),
+            name    = source.id.id,
+            extends = coder:getKey(source.extends),
+        })
+    else
+        coder:addLine('{key} = node.generic {name:q}' % {
+            key = coder:getKey(source),
+            name = source.id.id,
+        })
+    end
 end)

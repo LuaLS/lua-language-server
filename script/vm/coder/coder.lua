@@ -97,7 +97,9 @@ end
 
 function M:run()
     self:dispose()
-    self.map = {}
+    self.map = setmetatable({}, { __index = function (_, k)
+        error('No such key in coder map: ' .. tostring(k))
+    end })
     self.disposer = self.func(self)
 end
 
@@ -224,7 +226,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return string
 function M:getKey(source)
-    return string.format('r[%q]', table.concat {source.kind, '@', source.startRow + 1, ':', source.startCol + 1})
+    return string.format('r[%q]', source.uniqueKey)
 end
 
 ---@param vfile VM.Vfile

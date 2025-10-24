@@ -11,6 +11,7 @@
 ---@field finishRow integer # 结束行号
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
+---@field uniqueKey string # 形如"string@2:10"
 ---@field parent? unknown
 ---@field parentBlock LuaParser.Node.Block | false # 向上搜索一个block
 ---@field parentFunction LuaParser.Node.Function | false # 向上搜索一个function
@@ -190,6 +191,12 @@ end
 Base.__getter.code = function (self)
     local code = self.ast.code:sub(self.start + 1, self.finish)
     return code
+end
+---@param self LuaParser.Node.Base
+---@return string
+---@return true
+Base.__getter.uniqueKey = function (self)
+    return string.format('%s@%d:%d', self.kind, self.startRow + 1, self.startCol), true
 end
 
 ---@param self LuaParser.Node.Base

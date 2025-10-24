@@ -5,12 +5,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@alias f<T> T[]
 ---@alias A f<number>
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     assert(node.type('A').value:view() == 'f<number>')
     assert(node.type('A').value.value:view() == 'number[]')
@@ -21,12 +20,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@alias f<T> T['__index']
 ---@alias A f<{ __index: 1 }>
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'f<{ __index: 1 }>')
@@ -213,14 +211,13 @@ do
     node:reset()
     local vm = ls.vm.create(test.scope)
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@type fun(): boolean
 F = xxx
 
 R = F()
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     local R = node:globalGet('R')
     assert(R.value:view() == 'boolean')
@@ -230,14 +227,13 @@ do
     node:reset()
     local vm = ls.vm.create(test.scope)
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@type fun<T>(x: T): T[]
 F = xxx
 
 R = F(1)
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     local R = node:globalGet('R')
     assert(R.value:view() == '1[]')
@@ -247,14 +243,13 @@ do
     node:reset()
     local vm = ls.vm.create(test.scope)
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@return number
 function F() end
 
 R = F()
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     local F = node:globalGet('F')
     assert(F.value:view() == 'fun():number')
@@ -266,16 +261,15 @@ do
     node:reset()
     local vm = ls.vm.create(test.scope)
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@generic T
 ---@param x T
 ---@return T[]
 function F(x) end
 
 R = F(1)
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     local F = node:globalGet('F')
     assert(F.value:view() == 'fun<T>(x: <T>):<T>[]')
@@ -288,7 +282,7 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@generic T, MT
 ---@param t T
 ---@param mt MT
@@ -300,9 +294,8 @@ local mt = {}
 mt.__index = mt
 
 obj = setmetatable({}, mt)
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     assert(node:globalGet('obj'):view() == 'A')
     assert(node:globalGet('obj'):finalValue():view() == '{ __index: A }')
@@ -313,7 +306,7 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
 ---@generic T, MT
 ---@param t T
 ---@param mt MT
@@ -327,9 +320,8 @@ mt.xxx = 1
 
 obj = setmetatable({}, mt)
 value = obj.xxx
-    ]]
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    ]])
+    vfile:index()
 
     assert(node:globalGet('obj'):view() == '1')
     assert(node:globalGet('value'):view() == '1')

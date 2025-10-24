@@ -10,10 +10,7 @@ M.func = nil
 ---@type table<string, VM.CoderProvider?>
 M.providers = {}
 
----@param vfile VM.Vfile
-function M:__init(vfile)
-    self.vfile = vfile
-    self.scope = vfile.scope
+function M:__init()
     self.env   = _G
     self.indentation = 0
 
@@ -29,10 +26,10 @@ function M:makeFromAst(ast)
     self.buf = {}
     self.disposers = {}
 
-    self:addLine('-- Middle Code: ' .. self.vfile.uri)
-    self:addLine 'local coder = ...'
-    self:addLine 'local node  = coder.scope.node'
-    self:addLine(('local uri   = %q'):format(self.vfile.uri))
+    self:addLine('-- Middle Code: ' .. ast.source)
+    self:addLine 'local coder, vfile = ...'
+    self:addLine 'local node  = vfile.scope.node'
+    self:addLine 'local uri   = vfile.uri'
     self:addLine 'local r     = coder.map'
     self:addLine 'node:lockCache()'
     self:addLine ''
@@ -95,12 +92,15 @@ function M:dispose()
     end
 end
 
-function M:run()
+---@param vfile VM.Vfile
+function M:run(vfile)
     self:dispose()
     self.map = setmetatable({}, { __index = function (_, k)
         error('No such key in coder map: ' .. tostring(k))
     end })
-    self.disposer = self.func(self)
+    xpcall(function (...)
+        self.disposer = self.func(self, vfile)
+    end, log.error)
 end
 
 ---@param delta integer
@@ -235,10 +235,9 @@ function M:getCustomKey(key)
     return string.format('r[%q]', key)
 end
 
----@param vfile VM.Vfile
 ---@return VM.Coder
-function ls.vm.createCoder(vfile)
-    return New 'VM.Coder' (vfile)
+function ls.vm.createCoder()
+    return New 'VM.Coder' ()
 end
 
 ---@param kind string

@@ -19,7 +19,7 @@ end
 ---@param ast LuaParser.Ast
 ---@return VM.Coder
 function M:makeCoder(ast)
-    local coder = ls.vm.createCoder(self)
+    local coder = ls.vm.createCoder()
     coder:makeFromAst(ast)
     return coder
 end
@@ -42,6 +42,8 @@ function M:index()
     self.document = document
     self.version = self.version + 1
 
+    self.coder = self:makeCoder(document.ast)
+    self.coder:run(self)
 end
 
 ---@param source LuaParser.Node.Base

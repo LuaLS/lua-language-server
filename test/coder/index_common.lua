@@ -7,12 +7,11 @@ do
     local g = node.type '_G'
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         A = 1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(g:get('A'):view() == '1')
     assert(node:globalGet('A'):viewVariable() == 'A')
@@ -26,12 +25,11 @@ do
     local g = node.type '_G'
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         A.B.C = 1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(g:get('A'):view() == '{ B: { C: 1 } }')
     assert(node:globalGet('A', 'B', 'C'):viewVariable() == 'A.B.C')
@@ -45,12 +43,11 @@ do
     local g = node.type '_G'
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         A[1].C = 1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(g:get('A'):view() == '{ [1]: { C: 1 } }')
     assert(node:globalGet('A', 1, 'C'):viewVariable() == 'A[1].C')
@@ -64,12 +61,11 @@ do
     local g = node.type '_G'
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         A[XXX].C = 1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
     assert(node:globalGet('A', node.UNKNOWN, 'C'):viewVariable() == 'A[unknown].C')
@@ -83,13 +79,12 @@ do
     local g = node.type '_G'
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@class _G
         ---@field A 1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(g:get('A'):view() == '1')
     assert(node:globalGet('A'):viewVariable() == 'A')
@@ -101,12 +96,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A 1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '1')
@@ -117,12 +111,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A number?
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'number | nil')
@@ -133,12 +126,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A 1 | 2 | 3
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '1 | 2 | 3')
@@ -149,12 +141,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A B & C & D
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'B & C & D')
@@ -165,12 +156,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A number[]
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'number[]')
@@ -181,16 +171,15 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A {
         --- x: number,
         --- y: string,
         --- [number]: boolean,
         ---}
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
@@ -201,12 +190,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A [1, 2, 3]
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '[1, 2, 3]')
@@ -217,12 +205,11 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A table<number, boolean>
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'table<number, boolean>')
@@ -233,15 +220,14 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A async fun<T1: table, T2>(a: T1, b?: string, ...: T2)
         ---: T2[]
         ---, desc: string?
         ---, ...: T1
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
@@ -252,7 +238,7 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@class A
         local m = {
             x = 1,
@@ -261,10 +247,9 @@ do
             [10] = 4,
             5,
         }
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '{ [1]: 5, [10]: 4, abc: 3, x: 1, y: 2 }')
@@ -275,13 +260,12 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@class A
         B = {}
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node:globalGet('B').value:view() == 'A')
 end
@@ -333,7 +317,7 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@class A
         local m = {}
 
@@ -341,10 +325,9 @@ do
             self.x = 1
             self.y = 2
         end
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    coder:run()
+    vfile:index()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
@@ -355,14 +338,12 @@ do
     node:reset()
 
     local vfile = vm:createFile('test.lua')
-    local ast = ls.parser.compile [[
+    ls.file.setText('test.lua', [[
         ---@alias A { x: 1, y: 2 }
         ---@alias B A['x']
-    ]]
+    ]])
 
-    local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
-    coder:run()
+    vfile:index()
 
     assert(node.type('B'):view() == 'B')
     assert(node.type('B').value:view() == '1')

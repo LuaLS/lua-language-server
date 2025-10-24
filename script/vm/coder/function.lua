@@ -67,34 +67,51 @@ ls.vm.registerCoderProvider('function', function (coder, source)
     ---@cast source LuaParser.Node.Function
 
     coder:withIndentation(function ()
-        if source.name then
-            coder:compile(source.name)
-        end
-
         coder:addLine('{key} = node.func()' % {
             key = coder:getKey(source),
         })
         if source.name then
-            coder:compileAssign(source.name, 1, coder:getKey(source))
+            coder:withIndentation(function ()
+                coder:compile(source.name)
+                coder:compileAssign(source.name, 1, coder:getKey(source))
+                coder:addLine('')
+            end, 'function name --')
         end
 
         if source.params then
-            for i, param in ipairs(source.params) do
-                resolveParam(coder, source, param)
-            end
+            coder:withIndentation(function ()
+                for i, param in ipairs(source.params) do
+                    resolveParam(coder, source, param)
+                    coder:addLine('')
+                end
+            end, 'function params --')
         end
 
         local returns = coder:findCatReturns(source)
         if returns then
-            for _, cat in ipairs(returns) do
-                if cat.value then
-                    coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
-                        funcKey    = coder:getKey(source),
-                        returnKey  = cat.key and ('%q'):format(cat.key.id) or 'nil',
-                        returnType = coder:getKey(cat.value),
-                    })
+            coder:withIndentation(function ()
+                for _, cat in ipairs(returns) do
+                    if cat.value then
+                        coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
+                            funcKey    = coder:getKey(source),
+                            returnKey  = cat.key and ('%q'):format(cat.key.id) or 'nil',
+                            returnType = coder:getKey(cat.value),
+                        })
+                        coder:addLine('')
+                    end
                 end
-            end
+            end, 'function returns --')
+        end
+
+        if #source.childs > 0 then
+            coder:withIndentation(function ()
+                coder:pushBlock()
+                for _, child in ipairs(source.childs) do
+                    coder:compile(child)
+                    coder:addLine('')
+                end
+                coder:popBlock()
+            end, 'function body --')
         end
     end, source.code)
 end)

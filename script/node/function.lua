@@ -388,17 +388,20 @@ function M:inferGeneric(other, result)
 end
 
 ls.node.registerView('function', function (viewer, node, needParentheses)
+    if viewer.visited[node] > 1 then
+        return 'function'
+    end
     ---@cast node Node.Function
     local params = {}
     for i, v in ipairs(node.paramsDef) do
         params[i] = string.format('%s%s: %s'
             , v.key
             , v.optional and '?' or ''
-            , v.value:view()
+            , viewer:view(v.value)
         )
     end
     if node.varargParamDef then
-        params[#params+1] = string.format('...: %s', node.varargParamDef:view())
+        params[#params+1] = string.format('...: %s', viewer:view(node.varargParamDef))
     end
 
     local returns = {}
@@ -407,10 +410,10 @@ ls.node.registerView('function', function (viewer, node, needParentheses)
             returns[i] = string.format('(%s%s: %s)'
                 , v.key
                 , v.optional and '?' or ''
-                , v.value:view()
+                , viewer:view(v.value)
             )
         else
-            returns[i] = v.value:view()
+            returns[i] = viewer:view(v.value)
         end
     end
 

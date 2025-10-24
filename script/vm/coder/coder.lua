@@ -229,6 +229,12 @@ function M:getKey(source)
     return string.format('r[%q]', source.uniqueKey)
 end
 
+---@param key string
+---@return string
+function M:getCustomKey(key)
+    return string.format('r[%q]', key)
+end
+
 ---@param vfile VM.Vfile
 ---@return VM.Coder
 function ls.vm.createCoder(vfile)

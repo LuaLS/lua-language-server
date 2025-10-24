@@ -17,6 +17,10 @@ local function tryBindCat(coder, var, index)
                     var   = coder:getKey(var),
                     class = coder:getKey(cat.value),
                 })
+                coder:addDisposer('{class}:removeVariable({var})\n{var}:removeClass({class})' % {
+                    var   = coder:getKey(var),
+                    class = coder:getKey(cat.value),
+                })
             end
         end
     end
@@ -38,17 +42,26 @@ function M:compileAssign(var, index, valueKey)
         self:compile(var.key)
         key = self:getKey(var.key)
     end
+    local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
     self:addLine([[
-{varKey}:addAssign {
+{fieldKey} = {
     key      = {key},
     value    = {value},
     location = {location},
 }
 ]] % {
-        varKey   = self:getKey(var),
+        fieldKey = fieldKey,
         key      = key,
         value    = valueKey or 'node.NIL',
         location = self:makeLocationCode(var),
+    })
+    self:addLine('{varKey}:addAssign({fieldKey})' % {
+        varKey   = self:getKey(var),
+        fieldKey = fieldKey,
+    })
+    self:addDisposer('{varKey}:removeAssign({fieldKey})' % {
+        varKey   = self:getKey(var),
+        fieldKey = fieldKey,
     })
     tryBindCat(self, var, index)
 end

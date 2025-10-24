@@ -8,6 +8,7 @@ M.onViewAsKeyMap = {}
 function M:__init(skipLevel)
     ---@type integer
     self.skipLevel = skipLevel or 0
+    self.deep = 0
     ---@type table<Node, integer?>
     self.visited = {}
 end
@@ -21,7 +22,13 @@ function M:view(node, deltaLevel, needParentheses)
         deltaLevel = 1
     end
     self.skipLevel = self.skipLevel + deltaLevel
+    self.deep = self.deep + 1
+    if self.deep >= 10 then
+        self.deep = self.deep - 1
+        return '...'
+    end
     local result = self:onView(node, needParentheses)
+    self.deep = self.deep - 1
     return result
 end
 

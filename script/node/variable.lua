@@ -6,6 +6,8 @@ Extends('Node.Variable', 'Node')
 M.kind = 'variable'
 
 M.hideInUnionView = true
+---@type Node.Variable?
+M.parentVariable = nil
 
 ---@alias Node.Key string | number | boolean | Node
 
@@ -30,6 +32,10 @@ M.nodes = nil
 ---@param node Node
 ---@return Node.Variable
 function M:addType(node)
+    if self.parentVariable then
+        self.parentVariable:addType(node)
+        return self
+    end
     if not self.nodes then
         self.nodes = ls.linkedTable.create()
     end
@@ -42,6 +48,10 @@ end
 ---@param node Node
 ---@return Node.Variable
 function M:removeType(node)
+    if self.parentVariable then
+        self.parentVariable:removeType(node)
+        return self
+    end
     if not self.nodes then
         return self
     end
@@ -60,6 +70,10 @@ M.assigns = nil
 ---@param field Node.Field
 ---@return Node.Variable
 function M:addAssign(field)
+    if self.parentVariable then
+        self.parentVariable:addAssign(field)
+        return self
+    end
     if not self.assigns then
         self.assigns = ls.linkedTable.create()
     end
@@ -84,6 +98,10 @@ end
 ---@param field Node.Field
 ---@return Node.Variable
 function M:removeAssign(field)
+    if self.parentVariable then
+        self.parentVariable:removeAssign(field)
+        return self
+    end
     if not self.assigns then
         return self
     end
@@ -128,6 +146,10 @@ M.classes = nil
 ---@param node Node.Class
 ---@return Node.Variable
 function M:addClass(node)
+    if self.parentVariable then
+        self.parentVariable:addClass(node)
+        return self
+    end
     if not self.classes then
         self.classes = ls.linkedTable.create()
     end
@@ -140,6 +162,10 @@ end
 ---@param node Node.Class
 ---@return Node.Variable
 function M:removeClass(node)
+    if self.parentVariable then
+        self.parentVariable:removeClass(node)
+        return self
+    end
     if not self.classes then
         return self
     end
@@ -162,6 +188,7 @@ function M:addSubVariable(variable)
         self.subVariables = ls.linkedTable.create()
     end
     self.subVariables:pushTail(variable)
+    variable.parentVariable = self
     self:flushCache()
 
     return self
@@ -177,6 +204,7 @@ function M:removeSubVariable(variable)
     if self.subVariables:getSize() == 0 then
         self.subVariables = nil
     end
+    variable.parentVariable = nil
     self:flushCache()
 
     return self
@@ -187,10 +215,9 @@ M.fields = nil
 
 ---@pacakge
 ---@param t Node.Table
----@param variable Node.Variable
-function M:mergeFields(t, variable)
+function M:mergeFields(t)
     local node = self.scope.node
-    for k, v in pairs(variable.childs) do
+    for k, v in pairs(self.childs) do
         if type(k) ~= 'table' then
             ---@cast k -Node
             k = node.value(k)
@@ -206,11 +233,14 @@ end
 ---@return Node.Table?
 ---@return boolean
 M.__getter.fields = function (self)
+    if self.parentVariable then
+        return self.parentVariable.fields, false
+    end
     if not self.childs then
         return nil, false
     end
     local t = self.scope.node.table()
-    self:mergeFields(t, self)
+    self:mergeFields(t)
     return t, true
 end
 
@@ -222,6 +252,9 @@ M.childs = nil
 ---@param ... Node.Key
 ---@return Node.Variable
 function M:getChild(key1, key2, ...)
+    if self.parentVariable then
+        return self.parentVariable:getChild(key1, key2, ...)
+    end
     local node = self.scope.node
     local key = key1
     local path
@@ -263,6 +296,10 @@ end
 ---@param path? Node.Key[]
 ---@return Node.Variable
 function M:addField(field, path)
+    if self.parentVariable then
+        self.parentVariable:addField(field, path)
+        return self
+    end
     local node = self.scope.node
     local current = self
     if not current.childs then
@@ -300,6 +337,9 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
+    if self.parentVariable then
+        return self.parentVariable:get(key)
+    end
     local node = self.scope.node
     if type(key) ~= 'table' then
         ---@cast key -Node
@@ -318,6 +358,10 @@ end
 ---@param variable Node.Variable
 ---@return Node.Variable
 function M:setChild(key, variable)
+    if self.parentVariable then
+        self.parentVariable:setChild(key, variable)
+        return self
+    end
     if type(key) ~= 'table' then
         ---@cast key -Node
         key = self.scope.node.value(key)
@@ -334,6 +378,10 @@ end
 ---@param path? Node.Key[]
 ---@return Node.Variable
 function M:removeField(field, path)
+    if self.parentVariable then
+        self.parentVariable:removeField(field, path)
+        return self
+    end
     if not self.childs then
         return self
     end
@@ -373,8 +421,11 @@ M.value = nil
 
 ---@param self Node.Variable
 ---@return Node
----@return true
+---@return boolean
 M.__getter.value = function (self)
+    if self.parentVariable then
+        return self.parentVariable.value, false
+    end
     local node = self.scope.node
     if self.classes then
         local union = node.union(ls.util.map(self.classes:toArray(), function (v, k)

@@ -170,7 +170,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
@@ -265,7 +264,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
@@ -289,6 +287,49 @@ do
 end
 
 do
+    node:reset()
+    --[[
+        ---@class A
+        local m = {}
+
+        function m:init()
+            self.x = 1
+            self.y = 2
+        end
+    ]]
+
+    local CA = node.class 'A'
+    node.type('A'):addClass(CA)
+    local M = node.variable 'm'
+    M:addClass(CA)
+    CA:addVariable(M)
+
+    local FUNC = node.func()
+    FUNC:addParamDef('self', M)
+
+    M:addField {
+        key   = node.value 'init',
+        value = FUNC,
+    }
+
+    local SELF = node.variable 'self'
+    M:addSubVariable(SELF)
+
+    SELF:addField {
+        key   = node.value 'x',
+        value = node.value(1),
+    }
+
+    SELF:addField {
+        key   = node.value 'y',
+        value = node.value(2),
+    }
+
+    assert(node.type('A'):view() == 'A')
+    assert(node.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
+end
+
+do
     local vm = ls.vm.create(test.scope)
     node:reset()
 
@@ -304,7 +345,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')

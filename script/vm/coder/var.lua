@@ -60,6 +60,21 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         name = source.id,
     })
 
+    if source.isSelf then
+        local parentVariable = source.parent.name and source.parent.name.last
+        if parentVariable then
+            coder:addLine('{parent}:addSubVariable({key})' % {
+                parent = coder:getKey(parentVariable),
+                key    = coder:getKey(source),
+            })
+            coder:addDisposer('{parent}:removeSubVariable({key})' % {
+                parent = coder:getKey(parentVariable),
+                key    = coder:getKey(source),
+            })
+        end
+        return
+    end
+
     local type = 'node.ANY'
     local cat = coder:findMatchedCatParam(source)
     if cat and cat.value then

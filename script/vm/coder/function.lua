@@ -111,7 +111,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             coder:withIndentation(function ()
                 for _, cat in ipairs(typeParams) do
                     for _, param in ipairs(cat.typeParams) do
-                        coder:addLine('')
+                        coder:addLine('-- ' .. param.code)
                         coder:addLine('{func}:addTypeParam({param})' % {
                             func  = coder:getKey(source),
                             param = coder:getKey(param),
@@ -124,7 +124,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         if source.params then
             coder:withIndentation(function ()
                 for i, param in ipairs(source.params) do
-                    coder:addLine('')
+                    coder:addLine('-- ' .. param.code)
                     resolveParam(coder, source, param)
                 end
             end, 'function params --')
@@ -135,7 +135,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             coder:withIndentation(function ()
                 for _, cat in ipairs(returns) do
                     if cat.value then
-                        coder:addLine('')
+                        coder:addLine('-- ' .. cat.code)
                         coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
                             funcKey    = coder:getKey(source),
                             returnKey  = cat.key and ('%q'):format(cat.key.id) or 'nil',

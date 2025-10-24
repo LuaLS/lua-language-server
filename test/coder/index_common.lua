@@ -122,7 +122,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')
@@ -139,7 +138,6 @@ do
     ]]
 
     local coder = vfile:makeCoder(ast)
-    log.debug(coder.code)
     coder:run()
 
     assert(node.type('A'):view() == 'A')

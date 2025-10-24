@@ -8,7 +8,7 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
 
     local classParams = {
         qid = string.format('%q', source.classID.id),
-        class = coder:getKey(source.parent),
+        class = coder:getKey(source),
         location = coder:makeLocationCode(source),
     }
 
@@ -117,23 +117,23 @@ ls.vm.registerCoderProvider('catstatealias', function (coder, source)
         end
 
         coder:addLine('{alias} = node.alias({name:q})' % {
-            alias = coder:getKey(source.parent),
+            alias = coder:getKey(source),
             name  = source.aliasID.id,
         })
         coder:addLine('node.type({name:q}):addAlias({alias})' % {
-            alias = coder:getKey(source.parent),
+            alias = coder:getKey(source),
             name  = source.aliasID.id,
         })
 
         if source.extends then
             coder:addLine('{alias}:setValue({value})' % {
-                alias = coder:getKey(source.parent),
+                alias = coder:getKey(source),
                 value = coder:getKey(source.extends),
             })
         end
 
         coder:addDisposer('node.type({name:q}):removeAlias({alias})' % {
-            alias = coder:getKey(source.parent),
+            alias = coder:getKey(source),
             name  = source.aliasID.id,
         })
     end, source.parent.code)
@@ -151,5 +151,46 @@ ls.vm.registerCoderProvider('catinteger', function (coder, source)
 end)
 
 ls.vm.registerCoderProvider('catunion', function (coder, source)
-    
+    ---@cast source LuaParser.Node.CatUnion
+
+    local parts = {}
+    for i, v in ipairs(source.exps) do
+        coder:compile(v)
+        parts[i] = coder:getKey(v)
+    end
+
+    coder:addLine('{key} = node.union {{parts}}' % {
+        key = coder:getKey(source),
+        parts = table.concat(parts, ', '),
+    })
+end)
+
+ls.vm.registerCoderProvider('catintersection', function (coder, source)
+    ---@cast source LuaParser.Node.CatIntersection
+
+    local parts = {}
+    for i, v in ipairs(source.exps) do
+        coder:compile(v)
+        parts[i] = coder:getKey(v)
+    end
+
+    coder:addLine('{key} = node.intersection {{parts}}' % {
+        key = coder:getKey(source),
+        parts = table.concat(parts, ', '),
+    })
+end)
+
+ls.vm.registerCoderProvider('cattable', function (coder, source)
+    ---@cast source LuaParser.Node.CatTable
+
+    local fields = {}
+    for i, field in ipairs(source.fields) do
+        coder:compile(field)
+        fields[i] = coder:getKey(field)
+    end
+
+    coder:addLine('{key} = node.table {{fields}}' % {
+        key = coder:getKey(source),
+        fields = table.concat(fields, ', '),
+    })
 end)

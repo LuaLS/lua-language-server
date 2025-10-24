@@ -173,7 +173,7 @@ M.__getter.typeOfKey = function (self)
     return self.scope.node.union(self.keys), true
 end
 
----@type table<Node, Node>
+---@type table<Node.TableKey, Node>
 M.valueMap = nil
 
 ---@param self Node.Table
@@ -190,7 +190,15 @@ M.__getter.valueMap = function (self)
         else
             v = field.value
         end
-        valueMap[k] = v
+        if not v then
+            goto continue
+        end
+        if k.kind == 'value' then
+            valueMap[k.literal] = v
+        else
+            valueMap[k] = v
+        end
+        ::continue::
     end
     return valueMap, true
 end
@@ -226,7 +234,11 @@ M.__getter.values = function (self)
     local values = {}
 
     for i, key in ipairs(self.keys) do
-        values[i] = self.valueMap[key]
+        if key.kind == 'value' then
+            values[i] = self.valueMap[key.literal]
+        else
+            values[i] = self.valueMap[key]
+        end
     end
 
     return values, true
@@ -247,7 +259,7 @@ function M:get(key)
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
-        return self.valueMap[key]
+        return self.valueMap[key.literal]
             or self:get(key.nodeType)
             or node.NIL
     end
@@ -297,7 +309,7 @@ function M:onCanBeCast(other)
     end
     for _, key in ipairs(self.keys) do
         local v = other:get(key)
-        local myType = self.valueMap[key]
+        local myType = self:get(key)
         if not v:canCast(myType) then
             return false
         end
@@ -322,7 +334,7 @@ function M:onCanCast(other)
             and type(key.literal) == 'number'
             and key.literal % 1 == 0
             and key.literal >= 1 then
-                local v = self.valueMap[key]
+                local v = self.valueMap[key.literal]
                 if not v:canCast(other.head) then
                     return false
                 end
@@ -439,7 +451,12 @@ ls.node.registerView('table', function (viewer, node, needParentheses)
                 end
             end
         end
-        local value = node.valueMap[key]
+        ---@type Node.TableKey
+        local k = key
+        if k.kind == 'value' then
+            k = k.literal
+        end
+        local value = node.valueMap[k]
         fields[#fields+1] = string.format('%s: %s'
             , viewer:viewAsKey(key)
             , viewer:view(value)

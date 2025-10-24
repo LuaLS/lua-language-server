@@ -15,7 +15,7 @@ local function tryBindCat(coder, var, index)
             if index == 1 then
                 coder:addLine('{var}:addClass({class})\n{class}:addVariable({var})' % {
                     var   = coder:getKey(var),
-                    class = coder:getKey(cat),
+                    class = coder:getKey(cat.value),
                 })
             end
         end

@@ -32,7 +32,7 @@ function M:makeFromAst(ast)
     self:addLine('-- Middle Code: ' .. self.vfile.uri)
     self:addLine 'local coder = ...'
     self:addLine 'local node  = coder.scope.node'
-    self:addLine 'local uri   = coder.vfile.uri'
+    self:addLine(('local uri   = %q'):format(self.vfile.uri))
     self:addLine 'local r     = coder.map'
     self:addLine 'node:lockCache()'
     self:addLine ''

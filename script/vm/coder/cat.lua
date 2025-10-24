@@ -165,6 +165,15 @@ ls.vm.registerCoderProvider('catinteger', function (coder, source)
     })
 end)
 
+ls.vm.registerCoderProvider('catstring', function (coder, source)
+    ---@cast source LuaParser.Node.CatString
+
+    coder:addLine('{key} = node.value {value:q}' % {
+        key = coder:getKey(source),
+        value = source.value,
+    })
+end)
+
 ls.vm.registerCoderProvider('catunion', function (coder, source)
     ---@cast source LuaParser.Node.CatUnion
 

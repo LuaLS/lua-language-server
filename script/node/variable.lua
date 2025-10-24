@@ -184,6 +184,10 @@ M.subVariables = nil
 ---@param variable Node.Variable
 ---@return Node.Variable
 function M:addSubVariable(variable)
+    if self.parentVariable then
+        self.parentVariable:addSubVariable(variable)
+        return self
+    end
     if not self.subVariables then
         self.subVariables = ls.linkedTable.create()
     end
@@ -197,6 +201,10 @@ end
 ---@param variable Node.Variable
 ---@return Node.Variable
 function M:removeSubVariable(variable)
+    if self.parentVariable then
+        self.parentVariable:removeSubVariable(variable)
+        return self
+    end
     if not self.subVariables then
         return self
     end

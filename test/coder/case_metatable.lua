@@ -9,7 +9,8 @@ do
 ---@alias f<T> T[]
 ---@alias A f<number>
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node.type('A').value:view() == 'f<number>')
     assert(node.type('A').value.value:view() == 'number[]')
@@ -24,7 +25,8 @@ do
 ---@alias f<T> T['__index']
 ---@alias A f<{ __index: 1 }>
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node.type('A'):view() == 'A')
     assert(node.type('A').value:view() == 'f<{ __index: 1 }>')
@@ -217,7 +219,8 @@ F = xxx
 
 R = F()
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     local R = node:globalGet('R')
     assert(R.value:view() == 'boolean')
@@ -233,7 +236,8 @@ F = xxx
 
 R = F(1)
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     local R = node:globalGet('R')
     assert(R.value:view() == '1[]')
@@ -249,7 +253,8 @@ function F() end
 
 R = F()
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     local F = node:globalGet('F')
     assert(F.value:view() == 'fun():number')
@@ -269,7 +274,8 @@ function F(x) end
 
 R = F(1)
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     local F = node:globalGet('F')
     assert(F.value:view() == 'fun<T>(x: <T>):<T>[]')
@@ -295,7 +301,8 @@ mt.__index = mt
 
 obj = setmetatable({}, mt)
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node:globalGet('obj'):view() == 'A')
     assert(node:globalGet('obj'):finalValue():view() == '{ __index: A }')
@@ -321,7 +328,8 @@ mt.xxx = 1
 obj = setmetatable({}, mt)
 value = obj.xxx
     ]]
-    vfile:indexAst(ast, 'common')
+    local coder = vfile:makeCoder(ast)
+    coder:run()
 
     assert(node:globalGet('obj'):view() == '1')
     assert(node:globalGet('value'):view() == '1')

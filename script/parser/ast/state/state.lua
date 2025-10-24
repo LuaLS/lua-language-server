@@ -32,6 +32,17 @@ local Select = Class('LuaParser.Node.Select', 'LuaParser.Node.Base')
 
 Select.kind = 'select'
 
+---@param self LuaParser.Node.Select
+---@return string
+---@return true
+Select.__getter.uniqueKey = function (self)
+    return string.format('select#%d@%d:%d'
+        , self.index
+        , self.startRow + 1
+        , self.startCol + 1
+    ), true
+end
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 

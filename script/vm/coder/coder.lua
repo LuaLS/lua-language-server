@@ -25,6 +25,7 @@ end
 function M:makeFromAst(ast)
     self.buf = {}
     self.disposers = {}
+    self.compiled = {}
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'local coder, vfile = ...'
@@ -113,6 +114,10 @@ end
 
 ---@param source LuaParser.Node.Base
 function M:compile(source)
+    if self.compiled[source] then
+        error('Source already compiled: ' .. source.kind)
+    end
+    self.compiled[source] = true
     local provider = M.providers[source.kind]
     if not provider then
         self:addLine('--[[!!! ' .. source.kind .. ' !!!]]')

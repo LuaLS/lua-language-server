@@ -411,3 +411,18 @@ ls.vm.registerCoderProvider('catstatetype', function (coder, source)
         coder:addToCatGroup(source.parent, true)
     end, source.parent.code)
 end)
+
+ls.vm.registerCoderProvider('catstategeneric', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateGeneric
+
+    coder:withIndentation(function ()
+        if not source.typeParams then
+            return
+        end
+        for i, typeParam in ipairs(source.typeParams) do
+            coder:compile(typeParam)
+        end
+
+        coder:addToCatGroup(source.parent, true)
+    end, source.parent.code)
+end)

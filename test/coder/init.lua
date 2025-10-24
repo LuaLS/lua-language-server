@@ -1,3 +1,6 @@
+---@type string?
+TEST_CODER = nil
+
 ---@param code string
 function TEST_INDEX(code)
     test.scope.node:reset()
@@ -6,6 +9,7 @@ function TEST_INDEX(code)
     ls.file.setText('test.lua', code)
 
     vfile:index()
+    TEST_CODER = vfile.coder.code
 end
 
 require 'test.coder.index_meta'

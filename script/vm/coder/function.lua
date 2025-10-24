@@ -24,6 +24,34 @@ function M:findMatchedCatParam(param)
 end
 
 ---@param func LuaParser.Node.Function
+---@return LuaParser.Node.CatStateGeneric[]?
+function M:findCatTypeParams(func)
+    local catGroup = self:getCatGroup(func)
+    if not catGroup then
+        return nil
+    end
+    local typeParams = {}
+
+    for _, catState in ipairs(catGroup) do
+        local cat = catState.value
+        if not cat then
+            goto continue
+        end
+        if cat.kind == 'catstategeneric' then
+            ---@cast cat LuaParser.Node.CatStateGeneric
+            typeParams[#typeParams+1] = cat
+        end
+        ::continue::
+    end
+
+    if #typeParams == 0 then
+        return nil
+    end
+
+    return typeParams
+end
+
+---@param func LuaParser.Node.Function
 ---@return LuaParser.Node.CatStateReturn[]?
 function M:findCatReturns(func)
     local catGroup = self:getCatGroup(func)
@@ -72,17 +100,32 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         })
         if source.name then
             coder:withIndentation(function ()
+                coder:addLine('')
                 coder:compile(source.name)
                 coder:compileAssign(source.name, 1, coder:getKey(source))
-                coder:addLine('')
             end, 'function name --')
+        end
+
+        local typeParams = coder:findCatTypeParams(source)
+        if typeParams then
+            coder:withIndentation(function ()
+                for _, cat in ipairs(typeParams) do
+                    for _, param in ipairs(cat.typeParams) do
+                        coder:addLine('')
+                        coder:addLine('{func}:addTypeParam({param})' % {
+                            func  = coder:getKey(source),
+                            param = coder:getKey(param),
+                        })
+                    end
+                end
+            end, 'function type params --')
         end
 
         if source.params then
             coder:withIndentation(function ()
                 for i, param in ipairs(source.params) do
-                    resolveParam(coder, source, param)
                     coder:addLine('')
+                    resolveParam(coder, source, param)
                 end
             end, 'function params --')
         end
@@ -92,12 +135,12 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             coder:withIndentation(function ()
                 for _, cat in ipairs(returns) do
                     if cat.value then
+                        coder:addLine('')
                         coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
                             funcKey    = coder:getKey(source),
                             returnKey  = cat.key and ('%q'):format(cat.key.id) or 'nil',
                             returnType = coder:getKey(cat.value),
                         })
-                        coder:addLine('')
                     end
                 end
             end, 'function returns --')

@@ -181,10 +181,10 @@ end
 do
     node:reset()
     --[[
-    ---@type fun(): boolean
+    ---@type fun(): boolean, number
     F = xxx
 
-    R = F()
+    R1, R2 = F()
     ]]
 
     local F = node:globalAdd({
@@ -192,21 +192,27 @@ do
     })
     F:addType(node.func()
         : addReturnDef(nil, node.BOOLEAN)
+        : addReturnDef(nil, node.NUMBER)
     )
-    local R = node.call(F, {}).value
-    assert(R:view() == 'boolean')
+    local CALL = node.call(F, {})
+    local R1 = CALL.returns:get(1)
+    local R2 = CALL.returns:get(2)
+    assert(R1:view() == 'boolean')
+    assert(R2:view() == 'number')
 end
 
 do
     TEST_INDEX [[
----@type fun(): boolean
+---@type fun(): boolean, number
 F = xxx
 
-R = F()
+R1, R2 = F()
     ]]
 
-    local R = node:globalGet('R')
-    assert(R.value:view() == 'boolean')
+    local R1 = node:globalGet('R1')
+    local R2 = node:globalGet('R2')
+    assert(R1.value:view() == 'boolean')
+    assert(R2.value:view() == 'number')
 end
 
 do

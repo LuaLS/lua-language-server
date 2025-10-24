@@ -64,3 +64,40 @@ ls.vm.registerCoderProvider('tablefieldid', function (coder, source)
 
     makeValue(coder, source, source.id)
 end)
+
+ls.vm.registerCoderProvider('select', function (coder, source)
+    ---@cast source LuaParser.Node.Select
+
+    local value = source.value
+    if source.index == 1 then
+        coder:compile(value)
+    end
+    if value.kind == 'call' then
+        coder:addLine('{key} = {value}.returns:get({index})' % {
+            key   = coder:getKey(source),
+            value = coder:getKey(source.value),
+            index = source.index,
+        })
+    else
+        coder:addLine('{key} = {value}' % {
+            key   = coder:getKey(source),
+            value = coder:getKey(source.value),
+        })
+    end
+end)
+
+ls.vm.registerCoderProvider('call', function (coder, source)
+    ---@cast source LuaParser.Node.Call
+
+    coder:compile(source.node)
+    local args = {}
+    for i, arg in ipairs(source.args) do
+        coder:compile(arg)
+        args[i] = coder:getKey(arg)
+    end
+    coder:addLine('{key} = node.call({func}, { {args} })' % {
+        key   = coder:getKey(source),
+        func  = coder:getKey(source.node),
+        args  = table.concat(args, ', '),
+    })
+end)

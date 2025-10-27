@@ -146,7 +146,7 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     local buf = {}
     for _, v in ipairs(self.values) do
         buf[#buf+1] = viewer:view(v)

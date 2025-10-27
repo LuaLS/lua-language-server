@@ -83,7 +83,7 @@ function M:makeGenericMap(args)
     return map
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     if self.params then
         return '{}<{}>' % {
             self.aliasName,

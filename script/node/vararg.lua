@@ -19,9 +19,46 @@ M.max = nil
 ---@param max? integer
 function M:__init(scope, values, min, max)
     self.scope = scope
-    self.values = values or {}
-    self.min = min or #self.values
+    self.raw = values
+    self.min = min or (values and #values) or 0
     self.max = max
+end
+
+---@type Node[]
+M.values = nil
+
+---@param self Node.Vararg
+---@return Node[]
+---@return true
+M.__getter.values = function (self)
+    if not self.raw then
+        return {}, true
+    end
+    local values = {}
+    for i, raw in ipairs(self.raw) do
+        values[i] = raw
+    end
+    local n = #values
+    local last = values[n]
+    if last and last.kind == 'vararg' then
+        ---@cast last Node.Vararg
+        for i = 1, #last.values do
+            values[n + 1] = last.values[i + 1]
+        end
+        local min = n + last.min - 1
+        if min > self.min then
+            self.min = min
+        end
+        if last.max then
+            local max = n + last.max - 1
+            if not self.max then
+                self.max = max
+            elseif max > self.max then
+                self.max = max
+            end
+        end
+    end
+    return values, true
 end
 
 ---@type Node.Value[]
@@ -124,7 +161,7 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:onView(viewer, needParentheses)
+function M:onViewAsVararg(viewer, options)
     local values = self.values
     if #values == 0 then
         return 'nil'
@@ -147,7 +184,9 @@ function M:onView(viewer, needParentheses)
             end
         end
         if i > self.min then
-            buf[#buf+1] = viewer:view(v, 1, true) .. '?'
+            buf[#buf+1] = viewer:view(v, {
+                needParentheses = true,
+            }) .. '?'
         else
             buf[#buf+1] = viewer:view(v)
         end
@@ -192,7 +231,7 @@ function M:onView(viewer, needParentheses)
         view = view .. tail
     end
 
-    if needParentheses then
+    if options.needParentheses then
         view = '({})' % { view }
     end
 

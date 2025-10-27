@@ -207,6 +207,12 @@ function M:fillAPIs()
     function self.template(name, params)
         return New 'Node.Template' (scope, name, params)
     end
+
+    ---@param options? Node.Viewer.Options
+    ---@return Node.Viewer
+    function self.viewer(options)
+        return New 'Node.Viewer' (options)
+    end
 end
 
 ---@private

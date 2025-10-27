@@ -114,7 +114,7 @@ M.__getter.returns = function (self)
     return vararg, true
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     return '{}({})' % {
         self.head.typeName,
         table.concat(ls.util.map(self.args, function (arg)

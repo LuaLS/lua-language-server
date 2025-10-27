@@ -43,7 +43,7 @@ M.__getter.nodeType = function (self)
     return self.scope.node.type(self.typeName), true
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     if self.typeName == 'string' then
         return ls.util.viewString(self.literal, self.quo)
     else
@@ -51,7 +51,7 @@ function M:onView(viewer, needParentheses)
     end
 end
 
-function M:onViewAsKey(viewer)
+function M:onViewAsKey(viewer, options)
     local literal = self.literal
     if type(literal) == 'string' and literal:match '^[%a_][%w_]*$' then
         return literal

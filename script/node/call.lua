@@ -194,7 +194,7 @@ function M:resolveGeneric(map)
     return self.scope.node.call(self.head.typeName, args)
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     return '{}<{}>' % {
         self.head.typeName,
         table.concat(ls.util.map(self.args, function (arg)

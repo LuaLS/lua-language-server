@@ -468,6 +468,6 @@ M.__getter.callCache = function (self)
     return ls.pathTable.create(true, true), true
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     return self.typeName
 end

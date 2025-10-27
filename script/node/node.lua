@@ -69,18 +69,18 @@ function M:__shr(other)
 end
 
 ---展示节点内容
----@param skipLevel? integer
+---@param options? Node.Viewer.Options
 ---@return string
-function M:view(skipLevel)
-    ---@type Node.Viewer
-    local viewer = New 'Node.Viewer' (skipLevel)
-    return viewer:view(self)
+function M:view(options)
+    local viewer = self.scope.node.viewer()
+    return viewer:view(self, options)
 end
 
-function M:viewAsKey(skipLevel)
-    ---@type Node.Viewer
-    local viewer = New 'Node.Viewer' (skipLevel)
-    return viewer:viewAsKey(self)
+---@param options? Node.Viewer.Options
+---@return string
+function M:viewAsVararg(options)
+    local viewer = self.scope.node.viewer()
+    return viewer:viewAsVararg(self, options)
 end
 
 ---@param key string|number|boolean|Node
@@ -261,20 +261,43 @@ function M:each(kind)
 end
 
 ---@param viewer Node.Viewer
----@param needParentheses boolean?
+---@param options Node.Viewer.Options
 ---@return string
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     if self.value == self then
         error('Cannot view node of kind ' .. self.kind)
     end
-    return viewer:view(self.value, 0, needParentheses)
+    return viewer:view(self.value, options)
 end
 
 ---@param viewer Node.Viewer
+---@param options Node.Viewer.Options
 ---@return string
-function M:onViewAsKey(viewer)
-    return '[' .. viewer:view(self) .. ']'
+function M:onViewAsKey(viewer, options)
+    return '[' .. viewer:view(self, options) .. ']'
 end
+
+---@param viewer Node.Viewer
+---@param options Node.Viewer.Options
+---@return string
+function M:onViewAsVariable(viewer, options)
+    error('Cannot view variable of node kind ' .. self.kind)
+end
+
+---@param viewer Node.Viewer
+---@param options Node.Viewer.Options
+---@return string
+function M:onViewAsParam(viewer, options)
+    error('Cannot view variable of node kind ' .. self.kind)
+end
+
+---@param viewer Node.Viewer
+---@param options Node.Viewer.Options
+---@return string
+function M:onViewAsVararg(viewer, options)
+    error('Cannot view variable of node kind ' .. self.kind)
+end
+
 
 ---@generic T: Node
 ---@param nodeType `T`

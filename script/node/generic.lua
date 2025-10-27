@@ -51,6 +51,20 @@ function M:inferGeneric(other, result)
     result[self] = other
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     return '<' .. self.name .. '>'
+end
+
+function M:onViewAsParam(viewer, options)
+    local buf = {}
+    buf[#buf+1] = self.name
+    if self.extends ~= self.scope.node.ANY then
+        buf[#buf+1] = ':'
+        buf[#buf+1] = viewer:view(self.extends, { skipLevel = 0 })
+    end
+    if self.default then
+        buf[#buf+1] = '='
+        buf[#buf+1] = viewer:view(self.default, { skipLevel = 0 })
+    end
+    return table.concat(buf)
 end

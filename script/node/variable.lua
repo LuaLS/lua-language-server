@@ -462,9 +462,13 @@ function M:hideAtHead()
     return self
 end
 
----@param skipLevel? integer
+---@param viewer Node.Viewer
+---@param options Node.Viewer.Options
 ---@return string
-function M:viewVariable(skipLevel)
+function M:view(viewer, options)
+    if options.mode ~= 'variable' then
+        return viewer:view(self.value, options)
+    end
     ---@type Node.Variable[]
     local path = {}
     local current = self
@@ -492,10 +496,14 @@ function M:viewVariable(skipLevel)
     if tooLong then
         views[#views+1] = '...'
     end
-    views[#views+1] = path[#path].key:viewAsKey(skipLevel)
+    views[#views+1] = viewer:viewAsKey(path[#path].key, {
+        skipLevel = options.skipLevel,
+    })
     for i = #path - 1, 1, -1 do
         local var = path[i]
-        local view = var.key:viewAsKey(skipLevel)
+        local view = viewer:viewAsKey(var.key, {
+            skipLevel = options.skipLevel,
+        })
         if view:sub(1, 1) ~= '[' then
             view = '.' .. view
         end

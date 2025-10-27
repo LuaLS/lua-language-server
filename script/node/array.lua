@@ -103,6 +103,8 @@ function M:inferGeneric(other, result)
     self.head:inferGeneric(value, result)
 end
 
-function M:onView(viewer, needParentheses)
-    return viewer:format('%s[]', self.head, 0, true)
+function M:onView(viewer, options)
+    return viewer:format('%s[]', self.head, {
+        needParentheses = true,
+    })
 end

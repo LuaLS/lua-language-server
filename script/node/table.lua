@@ -426,7 +426,7 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     if #self.keys == 0 then
         return '{}'
     end

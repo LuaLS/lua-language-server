@@ -192,13 +192,16 @@ local sortScore = {
     ['nil'] = -1000,
 }
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     local values = self.values
     if #values == 0 then
         return 'never'
     end
     if #values == 1 then
-        return viewer:view(values[1], 0, needParentheses)
+        return viewer:view(values[1], {
+            skipLevel = 0,
+            needParentheses = options.needParentheses,
+        })
     end
     ---@type string[]
     local view = {}
@@ -206,7 +209,9 @@ function M:onView(viewer, needParentheses)
         if v.hideInUnionView then
             goto continue
         end
-        local thisView = viewer:view(v, 1, true)
+        local thisView = viewer:view(v, {
+            needParentheses = true,
+        })
         if not thisView then
             goto continue
         end
@@ -220,7 +225,7 @@ function M:onView(viewer, needParentheses)
         ls.util.sortCallbackOfIndex(view),
     })
     local result = table.concat(view, ' | ')
-    if needParentheses then
+    if options.needParentheses then
         return '(' .. result .. ')'
     end
     return result

@@ -280,25 +280,30 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     local values = self.values
     if #values == 0 then
         return 'never'
     end
     if #values == 1 then
-        return viewer:view(values[1], 0, needParentheses)
+        return viewer:view(values[1], {
+            skipLevel = 0,
+            needParentheses = options.needParentheses,
+        })
     end
     local elements = {}
     for _, v in ipairs(self.rawNodes) do
         if v.hideInUnionView then
             goto continue
         end
-        local view = viewer:view(v, 1, true)
+        local view = viewer:view(v, {
+            needParentheses = true,
+        })
         elements[#elements+1] = view
         ::continue::
     end
     local result = table.concat(elements, ' & ')
-    if needParentheses then
+    if options.needParentheses then
         return '(' .. result .. ')'
     end
     return result

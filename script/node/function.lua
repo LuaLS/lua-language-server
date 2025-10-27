@@ -435,7 +435,7 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:onView(viewer, needParentheses)
+function M:onView(viewer, options)
     if viewer.visited[self] > 1 then
         return 'function'
     end

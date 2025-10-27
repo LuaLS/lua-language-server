@@ -62,30 +62,8 @@ function M:onCanCast(other)
     end
     if other.kind == 'function' then
         ---@cast other Node.Function
-        for i, oparam in ipairs(other.paramsDef) do
-            local param = self:getParam(i)
-            if not param then
-                return false
-            end
-            if not param:canCast(oparam.value) then
-                return false
-            end
-        end
-        if other.varargParamDef then
-            for i = #other.paramsDef + 1, #self.paramsDef do
-                local param = self:getParam(i)
-                if not param then
-                    return false
-                end
-                if not param:canCast(other.varargParamDef) then
-                    return false
-                end
-            end
-            if self.varargParamDef then
-                if not self.varargParamDef:canCast(other.varargParamDef) then
-                    return false
-                end
-            end
+        if not other:isMatchedParams(self.paramsDef, self.varargParamDef) then
+            return false
         end
         for i, oreturn in ipairs(other.returnsDef) do
             local ret = self:getReturn(i)
@@ -99,6 +77,76 @@ function M:onCanCast(other)
         return true
     end
     return false
+end
+
+---@param params Node[]
+---@param varargs Node?
+---@return boolean
+function M:isMatchedParams(params, varargs)
+    for i, oparam in ipairs(params) do
+        local param = self:getParam(i)
+        if not param then
+            break
+        end
+        if not oparam.value:canCast(param) then
+            return false
+        end
+    end
+    for i, param in ipairs(self.paramsDef) do
+        local oparam = param
+    end
+    if varargs then
+        for i = #params + 1, #self.paramsDef do
+            local param = self:getParam(i)
+            if not param then
+                break
+            end
+            if not varargs:canCast(param) then
+                return false
+            end
+        end
+        if self.varargParamDef then
+            if not varargs:canCast(self.varargParamDef) then
+                return false
+            end
+        end
+    else
+        local lastOParam = params[#params]
+        if lastOParam and lastOParam.kind == 'vararg' then
+            ---@cast lastOParam Node.Vararg
+            if lastOParam.max then
+                -- 第一个上面已经检查过了
+                for i = #params + 1, lastOParam.max + #params - 1 do
+                    local param = self:getParam(i)
+                    if not param then
+                        break
+                    end
+                    local oparam = lastOParam:get(i - #params + 1)
+                    if not oparam:canCast(param) then
+                        return false
+                    end
+                end
+            else
+                for i = #params + 1, math.max(#self.paramsDef, #params + #lastOParam.values - 1) do
+                    local param = self:getParam(i)
+                    if not param then
+                        break
+                    end
+                    local oparam = lastOParam:get(i - #params + 1)
+                    if not oparam:canCast(param) then
+                        return false
+                    end
+                end
+                if self.varargParamDef then
+                    local oparam = lastOParam:getLastValue()
+                    if not oparam:canCast(self.varargParamDef) then
+                        return false
+                    end
+                end
+            end
+        end
+    end
+    return true
 end
 
 ---@param key string

@@ -28,6 +28,18 @@ M.__getter.value = function (self)
     return self.default or self.extends, true
 end
 
+function M:onCanBeCast(other)
+    if self.extends.onCanBeCast then
+        return self.extends:onCanBeCast(other)
+    end
+end
+
+function M:onCanCast(other)
+    if self.extends.onCanCast then
+        return self.extends:onCanCast(other)
+    end
+end
+
 function M:resolveGeneric(map)
     return map[self] or self
 end

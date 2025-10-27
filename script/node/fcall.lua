@@ -62,13 +62,39 @@ M.__getter.returns = function (self)
     local allMin = 0
     ---@type integer?
     local allMax = 0
-    local hasDef
 
     local node = self.scope.node
+    ---@type Node.Function[]
+    local defs = {}
 
     for f in self.head:finalValue():each 'function' do
-        hasDef = true
         ---@cast f Node.Function
+        if f:isMatchedParams(self.args) then
+            defs[#defs+1] = f
+        end
+    end
+
+    if #defs == 0 then
+        return node.UNKNOWN, true
+    end
+
+    local allParams = {}
+    for i, def in ipairs(defs) do
+        local params = ls.util.map(def.paramsDef, function (v)
+            local value = v.value
+            if value.kind == 'generic' then
+                ---@cast value Node.Generic
+                return value.extends
+            else
+                return value
+            end
+        end)
+        allParams[i] = params
+    end
+
+    local matches = node:getBestMatchs(allParams, #self.args)
+    for _, match in ipairs(matches) do
+        local f = defs[match]
         f = f:resolveGeneric(f:makeGenericMap(self.args))
         local min, max = f:getReturnCount()
         for i = 1, min do
@@ -84,19 +110,8 @@ M.__getter.returns = function (self)
         end
     end
 
-    if not hasDef then
-        return node.UNKNOWN, true
-    end
-
     local vararg = node.vararg(returns, allMin, allMax)
     return vararg, true
-end
-
-function M:resolveGeneric(map)
-    local args = ls.util.map(self.args, function (arg)
-        return arg:resolveGeneric(map)
-    end)
-    return self.scope.node.call(self.head.typeName, args)
 end
 
 function M:onView(viewer, needParentheses)

@@ -471,9 +471,10 @@ function M:calcFullExtends(node)
 end
 
 
----@param params Node[][]
+---@param params (Node?)[][]
+---@param n integer
 ---@return integer[]
-function M:getBestMatchs(params)
+function M:getBestMatchs(params, n)
     local matchs = {}
     for i = 1, #params do
         matchs[i] = i
@@ -503,8 +504,8 @@ function M:getBestMatchs(params)
     table.sort(matchs, function (a, b)
         local paramsA = params[a]
         local paramsB = params[b]
-        for i = 1, #paramsA do
-            local moreExact = isMoreExact(paramsA[i], paramsB[i])
+        for i = 1, n do
+            local moreExact = isMoreExact(paramsA[i] or self.ANY, paramsB[i] or self.ANY)
             if moreExact ~= nil then
                 return moreExact
             end
@@ -517,8 +518,8 @@ function M:getBestMatchs(params)
     local bestParams = params[bestI]
 
     local function isAllSame(paramsA, paramsB)
-        for i = 1, #paramsA do
-            if paramsA[i] ~= paramsB[i] then
+        for i = 1, n do
+            if (paramsA[i] or self.ANY) ~= (paramsB[i] or self.ANY) then
                 return false
             end
         end

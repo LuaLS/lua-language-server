@@ -1,4 +1,5 @@
 require 'test.node.view'
+require 'test.node.vararg'
 require 'test.node.cast_base'
 require 'test.node.view_intersection'
 require 'test.node.cast_function'

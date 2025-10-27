@@ -151,16 +151,6 @@ do
 end
 
 do
-    local v1 = node.vararg()
-
-    assert(v1:view() == '...')
-
-    local v2 = node.vararg({node.BOOLEAN})
-
-    assert(v2:view() == 'boolean...')
-end
-
-do
     local a = node.array(node.type('number'))
 
     assert(a:view() == 'number[]')

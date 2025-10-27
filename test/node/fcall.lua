@@ -39,3 +39,35 @@ do
     assert(fcall.returns:get(1):view() == 'number[]')
     assert(fcall.returns:get(2):view() == 'string[]')
 end
+
+do
+    node:reset()
+    --[[
+    ---@alias F fun(x: any): 1
+    ---@alias F fun(x: number): 2
+    ---@alias F<T: string> fun(x: T): 3
+    ]]
+
+    node.alias('F', node.func()
+        : addParamDef('x', node.ANY)
+        : addReturnDef(nil, node.value(1))
+    )
+    node.alias('F', node.func()
+        : addParamDef('x', node.NUMBER)
+        : addReturnDef(nil, node.value(2))
+    )
+    local T = node.generic('T', node.STRING)
+    node.alias('F', node.func()
+        : addTypeParam(T)
+        : addParamDef('x', T)
+        : addReturnDef(nil, node.value(3))
+    )
+
+    local r1 = node.fcall(node.type 'F', { node.value(true) })
+    local r2 = node.fcall(node.type 'F', { node.value(123) } )
+    local r3 = node.fcall(node.type 'F', { node.value('hello') } )
+
+    assert(r1.value:view() == '1')
+    assert(r2.value:view() == '2')
+    assert(r3.value:view() == '3')
+end

@@ -156,7 +156,7 @@ function M:getProtos(protos, args)
         end)
     end
 
-    local matchs = self.scope.node:getBestMatchs(params)
+    local matchs = self.scope.node:getBestMatchs(params, nargs)
     local finalResults = ls.util.map(matchs, function (i)
         return results[i]
     end)

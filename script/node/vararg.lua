@@ -7,6 +7,12 @@ local M = ls.node.register 'Node.Vararg'
 
 M.kind = 'vararg'
 
+---@type integer
+M.min = 0
+
+---@type integer?
+M.max = nil
+
 ---@param scope Scope
 ---@param values? Node[]
 ---@param min? integer
@@ -24,13 +30,16 @@ M.keys = nil
 function M:get(key)
     if type(key) ~= 'table' then
         if math.type(key) ~= 'integer'
-        or (self.min and self.min > key)
         or (self.max and self.max < key) then
             return self.scope.node.NIL
         end
-        return self.values[key]
+        local v = self.values[key]
             or self.values[#self.values]
             or self.scope.node.ANY
+        if key > self.min then
+            return v | self.scope.node.NIL
+        end
+        return v
     end
     local typeName = key.typeName
     if typeName == 'never'
@@ -68,16 +77,19 @@ function M:get(key)
     return self.scope.node.NIL
 end
 
----@param other Node
----@return boolean
-function M:onCanBeCast(other)
-    return false
+---@return Node
+function M:getLastValue()
+    if #self.values == 0 then
+        return self.scope.node.NIL
+    end
+    return self:get(#self.values)
 end
 
----@param other Node
----@return boolean
-function M:onCanCast(other)
-    return false
+---@param self Node.Vararg
+---@return Node
+---@return true
+M.__getter.value = function (self)
+    return self:get(1), true
 end
 
 ---@param self Node.Tuple
@@ -113,21 +125,75 @@ function M:inferGeneric(other, result)
 end
 
 function M:onView(viewer, needParentheses)
-    local buf = {}
-    if #self.values == 0 then
-        return '...'
+    local values = self.values
+    if #values == 0 then
+        return 'nil'
     end
-    for i, v in ipairs(self.values) do
-        if self.min and i > self.min then
-            break
+    local maxLen = 8
+    local buf = {}
+
+    local function push(i)
+        local v = values[i]
+        if self.max then
+            if i > self.max then
+                return true
+            end
+            if not v then
+                v = values[#values]
+            end
+        else
+            if not v then
+                return true
+            end
         end
-        buf[#buf+1] = viewer:view(v)
+        if i > self.min then
+            buf[#buf+1] = viewer:view(v, 1, true) .. '?'
+        else
+            buf[#buf+1] = viewer:view(v)
+        end
+    end
+
+    local tail
+    if #values <= maxLen then
+        for i = 1, maxLen do
+            if push(i) then
+                break
+            end
+        end
+
+        if not self.max then
+            tail = '...'
+        elseif self.max > maxLen then
+            tail = '...(+{})' % { self.max - maxLen + 1 }
+        end
+    else
+        for i = 1, maxLen // 2 do
+            if push(i) then
+                break
+            end
+        end
+        buf[#buf+1] = '...(+{})' % { #values - maxLen + 1 }
+        for i = #values - maxLen // 2 + 2, #values do
+            if push(i) then
+                break
+            end
+        end
+
+        if not self.max then
+            tail = '...'
+        elseif self.max > #values then
+            tail = '...(+{})' % { self.max - #values }
+        end
     end
 
     local view = table.concat(buf, ', ')
 
-    if not self.max or self.max > #buf then
-       view = view .. '...'
+    if tail then
+        view = view .. tail
+    end
+
+    if needParentheses then
+        view = '({})' % { view }
     end
 
     return view

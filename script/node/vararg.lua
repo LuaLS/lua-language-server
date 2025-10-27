@@ -36,23 +36,24 @@ M.__getter.values = function (self)
     end
     local values = {}
     for i, raw in ipairs(self.raw) do
-        if raw.kind == 'vararg' and i < #self.raw then
+        if raw.kind == 'vararg' then
             ---@cast raw Node.Vararg
-            values[i] = raw:select(1)
+            values[i] = raw.values[1]
         else
             values[i] = raw
         end
     end
     local n = #values
-    local last = values[n]
+    local last = self.raw[n]
     if last and last.kind == 'vararg' then
         ---@cast last Node.Vararg
         for i = 1, #last.values do
             values[n + i] = last.values[i + 1]
         end
-        local min = n + last.min - 1
-        if min > self.min then
-            self.min = min
+        if last.min > 0 then
+            self.min = self.min - 1 + last.min
+        elseif self.min == #values then
+            self.min = self.min - 1
         end
         if last.max then
             local max = n + last.max - 1
@@ -61,6 +62,8 @@ M.__getter.values = function (self)
             elseif max > self.max then
                 self.max = max
             end
+        else
+            self.max = nil
         end
     end
     return values, true

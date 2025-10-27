@@ -123,7 +123,7 @@ function M:fillAPIs()
         return New 'Node.Table' (scope, fields)
     end
 
-    ---@param values? Node[]
+    ---@param values? Node[] | Node.Vararg
     ---@return Node.Tuple
     function self.tuple(values)
         return New 'Node.Tuple' (scope, values)

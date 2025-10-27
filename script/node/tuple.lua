@@ -51,7 +51,10 @@ M.__getter.values = function (self)
     if self.vararg then
         return self.vararg, true
     end
-    return node.vararg(self.raw, #self.raw, #self.raw), true
+    if self.raw then
+        return node.vararg(self.raw, #self.raw, #self.raw), true
+    end
+    return node.vararg({}, 0, 0), true
 end
 
 ---@type Node.Value[]
@@ -86,12 +89,31 @@ function M:get(key)
 end
 
 ---@param other Node
----@return boolean
+---@return boolean?
 function M:onCanBeCast(other)
     if self == other then
         return true
     end
-    for i, v in ipairs(self.values) do
+    if other.kind == 'tuple' then
+        ---@cast other Node.Tuple
+        return other.values:canCast(self.values)
+    end
+    if other.kind == 'array' then
+        ---@cast other Node.Array
+        -- 数组转元组特殊处理，可以无视元组的长度
+        for _, v in ipairs(self.values.values) do
+            if not other.head:canCast(v) then
+                return false
+            end
+        end
+        return true
+    end
+    -- 无穷多的值肯定不能被有限的值转换。
+    if not self.values.max then
+        return false
+    end
+    for i = 1, math.min(100, self.values.max) do
+        local v = self.values:select(i)
         local value = other:get(i)
         if not value:canCast(v) then
             return false
@@ -105,12 +127,8 @@ end
 function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
-        for i, v in ipairs(self.values) do
-            if not v:canCast(other.head) then
-                return false
-            end
-        end
-        return true
+        local arrayVararg = self.scope.node.vararg({ other.head }, 0)
+        return self.values:canCast(arrayVararg)
     end
     return false
 end

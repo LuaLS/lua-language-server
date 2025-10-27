@@ -148,3 +148,12 @@ do
     assert(V1 >> V2 == true)
     assert(V2 >> V1 == true)
 end
+
+do
+    local V1 = node.vararg({ node.INTEGER }, 0)
+    assert(V1:viewAsVararg() == 'integer?...')
+
+    local V = node.vararg({ node.value(1), V1 }, 2, 2)
+
+    assert(V:viewAsVararg() == '1, integer?...')
+end

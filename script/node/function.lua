@@ -54,6 +54,32 @@ function M:onCanBeCast(other)
     end
 end
 
+---@type Node.Vararg
+M.paramsPack = nil
+
+---@param self Node.Function
+---@return Node.Vararg
+---@return true
+M.__getter.paramsPack = function (self)
+    local node = self.scope.node
+    local params = ls.util.map(self.paramsDef, function (v, k)
+        local value = v.value
+        if v.optional then
+            value = value | node.NIL
+        end
+        return value
+    end)
+    local min = #params
+    ---@type integer?
+    local max = #params
+    if self.varargParamDef then
+        params[#params+1] = self.varargParamDef
+        max = nil
+    end
+
+    return node.vararg(params, min, max), true
+end
+
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
@@ -62,7 +88,7 @@ function M:onCanCast(other)
     end
     if other.kind == 'function' then
         ---@cast other Node.Function
-        if not other:isMatchedParams(self.paramsDef, self.varargParamDef) then
+        if not self.paramsPack:canCast(other.paramsPack) then
             return false
         end
         for i, oreturn in ipairs(other.returnsDef) do

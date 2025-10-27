@@ -200,3 +200,11 @@ do
     assert(A >> B == false)
     assert(B >> A == true)
 end
+
+do
+    local A = node.array(node.value('x'))
+    local B = node.tuple(node.vararg({ node.STRING }, 3))
+
+    assert(A >> B == true)
+    assert(B >> A == false)
+end

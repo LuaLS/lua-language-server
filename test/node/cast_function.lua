@@ -107,7 +107,7 @@ do
         : addParamDef('x', test.scope.node.type 'number')
         : addParamDef('y', test.scope.node.type 'string')
 
-    assert(a >> b == true)
+    assert(a >> b == false)
     assert(b >> a == true)
 end
 

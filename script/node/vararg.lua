@@ -37,7 +37,8 @@ M.__getter.values = function (self)
     local values = {}
     for i, raw in ipairs(self.raw) do
         if raw.kind == 'vararg' and i < #self.raw then
-            values[i] = raw:get(1)
+            ---@cast raw Node.Vararg
+            values[i] = raw:select(1)
         else
             values[i] = raw
         end
@@ -68,7 +69,7 @@ end
 ---@type Node.Value[]
 M.keys = nil
 
-function M:get(key)
+function M:select(key)
     if type(key) ~= 'table' then
         if math.type(key) ~= 'integer'
         or (self.max and self.max < key) then
@@ -96,7 +97,7 @@ function M:get(key)
         return self.scope.node.union(self.values)
     end
     if key.kind == 'value' then
-        return self:get(key.literal)
+        return self:select(key.literal)
     end
     if key.typeName == 'number'
     or key.typeName == 'integer' then
@@ -110,7 +111,7 @@ function M:get(key)
         ---@type Node
         local result
         for _, v in ipairs(key.values) do
-            local r = self:get(v)
+            local r = self:select(v)
             result = result | r
         end
         return result
@@ -123,21 +124,21 @@ function M:getLastValue()
     if #self.values == 0 then
         return self.scope.node.NIL
     end
-    return self:get(#self.values)
+    return self:select(#self.values)
 end
 
 ---@param self Node.Vararg
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    return self:get(1), true
+    return self:select(1), true
 end
 
----@param self Node.Tuple
+---@param self Node.Vararg
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    for _, v in ipairs(self.values) do
+    for _, v in ipairs(self.raw) do
         if v.hasGeneric then
             return true, true
         end
@@ -150,18 +151,25 @@ function M:resolveGeneric(map)
         return self
     end
     local values = {}
-    for i, value in ipairs(self.values) do
+    for i, value in ipairs(self.raw) do
         values[i] = value:resolveGeneric(map)
     end
     return self.scope.node.vararg(values)
 end
 
+---@param other Node.Vararg
+---@param result table<Node.Generic, Node>
 function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
-    for i, v in ipairs(self.values) do
-        v:inferGeneric(other:get(i), result)
+    if other.kind ~= 'vararg' then
+        return
+    end
+    ---@cast other Node.Vararg
+    for i = 1, math.max(#self.values, #other.values) do
+        local v = self:select(i)
+        v:inferGeneric(other:select(i), result)
     end
 end
 
@@ -169,7 +177,7 @@ end
 ---@return boolean
 function M:onCanCast(other)
     if other.kind ~= 'vararg' then
-        return self.value >> other
+        return self.value:onCanCast(other)
     end
     ---@cast other Node.Vararg
 
@@ -192,8 +200,8 @@ function M:onCanCast(other)
         if other.max and i > other.max then
             return true
         end
-        local a = self:get(i)
-        local b = other:get(i)
+        local a = self:select(i)
+        local b = other:select(i)
         -- 类型匹配
         if a:canCast(b) then
             return true

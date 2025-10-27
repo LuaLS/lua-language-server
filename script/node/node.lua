@@ -90,7 +90,7 @@ function M:viewAsVariable(options)
     return viewer:viewAsVariable(self, options)
 end
 
----@param key string|number|boolean|Node
+---@param key Node.TableKey
 ---@return Node
 function M:get(key)
     local value = self.value
@@ -98,6 +98,12 @@ function M:get(key)
         return self.scope.node.NEVER
     end
     return value:get(key)
+end
+
+---@param key Node.TableKey
+---@return Node
+function M:select(key)
+    return self.scope.node.NEVER
 end
 
 ---@type Node

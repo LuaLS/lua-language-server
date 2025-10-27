@@ -7,18 +7,51 @@ local M = ls.node.register 'Node.Tuple'
 
 M.kind = 'tuple'
 
+---@type Node[]?
+M.raw = nil
+
+---@type Node.Vararg?
+M.vararg = nil
+
 ---@param scope Scope
----@param values? Node[]
+---@param values? Node[] | Node.Vararg
 function M:__init(scope, values)
     self.scope = scope
-    self.values = values or {}
+    if values and values.kind == 'vararg' then
+        ---@cast values Node.Vararg
+        self.vararg = values
+    else
+        ---@cast values Node[]
+        self.raw = values
+    end
 end
 
 ---@param value Node
 ---@return Node.Tuple
 function M:insert(value)
-    table.insert(self.values, value)
+    if self.vararg then
+        error('Cannot insert into a static tuple')
+    end
+    if not self.raw then
+        self.raw = {}
+    end
+    table.insert(self.raw, value)
+    self:flushCache()
     return self
+end
+
+---@type Node.Vararg
+M.values = nil
+
+---@param self Node.Tuple
+---@return Node.Vararg
+---@return true
+M.__getter.values = function (self)
+    local node = self.scope.node
+    if self.vararg then
+        return self.vararg, true
+    end
+    return node.vararg(self.raw, #self.raw, #self.raw), true
 end
 
 ---@type Node.Value[]
@@ -29,8 +62,10 @@ M.keys = nil
 ---@return true
 M.__getter.keys = function (self)
     local keys = {}
-    for i = 1, #self.values do
-        keys[i] = self.scope.node.value(i)
+    local node = self.scope.node
+    local max = self.values.max
+    for i = 1, math.min(max or 1000, 1000) do
+        keys[i] = node.value(i)
     end
     return keys, true
 end
@@ -39,49 +74,15 @@ end
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
+    local max = self.values.max
+    if not max or max > 1000 then
+        return self.scope.node.INTEGER, true
+    end
     return self.scope.node.union(self.keys), true
 end
 
 function M:get(key)
-    if type(key) ~= 'table' then
-        return self.values[key]
-            or self.scope.node.NIL
-    end
-    local typeName = key.typeName
-    if typeName == 'never'
-    or typeName == 'nil' then
-        return self.scope.node.NEVER
-    end
-    if typeName == 'any'
-    or typeName == 'unknown'
-    or typeName == 'truly' then
-        if #self.values == 0 then
-            return self.scope.node.NIL
-        end
-        return self.scope.node.union(self.values)
-    end
-    if key.kind == 'value' then
-        return self.values[key.literal]
-            or self.scope.node.NIL
-    end
-    if key.typeName == 'number'
-    or key.typeName == 'integer' then
-        if #self.values == 0 then
-            return self.scope.node.NIL
-        end
-        return self.scope.node.union(self.values)
-    end
-    if key.kind == 'union' then
-        ---@cast key Node.Union
-        ---@type Node
-        local result
-        for _, v in ipairs(key.values) do
-            local r = self:get(v)
-            result = result | r
-        end
-        return result
-    end
-    return self.scope.node.NIL
+    return self.values:select(key)
 end
 
 ---@param other Node
@@ -147,10 +148,5 @@ function M:inferGeneric(other, result)
 end
 
 function M:onView(viewer, options)
-    local buf = {}
-    for _, v in ipairs(self.values) do
-        buf[#buf+1] = viewer:view(v)
-    end
-
-    return '[' .. table.concat(buf, ', ') .. ']'
+    return '[' .. viewer:viewAsVararg(self.values) .. ']'
 end

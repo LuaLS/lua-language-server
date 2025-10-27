@@ -121,7 +121,7 @@ function M:isMatchedParams(params, varargs)
                     if not param then
                         break
                     end
-                    local oparam = lastOParam:get(i - #params + 1)
+                    local oparam = lastOParam:select(i - #params + 1)
                     if not oparam:canCast(param) then
                         return false
                     end
@@ -132,7 +132,7 @@ function M:isMatchedParams(params, varargs)
                     if not param then
                         break
                     end
-                    local oparam = lastOParam:get(i - #params + 1)
+                    local oparam = lastOParam:select(i - #params + 1)
                     if not oparam:canCast(param) then
                         return false
                     end

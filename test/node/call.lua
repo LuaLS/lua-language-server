@@ -46,10 +46,10 @@ do
     local r5 = node.call('A', { node.value 'x', node.value(true) })
     local r6 = node.type('A')
 
-    -- assert(r1:view() == '6')
-    -- assert(r2:view() == '5')
-    -- assert(r3:view() == '3')
-    -- assert(r4:view() == '4')
-    -- assert(r5:view() == '2')
-    -- assert(r6:view() == '1')
+    assert(r1.value:view() == '6')
+    assert(r2.value:view() == '5')
+    assert(r3.value:view() == '3')
+    assert(r4.value:view() == '4')
+    assert(r5.value:view() == '2')
+    assert(r6.value:view() == '1')
 end

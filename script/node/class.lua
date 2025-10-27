@@ -2,6 +2,7 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
+---@field params? Node.Generic[]
 local M = ls.node.register 'Node.Class'
 
 M.kind = 'class'

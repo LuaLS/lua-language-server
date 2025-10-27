@@ -434,6 +434,114 @@ function M:flushNodesNow()
     end
 end
 
+---@param node Node.Type | Node.Call
+---@return Node.Class.ExtendAble[]
+function M:calcFullExtends(node)
+    ---@type Node.Class.ExtendAble[]
+    local results = {}
+    local visited = {}
+
+    ---@param t Node.Type | Node.Call
+    ---@param nextQueue (Node.Type | Node.Call)[]
+    local function searchOnce(t, nextQueue)
+        if visited[t] then
+            return
+        end
+        visited[t] = true
+        for _, ext in ipairs(t.extends) do
+            results[#results+1] = ext
+            if ext.kind == 'type'
+            or ext.kind == 'call' then
+                ---@cast ext -Node.Table
+                nextQueue[#nextQueue+1] = ext
+            end
+        end
+    end
+
+    local queue = { node }
+    while #queue > 0 do
+        local nextQueue = {}
+        for _, t in ipairs(queue) do
+            searchOnce(t, nextQueue)
+        end
+        queue = nextQueue
+    end
+
+    return results
+end
+
+
+---@param params Node[][]
+---@return integer[]
+function M:getBestMatchs(params)
+    local matchs = {}
+    for i = 1, #params do
+        matchs[i] = i
+    end
+
+    ---@param a Node
+    ---@param b Node
+    ---@return boolean?
+    local function isMoreExact(a, b)
+        if a == b then
+            return nil
+        end
+        if a == self.ANY then
+            return false
+        end
+        if b == self.ANY then
+            return true
+        end
+        local a2b = a >> b
+        local b2a = b >> a
+        if a2b == b2a then
+            return nil
+        end
+        return a2b
+    end
+
+    table.sort(matchs, function (a, b)
+        local paramsA = params[a]
+        local paramsB = params[b]
+        for i = 1, #paramsA do
+            local moreExact = isMoreExact(paramsA[i], paramsB[i])
+            if moreExact ~= nil then
+                return moreExact
+            end
+        end
+        return false
+    end)
+
+    local bestN = 1
+    local bestI = matchs[1]
+    local bestParams = params[bestI]
+
+    local function isAllSame(paramsA, paramsB)
+        for i = 1, #paramsA do
+            if paramsA[i] ~= paramsB[i] then
+                return false
+            end
+        end
+        return true
+    end
+
+    for i = 2, #matchs do
+        local currI = matchs[i]
+        local currParams = params[currI]
+        if isAllSame(bestParams, currParams) then
+            bestN = bestN + 1
+        else
+            break
+        end
+    end
+
+    for i = bestN + 1, #matchs do
+        matchs[i] = nil
+    end
+
+    return matchs
+end
+
 M.cacheLocked = 0
 
 function M:lockCache()

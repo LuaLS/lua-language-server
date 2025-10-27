@@ -19,6 +19,9 @@ function M:__init(scope, head, args)
     self.args = args
 
     self.head:registerFlushChain(self)
+    for _, arg in ipairs(self.args) do
+        arg:registerFlushChain(self)
+    end
 end
 
 ---@type Node.Class[]
@@ -69,7 +72,7 @@ M.fullExtends = nil
 ---@return Node.Class.ExtendAble[]
 ---@return true
 M.__getter.fullExtends = function (self)
-    return ls.node.calcFullExtends(self), true
+    return self.scope.node:calcFullExtends(self), true
 end
 
 --- 所有继承的合并表

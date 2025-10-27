@@ -114,6 +114,7 @@ end
 ---@param args? Node[]
 ---@return (Node.Class | Node.Alias)[]
 function M:getProtos(protos, args)
+    ---@type (Node.Class | Node.Alias)[]
     local results = {}
 
     if not protos then
@@ -121,14 +122,46 @@ function M:getProtos(protos, args)
     end
 
     local nargs = args and #args or 0
+    ---@param proto Node.Class | Node.Alias
     for proto in protos:pairsFast() do
         local nparams = proto.params and #proto.params or 0
-        if nparams == nargs then
-            results[#results+1] = proto
+        if nparams ~= nargs then
+            goto continue
         end
+        if nparams == 0 then
+            results[#results+1] = proto
+            goto continue
+        end
+        ---@cast args -?
+        for i = 1, nparams do
+            local param = proto.params[i]
+            local arg = args[i]
+            if not (arg >> param.extends) then
+                goto continue
+            end
+        end
+        results[#results+1] = proto
+        ::continue::
     end
 
-    return results
+    if nargs == 0 then
+        return results
+    end
+
+    ---@cast args -?
+    local params = {}
+    for i, result in ipairs(results) do
+        params[i] = ls.util.map(result.params, function (v)
+            return v.extends
+        end)
+    end
+
+    local matchs = self.scope.node:getBestMatchs(params)
+    local finalResults = ls.util.map(matchs, function (i)
+        return results[i]
+    end)
+
+    return finalResults
 end
 
 ---@type Node.Class[]
@@ -178,7 +211,7 @@ M.fullExtends = nil
 ---@return Node.Class.ExtendAble[]
 ---@return true
 M.__getter.fullExtends = function (self)
-    return ls.node.calcFullExtends(self), true
+    return self.scope.node:calcFullExtends(self), true
 end
 
 --- 所有继承的合并表

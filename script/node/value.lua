@@ -59,3 +59,7 @@ function M:onViewAsKey(viewer)
         return '[' .. viewer:view(self) .. ']'
     end
 end
+
+function M:registerFlushChain(me)
+    -- do nothing
+end

@@ -16,6 +16,7 @@ M.hasGeneric = true
 function M:__init(scope, name, extends, default)
     self.scope = scope
     self.name = name
+    ---@type Node
     self.extends = extends or scope.node.ANY
     self.default = default
 end

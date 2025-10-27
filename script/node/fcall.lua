@@ -19,6 +19,9 @@ function M:__init(scope, head, args)
     self.inputs = args
 
     self.head:registerFlushChain(self)
+    for _, arg in ipairs(self.inputs) do
+        arg:registerFlushChain(self)
+    end
 end
 
 ---@type Node[]

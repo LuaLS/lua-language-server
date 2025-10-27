@@ -1,7 +1,6 @@
 ---@class LuaLS.Node
 ls.node = {}
 
-require 'node.helper'
 require 'node.view'
 require 'node.cache_module'
 require 'node.node'

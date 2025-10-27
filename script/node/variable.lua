@@ -465,10 +465,7 @@ end
 ---@param viewer Node.Viewer
 ---@param options Node.Viewer.Options
 ---@return string
-function M:view(viewer, options)
-    if options.mode ~= 'variable' then
-        return viewer:view(self.value, options)
-    end
+function M:onViewAsVariable(viewer, options)
     ---@type Node.Variable[]
     local path = {}
     local current = self

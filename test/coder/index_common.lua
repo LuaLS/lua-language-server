@@ -7,7 +7,7 @@ do
 
     local g = node.type '_G'
     assert(g:get('A'):view() == '1')
-    assert(node:globalGet('A'):viewVariable() == 'A')
+    assert(node:globalGet('A'):viewAsVariable() == 'A')
     assert(node:globalGet('A').value:view() == '1')
 end
 
@@ -18,7 +18,7 @@ do
 
     local g = node.type '_G'
     assert(g:get('A'):view() == '{ B: { C: 1 } }')
-    assert(node:globalGet('A', 'B', 'C'):viewVariable() == 'A.B.C')
+    assert(node:globalGet('A', 'B', 'C'):viewAsVariable() == 'A.B.C')
     assert(node:globalGet('A', 'B', 'C').value:view() == '1')
 end
 
@@ -29,7 +29,7 @@ do
 
     local g = node.type '_G'
     assert(g:get('A'):view() == '{ [1]: { C: 1 } }')
-    assert(node:globalGet('A', 1, 'C'):viewVariable() == 'A[1].C')
+    assert(node:globalGet('A', 1, 'C'):viewAsVariable() == 'A[1].C')
     assert(node:globalGet('A', 1, 'C').value:view() == '1')
 end
 
@@ -40,7 +40,7 @@ do
 
     local g = node.type '_G'
     assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
-    assert(node:globalGet('A', node.UNKNOWN, 'C'):viewVariable() == 'A[unknown].C')
+    assert(node:globalGet('A', node.UNKNOWN, 'C'):viewAsVariable() == 'A[unknown].C')
     assert(node:globalGet('A', node.UNKNOWN, 'C').value:view() == '1')
 end
 
@@ -52,7 +52,7 @@ do
 
     local g = node.type '_G'
     assert(g:get('A'):view() == '1')
-    assert(node:globalGet('A'):viewVariable() == 'A')
+    assert(node:globalGet('A'):viewAsVariable() == 'A')
     assert(node:globalGet('A').value:view() == 'unknown')
 end
 

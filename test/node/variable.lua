@@ -4,19 +4,19 @@ do
     node:reset()
     local var = node.variable('x')
 
-    assert(var:viewVariable() == 'x')
+    assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == 'unknown')
     assert(var.fields == nil)
 
     local child1 = node.variable(1, var)
 
-    assert(child1:viewVariable() == 'x[1]')
+    assert(child1:viewAsVariable() == 'x[1]')
     assert(var.value:view() == 'unknown')
     assert(var.fields == nil)
 
     local child2 = node.variable('y', child1)
 
-    assert(child2:viewVariable() == 'x[1].y')
+    assert(child2:viewAsVariable() == 'x[1].y')
     assert(var.value:view() == 'unknown')
     assert(var.fields == nil)
 end
@@ -44,7 +44,7 @@ do
         value = node.type 'number',
     }
 
-    assert(var:viewVariable() == 'x')
+    assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == '{ n: number }')
     assert(var.fields:view() == '{ n: number }')
 
@@ -127,22 +127,22 @@ do
         key = node.value 'd',
         value = node.value(1),
     }, {'b', 'c'})
-    assert(a:viewVariable() == 'a')
+    assert(a:viewAsVariable() == 'a')
     assert(a:view() == '{ b: { c: { d: 1 } } }')
 
     local b = a:getChild('b')
     assert(b)
-    assert(b:viewVariable() == 'a.b')
+    assert(b:viewAsVariable() == 'a.b')
     assert(b:view() == '{ c: { d: 1 } }')
 
     local c = a:getChild('b', 'c')
     assert(c)
-    assert(c:viewVariable() == 'a.b.c')
+    assert(c:viewAsVariable() == 'a.b.c')
     assert(c:view() == '{ d: 1 }')
 
     local d = a:getChild('b', 'c', 'd')
     assert(d)
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d:view() == '1')
 end
 
@@ -161,7 +161,7 @@ do
         key = node.value 'd',
         value = node.table(),
     }, {'b', 'c'})
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == '{}')
     assert(d.fields == nil)
 
@@ -169,7 +169,7 @@ do
     local CA = node.class 'A'
     CA:addVariable(d)
     d:addClass(CA)
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields == nil)
     assert(A.value:view() == '{}')
@@ -179,7 +179,7 @@ do
         value = node.value(1),
     }
     d:addField(dx)
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ x: 1 }')
     assert(A.value:view() == '{ x: 1 }')
@@ -189,19 +189,19 @@ do
         value = node.value(2),
     }
     a:addField(dy, {'b', 'c', 'd'})
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ x: 1, y: 2 }')
     assert(A.value:view() == '{ x: 1, y: 2 }')
 
     a:removeField(dx, {'b', 'c', 'd'})
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ y: 2 }')
     assert(A.value:view() == '{ y: 2 }')
 
     d:removeField(dy)
-    assert(d:viewVariable() == 'a.b.c.d')
+    assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields == nil)
     assert(A.value:view() == '{}')

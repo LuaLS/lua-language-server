@@ -68,3 +68,83 @@ do
     local V4 = node.vararg({ V1, V2, V3 })
     assert(V4:viewAsVararg() == '1, 3, 5, 6...(+98)')
 end
+
+do
+    local V1 = node.vararg({ node.value(1), node.value(2) }, 2, 2)
+    local V2 = node.vararg({ node.value(1), node.INTEGER }, 2, 2)
+
+    assert(V1 >> V2 == true)
+    assert(V2 >> V1 == false)
+end
+
+do
+    local V1 = node.vararg({
+        node.value(1),
+        node.value(2),
+        node.value(3),
+    }, 3, 3)
+    local V2 = node.vararg({
+        node.value(1),
+        node.value(2),
+    }, 2, 2)
+
+    assert(V1:viewAsVararg() == '1, 2, 3')
+    assert(V2:viewAsVararg() == '1, 2')
+
+    assert(V1 >> V2 == true)
+    assert(V2 >> V1 == false)
+end
+
+do
+    local V1 = node.vararg({
+        node.value(1),
+        node.value(2),
+        node.value(3),
+    }, 3, 3)
+    local V2 = node.vararg({
+        node.value(1),
+        node.value(2),
+    }, 2)
+
+    assert(V1:viewAsVararg() == '1, 2, 3')
+    assert(V2:viewAsVararg() == '1, 2...')
+
+    assert(V1 >> V2 == false)
+    assert(V2 >> V1 == false)
+end
+
+do
+    local V1 = node.vararg({
+        node.value(1),
+        node.value(2),
+        node.value(3),
+    }, 5, 5)
+    local V2 = node.vararg({
+        node.value(1),
+        node.value(2),
+    }, 5, 5)
+
+    assert(V1:viewAsVararg() == '1, 2, 3...(+2)')
+    assert(V2:viewAsVararg() == '1, 2...(+3)')
+
+    assert(V1 >> V2 == false)
+    assert(V2 >> V1 == false)
+end
+
+do
+    local V1 = node.vararg({
+        node.value(1),
+        node.value(2),
+        node.value(2),
+    }, 4, 4)
+    local V2 = node.vararg({
+        node.value(1),
+        node.value(2),
+    }, 4, 5)
+
+    assert(V1:viewAsVararg() == '1, 2, 2...(+1)')
+    assert(V2:viewAsVararg() == '1, 2...(+3)')
+
+    assert(V1 >> V2 == true)
+    assert(V2 >> V1 == true)
+end

@@ -36,7 +36,11 @@ M.__getter.values = function (self)
     end
     local values = {}
     for i, raw in ipairs(self.raw) do
-        values[i] = raw
+        if raw.kind == 'vararg' and i < #self.raw then
+            values[i] = raw:get(1)
+        else
+            values[i] = raw
+        end
     end
     local n = #values
     local last = values[n]
@@ -72,7 +76,7 @@ function M:get(key)
         end
         local v = self.values[key]
             or self.values[#self.values]
-            or self.scope.node.ANY
+            or self.scope.node.NIL
         if key > self.min then
             return v | self.scope.node.NIL
         end
@@ -159,6 +163,51 @@ function M:inferGeneric(other, result)
     for i, v in ipairs(self.values) do
         v:inferGeneric(other:get(i), result)
     end
+end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    if other.kind ~= 'vararg' then
+        return self.value >> other
+    end
+    ---@cast other Node.Vararg
+
+    local node = self.scope.node
+
+    local lastValueB = other:getLastValue()
+
+    -- 先快速检长度
+    if self.min < other.min then
+        if not node.NIL:canCast(lastValueB) then
+            return false
+        end
+    end
+
+    local values = self.values
+    local ovalues = other.values
+
+    local function isMatch(i)
+        -- 多余的参数，直接通过
+        if other.max and i > other.max then
+            return true
+        end
+        local a = self:get(i)
+        local b = other:get(i)
+        -- 类型匹配
+        if a:canCast(b) then
+            return true
+        end
+    end
+
+    -- 逐个对比(允许我的参数比对方多)
+    for i = 1, math.max(#values, #ovalues) do
+        if not isMatch(i) then
+            return false
+        end
+    end
+
+    return true
 end
 
 function M:onViewAsVararg(viewer, options)

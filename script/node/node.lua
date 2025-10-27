@@ -83,6 +83,13 @@ function M:viewAsVararg(options)
     return viewer:viewAsVararg(self, options)
 end
 
+---@param options? Node.Viewer.Options
+---@return string
+function M:viewAsVariable(options)
+    local viewer = self.scope.node.viewer()
+    return viewer:viewAsVariable(self, options)
+end
+
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)

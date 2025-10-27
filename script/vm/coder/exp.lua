@@ -95,7 +95,7 @@ ls.vm.registerCoderProvider('call', function (coder, source)
         coder:compile(arg)
         args[i] = coder:getKey(arg)
     end
-    coder:addLine('{key} = node.call({func}, { {args} })' % {
+    coder:addLine('{key} = node.fcall({func}, { {args} })' % {
         key   = coder:getKey(source),
         func  = coder:getKey(source.node),
         args  = table.concat(args, ', '),

@@ -11,22 +11,12 @@ M.kind = 'call'
 M.head = nil
 
 ---@param scope Scope
----@param head string | Node
+---@param head string
 ---@param args Node[]
 function M:__init(scope, head, args)
     self.scope = scope
-    if type(head) == 'string' then
-        self.head = scope.node.type(head)
-    else
-        self.head = head
-    end
+    self.head = scope.node.type(head)
     self.args = args
-
-    for i, arg in ipairs(self.args) do
-        if arg.kind == 'variable' then
-            self.args[i] = arg.value
-        end
-    end
 
     self.head:registerFlushChain(self)
 end
@@ -138,19 +128,9 @@ M.value = nil
 M.__getter.value = function (self)
     self.value = self.scope.node.NEVER
     local head = self.head
-    if head.kind == 'type' then
-        return self:getTypeValue(), true
-    else
-        return self.returns:get(1), true
-    end
-end
-
----@return Node
-function M:getTypeValue()
-    local head = self.head
     ---@cast head Node.Type
     if not head:isComplex() then
-        return self
+        return self, true
     end
     if head:isClassLike() then
         local merging = {}
@@ -171,12 +151,12 @@ function M:getTypeValue()
         end
 
         if #merging == 1 then
-            return merging[1]
+            return merging[1], true
         end
 
         local value = self.scope.node.table()
         value:addChilds(merging)
-        return value
+        return value, true
     end
     if head:isAliasLike() then
         ---@type Node[]
@@ -188,50 +168,9 @@ function M:getTypeValue()
             end
         end
         local union = self.scope.node.union(aliases)
-        return union.value
+        return union.value, true
     end
-    return self
-end
-
----@type Node
-M.returns = nil
-
----@param self Node.Call
----@return Node
----@return true
-M.__getter.returns = function (self)
-    local returns = {}
-    local allMin = 0
-    ---@type integer?
-    local allMax = 0
-    local hasDef
-
-    local node = self.scope.node
-
-    for f in self.head:finalValue():each 'function' do
-        hasDef = true
-        ---@cast f Node.Function
-        f = f:resolveGeneric(f:makeGenericMap(self.args))
-        local min, max = f:getReturnCount()
-        for i = 1, min do
-            returns[i] = returns[i] | f:getReturn(i)
-        end
-        if not allMin or allMin > min then
-            allMin = min
-        end
-        if not max then
-            allMax = nil
-        elseif allMax and allMax < max then
-            allMax = max
-        end
-    end
-
-    if not hasDef then
-        return node.UNKNOWN, true
-    end
-
-    local vararg = node.vararg(returns, allMin, allMax)
-    return vararg, true
+    return self, true
 end
 
 function M:resolveGeneric(map)

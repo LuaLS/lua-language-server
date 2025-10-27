@@ -313,9 +313,9 @@ ls.vm.registerCoderProvider('catcall', function (coder, source)
         args[i] = coder:getKey(arg)
     end
 
-    coder:addLine('{key} = node.call({type}, { {args} })' % {
+    coder:addLine('{key} = node.call({type:q}, { {args} })' % {
         key  = coder:getKey(source),
-        type = coder:getKey(source.node),
+        type = source.node.id,
         args = table.concat(args, ', '),
     })
 end)

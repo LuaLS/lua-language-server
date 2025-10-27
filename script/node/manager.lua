@@ -137,11 +137,18 @@ function M:fillAPIs()
         return New 'Node.Vararg' (scope, values, min, max)
     end
 
-    ---@param head string | Node
+    ---@param head string
     ---@param args Node[]
     ---@return Node.Call
     function self.call(head, args)
         return New 'Node.Call' (scope, head, args)
+    end
+
+    ---@param head Node
+    ---@param args Node[]
+    ---@return Node.FCall
+    function self.fcall(head, args)
+        return New 'Node.FCall' (scope, head, args)
     end
 
     ---@overload fun(nodes?: Node[]): Node

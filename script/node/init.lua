@@ -20,6 +20,7 @@ require 'node.intersection'
 require 'node.unsolve'
 require 'node.generic'
 require 'node.call'
+require 'node.fcall'
 require 'node.variable'
 require 'node.template'
 

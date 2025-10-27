@@ -96,8 +96,8 @@ do
         value = node.value(1),
     }
 
-    local CALL = node.call(F, { TABLE })
-    local R = CALL.value
+    local FCALL = node.fcall(F, { TABLE })
+    local R = FCALL.value
 
     assert(R:view() == '1')
 end
@@ -130,8 +130,8 @@ do
         value = node.value(1),
     }
 
-    local CALL = node.call(F, { MT })
-    local R = CALL.value
+    local FCALL = node.fcall(F, { MT })
+    local R = FCALL.value
 
     assert(R:view() == '1')
 end
@@ -170,8 +170,8 @@ do
         value = node.value(1),
     }
 
-    local CALL = node.call(F, { MT })
-    local R = CALL.value
+    local FCALL = node.fcall(F, { MT })
+    local R = FCALL.value
     assert(R:view() == '{ x: 1, __index: {...} }')
 
     local V = R:get 'x'
@@ -194,9 +194,9 @@ do
         : addReturnDef(nil, node.BOOLEAN)
         : addReturnDef(nil, node.NUMBER)
     )
-    local CALL = node.call(F, {})
-    local R1 = CALL.returns:get(1)
-    local R2 = CALL.returns:get(2)
+    local FCALL = node.fcall(F, {})
+    local R1 = FCALL.returns:get(1)
+    local R2 = FCALL.returns:get(2)
     assert(R1:view() == 'boolean')
     assert(R2:view() == 'number')
 end
@@ -292,8 +292,8 @@ do -- 变量作为参数时要转换为类型
         value = node.value(1),
     }
 
-    local CALL = node.call(FUNC, { A })
-    local R = CALL.value
+    local FCALL = node.fcall(FUNC, { A })
+    local R = FCALL.value
     assert(R:view() == '{ x: 1 }')
 end
 

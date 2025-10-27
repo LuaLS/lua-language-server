@@ -11,8 +11,8 @@ do
         : addParamDef('x', node.NUMBER)
         : addReturnDef(nil, node.BOOLEAN)
 
-    local call = node.call(f, { node.value(1) })
-    local r = call.value
+    local fcall = node.fcall(f, { node.value(1) })
+    local r = fcall.value
     assert(r:view() == 'boolean')
 end
 
@@ -33,9 +33,9 @@ do
         : addReturnDef(nil, node.array(T1))
         : addReturnDef(nil, node.array(T2))
 
-    local call = node.call(f, { node.NUMBER, node.STRING })
-    local r = call.value
+    local fcall = node.fcall(f, { node.NUMBER, node.STRING })
+    local r = fcall.value
     assert(r:view() == 'number[]')
-    assert(call.returns:get(1):view() == 'number[]')
-    assert(call.returns:get(2):view() == 'string[]')
+    assert(fcall.returns:get(1):view() == 'number[]')
+    assert(fcall.returns:get(2):view() == 'string[]')
 end

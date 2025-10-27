@@ -43,7 +43,7 @@ M.__getter.values = function (self)
     if last and last.kind == 'vararg' then
         ---@cast last Node.Vararg
         for i = 1, #last.values do
-            values[n + 1] = last.values[i + 1]
+            values[n + i] = last.values[i + 1]
         end
         local min = n + last.min - 1
         if min > self.min then
@@ -190,6 +190,9 @@ function M:onViewAsVararg(viewer, options)
         else
             buf[#buf+1] = viewer:view(v)
         end
+        if i == #values then
+            return true
+        end
     end
 
     local tail
@@ -202,8 +205,8 @@ function M:onViewAsVararg(viewer, options)
 
         if not self.max then
             tail = '...'
-        elseif self.max > maxLen then
-            tail = '...(+{})' % { self.max - maxLen + 1 }
+        elseif self.max > #values then
+            tail = '...(+{})' % { self.max - #values }
         end
     else
         for i = 1, maxLen // 2 do

@@ -38,7 +38,6 @@ function M:inferGeneric(other, result)
     result[self] = other
 end
 
-ls.node.registerView('generic', function (viewer, node, needParentheses)
-    ---@cast node Node.Generic
-    return '<' .. node.name .. '>'
-end)
+function M:onView(viewer, needParentheses)
+    return '<' .. self.name .. '>'
+end

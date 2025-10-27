@@ -146,12 +146,11 @@ function M:inferGeneric(other, result)
     end
 end
 
-ls.node.registerView('tuple', function (viewer, node, needParentheses)
-    ---@cast node Node.Tuple
+function M:onView(viewer, needParentheses)
     local buf = {}
-    for _, v in ipairs(node.values) do
+    for _, v in ipairs(self.values) do
         buf[#buf+1] = viewer:view(v)
     end
 
     return '[' .. table.concat(buf, ', ') .. ']'
-end)
+end

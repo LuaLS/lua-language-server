@@ -1,9 +1,6 @@
 ---@class Node.Viewer
 local M = Class 'Node.Viewer'
 
-M.onViewMap = {}
-M.onViewAsKeyMap = {}
-
 ---@param skipLevel integer?
 function M:__init(skipLevel)
     ---@type integer
@@ -35,11 +32,7 @@ end
 ---@param node Node
 ---@return string
 function M:viewAsKey(node)
-    local result = self:onViewAsKey(node)
-    if result then
-        return result
-    end
-    return '[' .. self:view(node) .. ']'
+    return node:onViewAsKey(self)
 end
 
 ---@param node Node.Generic
@@ -72,43 +65,8 @@ end
 ---@param needParentheses boolean?
 ---@return string
 function M:onView(node, needParentheses)
-    local callback = M.onViewMap[node.kind]
-    if callback then
-        self.visited[node] = (self.visited[node] or 0) + 1
-        local result = callback(self, node, needParentheses)
-        self.visited[node] = self.visited[node] - 1
-        return result
-    end
-    local value = node.value
-    if value == node then
-        error('Cannot view node of kind ' .. node.kind)
-    end
-    return self:onView(value, needParentheses)
-end
-
----@private
----@param node Node
----@return string?
-function M:onViewAsKey(node)
-    local callback = M.onViewAsKeyMap[node.kind]
-    if callback then
-        return callback(self, node)
-    end
-    local value = node.value
-    if value == node then
-        return nil
-    end
-    return self:onViewAsKey(value)
-end
-
----@param kind string
----@param callback fun(viewer: Node.Viewer, node: Node, needParentheses: boolean?):string
-function ls.node.registerView(kind, callback)
-    M.onViewMap[kind] = callback
-end
-
----@param kind string
----@param callback fun(viewer: Node.Viewer, node: Node):string
-function ls.node.registerViewAsKey(kind, callback)
-    M.onViewAsKeyMap[kind] = callback
+    self.visited[node] = (self.visited[node] or 0) + 1
+    local result = node:onView(self, needParentheses)
+    self.visited[node] = self.visited[node] - 1
+    return result
 end

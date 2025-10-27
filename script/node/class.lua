@@ -158,16 +158,15 @@ function M:makeGenericMap(args)
     return map
 end
 
-ls.node.registerView('class', function(viewer, node)
-    ---@cast node Node.Class
-    if node.params then
+function M:onView(viewer, needParentheses)
+    if self.params then
         return '{}<{}>' % {
-            node.className,
-            table.concat(ls.util.map(node.params, function (param)
+            self.className,
+            table.concat(ls.util.map(self.params, function (param)
                 return viewer:view(param)
             end), ', ')
         }
     else
-        return node.className
+        return self.className
     end
-end)
+end

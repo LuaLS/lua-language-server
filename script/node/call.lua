@@ -180,12 +180,11 @@ function M:resolveGeneric(map)
     return self.scope.node.call(self.head.typeName, args)
 end
 
-ls.node.registerView('call', function(viewer, node)
-    ---@cast node Node.Call
+function M:onView(viewer, needParentheses)
     return '{}<{}>' % {
-        node.head.typeName,
-        table.concat(ls.util.map(node.args, function (arg)
+        self.head.typeName,
+        table.concat(ls.util.map(self.args, function (arg)
             return viewer:view(arg)
         end), ', '),
     }
-end)
+end

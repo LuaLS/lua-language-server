@@ -43,21 +43,19 @@ M.__getter.nodeType = function (self)
     return self.scope.node.type(self.typeName), true
 end
 
-ls.node.registerView('value', function (viewer, node, needParentheses)
-    ---@cast node Node.Value
-    if node.typeName == 'string' then
-        return ls.util.viewString(node.literal, node.quo)
+function M:onView(viewer, needParentheses)
+    if self.typeName == 'string' then
+        return ls.util.viewString(self.literal, self.quo)
     else
-        return ls.util.viewLiteral(node.literal) or ''
+        return ls.util.viewLiteral(self.literal) or ''
     end
-end)
+end
 
-ls.node.registerViewAsKey('value', function (viewer, node)
-    ---@cast node Node.Value
-    local literal = node.literal
+function M:onViewAsKey(viewer)
+    local literal = self.literal
     if type(literal) == 'string' and literal:match '^[%a_][%w_]*$' then
         return literal
     else
-        return '[' .. viewer:view(node) .. ']'
+        return '[' .. viewer:view(self) .. ']'
     end
-end)
+end

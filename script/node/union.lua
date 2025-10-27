@@ -192,9 +192,8 @@ local sortScore = {
     ['nil'] = -1000,
 }
 
-ls.node.registerView('union', function(viewer, node, needParentheses)
-    ---@cast node Node.Union
-    local values = node.values
+function M:onView(viewer, needParentheses)
+    local values = self.values
     if #values == 0 then
         return 'never'
     end
@@ -225,4 +224,4 @@ ls.node.registerView('union', function(viewer, node, needParentheses)
         return '(' .. result .. ')'
     end
     return result
-end)
+end

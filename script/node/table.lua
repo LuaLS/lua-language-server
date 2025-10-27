@@ -426,20 +426,19 @@ function M:inferGeneric(other, result)
     end
 end
 
-ls.node.registerView('table', function (viewer, node, needParentheses)
-    ---@cast node Node.Table
-    if #node.keys == 0 then
+function M:onView(viewer, needParentheses)
+    if #self.keys == 0 then
         return '{}'
     end
 
-    if viewer.visited[node] > 1 then
+    if viewer.visited[self] > 1 then
         return '{...}'
     end
 
     local fields = {}
 
-    for _, key in ipairs(node.keys) do
-        local field = node.fieldMap[key]
+    for _, key in ipairs(self.keys) do
+        local field = self.fieldMap[key]
         if #field == 0 then
             if field.hideInView then
                 goto continue
@@ -456,7 +455,7 @@ ls.node.registerView('table', function (viewer, node, needParentheses)
         if k.kind == 'value' then
             k = k.literal
         end
-        local value = node.valueMap[k]
+        local value = self.valueMap[k]
         fields[#fields+1] = string.format('%s: %s'
             , viewer:viewAsKey(key)
             , viewer:view(value)
@@ -469,4 +468,4 @@ ls.node.registerView('table', function (viewer, node, needParentheses)
     end
 
     return '{ ' .. table.concat(fields, ', ') .. ' }'
-end)
+end

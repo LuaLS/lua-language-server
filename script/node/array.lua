@@ -103,7 +103,6 @@ function M:inferGeneric(other, result)
     self.head:inferGeneric(value, result)
 end
 
-ls.node.registerView('array', function(viewer, node, needParentheses)
-    ---@cast node Node.Array
-    return viewer:format('%s[]', node.head, 0, true)
-end)
+function M:onView(viewer, needParentheses)
+    return viewer:format('%s[]', self.head, 0, true)
+end

@@ -387,25 +387,24 @@ function M:inferGeneric(other, result)
     end
 end
 
-ls.node.registerView('function', function (viewer, node, needParentheses)
-    if viewer.visited[node] > 1 then
+function M:onView(viewer, needParentheses)
+    if viewer.visited[self] > 1 then
         return 'function'
     end
-    ---@cast node Node.Function
     local params = {}
-    for i, v in ipairs(node.paramsDef) do
+    for i, v in ipairs(self.paramsDef) do
         params[i] = string.format('%s%s: %s'
             , v.key
             , v.optional and '?' or ''
             , viewer:view(v.value)
         )
     end
-    if node.varargParamDef then
-        params[#params+1] = string.format('...: %s', viewer:view(node.varargParamDef))
+    if self.varargParamDef then
+        params[#params+1] = string.format('...: %s', viewer:view(self.varargParamDef))
     end
 
     local returns = {}
-    for i, v in ipairs(node.returnsDef) do
+    for i, v in ipairs(self.returnsDef) do
         if v.key then
             returns[i] = string.format('(%s%s: %s)'
                 , v.key
@@ -418,8 +417,8 @@ ls.node.registerView('function', function (viewer, node, needParentheses)
     end
 
     local typeParams = ''
-    if node.typeParams and #node.typeParams > 0 then
-        typeParams = '<' .. table.concat(ls.util.map(node.typeParams, function (v)
+    if self.typeParams and #self.typeParams > 0 then
+        typeParams = '<' .. table.concat(ls.util.map(self.typeParams, function (v)
             if v.kind == 'generic' then
                 ---@cast v Node.Generic
                 return viewer:viewAsParam(v)
@@ -434,16 +433,16 @@ ls.node.registerView('function', function (viewer, node, needParentheses)
             returnPart = '(' .. returnPart .. ')'
         end
         return string.format('%sfun%s(%s):%s'
-            , node.async and 'async ' or ''
+            , self.async and 'async ' or ''
             , typeParams
             , table.concat(params, ', ')
             , returnPart
         )
     else
         return string.format('%sfun%s(%s)'
-            , node.async and 'async ' or ''
+            , self.async and 'async ' or ''
             , typeParams
             , table.concat(params, ', ')
         )
     end
-end)
+end

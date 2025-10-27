@@ -442,7 +442,6 @@ M.__getter.callCache = function (self)
     return ls.pathTable.create(true, true), true
 end
 
-ls.node.registerView('type', function (viewer, node, needParentheses)
-    ---@cast node Node.Type
-    return node.typeName
-end)
+function M:onView(viewer, needParentheses)
+    return self.typeName
+end

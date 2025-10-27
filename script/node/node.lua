@@ -260,6 +260,22 @@ function M:each(kind)
     end
 end
 
+---@param viewer Node.Viewer
+---@param needParentheses boolean?
+---@return string
+function M:onView(viewer, needParentheses)
+    if self.value == self then
+        error('Cannot view node of kind ' .. self.kind)
+    end
+    return viewer:view(self.value, 0, needParentheses)
+end
+
+---@param viewer Node.Viewer
+---@return string
+function M:onViewAsKey(viewer)
+    return '[' .. viewer:view(self) .. ']'
+end
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

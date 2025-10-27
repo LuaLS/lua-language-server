@@ -280,9 +280,8 @@ function M:inferGeneric(other, result)
     end
 end
 
-ls.node.registerView('intersection', function(viewer, node, needParentheses)
-    ---@cast node Node.Intersection
-    local values = node.values
+function M:onView(viewer, needParentheses)
+    local values = self.values
     if #values == 0 then
         return 'never'
     end
@@ -290,7 +289,7 @@ ls.node.registerView('intersection', function(viewer, node, needParentheses)
         return viewer:view(values[1], 0, needParentheses)
     end
     local elements = {}
-    for _, v in ipairs(node.rawNodes) do
+    for _, v in ipairs(self.rawNodes) do
         if v.hideInUnionView then
             goto continue
         end
@@ -303,4 +302,4 @@ ls.node.registerView('intersection', function(viewer, node, needParentheses)
         return '(' .. result .. ')'
     end
     return result
-end)
+end

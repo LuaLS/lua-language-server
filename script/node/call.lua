@@ -7,7 +7,7 @@ local M = ls.node.register 'Node.Call'
 
 M.kind = 'call'
 
----@type Node
+---@type Node.Type
 M.head = nil
 
 ---@param scope Scope
@@ -21,6 +21,26 @@ function M:__init(scope, head, args)
     self.head:registerFlushChain(self)
 end
 
+---@type Node.Class[]
+M.protoClasses = nil
+
+---@param self Node.Call
+---@return Node.Class[]
+---@return true
+M.__getter.protoClasses = function (self)
+    return self.head:getProtos(self.head.classes, self.args), true
+end
+
+---@type Node.Alias[]
+M.protoAliases = nil
+
+---@param self Node.Call
+---@return Node.Alias[]
+---@return true
+M.__getter.protoAliases = function (self)
+    return self.head:getProtos(self.head.aliases, self.args), true
+end
+
 --- 获取我的继承
 ---@type Node.Class.ExtendAble[]
 M.extends = nil
@@ -30,12 +50,7 @@ M.extends = nil
 ---@return true
 M.__getter.extends = function (self)
     local results = {}
-    local head = self.head
-    if head.kind ~= 'type' then
-        return results, true
-    end
-    ---@cast head Node.Type
-    for _, class in ipairs(head:getProtoClassesWithNParams(#self.args)) do
+    for _, class in ipairs(self.protoClasses) do
         if class.extends then
             local genericMap = class:makeGenericMap(self.args)
             for _, ext in ipairs(class.extends) do
@@ -103,13 +118,9 @@ M.table = nil
 M.__getter.table = function (self)
     local table = self.scope.node.table()
     local head = self.head
-    if head.kind ~= 'type' then
-        return table, true
-    end
-    ---@cast head Node.Type
     if head.classes then
         local fields = {}
-        for _, class in ipairs(head:getProtoClassesWithNParams(#self.args)) do
+        for _, class in ipairs(self.protoClasses) do
             if class.fields then
                 fields[#fields+1] = class.fields:resolveGeneric(class:makeGenericMap(self.args))
             end
@@ -137,7 +148,7 @@ M.__getter.value = function (self)
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.table
         -- 2. 绑定的变量里的字段
-        for _, class in ipairs(head:getProtoClassesWithNParams(#self.args)) do
+        for _, class in ipairs(self.protoClasses) do
             if class.variables then
                 for variable in class.variables:pairsFast() do
                     ---@cast variable Node.Variable
@@ -162,7 +173,7 @@ M.__getter.value = function (self)
         ---@type Node[]
         local aliases = {}
         ---@param alias Node.Alias
-        for _, alias in ipairs(head:getProtoAliasesWithNParams(#self.args)) do
+        for _, alias in ipairs(self.protoAliases) do
             if alias.value then
                 aliases[#aliases+1] = alias.value:resolveGeneric(alias:makeGenericMap(self.args))
             end

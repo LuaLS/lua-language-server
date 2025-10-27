@@ -45,7 +45,7 @@ function M:isAliasLike()
     return self.aliases ~= nil
 end
 
----@type LinkedTable
+---@type LinkedTable?
 M.classes = nil
 
 ---@param class Node.Class
@@ -76,7 +76,7 @@ function M:removeClass(class)
     self:flushCache()
 end
 
----@type LinkedTable
+---@type LinkedTable?
 M.aliases = nil
 
 ---@param alias Node.Alias
@@ -110,52 +110,45 @@ function M:removeAlias(alias)
     return self
 end
 
----@param n integer
----@return Node.Class[]
-function M:getProtoClassesWithNParams(n)
-    ---@type Node.Class[]
+---@param protos? LinkedTable
+---@param args? Node[]
+---@return (Node.Class | Node.Alias)[]
+function M:getProtos(protos, args)
     local results = {}
 
-    if not self.classes then
+    if not protos then
         return results
     end
 
-    ---@param class Node.Class
-    for class in self.classes:pairsFast() do
-        if class.params then
-            if #class.params == n then
-                results[#results+1] = class
-            end
-        elseif n == 0 then
-            results[#results+1] = class
+    local nargs = args and #args or 0
+    for proto in protos:pairsFast() do
+        local nparams = proto.params and #proto.params or 0
+        if nparams == nargs then
+            results[#results+1] = proto
         end
     end
 
     return results
 end
 
----@param n integer
+---@type Node.Class[]
+M.protoClasses = nil
+
+---@param self Node.Type
+---@return Node.Class[]
+---@return true
+M.__getter.protoClasses = function (self)
+    return self:getProtos(self.classes), true
+end
+
+---@type Node.Alias[]
+M.protoAliases = nil
+
+---@param self Node.Type
 ---@return Node.Alias[]
-function M:getProtoAliasesWithNParams(n)
-    ---@type Node.Alias[]
-    local results = {}
-
-    if not self.aliases then
-        return results
-    end
-
-    ---@param alias Node.Alias
-    for alias in self.aliases:pairsFast() do
-        if alias.params then
-            if #alias.params == n then
-                results[#results+1] = alias
-            end
-        elseif n == 0 then
-            results[#results+1] = alias
-        end
-    end
-
-    return results
+---@return true
+M.__getter.protoAliases = function (self)
+    return self:getProtos(self.aliases), true
 end
 
 --- 获取我的继承
@@ -167,7 +160,7 @@ M.extends = nil
 ---@return true
 M.__getter.extends = function (self)
     local results = {}
-    for _, class in ipairs(self:getProtoClassesWithNParams(0)) do
+    for _, class in ipairs(self.protoClasses) do
         if class.extends then
             for _, ext in ipairs(class.extends) do
                 results[#results+1] = ext
@@ -235,7 +228,7 @@ M.__getter.table = function (self)
     local table = self.scope.node.table()
     if self.classes then
         local fields = {}
-        for _, class in ipairs(self:getProtoClassesWithNParams(0)) do
+        for _, class in ipairs(self.protoClasses) do
             if class.fields then
                 fields[#fields+1] = class.fields
             end
@@ -261,7 +254,7 @@ M.__getter.value = function (self)
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.table
         -- 2. 绑定的变量里的字段
-        for _, class in ipairs(self:getProtoClassesWithNParams(0)) do
+        for _, class in ipairs(self.protoClasses) do
             if class.variables then
                 for variable in class.variables:pairsFast() do
                     merging[#merging+1] = variable.fields
@@ -285,7 +278,7 @@ M.__getter.value = function (self)
         ---@type Node[]
         local aliases = {}
         ---@param alias Node.Alias
-        for _, alias in ipairs(self:getProtoAliasesWithNParams(0)) do
+        for _, alias in ipairs(self.protoAliases) do
             if alias.value then
                 aliases[#aliases+1] = alias.value
             end

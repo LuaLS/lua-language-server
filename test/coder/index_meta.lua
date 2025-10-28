@@ -1,4 +1,4 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
     TEST_INDEX [[
@@ -8,7 +8,7 @@ do
         ---@field z number
     ]]
 
-    assert(node.type('A').value:view() == '{ x: number, y: number, z: number }')
+    assert(rt.type('A').value:view() == '{ x: number, y: number, z: number }')
 end
 
 do
@@ -20,7 +20,7 @@ do
         A.y = 2
     ]]
 
-    assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
 end
 
 do
@@ -32,7 +32,7 @@ do
         A.B.y = 2
     ]]
 
-    assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
 end
 
 do
@@ -44,7 +44,7 @@ do
         A.y = 2
     ]]
 
-    assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
 end
 
 do
@@ -58,7 +58,7 @@ do
         A.B.y = 2
     ]]
 
-    assert(node.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
 end
 
 do
@@ -67,7 +67,7 @@ do
         end
     ]]
 
-    assert(node:globalGet('type').value:view() == 'fun(o: any)')
+    assert(rt:globalGet('type').value:view() == 'fun(o: any)')
 end
 
 do
@@ -78,5 +78,5 @@ do
         end
     ]]
 
-    assert(node:globalGet('type').value:view() == 'fun(o: table):string')
+    assert(rt:globalGet('type').value:view() == 'fun(o: table):string')
 end

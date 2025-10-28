@@ -39,7 +39,7 @@ end
 
 function M.__bor(a, b)
     return makeUnion(a, b)
-        or a.scope.node.union {a, b}
+        or a.scope.rt.union {a, b}
 end
 
 ---@param a Node
@@ -50,7 +50,7 @@ local function makeIntersection(a, b)
         return a
     end
     if a == nil or b == nil then
-        return (a or b).scope.node.NEVER
+        return (a or b).scope.rt.NEVER
     end
 end
 
@@ -59,7 +59,7 @@ end
 ---@return Node?
 function M.__band(a, b)
     return makeIntersection(a, b)
-        or a.scope.node.intersection {a, b}
+        or a.scope.rt.intersection {a, b}
 end
 
 ---@param other Node
@@ -72,21 +72,21 @@ end
 ---@param options? Node.Viewer.Options
 ---@return string
 function M:view(options)
-    local viewer = self.scope.node.viewer()
+    local viewer = self.scope.rt.viewer()
     return viewer:view(self, options)
 end
 
 ---@param options? Node.Viewer.Options
 ---@return string
 function M:viewAsVararg(options)
-    local viewer = self.scope.node.viewer()
+    local viewer = self.scope.rt.viewer()
     return viewer:viewAsVararg(self, options)
 end
 
 ---@param options? Node.Viewer.Options
 ---@return string
 function M:viewAsVariable(options)
-    local viewer = self.scope.node.viewer()
+    local viewer = self.scope.rt.viewer()
     return viewer:viewAsVariable(self, options)
 end
 
@@ -95,7 +95,7 @@ end
 function M:get(key)
     local value = self.value
     if value == self then
-        return self.scope.node.NEVER
+        return self.scope.rt.NEVER
     end
     return value:get(key)
 end
@@ -103,11 +103,11 @@ end
 ---@param key Node.TableKey
 ---@return Node
 function M:select(key)
-    local node = self.scope.node
+    local node = self.scope.rt
     if key == 1 or key == node.value(1) then
         return self
     end
-    return self.scope.node.NEVER
+    return self.scope.rt.NEVER
 end
 
 ---@type Node
@@ -117,7 +117,7 @@ M.typeOfKey = nil
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return self.scope.node.NEVER, true
+    return self.scope.rt.NEVER, true
 end
 
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'
@@ -133,9 +133,9 @@ end
 function M:canCast(other)
     if type(other) ~= 'table' then
         ---@cast other -Node
-        other = self.scope.node.value(other)
+        other = self.scope.rt.value(other)
     end
-    local castCache = self.scope.node.castCache
+    local castCache = self.scope.rt.castCache
     local path = { self, other }
     local res = castCache:get(path)
     if res then
@@ -203,7 +203,7 @@ end
 M.falsy = nil
 
 M.__getter.falsy = function (self)
-    return self.scope.node.NEVER
+    return self.scope.rt.NEVER
 end
 
 ---@type boolean | number | string | nil
@@ -214,9 +214,9 @@ M.literal = nil
 ---@return Node otherHand
 function M:narrow(other)
     if self:canCast(other) then
-        return self, self.scope.node.NEVER
+        return self, self.scope.rt.NEVER
     end
-    return self.scope.node.NEVER, self
+    return self.scope.rt.NEVER, self
 end
 
 ---@param key string | number | boolean | Node
@@ -226,9 +226,9 @@ end
 function M:narrowByField(key, value)
     local myValue = self:get(key)
     if myValue:canCast(value) then
-        return self, self.scope.node.NEVER
+        return self, self.scope.rt.NEVER
     end
-    return self.scope.node.NEVER, self
+    return self.scope.rt.NEVER, self
 end
 
 ---@type boolean

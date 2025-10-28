@@ -25,5 +25,5 @@ end
 
 -- 清理自身的缓存
 function M:flushCache()
-    self.scope.node:collectFlushNodes(self)
+    self.scope.rt:collectFlushNodes(self)
 end

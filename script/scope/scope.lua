@@ -13,8 +13,8 @@ function M:__init(uri, fs)
     ---@type Config
     self.config = ls.config.create(self.uri)
 
-    self.node = ls.node.createManager(self)
-    self.node:reset()
+    self.rt = ls.node.createRuntime(self)
+    self.rt:reset()
 
     ---@type table<Uri, Document?>
     self.documents = setmetatable({}, ls.util.MODE_V)

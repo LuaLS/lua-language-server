@@ -40,7 +40,7 @@ end
 ---@type Node.Type
 M.nodeType = nil
 M.__getter.nodeType = function (self)
-    return self.scope.node.type(self.typeName), true
+    return self.scope.rt.type(self.typeName), true
 end
 
 function M:onView(viewer, options)

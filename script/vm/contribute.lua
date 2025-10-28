@@ -37,7 +37,7 @@ function M:__init(scope)
 end
 
 function M:__del()
-    local node = self.scope.node
+    local node = self.scope.rt
     node:lockCache()
     for _, commit in ipairs(self.history) do
         self:revert(commit)
@@ -50,20 +50,20 @@ function M:commit(action)
     -- local kind = action.kind
     -- if kind == 'classfield' then
     --     ---@cast action VM.Contribute.ClassField
-    --     local tp = self.scope.node.type(action.className)
+    --     local tp = self.scope.rt.type(action.className)
     --     tp:addField(action.field)
     -- elseif kind == 'global' then
     --     ---@cast action VM.Contribute.Global
-    --     local variable = self.scope.node:globalAdd(action.field, action.path)
+    --     local variable = self.scope.rt:globalAdd(action.field, action.path)
     --     if action.className then
-    --         local class = self.scope.node.type(action.className)
+    --         local class = self.scope.rt.type(action.className)
     --     end
     -- elseif kind == 'class' then
     --     ---@cast action VM.Contribute.Class
-    --     self.scope.node.type(action.name):addClass(action.location)
+    --     self.scope.rt.type(action.name):addClass(action.location)
     -- elseif kind == 'alias' then
     --     ---@cast action VM.Contribute.Alias
-    --     self.scope.node.type(action.name):addAlias(action.value, action.location)
+    --     self.scope.rt.type(action.name):addAlias(action.value, action.location)
     -- end
     -- self.history[#self.history+1] = action
 end
@@ -73,23 +73,23 @@ function M:revert(action)
     -- local kind = action.kind
     -- if kind == 'classfield' then
     --     ---@cast action VM.Contribute.ClassField
-    --     local tp = self.scope.node.type(action.className)
+    --     local tp = self.scope.rt.type(action.className)
     --     tp:removeField(action.field)
     -- elseif kind == 'global' then
     --     ---@cast action VM.Contribute.Global
-    --     self.scope.node:globalRemove(action.field, action.path)
+    --     self.scope.rt:globalRemove(action.field, action.path)
     -- elseif kind == 'class' then
     --     ---@cast action VM.Contribute.Class
-    --     self.scope.node.type(action.name):removeClass(action.location)
+    --     self.scope.rt.type(action.name):removeClass(action.location)
     -- elseif kind == 'alias' then
     --     ---@cast action VM.Contribute.Alias
-    --     self.scope.node.type(action.name):removeAlias(action.value, action.location)
+    --     self.scope.rt.type(action.name):removeAlias(action.value, action.location)
     -- end
 end
 
 ---@param actions VM.Contribute.Action[]
 function M:commitActions(actions)
-    local node = self.scope.node
+    local node = self.scope.rt
     node:lockCache()
     for _, action in ipairs(actions) do
         self:commit(action)

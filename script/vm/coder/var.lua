@@ -6,7 +6,7 @@ ls.vm.registerCoderProvider('var', function (coder, source)
             loc = coder:getKey(source.loc),
         })
     else
-        coder:addLine('{key} = node:globalGet {name:q}' % {
+        coder:addLine('{key} = rt:globalGet {name:q}' % {
             key = coder:getKey(source),
             name = source.id,
         })
@@ -34,10 +34,10 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         coder:addLine('{var} = {last}:getChild({field})' % {
             var    = coder:getKey(source),
             last   = coder:getKey(last),
-            field  = isComplexKey and 'node.UNKNOWN' or coder:getKey(source.key),
+            field  = isComplexKey and 'rt.UNKNOWN' or coder:getKey(source.key),
         })
     else
-        coder:addLine('{var} = node.index({last}, {field})' % {
+        coder:addLine('{var} = rt.index({last}, {field})' % {
             var     = coder:getKey(source),
             last    = coder:getKey(last),
             field   = coder:getKey(source.key),
@@ -47,7 +47,7 @@ end)
 
 ls.vm.registerCoderProvider('fieldid', function (coder, source)
     ---@cast source LuaParser.Node.FieldID
-    coder:addLine('{key} = node.value {name:q}' % {
+    coder:addLine('{key} = rt.value {name:q}' % {
         key = coder:getKey(source),
         name = source.id,
     })
@@ -55,7 +55,7 @@ end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)
     ---@cast source LuaParser.Node.Local
-    coder:addLine('{key} = node.variable {name:q}' % {
+    coder:addLine('{key} = rt.variable {name:q}' % {
         key = coder:getKey(source),
         name = source.id,
     })
@@ -63,7 +63,7 @@ end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
     ---@cast source LuaParser.Node.Param
-    coder:addLine('{key} = node.variable {name:q}' % {
+    coder:addLine('{key} = rt.variable {name:q}' % {
         key = coder:getKey(source),
         name = source.id,
     })
@@ -83,7 +83,7 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         return
     end
 
-    local type = 'node.ANY'
+    local type = 'rt.ANY'
     local cat = coder:findMatchedCatParam(source)
     if cat and cat.value then
         type = coder:getKey(cat.value)

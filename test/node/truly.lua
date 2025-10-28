@@ -1,39 +1,39 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    assert(node.ANY.truly:view() == 'truly')
-    assert(node.ANY.falsy:view() == 'false | nil')
+    assert(rt.ANY.truly:view() == 'truly')
+    assert(rt.ANY.falsy:view() == 'false | nil')
 
-    assert(node.UNKNOWN.truly:view() == 'truly')
-    assert(node.UNKNOWN.falsy:view() == 'false')
+    assert(rt.UNKNOWN.truly:view() == 'truly')
+    assert(rt.UNKNOWN.falsy:view() == 'false')
 
-    assert(node.TRULY.truly:view() == 'truly')
-    assert(node.TRULY.falsy:view() == 'never')
+    assert(rt.TRULY.truly:view() == 'truly')
+    assert(rt.TRULY.falsy:view() == 'never')
 
-    assert(node.NIL.truly:view() == 'never')
-    assert(node.NIL.falsy:view() == 'nil')
+    assert(rt.NIL.truly:view() == 'never')
+    assert(rt.NIL.falsy:view() == 'nil')
 
-    assert(node.BOOLEAN.truly:view() == 'true')
-    assert(node.BOOLEAN.falsy:view() == 'false')
+    assert(rt.BOOLEAN.truly:view() == 'true')
+    assert(rt.BOOLEAN.falsy:view() == 'false')
 
-    assert(node.TRUE.truly:view() == 'true')
-    assert(node.TRUE.falsy:view() == 'never')
+    assert(rt.TRUE.truly:view() == 'true')
+    assert(rt.TRUE.falsy:view() == 'never')
 
-    assert(node.FALSE.truly:view() == 'never')
-    assert(node.FALSE.falsy:view() == 'false')
+    assert(rt.FALSE.truly:view() == 'never')
+    assert(rt.FALSE.falsy:view() == 'false')
 
-    assert(node.TABLE.truly:view() == 'table')
-    assert(node.TABLE.falsy:view() == 'never')
+    assert(rt.TABLE.truly:view() == 'table')
+    assert(rt.TABLE.falsy:view() == 'never')
 
-    assert(node.value(0).truly:view() == '0')
-    assert(node.value(0).falsy:view() == 'never')
+    assert(rt.value(0).truly:view() == '0')
+    assert(rt.value(0).falsy:view() == 'never')
 
-    assert(node.value(1).truly:view() == '1')
-    assert(node.value(1).falsy:view() == 'never')
+    assert(rt.value(1).truly:view() == '1')
+    assert(rt.value(1).falsy:view() == 'never')
 end
 
 do
-    local u = node.value(0) | node.value(1) | node.value(true) | node.value(false) | node.NIL
+    local u = rt.value(0) | rt.value(1) | rt.value(true) | rt.value(false) | rt.NIL
 
     assert(u:view() == '0 | 1 | true | false | nil')
     assert(u.truly:view() == '0 | 1 | true')
@@ -41,14 +41,14 @@ do
 end
 
 do
-    local u = node.table()
+    local u = rt.table()
         : addField {
-            key   = node.value('x'),
-            value = node.value(1)
+            key   = rt.value('x'),
+            value = rt.value(1)
         }
         : addField {
-            key   = node.value('y'),
-            value = node.value(2)
+            key   = rt.value('y'),
+            value = rt.value(2)
         }
 
     assert(u:view() == '{ x: 1, y: 2 }')
@@ -57,15 +57,15 @@ do
 end
 
 do
-    local a = node.table()
+    local a = rt.table()
         : addField {
-            key   = node.value('x'),
-            value = node.value(1)
+            key   = rt.value('x'),
+            value = rt.value(1)
         }
-    local b = node.table()
+    local b = rt.table()
         : addField {
-            key   = node.value('y'),
-            value = node.value(2)
+            key   = rt.value('y'),
+            value = rt.value(2)
         }
 
     local u = a & b
@@ -75,21 +75,21 @@ do
 end
 
 do
-    node.TYPE_POOL['A'] = nil
-    local a = node.type 'A'
+    rt.TYPE_POOL['A'] = nil
+    local a = rt.type 'A'
 
     assert(a.truly:view() == 'A')
     assert(a.falsy:view() == 'never')
 end
 
 do
-    node:reset()
+    rt:reset()
 
-    local a = node.type 'A'
-    node.class('A')
+    local a = rt.type 'A'
+    rt.class('A')
         : addField {
-            key   = node.value('x'),
-            value = node.value(1)
+            key   = rt.value('x'),
+            value = rt.value(1)
         }
 
     assert(a.truly:view() == 'A')
@@ -97,13 +97,13 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
 
-    local a = node.type 'A'
-    node.alias('A', nil, node.value(1))
-    node.alias('A', nil, node.value(2))
-    node.alias('A', nil, node.value(true))
-    node.alias('A', nil, node.value(false))
+    local a = rt.type 'A'
+    rt.alias('A', nil, rt.value(1))
+    rt.alias('A', nil, rt.value(2))
+    rt.alias('A', nil, rt.value(true))
+    rt.alias('A', nil, rt.value(false))
 
     assert(a:view() == 'A')
     assert(a.truly:view() == '1 | 2 | true')

@@ -156,7 +156,7 @@ function M:getProtos(protos, args)
         end)
     end
 
-    local matchs = self.scope.node:getBestMatchs(params, nargs)
+    local matchs = self.scope.rt:getBestMatchs(params, nargs)
     local finalResults = ls.util.map(matchs, function (i)
         return results[i]
     end)
@@ -211,7 +211,7 @@ M.fullExtends = nil
 ---@return Node.Class.ExtendAble[]
 ---@return true
 M.__getter.fullExtends = function (self)
-    return self.scope.node:calcFullExtends(self), true
+    return self.scope.rt:calcFullExtends(self), true
 end
 
 --- 所有继承的合并表
@@ -222,7 +222,7 @@ M.extendsTable = nil
 ---@return Node.Table
 ---@return true
 M.__getter.extendsTable = function (self)
-    local table = self.scope.node.table()
+    local table = self.scope.rt.table()
     if #self.fullExtends == 0 then
         return table, true
     end
@@ -258,7 +258,7 @@ M.table = nil
 ---@return Node.Table
 ---@return true
 M.__getter.table = function (self)
-    local table = self.scope.node.table()
+    local table = self.scope.rt.table()
     if self.classes then
         local fields = {}
         for _, class in ipairs(self.protoClasses) do
@@ -278,7 +278,7 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = self.scope.node.NEVER
+    self.value = self.scope.rt.NEVER
     if not self:isComplex() then
         return self, true
     end
@@ -303,7 +303,7 @@ M.__getter.value = function (self)
             return merging[1], true
         end
 
-        local value = self.scope.node.table()
+        local value = self.scope.rt.table()
         value:addChilds(merging)
         return value, true
     end
@@ -316,7 +316,7 @@ M.__getter.value = function (self)
                 aliases[#aliases+1] = alias.value
             end
         end
-        local union = self.scope.node.union(aliases)
+        local union = self.scope.rt.union(aliases)
         return union, true
     end
     return self, true
@@ -339,7 +339,7 @@ M.__getter.falsy = function (self)
     if self:isAliasLike() then
         return self.value.falsy, true
     end
-    return self.scope.node.NEVER, true
+    return self.scope.rt.NEVER, true
 end
 
 ---@type fun(self: Node.Type, other: Node): boolean?
@@ -439,7 +439,7 @@ end
 
 function M:get(key)
     if self.value == self then
-        return self.scope.node.NEVER
+        return self.scope.rt.NEVER
     end
     return self.value:get(key)
 end
@@ -451,7 +451,7 @@ M.hasGeneric = false
 function M:call(nodes)
     local call = self.callCache:get(nodes)
     if not call then
-        call = self.scope.node.call(self.typeName, nodes)
+        call = self.scope.rt.call(self.typeName, nodes)
         self.callCache:set(nodes, call)
     end
     return call

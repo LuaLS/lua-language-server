@@ -61,7 +61,7 @@ M.paramsPack = nil
 ---@return Node.Vararg
 ---@return true
 M.__getter.paramsPack = function (self)
-    local node = self.scope.node
+    local node = self.scope.rt
     local params = ls.util.map(self.paramsDef, function (v, k)
         local value = v.value
         if v.optional then
@@ -159,7 +159,7 @@ function M:getParam(index)
     local paramDef = self.paramsDef[index]
     if paramDef then
         if paramDef.optional then
-            return paramDef.value | self.scope.node.NIL
+            return paramDef.value | self.scope.rt.NIL
         else
             return paramDef.value
         end
@@ -176,7 +176,7 @@ function M:getReturn(index)
     local retDef = self.returnsDef[index]
     if retDef then
         if retDef.optional then
-            return retDef.value | self.scope.node.NIL
+            return retDef.value | self.scope.rt.NIL
         else
             return retDef.value
         end
@@ -226,7 +226,7 @@ function M:getParamStartFrom(index)
     if #nodes == 1 then
         return nodes[1]
     end
-    return self.scope.node.union(nodes)
+    return self.scope.rt.union(nodes)
 end
 
 ---@param index integer
@@ -237,7 +237,7 @@ function M:getReturnStartFrom(index)
         nodes[#nodes+1] = self.returnsDef[i].value
     end
     for i = #self.returnsDef + 1, self.returnCount do
-        nodes[#nodes+1] = self.returnNode[i] or self.scope.node.NIL
+        nodes[#nodes+1] = self.returnNode[i] or self.scope.rt.NIL
     end
     if #nodes == 0 then
         return nil
@@ -245,7 +245,7 @@ function M:getReturnStartFrom(index)
     if #nodes == 1 then
         return nodes[1]
     end
-    return self.scope.node.union(nodes)
+    return self.scope.rt.union(nodes)
 end
 
 ---@param self Node.Function
@@ -289,7 +289,7 @@ function M:makeGenericMap(args)
         return map
     end
     for i, param in ipairs(self.typeParams) do
-        map[param] = args[i] or self.scope.node.UNKNOWN
+        map[param] = args[i] or self.scope.rt.UNKNOWN
     end
     return map
 end
@@ -298,7 +298,7 @@ function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
     end
-    local newFunc = self.scope.node.func()
+    local newFunc = self.scope.rt.func()
     if self.typeParams then
         newFunc.typeParams = ls.util.map(self.typeParams, function (v)
             return map[v] or v
@@ -384,7 +384,7 @@ function M:inferGeneric(other, result)
             if param.kind == 'generic' then
                 ---@cast param Node.Generic
                 if not result[param] then
-                    result[param] = self.scope.node.UNKNOWN
+                    result[param] = self.scope.rt.UNKNOWN
                 end
             end
         end

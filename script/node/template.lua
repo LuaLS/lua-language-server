@@ -19,7 +19,7 @@ function M:__init(scope, name, params)
 end
 
 function M:resolveGeneric(map)
-    local node = self.scope.node
+    local node = self.scope.rt
     local result
 
     local function nextToken(start, current)
@@ -69,5 +69,5 @@ end
 ---@return Node
 ---@return true
 function M.__getter.value(self)
-    return self.scope.node.UNKNOWN, true
+    return self.scope.rt.UNKNOWN, true
 end

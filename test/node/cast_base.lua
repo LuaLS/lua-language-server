@@ -1,9 +1,9 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
-local Any     = node.ANY
-local Nil     = node.NIL
-local Never   = node.NEVER
-local Unknown = node.UNKNOWN
+local Any     = rt.ANY
+local Nil     = rt.NIL
+local Never   = rt.NEVER
+local Unknown = rt.UNKNOWN
 
 do
     assert(Any >> Any == true)
@@ -34,116 +34,116 @@ do
 end
 
 do
-    assert(node.value(1) >> Any == true)
-    assert(node.value(1) >> Nil == false)
-    assert(node.value(1) >> Never == false)
-    assert(node.value(1) >> Unknown == true)
+    assert(rt.value(1) >> Any == true)
+    assert(rt.value(1) >> Nil == false)
+    assert(rt.value(1) >> Never == false)
+    assert(rt.value(1) >> Unknown == true)
 
-    assert(Any     >> node.value(1) == true)
-    assert(Nil     >> node.value(1) == false)
-    assert(Never   >> node.value(1) == false)
-    assert(Unknown >> node.value(1) == true)
+    assert(Any     >> rt.value(1) == true)
+    assert(Nil     >> rt.value(1) == false)
+    assert(Never   >> rt.value(1) == false)
+    assert(Unknown >> rt.value(1) == true)
 end
 
 do
-    assert(node.value(1) >> node.value(1) == true)
-    assert(node.value(1) >> node.value(2) == false)
-    assert(node.value(1) >> node.value(1.0) == true)
-    assert(node.value(1) >> node.type 'integer' == true)
+    assert(rt.value(1) >> rt.value(1) == true)
+    assert(rt.value(1) >> rt.value(2) == false)
+    assert(rt.value(1) >> rt.value(1.0) == true)
+    assert(rt.value(1) >> rt.type 'integer' == true)
 
-    assert(node.type 'integer' >> node.value(1) == false)
+    assert(rt.type 'integer' >> rt.value(1) == false)
 end
 
 do
-    assert(node.value(1.0) >> node.value(1) == true)
-    assert(node.value(1.0) >> node.value(1.0) == true)
-    assert(node.value(1.0) >> node.value(2) == false)
-    assert(node.value(1.0) >> node.type 'integer' == true)
+    assert(rt.value(1.0) >> rt.value(1) == true)
+    assert(rt.value(1.0) >> rt.value(1.0) == true)
+    assert(rt.value(1.0) >> rt.value(2) == false)
+    assert(rt.value(1.0) >> rt.type 'integer' == true)
 
-    assert(node.type 'integer' >> node.value(1.0) == false)
+    assert(rt.type 'integer' >> rt.value(1.0) == false)
 end
 
 do
-    assert(node.value(1.1) >> node.type 'integer' == false)
-    assert(node.value(1.1) >> node.type 'number'  == true)
+    assert(rt.value(1.1) >> rt.type 'integer' == false)
+    assert(rt.value(1.1) >> rt.type 'number'  == true)
 
-    assert(node.type 'number' >> node.value(1.1) == false)
+    assert(rt.type 'number' >> rt.value(1.1) == false)
 end
 
 do
-    assert(node.value(true) >> node.value(true) == true)
-    assert(node.value(true) >> node.value(false) == false)
-    assert(node.value(true) >> node.type 'boolean' == true)
+    assert(rt.value(true) >> rt.value(true) == true)
+    assert(rt.value(true) >> rt.value(false) == false)
+    assert(rt.value(true) >> rt.type 'boolean' == true)
 
-    assert(node.type 'boolean' >> node.value(true) == false)
+    assert(rt.type 'boolean' >> rt.value(true) == false)
 end
 
 do
-    assert(node.value(false) >> node.value(false) == true)
-    assert(node.value(false) >> node.value(true) == false)
-    assert(node.value(false) >> node.type 'boolean' == true)
+    assert(rt.value(false) >> rt.value(false) == true)
+    assert(rt.value(false) >> rt.value(true) == false)
+    assert(rt.value(false) >> rt.type 'boolean' == true)
 
-    assert(node.type 'boolean' >> node.value(false) == false)
+    assert(rt.type 'boolean' >> rt.value(false) == false)
 end
 
 do
-    assert(node.value('abc', '"') >> node.value('abc', '"') == true)
-    assert(node.value('abc', '"') >> node.value('abc', "'") == true)
-    assert(node.value('abc', '"') >> node.type 'string' == true)
+    assert(rt.value('abc', '"') >> rt.value('abc', '"') == true)
+    assert(rt.value('abc', '"') >> rt.value('abc', "'") == true)
+    assert(rt.value('abc', '"') >> rt.type 'string' == true)
 
-    assert(node.type 'string' >> node.value('abc', '"') == false)
+    assert(rt.type 'string' >> rt.value('abc', '"') == false)
 end
 
 do
-    local a = node.type 'number'
-    local b = node.type 'string'
+    local a = rt.type 'number'
+    local b = rt.type 'string'
 
     assert(a >> b == false)
     assert(b >> a == false)
 end
 
 do
-    local a = node.type 'number'
-    local b = node.type 'number' | node.type 'string'
+    local a = rt.type 'number'
+    local b = rt.type 'number' | rt.type 'string'
 
     assert(a >> b == true)
     assert(b >> a == false)
 end
 
 do
-    local a = node.type 'number' | node.type 'string'
-    local b = node.type 'number' | node.type 'boolean'
+    local a = rt.type 'number' | rt.type 'string'
+    local b = rt.type 'number' | rt.type 'boolean'
 
     assert(a >> b == false)
     assert(b >> a == false)
 end
 
 do
-    local a = node.type 'number' | node.type 'string'
-    local b = node.type 'number' | node.type 'boolean' | node.type 'string'
+    local a = rt.type 'number' | rt.type 'string'
+    local b = rt.type 'number' | rt.type 'boolean' | rt.type 'string'
 
     assert(a >> b == true)
     assert(b >> a == false)
 end
 
 do
-    local a = node.type 'number'
-    local b = node.type 'integer'
+    local a = rt.type 'number'
+    local b = rt.type 'integer'
 
     assert(a >> b == false)
     assert(b >> a == true)
 end
 
 do
-    node:reset()
+    rt:reset()
 
-    local a = node.type 'A'
-    local b = node.type 'B'
-    local c = node.type 'C'
+    local a = rt.type 'A'
+    local b = rt.type 'B'
+    local c = rt.type 'C'
 
-    node.class('A', nil, { b })
-    node.class('B', nil, { c })
-    node.class('C', nil, { a })
+    rt.class('A', nil, { b })
+    rt.class('B', nil, { c })
+    rt.class('C', nil, { a })
 
     assert(a >> b == true)
     assert(a >> c == true)
@@ -154,9 +154,9 @@ do
 end
 
 do
-    local a = node.value(1)
-    local b = node.value(2)
-    local c = node.type 'number'
+    local a = rt.value(1)
+    local b = rt.value(2)
+    local c = rt.type 'number'
 
     assert(a >> b == false)
     assert(a >> c == true)
@@ -173,22 +173,22 @@ do
 end
 
 do
-    local a = node.type 'number'
-            & (node.value(1) | node.value(2))
+    local a = rt.type 'number'
+            & (rt.value(1) | rt.value(2))
 
     assert(a:view() == '1 | 2')
 end
 
 do
-    local a = (node.value(1) | node.value(2))
-            & node.type 'number'
+    local a = (rt.value(1) | rt.value(2))
+            & rt.type 'number'
 
     assert(a:view() == '1 | 2')
 end
 
 do
-    local a = (node.value(1) | node.value(2))
-            & (node.type 'number' | node.type 'string')
+    local a = (rt.value(1) | rt.value(2))
+            & (rt.type 'number' | rt.type 'string')
 
     assert(a:view() == '1 | 2')
 end

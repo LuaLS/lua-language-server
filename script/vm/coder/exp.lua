@@ -2,7 +2,7 @@
 ---@param source LuaParser.Node.Base
 ---@param value string | number | boolean
 local function makeValue(coder, source, value)
-    coder:addLine('{key} = node.value({value:q})' % {
+    coder:addLine('{key} = rt.value({value:q})' % {
         key   = coder:getKey(source),
         value = value,
     })
@@ -23,7 +23,7 @@ end)
 ls.vm.registerCoderProvider('table', function (coder, source)
     ---@cast source LuaParser.Node.Table
 
-    coder:addLine('{key} = node.table()' % {
+    coder:addLine('{key} = rt.table()' % {
         key = coder:getKey(source),
     })
 
@@ -95,7 +95,7 @@ ls.vm.registerCoderProvider('call', function (coder, source)
         coder:compile(arg)
         args[i] = coder:getKey(arg)
     end
-    coder:addLine('{key} = node.fcall({func}, { {args} })' % {
+    coder:addLine('{key} = rt.fcall({func}, { {args} })' % {
         key   = coder:getKey(source),
         func  = coder:getKey(source.node),
         args  = table.concat(args, ', '),

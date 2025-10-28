@@ -1,7 +1,7 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@alias A 1
     ---@alias A<X, Y> 2
@@ -18,35 +18,35 @@ do
     A --> 1
     ]]
     -- 维持住引用
-    local A = node.type 'A'
-    node.alias('A', nil, node.value(1))
-    node.alias('A', {
-        node.generic 'X',
-        node.generic 'Y',
-    }, node.value(2))
-    node.alias('A', {
-        node.generic('X', node.NUMBER),
-        node.generic 'Y',
-    }, node.value(3))
-    node.alias('A', {
-        node.generic 'X',
-        node.generic('Y', node.NUMBER),
-    }, node.value(4))
-    node.alias('A', {
-        node.generic('X', node.NUMBER),
-        node.generic('Y', node.STRING),
-    }, node.value(5))
-    node.alias('A', {
-        node.generic('X', node.NUMBER),
-        node.generic('Y', node.NUMBER),
-    }, node.value(6))
+    local A = rt.type 'A'
+    rt.alias('A', nil, rt.value(1))
+    rt.alias('A', {
+        rt.generic 'X',
+        rt.generic 'Y',
+    }, rt.value(2))
+    rt.alias('A', {
+        rt.generic('X', rt.NUMBER),
+        rt.generic 'Y',
+    }, rt.value(3))
+    rt.alias('A', {
+        rt.generic 'X',
+        rt.generic('Y', rt.NUMBER),
+    }, rt.value(4))
+    rt.alias('A', {
+        rt.generic('X', rt.NUMBER),
+        rt.generic('Y', rt.STRING),
+    }, rt.value(5))
+    rt.alias('A', {
+        rt.generic('X', rt.NUMBER),
+        rt.generic('Y', rt.NUMBER),
+    }, rt.value(6))
 
-    local r1 = node.call('A', { node.value(1), node.value(1) })
-    local r2 = node.call('A', { node.value(1), node.value 'x' })
-    local r3 = node.call('A', { node.value(1), node.value(true) })
-    local r4 = node.call('A', { node.value 'x', node.value(1) })
-    local r5 = node.call('A', { node.value 'x', node.value(true) })
-    local r6 = node.type('A')
+    local r1 = rt.call('A', { rt.value(1), rt.value(1) })
+    local r2 = rt.call('A', { rt.value(1), rt.value 'x' })
+    local r3 = rt.call('A', { rt.value(1), rt.value(true) })
+    local r4 = rt.call('A', { rt.value 'x', rt.value(1) })
+    local r5 = rt.call('A', { rt.value 'x', rt.value(true) })
+    local r6 = rt.type('A')
 
     assert(r1.value:view() == '6')
     assert(r2.value:view() == '5')

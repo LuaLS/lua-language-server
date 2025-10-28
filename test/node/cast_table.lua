@@ -1,145 +1,145 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    local A = node.table()
-        : addField { key = node.value('x'), value = node.value(1) }
-        : addField { key = node.value('y'), value = node.value(2) }
+    local A = rt.table()
+        : addField { key = rt.value('x'), value = rt.value(1) }
+        : addField { key = rt.value('y'), value = rt.value(2) }
 
-    local B = node.table()
-        : addField { key = node.value('x'), value = node.value(1) }
-        : addField { key = node.value('y'), value = node.value(2) }
-        : addField { key = node.value('z'), value = node.value(3) }
+    local B = rt.table()
+        : addField { key = rt.value('x'), value = rt.value(1) }
+        : addField { key = rt.value('y'), value = rt.value(2) }
+        : addField { key = rt.value('z'), value = rt.value(3) }
 
     assert(A >> B == false)
     assert(B >> A == true)
 end
 
 do
-    local A = node.table()
+    local A = rt.table()
         : addField {
-            key   = node.value('x'),
-            value = node.value(1)
+            key   = rt.value('x'),
+            value = rt.value(1)
         }
         : addField {
-            key   = node.value('y'),
-            value = node.value(2)
+            key   = rt.value('y'),
+            value = rt.value(2)
         }
         : addField {
-            key   = node.value(1),
-            value = node.value('x')
+            key   = rt.value(1),
+            value = rt.value('x')
         }
         : addField {
-            key   = node.value(2),
-            value = node.value('y')
+            key   = rt.value(2),
+            value = rt.value('y')
         }
         : addField {
-            key   = node.value(3),
-            value = node.value('z')
+            key   = rt.value(3),
+            value = rt.value('z')
         }
 
-    local B = node.array(node.type 'string')
+    local B = rt.array(rt.type 'string')
 
     assert(A >> B == true)
     assert(B >> A == false)
 end
 
 do
-    local A = node.table()
+    local A = rt.table()
         : addField {
-            key   = node.value('x'),
-            value = node.value(1)
+            key   = rt.value('x'),
+            value = rt.value(1)
         }
         : addField {
-            key   = node.value('y'),
-            value = node.value(2)
+            key   = rt.value('y'),
+            value = rt.value(2)
         }
         : addField {
-            key   = node.value(1),
-            value = node.value('x')
+            key   = rt.value(1),
+            value = rt.value('x')
         }
         : addField {
-            key   = node.value(2),
-            value = node.value('y')
+            key   = rt.value(2),
+            value = rt.value('y')
         }
         : addField {
-            key   = node.value(3),
-            value = node.value(false)
+            key   = rt.value(3),
+            value = rt.value(false)
         }
 
-    local B = node.array(node.type 'string')
+    local B = rt.array(rt.type 'string')
 
     assert(A >> B == false)
     assert(B >> A == false)
 end
 
 do
-    local A = node.table()
+    local A = rt.table()
         : addField {
-            key   = node.type('number'),
-            value = node.value('x')
+            key   = rt.type('number'),
+            value = rt.value('x')
         }
 
-    local B = node.array(node.type 'string')
+    local B = rt.array(rt.type 'string')
 
     assert(A >> B == true)
     assert(B >> A == false)
 end
 
 do
-    local A = node.table()
+    local A = rt.table()
         : addField {
-            key   = node.type('number'),
-            value = node.value(false)
+            key   = rt.type('number'),
+            value = rt.value(false)
         }
 
-    local B = node.array(node.type 'string')
+    local B = rt.array(rt.type 'string')
 
     assert(A >> B == false)
     assert(B >> A == false)
 end
 
 do
-    local A = node.table()
+    local A = rt.table()
         : addField {
-            key   = node.value(1),
-            value = node.value(5),
+            key   = rt.value(1),
+            value = rt.value(5),
         }
         : addField {
-            key   = node.value(2),
-            value = node.value(true),
+            key   = rt.value(2),
+            value = rt.value(true),
         }
         : addField {
-            key   = node.value(3),
-            value = node.value('hello'),
+            key   = rt.value(3),
+            value = rt.value('hello'),
         }
 
-    local B = node.tuple()
-        : insert(node.NUMBER)
-        : insert(node.BOOLEAN)
-        : insert(node.STRING)
+    local B = rt.tuple()
+        : insert(rt.NUMBER)
+        : insert(rt.BOOLEAN)
+        : insert(rt.STRING)
 
     assert(A >> B == true)
     assert(B >> A == false)
 end
 
 do
-    local A = node.array(node.value('x'))
-    local B = node.array(node.type 'string')
+    local A = rt.array(rt.value('x'))
+    local B = rt.array(rt.type 'string')
 
     assert(A >> B == true)
     assert(B >> A == false)
 end
 
 do
-    local A = node.array(node.value('x'))
-    local B = node.table()
+    local A = rt.array(rt.value('x'))
+    local B = rt.table()
         : addField {
-            key   = node.value(1),
-            value = node.value('x'),
+            key   = rt.value(1),
+            value = rt.value('x'),
         }
         : addField {
-            key   = node.value(2),
-            value = node.value('x'),
+            key   = rt.value(2),
+            value = rt.value('x'),
         }
 
     assert(A >> B == true)
@@ -147,19 +147,19 @@ do
 end
 
 do
-    local A = node.array(node.value('x'))
-    local B = node.table()
+    local A = rt.array(rt.value('x'))
+    local B = rt.table()
         : addField {
-            key   = node.value(1),
-            value = node.value('x'),
+            key   = rt.value(1),
+            value = rt.value('x'),
         }
         : addField {
-            key   = node.value(2),
-            value = node.value('x'),
+            key   = rt.value(2),
+            value = rt.value('x'),
         }
         : addField {
-            key   = node.value(3),
-            value = node.value('y'),
+            key   = rt.value(3),
+            value = rt.value('y'),
         }
 
     assert(A >> B == false)
@@ -167,43 +167,43 @@ do
 end
 
 do
-    local A = node.array(node.value('x'))
-    local B = node.tuple()
-        : insert(node.STRING)
-        : insert(node.STRING)
-        : insert(node.STRING)
+    local A = rt.array(rt.value('x'))
+    local B = rt.tuple()
+        : insert(rt.STRING)
+        : insert(rt.STRING)
+        : insert(rt.STRING)
 
     assert(A >> B == true)
     assert(B >> A == false)
 end
 
 do
-    local A = node.array(node.STRING)
-    local B = node.tuple()
-        : insert(node.value 'x')
-        : insert(node.value 'y')
-        : insert(node.value 'z')
+    local A = rt.array(rt.STRING)
+    local B = rt.tuple()
+        : insert(rt.value 'x')
+        : insert(rt.value 'y')
+        : insert(rt.value 'z')
 
     assert(A >> B == false)
     assert(B >> A == true)
 end
 
 do
-    local A = node.tuple()
-        : insert(node.STRING)
-        : insert(node.STRING)
-    local B = node.tuple()
-        : insert(node.value 'x')
-        : insert(node.value 'y')
-        : insert(node.value 'z')
+    local A = rt.tuple()
+        : insert(rt.STRING)
+        : insert(rt.STRING)
+    local B = rt.tuple()
+        : insert(rt.value 'x')
+        : insert(rt.value 'y')
+        : insert(rt.value 'z')
 
     assert(A >> B == false)
     assert(B >> A == true)
 end
 
 do
-    local A = node.array(node.value('x'))
-    local B = node.tuple(node.vararg({ node.STRING }, 3))
+    local A = rt.array(rt.value('x'))
+    local B = rt.tuple(rt.vararg({ rt.STRING }, 3))
 
     assert(A >> B == true)
     assert(B >> A == false)

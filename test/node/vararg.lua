@@ -1,4 +1,4 @@
-local node = test.scope.node
+local node = test.scope.rt
 
 do
     local v1 = node.vararg()

@@ -1,20 +1,20 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    node:reset()
-    local var = node.variable('x')
+    rt:reset()
+    local var = rt.variable('x')
 
     assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == 'unknown')
     assert(var.fields == nil)
 
-    local child1 = node.variable(1, var)
+    local child1 = rt.variable(1, var)
 
     assert(child1:viewAsVariable() == 'x[1]')
     assert(var.value:view() == 'unknown')
     assert(var.fields == nil)
 
-    local child2 = node.variable('y', child1)
+    local child2 = rt.variable('y', child1)
 
     assert(child2:viewAsVariable() == 'x[1].y')
     assert(var.value:view() == 'unknown')
@@ -22,43 +22,43 @@ do
 end
 
 do
-    node:reset()
-    local var = node.variable('x')
+    rt:reset()
+    local var = rt.variable('x')
 
-    var:addType(node.type 'number')
+    var:addType(rt.type 'number')
     assert(var.value:view() == 'number')
 
-    var:addType(node.type 'string')
+    var:addType(rt.type 'string')
     assert(var.value:view() == 'number | string')
 
-    var:addClass(node.class 'A')
+    var:addClass(rt.class 'A')
     assert(var.value:view() == 'A')
 end
 
 do
-    node:reset()
-    local var = node.variable('x')
+    rt:reset()
+    local var = rt.variable('x')
 
     var:addField {
-        key = node.value 'n',
-        value = node.type 'number',
+        key = rt.value 'n',
+        value = rt.type 'number',
     }
 
     assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == '{ n: number }')
     assert(var.fields:view() == '{ n: number }')
 
-    local a = node.type 'A'
+    local a = rt.type 'A'
 
     assert(a.value:view() == 'A')
 
-    local ca = node.class 'A'
+    local ca = rt.class 'A'
     a:addClass(ca)
     ca:addVariable(var)
     assert(a.value:view() == '{ n: number }')
 
     var:addField {
-        key = node.value 'self',
+        key = rt.value 'self',
         value = a,
     }
     assert(var.value:view() == '{ n: number, self: A }')
@@ -70,8 +70,8 @@ do
     assert(a.value:view() == '{ n: number, self: A }')
 
     ca:addField {
-        key = node.value 's',
-        value = node.type 'string',
+        key = rt.value 's',
+        value = rt.type 'string',
     }
     assert(var.value:view() == 'A')
     assert(var.fields:view() == '{ n: number, self: A }')
@@ -87,28 +87,28 @@ do
 
     M.y = 'abc'
     ]]
-    node:reset()
+    rt:reset()
 
-    local a = node.type 'A'
-    local ca = node.class 'A'
+    local a = rt.type 'A'
+    local ca = rt.class 'A'
     ca:addField {
-        key = node.value 'x',
-        value = node.type 'number',
+        key = rt.value 'x',
+        value = rt.type 'number',
     }
 
-    local m = node.variable 'M'
+    local m = rt.variable 'M'
     ca:addVariable(m)
     m:addClass(ca)
 
     m:addField {
-        key = node.value '__index',
-        value = node.unsolve(node.TABLE, m, function (unsolve, var)
+        key = rt.value '__index',
+        value = rt.unsolve(rt.TABLE, m, function (unsolve, var)
             return var.value
         end),
     }
     m:addField {
-        key = node.value 'y',
-        value = node.value 'abc',
+        key = rt.value 'y',
+        value = rt.value 'abc',
     }
 
     assert(a.value:view() == '{ x: number, y: "abc", __index: A }')
@@ -120,12 +120,12 @@ do
     --[[
     a.b.c.d = 1
     ]]
-    node:reset()
+    rt:reset()
 
-    local a = node.variable 'a'
+    local a = rt.variable 'a'
     a:addField ({
-        key = node.value 'd',
-        value = node.value(1),
+        key = rt.value 'd',
+        value = rt.value(1),
     }, {'b', 'c'})
     assert(a:viewAsVariable() == 'a')
     assert(a:view() == '{ b: { c: { d: 1 } } }')
@@ -154,19 +154,19 @@ do
     a.b.c.d.x = 1
     a.b.c.d.y = 2
     ]]
-    node:reset()
+    rt:reset()
 
-    local a = node.variable 'a'
+    local a = rt.variable 'a'
     local d = a:addField({
-        key = node.value 'd',
-        value = node.table(),
+        key = rt.value 'd',
+        value = rt.table(),
     }, {'b', 'c'})
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == '{}')
     assert(d.fields == nil)
 
-    local A = node.type 'A'
-    local CA = node.class 'A'
+    local A = rt.type 'A'
+    local CA = rt.class 'A'
     CA:addVariable(d)
     d:addClass(CA)
     assert(d:viewAsVariable() == 'a.b.c.d')
@@ -175,8 +175,8 @@ do
     assert(A.value:view() == '{}')
 
     local dx = {
-        key = node.value 'x',
-        value = node.value(1),
+        key = rt.value 'x',
+        value = rt.value(1),
     }
     d:addField(dx)
     assert(d:viewAsVariable() == 'a.b.c.d')
@@ -185,8 +185,8 @@ do
     assert(A.value:view() == '{ x: 1 }')
 
     local dy = {
-        key = node.value 'y',
-        value = node.value(2),
+        key = rt.value 'y',
+        value = rt.value(2),
     }
     a:addField(dy, {'b', 'c', 'd'})
     assert(d:viewAsVariable() == 'a.b.c.d')

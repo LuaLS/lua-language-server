@@ -24,10 +24,10 @@ function M:__init(scope, fields)
         self.fields = ls.linkedTable.create()
         for k, v in pairs(fields) do
             if type(k) ~= 'table' then
-                k = scope.node.value(k)
+                k = scope.rt.value(k)
             end
             if type(v) ~= 'table' then
-                v = scope.node.value(v)
+                v = scope.rt.value(v)
             end
             self.fields:pushTail { key = k, value = v }
         end
@@ -170,7 +170,7 @@ end
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return self.scope.node.union(self.keys), true
+    return self.scope.rt.union(self.keys), true
 end
 
 ---@type table<Node.TableKey, Node>
@@ -184,7 +184,7 @@ M.__getter.valueMap = function (self)
     for k, field in pairs(self.fieldMap) do
         local v
         if #field > 0 then
-            v = self.scope.node.union(ls.util.map(field, function (v, k)
+            v = self.scope.rt.union(ls.util.map(field, function (v, k)
                 return v.value
             end))
         else
@@ -249,7 +249,7 @@ end
 ---@param key Node.TableKey
 ---@return Node
 function M:get(key)
-    local node = self.scope.node
+    local node = self.scope.rt
     if not self.fields then
         return node.NIL
     end
@@ -320,7 +320,7 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    local node = self.scope.node
+    local node = self.scope.rt
     if other.kind == 'array' then
         ---@cast other Node.Array
         local myType = self:get(node.INTEGER)
@@ -348,7 +348,7 @@ end
 ---越靠前的字段越优先。
 ---@param childs Node.Table[]
 function M:addChilds(childs)
-    local node = self.scope.node
+    local node = self.scope.rt
     node:lockCache()
 
     local fieldMap = self.fieldMap
@@ -389,7 +389,7 @@ function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
     end
-    local newTable = self.scope.node.table()
+    local newTable = self.scope.rt.table()
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
         if field.key.hasGeneric
@@ -414,10 +414,10 @@ function M:inferGeneric(other, result)
         if field.key.hasGeneric then
             -- 仅支持 [K] 这种形式的推导，不支持 [K[]] 等嵌套形式
             if  field.key.kind == 'generic'
-            and other.typeOfKey ~= self.scope.node.NEVER then
+            and other.typeOfKey ~= self.scope.rt.NEVER then
                 field.key:inferGeneric(other.typeOfKey, result)
                 if field.value.hasGeneric then
-                    field.value:inferGeneric(other:get(self.scope.node.ANY), result)
+                    field.value:inferGeneric(other:get(self.scope.rt.ANY), result)
                 end
             end
         elseif field.value.hasGeneric then

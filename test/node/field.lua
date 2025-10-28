@@ -1,42 +1,42 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    assert(node.NEVER:get('x') == node.NEVER)
-    assert(node.NIL:get('x') == node.NEVER)
-    assert(node.UNKNOWN:get('x') == node.ANY)
-    assert(node.ANY:get('x') == node.ANY)
-    assert(node.TABLE:get('x') == node.ANY)
+    assert(rt.NEVER:get('x') == rt.NEVER)
+    assert(rt.NIL:get('x') == rt.NEVER)
+    assert(rt.UNKNOWN:get('x') == rt.ANY)
+    assert(rt.ANY:get('x') == rt.ANY)
+    assert(rt.TABLE:get('x') == rt.ANY)
 end
 
 do
-    local t = node.table()
+    local t = rt.table()
         : addField {
-            key   = node.value 'x',
-            value = node.type 'number'
+            key   = rt.value 'x',
+            value = rt.type 'number'
         }
         : addField {
-            key   = node.value 'y',
-            value = node.type 'boolean'
+            key   = rt.value 'y',
+            value = rt.type 'boolean'
         }
         : addField {
-            key   = node.value 'z',
-            value = node.type 'string'
+            key   = rt.value 'z',
+            value = rt.type 'string'
         }
         : addField {
-            key   = node.union { node.value(1), node.value(2) },
-            value = node.value('union')
+            key   = rt.union { rt.value(1), rt.value(2) },
+            value = rt.value('union')
         }
         : addField {
-            key   = node.type 'string',
-            value = node.value('string')
+            key   = rt.type 'string',
+            value = rt.value('string')
         }
         : addField {
-            key   = node.type 'integer',
-            value = node.value('integer')
+            key   = rt.type 'integer',
+            value = rt.value('integer')
         }
         : addField {
-            key   = node.type 'number',
-            value = node.value('number')
+            key   = rt.type 'number',
+            value = rt.value('number')
         }
 
     assert(t:get('x'):view() == 'number')
@@ -48,39 +48,39 @@ do
     assert(t:get(3):view() == '"integer"')
     assert(t:get(0.5):view() == '"number"')
     assert(t:get(true):view() == 'nil')
-    assert(t:get(node.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
-    assert(t.keys[1] == node.value(1))
-    assert(t.keys[2] == node.value(2))
-    assert(t.keys[3] == node.value 'x')
-    assert(t.keys[4] == node.value 'y')
-    assert(t.keys[5] == node.value 'z')
-    assert(t.keys[6] == node.type 'integer')
-    assert(t.keys[7] == node.type 'number')
-    assert(t.keys[8] == node.type 'string')
+    assert(t:get(rt.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
+    assert(t.keys[1] == rt.value(1))
+    assert(t.keys[2] == rt.value(2))
+    assert(t.keys[3] == rt.value 'x')
+    assert(t.keys[4] == rt.value 'y')
+    assert(t.keys[5] == rt.value 'z')
+    assert(t.keys[6] == rt.type 'integer')
+    assert(t.keys[7] == rt.type 'number')
+    assert(t.keys[8] == rt.type 'string')
 end
 
 do
-    local a = node.table()
+    local a = rt.table()
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
 
-    local b = node.table()
+    local b = rt.table()
         : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'y',
+            value = rt.value 'y'
         }
 
     local u = a | b
 
     assert(u:get('x'):view() == '"x" | nil')
     assert(u:get('y'):view() == '"y" | nil')
-    assert(u:get(node.ANY):view() == [["x" | "y"]])
+    assert(u:get(rt.ANY):view() == [["x" | "y"]])
 end
 
 do
-    node:reset()
+    rt:reset()
 
     ---@type table<string, Node.Type>
     local t = {}
@@ -89,9 +89,9 @@ do
     local names = {'A', 'A1', 'A2', 'A11', 'A12', 'A21', 'A22'}
 
     for _, name in ipairs(names) do
-        node.TYPE_POOL[name] = nil
-        t[name] = node.type(name)
-        c[name] = node.class(name)
+        rt.TYPE_POOL[name] = nil
+        t[name] = rt.type(name)
+        c[name] = rt.class(name)
     end
 
     c.A:addExtends(t.A1)
@@ -112,8 +112,8 @@ do
 
     for _, name in ipairs(names) do
         c[name]:addField {
-            key   = node.value(name),
-            value = node.value(name),
+            key   = rt.value(name),
+            value = rt.value(name),
         }
     end
 
@@ -121,30 +121,30 @@ do
     assert(t.A:get('A11'):view() == '"A11"')
     assert(t.A:get('A33'):view() == 'nil')
 
-    assert(t.A:get(node.ANY):view() == [["A" | "A1" | "A11" | "A12" | "A2" | "A21" | "A22"]])
+    assert(t.A:get(rt.ANY):view() == [["A" | "A1" | "A11" | "A12" | "A2" | "A21" | "A22"]])
     local value = t.A.value
     assert(value.kind == 'table')
     ---@cast value Node.Table
-    assert(value.keys[1] == node.value "A")
-    assert(value.keys[2] == node.value "A1")
-    assert(value.keys[3] == node.value "A11")
-    assert(value.keys[4] == node.value "A12")
-    assert(value.keys[5] == node.value "A2")
-    assert(value.keys[6] == node.value "A21")
-    assert(value.keys[7] == node.value "A22")
+    assert(value.keys[1] == rt.value "A")
+    assert(value.keys[2] == rt.value "A1")
+    assert(value.keys[3] == rt.value "A11")
+    assert(value.keys[4] == rt.value "A12")
+    assert(value.keys[5] == rt.value "A2")
+    assert(value.keys[6] == rt.value "A21")
+    assert(value.keys[7] == rt.value "A22")
 end
 
 do
-    local a = node.table()
+    local a = rt.table()
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
 
-    local b = node.table()
+    local b = rt.table()
         : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'y',
+            value = rt.value 'y'
         }
 
     local u = a & b
@@ -158,20 +158,20 @@ do
 end
 
 do
-    local a = node.table()
+    local a = rt.table()
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
 
-    local b = node.table()
+    local b = rt.table()
         : addField {
-            key   = node.value 'x',
-            value = node.value 'y'
+            key   = rt.value 'x',
+            value = rt.value 'y'
         }
         : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'y',
+            value = rt.value 'y'
         }
 
     local u = a & b
@@ -185,22 +185,22 @@ do
 end
 
 do
-    local a = node.table()
+    local a = rt.table()
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
 
-    local b = node.table()
+    local b = rt.table()
         : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'y',
+            value = rt.value 'y'
         }
 
-    local c = node.table()
+    local c = rt.table()
         : addField {
-            key   = node.value 'z',
-            value = node.value 'z'
+            key   = rt.value 'z',
+            value = rt.value 'z'
         }
 
     local u = a & (b | c)
@@ -215,72 +215,72 @@ do
 end
 
 do
-    local t = node.table()
+    local t = rt.table()
 
-    assert(t:get(node.ANY):view() == 'nil')
-    assert(t:get(node.UNKNOWN):view() == 'nil')
+    assert(t:get(rt.ANY):view() == 'nil')
+    assert(t:get(rt.UNKNOWN):view() == 'nil')
 end
 
 do
-    local t = node.tuple()
+    local t = rt.tuple()
 
-    assert(t:get(node.ANY):view() == 'nil')
-    assert(t:get(node.UNKNOWN):view() == 'nil')
+    assert(t:get(rt.ANY):view() == 'nil')
+    assert(t:get(rt.UNKNOWN):view() == 'nil')
 end
 
 do
-    local t = node.tuple()
-        : insert(node.value 'x')
-        : insert(node.value 'y')
-        : insert(node.value 'z')
+    local t = rt.tuple()
+        : insert(rt.value 'x')
+        : insert(rt.value 'y')
+        : insert(rt.value 'z')
 
-    assert(t:get(node.ANY):view() == '"x" | "y" | "z"')
-    assert(t:get(node.UNKNOWN):view() == '"x" | "y" | "z"')
+    assert(t:get(rt.ANY):view() == '"x" | "y" | "z"')
+    assert(t:get(rt.UNKNOWN):view() == '"x" | "y" | "z"')
 
     assert(t:get(1):view() == '"x"')
     assert(t:get(2):view() == '"y"')
     assert(t:get(3):view() == '"z"')
     assert(t:get(4):view() == 'nil')
 
-    assert(t:get(node.value(1)):view() == '"x"')
+    assert(t:get(rt.value(1)):view() == '"x"')
 
-    assert(t:get(node.type 'number'):view() == '"x" | "y" | "z"')
-    assert(t:get(node.type 'integer'):view() == '"x" | "y" | "z"')
-    assert(t:get(node.type 'boolean'):view() == 'nil')
+    assert(t:get(rt.type 'number'):view() == '"x" | "y" | "z"')
+    assert(t:get(rt.type 'integer'):view() == '"x" | "y" | "z"')
+    assert(t:get(rt.type 'boolean'):view() == 'nil')
 
-    assert(t:get(node.value(1) | node.value(2) | node.value(9)):view() == '"x" | "y" | nil')
+    assert(t:get(rt.value(1) | rt.value(2) | rt.value(9)):view() == '"x" | "y" | nil')
 end
 
 do
-    local t = node.array(node.value(true))
+    local t = rt.array(rt.value(true))
 
-    assert(t:get(node.ANY):view() == 'true')
-    assert(t:get(node.UNKNOWN):view() == 'true')
+    assert(t:get(rt.ANY):view() == 'true')
+    assert(t:get(rt.UNKNOWN):view() == 'true')
 
     assert(t:get(0):view() == 'nil')
     assert(t:get(1):view() == 'true')
-    assert(t:get(node.value(1)):view() == 'true')
+    assert(t:get(rt.value(1)):view() == 'true')
 
-    assert(t:get(node.type 'number'):view() == 'true')
-    assert(t:get(node.type 'integer'):view() == 'true')
-    assert(t:get(node.type 'boolean'):view() == 'nil')
+    assert(t:get(rt.type 'number'):view() == 'true')
+    assert(t:get(rt.type 'integer'):view() == 'true')
+    assert(t:get(rt.type 'boolean'):view() == 'nil')
 
-    assert(t:get(node.value(1) | node.value(2)):view() == 'true')
-    assert(t:get(node.value(0) | node.value(1)):view() == 'true | nil')
+    assert(t:get(rt.value(1) | rt.value(2)):view() == 'true')
+    assert(t:get(rt.value(0) | rt.value(1)):view() == 'true | nil')
 end
 
 do
-    local index = node.index(
-        node.table()
+    local index = rt.index(
+        rt.table()
             : addField {
-                key   = node.value 'x',
-                value = node.value(1)
+                key   = rt.value 'x',
+                value = rt.value(1)
             }
             : addField {
-                key   = node.value 'y',
-                value = node.value(2)
+                key   = rt.value 'y',
+                value = rt.value(2)
             },
-        node.value 'x'
+        rt.value 'x'
     )
     assert(index:view() == '1')
 end

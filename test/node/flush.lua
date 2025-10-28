@@ -1,17 +1,17 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    local t = node.table()
+    local t = rt.table()
 
     assert(t:view() == '{}')
 
     local field1 = {
-        key = node.value 'x',
-        value = node.NUMBER
+        key = rt.value 'x',
+        value = rt.NUMBER
     }
     local field2 = {
-        key = node.value 'y',
-        value = node.STRING
+        key = rt.value 'y',
+        value = rt.STRING
     }
 
     t:addField(field1)
@@ -28,75 +28,75 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
 
-    local a = node.type 'A'
+    local a = rt.type 'A'
 
-    assert(a:get 'x' == node.NEVER)
+    assert(a:get 'x' == rt.NEVER)
 
     local field1 = {
-        key = node.value 'x',
-        value = node.NUMBER
+        key = rt.value 'x',
+        value = rt.NUMBER
     }
     local field2 = {
-        key = node.value 'x',
-        value = node.STRING
+        key = rt.value 'x',
+        value = rt.STRING
     }
-    local ca = node.class 'A'
-    assert(a:get 'x' == node.NIL)
+    local ca = rt.class 'A'
+    assert(a:get 'x' == rt.NIL)
 
     ca:addField(field1)
-    assert(a:get 'x' == node.NUMBER)
+    assert(a:get 'x' == rt.NUMBER)
 
-    local b = node.type 'B'
-    assert(b:get 'x' == node.NEVER)
+    local b = rt.type 'B'
+    assert(b:get 'x' == rt.NEVER)
 
-    local cb = node.class 'B'
+    local cb = rt.class 'B'
 
     cb:addExtends(a)
-    assert(b:get 'x' == node.NUMBER)
-    assert(b:get 'y' == node.NIL)
+    assert(b:get 'x' == rt.NUMBER)
+    assert(b:get 'y' == rt.NIL)
 
     ca:removeField(field1)
     ca:addField(field2)
-    assert(a:get 'x' == node.STRING)
-    assert(b:get 'x' == node.STRING)
+    assert(a:get 'x' == rt.STRING)
+    assert(b:get 'x' == rt.STRING)
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A<T>
     ---@field x T
     ]]
 
-    local a = node.type 'A'
-    local T = node.generic 'T'
+    local a = rt.type 'A'
+    local T = rt.generic 'T'
 
-    local ca = node.class('A', { T })
+    local ca = rt.class('A', { T })
         : addField {
-            key = node.value 'x',
+            key = rt.value 'x',
             value = T,
         }
 
-    local an = a:call { node.NUMBER }
+    local an = a:call { rt.NUMBER }
     assert(an.value:view() == '{ x: number }')
     assert(an:get('x'):view() == 'number')
     assert(an:get('y'):view() == 'nil')
 
     ca:addField {
-        key = node.value 'y',
-        value = node.STRING,
+        key = rt.value 'y',
+        value = rt.STRING,
     }
     assert(an.value:view() == '{ x: number, y: string }')
     assert(an:get('y'):view() == 'string')
 end
 
 do
-    local t1 = node.table {
+    local t1 = rt.table {
         x = 1
     }
-    local t2 = node.table {
+    local t2 = rt.table {
         y = 2
     }
     local sec = t1 & t2
@@ -105,12 +105,12 @@ do
     assert(sec.value:view() == '{ x: 1, y: 2 }')
 
     t1:addField {
-        key = node.value 'xx',
-        value = node.value(11)
+        key = rt.value 'xx',
+        value = rt.value(11)
     }
     t2:addField {
-        key = node.value 'yy',
-        value = node.value(22)
+        key = rt.value 'yy',
+        value = rt.value(22)
     }
 
     assert(sec:view() == '{ x: 1, xx: 11 } & { y: 2, yy: 22 }')
@@ -118,17 +118,17 @@ do
 end
 
 do
-    local t1 = node.table {
+    local t1 = rt.table {
         x = 1
     }
-    local t2 = node.table {
+    local t2 = rt.table {
         y = 2
     }
     assert((t1 >> t2) == false)
 
     t1:addField {
-        key = node.value 'y',
-        value = node.value(2)
+        key = rt.value 'y',
+        value = rt.value(2)
     }
     assert((t1 >> t2) == true)
 end

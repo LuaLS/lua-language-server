@@ -20,7 +20,7 @@ function M:__init(scope, name, parent)
         self.key = name
     else
         ---@cast name -Node
-        self.key = scope.node.value(name)
+        self.key = scope.rt.value(name)
     end
     self.scope = scope
     self.parent = parent
@@ -224,7 +224,7 @@ M.fields = nil
 ---@pacakge
 ---@param t Node.Table
 function M:mergeFields(t)
-    local node = self.scope.node
+    local node = self.scope.rt
     for k, v in pairs(self.childs) do
         if type(k) ~= 'table' then
             ---@cast k -Node
@@ -247,7 +247,7 @@ M.__getter.fields = function (self)
     if not self.childs then
         return nil, false
     end
-    local t = self.scope.node.table()
+    local t = self.scope.rt.table()
     self:mergeFields(t)
     return t, true
 end
@@ -263,7 +263,7 @@ function M:getChild(key1, key2, ...)
     if self.parentVariable then
         return self.parentVariable:getChild(key1, key2, ...)
     end
-    local node = self.scope.node
+    local node = self.scope.rt
     local key = key1
     local path
     if key2 then
@@ -308,7 +308,7 @@ function M:addField(field, path)
         self.parentVariable:addField(field, path)
         return self
     end
-    local node = self.scope.node
+    local node = self.scope.rt
     local current = self
     if not current.childs then
         current.childs = {}
@@ -348,7 +348,7 @@ function M:get(key)
     if self.parentVariable then
         return self.parentVariable:get(key)
     end
-    local node = self.scope.node
+    local node = self.scope.rt
     if type(key) ~= 'table' then
         ---@cast key -Node
         key = node.value(key)
@@ -366,7 +366,7 @@ function M:setChild(key, variable)
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
-        key = self.scope.node.value(key)
+        key = self.scope.rt.value(key)
     end
     if not self.childs then
         self.childs = {}
@@ -393,7 +393,7 @@ function M:removeField(field, path)
         return self
     end
 
-    local node = self.scope.node
+    local node = self.scope.rt
     if path then
         for _, k in ipairs(path) do
             if type(k) ~= 'table' then
@@ -428,7 +428,7 @@ M.__getter.value = function (self)
     if self.parentVariable then
         return self.parentVariable.value, false
     end
-    local node = self.scope.node
+    local node = self.scope.rt
     if self.classes then
         local union = node.union(ls.util.map(self.classes:toArray(), function (v, k)
             ---@cast v Node.Class
@@ -450,7 +450,7 @@ M.__getter.value = function (self)
             return union, true
         end
     end
-    return self.fields or self.scope.node.UNKNOWN, true
+    return self.fields or self.scope.rt.UNKNOWN, true
 end
 
 ---@private

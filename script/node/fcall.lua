@@ -47,7 +47,7 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = self.scope.node.NEVER
+    self.value = self.scope.rt.NEVER
     return self.returns:select(1), true
 end
 
@@ -66,7 +66,7 @@ M.__getter.returns = function (self)
     ---@type integer?, integer?
     local allMin, allMax
 
-    local node = self.scope.node
+    local node = self.scope.rt
     ---@type Node.Function[]
     local defs = {}
     local args = node.vararg(self.args, #self.args, #self.args)

@@ -39,5 +39,5 @@ function M:resolveGeneric(map)
     if head == self.head and index == self.index then
         return self
     end
-    return self.scope.node.index(head, index)
+    return self.scope.rt.index(head, index)
 end

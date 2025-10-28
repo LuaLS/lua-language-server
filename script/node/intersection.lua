@@ -93,9 +93,9 @@ M.__getter.values = function (self)
                 return true, result[1]
             end
             if #result == 0 then
-                return true, self.scope.node.NEVER
+                return true, self.scope.rt.NEVER
             end
-            return true, self.scope.node.union(result)
+            return true, self.scope.rt.union(result)
         end
         if  y.kind == 'union'
         and canMerge(x) then
@@ -108,20 +108,20 @@ M.__getter.values = function (self)
                 return true, result[1]
             end
             if #result == 0 then
-                return true, self.scope.node.NEVER
+                return true, self.scope.rt.NEVER
             end
-            return true, self.scope.node.union(result)
+            return true, self.scope.rt.union(result)
         end
         if x.kind == 'type' then
             ---@cast x Node.Type
             if x.isBasicType then
-                return true, self.scope.node.NEVER
+                return true, self.scope.rt.NEVER
             end
         end
         if y.kind == 'type' then
             ---@cast y Node.Type
             if y.isBasicType then
-                return true, self.scope.node.NEVER
+                return true, self.scope.rt.NEVER
             end
         end
         if x.kind == 'table'
@@ -133,7 +133,7 @@ M.__getter.values = function (self)
             return false
         end
 
-        return true, self.scope.node.NEVER
+        return true, self.scope.rt.NEVER
     end
 
     local values = self.rawNodes
@@ -163,11 +163,11 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = self.scope.node.NEVER
+    self.value = self.scope.rt.NEVER
     local values = self.values
 
     if #values == 0 then
-        return self.scope.node.NEVER, true
+        return self.scope.rt.NEVER, true
     end
     if #values == 1 then
         return values[1], true
@@ -200,13 +200,13 @@ M.__getter.value = function (self)
         end
         ::continue::
     end
-    local table = self.scope.node.table(valueMap)
+    local table = self.scope.rt.table(valueMap)
 
     if #unionParts == 0 then
         return table, true
     end
 
-    local unionValue = self.scope.node.union(unionParts)
+    local unionValue = self.scope.rt.union(unionParts)
 
     if unionValue.kind ~= 'union' then
         local result = table & unionValue
@@ -219,7 +219,7 @@ M.__getter.value = function (self)
         results[i] = table & n
     end
 
-    return self.scope.node.union(results), true
+    return self.scope.rt.union(results), true
 end
 
 ---@param self Node.Intersection
@@ -271,7 +271,7 @@ function M:resolveGeneric(map)
     for _, v in ipairs(self.rawNodes) do
         newValues[#newValues+1] = v:resolveGeneric(map)
     end
-    return self.scope.node.intersection(newValues)
+    return self.scope.rt.intersection(newValues)
 end
 
 function M:inferGeneric(other, result)

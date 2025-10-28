@@ -36,7 +36,7 @@ function M:get(key)
         and key % 1 == 0 then
             return self.head
         else
-            return self.scope.node.NIL
+            return self.scope.rt.NIL
         end
     end
     if key.typeName == 'number'
@@ -53,14 +53,14 @@ function M:get(key)
         end
         return result
     end
-    return self.scope.node.NIL
+    return self.scope.rt.NIL
 end
 
 ---@param self Node.Array
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return self.scope.node.INTEGER, true
+    return self.scope.rt.INTEGER, true
 end
 
 ---@param other Node
@@ -88,14 +88,14 @@ function M:resolveGeneric(map)
     if newHead == self.head then
         return self
     end
-    return self.scope.node.array(newHead)
+    return self.scope.rt.array(newHead)
 end
 
 function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
-    local value = other:get(self.scope.node.INTEGER)
+    local value = other:get(self.scope.rt.INTEGER)
     if value.typeName == 'never'
     or value.typeName == 'nil' then
         return

@@ -96,9 +96,9 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = self.scope.node.NEVER
+    self.value = self.scope.rt.NEVER
     if #self.values == 0 then
-        return self.scope.node.NEVER, true
+        return self.scope.rt.NEVER, true
     end
     if #self.values == 1 then
         return self.values[1], true
@@ -114,7 +114,7 @@ M.__getter.truly = function (self)
     for _, v in ipairs(self.values) do
         result[#result+1] = v.truly
     end
-    return self.scope.node.union(result), true
+    return self.scope.rt.union(result), true
 end
 
 ---@param self Node.Union
@@ -125,17 +125,17 @@ M.__getter.falsy = function (self)
     for _, v in ipairs(self.values) do
         result[#result+1] = v.falsy
     end
-    return self.scope.node.union(result), true
+    return self.scope.rt.union(result), true
 end
 
 function M:narrow(other)
-    return self.scope.node.union(self.values, function (v)
+    return self.scope.rt.union(self.values, function (v)
         return v:canCast(other)
     end)
 end
 
 function M:narrowByField(key, value)
-    return self.scope.node.union(self.values, function (v)
+    return self.scope.rt.union(self.values, function (v)
         return v:get(key):canCast(value)
     end)
 end
@@ -163,7 +163,7 @@ function M:resolveGeneric(map)
     for _, v in ipairs(self.rawNodes) do
         newValues[#newValues+1] = v:resolveGeneric(map)
     end
-    return self.scope.node.union(newValues)
+    return self.scope.rt.union(newValues)
 end
 
 function M:inferGeneric(other, result)

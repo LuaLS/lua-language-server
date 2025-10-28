@@ -1,6 +1,6 @@
----@class Node.Manager: Class.Base
----@overload fun(scope: Scope): Node.Manager
-local M = Class 'Node.Manager'
+---@class Node.Runtime: Class.Base
+---@overload fun(scope: Scope): Node.Runtime
+local M = Class 'Node.Runtime'
 
 ---@param scope Scope
 function M:__init(scope)
@@ -159,7 +159,7 @@ function M:fillAPIs()
         if not filter then
             if nodes then
                 if #nodes == 0 then
-                    return scope.node.NEVER
+                    return scope.rt.NEVER
                 end
                 if #nodes == 1 then
                     return nodes[1]
@@ -168,7 +168,7 @@ function M:fillAPIs()
             return New 'Node.Union' (scope, nodes)
         end
         if not nodes then
-            return scope.node.NEVER
+            return scope.rt.NEVER
         end
         local result = {}
         for _, v in ipairs(nodes) do
@@ -177,7 +177,7 @@ function M:fillAPIs()
             end
         end
         if #result == 0 then
-            return scope.node.NEVER
+            return scope.rt.NEVER
         end
         if #result == 1 then
             return result[1]
@@ -563,8 +563,8 @@ function M:unlockCache()
 end
 
 ---@param scope Scope
----@return Node.Manager
-function ls.node.createManager(scope)
-    local apis = New 'Node.Manager' (scope)
+---@return Node.Runtime
+function ls.node.createRuntime(scope)
+    local apis = New 'Node.Runtime' (scope)
     return apis
 end

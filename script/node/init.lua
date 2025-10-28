@@ -23,4 +23,4 @@ require 'node.fcall'
 require 'node.variable'
 require 'node.template'
 
-require 'node.manager'
+require 'node.runtime'

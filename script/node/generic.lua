@@ -17,7 +17,7 @@ function M:__init(scope, name, extends, default)
     self.scope = scope
     self.name = name
     ---@type Node
-    self.extends = extends or scope.node.ANY
+    self.extends = extends or scope.rt.ANY
     self.default = default
 end
 
@@ -54,7 +54,7 @@ end
 function M:onViewAsParam(viewer, options)
     local buf = {}
     buf[#buf+1] = self.name
-    if self.extends ~= self.scope.node.ANY then
+    if self.extends ~= self.scope.rt.ANY then
         buf[#buf+1] = ':'
         buf[#buf+1] = viewer:view(self.extends, { skipLevel = 0 })
     end

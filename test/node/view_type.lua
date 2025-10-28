@@ -1,31 +1,31 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    node:reset()
+    rt:reset()
 
-    local a = node.type('A')
+    local a = rt.type('A')
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'A')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A
     ---@field x 'x'
     ---@field y 'y'
     ]]
 
-    local a = node.type('A')
-    node.class('A')
+    local a = rt.type('A')
+    rt.class('A')
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
         : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'y',
+            value = rt.value 'y'
         }
 
     assert(a:view() == 'A')
@@ -33,7 +33,7 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A: B, C, D
 
@@ -47,34 +47,34 @@ do
     ---@field z 'z'
     ]]
 
-    local a = node.type('A')
-    local b = node.type('B')
-    node.class('B')
+    local a = rt.type('A')
+    local b = rt.type('B')
+    rt.class('B')
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
-    local c = node.type('C')
-    node.class('C')
+    local c = rt.type('C')
+    rt.class('C')
         : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'y',
+            value = rt.value 'y'
         }
-    local d = node.type('D')
-    node.class('D')
+    local d = rt.type('D')
+    rt.class('D')
         : addField {
-            key   = node.value 'z',
-            value = node.value 'z'
+            key   = rt.value 'z',
+            value = rt.value 'z'
         }
 
-    node.class('A', nil, { b, c, d })
+    rt.class('A', nil, { b, c, d })
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: "x", y: "y", z: "z" }')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A: B, C, D
     ---@field w 1
@@ -91,40 +91,40 @@ do
     ---@field field z 'z'
     ]]
 
-    local a = node.type('A')
-    node.class('A')
+    local a = rt.type('A')
+    rt.class('A')
         : addField {
-            key   = node.value 'w',
-            value = node.value '1'
+            key   = rt.value 'w',
+            value = rt.value '1'
         }
         : addField {
-            key   = node.value 'x',
-            value = node.value '2'
+            key   = rt.value 'x',
+            value = rt.value '2'
         }
         : addField {
-            key   = node.value 'y',
-            value = node.value '3'
+            key   = rt.value 'y',
+            value = rt.value '3'
         }
-        : addExtends(node.type 'B')
-        : addExtends(node.type 'C')
-        : addExtends(node.type 'D')
+        : addExtends(rt.type 'B')
+        : addExtends(rt.type 'C')
+        : addExtends(rt.type 'D')
 
-    node.class('B')
+    rt.class('B')
         : addField {
-            key   = node.value 'x',
-            value = node.value 'x'
-        }
-
-    node.class('C')
-        : addField {
-            key   = node.value 'y',
-            value = node.value 'y'
+            key   = rt.value 'x',
+            value = rt.value 'x'
         }
 
-    node.class('D')
+    rt.class('C')
         : addField {
-            key   = node.value 'z',
-            value = node.value 'z'
+            key   = rt.value 'y',
+            value = rt.value 'y'
+        }
+
+    rt.class('D')
+        : addField {
+            key   = rt.value 'z',
+            value = rt.value 'z'
         }
 
     assert(a:view() == 'A')
@@ -132,24 +132,24 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@alias A 1
     ---@alias A 2
     ---@alias A 3
     ]]
 
-    local a = node.type('A')
-    node.alias('A', nil, node.value(1))
-    node.alias('A', nil, node.value(2))
-    node.alias('A', nil, node.value(3))
+    local a = rt.type('A')
+    rt.alias('A', nil, rt.value(1))
+    rt.alias('A', nil, rt.value(2))
+    rt.alias('A', nil, rt.value(3))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '1 | 2 | 3')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@alias A B
     ---@alias A C
@@ -165,33 +165,33 @@ do
     ---@alias D 4
     ]]
 
-    local a = node.type('A')
-    node.alias('A', nil, node.type 'B')
-    node.alias('A', nil, node.type 'C')
-    node.alias('A', nil, node.type 'D')
-    node.type('B')
-    node.alias('B', nil, node.value(1))
-    node.alias('B', nil, node.value(2))
-    node.type('C')
-    node.alias('C', nil, node.value(2))
-    node.alias('C', nil, node.value(3))
-    node.type('D')
-    node.alias('D', nil, node.value(3))
-    node.alias('D', nil, node.value(4))
+    local a = rt.type('A')
+    rt.alias('A', nil, rt.type 'B')
+    rt.alias('A', nil, rt.type 'C')
+    rt.alias('A', nil, rt.type 'D')
+    rt.type('B')
+    rt.alias('B', nil, rt.value(1))
+    rt.alias('B', nil, rt.value(2))
+    rt.type('C')
+    rt.alias('C', nil, rt.value(2))
+    rt.alias('C', nil, rt.value(3))
+    rt.type('D')
+    rt.alias('D', nil, rt.value(3))
+    rt.alias('D', nil, rt.value(4))
 
     assert(a:view() == 'A')
     assert(a.value:view() == 'B | C | D')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A: { [string]: boolean }
     ]]
 
-    local a = node.type('A')
-    node.class('A', nil, { node.table {
-        [node.STRING] = node.BOOLEAN,
+    local a = rt.type('A')
+    rt.class('A', nil, { rt.table {
+        [rt.STRING] = rt.BOOLEAN,
     }})
 
     assert(a:view() == 'A')
@@ -199,7 +199,7 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A: B
     ---@field x 1
@@ -208,19 +208,19 @@ do
     ---@field y 2
     ]]
 
-    local a = node.type('A')
-    node.class('A', nil, { node.type 'B' })
+    local a = rt.type('A')
+    rt.class('A', nil, { rt.type 'B' })
         : addField {
-            key   = node.value('x'),
-            value = node.value(1)
+            key   = rt.value('x'),
+            value = rt.value(1)
         }
 
 
-    local b = node.type('B')
-    node.class('B', nil, { node.type 'A' })
+    local b = rt.type('B')
+    rt.class('B', nil, { rt.type 'A' })
         : addField {
-            key   = node.value('y'),
-            value = node.value(2)
+            key   = rt.value('y'),
+            value = rt.value(2)
         }
 
 

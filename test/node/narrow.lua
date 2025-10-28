@@ -1,33 +1,33 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
-    node.TYPE_POOL['A'] = nil
-    node.TYPE_POOL['B'] = nil
-    node.TYPE_POOL['C'] = nil
+    rt.TYPE_POOL['A'] = nil
+    rt.TYPE_POOL['B'] = nil
+    rt.TYPE_POOL['C'] = nil
 
-    local u = node.type 'A' | node.type 'B' | node.type 'C'
-    local r = u:narrow(node.type 'B')
+    local u = rt.type 'A' | rt.type 'B' | rt.type 'C'
+    local r = u:narrow(rt.type 'B')
 
     assert(r:view() == 'B')
 end
 
 do
-    node:reset()
+    rt:reset()
 
-    node.type 'A'
-    node.class('A', nil, { node.type 'B' })
+    rt.type 'A'
+    rt.class('A', nil, { rt.type 'B' })
 
-    local u = node.type 'A' | node.type 'B' | node.type 'C'
-    local r = u:narrow(node.type 'B')
+    local u = rt.type 'A' | rt.type 'B' | rt.type 'C'
+    local r = u:narrow(rt.type 'B')
 
     assert(r:view() == 'A | B')
 end
 
 do
-    local u = node.value(1) | node.value(true) | node.value('x')
-    local r1 = u:narrow(node.NUMBER)
-    local r2 = u:narrow(node.STRING)
-    local r3 = u:narrow(node.BOOLEAN)
+    local u = rt.value(1) | rt.value(true) | rt.value('x')
+    local r1 = u:narrow(rt.NUMBER)
+    local r2 = u:narrow(rt.STRING)
+    local r3 = u:narrow(rt.BOOLEAN)
 
     assert(r1:view() == '1')
     assert(r2:view() == '"x"')
@@ -35,21 +35,21 @@ do
 end
 
 do
-    local t = node.table {
+    local t = rt.table {
         x = 1,
-    } | node.table {
+    } | rt.table {
         y = 2,
-    } | node.table {
+    } | rt.table {
         z = 3,
     }
 
-    local r1 = t:narrow(node.table {
+    local r1 = t:narrow(rt.table {
         x = 1,
     })
-    local r2 = t:narrow(node.table {
+    local r2 = t:narrow(rt.table {
         y = 2,
     })
-    local r3 = t:narrow(node.table {
+    local r3 = t:narrow(rt.table {
         z = 3,
     })
     local r4 = t:narrowByField('x', 1)
@@ -65,13 +65,13 @@ do
 end
 
 do
-    local t = node.func()
-        : addParamDef('x', node.NUMBER)
-    | node.func()
-        : addParamDef('x', node.STRING)
+    local t = rt.func()
+        : addParamDef('x', rt.NUMBER)
+    | rt.func()
+        : addParamDef('x', rt.STRING)
 
-    local r = t:narrow(node.func()
-        : addParamDef('x', node.NUMBER)
+    local r = t:narrow(rt.func()
+        : addParamDef('x', rt.NUMBER)
     )
 
     assert(r:view() == 'fun(x: number)')

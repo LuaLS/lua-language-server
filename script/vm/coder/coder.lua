@@ -17,10 +17,6 @@ function M:__init()
     self.blockStack = {}
 end
 
-function M:__del()
-    self:dispose()
-end
-
 ---@param ast LuaParser.Ast
 function M:makeFromAst(ast)
     self.buf = {}
@@ -29,23 +25,19 @@ function M:makeFromAst(ast)
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'local coder, vfile = ...'
-    self:addLine 'local node = vfile.scope.node'
-    self:addLine 'local uri  = vfile.uri'
-    self:addLine 'local r    = coder.map'
-    self:addLine 'node:lockCache()'
+    self:addLine 'local rt  = vfile.scope.rt'
+    self:addLine 'local uri = vfile.uri'
+    self:addLine 'local r   = coder.map'
     self:addLine ''
 
     self:compile(ast.main)
 
-    self:addLine 'node:unlockCache()'
     self:addLine ''
     self:addLine 'return function ()'
     self:addIndentation(1)
-    self:addLine 'node:lockCache()'
     for i = #self.disposers, 1, -1 do
         self:addLine(self.disposers[i])
     end
-    self:addLine 'node:unlockCache()'
     self:addIndentation(-1)
     self:addLine 'end'
 
@@ -88,22 +80,29 @@ end
 ---@type function?
 M.disposer = nil
 
-function M:dispose()
+---@param vfile VM.Vfile
+function M:dispose(vfile)
     if self.disposer then
-        self.disposer()
+        vfile.scope.rt:lockCache()
+        xpcall(function ()
+            self.disposer()
+        end, log.error)
+        vfile.scope.rt:unlockCache()
         self.disposer = nil
     end
 end
 
 ---@param vfile VM.Vfile
 function M:run(vfile)
-    self:dispose()
+    self:dispose(vfile)
     self.map = setmetatable({}, { __index = function (_, k)
         error('No such key in coder map: ' .. tostring(k))
     end })
-    local suc = pcall(function (...)
+    vfile.scope.rt:lockCache()
+    local suc = xpcall(function (...)
         self.disposer = self.func(self, vfile)
-    end)
+    end, log.error)
+    vfile.scope.rt:unlockCache()
     if not suc then
         log.debug(self.code)
     end

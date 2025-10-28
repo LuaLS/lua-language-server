@@ -5,7 +5,7 @@ do
 GlobalA = 1
 ]])
 
-    local global = scope.node:globalGet('GlobalA')
+    local global = scope.rt:globalGet('GlobalA')
     assert(global.value:view() == 'unknown')
 
     local vfile = scope.vm:indexFile(test.fileUri)

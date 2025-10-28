@@ -19,7 +19,7 @@ function M:__init(scope, name, params, extends)
     self.params = params
     self.extends = extends
 
-    self.masterType = scope.node.type(name)
+    self.masterType = scope.rt.type(name)
     self.masterType:addClass(self)
 end
 
@@ -64,7 +64,7 @@ M.fields = nil
 ---@return Node.Class
 function M:addField(field)
     if not self.fields then
-        self.fields = self.scope.node.table()
+        self.fields = self.scope.rt.table()
     end
     self.fields:addField(field)
     self:flushCache()

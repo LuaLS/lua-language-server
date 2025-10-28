@@ -95,7 +95,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
     ---@cast source LuaParser.Node.Function
 
     coder:withIndentation(function ()
-        coder:addLine('{key} = node.func()' % {
+        coder:addLine('{key} = rt.func()' % {
             key = coder:getKey(source),
         })
         if source.name then

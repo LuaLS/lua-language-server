@@ -47,7 +47,7 @@ M.values = nil
 ---@return Node.Vararg
 ---@return true
 M.__getter.values = function (self)
-    local node = self.scope.node
+    local node = self.scope.rt
     if self.vararg then
         return self.vararg, true
     end
@@ -65,7 +65,7 @@ M.keys = nil
 ---@return true
 M.__getter.keys = function (self)
     local keys = {}
-    local node = self.scope.node
+    local node = self.scope.rt
     local max = self.values.max
     for i = 1, math.min(max or 1000, 1000) do
         keys[i] = node.value(i)
@@ -79,9 +79,9 @@ end
 M.__getter.typeOfKey = function (self)
     local max = self.values.max
     if not max or max > 1000 then
-        return self.scope.node.INTEGER, true
+        return self.scope.rt.INTEGER, true
     end
-    return self.scope.node.union(self.keys), true
+    return self.scope.rt.union(self.keys), true
 end
 
 function M:get(key)
@@ -127,7 +127,7 @@ end
 function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
-        local arrayVararg = self.scope.node.vararg({ other.head }, 0)
+        local arrayVararg = self.scope.rt.vararg({ other.head }, 0)
         return self.values:canCast(arrayVararg)
     end
     return false
@@ -145,7 +145,7 @@ function M:resolveGeneric(map)
         return self
     end
     local values = self.values:resolveGeneric(map)
-    return self.scope.node.tuple(values)
+    return self.scope.rt.tuple(values)
 end
 
 function M:inferGeneric(other, result)

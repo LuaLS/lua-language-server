@@ -1,4 +1,4 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
     TEST_INDEX [[
@@ -6,8 +6,8 @@ do
 ---@alias A f<number>
     ]]
 
-    assert(node.type('A').value:view() == 'f<number>')
-    assert(node.type('A').value.value:view() == 'number[]')
+    assert(rt.type('A').value:view() == 'f<number>')
+    assert(rt.type('A').value.value:view() == 'number[]')
 end
 
 do
@@ -16,13 +16,13 @@ do
 ---@alias A f<{ __index: 1 }>
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'f<{ __index: 1 }>')
-    assert(node.type('A').value.value:view() == '1')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == 'f<{ __index: 1 }>')
+    assert(rt.type('A').value.value:view() == '1')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@class A
     local t
@@ -32,27 +32,27 @@ do
     --> A['x']
     ]]
 
-    local A = node.type 'A'
-    local CA = node.class 'A'
+    local A = rt.type 'A'
+    local CA = rt.class 'A'
 
-    local V = node.variable 't'
+    local V = rt.variable 't'
     CA:addVariable(V)
     V:addClass(CA)
 
     V:addField {
-        key   = node.value 'x',
+        key   = rt.value 'x',
         value = V,
     }
 
     local r = A:get 'x'
     assert(r:view() == 'A')
 
-    local I = node.index(A, node.value 'x')
+    local I = rt.index(A, rt.value 'x')
     assert(I:view() == 'A')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     local t
 
@@ -61,11 +61,11 @@ do
     --> t['x']
     ]]
 
-    local V = node.variable 't'
+    local V = rt.variable 't'
 
     V:addField {
-        key   = node.value 'x',
-        value = node.value(1),
+        key   = rt.value 'x',
+        value = rt.value(1),
     }
 
     local r = V:get 'x'
@@ -73,7 +73,7 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@type fun<T>(x: T): T['__index']
     local f
@@ -81,29 +81,29 @@ do
     local r = f({ __index = 1 })
     ]]
 
-    local F = node.variable 'f'
-    local T = node.generic 'T'
-    local FUN = node.func()
+    local F = rt.variable 'f'
+    local T = rt.generic 'T'
+    local FUN = rt.func()
         : addTypeParam(T)
         : addParamDef('x', T)
-        : addReturnDef(nil, node.index(T, node.value '__index'))
+        : addReturnDef(nil, rt.index(T, rt.value '__index'))
 
     F:addType(FUN)
 
-    local TABLE = node.variable 't'
+    local TABLE = rt.variable 't'
     TABLE:addField {
-        key   = node.value '__index',
-        value = node.value(1),
+        key   = rt.value '__index',
+        value = rt.value(1),
     }
 
-    local FCALL = node.fcall(F, { TABLE })
+    local FCALL = rt.fcall(F, { TABLE })
     local R = FCALL.value
 
     assert(R:view() == '1')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@type fun<T>(x: T): T['__index']
     local f
@@ -115,29 +115,29 @@ do
     local r = f(mt)
     ]]
 
-    local F = node.variable 'f'
-    local T = node.generic 'T'
-    local FUN = node.func()
+    local F = rt.variable 'f'
+    local T = rt.generic 'T'
+    local FUN = rt.func()
         : addTypeParam(T)
         : addParamDef('x', T)
-        : addReturnDef(nil, node.index(T, node.value '__index'))
+        : addReturnDef(nil, rt.index(T, rt.value '__index'))
 
     F:addType(FUN)
 
-    local MT = node.variable 'mt'
+    local MT = rt.variable 'mt'
     MT:addField {
-        key   = node.value '__index',
-        value = node.value(1),
+        key   = rt.value '__index',
+        value = rt.value(1),
     }
 
-    local FCALL = node.fcall(F, { MT })
+    local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
 
     assert(R:view() == '1')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@type fun<T>(x: T): T['__index']
     local f
@@ -151,26 +151,26 @@ do
     local v = r.x
     ]]
 
-    local F = node.variable 'f'
-    local T = node.generic 'T'
-    local FUN = node.func()
+    local F = rt.variable 'f'
+    local T = rt.generic 'T'
+    local FUN = rt.func()
         : addTypeParam(T)
         : addParamDef('x', T)
-        : addReturnDef(nil, node.index(T, node.value '__index'))
+        : addReturnDef(nil, rt.index(T, rt.value '__index'))
 
     F:addType(FUN)
 
-    local MT = node.variable 'mt'
+    local MT = rt.variable 'mt'
     MT:addField {
-        key   = node.value '__index',
+        key   = rt.value '__index',
         value = MT,
     }
     MT:addField {
-        key   = node.value 'x',
-        value = node.value(1),
+        key   = rt.value 'x',
+        value = rt.value(1),
     }
 
-    local FCALL = node.fcall(F, { MT })
+    local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
     assert(R:view() == '{ x: 1, __index: {...} }')
 
@@ -179,7 +179,7 @@ do
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
     ---@type fun(): boolean, number
     F = xxx
@@ -187,14 +187,14 @@ do
     R1, R2 = F()
     ]]
 
-    local F = node:globalAdd({
-        key = node.value 'F',
+    local F = rt:globalAdd({
+        key = rt.value 'F',
     })
-    F:addType(node.func()
-        : addReturnDef(nil, node.BOOLEAN)
-        : addReturnDef(nil, node.NUMBER)
+    F:addType(rt.func()
+        : addReturnDef(nil, rt.BOOLEAN)
+        : addReturnDef(nil, rt.NUMBER)
     )
-    local FCALL = node.fcall(F, {})
+    local FCALL = rt.fcall(F, {})
     local R1 = FCALL.returns:select(1)
     local R2 = FCALL.returns:select(2)
     assert(R1:view() == 'boolean')
@@ -209,8 +209,8 @@ F = xxx
 R1, R2 = F()
     ]]
 
-    local R1 = node:globalGet('R1')
-    local R2 = node:globalGet('R2')
+    local R1 = rt:globalGet('R1')
+    local R2 = rt:globalGet('R2')
     assert(R1.value:view() == 'boolean')
     assert(R2.value:view() == 'number')
 end
@@ -223,7 +223,7 @@ F = xxx
 R = F(1)
     ]]
 
-    local R = node:globalGet('R')
+    local R = rt:globalGet('R')
     assert(R.value:view() == '1[]')
 end
 
@@ -235,9 +235,9 @@ function F() end
 R = F()
     ]]
 
-    local F = node:globalGet('F')
+    local F = rt:globalGet('F')
     assert(F.value:view() == 'fun():number')
-    local R = node:globalGet('R')
+    local R = rt:globalGet('R')
     assert(R.value:view() == 'number')
 end
 
@@ -251,9 +251,9 @@ function F(x) end
 R = F(1)
     ]]
 
-    local F = node:globalGet('F')
+    local F = rt:globalGet('F')
     assert(F.value:view() == 'fun<T>(x: <T>):<T>[]')
-    local R = node:globalGet('R')
+    local R = rt:globalGet('R')
     assert(R.value:view() == '1[]')
 end
 
@@ -272,27 +272,27 @@ mt.__index = mt
 obj = setmetatable({}, mt)
     ]]
 
-    assert(node:globalGet('obj'):view() == 'A')
-    assert(node:globalGet('obj'):finalValue():view() == '{ __index: A }')
+    assert(rt:globalGet('obj'):view() == 'A')
+    assert(rt:globalGet('obj'):finalValue():view() == '{ __index: A }')
 end
 
 do -- 变量作为参数时要转换为类型
-    node:reset()
+    rt:reset()
 
-    local T = node.generic 'T'
-    local FUNC = node.func()
+    local T = rt.generic 'T'
+    local FUNC = rt.func()
         : addTypeParam(T)
         : addParamDef('x', T)
         : addReturnDef(nil, T)
 
-    local A = node.variable('A')
+    local A = rt.variable('A')
 
     A:addField {
-        key   = node.value 'x',
-        value = node.value(1),
+        key   = rt.value 'x',
+        value = rt.value(1),
     }
 
-    local FCALL = node.fcall(FUNC, { A })
+    local FCALL = rt.fcall(FUNC, { A })
     local R = FCALL.value
     assert(R:view() == '{ x: 1 }')
 end
@@ -305,7 +305,7 @@ do
     B = t.x
     ]]
 
-    assert(node:globalGet('B').value:view() == 'number')
+    assert(rt:globalGet('B').value:view() == 'number')
 end
 
 do
@@ -325,6 +325,6 @@ obj = setmetatable({}, mt)
 value = obj.xxx
     ]]
 
-    assert(node:globalGet('obj'):view() == '{ xxx: 1, __index: {...} }')
-    assert(node:globalGet('value'):view() == '1')
+    assert(rt:globalGet('obj'):view() == '{ xxx: 1, __index: {...} }')
+    assert(rt:globalGet('value'):view() == '1')
 end

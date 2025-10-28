@@ -15,7 +15,7 @@ M.head = nil
 ---@param args Node[]
 function M:__init(scope, head, args)
     self.scope = scope
-    self.head = scope.node.type(head)
+    self.head = scope.rt.type(head)
     self.args = args
 
     self.head:registerFlushChain(self)
@@ -72,7 +72,7 @@ M.fullExtends = nil
 ---@return Node.Class.ExtendAble[]
 ---@return true
 M.__getter.fullExtends = function (self)
-    return self.scope.node:calcFullExtends(self), true
+    return self.scope.rt:calcFullExtends(self), true
 end
 
 --- 所有继承的合并表
@@ -83,7 +83,7 @@ M.extendsTable = nil
 ---@return Node.Table
 ---@return true
 M.__getter.extendsTable = function (self)
-    local table = self.scope.node.table()
+    local table = self.scope.rt.table()
     if #self.fullExtends == 0 then
         return table, true
     end
@@ -119,7 +119,7 @@ M.table = nil
 ---@return Node.Table
 ---@return true
 M.__getter.table = function (self)
-    local table = self.scope.node.table()
+    local table = self.scope.rt.table()
     local head = self.head
     if head.classes then
         local fields = {}
@@ -140,7 +140,7 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = self.scope.node.NEVER
+    self.value = self.scope.rt.NEVER
     local head = self.head
     ---@cast head Node.Type
     if not head:isComplex() then
@@ -168,7 +168,7 @@ M.__getter.value = function (self)
             return merging[1], true
         end
 
-        local value = self.scope.node.table()
+        local value = self.scope.rt.table()
         value:addChilds(merging)
         return value, true
     end
@@ -181,7 +181,7 @@ M.__getter.value = function (self)
                 aliases[#aliases+1] = alias.value:resolveGeneric(alias:makeGenericMap(self.args))
             end
         end
-        local union = self.scope.node.union(aliases)
+        local union = self.scope.rt.union(aliases)
         return union.value, true
     end
     return self, true
@@ -191,7 +191,7 @@ function M:resolveGeneric(map)
     local args = ls.util.map(self.args, function (arg)
         return arg:resolveGeneric(map)
     end)
-    return self.scope.node.call(self.head.typeName, args)
+    return self.scope.rt.call(self.head.typeName, args)
 end
 
 function M:onView(viewer, options)

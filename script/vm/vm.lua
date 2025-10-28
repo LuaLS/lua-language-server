@@ -4,7 +4,7 @@ local M = Class 'VM'
 ---@param scope Scope
 function M:__init(scope)
     self.scope  = scope
-    self.node   = scope.node
+    self.node   = scope.rt
     self.vfiles = ls.fs.newMap()
 end
 

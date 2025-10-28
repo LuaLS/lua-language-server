@@ -1,14 +1,14 @@
-local node = test.scope.node
+local rt = test.scope.rt
 
 do
     TEST_INDEX [[
         A = 1
     ]]
 
-    local g = node.type '_G'
+    local g = rt.type '_G'
     assert(g:get('A'):view() == '1')
-    assert(node:globalGet('A'):viewAsVariable() == 'A')
-    assert(node:globalGet('A').value:view() == '1')
+    assert(rt:globalGet('A'):viewAsVariable() == 'A')
+    assert(rt:globalGet('A').value:view() == '1')
 end
 
 do
@@ -16,10 +16,10 @@ do
         A.B.C = 1
     ]]
 
-    local g = node.type '_G'
+    local g = rt.type '_G'
     assert(g:get('A'):view() == '{ B: { C: 1 } }')
-    assert(node:globalGet('A', 'B', 'C'):viewAsVariable() == 'A.B.C')
-    assert(node:globalGet('A', 'B', 'C').value:view() == '1')
+    assert(rt:globalGet('A', 'B', 'C'):viewAsVariable() == 'A.B.C')
+    assert(rt:globalGet('A', 'B', 'C').value:view() == '1')
 end
 
 do
@@ -27,10 +27,10 @@ do
         A[1].C = 1
     ]]
 
-    local g = node.type '_G'
+    local g = rt.type '_G'
     assert(g:get('A'):view() == '{ [1]: { C: 1 } }')
-    assert(node:globalGet('A', 1, 'C'):viewAsVariable() == 'A[1].C')
-    assert(node:globalGet('A', 1, 'C').value:view() == '1')
+    assert(rt:globalGet('A', 1, 'C'):viewAsVariable() == 'A[1].C')
+    assert(rt:globalGet('A', 1, 'C').value:view() == '1')
 end
 
 do
@@ -38,10 +38,10 @@ do
         A[XXX].C = 1
     ]]
 
-    local g = node.type '_G'
+    local g = rt.type '_G'
     assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
-    assert(node:globalGet('A', node.UNKNOWN, 'C'):viewAsVariable() == 'A[unknown].C')
-    assert(node:globalGet('A', node.UNKNOWN, 'C').value:view() == '1')
+    assert(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable() == 'A[unknown].C')
+    assert(rt:globalGet('A', rt.UNKNOWN, 'C').value:view() == '1')
 end
 
 do
@@ -50,10 +50,10 @@ do
         ---@field A 1
     ]]
 
-    local g = node.type '_G'
+    local g = rt.type '_G'
     assert(g:get('A'):view() == '1')
-    assert(node:globalGet('A'):viewAsVariable() == 'A')
-    assert(node:globalGet('A').value:view() == 'unknown')
+    assert(rt:globalGet('A'):viewAsVariable() == 'A')
+    assert(rt:globalGet('A').value:view() == 'unknown')
 end
 
 do
@@ -61,8 +61,8 @@ do
         ---@alias A 1
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '1')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '1')
 end
 
 do
@@ -70,8 +70,8 @@ do
         ---@alias A number?
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'number | nil')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == 'number | nil')
 end
 
 do
@@ -79,8 +79,8 @@ do
         ---@alias A 1 | 2 | 3
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '1 | 2 | 3')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '1 | 2 | 3')
 end
 
 do
@@ -88,8 +88,8 @@ do
         ---@alias A B & C & D
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'B & C & D')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == 'B & C & D')
 end
 
 do
@@ -97,8 +97,8 @@ do
         ---@alias A number[]
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'number[]')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == 'number[]')
 end
 
 do
@@ -110,8 +110,8 @@ do
         ---}
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
 end
 
 do
@@ -119,8 +119,8 @@ do
         ---@alias A [1, 2, 3]
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '[1, 2, 3]')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '[1, 2, 3]')
 end
 
 do
@@ -128,8 +128,8 @@ do
         ---@alias A table<number, boolean>
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'table<number, boolean>')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == 'table<number, boolean>')
 end
 
 do
@@ -140,8 +140,8 @@ do
         ---, ...: T1
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
 end
 
 do
@@ -156,8 +156,8 @@ do
         }
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '{ [1]: 5, [10]: 4, abc: 3, x: 1, y: 2 }')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '{ [1]: 5, [10]: 4, abc: 3, x: 1, y: 2 }')
 end
 
 do
@@ -166,11 +166,11 @@ do
         B = {}
     ]]
 
-    assert(node:globalGet('B').value:view() == 'A')
+    assert(rt:globalGet('B').value:view() == 'A')
 end
 
 do
-    node:reset()
+    rt:reset()
     --[[
         ---@class A
         local m = {}
@@ -181,34 +181,34 @@ do
         end
     ]]
 
-    local CA = node.class 'A'
-    local M = node.variable 'm'
+    local CA = rt.class 'A'
+    local M = rt.variable 'm'
     M:addClass(CA)
     CA:addVariable(M)
 
-    local FUNC = node.func()
+    local FUNC = rt.func()
     FUNC:addParamDef('self', M)
 
     M:addField {
-        key   = node.value 'init',
+        key   = rt.value 'init',
         value = FUNC,
     }
 
-    local SELF = node.variable 'self'
+    local SELF = rt.variable 'self'
     M:addSubVariable(SELF)
 
     SELF:addField {
-        key   = node.value 'x',
-        value = node.value(1),
+        key   = rt.value 'x',
+        value = rt.value(1),
     }
 
     SELF:addField {
-        key   = node.value 'y',
-        value = node.value(2),
+        key   = rt.value 'y',
+        value = rt.value(2),
     }
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
 end
 
 do
@@ -222,8 +222,8 @@ do
         end
     ]]
 
-    assert(node.type('A'):view() == 'A')
-    assert(node.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
+    assert(rt.type('A'):view() == 'A')
+    assert(rt.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
 end
 
 do
@@ -232,8 +232,8 @@ do
         ---@alias B A['x']
     ]]
 
-    assert(node.type('B'):view() == 'B')
-    assert(node.type('B').value:view() == '1')
+    assert(rt.type('B'):view() == 'B')
+    assert(rt.type('B').value:view() == '1')
 end
 
 do
@@ -242,9 +242,9 @@ do
         ---@alias B A<number>
     ]]
 
-    assert(node.type('B'):view() == 'B')
-    assert(node.type('B').value:view() == 'A<number>')
-    assert(node.type('B').value.value:view() == 'number[]')
+    assert(rt.type('B'):view() == 'B')
+    assert(rt.type('B').value:view() == 'A<number>')
+    assert(rt.type('B').value.value:view() == 'number[]')
 end
 
 do
@@ -255,9 +255,9 @@ do
         ---@alias B A<number>
     ]]
 
-    assert(node.type('B'):view() == 'B')
-    assert(node.type('B').value:view() == 'A<number>')
-    assert(node.type('B').value.value:view() == '{ data: number[] }')
+    assert(rt.type('B'):view() == 'B')
+    assert(rt.type('B').value:view() == 'A<number>')
+    assert(rt.type('B').value.value:view() == '{ data: number[] }')
 end
 
 do
@@ -269,9 +269,9 @@ do
         ---@alias C B<number>
     ]]
 
-    assert(node.type('C'):view() == 'C')
-    assert(node.type('C').value:view() == 'B<number>')
-    assert(node.type('C').value.value:view() == '[number, 2]')
+    assert(rt.type('C'):view() == 'C')
+    assert(rt.type('C').value:view() == 'B<number>')
+    assert(rt.type('C').value.value:view() == '[number, 2]')
 end
 
 do
@@ -285,7 +285,7 @@ do
         ---@alias C B<number>
     ]]
 
-    assert(node.type('C'):view() == 'C')
-    assert(node.type('C').value:view() == 'B<number>')
-    assert(node.type('C').value.value:view() == '{ data: [number, 2], extra: number[] }')
+    assert(rt.type('C'):view() == 'C')
+    assert(rt.type('C').value:view() == 'B<number>')
+    assert(rt.type('C').value.value:view() == '{ data: [number, 2], extra: number[] }')
 end

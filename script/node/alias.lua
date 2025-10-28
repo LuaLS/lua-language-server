@@ -17,7 +17,7 @@ function M:__init(scope, name, params, value)
     self.params = params
     self.value = value
 
-    self.masterType = scope.node.type(name)
+    self.masterType = scope.rt.type(name)
     self.masterType:addAlias(self)
 end
 

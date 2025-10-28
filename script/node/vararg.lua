@@ -76,28 +76,28 @@ function M:select(key)
     if type(key) ~= 'table' then
         if math.type(key) ~= 'integer'
         or (self.max and self.max < key) then
-            return self.scope.node.NIL
+            return self.scope.rt.NIL
         end
         local v = self.values[key]
             or self.values[#self.values]
-            or self.scope.node.NIL
+            or self.scope.rt.NIL
         if key > self.min then
-            return v | self.scope.node.NIL
+            return v | self.scope.rt.NIL
         end
         return v
     end
     local typeName = key.typeName
     if typeName == 'never'
     or typeName == 'nil' then
-        return self.scope.node.NEVER
+        return self.scope.rt.NEVER
     end
     if typeName == 'any'
     or typeName == 'unknown'
     or typeName == 'truly' then
         if #self.values == 0 then
-            return self.scope.node.NIL
+            return self.scope.rt.NIL
         end
-        return self.scope.node.union(self.values)
+        return self.scope.rt.union(self.values)
     end
     if key.kind == 'value' then
         return self:select(key.literal)
@@ -105,9 +105,9 @@ function M:select(key)
     if key.typeName == 'number'
     or key.typeName == 'integer' then
         if #self.values == 0 then
-            return self.scope.node.NIL
+            return self.scope.rt.NIL
         end
-        return self.scope.node.union(self.values)
+        return self.scope.rt.union(self.values)
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -119,13 +119,13 @@ function M:select(key)
         end
         return result
     end
-    return self.scope.node.NIL
+    return self.scope.rt.NIL
 end
 
 ---@return Node
 function M:getLastValue()
     if #self.values == 0 then
-        return self.scope.node.NIL
+        return self.scope.rt.NIL
     end
     return self:select(#self.values)
 end
@@ -157,7 +157,7 @@ function M:resolveGeneric(map)
     for i, value in ipairs(self.raw) do
         values[i] = value:resolveGeneric(map)
     end
-    return self.scope.node.vararg(values, self.min, self.max)
+    return self.scope.rt.vararg(values, self.min, self.max)
 end
 
 ---@param other Node.Vararg
@@ -184,7 +184,7 @@ function M:onCanCast(other)
     end
     ---@cast other Node.Vararg
 
-    local node = self.scope.node
+    local node = self.scope.rt
 
     local lastValueB = other:getLastValue()
 

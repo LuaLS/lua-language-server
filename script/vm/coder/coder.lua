@@ -239,6 +239,12 @@ function M:getKey(source)
     return string.format('r[%q]', source.uniqueKey)
 end
 
+---@param source LuaParser.Node.Base
+---@return string
+function M:getVariableKey(source)
+    return string.format('r[%q]', source.uniqueKey:gsub('^%w+', 'variable'))
+end
+
 ---@param key string
 ---@return string
 function M:getCustomKey(key)

@@ -15,3 +15,4 @@ end
 require 'test.coder.meta'
 require 'test.coder.common'
 require 'test.coder.metatable'
+require 'test.coder.block'

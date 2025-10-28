@@ -11,6 +11,10 @@ ls.vm.registerCoderProvider('var', function (coder, source)
             name = source.id,
         })
     end
+    coder:addLine('{variable} = {key}' % {
+        variable = coder:getVariableKey(source),
+        key      = coder:getKey(source),
+    })
 end)
 
 ls.vm.registerCoderProvider('field', function (coder, source)
@@ -30,13 +34,16 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         isComplexKey = true
     end
 
-    if isGetVariable then
-        coder:addLine('{var} = {last}:getChild({field})' % {
-            var    = coder:getKey(source),
-            last   = coder:getKey(last),
-            field  = isComplexKey and 'rt.UNKNOWN' or coder:getKey(source.key),
-        })
-    else
+    coder:addLine('{var} = {last}:getChild({field})' % {
+        var    = coder:getKey(source),
+        last   = coder:getKey(last),
+        field  = isComplexKey and 'rt.UNKNOWN' or coder:getKey(source.key),
+    })
+    coder:addLine('{variable} = {var}' % {
+        variable = coder:getVariableKey(source.key),
+        var      = coder:getKey(source),
+    })
+    if not isGetVariable then
         coder:addLine('{var} = rt.index({last}, {field})' % {
             var     = coder:getKey(source),
             last    = coder:getKey(last),
@@ -59,6 +66,10 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         key = coder:getKey(source),
         name = source.id,
     })
+    coder:addLine('{variable} = {key}' % {
+        variable = coder:getVariableKey(source),
+        key      = coder:getKey(source),
+    })
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -66,6 +77,10 @@ ls.vm.registerCoderProvider('param', function (coder, source)
     coder:addLine('{key} = rt.variable {name:q}' % {
         key = coder:getKey(source),
         name = source.id,
+    })
+    coder:addLine('{variable} = {key}' % {
+        variable = coder:getVariableKey(source),
+        key      = coder:getKey(source),
     })
 
     if source.isSelf then

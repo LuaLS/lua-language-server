@@ -83,37 +83,33 @@ end
 ls.vm.registerCoderProvider('assign', function (coder, source)
     ---@cast source LuaParser.Node.Assign
 
-    coder:withIndentation(function ()
-        local valueKeys = {}
-        for i, value in ipairs(source.values) do
-            valueKeys[i] = coder:getKey(value)
-            coder:compile(value)
-        end
-        for i, exp in ipairs(source.exps) do
-            coder:compile(exp)
-            coder:compileAssign(exp, i, valueKeys[i])
-        end
-    end, source.code)
+    local valueKeys = {}
+    for i, value in ipairs(source.values) do
+        valueKeys[i] = coder:getKey(value)
+        coder:compile(value)
+    end
+    for i, exp in ipairs(source.exps) do
+        coder:compile(exp)
+        coder:compileAssign(exp, i, valueKeys[i])
+    end
 end)
 
 ls.vm.registerCoderProvider('localdef', function (coder, source)
     ---@cast source LuaParser.Node.LocalDef
 
-    coder:withIndentation(function ()
-        local valueKeys = {}
-        if source.values then
-            for i, value in ipairs(source.values) do
-                valueKeys[i] = coder:getKey(value)
-                coder:compile(value)
-            end
+    local valueKeys = {}
+    if source.values then
+        for i, value in ipairs(source.values) do
+            valueKeys[i] = coder:getKey(value)
+            coder:compile(value)
         end
-        for i, var in ipairs(source.vars) do
-            coder:compile(var)
-            if valueKeys[i] then
-                coder:compileAssign(var, i, valueKeys[i])
-            else
-                coder:compileAssign(var, i, 'rt.NIL')
-            end
+    end
+    for i, var in ipairs(source.vars) do
+        coder:compile(var)
+        if valueKeys[i] then
+            coder:compileAssign(var, i, valueKeys[i])
+        else
+            coder:compileAssign(var, i, 'rt.NIL')
         end
-    end, source.code)
+    end
 end)

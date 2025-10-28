@@ -21,7 +21,7 @@ M.fields = nil
 function M:__init(scope, fields)
     self.scope = scope
     if fields then
-        self.fields = ls.linkedTable.create()
+        self.fields = ls.tools.linkedTable.create()
         for k, v in pairs(fields) do
             if type(k) ~= 'table' then
                 k = scope.rt.value(k)
@@ -38,7 +38,7 @@ end
 ---@return Node.Table
 function M:addField(field)
     if not self.fields then
-        self.fields = ls.linkedTable.create()
+        self.fields = ls.tools.linkedTable.create()
     end
     self.fields:pushTail(field)
     self:flushCache()

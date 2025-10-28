@@ -390,7 +390,7 @@ end
 M.castCache = nil
 
 M.__getter.castCache = function (self)
-    return ls.pathTable.create(true, false), true
+    return ls.tools.pathTable.create(true, false), true
 end
 
 ---@type Node.CacheModule[]

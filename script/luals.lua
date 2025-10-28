@@ -24,9 +24,13 @@ package.loaded['json'] = ls.json
 package.loaded['json-beautify'] = require 'tools.json-beautify'
 package.loaded['jsonc']         = require 'tools.jsonc'
 package.loaded['json-edit']     = require 'tools.json-edit'
-ls.linkedTable   = require 'tools.linked-table'
-ls.pathTable     = require 'tools.path-table'
-ls.caselessTable = require 'tools.caseless-table'
+---@class LuaLS.Tools
+ls.tools = {
+    linkedTable   = require 'tools.linked-table',
+    pathTable     = require 'tools.path-table',
+    caselessTable = require 'tools.caseless-table',
+    pqueue        = require 'tools.priority-queue',
+}
 ls.uri           = require 'tools.uri'
 ls.timer         = require 'tools.timer'
 ls.await         = require 'tools.await'

@@ -71,7 +71,7 @@ end
 ---@return table<string, any>
 function ls.fs.newMap()
     if ls.env.IGNORE_CASE then
-        return ls.caselessTable.create()
+        return ls.tools.caselessTable.create()
     else
         return {}
     end

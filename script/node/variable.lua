@@ -37,7 +37,7 @@ function M:addType(node)
         return self
     end
     if not self.nodes then
-        self.nodes = ls.linkedTable.create()
+        self.nodes = ls.tools.linkedTable.create()
     end
     self.nodes:pushTail(node)
     self:flushCache()
@@ -75,7 +75,7 @@ function M:addAssign(field)
         return self
     end
     if not self.assigns then
-        self.assigns = ls.linkedTable.create()
+        self.assigns = ls.tools.linkedTable.create()
     end
     self.assigns:pushTail(field)
 
@@ -151,7 +151,7 @@ function M:addClass(node)
         return self
     end
     if not self.classes then
-        self.classes = ls.linkedTable.create()
+        self.classes = ls.tools.linkedTable.create()
     end
     self.classes:pushTail(node)
     self:flushCache()
@@ -189,7 +189,7 @@ function M:addSubVariable(variable)
         return self
     end
     if not self.subVariables then
-        self.subVariables = ls.linkedTable.create()
+        self.subVariables = ls.tools.linkedTable.create()
     end
     self.subVariables:pushTail(variable)
     variable.parentVariable = self

@@ -116,7 +116,7 @@ function M:loadFiles(callback, status)
     end)
     xpcall(callback, log.error, 'found', status)
 
-    local loadedUris = ls.linkedTable.create()
+    local loadedUris = ls.tools.linkedTable.create()
     local loadTasks = {}
 
     for _, uri in ipairs(self.uris) do

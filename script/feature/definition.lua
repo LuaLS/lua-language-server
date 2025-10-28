@@ -1,4 +1,4 @@
-local providers = {}
+local providers = ls.tools.pqueue.create()
 
 ---@class Feature.Definition.Param
 ---@field uri Uri
@@ -16,9 +16,7 @@ function ls.feature.definition(uri, offset)
     end
 
     local results = {}
-    local function push(loc)
-        results[#results+1] = loc
-    end
+    local skipPriorty = -1
 
     local param = {
         uri     = uri,
@@ -27,24 +25,35 @@ function ls.feature.definition(uri, offset)
         sources = sources,
     }
 
-    for _, provider in ipairs(providers) do
-        xpcall(provider, log.error, param, push)
+    for provider, priority in providers:pairs() do
+        if priority <= skipPriorty then
+            break
+        end
+        xpcall(provider, log.error, param, function (loc)
+            results[#results+1] = loc
+        end, function (p)
+            p = p or priority
+            if skipPriorty < p then
+                skipPriorty = p
+            end
+        end)
     end
 
     return ls.feature.organizeResults(results)
 end
 
----@param callback fun(param: Feature.Definition.Param, push: fun(loc: Location))
+---@param callback fun(param: Feature.Definition.Param, push: fun(loc: Location), skip: fun(priority?: integer))
+---@param priority integer? # 优先级
 ---@return fun() disposable
-function ls.feature.provider.definition(callback)
-    table.insert(providers, callback)
+function ls.feature.provider.definition(callback, priority)
+    providers:insert(callback, priority)
     return function ()
-        ls.util.arrayRemove(providers, callback)
+        providers:remove(callback)
     end
 end
 
 -- 局部变量的定义位置
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, push, skip)
     local first = param.sources[1]
     if first.kind ~= 'var' then
         return
@@ -54,6 +63,7 @@ ls.feature.provider.definition(function (param, push)
     if not loc then
         return
     end
+    skip()
     if not loc.value and loc.kind ~= 'param' then
         local results = ls.feature.implementation(param.uri, loc.start)
         ls.util.map(results, push)
@@ -74,17 +84,11 @@ ls.feature.provider.definition(function (param, push)
     }
 end)
 
--- 全局变量的赋值位置
+-- 变量的赋值位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
     ---@type Node.Variable?
-    local variable
-    if first.kind == 'var' then
-        ---@cast first LuaParser.Node.Var
-        if not first.loc then
-            variable = param.scope.vm:getVariable(first)
-        end
-    end
+    local variable = param.scope.vm:getVariable(first)
 
     if not variable or not variable.assigns then
         return
@@ -97,34 +101,6 @@ ls.feature.provider.definition(function (param, push)
                 uri = assign.location.uri,
                 range = { assign.location.offset, assign.location.offset + assign.location.length },
                 originRange = { first.start, first.finish },
-            }
-        end
-    end
-end)
-
--- 字段的赋值位置
-ls.feature.provider.definition(function (param, push)
-    local key   = param.sources[1]
-    local field = param.sources[2]
-    if not key
-    or not field
-    or field.kind ~= 'field'
-    ---@cast field LuaParser.Node.Field
-    or field.key ~= key then
-        return
-    end
-
-    ---@cast field LuaParser.Node.Field
-    local results = param.scope.vm:findFields(field.last, param.scope.vm:getKey(field))
-    if not results then
-        return
-    end
-    for _, result in ipairs(results) do
-        if result.location then
-            push {
-                uri = result.location.uri,
-                range = { result.location.offset, result.location.offset + result.location.length },
-                originRange = { field.start, field.finish },
             }
         end
     end
@@ -151,11 +127,12 @@ ls.feature.provider.definition(function (param, push)
 end)
 
 -- 标签
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, push, skip)
     local source = param.sources[2]
     if not source or source.kind ~= 'goto' then
         return
     end
+    skip()
     ---@cast source LuaParser.Node.Goto
     local label = source.label
     if not label then

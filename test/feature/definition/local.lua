@@ -191,5 +191,5 @@ end
 ]]
 
 TEST [[
-local <?x?>
+local <?<!x!>?>
 ]]

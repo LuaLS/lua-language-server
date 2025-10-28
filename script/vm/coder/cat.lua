@@ -12,34 +12,32 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
         location = coder:makeLocationCode(source),
     }
 
-    coder:withIndentation(function ()
-        coder:addLine('{class} = rt.class {qid}' % classParams)
-        coder:addLine('{class}:setLocation {location}' % classParams)
+    coder:addLine('{class} = rt.class {qid}' % classParams)
+    coder:addLine('{class}:setLocation {location}' % classParams)
 
-        if source.typeParams then
-            for i, param in ipairs(source.typeParams) do
-                coder:compile(param)
-                coder:addLine('{class}:addTypeParam({param})' % {
-                    class = coder:getKey(source),
-                    param = coder:getKey(param),
-                })
-                coder:addLine('')
-            end
+    if source.typeParams then
+        for i, param in ipairs(source.typeParams) do
+            coder:compile(param)
+            coder:addLine('{class}:addTypeParam({param})' % {
+                class = coder:getKey(source),
+                param = coder:getKey(param),
+            })
+            coder:addLine('')
         end
+    end
 
-        if source.extends then
-            for i, extend in ipairs(source.extends) do
-                coder:compile(extend)
-                coder:addLine('{class}:addExtends({extend})' % {
-                    class  = coder:getKey(source),
-                    extend = coder:getKey(extend),
-                })
-                coder:addLine('')
-            end
+    if source.extends then
+        for i, extend in ipairs(source.extends) do
+            coder:compile(extend)
+            coder:addLine('{class}:addExtends({extend})' % {
+                class  = coder:getKey(source),
+                extend = coder:getKey(extend),
+            })
+            coder:addLine('')
         end
+    end
 
-        coder:addDisposer('{class}:dispose()' % classParams)
-    end, source.parent.code)
+    coder:addDisposer('{class}:dispose()' % classParams)
 
     coder:setBlockKV('lastClass', classParams)
 
@@ -52,41 +50,39 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
 
     local classParams = coder:getBlockKV('lastClass')
 
-    coder:withIndentation(function ()
-        local key = coder:getKey(source.key)
-        coder:compile(source.key)
+    local key = coder:getKey(source.key)
+    coder:compile(source.key)
 
-        local value = coder:getKey(source.value)
-        coder:compile(source.value)
+    local value = coder:getKey(source.value)
+    coder:compile(source.value)
 
-        if not classParams then
-            return
-        end
+    if not classParams then
+        return
+    end
 
-        local field = coder:getKey(source)
-        coder:addLine([[
+    local field = coder:getKey(source)
+    coder:addLine([[
 {field} = {
-    key = {key},
-    value = {value},
-    location = {location},
+key = {key},
+value = {value},
+location = {location},
 }
 ]] % {
-            field = field,
-            key = key,
-            value = value,
-            location = coder:makeLocationCode(source),
-        })
+        field = field,
+        key = key,
+        value = value,
+        location = coder:makeLocationCode(source),
+    })
 
-        coder:addLine('{class}:addField({field})' % {
-            class = classParams.class,
-            field = field,
-        })
+    coder:addLine('{class}:addField({field})' % {
+        class = classParams.class,
+        field = field,
+    })
 
-        -- coder:addDisposer('{class}:removeField({field})' % {
-        --     class = classParams.class,
-        --     field = field,
-        -- })
-    end, source.parent.code)
+    -- coder:addDisposer('{class}:removeField({field})' % {
+    --     class = classParams.class,
+    --     field = field,
+    -- })
 end)
 
 ---@param coder VM.Coder
@@ -130,11 +126,9 @@ end)
 ls.vm.registerCoderProvider('catstateparam', function (coder, source)
     ---@cast source LuaParser.Node.CatStateParam
 
-    coder:withIndentation(function ()
-        if source.value then
-            coder:compile(source.value)
-        end
-    end, source.parent.code)
+    if source.value then
+        coder:compile(source.value)
+    end
 
     coder:addToCatGroup(source.parent, true)
 end)
@@ -142,9 +136,7 @@ end)
 ls.vm.registerCoderProvider('catstatereturn', function (coder, source)
     ---@cast source LuaParser.Node.CatStateReturn
 
-    coder:withIndentation(function ()
-        coder:compile(source.value)
-    end, source.parent.code)
+    coder:compile(source.value)
 
     coder:addToCatGroup(source.parent, true)
 end)
@@ -152,36 +144,34 @@ end)
 ls.vm.registerCoderProvider('catstatealias', function (coder, source)
     ---@cast source LuaParser.Node.CatStateAlias
 
-    coder:withIndentation(function ()
-        coder:addLine('{alias} = rt.alias({name:q})' % {
-            alias = coder:getKey(source),
-            name  = source.aliasID.id,
-        })
+    coder:addLine('{alias} = rt.alias({name:q})' % {
+        alias = coder:getKey(source),
+        name  = source.aliasID.id,
+    })
 
-        if source.typeParams then
-            for i, param in ipairs(source.typeParams) do
-                coder:compile(param)
-                coder:addLine('{alias}:addTypeParam({param})' % {
-                    alias = coder:getKey(source),
-                    param = coder:getKey(param),
-                })
-                coder:addLine('')
-            end
-        end
-
-        if source.extends then
-            coder:compile(source.extends)
-            coder:addLine('{alias}:setValue({value})' % {
+    if source.typeParams then
+        for i, param in ipairs(source.typeParams) do
+            coder:compile(param)
+            coder:addLine('{alias}:addTypeParam({param})' % {
                 alias = coder:getKey(source),
-                value = coder:getKey(source.extends),
+                param = coder:getKey(param),
             })
+            coder:addLine('')
         end
+    end
 
-        coder:addDisposer('{alias}:dispose()' % {
+    if source.extends then
+        coder:compile(source.extends)
+        coder:addLine('{alias}:setValue({value})' % {
             alias = coder:getKey(source),
-            name  = source.aliasID.id,
+            value = coder:getKey(source.extends),
         })
-    end, source.parent.code)
+    end
+
+    coder:addDisposer('{alias}:dispose()' % {
+        alias = coder:getKey(source),
+        name  = source.aliasID.id,
+    })
 
     coder:addToCatGroup(source.parent, true)
 end)
@@ -405,24 +395,20 @@ end)
 ls.vm.registerCoderProvider('catstatetype', function (coder, source)
     ---@cast source LuaParser.Node.CatStateType
 
-    coder:withIndentation(function ()
-        coder:compile(source.exp)
+    coder:compile(source.exp)
 
-        coder:addToCatGroup(source.parent, true)
-    end, source.parent.code)
+    coder:addToCatGroup(source.parent, true)
 end)
 
 ls.vm.registerCoderProvider('catstategeneric', function (coder, source)
     ---@cast source LuaParser.Node.CatStateGeneric
 
-    coder:withIndentation(function ()
-        if not source.typeParams then
-            return
-        end
-        for i, typeParam in ipairs(source.typeParams) do
-            coder:compile(typeParam)
-        end
+    if not source.typeParams then
+        return
+    end
+    for i, typeParam in ipairs(source.typeParams) do
+        coder:compile(typeParam)
+    end
 
-        coder:addToCatGroup(source.parent, true)
-    end, source.parent.code)
+    coder:addToCatGroup(source.parent, true)
 end)

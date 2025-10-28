@@ -98,7 +98,7 @@ end
 ---@return Node.Class
 function M:addVariable(variable)
     if not self.variables then
-        self.variables = ls.linkedTable.create()
+        self.variables = ls.tools.linkedTable.create()
     end
 
     self.variables:pushTail(variable)

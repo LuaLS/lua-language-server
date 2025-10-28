@@ -52,7 +52,7 @@ M.classes = nil
 ---@return Node.Type
 function M:addClass(class)
     if not self.classes then
-        self.classes = ls.linkedTable.create()
+        self.classes = ls.tools.linkedTable.create()
     end
     self.classes:pushTail(class)
 
@@ -83,7 +83,7 @@ M.aliases = nil
 ---@return Node.Type
 function M:addAlias(alias)
     if not self.aliases then
-        self.aliases = ls.linkedTable.create()
+        self.aliases = ls.tools.linkedTable.create()
     end
     self.aliases:pushTail(alias)
 
@@ -465,7 +465,7 @@ M.callCache = nil
 ---@return PathTable
 ---@return true
 M.__getter.callCache = function (self)
-    return ls.pathTable.create(true, true), true
+    return ls.tools.pathTable.create(true, true), true
 end
 
 function M:onView(viewer, options)

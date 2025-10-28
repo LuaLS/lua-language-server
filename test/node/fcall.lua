@@ -36,8 +36,8 @@ do
     local fcall = node.fcall(f, { node.NUMBER, node.STRING })
     local r = fcall.value
     assert(r:view() == 'number[]')
-    assert(fcall.returns:get(1):view() == 'number[]')
-    assert(fcall.returns:get(2):view() == 'string[]')
+    assert(fcall.returns:select(1):view() == 'number[]')
+    assert(fcall.returns:select(2):view() == 'string[]')
 end
 
 do
@@ -48,16 +48,16 @@ do
     ---@alias F<T: string> fun(x: T): 3
     ]]
 
-    node.alias('F', node.func()
+    node.alias('F', nil, node.func()
         : addParamDef('x', node.ANY)
         : addReturnDef(nil, node.value(1))
     )
-    node.alias('F', node.func()
+    node.alias('F', nil, node.func()
         : addParamDef('x', node.NUMBER)
         : addReturnDef(nil, node.value(2))
     )
     local T = node.generic('T', node.STRING)
-    node.alias('F', node.func()
+    node.alias('F', nil, node.func()
         : addTypeParam(T)
         : addParamDef('x', T)
         : addReturnDef(nil, node.value(3))

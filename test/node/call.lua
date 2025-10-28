@@ -17,6 +17,8 @@ do
     A<'x', true> --> 2
     A --> 1
     ]]
+    -- 维持住引用
+    local A = node.type 'A'
     node.alias('A', nil, node.value(1))
     node.alias('A', {
         node.generic 'X',

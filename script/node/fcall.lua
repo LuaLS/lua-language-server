@@ -48,7 +48,11 @@ M.value = nil
 ---@return true
 M.__getter.value = function (self)
     self.value = self.scope.node.NEVER
-    return self.returns:get(1), true
+    return self.returns:select(1), true
+end
+
+function M:select(key)
+    return self.returns:select(key)
 end
 
 ---@type Node
@@ -59,17 +63,17 @@ M.returns = nil
 ---@return true
 M.__getter.returns = function (self)
     local returns = {}
-    local allMin = 0
-    ---@type integer?
-    local allMax = 0
+    ---@type integer?, integer?
+    local allMin, allMax
 
     local node = self.scope.node
     ---@type Node.Function[]
     local defs = {}
+    local args = node.vararg(self.args, #self.args, #self.args)
 
     for f in self.head:finalValue():each 'function' do
         ---@cast f Node.Function
-        if f:isMatchedParams(self.args) then
+        if args:canCast(f.paramsPack) then
             defs[#defs+1] = f
         end
     end

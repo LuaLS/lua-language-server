@@ -195,8 +195,8 @@ do
         : addReturnDef(nil, node.NUMBER)
     )
     local FCALL = node.fcall(F, {})
-    local R1 = FCALL.returns:get(1)
-    local R2 = FCALL.returns:get(2)
+    local R1 = FCALL.returns:select(1)
+    local R2 = FCALL.returns:select(2)
     assert(R1:view() == 'boolean')
     assert(R2:view() == 'number')
 end

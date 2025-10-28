@@ -137,22 +137,14 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    for _, v in ipairs(self.values) do
-        if v.hasGeneric then
-            return true, true
-        end
-    end
-    return false, true
+    return self.values.hasGeneric, true
 end
 
 function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self
     end
-    local values = {}
-    for i, value in ipairs(self.values) do
-        values[i] = value:resolveGeneric(map)
-    end
+    local values = self.values:resolveGeneric(map)
     return self.scope.node.tuple(values)
 end
 
@@ -160,7 +152,7 @@ function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
-    for i, v in ipairs(self.values) do
+    for i, v in ipairs(self.values.values) do
         v:inferGeneric(other:get(i), result)
     end
 end

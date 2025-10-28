@@ -29,15 +29,11 @@ M.__getter.value = function (self)
 end
 
 function M:onCanBeCast(other)
-    if self.extends.onCanBeCast then
-        return self.extends:onCanBeCast(other)
-    end
+    return other:canCast(self.extends)
 end
 
 function M:onCanCast(other)
-    if self.extends.onCanCast then
-        return self.extends:onCanCast(other)
-    end
+    return self.extends:canCast(other)
 end
 
 function M:resolveGeneric(map)

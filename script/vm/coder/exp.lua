@@ -73,7 +73,7 @@ ls.vm.registerCoderProvider('select', function (coder, source)
         coder:compile(value)
     end
     if value.kind == 'call' then
-        coder:addLine('{key} = {value}.returns:get({index})' % {
+        coder:addLine('{key} = {value}:select({index})' % {
             key   = coder:getKey(source),
             value = coder:getKey(source.value),
             index = source.index,

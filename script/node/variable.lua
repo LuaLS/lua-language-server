@@ -509,3 +509,15 @@ function M:onViewAsVariable(viewer, options)
 
     return table.concat(views)
 end
+
+---@param other Node
+---@return boolean
+function M:onCanBeCast(other)
+    return other:canCast(self.value)
+end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    return self.value:canCast(other)
+end

@@ -157,7 +157,7 @@ function M:resolveGeneric(map)
     for i, value in ipairs(self.raw) do
         values[i] = value:resolveGeneric(map)
     end
-    return self.scope.node.vararg(values)
+    return self.scope.node.vararg(values, self.min, self.max)
 end
 
 ---@param other Node.Vararg

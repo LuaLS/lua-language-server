@@ -49,14 +49,34 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Node?
 function M:getNode(source)
-    error('Not implemented')
-    return nil
+    if not self.coder then
+        return nil
+    end
+    local key = source.uniqueKey
+    local node = self.coder.map[key]
+    if not node then
+        return nil
+    end
+    if node.kind == 'variable' then
+        return node.value
+    end
+    return node
 end
 
 ---@param source LuaParser.Node.Base
 ---@return Node.Variable?
 function M:getVariable(source)
-    error('Not implemented')
+    if not self.coder then
+        return nil
+    end
+    local key = source.uniqueKey
+    local node = self.coder.map[key]
+    if not node then
+        return nil
+    end
+    if node.kind == 'variable' then
+        return node
+    end
     return nil
 end
 

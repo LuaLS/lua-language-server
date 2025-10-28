@@ -93,10 +93,17 @@ function M:fillAPIs()
     end
 
     ---@param head Node
-    ---@param index Node
+    ---@param index Node.TableKey
     ---@return Node.Index
     function self.index(head, index)
         return New 'Node.Index' (scope, head, index)
+    end
+
+    ---@param head Node
+    ---@param key Node.TableKey
+    ---@return Node.Select
+    function self.select(head, key)
+        return New 'Node.Select' (scope, head, key)
     end
 
     function self.func()

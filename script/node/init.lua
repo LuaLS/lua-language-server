@@ -21,6 +21,7 @@ require 'node.generic'
 require 'node.call'
 require 'node.fcall'
 require 'node.variable'
+require 'node.select'
 require 'node.template'
 
 require 'node.runtime'

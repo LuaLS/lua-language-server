@@ -12,6 +12,6 @@ function TEST_INDEX(code)
     TEST_CODER = vfile.coder.code
 end
 
-require 'test.coder.index_meta'
-require 'test.coder.index_common'
-require 'test.coder.case_metatable'
+require 'test.coder.meta'
+require 'test.coder.common'
+require 'test.coder.metatable'

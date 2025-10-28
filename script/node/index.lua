@@ -2,17 +2,21 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, head: Node, index: Node): Node.Index
+---@overload fun(scope: Scope, head: Node, index: Node.TableKey): Node.Index
 local M = ls.node.register 'Node.Index'
 
 M.kind = 'index'
 
 ---@param scope Scope
 ---@param head Node
----@param index Node
+---@param index Node.TableKey
 function M:__init(scope, head, index)
     self.scope = scope
     self.head  = head
+    if type(index) ~= 'table' then
+        ---@cast index -Node
+        index = scope.rt.value(index)
+    end
     self.index = index
 end
 

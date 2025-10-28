@@ -23,7 +23,7 @@ end
 function M:wrap(node, options, callback)
     self.skipLevel = self.skipLevel + (options and options.skipLevel or 1)
     self.deep = self.deep + 1
-    if self.deep >= 10 then
+    if self.deep >= 100 then
         self.deep = self.deep - 1
         return '...'
     end

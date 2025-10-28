@@ -72,18 +72,11 @@ ls.vm.registerCoderProvider('select', function (coder, source)
     if source.index == 1 then
         coder:compile(value)
     end
-    if value.kind == 'call' then
-        coder:addLine('{key} = {value}:select({index})' % {
-            key   = coder:getKey(source),
-            value = coder:getKey(source.value),
-            index = source.index,
-        })
-    else
-        coder:addLine('{key} = {value}' % {
-            key   = coder:getKey(source),
-            value = coder:getKey(source.value),
-        })
-    end
+    coder:addLine('{key} = rt.select({value}, {index})' % {
+        key   = coder:getKey(source),
+        value = coder:getKey(source.value),
+        index = source.index,
+    })
 end)
 
 ls.vm.registerCoderProvider('call', function (coder, source)

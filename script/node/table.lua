@@ -173,7 +173,7 @@ M.__getter.typeOfKey = function (self)
     return self.scope.rt.union(self.keys), true
 end
 
----@type table<Node.TableKey, Node>
+---@type table<Node.Key, Node>
 M.valueMap = nil
 
 ---@param self Node.Table
@@ -244,9 +244,7 @@ M.__getter.values = function (self)
     return values, true
 end
 
----@alias Node.TableKey string|number|boolean|Node
-
----@param key Node.TableKey
+---@param key Node.Key
 ---@return Node
 function M:get(key)
     local node = self.scope.rt
@@ -450,7 +448,7 @@ function M:onView(viewer, options)
                 end
             end
         end
-        ---@type Node.TableKey
+        ---@type Node.Key
         local k = key
         if k.kind == 'value' then
             k = k.literal

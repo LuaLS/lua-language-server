@@ -2,14 +2,14 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, head: Node, key: Node.TableKey): Node.Select
+---@overload fun(scope: Scope, head: Node, key: Node.Key): Node.Select
 local M = ls.node.register 'Node.Select'
 
 M.kind = 'select'
 
 ---@param scope Scope
 ---@param head Node
----@param key Node.TableKey
+---@param key Node.Key
 function M:__init(scope, head, key)
     self.scope = scope
     self.head  = head

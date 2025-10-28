@@ -109,7 +109,7 @@ function M:viewAsVariable(options)
     return viewer:viewAsVariable(self, options)
 end
 
----@param key Node.TableKey
+---@param key Node.Key
 ---@return Node
 function M:get(key)
     local value = self.value
@@ -119,7 +119,7 @@ function M:get(key)
     return value:get(key)
 end
 
----@param key Node.TableKey
+---@param key Node.Key
 ---@return Node
 function M:select(key)
     local node = self.scope.rt

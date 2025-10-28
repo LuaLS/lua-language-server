@@ -224,9 +224,10 @@ function M:getCatGroup(nearbySource)
     return group
 end
 
----@param source { start: integer, finish: integer }
+---@param source { start: integer, finish: integer, key?: { start: integer, finish: integer } }
 ---@return string
 function M:makeLocationCode(source)
+    source = source.key or source
     return string.format('{ uri = uri, offset = %d, length = %d }'
         , source.start
         , source.finish - source.start

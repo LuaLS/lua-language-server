@@ -206,3 +206,27 @@ do
     assert(d.fields == nil)
     assert(A.value:view() == '{}')
 end
+
+do
+    rt:reset()
+    --[[
+    X.a = 1
+    local t = X
+    print(t.a)
+    ]]
+
+    local X = rt.variable 'X'
+    X:addField {
+        key   = rt.value 'a',
+        value = rt.value(1),
+    }
+
+    local T = rt.variable 't'
+    T:addAssign {
+        key   = rt.value 't',
+        value = rt:globalGet 'X',
+    }
+
+    local TA = T:getChild 'a'
+    assert(TA:view() == '1')
+end

@@ -184,13 +184,13 @@ function M:onCanCast(other)
     end
     ---@cast other Node.Vararg
 
-    local node = self.scope.rt
+    local rt = self.scope.rt
 
     local lastValueB = other:getLastValue()
 
     -- 先快速检长度
     if self.min < other.min then
-        if not node.NIL:canCast(lastValueB) then
+        if not rt.NIL:canCast(lastValueB) then
             return false
         end
     end

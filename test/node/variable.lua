@@ -6,19 +6,19 @@ do
 
     assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == 'unknown')
-    assert(var.fields == nil)
+    assert(var.fields:view() == '{}')
 
     local child1 = rt.variable(1, var)
 
     assert(child1:viewAsVariable() == 'x[1]')
     assert(var.value:view() == 'unknown')
-    assert(var.fields == nil)
+    assert(var.fields:view() == '{}')
 
     local child2 = rt.variable('y', child1)
 
     assert(child2:viewAsVariable() == 'x[1].y')
     assert(var.value:view() == 'unknown')
-    assert(var.fields == nil)
+    assert(var.fields:view() == '{}')
 end
 
 do
@@ -102,9 +102,7 @@ do
 
     m:addField {
         key = rt.value '__index',
-        value = rt.unsolve(rt.TABLE, m, function (unsolve, var)
-            return var.value
-        end),
+        value = m,
     }
     m:addField {
         key = rt.value 'y',

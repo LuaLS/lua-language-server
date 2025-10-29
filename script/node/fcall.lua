@@ -66,10 +66,10 @@ M.__getter.returns = function (self)
     ---@type integer?, integer?
     local allMin, allMax
 
-    local node = self.scope.rt
+    local rt = self.scope.rt
     ---@type Node.Function[]
     local defs = {}
-    local args = node.vararg(self.args, #self.args, #self.args)
+    local args = rt.vararg(self.args, #self.args, #self.args)
 
     for f in self.head:finalValue():each 'function' do
         ---@cast f Node.Function
@@ -79,7 +79,7 @@ M.__getter.returns = function (self)
     end
 
     if #defs == 0 then
-        return node.UNKNOWN, true
+        return rt.UNKNOWN, true
     end
 
     local allParams = {}
@@ -96,7 +96,7 @@ M.__getter.returns = function (self)
         allParams[i] = params
     end
 
-    local matches = node:getBestMatchs(allParams, #self.args)
+    local matches = rt:getBestMatchs(allParams, #self.args)
     for _, match in ipairs(matches) do
         local f = defs[match]
         f = f:resolveGeneric(f:makeGenericMap(self.args))
@@ -114,7 +114,7 @@ M.__getter.returns = function (self)
         end
     end
 
-    local vararg = node.vararg(returns, allMin, allMax)
+    local vararg = rt.vararg(returns, allMin, allMax)
     return vararg, true
 end
 

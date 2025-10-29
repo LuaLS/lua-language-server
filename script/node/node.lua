@@ -122,8 +122,8 @@ end
 ---@param key Node.Key
 ---@return Node
 function M:select(key)
-    local node = self.scope.rt
-    if key == 1 or key == node.value(1) then
+    local rt = self.scope.rt
+    if key == 1 or key == rt.value(1) then
         return self
     end
     return self.scope.rt.NEVER

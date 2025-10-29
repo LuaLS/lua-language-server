@@ -322,6 +322,49 @@ M.__getter.value = function (self)
     return self, true
 end
 
+---@type Node
+M.expectValue = nil
+
+---@param self Node.Type
+---@return Node
+---@return true
+M.__getter.expectValue = function (self)
+    self.expectValue = self.scope.rt.NEVER
+    if not self:isComplex() then
+        return self, true
+    end
+    if self:isClassLike() then
+        local merging = {}
+        -- 1. 直接写在 class 里的字段
+        merging[#merging+1] = self.table
+        -- 2. 继承来的字段
+        if not self.extendsTable:isEmpty() then
+            merging[#merging+1] = self.extendsTable
+        end
+
+        if #merging == 1 then
+            return merging[1], true
+        end
+
+        local value = self.scope.rt.table()
+        value:addChilds(merging)
+        return value, true
+    end
+    if self:isAliasLike() then
+        ---@type Node[]
+        local aliases = {}
+        ---@param alias Node.Alias
+        for _, alias in ipairs(self.protoAliases) do
+            if alias.value then
+                aliases[#aliases+1] = alias.value
+            end
+        end
+        local union = self.scope.rt.union(aliases)
+        return union, true
+    end
+    return self, true
+end
+
 ---@param self Node.Type
 ---@return Node
 ---@return true

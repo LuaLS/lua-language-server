@@ -37,12 +37,12 @@ function M:__init(scope)
 end
 
 function M:__del()
-    local node = self.scope.rt
-    node:lockCache()
+    local rt = self.scope.rt
+    rt:lockCache()
     for _, commit in ipairs(self.history) do
         self:revert(commit)
     end
-    node:unlockCache()
+    rt:unlockCache()
 end
 
 ---@param action VM.Contribute.Action
@@ -89,12 +89,12 @@ end
 
 ---@param actions VM.Contribute.Action[]
 function M:commitActions(actions)
-    local node = self.scope.rt
-    node:lockCache()
+    local rt = self.scope.rt
+    rt:lockCache()
     for _, action in ipairs(actions) do
         self:commit(action)
     end
-    node:unlockCache()
+    rt:unlockCache()
 end
 
 function M:remove()

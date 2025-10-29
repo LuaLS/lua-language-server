@@ -19,13 +19,13 @@ function M:__init(scope, name, params)
 end
 
 function M:resolveGeneric(map)
-    local node = self.scope.rt
+    local rt = self.scope.rt
     local result
 
     local function nextToken(start, current)
         local startMark = self.name:find('`', start, true)
         if not startMark then
-            result = result | node.type(current .. self.name:sub(start))
+            result = result | rt.type(current .. self.name:sub(start))
             return
         end
         current = current .. self.name:sub(start, startMark - 1)
@@ -54,7 +54,7 @@ function M:resolveGeneric(map)
                     ---@cast v Node.Value
                     nextToken(endMark + 1, current .. tostring(v.literal))
                 else
-                    result = result | node.UNKNOWN
+                    result = result | rt.UNKNOWN
                 end
             end
         end
@@ -62,7 +62,7 @@ function M:resolveGeneric(map)
 
     nextToken(1, '')
 
-    return result or node.UNKNOWN
+    return result or rt.UNKNOWN
 end
 
 ---@param self Node

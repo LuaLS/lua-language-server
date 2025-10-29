@@ -247,19 +247,19 @@ end
 ---@param key Node.Key
 ---@return Node
 function M:get(key)
-    local node = self.scope.rt
+    local rt = self.scope.rt
     if not self.fields then
-        return node.NIL
+        return rt.NIL
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
-        key = node.value(key)
+        key = rt.value(key)
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
         return self.valueMap[key.literal]
             or self:get(key.nodeType)
-            or node.NIL
+            or rt.NIL
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -270,9 +270,9 @@ function M:get(key)
             results[#results+1] = r
         end
         if #results == 0 then
-            return node.NIL
+            return rt.NIL
         end
-        return node.union(results)
+        return rt.union(results)
     end
     ---@cast key Node
     local typeName = key.typeName
@@ -283,9 +283,9 @@ function M:get(key)
     if typeName == 'any'
     or typeName == 'unknown' then
         if #self.values == 0 then
-            return node.NIL
+            return rt.NIL
         end
-        return node.union(self.values)
+        return rt.union(self.values)
     end
     local value = self.valueMap[key]
     if value then
@@ -296,7 +296,7 @@ function M:get(key)
             return field.value
         end
     end
-    return node.NIL
+    return rt.NIL
 end
 
 ---@param other Node
@@ -318,13 +318,13 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    local node = self.scope.rt
+    local rt = self.scope.rt
     if other.kind == 'array' then
         ---@cast other Node.Array
-        local myType = self:get(node.INTEGER)
+        local myType = self:get(rt.INTEGER)
         if myType:canCast(other.head) then
             return true
-        elseif myType ~= node.NIL then
+        elseif myType ~= rt.NIL then
             return false
         end
         for _, key in ipairs(self.keys) do
@@ -346,8 +346,8 @@ end
 ---越靠前的字段越优先。
 ---@param childs Node.Table[]
 function M:addChilds(childs)
-    local node = self.scope.rt
-    node:lockCache()
+    local rt = self.scope.rt
+    rt:lockCache()
 
     local fieldMap = self.fieldMap
     local addedKeys = {}
@@ -365,7 +365,7 @@ function M:addChilds(childs)
         end
     end
 
-    node:unlockCache()
+    rt:unlockCache()
 end
 
 ---@param self Node.Table

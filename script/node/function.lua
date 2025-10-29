@@ -61,11 +61,11 @@ M.paramsPack = nil
 ---@return Node.Vararg
 ---@return true
 M.__getter.paramsPack = function (self)
-    local node = self.scope.rt
+    local rt = self.scope.rt
     local params = ls.util.map(self.paramsDef, function (v, k)
         local value = v.value
         if v.optional then
-            value = value | node.NIL
+            value = value | rt.NIL
         end
         return value
     end)
@@ -77,7 +77,7 @@ M.__getter.paramsPack = function (self)
         max = nil
     end
 
-    return node.vararg(params, min, max), true
+    return rt.vararg(params, min, max), true
 end
 
 ---@param other Node

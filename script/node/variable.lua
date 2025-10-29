@@ -11,6 +11,9 @@ M.parentVariable = nil
 
 ---@alias Node.Key string | number | boolean | Node
 
+---@type Node
+M.key = nil
+
 ---@param scope Scope
 ---@param name Node.Key
 ---@param parent? Node.Variable
@@ -27,7 +30,7 @@ function M:__init(scope, name, parent)
 end
 
 ---@type LinkedTable
-M.nodes = nil
+M.types = nil
 
 ---@param node Node
 ---@return Node.Variable
@@ -36,10 +39,10 @@ function M:addType(node)
         self.parentVariable:addType(node)
         return self
     end
-    if not self.nodes then
-        self.nodes = ls.tools.linkedTable.create()
+    if not self.types then
+        self.types = ls.tools.linkedTable.create()
     end
-    self.nodes:pushTail(node)
+    self.types:pushTail(node)
     self:flushCache()
 
     return self
@@ -52,12 +55,12 @@ function M:removeType(node)
         self.parentVariable:removeType(node)
         return self
     end
-    if not self.nodes then
+    if not self.types then
         return self
     end
-    self.nodes:pop(node)
-    if self.nodes:getSize() == 0 then
-        self.nodes = nil
+    self.types:pop(node)
+    if self.types:getSize() == 0 then
+        self.types = nil
     end
     self:flushCache()
 
@@ -79,17 +82,6 @@ function M:addAssign(field)
     end
     self.assigns:pushTail(field)
 
-    local value = field.value and field.value.solve
-    if value and value.kind == 'table' then
-        ---@cast value Node.Table
-        if value.fields then
-            ---@param vfield Node.Field
-            for vfield in value.fields:pairsFast() do
-                self:addField(vfield)
-            end
-        end
-    end
-
     self:flushCache()
 
     return self
@@ -106,17 +98,6 @@ function M:removeAssign(field)
         return self
     end
     self.assigns:pop(field)
-
-    local value = field.value and field.value.solve
-    if value and value.kind == 'table' then
-        ---@cast value Node.Table
-        if value.fields then
-            ---@param vfield Node.Field
-            for vfield in value.fields:pairsFast() do
-                self:removeField(vfield)
-            end
-        end
-    end
 
     if self.assigns:getSize() == 0 then
         self.assigns = nil
@@ -218,38 +199,113 @@ function M:removeSubVariable(variable)
     return self
 end
 
----@type Node.Table?
-M.fields = nil
-
----@pacakge
----@param t Node.Table
-function M:mergeFields(t)
-    local node = self.scope.rt
-    for k, v in pairs(self.childs) do
-        if type(k) ~= 'table' then
-            ---@cast k -Node
-            k = node.value(k)
-        end
-        t:addField {
-            key = k,
-            value = v.value,
-        }
-    end
-end
+---@type Node|false
+M.classValue = nil
 
 ---@param self Node.Variable
----@return Node.Table?
----@return boolean
+---@return Node|false
+---@return true
+M.__getter.classValue = function (self)
+    if self.parentVariable then
+        return self.parentVariable.classValue, true
+    end
+    if not self.classes then
+        return false, true
+    end
+    local rt = self.scope.rt
+    local union = rt.union(ls.util.map(self.classes:toArray(), function (v)
+        ---@cast v Node.Class
+        return v.masterType
+    end))
+    return union, true
+end
+
+---@type Node|false
+M.typeValue = nil
+
+---@param self Node.Variable
+---@return Node|false
+---@return true
+M.__getter.typeValue = function (self)
+    if self.parentVariable then
+        return self.parentVariable.typeValue, true
+    end
+    if not self.types then
+        return false, true
+    end
+    local rt = self.scope.rt
+    local union = rt.union(self.types:toArray())
+    return union, true
+end
+
+---@type Node|false
+M.assignValue = nil
+
+---@param self Node.Variable
+---@return Node|false
+---@return true
+M.__getter.assignValue = function (self)
+    if self.parentVariable then
+        return self.parentVariable.assignValue, true
+    end
+    if not self.assigns then
+        return false, true
+    end
+    local rt = self.scope.rt
+    local union = rt.union(ls.util.map(self.assigns:toArray(), function (v)
+        ---@cast v Node.Field
+        return v.value
+    end))
+    return union, true
+end
+
+---@type Node|false
+M.parentExpectValue = nil
+
+---@param self Node.Variable
+---@return Node|false
+---@return true?
+M.__getter.parentExpectValue = function (self)
+    if self.parentVariable then
+        return self.parentVariable.parentExpectValue
+    end
+    local parent = self.parent
+    if not parent then
+        return false, true
+    end
+    return parent:getExpect(self.key) or false, true
+end
+
+---@type Node.Table
+M.fields = nil
+
+---@param self Node.Variable
+---@return Node.Table
+---@return true
 M.__getter.fields = function (self)
     if self.parentVariable then
-        return self.parentVariable.fields, false
+        return self.parentVariable.fields, true
     end
-    if not self.childs then
-        return nil, false
+    local selfValue = self.selfValue
+    if selfValue.kind == 'table' then
+        ---@cast selfValue Node.Table
+        return selfValue, true
     end
-    local t = self.scope.rt.table()
-    self:mergeFields(t)
-    return t, true
+    local rt = self.scope.rt
+    if selfValue.kind == 'union' then
+        ---@cast selfValue Node.Union
+        if #selfValue.values == 0 then
+            return rt.table(), true
+        end
+    end
+    local table = rt.table()
+    local childs = {}
+    for t in selfValue:each 'table' do
+        ---@cast t Node.Table
+        childs[#childs+1] = t
+    end
+    table:addChilds(childs)
+    return table, true
 end
 
 ---@type table<Node, Node.Variable>?
@@ -263,7 +319,7 @@ function M:getChild(key1, key2, ...)
     if self.parentVariable then
         return self.parentVariable:getChild(key1, key2, ...)
     end
-    local node = self.scope.rt
+    local rt = self.scope.rt
     local key = key1
     local path
     if key2 then
@@ -276,11 +332,11 @@ function M:getChild(key1, key2, ...)
         for _, k in ipairs(path) do
             if type(k) ~= 'table' then
                 ---@cast k -Node
-                k = node.value(k)
+                k = rt.value(k)
             end
             local child = current.childs and current.childs[k]
             if not child then
-                child = node.variable(k, current)
+                child = rt.variable(k, current)
                 current.childs = current.childs or {}
                 current.childs[k] = child
             end
@@ -289,11 +345,11 @@ function M:getChild(key1, key2, ...)
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
-        key = node.value(key)
+        key = rt.value(key)
     end
     local child = current.childs and current.childs[key]
     if not child then
-        child = node.variable(key, current)
+        child = rt.variable(key, current)
         current.childs = current.childs or {}
         current.childs[key] = child
     end
@@ -308,7 +364,7 @@ function M:addField(field, path)
         self.parentVariable:addField(field, path)
         return self
     end
-    local node = self.scope.rt
+    local rt = self.scope.rt
     local current = self
     if not current.childs then
         current.childs = {}
@@ -318,10 +374,10 @@ function M:addField(field, path)
         for _, k in ipairs(path) do
             if type(k) ~= 'table' then
                 ---@cast k -Node
-                k = node.value(k)
+                k = rt.value(k)
             end
             if not current.childs[k] then
-                current.childs[k] = node.variable(k, current)
+                current.childs[k] = rt.variable(k, current)
             end
             current = current.childs[k]
             if not current.childs then
@@ -331,7 +387,7 @@ function M:addField(field, path)
     end
 
     if not current.childs[field.key] then
-        current.childs[field.key] = node.variable(field.key, current)
+        current.childs[field.key] = rt.variable(field.key, current)
     end
     current = current.childs[field.key]
     if field.value then
@@ -348,12 +404,39 @@ function M:get(key)
     if self.parentVariable then
         return self.parentVariable:get(key)
     end
-    local node = self.scope.rt
+    local rt = self.scope.rt
     if type(key) ~= 'table' then
         ---@cast key -Node
-        key = node.value(key)
+        key = rt.value(key)
     end
     return self.value:get(key)
+end
+
+---@param key string|number|boolean|Node
+---@return Node?
+function M:getExpect(key)
+    if self.parentVariable then
+        return self.parentVariable:getExpect(key)
+    end
+    if self.parentExpectValue then
+        return self.parentExpectValue:get(key)
+    end
+    local rt = self.scope.rt
+    if self.classes then
+        local expectValue = rt.union(ls.util.map(self.classes:toArray(), function (v)
+            ---@cast v Node.Class
+            return v.masterType.expectValue
+        end))
+        return expectValue:get(key)
+    end
+    if self.types then
+        local expectValue = rt.union(ls.util.map(self.types:toArray(), function (v)
+            ---@cast v Node.Type
+            return v.expectValue
+        end))
+        return expectValue:get(key)
+    end
+    return nil
 end
 
 ---@param key Node.Key
@@ -393,12 +476,12 @@ function M:removeField(field, path)
         return self
     end
 
-    local node = self.scope.rt
+    local rt = self.scope.rt
     if path then
         for _, k in ipairs(path) do
             if type(k) ~= 'table' then
                 ---@cast k -Node
-                k = node.value(k)
+                k = rt.value(k)
             end
             ---@type Node.Variable
             current = current.childs[k]
@@ -423,34 +506,65 @@ M.value = nil
 
 ---@param self Node.Variable
 ---@return Node
----@return boolean
+---@return true
 M.__getter.value = function (self)
     if self.parentVariable then
-        return self.parentVariable.value, false
+        return self.parentVariable.value, true
     end
-    local node = self.scope.rt
-    if self.classes then
-        local union = node.union(ls.util.map(self.classes:toArray(), function (v, k)
-            ---@cast v Node.Class
-            return node.type(v.className)
-        end))
-        return union, true
+    local rt = self.scope.rt
+    return self.parentExpectValue
+        or self.classValue
+        or self.typeValue
+        or self.selfValue
+        or rt.UNKNOWN
+        , true
+end
+
+---@type Node
+M.selfValue = nil
+
+---@param self Node.Variable
+---@return Node
+---@return true
+M.__getter.selfValue = function (self)
+    if self.parentVariable then
+        return self.parentVariable.selfValue, true
     end
-    if self.nodes then
-        local union = node.union(self.nodes:toArray())
-        return union, true
+    local rt = self.scope.rt
+    ---@type Node?
+    local result = nil
+    if self.assignValue then
+        result = self.assignValue
     end
-    if self.assigns then
-        local union = node.union(ls.util.map(self.assigns:toArray(), function (v, k)
-            return v.value
-        end))
-        if self.fields then
-            return union & self.fields, true
-        else
-            return union, true
-        end
+    if self.childs then
+        result = result | self.childsValue
     end
-    return self.fields or self.scope.rt.UNKNOWN, true
+
+    return result or rt.UNKNOWN, true
+end
+
+---@type Node.Table
+M.childsValue = nil
+
+---@param self Node.Variable
+---@return Node.Table
+---@return true
+M.__getter.childsValue = function (self)
+    if self.parentVariable then
+        return self.parentVariable.childsValue, true
+    end
+    local rt = self.scope.rt
+    local table = rt.table()
+    if not self.childs then
+        return table, true
+    end
+    for key, var in pairs(self.childs) do
+        table:addField {
+            key   = key,
+            value = var,
+        }
+    end
+    return table, true
 end
 
 ---@private

@@ -48,6 +48,7 @@ do
     ---@alias F<T: string> fun(x: T): 3
     ]]
 
+    local _ = rt.type 'F'
     rt.alias('F', nil, rt.func()
         : addParamDef('x', rt.ANY)
         : addReturnDef(nil, rt.value(1))

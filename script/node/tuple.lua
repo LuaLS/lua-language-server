@@ -47,14 +47,14 @@ M.values = nil
 ---@return Node.Vararg
 ---@return true
 M.__getter.values = function (self)
-    local node = self.scope.rt
+    local rt = self.scope.rt
     if self.vararg then
         return self.vararg, true
     end
     if self.raw then
-        return node.vararg(self.raw, #self.raw, #self.raw), true
+        return rt.vararg(self.raw, #self.raw, #self.raw), true
     end
-    return node.vararg({}, 0, 0), true
+    return rt.vararg({}, 0, 0), true
 end
 
 ---@type Node.Value[]
@@ -65,10 +65,10 @@ M.keys = nil
 ---@return true
 M.__getter.keys = function (self)
     local keys = {}
-    local node = self.scope.rt
+    local rt = self.scope.rt
     local max = self.values.max
     for i = 1, math.min(max or 1000, 1000) do
-        keys[i] = node.value(i)
+        keys[i] = rt.value(i)
     end
     return keys, true
 end

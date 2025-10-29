@@ -9,7 +9,7 @@ function TEST_INDEX(code)
     ls.file.setText('test.lua', code)
 
     vfile:index()
-    TEST_CODER = vfile.coder.code
+    TEST_CODER = vfile.coder
 end
 
 require 'test.coder.meta'

@@ -117,7 +117,7 @@ function M:run(vfile)
         self.disposer = self.func(self, vfile)
     end, log.error)
     vfile.scope.rt:unlockCache()
-    setmetatable(map, nil)
+    self.map = map
     if not suc then
         log.debug(self.code)
     end

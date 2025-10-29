@@ -87,6 +87,12 @@ end)
 -- 变量的赋值位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
+    if first.kind == 'fieldid' then
+        first = first.parent
+    end
+    if not first then
+        return
+    end
     ---@type Node.Variable?
     local variable = param.scope.vm:getVariable(first)
 

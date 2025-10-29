@@ -556,7 +556,11 @@ M.__getter.selfValue = function (self)
         end
     end
     if self.foreignVariables then
-        ls.util.arrayMerge(results, self.foreignVariables)
+        for _, var in ipairs(self.foreignVariables) do
+            if var ~= self then
+                results[#results+1] = var
+            end
+        end
     end
 
     return #results > 0 and rt.union(results) or rt.UNKNOWN, true
@@ -585,7 +589,11 @@ M.__getter.foreignVariables = function (self)
                     end
                     results[#results+1] = var
                     if var.foreignVariables then
-                        ls.util.arrayMerge(results, var.foreignVariables)
+                        for _, fv in ipairs(var.foreignVariables) do
+                            if fv ~= self then
+                                results[#results+1] = fv
+                            end
+                        end
                     end
                 end)
             end

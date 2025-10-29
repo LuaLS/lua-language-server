@@ -83,6 +83,10 @@ function Ast:parseFunction(isLocal)
         }))
     end
 
+    if params and #params == 0 then
+        params = nil
+    end
+
     local func = self:createNode('LuaParser.Node.Function', {
         start      = pos,
         name       = name,

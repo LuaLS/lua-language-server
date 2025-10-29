@@ -90,7 +90,7 @@ M.__getter.fieldMap = function (self)
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        local key = field.key.solve
+        local key = field.key:findValue { 'union' } or field.key
         key:addRef(self)
         if field.value then
             field.value:addRef(self)
@@ -224,7 +224,7 @@ M.__getter.typeFields = function (self)
         if field.value then
             field.value:addRef(self)
         end
-        if field.key.solve.kind ~= 'value' then
+        if not field.key:findValue { 'value' } then
             fields[#fields+1] = field
         end
     end

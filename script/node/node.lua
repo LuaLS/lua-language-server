@@ -188,23 +188,32 @@ function M:canCast(other)
 end
 
 ---@return Node
----@param stops? string[]
-function M:finalValue(stops)
+function M:finalValue()
     local value = self
-    if stops then
-        local stopMap = {}
-        for _, v in ipairs(stops) do
-            stopMap[v] = true
-        end
-        while value ~= value.value and not stopMap[value.kind] do
-            value = value.value
-        end
-    else
-        while value ~= value.value do
-            value = value.value
-        end
+    while value ~= value.value do
+        value = value.value
     end
     return value
+end
+
+---@param types string[]
+---@return Node?
+function M:findValue(types)
+    local map = {}
+    for _, v in ipairs(types) do
+        map[v] = true
+    end
+    local value = self
+    for _ = 1, 1000 do
+        if map[value.kind] then
+            return value
+        end
+        if value == value.value then
+            return nil
+        end
+        value = value.value
+    end
+    return nil
 end
 
 ---@type Node

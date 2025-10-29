@@ -16,6 +16,7 @@ end
 
 ---@param script string
 function TEST(script)
+    test.scope.rt:reset()
     local newScript, catched = test.catch(script, '!?')
 
     local file <close> = ls.file.setText(test.fileUri, newScript)

@@ -195,7 +195,7 @@ do
     }
 
     local SELF = rt.variable 'self'
-    M:addSubVariable(SELF)
+    SELF:setMasterVariable(M)
 
     SELF:addField {
         key   = rt.value 'x',

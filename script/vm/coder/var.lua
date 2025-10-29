@@ -79,11 +79,7 @@ ls.vm.registerCoderProvider('param', function (coder, source)
     if source.isSelf then
         local parentVariable = source.parent.name and source.parent.name.last
         if parentVariable then
-            coder:addLine('{parent}:addSubVariable({key})' % {
-                parent = coder:getKey(parentVariable),
-                key    = coder:getKey(source),
-            })
-            coder:addDisposer('{parent}:removeSubVariable({key})' % {
+            coder:addLine('{key}:setMasterVariable({parent})' % {
                 parent = coder:getKey(parentVariable),
                 key    = coder:getKey(source),
             })

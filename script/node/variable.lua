@@ -5,7 +5,7 @@ M.kind = 'variable'
 
 M.hideInUnionView = true
 ---@type Node.Variable?
-M.parentVariable = nil
+M.masterVariable = nil
 
 ---@alias Node.Key string | number | boolean | Node
 
@@ -33,8 +33,8 @@ M.types = nil
 ---@param node Node
 ---@return Node.Variable
 function M:addType(node)
-    if self.parentVariable then
-        self.parentVariable:addType(node)
+    if self.masterVariable then
+        self.masterVariable:addType(node)
         return self
     end
     if not self.types then
@@ -49,8 +49,8 @@ end
 ---@param node Node
 ---@return Node.Variable
 function M:removeType(node)
-    if self.parentVariable then
-        self.parentVariable:removeType(node)
+    if self.masterVariable then
+        self.masterVariable:removeType(node)
         return self
     end
     if not self.types then
@@ -71,8 +71,8 @@ M.assigns = nil
 ---@param field Node.Field
 ---@return Node.Variable
 function M:addAssign(field)
-    if self.parentVariable then
-        self.parentVariable:addAssign(field)
+    if self.masterVariable then
+        self.masterVariable:addAssign(field)
         return self
     end
     if not self.assigns then
@@ -88,8 +88,8 @@ end
 ---@param field Node.Field
 ---@return Node.Variable
 function M:removeAssign(field)
-    if self.parentVariable then
-        self.parentVariable:removeAssign(field)
+    if self.masterVariable then
+        self.masterVariable:removeAssign(field)
         return self
     end
     if not self.assigns then
@@ -125,8 +125,8 @@ M.classes = nil
 ---@param node Node.Class
 ---@return Node.Variable
 function M:addClass(node)
-    if self.parentVariable then
-        self.parentVariable:addClass(node)
+    if self.masterVariable then
+        self.masterVariable:addClass(node)
         return self
     end
     if not self.classes then
@@ -141,8 +141,8 @@ end
 ---@param node Node.Class
 ---@return Node.Variable
 function M:removeClass(node)
-    if self.parentVariable then
-        self.parentVariable:removeClass(node)
+    if self.masterVariable then
+        self.masterVariable:removeClass(node)
         return self
     end
     if not self.classes then
@@ -157,44 +157,12 @@ function M:removeClass(node)
     return self
 end
 
----@type LinkedTable
-M.subVariables = nil
-
----@param variable Node.Variable
----@return Node.Variable
-function M:addSubVariable(variable)
-    if self.parentVariable then
-        self.parentVariable:addSubVariable(variable)
-        return self
+---@param var Node.Variable
+function M:setMasterVariable(var)
+    if self == var or self.masterVariable then
+        error('Cannot set master variable')
     end
-    if not self.subVariables then
-        self.subVariables = ls.tools.linkedTable.create()
-    end
-    self.subVariables:pushTail(variable)
-    variable.parentVariable = self
-    self:flushCache()
-
-    return self
-end
-
----@param variable Node.Variable
----@return Node.Variable
-function M:removeSubVariable(variable)
-    if self.parentVariable then
-        self.parentVariable:removeSubVariable(variable)
-        return self
-    end
-    if not self.subVariables then
-        return self
-    end
-    self.subVariables:pop(variable)
-    if self.subVariables:getSize() == 0 then
-        self.subVariables = nil
-    end
-    variable.parentVariable = nil
-    self:flushCache()
-
-    return self
+    self.masterVariable = var.masterVariable or var
 end
 
 ---@type Node|false
@@ -204,8 +172,8 @@ M.classValue = nil
 ---@return Node|false
 ---@return true
 M.__getter.classValue = function (self)
-    if self.parentVariable then
-        return self.parentVariable.classValue, true
+    if self.masterVariable then
+        return self.masterVariable.classValue, true
     end
     if not self.classes then
         return false, true
@@ -225,8 +193,8 @@ M.typeValue = nil
 ---@return Node|false
 ---@return true
 M.__getter.typeValue = function (self)
-    if self.parentVariable then
-        return self.parentVariable.typeValue, true
+    if self.masterVariable then
+        return self.masterVariable.typeValue, true
     end
     if not self.types then
         return false, true
@@ -243,8 +211,8 @@ M.assignValue = nil
 ---@return Node|false
 ---@return true
 M.__getter.assignValue = function (self)
-    if self.parentVariable then
-        return self.parentVariable.assignValue, true
+    if self.masterVariable then
+        return self.masterVariable.assignValue, true
     end
     if not self.assigns then
         return false, true
@@ -264,8 +232,8 @@ M.parentExpectValue = nil
 ---@return Node|false
 ---@return true?
 M.__getter.parentExpectValue = function (self)
-    if self.parentVariable then
-        return self.parentVariable.parentExpectValue
+    if self.masterVariable then
+        return self.masterVariable.parentExpectValue
     end
     local parent = self.parent
     if not parent then
@@ -282,8 +250,8 @@ M.fields = nil
 ---@return Node.Table|false
 ---@return true
 M.__getter.fields = function (self)
-    if self.parentVariable then
-        return self.parentVariable.fields, true
+    if self.masterVariable then
+        return self.masterVariable.fields, true
     end
     local childs = {}
     if self.assigns then
@@ -318,8 +286,8 @@ M.childs = nil
 ---@param ... Node.Key
 ---@return Node.Variable
 function M:getChild(key1, key2, ...)
-    if self.parentVariable then
-        return self.parentVariable:getChild(key1, key2, ...)
+    if self.masterVariable then
+        return self.masterVariable:getChild(key1, key2, ...)
     end
     local rt = self.scope.rt
     local key = key1
@@ -362,8 +330,8 @@ end
 ---@param path? Node.Key[]
 ---@return Node.Variable
 function M:addField(field, path)
-    if self.parentVariable then
-        self.parentVariable:addField(field, path)
+    if self.masterVariable then
+        self.masterVariable:addField(field, path)
         return self
     end
     local rt = self.scope.rt
@@ -404,8 +372,8 @@ end
 ---@return Node
 ---@return boolean exists
 function M:get(key)
-    if self.parentVariable then
-        return self.parentVariable:get(key)
+    if self.masterVariable then
+        return self.masterVariable:get(key)
     end
     local rt = self.scope.rt
     if type(key) ~= 'table' then
@@ -418,8 +386,8 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node?
 function M:getExpect(key)
-    if self.parentVariable then
-        return self.parentVariable:getExpect(key)
+    if self.masterVariable then
+        return self.masterVariable:getExpect(key)
     end
     if self.parentExpectValue then
         local r, e = self.parentExpectValue:get(key)
@@ -452,8 +420,8 @@ end
 ---@param variable Node.Variable
 ---@return Node.Variable
 function M:setChild(key, variable)
-    if self.parentVariable then
-        self.parentVariable:setChild(key, variable)
+    if self.masterVariable then
+        self.masterVariable:setChild(key, variable)
         return self
     end
     if type(key) ~= 'table' then
@@ -472,8 +440,8 @@ end
 ---@param path? Node.Key[]
 ---@return Node.Variable
 function M:removeField(field, path)
-    if self.parentVariable then
-        self.parentVariable:removeField(field, path)
+    if self.masterVariable then
+        self.masterVariable:removeField(field, path)
         return self
     end
     if not self.childs then
@@ -517,8 +485,8 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    if self.parentVariable then
-        return self.parentVariable.value, true
+    if self.masterVariable then
+        return self.masterVariable.value, true
     end
     local rt = self.scope.rt
     return self.classValue
@@ -537,8 +505,8 @@ M.selfValue = nil
 ---@return Node
 ---@return true
 M.__getter.selfValue = function (self)
-    if self.parentVariable then
-        return self.parentVariable.selfValue, true
+    if self.masterVariable then
+        return self.masterVariable.selfValue, true
     end
     local rt = self.scope.rt
     ---@type Node[]
@@ -573,8 +541,8 @@ M.foreignVariables = nil
 ---@return Node.Variable[]|false
 ---@return true
 M.__getter.foreignVariables = function (self)
-    if self.parentVariable then
-        return self.parentVariable.foreignVariables, true
+    if self.masterVariable then
+        return self.masterVariable.foreignVariables, true
     end
     local results = {}
     if self.assigns then
@@ -622,8 +590,8 @@ M.childsValue = nil
 ---@return Node.Table|false
 ---@return true
 M.__getter.childsValue = function (self)
-    if self.parentVariable then
-        return self.parentVariable.childsValue, true
+    if self.masterVariable then
+        return self.masterVariable.childsValue, true
     end
     local rt = self.scope.rt
     if not self.childs then

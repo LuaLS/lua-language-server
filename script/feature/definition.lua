@@ -52,6 +52,29 @@ function ls.feature.provider.definition(callback, priority)
     end
 end
 
+-- 函数值的位置
+ls.feature.provider.definition(function (param, push)
+    local first = param.sources[1]
+    local node = param.scope.vm:getNode(first)
+    if not node then
+        return
+    end
+    node = node:findValue { 'function' }
+    if not node then
+        return
+    end
+    if node.kind == 'function' then
+        ---@cast node Node.Function
+        if node.location then
+            push {
+                uri = node.location.uri,
+                range = { node.location.offset, node.location.offset + node.location.length },
+                originRange = { first.start, first.finish },
+            }
+        end
+    end
+end)
+
 -- 局部变量的定义位置
 ls.feature.provider.definition(function (param, push, skip)
     local first = param.sources[1]
@@ -122,26 +145,6 @@ ls.feature.provider.definition(function (param, push)
     if variable.foreignVariables then
         for _, var in ipairs(variable.foreignVariables) do
             collect(var)
-        end
-    end
-end)
-
--- 函数值的位置
-ls.feature.provider.definition(function (param, push)
-    local first = param.sources[1]
-    local node = param.scope.vm:getNode(first)
-    if not node then
-        return
-    end
-    node = node.solve
-    if node.kind == 'function' then
-        ---@cast node Node.Function
-        if node.location then
-            push {
-                uri = node.location.uri,
-                range = { node.location.offset, node.location.offset + node.location.length },
-                originRange = { first.start, first.finish },
-            }
         end
     end
 end)

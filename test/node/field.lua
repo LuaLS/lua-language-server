@@ -208,7 +208,7 @@ do
     assert(u:view() == '{ x: "x" } & ({ y: "y" } | { z: "z" })')
     assert(u.kind == 'intersection')
     ---@cast u Node.Intersection
-    assert(u.value:view() == '({ x: "x" } & { y: "y" }) | ({ x: "x" } & { z: "z" })')
+    assert(u.value:view() == '{ x: "x", y: "y" } | { x: "x", z: "z" }')
     assert(u:get('x'):view() == '"x"')
     assert(u:get('y'):view() == '"y" | nil')
     assert(u:get('z'):view() == '"z" | nil')

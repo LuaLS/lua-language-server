@@ -188,10 +188,21 @@ function M:canCast(other)
 end
 
 ---@return Node
-function M:finalValue()
+---@param stops? string[]
+function M:finalValue(stops)
     local value = self
-    while value ~= value.value do
-        value = value.value
+    if stops then
+        local stopMap = {}
+        for _, v in ipairs(stops) do
+            stopMap[v] = true
+        end
+        while value ~= value.value and not stopMap[value.kind] do
+            value = value.value
+        end
+    else
+        while value ~= value.value do
+            value = value.value
+        end
     end
     return value
 end

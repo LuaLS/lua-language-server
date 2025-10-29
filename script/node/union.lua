@@ -62,13 +62,13 @@ M.__getter.values = function (self)
         if v.kind == 'union' then
             ---@cast v Node.Union
             for _, vv in ipairs(v.values) do
-                values[#values+1] = vv
+                values[#values+1] = vv:finalValue { 'type', 'generic' }
                 if #values >= 1000 then
                     return values, true
                 end
             end
         else
-            values[#values+1] = v
+            values[#values+1] = v:finalValue { 'type', 'generic' }
             if #values >= 1000 then
                 return values, true
             end
@@ -219,6 +219,7 @@ function M:onView(viewer, options)
         view[#view+1] = thisView
         ::continue::
     end
+    ls.util.arrayRemoveDuplicate(view)
     ls.util.sortByScore(view, {
         function (v)
             return sortScore[v] or 0

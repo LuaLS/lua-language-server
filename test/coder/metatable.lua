@@ -258,6 +258,35 @@ R = F(1)
 end
 
 do
+    rt:reset()
+    --[[
+    ---@class A
+    local mt = {}
+    mt.__index = mt
+
+    mt['__index'] --> A
+    ]]
+
+    local A = rt.class 'A'
+    local MT = rt.variable 'mt'
+    A:addVariable(MT)
+    MT:addClass(A)
+
+    MT:addAssign {
+        key   = rt.value 'mt',
+        value = rt.table(),
+    }
+    MT:addField {
+        key   = rt.value '__index',
+        value = MT,
+    }
+
+    local R = rt.index(MT, rt.value '__index')
+    assert(R:view() == 'A')
+    assert(R:finalValue():view() == '{ __index: A }')
+end
+
+do
     TEST_INDEX [[
 ---@generic T, MT
 ---@param t T

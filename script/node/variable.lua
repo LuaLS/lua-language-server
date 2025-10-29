@@ -521,8 +521,8 @@ M.__getter.value = function (self)
         return self.parentVariable.value, true
     end
     local rt = self.scope.rt
-    return self.parentExpectValue
-        or self.classValue
+    return self.classValue
+        or self.parentExpectValue
         or self.typeValue
         or self.selfValue
         or rt.UNKNOWN
@@ -554,7 +554,6 @@ M.__getter.selfValue = function (self)
                 results[#results+1] = assign.value
             end
         end
-        results[#results+1] = self.assignValue
     end
     if self.foreignVariables then
         ls.util.arrayMerge(results, self.foreignVariables)
@@ -578,9 +577,17 @@ M.__getter.foreignVariables = function (self)
         for assign in self.assigns:pairsFast() do
             ---@cast assign Node.Field
             local value = assign.value
-            if value and value ~= self and value.kind == 'variable' then
-                ---@cast value Node.Variable
-                results[#results+1] = value
+            if value then
+                value:each('variable', function (var)
+                    ---@cast var Node.Variable
+                    if var == self then
+                        return
+                    end
+                    results[#results+1] = var
+                    if var.foreignVariables then
+                        ls.util.arrayMerge(results, var.foreignVariables)
+                    end
+                end)
             end
         end
     end
@@ -593,6 +600,7 @@ M.__getter.foreignVariables = function (self)
             end
         end
     end
+    ls.util.arrayRemoveDuplicate(results)
     if #results == 0 then
         return false, true
     end
@@ -613,12 +621,21 @@ M.__getter.childsValue = function (self)
     if not self.childs then
         return false, true
     end
-    local table = rt.table()
+    local fields = {}
     for key, var in pairs(self.childs) do
-        table:addField {
-            key   = key,
-            value = var,
-        }
+        if var.assigns or var.childs then
+            fields[#fields+1] = {
+                key   = key,
+                value = var,
+            }
+        end
+    end
+    if #fields == 0 then
+        return false, true
+    end
+    local table = rt.table()
+    for _, field in ipairs(fields) do
+        table:addField(field)
     end
     return table, true
 end

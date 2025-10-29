@@ -84,6 +84,9 @@ M.__getter.typeOfKey = function (self)
     return self.scope.rt.union(self.keys), true
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:get(key)
     return self.values:select(key)
 end

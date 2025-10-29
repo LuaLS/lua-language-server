@@ -51,6 +51,9 @@ M.__getter.value = function (self)
     return self.returns:select(1), true
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:select(key)
     return self.returns:select(key)
 end

@@ -480,9 +480,12 @@ function M:onCanCast(other)
     return false
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:get(key)
     if self.value == self then
-        return self.scope.rt.NEVER
+        return self.scope.rt.NEVER, false
     end
     return self.value:get(key)
 end

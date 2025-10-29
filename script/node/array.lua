@@ -14,17 +14,20 @@ function M:__init(scope, value)
     self.head = value
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:get(key)
     if type(key) == 'table' then
         local typeName = key.typeName
         if typeName == 'never'
         or typeName == 'nil' then
-            return key
+            return key, false
         end
         if typeName == 'any'
         or typeName == 'unknown'
         or typeName == 'truly' then
-            return self.head
+            return self.head, true
         end
         if key.kind == 'value' then
             key = key.literal
@@ -34,26 +37,30 @@ function M:get(key)
         if  type(key) == 'number'
         and key >= 1
         and key % 1 == 0 then
-            return self.head
+            return self.head, true
         else
-            return self.scope.rt.NIL
+            return self.scope.rt.NIL, false
         end
     end
     if key.typeName == 'number'
     or key.typeName == 'integer' then
-        return self.head
+        return self.head, true
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
         ---@type Node
         local result
+        local existsOnce = false
         for _, v in ipairs(key.values) do
-            local r = self:get(v)
+            local r, e = self:get(v)
             result = result | r
+            if e then
+                existsOnce = true
+            end
         end
-        return result
+        return result or self.scope.rt.NIL, existsOnce
     end
-    return self.scope.rt.NIL
+    return self.scope.rt.NIL, false
 end
 
 ---@param self Node.Array

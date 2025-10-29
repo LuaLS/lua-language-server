@@ -72,32 +72,35 @@ end
 ---@type Node.Value[]
 M.keys = nil
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:select(key)
     if type(key) ~= 'table' then
         if math.type(key) ~= 'integer'
         or (self.max and self.max < key) then
-            return self.scope.rt.NIL
+            return self.scope.rt.NIL, false
         end
         local v = self.values[key]
             or self.values[#self.values]
             or self.scope.rt.NIL
         if key > self.min then
-            return v | self.scope.rt.NIL
+            return v | self.scope.rt.NIL, true
         end
-        return v
+        return v, true
     end
     local typeName = key.typeName
     if typeName == 'never'
     or typeName == 'nil' then
-        return self.scope.rt.NEVER
+        return self.scope.rt.NEVER, false
     end
     if typeName == 'any'
     or typeName == 'unknown'
     or typeName == 'truly' then
         if #self.values == 0 then
-            return self.scope.rt.NIL
+            return self.scope.rt.NIL, false
         end
-        return self.scope.rt.union(self.values)
+        return self.scope.rt.union(self.values), true
     end
     if key.kind == 'value' then
         return self:select(key.literal)
@@ -105,27 +108,32 @@ function M:select(key)
     if key.typeName == 'number'
     or key.typeName == 'integer' then
         if #self.values == 0 then
-            return self.scope.rt.NIL
+            return self.scope.rt.NIL, false
         end
-        return self.scope.rt.union(self.values)
+        return self.scope.rt.union(self.values), true
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
         ---@type Node
         local result
+        local existsOnce = false
         for _, v in ipairs(key.values) do
-            local r = self:select(v)
+            local r, e = self:select(v)
             result = result | r
+            if e then
+                existsOnce = true
+            end
         end
-        return result
+        return result or self.scope.rt.NIL, existsOnce
     end
-    return self.scope.rt.NIL
+    return self.scope.rt.NIL, false
 end
 
 ---@return Node
+---@return boolean exists
 function M:getLastValue()
     if #self.values == 0 then
-        return self.scope.rt.NIL
+        return self.scope.rt.NIL, false
     end
     return self:select(#self.values)
 end

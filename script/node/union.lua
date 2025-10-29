@@ -80,13 +80,20 @@ M.__getter.values = function (self)
     return values, true
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:get(key)
     local value
+    local existsOnce = false
     for _, v in ipairs(self.values) do
-        local thisValue = v:get(key)
+        local thisValue, exists = v:get(key)
         value = value | thisValue
+        if exists then
+            existsOnce = true
+        end
     end
-    return value
+    return value or self.scope.rt.NIL, existsOnce
 end
 
 ---@type Node

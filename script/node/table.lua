@@ -246,10 +246,11 @@ end
 
 ---@param key Node.Key
 ---@return Node
+---@return boolean exists
 function M:get(key)
     local rt = self.scope.rt
     if not self.fields then
-        return rt.NIL
+        return rt.NIL, false
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
@@ -257,9 +258,11 @@ function M:get(key)
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
-        return self.valueMap[key.literal]
-            or self:get(key.nodeType)
-            or rt.NIL
+        local result = self.valueMap[key.literal]
+        if result then
+            return result, true
+        end
+        return self:get(key.nodeType)
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -270,33 +273,33 @@ function M:get(key)
             results[#results+1] = r
         end
         if #results == 0 then
-            return rt.NIL
+            return rt.NIL, false
         end
-        return rt.union(results)
+        return rt.union(results), true
     end
     ---@cast key Node
     local typeName = key.typeName
     if typeName == 'never'
     or typeName == 'nil' then
-        return key
+        return key, true
     end
     if typeName == 'any'
     or typeName == 'unknown' then
         if #self.values == 0 then
-            return rt.NIL
+            return rt.NIL, false
         end
-        return rt.union(self.values)
+        return rt.union(self.values), true
     end
     local value = self.valueMap[key]
     if value then
-        return value
+        return value, true
     end
     for _, field in ipairs(self.typeFields) do
         if key:canCast(field.key) then
-            return field.value
+            return field.value, true
         end
     end
-    return rt.NIL
+    return rt.NIL, false
 end
 
 ---@param other Node

@@ -398,8 +398,9 @@ function M:addField(field, path)
     return current
 end
 
----@param key string|number|boolean|Node
+---@param key Node.Key
 ---@return Node
+---@return boolean exists
 function M:get(key)
     if self.parentVariable then
         return self.parentVariable:get(key)
@@ -419,7 +420,8 @@ function M:getExpect(key)
         return self.parentVariable:getExpect(key)
     end
     if self.parentExpectValue then
-        return self.parentExpectValue:get(key)
+        local r, e = self.parentExpectValue:get(key)
+        return e and r or nil
     end
     local rt = self.scope.rt
     if self.classes then
@@ -427,14 +429,16 @@ function M:getExpect(key)
             ---@cast v Node.Class
             return v.masterType.expectValue
         end))
-        return expectValue:get(key)
+        local r, e = expectValue:get(key)
+        return e and r or nil
     end
     if self.types then
         local expectValue = rt.union(ls.util.map(self.types:toArray(), function (v)
             ---@cast v Node.Type
             return v.expectValue
         end))
-        return expectValue:get(key)
+        local r, e = expectValue:get(key)
+        return e and r or nil
     end
     return nil
 end

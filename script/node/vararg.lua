@@ -36,6 +36,7 @@ M.__getter.values = function (self)
     end
     local values = {}
     for i, raw in ipairs(self.raw) do
+        raw:addRef(self)
         if raw.kind == 'vararg' then
             ---@cast raw Node.Vararg
             values[i] = raw.values[1]
@@ -149,12 +150,14 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    local hasGeneric = false
     for _, v in ipairs(self.raw) do
+        v:addRef(self)
         if v.hasGeneric then
-            return true, true
+            hasGeneric = true
         end
     end
-    return false, true
+    return hasGeneric, true
 end
 
 function M:resolveGeneric(map)

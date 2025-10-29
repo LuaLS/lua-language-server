@@ -49,9 +49,6 @@ function M:addExtends(extends)
     end
     table.insert(self.extends, extends)
     self:flushCache()
-    for _, v in ipairs(self.extends) do
-        v:registerFlushChain(self)
-    end
     return self
 end
 
@@ -103,7 +100,6 @@ function M:addVariable(variable)
 
     self.variables:pushTail(variable)
 
-    variable:registerFlushChain(self)
     self:flushCache()
 
     return self
@@ -124,7 +120,6 @@ function M:removeVariable(variable)
         self.variables = nil
     end
 
-    variable:unregisterFlushChain(self)
     self:flushCache()
 
     return self
@@ -134,7 +129,15 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    return self.params ~= nil, true
+    local params = self.params
+    if params then
+        for _, param in ipairs(params) do
+            param:addRef(self)
+        end
+        return true, true
+    else
+        return false, true
+    end
 end
 
 ---@param map table<Node.Generic, Node>

@@ -84,6 +84,7 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    self.head:addRef(self)
     return self.head.hasGeneric, true
 end
 

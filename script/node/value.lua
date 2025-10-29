@@ -60,6 +60,6 @@ function M:onViewAsKey(viewer, options)
     end
 end
 
-function M:registerFlushChain(me)
+function M:addRef(child)
     -- do nothing
 end

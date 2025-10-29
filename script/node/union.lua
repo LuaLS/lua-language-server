@@ -56,6 +56,7 @@ M.values = nil
 M.__getter.values = function (self)
     local values = {}
     for _, v in ipairs(self.rawNodes) do
+        v:addRef(self)
         if v.typeName == 'never' then
             goto continue
         end
@@ -151,12 +152,14 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    local hasGeneric = false
     for _, v in ipairs(self.rawNodes) do
+        v:addRef(self)
         if v.hasGeneric then
-            return true, true
+            hasGeneric = true
         end
     end
-    return false, true
+    return hasGeneric, true
 end
 
 function M:resolveGeneric(map)

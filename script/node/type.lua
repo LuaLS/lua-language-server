@@ -57,7 +57,7 @@ function M:addClass(class)
     self.classes:pushTail(class)
 
     self:flushCache()
-    class:registerFlushChain(self)
+    class:addRef(self)
 
     return self
 end
@@ -72,7 +72,6 @@ function M:removeClass(class)
         self.classes = nil
     end
 
-    class:unregisterFlushChain(self)
     self:flushCache()
 end
 
@@ -88,7 +87,7 @@ function M:addAlias(alias)
     self.aliases:pushTail(alias)
 
     self:flushCache()
-    alias:registerFlushChain(self)
+    alias:addRef(self)
 
     return self
 end
@@ -104,7 +103,6 @@ function M:removeAlias(alias)
         self.aliases = nil
     end
 
-    alias:unregisterFlushChain(self)
     self:flushCache()
 
     return self
@@ -124,6 +122,7 @@ function M:getProtos(protos, args)
     local nargs = args and #args or 0
     ---@param proto Node.Class | Node.Alias
     for proto in protos:pairsFast() do
+        proto:addRef(self)
         local nparams = proto.params and #proto.params or 0
         if nparams ~= nargs then
             goto continue
@@ -262,6 +261,7 @@ M.__getter.table = function (self)
     if self.classes then
         local fields = {}
         for _, class in ipairs(self.protoClasses) do
+            class:addRef(self)
             if class.fields then
                 fields[#fields+1] = class.fields
             end
@@ -290,6 +290,7 @@ M.__getter.value = function (self)
         for _, class in ipairs(self.protoClasses) do
             if class.variables then
                 for variable in class.variables:pairsFast() do
+                    variable:addRef(self)
                     if variable.fields then
                         merging[#merging+1] = variable.fields
                     end

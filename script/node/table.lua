@@ -91,6 +91,10 @@ M.__getter.fieldMap = function (self)
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
         local key = field.key.solve
+        key:addRef(self)
+        if field.value then
+            field.value:addRef(self)
+        end
         if key.kind == 'union' then
             ---@cast key Node.Union
             for _, k in ipairs(key.values) do
@@ -216,6 +220,10 @@ M.__getter.typeFields = function (self)
     end
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
+        field.key:addRef(self)
+        if field.value then
+            field.value:addRef(self)
+        end
         if field.key.solve.kind ~= 'value' then
             fields[#fields+1] = field
         end
@@ -378,12 +386,15 @@ M.__getter.hasGeneric = function (self)
     if not self.fields then
         return false, true
     end
+    local hasGeneric = false
     for field in self.fields:pairsFast() do
+        field.key:addRef(self)
+        field.value:addRef(self)
         if field.key.hasGeneric or field.value.hasGeneric then
-            return true, true
+            hasGeneric = true
         end
     end
-    return false, true
+    return hasGeneric, true
 end
 
 function M:resolveGeneric(map)

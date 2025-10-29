@@ -163,6 +163,9 @@ function M:setMasterVariable(var)
         error('Cannot set master variable')
     end
     self.masterVariable = var.masterVariable or var
+    self.masterVariable:addRef(self)
+
+    self:flushCache()
 end
 
 ---@type Node|false
@@ -183,6 +186,7 @@ M.__getter.classValue = function (self)
         ---@cast v Node.Class
         return v.masterType
     end))
+    union:addRef(self)
     return union, true
 end
 
@@ -201,6 +205,7 @@ M.__getter.typeValue = function (self)
     end
     local rt = self.scope.rt
     local union = rt.union(self.types:toArray())
+    union:addRef(self)
     return union, true
 end
 
@@ -220,6 +225,7 @@ M.__getter.assignValue = function (self)
     local rt = self.scope.rt
     local union = rt.union(ls.util.map(self.assigns:toArray(), function (v)
         ---@cast v Node.Field
+        v.value:addRef(self)
         return v.value
     end))
     return union, true
@@ -239,6 +245,7 @@ M.__getter.parentExpectValue = function (self)
     if not parent then
         return false, true
     end
+    parent:addRef(self)
     return parent:getExpect(self.key) or false, true
 end
 
@@ -259,6 +266,7 @@ M.__getter.fields = function (self)
             ---@cast assign Node.Field
             if assign.value and assign.value.kind == 'table' then
                 childs[#childs+1] = assign.value
+                assign.value:addRef(self)
             end
         end
     end
@@ -525,9 +533,7 @@ M.__getter.selfValue = function (self)
     end
     if self.foreignVariables then
         for _, var in ipairs(self.foreignVariables) do
-            if var ~= self then
-                results[#results+1] = var
-            end
+            results[#results+1] = var
         end
     end
 
@@ -567,6 +573,9 @@ M.__getter.foreignVariables = function (self)
             end
         end
     end
+    if self.parent then
+        self.parent:addRef(self)
+    end
     local parentForeigns = self.parent and self.parent.foreignVariables
     if parentForeigns then
         for _, var in ipairs(parentForeigns) do
@@ -579,6 +588,9 @@ M.__getter.foreignVariables = function (self)
     ls.util.arrayRemoveDuplicate(results)
     if #results == 0 then
         return false, true
+    end
+    for _, result in ipairs(results) do
+        result:addRef(self)
     end
     return results, true
 end
@@ -599,6 +611,7 @@ M.__getter.childsValue = function (self)
     end
     local fields = {}
     for key, var in pairs(self.childs) do
+        var:addRef(self)
         if var.assigns or var.childs then
             fields[#fields+1] = {
                 key   = key,

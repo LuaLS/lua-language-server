@@ -28,10 +28,6 @@ function M:__init(scope, nodes)
     end
 
     self.rawNodes = values
-
-    for _, v in ipairs(values) do
-        v:registerFlushChain(self)
-    end
 end
 
 ---@type Node[]
@@ -41,6 +37,9 @@ M.values = nil
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
+    for _, node in ipairs(self.rawNodes) do
+        node:addRef(self)
+    end
 
     ---@param n Node
     ---@return boolean
@@ -169,6 +168,11 @@ M.__getter.value = function (self)
     if #values == 0 then
         return self.scope.rt.NEVER, true
     end
+
+    for _, value in ipairs(values) do
+        value:addRef(self)
+    end
+
     if #values == 1 then
         return values[1], true
     end
@@ -226,6 +230,7 @@ end
 ---@return Node
 ---@return true
 M.__getter.truly = function (self)
+    self.value:addRef(self)
     return self.value.truly, true
 end
 
@@ -233,6 +238,7 @@ end
 ---@return Node
 ---@return true
 M.__getter.falsy = function (self)
+    self.value:addRef(self)
     return self.value.falsy, true
 end
 
@@ -249,13 +255,16 @@ end
 ---@return true
 M.__getter.hasGeneric = function (self)
     if self.value == self then
+        local hasGeneric = false
         for _, v in ipairs(self.rawNodes) do
+            v:addRef(self)
             if v.hasGeneric then
-                return true, true
+                hasGeneric = true
             end
         end
-        return false, true
+        return hasGeneric, true
     else
+        self.value:addRef(self)
         return self.value.hasGeneric, true
     end
 end

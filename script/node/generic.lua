@@ -25,7 +25,9 @@ end
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    return self.default or self.extends, true
+    local value = self.default or self.extends
+    value:addRef(self)
+    return value, true
 end
 
 function M:onCanBeCast(other)

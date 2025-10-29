@@ -2,7 +2,7 @@
 ls.node = {}
 
 require 'node.view'
-require 'node.cache_module'
+require 'node.ref_module'
 require 'node.node'
 require 'node.class'
 require 'node.alias'

@@ -52,6 +52,9 @@ M.__getter.values = function (self)
         return self.vararg, true
     end
     if self.raw then
+        for _, raw in ipairs(self.raw) do
+            raw:addRef(self)
+        end
         return rt.vararg(self.raw, #self.raw, #self.raw), true
     end
     return rt.vararg({}, 0, 0), true

@@ -1,4 +1,4 @@
----@class Node: Node.CacheModule
+---@class Node: Node.RefModule
 ---@field onCanCast? fun(self: Node, other: Node): boolean # 能否转换为另一个节点
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
@@ -9,7 +9,7 @@
 ---@operator shr(Node): boolean
 local M = Class 'Node'
 
-Extends('Node', 'Node.CacheModule')
+Extends('Node', 'Node.RefModule')
 
 ---@alias Node.Kind
 ---|'type'
@@ -282,6 +282,7 @@ M.__getter.hasGeneric = function (self)
     if self.value == self then
         return false, true
     end
+    self.value:addRef(self)
     return self.value.hasGeneric, true
 end
 

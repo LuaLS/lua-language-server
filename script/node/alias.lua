@@ -36,14 +36,29 @@ function M:addTypeParam(param)
         self.params = {}
     end
     table.insert(self.params, param)
+
+    self:flushCache()
+
     return self
 end
 
 ---@param value Node
 ---@return Node.Alias
 function M:setValue(value)
-    self.value = value
+    self.extendsValue = value
+
+    self:flushCache()
+
     return self
+end
+
+M.__getter.value = function (self)
+    if self.extendsValue then
+        self.extendsValue:addRef(self)
+        return self.extendsValue, true
+    else
+        return self.scope.rt.UNKNOWN, true
+    end
 end
 
 ---@type Node.Location?
@@ -58,7 +73,15 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    return self.params ~= nil, true
+    local params = self.params
+    if params then
+        for _, param in ipairs(params) do
+            param:addRef(self)
+        end
+        return true, true
+    else
+        return false, true
+    end
 end
 
 ---@param map table<Node.Generic, Node>

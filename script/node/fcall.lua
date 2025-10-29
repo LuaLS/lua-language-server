@@ -16,29 +16,7 @@ M.head = nil
 function M:__init(scope, head, args)
     self.scope = scope
     self.head = head
-    self.inputs = args
-
-    self.head:registerFlushChain(self)
-    for _, arg in ipairs(self.inputs) do
-        arg:registerFlushChain(self)
-    end
-end
-
----@type Node[]
-M.args = nil
-
----@param self Node.FCall
----@return Node[]
----@return true
-M.__getter.args = function (self)
-    -- return ls.util.map(self.inputs, function (arg)
-    --     if arg.kind == 'variable' then
-    --         return arg.value
-    --     else
-    --         return arg
-    --     end
-    -- end), true
-    return self.inputs, true
+    self.args = args
 end
 
 ---@type Node
@@ -74,6 +52,9 @@ M.__getter.returns = function (self)
     ---@type Node.Function[]
     local defs = {}
     local args = rt.vararg(self.args, #self.args, #self.args)
+
+    self.head:addRef(self)
+    args:addRef(self)
 
     self.head:each('function', function (f)
         ---@cast f Node.Function

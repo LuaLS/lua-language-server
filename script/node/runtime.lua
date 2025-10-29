@@ -394,57 +394,53 @@ M.__getter.castCache = function (self)
     return ls.tools.pathTable.create(true, false), true
 end
 
----@type Node.CacheModule[]
+---@type table<Node.RefModule, true>
 M.waitFlushList = nil
 
----@param node Node.CacheModule
+---@param node Node.RefModule
 function M:collectFlushNodes(node)
     if not self.waitFlushList then
-        self.waitFlushList = {}
+        self.waitFlushList = setmetatable({}, ls.util.MODE_K)
     end
-    self.waitFlushList[#self.waitFlushList+1] = node
+    self.waitFlushList[node] = true
     if self.cacheLocked == 0 then
-        self:flushNodesNow()
+        self:flushCacheNow()
     end
 end
 
-function M:flushNodesNow()
+function M:flushCacheNow()
     self.castCache = nil
     local list = self.waitFlushList
     if not list then
         return
     end
     self.waitFlushList = nil
-
     local flushed = {}
-    for _ = 1, 1000000 do
-        local node = list[#list]
-        if not node then
-            break
-        end
-        list[#list] = nil
 
+    ---@param node Node.RefModule
+    local function flushOne(node)
         if flushed[node] then
-            goto continue
+            return
         end
         flushed[node] = true
 
-        -- flush this node
         local getter = node.__getter
         for k in pairs(getter) do
             node[k] = nil
         end
 
-        -- push children to list
-        local needFlush = node.needFlush
-        if needFlush then
-            for child in pairs(needFlush) do
-                if not flushed[child] then
-                    list[#list+1] = child
-                end
+        local refMap = node.refMap
+        if refMap then
+            node.refMap = nil
+
+            for child in pairs(refMap) do
+                flushOne(child)
             end
         end
-        ::continue::
+    end
+
+    for node in pairs(list) do
+        flushOne(node)
     end
 end
 
@@ -479,6 +475,10 @@ function M:calcFullExtends(node)
             searchOnce(t, nextQueue)
         end
         queue = nextQueue
+    end
+
+    for _, result in ipairs(results) do
+        result:addRef(node)
     end
 
     return results
@@ -566,7 +566,7 @@ end
 function M:unlockCache()
     self.cacheLocked = self.cacheLocked - 1
     if self.cacheLocked == 0 then
-        self:flushNodesNow()
+        self:flushCacheNow()
     end
 end
 

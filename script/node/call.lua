@@ -17,11 +17,6 @@ function M:__init(scope, head, args)
     self.scope = scope
     self.head = scope.rt.type(head)
     self.args = args
-
-    self.head:registerFlushChain(self)
-    for _, arg in ipairs(self.args) do
-        arg:registerFlushChain(self)
-    end
 end
 
 ---@type Node.Class[]
@@ -31,6 +26,10 @@ M.protoClasses = nil
 ---@return Node.Class[]
 ---@return true
 M.__getter.protoClasses = function (self)
+    self.head:addRef(self)
+    for _, arg in ipairs(self.args) do
+        arg:addRef(self)
+    end
     return self.head:getProtos(self.head.classes, self.args), true
 end
 
@@ -41,6 +40,10 @@ M.protoAliases = nil
 ---@return Node.Alias[]
 ---@return true
 M.__getter.protoAliases = function (self)
+    self.head:addRef(self)
+    for _, arg in ipairs(self.args) do
+        arg:addRef(self)
+    end
     return self.head:getProtos(self.head.aliases, self.args), true
 end
 
@@ -55,6 +58,7 @@ M.__getter.extends = function (self)
     local results = {}
     for _, class in ipairs(self.protoClasses) do
         if class.extends then
+            class:addRef(self)
             local genericMap = class:makeGenericMap(self.args)
             for _, ext in ipairs(class.extends) do
                 results[#results+1] = ext:resolveGeneric(genericMap)
@@ -121,10 +125,12 @@ M.table = nil
 M.__getter.table = function (self)
     local table = self.scope.rt.table()
     local head = self.head
+    head:addRef(self)
     if head.classes then
         local fields = {}
         for _, class in ipairs(self.protoClasses) do
             if class.fields then
+                class:addRef(self)
                 fields[#fields+1] = class.fields:resolveGeneric(class:makeGenericMap(self.args))
             end
         end
@@ -142,6 +148,7 @@ M.value = nil
 M.__getter.value = function (self)
     self.value = self.scope.rt.NEVER
     local head = self.head
+    head:addRef(self)
     ---@cast head Node.Type
     if not head:isComplex() then
         return self, true

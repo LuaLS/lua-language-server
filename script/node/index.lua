@@ -24,6 +24,8 @@ end
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
+    self.head:addRef(self)
+    self.index:addRef(self)
     return self.head:get(self.index), true
 end
 
@@ -31,6 +33,8 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    self.head:addRef(self)
+    self.index:addRef(self)
     return self.head.hasGeneric or self.index.hasGeneric, true
 end
 

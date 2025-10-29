@@ -90,18 +90,32 @@ ls.feature.provider.definition(function (param, push)
     ---@type Node.Variable?
     local variable = param.scope.vm:getVariable(first)
 
-    if not variable or not variable.assigns then
+    if not variable then
         return
     end
 
-    ---@param assign Node.Field
-    for assign in variable.assigns:pairsFast() do
-        if assign.location then
-            push {
-                uri = assign.location.uri,
-                range = { assign.location.offset, assign.location.offset + assign.location.length },
-                originRange = { first.start, first.finish },
-            }
+    ---@param var Node.Variable
+    local function collect(var)
+        if not var.assigns then
+            return
+        end
+        ---@param assign Node.Field
+        for assign in var.assigns:pairsFast() do
+            if assign.location then
+                push {
+                    uri = assign.location.uri,
+                    range = { assign.location.offset, assign.location.offset + assign.location.length },
+                    originRange = { first.start, first.finish },
+                }
+            end
+        end
+    end
+
+    collect(variable)
+
+    if variable.foreignVariables then
+        for _, var in ipairs(variable.foreignVariables) do
+            collect(var)
         end
     end
 end)

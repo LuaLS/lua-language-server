@@ -1,7 +1,5 @@
 ---@class Node.Variable: Node
-local M = Class 'Node.Variable'
-
-Extends('Node.Variable', 'Node')
+local M = ls.node.register 'Node.Variable'
 
 M.kind = 'variable'
 
@@ -277,11 +275,11 @@ M.__getter.parentExpectValue = function (self)
 end
 
 -- 仅包含自身显式赋值，以及赋值一张字面量表所产生的字段
----@type Node.Table
+---@type Node.Table|false
 M.fields = nil
 
 ---@param self Node.Variable
----@return Node.Table
+---@return Node.Table|false
 ---@return true
 M.__getter.fields = function (self)
     if self.parentVariable then
@@ -296,10 +294,12 @@ M.__getter.fields = function (self)
             end
         end
     end
-    childs[#childs+1] = self.childsValue
+    if self.childsValue then
+        childs[#childs+1] = self.childsValue
+    end
 
     if #childs == 0 then
-        return self.scope.rt.table(), true
+        return false, true
     end
     if #childs == 1 then
         return childs[1], true
@@ -436,8 +436,11 @@ function M:getExpect(key)
     end
     if self.types then
         local expectValue = rt.union(ls.util.map(self.types:toArray(), function (v)
-            ---@cast v Node.Type
-            return v.expectValue
+            if v.kind == 'type' then
+                ---@cast v Node.Type
+                return v.expectValue
+            end
+            return v
         end))
         local r, e = expectValue:get(key)
         return e and r or nil
@@ -540,22 +543,24 @@ M.__getter.selfValue = function (self)
     local rt = self.scope.rt
     ---@type Node[]
     local results = {}
-    if self.assignValue then
-        results[#results+1] = self.assignValue
+    if self.fields then
+        results[#results+1] = self.fields
     end
-    if self.childs then
-        results[#results+1] = self.childsValue
-    end
-    if self.parent and self.parent.foreignVariables then
-        for _, var in ipairs(self.parent.foreignVariables) do
-            local child = var.childs and var.childs[self.key]
-            if child and child ~= self then
-                results[#results+1] = child
+    --- 不属于 fields 的部分
+    if self.assigns then
+        for assign in self.assigns:pairsFast() do
+            ---@cast assign Node.Field
+            if assign.value and assign.value.kind ~= 'table' then
+                results[#results+1] = assign.value
             end
         end
+        results[#results+1] = self.assignValue
+    end
+    if self.foreignVariables then
+        ls.util.arrayMerge(results, self.foreignVariables)
     end
 
-    return #results > 0 and rt.intersection(results) or rt.UNKNOWN, true
+    return #results > 0 and rt.union(results) or rt.UNKNOWN, true
 end
 
 ---@type Node.Variable[]|false
@@ -594,21 +599,21 @@ M.__getter.foreignVariables = function (self)
     return results, true
 end
 
----@type Node.Table
+---@type Node.Table|false
 M.childsValue = nil
 
 ---@param self Node.Variable
----@return Node.Table
+---@return Node.Table|false
 ---@return true
 M.__getter.childsValue = function (self)
     if self.parentVariable then
         return self.parentVariable.childsValue, true
     end
     local rt = self.scope.rt
-    local table = rt.table()
     if not self.childs then
-        return table, true
+        return false, true
     end
+    local table = rt.table()
     for key, var in pairs(self.childs) do
         table:addField {
             key   = key,

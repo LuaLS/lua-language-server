@@ -155,7 +155,9 @@ M.__getter.value = function (self)
             if class.variables then
                 for variable in class.variables:pairsFast() do
                     ---@cast variable Node.Variable
-                    merging[#merging+1] = variable.fields
+                    if variable.fields then
+                        merging[#merging+1] = variable.fields
+                    end
                 end
             end
         end

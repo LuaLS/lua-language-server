@@ -95,18 +95,34 @@ end
 ---@param vfile VM.Vfile
 function M:run(vfile)
     self:dispose(vfile)
-    self.map = setmetatable({}, { __index = function (_, k)
-        error('No such key in coder map: ' .. tostring(k))
-    end })
+    local map = {}
+    self.map = setmetatable({}, {
+        __index = function (_, k)
+            local v = map[k]
+            if v == nil then
+                error('No such key in coder map: ' .. tostring(k))
+            end
+            return v
+        end,
+        __newindex = function (_, k, v)
+            local ov = map[k]
+            if ov ~= nil then
+                error('Key already exists in coder map: ' .. tostring(k))
+            end
+            map[k] = v
+        end,
+    })
     vfile.scope.rt:lockCache()
     local suc = xpcall(function (...)
         self.disposer = self.func(self, vfile)
     end, log.error)
     vfile.scope.rt:unlockCache()
-    setmetatable(self.map, nil)
+    setmetatable(map, nil)
     if not suc then
         log.debug(self.code)
     end
+
+    LAST_CODE = self.code
 end
 
 ---@param delta integer

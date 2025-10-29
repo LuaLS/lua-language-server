@@ -40,16 +40,9 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         field  = isComplexKey and 'rt.UNKNOWN' or coder:getKey(source.key),
     })
     coder:addLine('{variable} = {var}' % {
-        variable = coder:getVariableKey(source.key),
+        variable = coder:getVariableKey(source),
         var      = coder:getKey(source),
     })
-    if not isGetVariable then
-        coder:addLine('{var} = rt.index({last}, {field})' % {
-            var     = coder:getKey(source),
-            last    = coder:getKey(last),
-            field   = coder:getKey(source.key),
-        })
-    end
 end)
 
 ls.vm.registerCoderProvider('fieldid', function (coder, source)

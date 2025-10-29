@@ -290,7 +290,9 @@ M.__getter.value = function (self)
         for _, class in ipairs(self.protoClasses) do
             if class.variables then
                 for variable in class.variables:pairsFast() do
-                    merging[#merging+1] = variable.fields
+                    if variable.fields then
+                        merging[#merging+1] = variable.fields
+                    end
                 end
             end
         end

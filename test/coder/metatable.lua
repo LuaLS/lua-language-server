@@ -298,6 +298,25 @@ do -- 变量作为参数时要转换为类型
 end
 
 do
+    rt:reset()
+    --[[
+    ---@type { x: number }
+    local t
+
+    B = t.x
+    ]]
+
+    local T = rt.variable 't'
+    T:addType(rt.table {
+        x = rt.NUMBER,
+    })
+
+    assert(T:view() == '{ x: number }')
+    local X = T:getChild('x')
+    assert(X:view() == 'number')
+end
+
+do
     TEST_INDEX [[
     ---@type { x: number }
     local t

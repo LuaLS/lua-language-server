@@ -197,9 +197,9 @@ end
 ---@return true
 Base.__getter.uniqueKey = function (self)
     if self.dummy then
-        return string.format('dummy@%d:%d', self.startRow + 1, self.startCol + 1), true
+        return string.format('dummy|%s@%d:%d-%d:%d', self.kind, self.startRow + 1, self.startCol + 1, self.finishRow + 1, self.finishCol), true
     else
-        return string.format('%s@%d:%d', self.kind, self.startRow + 1, self.startCol + 1), true
+        return string.format('%s@%d:%d-%d:%d', self.kind, self.startRow + 1, self.startCol + 1, self.finishRow + 1, self.finishCol), true
     end
 end
 

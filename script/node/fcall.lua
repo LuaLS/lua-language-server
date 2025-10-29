@@ -31,13 +31,14 @@ M.args = nil
 ---@return Node[]
 ---@return true
 M.__getter.args = function (self)
-    return ls.util.map(self.inputs, function (arg)
-        if arg.kind == 'variable' then
-            return arg.value
-        else
-            return arg
-        end
-    end), true
+    -- return ls.util.map(self.inputs, function (arg)
+    --     if arg.kind == 'variable' then
+    --         return arg.value
+    --     else
+    --         return arg
+    --     end
+    -- end), true
+    return self.inputs, true
 end
 
 ---@type Node

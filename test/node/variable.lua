@@ -6,19 +6,19 @@ do
 
     assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == 'unknown')
-    assert(var.fields:view() == '{}')
+    assert(var.fields == false)
 
     local child1 = rt.variable(1, var)
 
     assert(child1:viewAsVariable() == 'x[1]')
     assert(var.value:view() == 'unknown')
-    assert(var.fields:view() == '{}')
+    assert(var.fields == false)
 
     local child2 = rt.variable('y', child1)
 
     assert(child2:viewAsVariable() == 'x[1].y')
     assert(var.value:view() == 'unknown')
-    assert(var.fields:view() == '{}')
+    assert(var.fields == false)
 end
 
 do
@@ -225,7 +225,7 @@ do
         value = X,
     }
 
-    assert(T.fields:view() == '{}')
+    assert(T.fields == false)
     assert(T:view() == '{ a: 1 }')
 
     local TA = T:getChild 'a'
@@ -252,9 +252,36 @@ do
         value = X,
     }
 
-    assert(T.fields:view() == '{}')
+    assert(T.fields == false)
     assert(T:view() == '{ a: { b: 1 } }')
 
     local TA = T:getChild('a', 'b')
+    assert(TA:view() == '1')
+end
+
+do
+    rt:reset()
+    --[[
+    X.a.b = 1
+    local t = X.a
+    print(t.b)
+    ]]
+
+    local X = rt.variable 'X'
+    X:addField({
+        key   = rt.value 'b',
+        value = rt.value(1),
+    }, { 'a' })
+
+    local T = rt.variable 't'
+    T:addAssign {
+        key   = rt.value 't',
+        value = X:getChild 'a',
+    }
+
+    assert(T.fields == false)
+    assert(T:view() == '{ b: 1 }')
+
+    local TA = T:getChild('b')
     assert(TA:view() == '1')
 end

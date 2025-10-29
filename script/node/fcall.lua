@@ -74,12 +74,12 @@ M.__getter.returns = function (self)
     local defs = {}
     local args = rt.vararg(self.args, #self.args, #self.args)
 
-    for f in self.head:finalValue():each 'function' do
+    self.head:each('function', function (f)
         ---@cast f Node.Function
         if args:canCast(f.paramsPack) then
             defs[#defs+1] = f
         end
-    end
+    end)
 
     if #defs == 0 then
         return rt.UNKNOWN, true

@@ -53,7 +53,7 @@ do
     local g = rt.type '_G'
     assert(g:get('A'):view() == '1')
     assert(rt:globalGet('A'):viewAsVariable() == 'A')
-    assert(rt:globalGet('A').value:view() == 'unknown')
+    assert(rt:globalGet('A').value:view() == '1')
 end
 
 do

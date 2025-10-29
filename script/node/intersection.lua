@@ -293,6 +293,9 @@ function M:onView(viewer, options)
     end
     local elements = {}
     for _, v in ipairs(self.rawNodes) do
+        if v.kind == 'variable' then
+            v = v.value
+        end
         if v.hideInUnionView then
             goto continue
         end

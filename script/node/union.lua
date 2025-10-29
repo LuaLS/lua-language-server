@@ -179,19 +179,10 @@ function M:inferGeneric(other, result)
     end
 end
 
----@param kind string
----@return fun(...): Node?
-function M:each(kind)
-    local i = 0
+function M:each(kind, callback)
     local values = self.values
-    return function ()
-        while i < #values do
-            i = i + 1
-            local v = values[i]
-            if v.kind == kind then
-                return v
-            end
-        end
+    for _, v in ipairs(values) do
+        v:each(kind, callback)
     end
 end
 
@@ -213,6 +204,9 @@ function M:onView(viewer, options)
     ---@type string[]
     local view = {}
     for _, v in ipairs(values) do
+        if v.kind == 'variable' then
+            v = v.value
+        end
         if v.hideInUnionView then
             goto continue
         end

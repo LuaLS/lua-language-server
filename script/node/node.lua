@@ -284,18 +284,16 @@ function M:inferGeneric(other, result)
 end
 
 ---@param kind string
----@return fun(...): Node?
-function M:each(kind)
+---@param callback fun(node: Node)
+function M:each(kind, callback)
     if self.kind == kind then
-        return function (_, last)
-            if last then
-                return nil
-            end
-            return self
-        end
-    else
-        return function () end
+        callback(self)
+        return
     end
+    if self.value == self then
+        return
+    end
+    self.value:each(kind, callback)
 end
 
 ---@param viewer Node.Viewer

@@ -276,6 +276,7 @@ M.__getter.parentExpectValue = function (self)
     return parent:getExpect(self.key) or false, true
 end
 
+-- 仅包含自身显式赋值，以及赋值一张字面量表所产生的字段
 ---@type Node.Table
 M.fields = nil
 
@@ -286,26 +287,27 @@ M.__getter.fields = function (self)
     if self.parentVariable then
         return self.parentVariable.fields, true
     end
-    local selfValue = self.selfValue
-    if selfValue.kind == 'table' then
-        ---@cast selfValue Node.Table
-        return selfValue, true
-    end
-    local rt = self.scope.rt
-    if selfValue.kind == 'union' then
-        ---@cast selfValue Node.Union
-        if #selfValue.values == 0 then
-            return rt.table(), true
+    local childs = {}
+    if self.assigns then
+        for assign in self.assigns:pairsFast() do
+            ---@cast assign Node.Field
+            if assign.value and assign.value.kind == 'table' then
+                childs[#childs+1] = assign.value
+            end
         end
     end
-    local table = rt.table()
-    local childs = {}
-    for t in selfValue:each 'table' do
-        ---@cast t Node.Table
-        childs[#childs+1] = t
+    childs[#childs+1] = self.childsValue
+
+    if #childs == 0 then
+        return self.scope.rt.table(), true
     end
-    table:addChilds(childs)
-    return table, true
+    if #childs == 1 then
+        return childs[1], true
+    end
+
+    local t = self.scope.rt.table()
+    t:addChilds(childs)
+    return t, true
 end
 
 ---@type table<Node, Node.Variable>?
@@ -524,6 +526,7 @@ M.__getter.value = function (self)
         , true
 end
 
+-- 包含自身赋值（递归），父变量赋值（递归）
 ---@type Node
 M.selfValue = nil
 
@@ -535,16 +538,60 @@ M.__getter.selfValue = function (self)
         return self.parentVariable.selfValue, true
     end
     local rt = self.scope.rt
-    ---@type Node?
-    local result = nil
+    ---@type Node[]
+    local results = {}
     if self.assignValue then
-        result = self.assignValue
+        results[#results+1] = self.assignValue
     end
     if self.childs then
-        result = result | self.childsValue
+        results[#results+1] = self.childsValue
+    end
+    if self.parent and self.parent.foreignVariables then
+        for _, var in ipairs(self.parent.foreignVariables) do
+            local child = var.childs and var.childs[self.key]
+            if child and child ~= self then
+                results[#results+1] = child
+            end
+        end
     end
 
-    return result or rt.UNKNOWN, true
+    return #results > 0 and rt.intersection(results) or rt.UNKNOWN, true
+end
+
+---@type Node.Variable[]|false
+M.foreignVariables = nil
+
+---@param self Node.Variable
+---@return Node.Variable[]|false
+---@return true
+M.__getter.foreignVariables = function (self)
+    if self.parentVariable then
+        return self.parentVariable.foreignVariables, true
+    end
+    local results = {}
+    if self.assigns then
+        for assign in self.assigns:pairsFast() do
+            ---@cast assign Node.Field
+            local value = assign.value
+            if value and value ~= self and value.kind == 'variable' then
+                ---@cast value Node.Variable
+                results[#results+1] = value
+            end
+        end
+    end
+    local parentForeigns = self.parent and self.parent.foreignVariables
+    if parentForeigns then
+        for _, var in ipairs(parentForeigns) do
+            local child = var.childs and var.childs[self.key]
+            if child and child ~= self then
+                results[#results+1] = child
+            end
+        end
+    end
+    if #results == 0 then
+        return false, true
+    end
+    return results, true
 end
 
 ---@type Node.Table

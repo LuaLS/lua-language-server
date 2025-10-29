@@ -161,7 +161,7 @@ do
     }, {'b', 'c'})
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == '{}')
-    assert(d.fields == nil)
+    assert(d.fields:view() == '{}')
 
     local A = rt.type 'A'
     local CA = rt.class 'A'
@@ -169,7 +169,7 @@ do
     d:addClass(CA)
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
-    assert(d.fields == nil)
+    assert(d.fields:view() == '{}')
     assert(A.value:view() == '{}')
 
     local dx = {
@@ -201,7 +201,7 @@ do
     d:removeField(dy)
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
-    assert(d.fields == nil)
+    assert(d.fields:view() == '{}')
     assert(A.value:view() == '{}')
 end
 
@@ -222,9 +222,39 @@ do
     local T = rt.variable 't'
     T:addAssign {
         key   = rt.value 't',
-        value = rt:globalGet 'X',
+        value = X,
     }
 
+    assert(T.fields:view() == '{}')
+    assert(T:view() == '{ a: 1 }')
+
     local TA = T:getChild 'a'
+    assert(TA:view() == '1')
+end
+
+do
+    rt:reset()
+    --[[
+    X.a.b = 1
+    local t = X
+    print(t.a.b)
+    ]]
+
+    local X = rt.variable 'X'
+    X:addField({
+        key   = rt.value 'b',
+        value = rt.value(1),
+    }, { 'a' })
+
+    local T = rt.variable 't'
+    T:addAssign {
+        key   = rt.value 't',
+        value = X,
+    }
+
+    assert(T.fields:view() == '{}')
+    assert(T:view() == '{ a: { b: 1 } }')
+
+    local TA = T:getChild('a', 'b')
     assert(TA:view() == '1')
 end

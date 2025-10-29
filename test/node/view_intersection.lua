@@ -51,7 +51,7 @@ end
 do
     local a = rt.type('table') & rt.VAR_G
 
-    assert(a:view() == 'table')
+    assert(a:view() == 'table & _G')
 end
 
 do

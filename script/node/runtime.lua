@@ -118,9 +118,15 @@ function M:fillAPIs()
         return New 'Node.Generic' (scope, name, extends, default)
     end
 
-    ---@param nodes? Node[]
-    ---@return Node.Intersection
+    ---@param nodes Node[]
+    ---@return Node
     function self.intersection(nodes)
+        if #nodes == 0 then
+            return scope.rt.NEVER
+        end
+        if #nodes == 1 then
+            return nodes[1]
+        end
         return New 'Node.Intersection' (scope, nodes)
     end
 
@@ -348,11 +354,6 @@ function M:fillPresets()
             : addField {
                 key    = self.value '_G',
                 value  = self.TYPE_G,
-            }
-            : addField {
-                key   = self.ANY,
-                value = self.ANY,
-                hideInView = true,
             }
         self.TYPE_G:addClass(G)
         self.VAR_G:addClass(G)

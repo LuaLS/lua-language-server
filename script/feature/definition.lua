@@ -110,7 +110,8 @@ end)
 -- 变量的赋值位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
-    if first.kind == 'fieldid' then
+    if first.kind == 'fieldid'
+    or first.kind == 'string' then
         first = first.parent
     end
     if not first then

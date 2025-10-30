@@ -289,3 +289,38 @@ do
     assert(rt.type('C').value:view() == 'B<number>')
     assert(rt.type('C').value.value:view() == '{ data: [number, 2], extra: number[] }')
 end
+
+do
+    TEST_INDEX [[
+        local t = {
+            insert = 1,
+        }
+        X = t
+    ]]
+
+    assert(rt:globalGet('X'):view() == '{ insert: 1 }')
+end
+
+do
+    TEST_INDEX [[
+        local t = {
+            insert = 1,
+        }
+        X = t.insert
+    ]]
+
+    assert(rt:globalGet('X'):view() == '1')
+end
+
+do
+    TEST_INDEX [[
+        local t = {
+            l = {
+                insert = 1,
+            },
+        }
+        X = t.l.insert
+    ]]
+
+    assert(rt:globalGet('X'):view() == '1')
+end

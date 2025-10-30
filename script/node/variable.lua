@@ -505,6 +505,28 @@ M.__getter.value = function (self)
         , true
 end
 
+-- 所有可能的赋值（递归）
+---@type Node.Field[]
+M.allAssigns = nil
+
+---@param self Node.Variable
+---@return Node.Field[]
+---@return true
+M.__getter.allAssigns = function (self)
+    if self.masterVariable then
+        return self.masterVariable.allAssigns, true
+    end
+    local results = {}
+    if self.assigns then
+        ls.util.arrayMerge(results, self.assigns:toArray())
+    end
+    local parent = self.parent
+    if parent then
+        
+    end
+    return results, true
+end
+
 -- 包含自身赋值（递归），父变量赋值（递归）
 ---@type Node
 M.selfValue = nil

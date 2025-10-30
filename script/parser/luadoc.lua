@@ -2324,7 +2324,6 @@ return {
             pluginDocs[#pluginDocs+1] = doc
             doc.special = src
             doc.originalComment = comment
-            doc.virtual = true
             markVirtual(doc)
             doc.specialBindGroup = group
             ast.state.pluginDocs = pluginDocs

@@ -2308,6 +2308,14 @@ local function luadoc(state)
     bindDocs(state)
 end
 
+local function markVirtual(node)
+    if not node then
+        return
+    end
+    node.virtual = true
+    guide.eachChild(node, markVirtual)
+end
+
 return {
     buildAndBindDoc = function (ast, src, comment, group)
         local doc = buildLuaDoc(comment)
@@ -2317,6 +2325,7 @@ return {
             doc.special = src
             doc.originalComment = comment
             doc.virtual = true
+            markVirtual(doc)
             doc.specialBindGroup = group
             ast.state.pluginDocs = pluginDocs
             return doc

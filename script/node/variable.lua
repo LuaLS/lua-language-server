@@ -604,13 +604,19 @@ M.__getter.equivalentValue = function (self)
         end
     end
 
+    -- 尽量合并表的字段
+    local hasTable = false
     local tableParts = {}
     local unionResults = {}
     local hasType = false
     for _, node in ipairs(results) do
-        local t = node:findValue{'table', 'type'}
+        local t = node:findValue {'table', 'type'}
         if t and t.kind == 'table' then
-            tableParts[#tableParts+1] = t
+            hasTable = true
+            ---@cast t Node.Table
+            if t.fields then
+                tableParts[#tableParts+1] = t
+            end
         else
             unionResults[#unionResults+1] = t or node
         end
@@ -618,6 +624,8 @@ M.__getter.equivalentValue = function (self)
             hasType = true
         end
     end
+
+    ls.util.arrayRemoveDuplicate(tableParts)
 
     if not hasType and #tableParts > 0 then
         if #tableParts == 1 then
@@ -629,7 +637,15 @@ M.__getter.equivalentValue = function (self)
         end
     end
 
-    return #unionResults > 0 and rt.union(unionResults) or rt.UNKNOWN, true
+    local result = #unionResults > 0 and rt.union(unionResults)
+    if result then
+        return result, true
+    end
+    if hasTable then
+        return rt.table(), true
+    else
+        return rt.UNKNOWN, true
+    end
 end
 
 ---@return Node.Location[]

@@ -20,7 +20,7 @@ M.fields = nil
 ---@param fields? table
 function M:__init(scope, fields)
     self.scope = scope
-    if fields then
+    if fields and next(fields) then
         self.fields = ls.tools.linkedTable.create()
         for k, v in pairs(fields) do
             if type(k) ~= 'table' then

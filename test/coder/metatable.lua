@@ -373,6 +373,6 @@ obj = setmetatable({}, mt)
 value = obj.xxx
     ]]
 
-    --assert(rt:globalGet('obj'):view() == '{ xxx: 1, __index: {...} }')
+    assert(rt:globalGet('obj'):view() == '{ xxx: 1, __index: {...} }')
     assert(rt:globalGet('value'):view() == '1')
 end

@@ -139,6 +139,19 @@ function M:getLastValue()
     return self:select(#self.values)
 end
 
+---@param start integer
+---@return Node.Vararg
+function M:slice(start)
+    local values = {}
+    for i = start, #self.values do
+        values[i - start + 1] = self.values[i]
+    end
+    return self.scope.rt.vararg(values
+        , self.min - start + 1
+        , self.max and (self.max - start + 1)
+    )
+end
+
 ---@param self Node.Vararg
 ---@return Node
 ---@return true
@@ -180,10 +193,39 @@ function M:inferGeneric(other, result)
     if other.kind ~= 'vararg' then
         return
     end
+    local rt = self.scope.rt
     ---@cast other Node.Vararg
-    for i = 1, math.max(#self.values, #other.values) do
-        local v = self:select(i)
-        v:inferGeneric(other:select(i), result)
+    if self.max then
+        for i = 1, self.max do
+            local a = self:select(i)
+            local b, e = other:select(i)
+            if not e then
+                a:inferGeneric(rt.UNKNOWN, result)
+                break
+            end
+            a:inferGeneric(b, result)
+        end
+    else
+        for i = 1, #self.values - 1 do
+            local a = self:select(i)
+            local b, e = other:select(i)
+            if not e then
+                a:inferGeneric(rt.UNKNOWN, result)
+                break
+            end
+            a:inferGeneric(b, result)
+        end
+        local lastV = self.values[#self.values]
+        local ovalues = {}
+        for i = #self.values, #other.values do
+            ovalues[#ovalues+1] = other:select(i)
+        end
+        ---@type Node
+        local onode = rt.UNKNOWN
+        if #ovalues > 0 then
+            onode = rt.union(ovalues)
+        end
+        lastV:inferGeneric(onode, result)
     end
 end
 

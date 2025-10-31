@@ -80,6 +80,28 @@ M.__getter.paramsPack = function (self)
     return rt.vararg(params, min, max), true
 end
 
+---@type Node.Vararg
+M.returnsPack = nil
+
+---@param self Node.Function
+---@return Node.Vararg
+---@return true
+M.__getter.returnsPack = function (self)
+    local rt = self.scope.rt
+    local returns = ls.util.map(self.returnsDef, function (v, k)
+        local value = v.value
+        if v.optional then
+            value = value | rt.NIL
+        end
+        return value
+    end)
+    local min = #returns
+    ---@type integer?
+    local max = #returns
+
+    return rt.vararg(returns, min, max), true
+end
+
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
@@ -136,15 +158,6 @@ function M:addReturnDef(key, value, optional)
     return self
 end
 
----@param index integer
----@param node Node
-function M:setReturnNode(index, node)
-    self.returnNode[index] = self.returnNode[index] | node
-    if index > self.returnCount then
-        self.returnCount = index
-    end
-end
-
 ---@param value Node
 ---@return Node.Function
 function M:addVarargParamDef(value)
@@ -156,16 +169,9 @@ end
 ---@param index integer
 ---@return Node?
 function M:getParam(index)
-    local paramDef = self.paramsDef[index]
-    if paramDef then
-        if paramDef.optional then
-            return paramDef.value | self.scope.rt.NIL
-        else
-            return paramDef.value
-        end
-    end
-    if self.varargParamDef then
-        return self.varargParamDef
+    local n, e = self.paramsPack:select(index)
+    if e then
+        return n
     end
     return nil
 end
@@ -173,16 +179,9 @@ end
 ---@param index integer
 ---@return Node?
 function M:getReturn(index)
-    local retDef = self.returnsDef[index]
-    if retDef then
-        if retDef.optional then
-            return retDef.value | self.scope.rt.NIL
-        else
-            return retDef.value
-        end
-    end
-    if self.returnNode[index] then
-        return self.returnNode[index]
+    local n, e = self.returnsPack:select(index)
+    if e then
+        return n
     end
     return nil
 end
@@ -190,82 +189,14 @@ end
 ---@return integer min
 ---@return integer? max
 function M:getReturnCount()
-    local count = self.returnCount
-    local lastValue = self.returnsDef[count]
-                  and self.returnsDef[count].value
-                   or self.returnNode[count]
-    if not lastValue then
-        return 0, 0
-    end
-    if lastValue.kind == 'vararg' then
-        ---@cast lastValue Node.Vararg
-        local min = count + lastValue.min
-        ---@type integer?
-        local max = count
-        if lastValue.max then
-            max = max + lastValue.max
-        else
-            max = nil
-        end
-        return min, max
-    end
-    return count, count
-end
-
----@param index integer
----@return Node?
-function M:getParamStartFrom(index)
-    local nodes = {}
-    for i = index, #self.paramsDef do
-        nodes[#nodes+1] = self.paramsDef[i].value
-    end
-    nodes[#nodes+1] = self.varargParamDef
-    if #nodes == 0 then
-        return nil
-    end
-    if #nodes == 1 then
-        return nodes[1]
-    end
-    return self.scope.rt.union(nodes)
-end
-
----@param index integer
----@return Node?
-function M:getReturnStartFrom(index)
-    local nodes = {}
-    for i = index, #self.returnsDef do
-        nodes[#nodes+1] = self.returnsDef[i].value
-    end
-    for i = #self.returnsDef + 1, self.returnCount do
-        nodes[#nodes+1] = self.returnNode[i] or self.scope.rt.NIL
-    end
-    if #nodes == 0 then
-        return nil
-    end
-    if #nodes == 1 then
-        return nodes[1]
-    end
-    return self.scope.rt.union(nodes)
+    return self.returnsPack.min, self.returnsPack.max
 end
 
 ---@param self Node.Function
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
-    for _, v in ipairs(self.paramsDef) do
-        if v.value.hasGeneric then
-            return true, true
-        end
-    end
-    for _, v in ipairs(self.returnsDef) do
-        if v.value.hasGeneric then
-            return true, true
-        end
-    end
-    if self.varargParamDef and self.varargParamDef.hasGeneric then
-        return true, true
-    end
-    return false, true
+    return self.paramsPack.hasGeneric or self.returnsPack.hasGeneric, true
 end
 
 ---@type Node[]?
@@ -351,34 +282,13 @@ function M:inferGeneric(other, result)
         end
         return
     end
-    if value.kind ~= 'function' then
+    local func = value:findValue { 'function' }
+    if not func then
         return
     end
-    ---@cast value Node.Function
-    for i, param in ipairs(self.paramsDef) do
-        if param.value.hasGeneric then
-            local otherParam = value:getParam(i)
-            if not otherParam then
-                break
-            end
-            param.value:inferGeneric(otherParam, result)
-        end
-    end
-    for i, ret in ipairs(self.returnsDef) do
-        if ret.value.hasGeneric then
-            local otherReturn = value:getReturn(i)
-            if not otherReturn then
-                break
-            end
-            ret.value:inferGeneric(otherReturn, result)
-        end
-    end
-    if self.varargParamDef and self.varargParamDef.hasGeneric then
-        local otherParam = value:getParamStartFrom(#self.paramsDef + 1)
-        if otherParam then
-            self.varargParamDef:inferGeneric(otherParam, result)
-        end
-    end
+    ---@cast func Node.Function
+    self.paramsPack:inferGeneric(func.paramsPack, result)
+    self.returnsPack:inferGeneric(func.returnsPack, result)
     if self.typeParams then
         for _, param in ipairs(self.typeParams) do
             if param.kind == 'generic' then

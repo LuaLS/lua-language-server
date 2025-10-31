@@ -352,7 +352,7 @@ do
     funG:inferGeneric(target, result)
 
     assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'string')
+    assert(result[T2]:view() == 'string | nil')
 end
 
 do
@@ -375,7 +375,7 @@ do
     funG:inferGeneric(target, result)
 
     assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'boolean | string')
+    assert(result[T2]:view() == 'boolean | string | nil')
 end
 
 do

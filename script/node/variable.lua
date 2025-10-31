@@ -504,9 +504,10 @@ M.__getter.allEquivalents = function (self)
             if not value then
                 goto continue
             end
-            if value.kind == 'variable' then
-                ---@cast value Node.Variable
-                results[#results+1] = value
+            local var = value:findValue { 'variable' }
+            if var then
+                ---@cast var Node.Variable
+                results[#results+1] = var
             end
             ::continue::
         end
@@ -540,16 +541,23 @@ M.__getter.allEquivalents = function (self)
                     for assign in equivalent.assigns:pairsFast() do
                         ---@cast assign Node.Field
                         local value = assign.value
-                        if value and value.kind == 'table' then
-                            ---@cast value Node.Table
-                            lookIntoTable(value)
+                        if value then
+                            local t = value:findValue { 'type', 'table' }
+                            if t and t.kind == 'table' then
+                                ---@cast t Node.Table
+                                lookIntoTable(t)
+                            end
                         end
                     end
                 end
             else
                 ---@cast equivalent Node.Field
-                if equivalent.value and equivalent.value.kind == 'table' then
-                    lookIntoTable(equivalent.value--[[@as Node.Table]])
+                if equivalent.value then
+                    local t = equivalent.value:findValue { 'type', 'table' }
+                    if t and t.kind == 'table' then
+                        ---@cast t Node.Table
+                        lookIntoTable(t)
+                    end
                 end
             end
         end
@@ -598,22 +606,51 @@ M.__getter.equivalentValue = function (self)
 
     local tableParts = {}
     local unionResults = {}
+    local hasType = false
     for _, node in ipairs(results) do
         local t = node:findValue{'table', 'type'}
         if t and t.kind == 'table' then
-            tableParts[#tableParts+1] = node
+            tableParts[#tableParts+1] = t
         else
-            unionResults[#unionResults+1] = node
+            unionResults[#unionResults+1] = t or node
+        end
+        if t and t.kind == 'type' then
+            hasType = true
         end
     end
 
-    if #tableParts > 0 then
-        local tableNode = rt.table()
-        tableNode:addChilds(tableParts)
-        unionResults[#unionResults+1] = tableNode
+    if not hasType and #tableParts > 0 then
+        if #tableParts == 1 then
+            unionResults[#unionResults+1] = tableParts[1]
+        else
+            local tableNode = rt.table()
+            tableNode:addChilds(tableParts)
+            unionResults[#unionResults+1] = tableNode
+        end
     end
 
     return #unionResults > 0 and rt.union(unionResults) or rt.UNKNOWN, true
+end
+
+---@return Node.Location[]
+function M:getEquivalentLocations()
+    ---@type Node.Location[]
+    local locations = {}
+    for _, equivalent in ipairs(self.allEquivalents) do
+        if equivalent.kind == 'variable' then
+            ---@cast equivalent Node.Variable
+            if equivalent.assigns then
+                for assign in equivalent.assigns:pairsFast() do
+                    ---@cast assign Node.Field
+                    locations[#locations+1] = assign.location
+                end
+            end
+        else
+            ---@cast equivalent Node.Field
+            locations[#locations+1] = equivalent.location
+        end
+    end
+    return locations
 end
 
 ---@type Node.Table|false

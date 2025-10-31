@@ -124,24 +124,13 @@ ls.feature.provider.definition(function (param, push)
         return
     end
 
-    ---@param var Node.Variable
-    local function collect(var)
-        if not var.assigns then
-            return
-        end
-        ---@param assign Node.Field
-        for assign in var.assigns:pairsFast() do
-            if assign.location then
-                push {
-                    uri = assign.location.uri,
-                    range = { assign.location.offset, assign.location.offset + assign.location.length },
-                    originRange = { first.start, first.finish },
-                }
-            end
-        end
+    for _, location in ipairs(variable:getEquivalentLocations()) do
+        push {
+            uri = location.uri,
+            range = { location.offset, location.offset + location.length },
+            originRange = { first.start, first.finish },
+        }
     end
-
-    collect(variable)
 end)
 
 -- 标签

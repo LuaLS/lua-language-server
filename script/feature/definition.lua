@@ -142,12 +142,6 @@ ls.feature.provider.definition(function (param, push)
     end
 
     collect(variable)
-
-    if variable.foreignVariables then
-        for _, var in ipairs(variable.foreignVariables) do
-            collect(var)
-        end
-    end
 end)
 
 -- 标签

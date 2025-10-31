@@ -470,7 +470,9 @@ function M:onView(viewer, options)
         local value = self.valueMap[k]
         fields[#fields+1] = string.format('%s: %s'
             , viewer:viewAsKey(key)
-            , viewer:view(value)
+            , viewer:view(value, {
+                needParentheses = true,
+            })
         )
         ::continue::
     end

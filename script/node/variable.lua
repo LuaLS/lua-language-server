@@ -210,28 +210,6 @@ M.__getter.typeValue = function (self)
 end
 
 ---@type Node|false
-M.assignValue = nil
-
----@param self Node.Variable
----@return Node|false
----@return true
-M.__getter.assignValue = function (self)
-    if self.masterVariable then
-        return self.masterVariable.assignValue, true
-    end
-    if not self.assigns then
-        return false, true
-    end
-    local rt = self.scope.rt
-    local union = rt.union(ls.util.map(self.assigns:toArray(), function (v)
-        ---@cast v Node.Field
-        v.value:addRef(self)
-        return v.value
-    end))
-    return union, true
-end
-
----@type Node|false
 M.parentExpectValue = nil
 
 ---@param self Node.Variable
@@ -500,121 +478,142 @@ M.__getter.value = function (self)
     return self.classValue
         or self.parentExpectValue
         or self.typeValue
-        or self.selfValue
+        or self.equivalentValue
         or rt.UNKNOWN
         , true
 end
 
--- 所有可能的赋值（递归）
----@type Node.Field[]
-M.allAssigns = nil
+---所有的等价对象（递归）
+    ---@type (Node.Variable | Node.Field)[]
+M.allEquivalents = nil
 
 ---@param self Node.Variable
----@return Node.Field[]
+---@return (Node.Variable | Node.Field)[]
 ---@return true
-M.__getter.allAssigns = function (self)
+M.__getter.allEquivalents = function (self)
     if self.masterVariable then
-        return self.masterVariable.allAssigns, true
+        return self.masterVariable.allEquivalents, true
     end
-    local results = {}
-    if self.assigns then
-        ls.util.arrayMerge(results, self.assigns:toArray())
-    end
-    local parent = self.parent
-    if parent then
-        
-    end
-    return results, true
-end
+    ---@type (Node.Variable | Node.Field)[]
+    local results = { self }
 
--- 包含自身赋值（递归），父变量赋值（递归）
----@type Node
-M.selfValue = nil
-
----@param self Node.Variable
----@return Node
----@return true
-M.__getter.selfValue = function (self)
-    if self.masterVariable then
-        return self.masterVariable.selfValue, true
-    end
-    local rt = self.scope.rt
-    ---@type Node[]
-    local results = {}
-    if self.fields then
-        results[#results+1] = self.fields
-    end
-    --- 不属于 fields 的部分
-    if self.assigns then
-        for assign in self.assigns:pairsFast() do
-            ---@cast assign Node.Field
-            if assign.value and assign.value.kind ~= 'table' then
-                results[#results+1] = assign.value
-            end
-        end
-    end
-    if self.foreignVariables then
-        for _, var in ipairs(self.foreignVariables) do
-            results[#results+1] = var
-        end
-    end
-
-    return #results > 0 and rt.union(results) or rt.UNKNOWN, true
-end
-
----@type Node.Variable[]|false
-M.foreignVariables = nil
-
----@param self Node.Variable
----@return Node.Variable[]|false
----@return true
-M.__getter.foreignVariables = function (self)
-    if self.masterVariable then
-        return self.masterVariable.foreignVariables, true
-    end
-    local results = {}
     if self.assigns then
         for assign in self.assigns:pairsFast() do
             ---@cast assign Node.Field
             local value = assign.value
-            if value then
-                value:each('variable', function (var)
-                    ---@cast var Node.Variable
-                    if var == self then
-                        return
-                    end
-                    results[#results+1] = var
-                    if var.foreignVariables then
-                        for _, fv in ipairs(var.foreignVariables) do
-                            if fv ~= self then
-                                results[#results+1] = fv
-                            end
-                        end
-                    end
-                end)
+            if not value then
+                goto continue
             end
+            if value.kind == 'variable' then
+                ---@cast value Node.Variable
+                results[#results+1] = value
+            end
+            ::continue::
         end
     end
-    if self.parent then
-        self.parent:addRef(self)
+
+    ---@param value Node.Table
+    local function lookIntoTable(value)
+        local child = value.fieldMap[self.key]
+        if not child then
+            return
+        end
+        value:addRef(self)
+        if #child > 0 then
+            ls.util.arrayMerge(results, child)
+        else
+            results[#results+1] = child
+        end
     end
-    local parentForeigns = self.parent and self.parent.foreignVariables
-    if parentForeigns then
-        for _, var in ipairs(parentForeigns) do
-            local child = var.childs and var.childs[self.key]
-            if child and child ~= self then
-                results[#results+1] = child
+
+    local parent = self.parent
+    if parent then
+        for _, equivalent in ipairs(parent.allEquivalents) do
+            if equivalent.kind == 'variable' then
+                ---@cast equivalent Node.Variable
+                local child = equivalent.childs and equivalent.childs[self.key]
+                if child and child ~= self then
+                    results[#results+1] = child
+                    equivalent:addRef(self)
+                end
+                if equivalent.assigns then
+                    for assign in equivalent.assigns:pairsFast() do
+                        ---@cast assign Node.Field
+                        local value = assign.value
+                        if value and value.kind == 'table' then
+                            ---@cast value Node.Table
+                            lookIntoTable(value)
+                        end
+                    end
+                end
+            else
+                ---@cast equivalent Node.Field
+                if equivalent.value and equivalent.value.kind == 'table' then
+                    lookIntoTable(equivalent.value--[[@as Node.Table]])
+                end
             end
         end
     end
     ls.util.arrayRemoveDuplicate(results)
-    if #results == 0 then
-        return false, true
-    end
-    for _, result in ipairs(results) do
-        result:addRef(self)
-    end
     return results, true
+end
+
+-- 从等价物上获取所有的值
+---@type Node
+M.equivalentValue = nil
+
+---@param self Node.Variable
+---@return Node
+---@return true
+M.__getter.equivalentValue = function (self)
+    if self.masterVariable then
+        return self.masterVariable.equivalentValue, true
+    end
+    local rt = self.scope.rt
+    ---@type Node[]
+    local results = {}
+    for _, equivalent in ipairs(self.allEquivalents) do
+        if equivalent.kind == 'variable' then
+            ---@cast equivalent Node.Variable
+            if equivalent.assigns then
+                equivalent:addRef(self)
+                for assign in equivalent.assigns:pairsFast() do
+                    ---@cast assign Node.Field
+                    if assign.value then
+                        results[#results+1] = assign.value
+                    end
+                end
+            end
+            if equivalent.childsValue then
+                results[#results+1] = equivalent.childsValue
+            end
+        else
+            ---@cast equivalent Node.Field
+            if equivalent.value then
+                results[#results+1] = equivalent.value
+                equivalent.value:addRef(self)
+            end
+        end
+    end
+
+    local tableParts = {}
+    local unionResults = {}
+    for _, node in ipairs(results) do
+        local t = node:findValue{'table', 'type'}
+        if t and t.kind == 'table' then
+            tableParts[#tableParts+1] = node
+        else
+            unionResults[#unionResults+1] = node
+        end
+    end
+
+    if #tableParts > 0 then
+        local tableNode = rt.table()
+        tableNode:addChilds(tableParts)
+        unionResults[#unionResults+1] = tableNode
+    end
+
+    return #unionResults > 0 and rt.union(unionResults) or rt.UNKNOWN, true
 end
 
 ---@type Node.Table|false

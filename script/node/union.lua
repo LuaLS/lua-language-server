@@ -54,6 +54,7 @@ M.values = nil
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
+    ---@type Node[]
     local values = {}
     for _, v in ipairs(self.rawNodes) do
         v:addRef(self)

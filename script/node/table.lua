@@ -443,7 +443,8 @@ function M:onView(viewer, options)
         return '{}'
     end
 
-    if viewer.visited[self] > 1 then
+    if viewer.visited[self] > 1
+    or viewer.skipLevel >= 10 then
         return '{...}'
     end
 

@@ -347,7 +347,9 @@ function M:onView(viewer, options)
         params[i] = string.format('%s%s: %s'
             , v.key
             , v.optional and '?' or ''
-            , viewer:view(v.value)
+            , viewer:view(v.value, {
+                skipLevel = 10,
+            })
         )
     end
     if self.varargParamDef then

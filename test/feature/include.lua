@@ -3,7 +3,7 @@ test.includeUri = ls.uri.encode(test.rootPath .. '/include.lua')
 test.includeCodes = {}
 
 test.includeCodes['setmetatable'] = [[
----@generic T: table, MT: table
+---@generic T: table, MT: table|nil
 ---@param t T
 ---@param mt MT
 ---@return T & MT['__index']

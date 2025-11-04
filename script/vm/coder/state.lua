@@ -56,6 +56,11 @@ function M:compileAssign(var, index, valueKey)
         ---@cast var LuaParser.Node.Field
         key = self:makeFieldCode(var.key) or 'rt.UNKNOWN'
     end
+    tryBindCat(self, var, index)
+
+    if not valueKey then
+        return
+    end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
     self:addLine([[
 {fieldKey} = {
@@ -77,7 +82,6 @@ function M:compileAssign(var, index, valueKey)
         varKey   = self:getKey(var),
         fieldKey = fieldKey,
     })
-    tryBindCat(self, var, index)
 end
 
 ls.vm.registerCoderProvider('assign', function (coder, source)
@@ -109,7 +113,7 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
         if valueKeys[i] then
             coder:compileAssign(var, i, valueKeys[i])
         else
-            coder:compileAssign(var, i, 'rt.NIL')
+            coder:compileAssign(var, i)
         end
     end
 end)

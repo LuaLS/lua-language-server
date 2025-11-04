@@ -13,6 +13,16 @@ end
 do
     rt:reset()
 
+    local a = rt.NIL
+    local b = rt.ANY
+
+    assert(a >> b == true)
+    assert(b >> a == true)
+end
+
+do
+    rt:reset()
+
     local a = rt.type 'A'
     local b = rt.type 'B'
 

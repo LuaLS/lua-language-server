@@ -627,17 +627,23 @@ M.__getter.equivalentValue = function (self)
     local hasType = false
     for _, node in ipairs(results) do
         local t = node:findValue {'table', 'type'}
-        if t and t.kind == 'table' then
-            hasTable = true
-            ---@cast t Node.Table
-            if t.fields then
-                tableParts[#tableParts+1] = t
+        if t then
+            if t.kind == 'table' then
+                hasTable = true
+                ---@cast t Node.Table
+                if t.fields then
+                    tableParts[#tableParts+1] = t
+                end
+            end
+            if t.kind == 'type' then
+                ---@cast t Node.Type
+                if not t.isBasicType then
+                    hasType = true
+                end
+                unionResults[#unionResults+1] = t
             end
         else
-            unionResults[#unionResults+1] = t or node
-        end
-        if t and t.kind == 'type' then
-            hasType = true
+            unionResults[#unionResults+1] = node
         end
     end
 

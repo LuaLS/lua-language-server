@@ -45,7 +45,7 @@ M.returns = nil
 ---@return true
 M.__getter.returns = function (self)
     local returns = {}
-    ---@type integer?, integer?
+    ---@type integer?, integer|false|nil
     local allMin, allMax
 
     local rt = self.scope.rt
@@ -58,10 +58,20 @@ M.__getter.returns = function (self)
 
     self.head:each('function', function (f)
         ---@cast f Node.Function
-        if args:canCast(f.paramsPack) then
-            defs[#defs+1] = f
-        end
+        defs[#defs+1] = f
     end)
+
+    if #defs > 1 then
+        local matches = {}
+        for _, def in ipairs(defs) do
+            if args:canCast(def.paramsPack) then
+                matches[#matches+1] = def
+            end
+        end
+        if #matches > 0 then
+            defs = matches
+        end
+    end
 
     if #defs == 0 then
         return rt.UNKNOWN, true
@@ -93,7 +103,7 @@ M.__getter.returns = function (self)
             allMin = min
         end
         if not max then
-            allMax = nil
+            allMax = false
         elseif allMax and allMax < max then
             allMax = max
         end

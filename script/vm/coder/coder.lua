@@ -28,6 +28,7 @@ function M:makeFromAst(ast)
     self:addLine 'local rt  = vfile.scope.rt'
     self:addLine 'local uri = vfile.uri'
     self:addLine 'local r   = coder.map'
+    self:addLine 'local v   = coder.var'
     self:addLine ''
 
     self:compile(ast.main)
@@ -92,32 +93,39 @@ function M:dispose(vfile)
     end
 end
 
----@param vfile VM.Vfile
-function M:run(vfile)
-    self:dispose(vfile)
-    local map = {}
-    self.map = setmetatable({}, {
+local function makeRegistry(t)
+    return setmetatable({}, {
         __index = function (_, k)
-            local v = map[k]
+            local v = t[k]
             if v == nil then
-                error('No such key in coder map: ' .. tostring(k))
+                error('No such key: ' .. tostring(k))
             end
             return v
         end,
         __newindex = function (_, k, v)
-            local ov = map[k]
+            local ov = t[k]
             if ov ~= nil then
-                error('Key already exists in coder map: ' .. tostring(k))
+                error('Key already exists: ' .. tostring(k))
             end
-            map[k] = v
+            t[k] = v
         end,
     })
+end
+
+---@param vfile VM.Vfile
+function M:run(vfile)
+    self:dispose(vfile)
+    local map = {}
+    local var = {}
+    self.map = makeRegistry(map)
+    self.var = makeRegistry(var)
     vfile.scope.rt:lockCache()
     local suc = xpcall(function (...)
         self.disposer = self.func(self, vfile)
     end, log.error)
     vfile.scope.rt:unlockCache()
     self.map = map
+    self.var = var
     if not suc then
         log.debug(self.code)
     end
@@ -259,7 +267,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return string
 function M:getVariableKey(source)
-    return string.format('r[%q]', source.uniqueKey:gsub('^%w+', 'variable'))
+    return string.format('v[%q]', source.uniqueKey)
 end
 
 ---@param key string

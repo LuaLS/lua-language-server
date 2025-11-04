@@ -69,8 +69,8 @@ function M:getVariable(source)
     if not self.coder then
         return nil
     end
-    local key = source.uniqueKey:gsub('^%w+', 'variable')
-    local node = self.coder.map[key]
+    local key = source.uniqueKey
+    local node = self.coder.var[key]
     if not node then
         return nil
     end

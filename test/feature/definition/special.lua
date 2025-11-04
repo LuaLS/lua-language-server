@@ -14,6 +14,22 @@ print(<?x?>)
 -- ]]
 
 TEST [[
+---@generic T, MT
+---@param t T
+---@param mt MT
+---@return T & MT['__index']
+function setmetatable(t, mt) return end
+
+local mt = {}
+mt.__index = mt
+
+mt.<!xxx!> = 1
+
+obj = setmetatable({}, mt)
+value = obj.<?xxx?>
+]]
+
+TEST [[
 --!include setmetatable
 local mt
 mt.__index = mt

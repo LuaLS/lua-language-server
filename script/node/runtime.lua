@@ -273,7 +273,6 @@ function M:fillPresets()
     self.FUNCTION = self.type 'function'
         : setConfig('basicType', true)
     self.TABLE = self.type 'table'
-        : setConfig('basicType', true)
     self.USERDATA = self.type 'userdata'
         : setConfig('basicType', true)
     self.THREAD = self.type 'thread'

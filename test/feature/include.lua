@@ -1,3 +1,5 @@
+test.includeUri = ls.uri.encode(test.rootPath .. '/include.lua')
+
 test.includeCodes = {}
 
 test.includeCodes['setmetatable'] = [[
@@ -7,8 +9,6 @@ test.includeCodes['setmetatable'] = [[
 ---@return T & MT['__index']
 function setmetatable(t, mt) end
 ]]
-
-test.includeUri = ls.uri.encode(test.rootPath .. '/include.lua')
 
 ---@param script string
 ---@return File?

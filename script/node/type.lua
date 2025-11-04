@@ -425,17 +425,13 @@ function M:onCanBeCast(other)
         end
     end
     if self.isBasicType then
-        return nil
+        return
     end
     if self:isClassLike() then
-        if other.kind ~= 'type' then
-            return false
+        if other.kind == 'type' then
+            return
         end
-        ---@cast other Node.Type
-        if other:isAliasLike() then
-            return false
-        end
-        return nil
+        return other:canCast(self.value)
     end
     if self:isAliasLike() then
         return other:canCast(self.value)

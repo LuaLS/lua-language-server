@@ -208,3 +208,11 @@ do
     assert(A >> B == true)
     assert(B >> A == false)
 end
+
+do
+    local a = rt.type 'table'
+    local b = rt.table()
+
+    assert(a >> b == true)
+    assert(b >> a == true)
+end

@@ -285,3 +285,33 @@ do
     local TA = T:getChild('b')
     assert(TA:view() == '1')
 end
+
+do
+    rt:reset()
+    --[[
+    x.a = 1
+    y = x
+    z = y
+    print(z.a)
+    ]]
+    local X = rt.variable 'x'
+    X:addField {
+        key   = rt.value 'a',
+        value = rt.value(1),
+        location = { uri = test.fileUri, offset = 0 },
+    }
+    local Y = rt.variable 'y'
+    Y:addAssign {
+        key   = rt.value 'y',
+        value = X,
+    }
+    local Z = rt.variable 'z'
+    Z:addAssign {
+        key   = rt.value 'z',
+        value = Y,
+    }
+    local A = Z:getChild 'a'
+
+    assert(Z:view() == '{ a: 1 }')
+    assert(#A:getEquivalentLocations() == 1)
+end

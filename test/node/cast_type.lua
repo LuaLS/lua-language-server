@@ -88,10 +88,10 @@ do
     assert(tc >> a == false)
 
     assert(a >> (ta & tb) == true)
-    assert((ta & tb) >> a == false)
+    assert((ta & tb) >> a == true)
 
     assert(a >> (ta & tb & tc) == false)
-    assert((ta & tb & tc) >> a == false)
+    assert((ta & tb & tc) >> a == true)
 end
 
 do
@@ -180,7 +180,7 @@ do
             value = rt.value 'y',
         }
 
-    assert(a >> b == false)
+    assert(a >> b == true)
     assert(b >> a == true)
 end
 
@@ -212,7 +212,7 @@ do
         }
 
 
-    assert(a >> b == false)
+    assert(a >> b == true)
     assert(b >> a == true)
 end
 
@@ -247,7 +247,7 @@ do
             value = rt.value 'y',
         }
 
-    assert(a >> b == false)
+    assert(a >> b == true)
     assert(b >> a == false)
 end
 
@@ -287,6 +287,6 @@ do
             value = rt.value 'y',
         }
 
-    assert(a >> b == false)
+    assert(a >> b == true)
     assert(b >> a == true)
 end

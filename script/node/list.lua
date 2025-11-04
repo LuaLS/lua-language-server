@@ -272,6 +272,7 @@ function M:onCanCast(other)
         if a:canCast(b) then
             return true
         end
+        return false
     end
 
     -- 逐个对比(允许我的参数比对方多)

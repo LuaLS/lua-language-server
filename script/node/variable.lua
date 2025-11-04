@@ -495,26 +495,42 @@ M.__getter.allEquivalents = function (self)
         return self.masterVariable.allEquivalents, true
     end
     ---@type (Node.Variable | Node.Field)[]
-    local results = { self }
+    local results = {}
+    local visited = {}
 
-    if self.assigns then
-        for assign in self.assigns:pairsFast() do
+    ---@param var Node.Variable
+    local function lookIntoVariable(var)
+        if visited[var] then
+            return
+        end
+        visited[var] = true
+        results[#results+1] = var
+        if not var.assigns then
+            return
+        end
+        for assign in var.assigns:pairsFast() do
             ---@cast assign Node.Field
             local value = assign.value
             if not value then
                 goto continue
             end
-            local var = value:findValue { 'variable' }
-            if var then
-                ---@cast var Node.Variable
-                results[#results+1] = var
+            local subVar = value:findValue { 'variable' }
+            if subVar then
+                ---@cast subVar Node.Variable
+                lookIntoVariable(subVar)
             end
             ::continue::
         end
     end
 
+    lookIntoVariable(self)
+
     ---@param value Node.Table
     local function lookIntoTable(value)
+        if visited[value] then
+            return
+        end
+        visited[value] = true
         local child = value.fieldMap[self.key]
         if not child then
             return

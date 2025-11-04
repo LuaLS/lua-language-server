@@ -29,6 +29,7 @@ end
 ---@type Node[]
 M.values = nil
 
+---每一项的值，保证不会嵌套 List
 ---@param self Node.List
 ---@return Node[]
 ---@return true
@@ -145,8 +146,12 @@ end
 ---@return Node.List
 function M:slice(start)
     local values = {}
-    for i = start, #self.values do
-        values[i - start + 1] = self.values[i]
+    if start <= #self.values then
+        for i = start, #self.values do
+            values[i - start + 1] = self.values[i]
+        end
+    else
+        values[1] = self.values[#self.values]
     end
     return self.scope.rt.list(values
         , self.min - start + 1
@@ -166,6 +171,9 @@ end
 ---@return true
 M.__getter.hasGeneric = function (self)
     local hasGeneric = false
+    if not self.raw then
+        return false, true
+    end
     for _, v in ipairs(self.raw) do
         v:addRef(self)
         if v.hasGeneric then

@@ -88,15 +88,51 @@ M.returnsPack = nil
 ---@return true
 M.__getter.returnsPack = function (self)
     local rt = self.scope.rt
-    local returns = ls.util.map(self.returnsDef, function (v, k)
-        local value = v.value
-        if v.optional then
-            value = value | rt.NIL
-        end
-        return value
-    end)
 
-    return rt.list(returns), true
+    if #self.returnsDef > 0 then
+        local returns = ls.util.map(self.returnsDef, function (v, k)
+            local value = v.value
+            value:addRef(self)
+            if v.optional then
+                value = value | rt.NIL
+            end
+            return value
+        end)
+        return rt.list(returns), true
+    else
+        local maxReturn = 0
+        for _, list in ipairs(self.returnList) do
+            list:addRef(self)
+            if #list.values > maxReturn then
+                maxReturn = #list.values
+            end
+        end
+        local returns = {}
+        if maxReturn == 0 then
+            return rt.list(), true
+        end
+        for i = 1, maxReturn do
+            local unionValues = {}
+            for _, list in ipairs(self.returnList) do
+                local value = list:select(i)
+                unionValues[#unionValues+1] = value
+            end
+            returns[i] = rt.union(unionValues)
+        end
+        ---@type integer | false
+        local allMax = maxReturn
+        for _, list in ipairs(self.returnList) do
+            local max = list.max
+            if max then
+                if allMax and allMax < max then
+                    allMax = max
+                end
+            else
+                allMax = false
+            end
+        end
+        return rt.list(returns, nil, allMax), true
+    end
 end
 
 ---@param other Node

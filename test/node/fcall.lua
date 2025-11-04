@@ -84,4 +84,29 @@ do
     ]]
     local f = rt.func()
         : addReturnList(rt.list { rt.value(1) })
+
+    local fcall = rt.fcall(f, {})
+    local r = fcall.value
+    assert(r:view() == '1')
+end
+
+do
+    rt:reset()
+    --[[
+    local function f()
+        return 1, 2
+        return 3, 4
+    end
+
+    local x = f()
+    ]]
+    local f = rt.func()
+        : addReturnList(rt.list { rt.value(1), rt.value(2) })
+        : addReturnList(rt.list { rt.value(3), rt.value(4) })
+
+    local fcall = rt.fcall(f, {})
+    local r1 = fcall:select(1)
+    assert(r1:view() == '1 | 3')
+    local r2 = fcall:select(2)
+    assert(r2:view() == '2 | 4')
 end

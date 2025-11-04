@@ -144,7 +144,7 @@ function M:fillAPIs()
 
     ---@param values? Node[]
     ---@param min? integer
-    ---@param max? integer
+    ---@param max? integer | false
     ---@return Node.List
     function self.list(values, min, max)
         return New 'Node.List' (scope, values, min, max)

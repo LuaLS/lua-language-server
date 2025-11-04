@@ -2,7 +2,7 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, values?: Node[], min?: integer, max: integer): Node.List
+---@overload fun(scope: Scope, values?: Node[], min?: integer, max?: integer): Node.List
 local M = ls.node.register 'Node.List'
 
 M.kind = 'list'
@@ -10,18 +10,20 @@ M.kind = 'list'
 ---@type integer
 M.min = 0
 
----@type integer?
-M.max = nil
+---@type integer | false
+M.max = false
 
 ---@param scope Scope
 ---@param values? Node[]
 ---@param min? integer
----@param max? integer
+---@param max? integer | false
 function M:__init(scope, values, min, max)
     self.scope = scope
     self.raw = values
     self.min = min or (values and #values) or 0
-    self.max = max
+    if max ~= false then
+        self.max = max or (values and #values) or 0
+    end
 end
 
 ---@type Node[]
@@ -148,7 +150,7 @@ function M:slice(start)
     end
     return self.scope.rt.list(values
         , self.min - start + 1
-        , self.max and (self.max - start + 1)
+        , self.max and (self.max - start + 1) or false
     )
 end
 

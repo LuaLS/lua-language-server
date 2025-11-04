@@ -55,9 +55,9 @@ M.__getter.values = function (self)
         for _, raw in ipairs(self.raw) do
             raw:addRef(self)
         end
-        return rt.list(self.raw, #self.raw, #self.raw), true
+        return rt.list(self.raw), true
     end
-    return rt.list({}, 0, 0), true
+    return rt.list(), true
 end
 
 ---@type Node.Value[]
@@ -133,7 +133,7 @@ end
 function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
-        local arrayVararg = self.scope.rt.list({ other.head }, 0)
+        local arrayVararg = self.scope.rt.list({ other.head }, 0, false)
         return self.values:canCast(arrayVararg)
     end
     return false

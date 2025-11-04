@@ -24,14 +24,14 @@ function M:__init(scope)
     self.paramsDef = {}
     ---@type Node.Function.Return[]
     self.returnsDef = {}
-    ---@type Node[]
-    self.returnNode = {}
 
     ---@type table<string, Node>
     self.paramDefMap = {}
-
     ---@type table<string, Node>
     self.returnDefMap = {}
+
+    ---@type Node.List[]
+    self.returnList = {}
 end
 
 function M:setAsync()
@@ -70,11 +70,11 @@ M.__getter.paramsPack = function (self)
         return value
     end)
     local min = #params
-    ---@type integer?
+    ---@type integer | false
     local max = #params
     if self.varargParamDef then
         params[#params+1] = self.varargParamDef
-        max = nil
+        max = false
     end
 
     return rt.list(params, min, max), true
@@ -95,11 +95,8 @@ M.__getter.returnsPack = function (self)
         end
         return value
     end)
-    local min = #returns
-    ---@type integer?
-    local max = #returns
 
-    return rt.list(returns, min, max), true
+    return rt.list(returns), true
 end
 
 ---@param other Node
@@ -141,8 +138,6 @@ function M:addParamDef(key, value, optional)
     return self
 end
 
-M.returnCount = 0
-
 ---@param key? string
 ---@param value Node
 ---@param optional? boolean
@@ -152,9 +147,13 @@ function M:addReturnDef(key, value, optional)
     if key then
         self.returnDefMap[key] = value
     end
-    if self.returnCount < #self.returnsDef then
-        self.returnCount = #self.returnsDef
-    end
+    return self
+end
+
+---@param list Node.List
+---@return Node.Function
+function M:addReturnList(list)
+    table.insert(self.returnList, list)
     return self
 end
 
@@ -189,7 +188,7 @@ end
 ---@return integer min
 ---@return integer? max
 function M:getReturnCount()
-    return self.returnsPack.min, self.returnsPack.max
+    return self.returnsPack.min, self.returnsPack.max or nil
 end
 
 ---@param self Node.Function
@@ -266,7 +265,9 @@ function M:resolveGeneric(map)
             newFunc.varargParamDef = self.varargParamDef
         end
     end
-    newFunc.returnCount = self.returnCount
+    for i, list in ipairs(self.returnList) do
+        newFunc.returnList[i] = list:resolveGeneric(map)
+    end
     return newFunc
 end
 

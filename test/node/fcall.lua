@@ -83,5 +83,5 @@ do
     local x = f()
     ]]
     local f = rt.func()
-        : addReturnDef(nil, rt.value(1))
+        : addReturnList(rt.list { rt.value(1) })
 end

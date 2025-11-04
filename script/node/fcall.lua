@@ -51,7 +51,7 @@ M.__getter.returns = function (self)
     local rt = self.scope.rt
     ---@type Node.Function[]
     local defs = {}
-    local args = rt.list(self.args, #self.args, #self.args)
+    local args = rt.list(self.args)
 
     self.head:addRef(self)
     args:addRef(self)

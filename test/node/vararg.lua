@@ -7,7 +7,7 @@ do
 end
 
 do
-    local V1 = node.list({ node.value(1), node.value(2) }, 2, 2)
+    local V1 = node.list({ node.value(1), node.value(2) })
     assert(V1:viewAsVararg() == '1, 2')
     assert(V1.value:view() == '1')
     assert(V1:getLastValue():view() == '2')
@@ -17,7 +17,7 @@ do
     assert(V2.value:view() == '1')
     assert(V2:getLastValue():view() == '3 | nil')
 
-    local V3 = node.list({ node.value(1), node.value(2), node.value(3) })
+    local V3 = node.list({ node.value(1), node.value(2), node.value(3) }, 3, false)
     assert(V3:viewAsVararg() == '1, 2, 3...')
     assert(V3.value:view() == '1')
     assert(V3:getLastValue():view() == '3')
@@ -27,7 +27,7 @@ do
     assert(V4.value:view() == '1')
     assert(V4:getLastValue():view() == '3')
 
-    local V5 = node.list({
+    local V5 = node.list {
         node.value(1),
         node.value(2),
         node.value(3),
@@ -38,7 +38,7 @@ do
         node.value(8),
         node.value(9),
         node.value(10),
-    }, 10, 10)
+    }
     assert(V5:viewAsVararg() == '1, 2, 3, 4, ...(+3), 8, 9, 10')
     assert(V5.value:view() == '1')
     assert(V5:getLastValue():view() == '10')
@@ -70,23 +70,23 @@ do
 end
 
 do
-    local V1 = node.list({ node.value(1), node.value(2) }, 2, 2)
-    local V2 = node.list({ node.value(1), node.INTEGER }, 2, 2)
+    local V1 = node.list { node.value(1), node.value(2) }
+    local V2 = node.list { node.value(1), node.INTEGER }
 
     assert(V1 >> V2 == true)
     assert(V2 >> V1 == false)
 end
 
 do
-    local V1 = node.list({
+    local V1 = node.list {
         node.value(1),
         node.value(2),
         node.value(3),
-    }, 3, 3)
-    local V2 = node.list({
+    }
+    local V2 = node.list {
         node.value(1),
         node.value(2),
-    }, 2, 2)
+    }
 
     assert(V1:viewAsVararg() == '1, 2, 3')
     assert(V2:viewAsVararg() == '1, 2')
@@ -96,15 +96,15 @@ do
 end
 
 do
-    local V1 = node.list({
+    local V1 = node.list {
         node.value(1),
         node.value(2),
         node.value(3),
-    }, 3, 3)
+    }
     local V2 = node.list({
         node.value(1),
         node.value(2),
-    }, 2)
+    }, 2, false)
 
     assert(V1:viewAsVararg() == '1, 2, 3')
     assert(V2:viewAsVararg() == '1, 2...')
@@ -150,10 +150,10 @@ do
 end
 
 do
-    local V1 = node.list({ node.INTEGER }, 0)
+    local V1 = node.list({ node.INTEGER }, 0, false)
     assert(V1:viewAsVararg() == 'integer?...')
 
-    local V = node.list({ node.value(1), V1 }, 2, 2)
+    local V = node.list { node.value(1), V1 }
 
     assert(V:viewAsVararg() == '1, integer?...')
 end

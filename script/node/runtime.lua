@@ -335,19 +335,14 @@ function M:fillPresets()
 
     self.USERDATA:addClass(anykv)
 
-    self.TYPE_G = self.type '_G'
     self.VAR_G = self.variable '_G'
         : hideAtHead()
 
     do
         local G = self.class '_G'
-            : addVariable(self.VAR_G)
-            : addField {
-                key    = self.value '_G',
-                value  = self.TYPE_G,
-            }
-        self.TYPE_G:addClass(G)
+        G:addVariable(self.VAR_G)
         self.VAR_G:addClass(G)
+        self.VAR_G:setChild('_G', self.VAR_G)
     end
 end
 

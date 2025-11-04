@@ -13,6 +13,18 @@ end
 
 ls.vm.registerCoderProvider('main', function (coder, source)
     ---@cast source LuaParser.Node.Main
+
+    local env = source.localMap['_ENV']
+    if env then
+        coder:addLine('{key} = rt.VAR_G' % {
+            key = coder:getKey(env),
+        })
+        coder:addLine('{var} = {key}' % {
+            var = coder:getVariableKey(env),
+            key = coder:getKey(env),
+        })
+        coder:addLine('')
+    end
     parseBlock(coder, source)
 end)
 

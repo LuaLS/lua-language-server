@@ -17,6 +17,7 @@ end
 ---@param script string
 function TEST(script)
     test.scope.rt:reset()
+    local _ <close> = test.checkInclude(script)
     local newScript, catched = test.catch(script, '!?')
 
     local file <close> = ls.file.setText(test.fileUri, newScript)

@@ -25,31 +25,20 @@ ls.vm.registerCoderProvider('field', function (coder, source)
     end
 
     coder:compile(last)
-    coder:compile(source.key)
-    local isGetVariable, isComplexKey
-    if source.next or source.value then
-        isGetVariable = true
-    end
-    if source.subtype == 'index' and not source.key.isLiteral then
-        isComplexKey = true
+    local fieldCode = coder:makeFieldCode(source.key)
+    if not fieldCode then
+        fieldCode = 'rt.UNKNOWN'
+        coder:compile(source.key)
     end
 
     coder:addLine('{var} = {last}:getChild({field})' % {
         var    = coder:getKey(source),
         last   = coder:getKey(last),
-        field  = isComplexKey and 'rt.UNKNOWN' or coder:getKey(source.key),
+        field  = fieldCode,
     })
     coder:addLine('{variable} = {var}' % {
         variable = coder:getVariableKey(source),
         var      = coder:getKey(source),
-    })
-end)
-
-ls.vm.registerCoderProvider('fieldid', function (coder, source)
-    ---@cast source LuaParser.Node.FieldID
-    coder:addLine('{key} = rt.value {name:q}' % {
-        key = coder:getKey(source),
-        name = source.id,
     })
 end)
 

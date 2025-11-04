@@ -14,6 +14,7 @@ print(<?x?>)
 -- ]]
 
 TEST [[
+--!include setmetatable
 local mt
 mt.__index = mt
 function mt:<!method1!>()
@@ -24,6 +25,7 @@ obj:<?method1?>()
 ]]
 
 TEST [[
+--!include setmetatable
 local mt
 function mt:<!method1!>()
 end
@@ -94,6 +96,7 @@ obj:<?method1?>()
 --]]
 
 TEST [[
+--!include setmetatable
 local sm = setmetatable
 local mt
 mt.__index = mt
@@ -105,6 +108,7 @@ obj:<?method1?>()
 ]]
 
 TEST [[
+--!include setmetatable
 local mt = {}
 function mt:<!x!>()
 end
@@ -118,6 +122,7 @@ mt:<?x?>()
 
 -- TODO 通过代码执行顺序来判断?
 TEST [[
+--!include setmetatable
 local mt = {}
 function mt:<!x!>()
 end

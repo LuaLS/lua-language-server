@@ -42,7 +42,11 @@ end)
 ls.vm.registerCoderProvider('tablefield', function (coder, source)
     ---@cast source LuaParser.Node.TableField
 
-    coder:compile(source.key)
+    local key = coder:makeFieldCode(source.key)
+    if not key then
+        key = 'rt.UNKNOWN'
+        coder:compile(source.key)
+    end
     coder:compile(source.value)
 
     coder:addLine([[
@@ -53,16 +57,10 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
 }
 ]] % {
         field    = coder:getKey(source),
-        key      = coder:getKey(source.key),
+        key      = key,
         value    = coder:getKey(source.value),
         location = coder:makeLocationCode(source),
     })
-end)
-
-ls.vm.registerCoderProvider('tablefieldid', function (coder, source)
-    ---@cast source LuaParser.Node.TableFieldID
-
-    makeValue(coder, source, source.id)
 end)
 
 ls.vm.registerCoderProvider('select', function (coder, source)

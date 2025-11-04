@@ -258,6 +258,24 @@ function M:makeLocationCode(source)
     )
 end
 
+---@param source LuaParser.Node.FieldID | LuaParser.Node.Exp | LuaParser.Node.TableFieldID
+---@return string?
+function M:makeFieldCode(source)
+    if source.kind == 'fieldid' then
+        ---@cast source LuaParser.Node.FieldID
+        return string.format('rt.value(%q)', source.id)
+    end
+    if source.kind == 'tablefieldid' then
+        ---@cast source LuaParser.Node.TableFieldID
+        return string.format('rt.value(%q)', source.id)
+    end
+    if source.isLiteral then
+        ---@cast source LuaParser.Node.Literal
+        return string.format('rt.value(%q)', source.value)
+    end
+    return nil
+end
+
 ---@param source LuaParser.Node.Base
 ---@return string
 function M:getKey(source)

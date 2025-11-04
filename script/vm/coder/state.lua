@@ -54,7 +54,7 @@ function M:compileAssign(var, index, valueKey)
         key = ('rt.value %q'):format(var.id)
     elseif var.kind == 'field' then
         ---@cast var LuaParser.Node.Field
-        key = self:getKey(var.key)
+        key = self:makeFieldCode(var.key) or 'rt.UNKNOWN'
     end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
     self:addLine([[

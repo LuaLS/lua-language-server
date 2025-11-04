@@ -72,3 +72,16 @@ do
     assert(r2.value:view() == '2')
     assert(r3.value:view() == '3')
 end
+
+do
+    rt:reset()
+    --[[
+    local function f()
+        return 1
+    end
+
+    local x = f()
+    ]]
+    local f = rt.func()
+        : addReturnDef(nil, rt.value(1))
+end

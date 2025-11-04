@@ -54,11 +54,11 @@ function M:onCanBeCast(other)
     end
 end
 
----@type Node.Vararg
+---@type Node.List
 M.paramsPack = nil
 
 ---@param self Node.Function
----@return Node.Vararg
+---@return Node.List
 ---@return true
 M.__getter.paramsPack = function (self)
     local rt = self.scope.rt
@@ -77,14 +77,14 @@ M.__getter.paramsPack = function (self)
         max = nil
     end
 
-    return rt.vararg(params, min, max), true
+    return rt.list(params, min, max), true
 end
 
----@type Node.Vararg
+---@type Node.List
 M.returnsPack = nil
 
 ---@param self Node.Function
----@return Node.Vararg
+---@return Node.List
 ---@return true
 M.__getter.returnsPack = function (self)
     local rt = self.scope.rt
@@ -99,7 +99,7 @@ M.__getter.returnsPack = function (self)
     ---@type integer?
     local max = #returns
 
-    return rt.vararg(returns, min, max), true
+    return rt.list(returns, min, max), true
 end
 
 ---@param other Node

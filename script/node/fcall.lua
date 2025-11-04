@@ -51,7 +51,7 @@ M.__getter.returns = function (self)
     local rt = self.scope.rt
     ---@type Node.Function[]
     local defs = {}
-    local args = rt.vararg(self.args, #self.args, #self.args)
+    local args = rt.list(self.args, #self.args, #self.args)
 
     self.head:addRef(self)
     args:addRef(self)
@@ -99,8 +99,8 @@ M.__getter.returns = function (self)
         end
     end
 
-    local vararg = rt.vararg(returns, allMin, allMax)
-    return vararg, true
+    local list = rt.list(returns, allMin, allMax)
+    return list, true
 end
 
 function M:onView(viewer, options)

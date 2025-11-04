@@ -10,16 +10,16 @@ M.kind = 'tuple'
 ---@type Node[]?
 M.raw = nil
 
----@type Node.Vararg?
-M.vararg = nil
+---@type Node.List?
+M.list = nil
 
 ---@param scope Scope
----@param values? Node[] | Node.Vararg
+---@param values? Node[] | Node.List
 function M:__init(scope, values)
     self.scope = scope
-    if values and values.kind == 'vararg' then
-        ---@cast values Node.Vararg
-        self.vararg = values
+    if values and values.kind == 'list' then
+        ---@cast values Node.List
+        self.list = values
     else
         ---@cast values Node[]
         self.raw = values
@@ -29,7 +29,7 @@ end
 ---@param value Node
 ---@return Node.Tuple
 function M:insert(value)
-    if self.vararg then
+    if self.list then
         error('Cannot insert into a static tuple')
     end
     if not self.raw then
@@ -40,24 +40,24 @@ function M:insert(value)
     return self
 end
 
----@type Node.Vararg
+---@type Node.List
 M.values = nil
 
 ---@param self Node.Tuple
----@return Node.Vararg
+---@return Node.List
 ---@return true
 M.__getter.values = function (self)
     local rt = self.scope.rt
-    if self.vararg then
-        return self.vararg, true
+    if self.list then
+        return self.list, true
     end
     if self.raw then
         for _, raw in ipairs(self.raw) do
             raw:addRef(self)
         end
-        return rt.vararg(self.raw, #self.raw, #self.raw), true
+        return rt.list(self.raw, #self.raw, #self.raw), true
     end
-    return rt.vararg({}, 0, 0), true
+    return rt.list({}, 0, 0), true
 end
 
 ---@type Node.Value[]
@@ -133,7 +133,7 @@ end
 function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
-        local arrayVararg = self.scope.rt.vararg({ other.head }, 0)
+        local arrayVararg = self.scope.rt.list({ other.head }, 0)
         return self.values:canCast(arrayVararg)
     end
     return false

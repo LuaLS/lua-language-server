@@ -203,7 +203,7 @@ end
 
 do
     local A = rt.array(rt.value('x'))
-    local B = rt.tuple(rt.vararg({ rt.STRING }, 3))
+    local B = rt.tuple(rt.list({ rt.STRING }, 3))
 
     assert(A >> B == true)
     assert(B >> A == false)

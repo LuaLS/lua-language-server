@@ -1,11 +1,11 @@
----@class Node.Vararg: Node
+---@class Node.List: Node
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, values?: Node[], min?: integer, max: integer): Node.Vararg
-local M = ls.node.register 'Node.Vararg'
+---@overload fun(scope: Scope, values?: Node[], min?: integer, max: integer): Node.List
+local M = ls.node.register 'Node.List'
 
-M.kind = 'vararg'
+M.kind = 'list'
 
 ---@type integer
 M.min = 0
@@ -27,7 +27,7 @@ end
 ---@type Node[]
 M.values = nil
 
----@param self Node.Vararg
+---@param self Node.List
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
@@ -37,8 +37,8 @@ M.__getter.values = function (self)
     local values = {}
     for i, raw in ipairs(self.raw) do
         raw:addRef(self)
-        if raw.kind == 'vararg' then
-            ---@cast raw Node.Vararg
+        if raw.kind == 'list' then
+            ---@cast raw Node.List
             values[i] = raw.values[1]
         else
             values[i] = raw
@@ -46,8 +46,8 @@ M.__getter.values = function (self)
     end
     local n = #values
     local last = self.raw[n]
-    if last and last.kind == 'vararg' then
-        ---@cast last Node.Vararg
+    if last and last.kind == 'list' then
+        ---@cast last Node.List
         for i = 1, #last.values do
             values[n + i] = last.values[i + 1]
         end
@@ -140,26 +140,26 @@ function M:getLastValue()
 end
 
 ---@param start integer
----@return Node.Vararg
+---@return Node.List
 function M:slice(start)
     local values = {}
     for i = start, #self.values do
         values[i - start + 1] = self.values[i]
     end
-    return self.scope.rt.vararg(values
+    return self.scope.rt.list(values
         , self.min - start + 1
         , self.max and (self.max - start + 1)
     )
 end
 
----@param self Node.Vararg
+---@param self Node.List
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
     return self:select(1), true
 end
 
----@param self Node.Vararg
+---@param self Node.List
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
@@ -181,20 +181,20 @@ function M:resolveGeneric(map)
     for i, value in ipairs(self.raw) do
         values[i] = value:resolveGeneric(map)
     end
-    return self.scope.rt.vararg(values, self.min, self.max)
+    return self.scope.rt.list(values, self.min, self.max)
 end
 
----@param other Node.Vararg
+---@param other Node.List
 ---@param result table<Node.Generic, Node>
 function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
-    if other.kind ~= 'vararg' then
+    if other.kind ~= 'list' then
         return
     end
     local rt = self.scope.rt
-    ---@cast other Node.Vararg
+    ---@cast other Node.List
     if self.max then
         for i = 1, self.max do
             local a = self:select(i)
@@ -232,10 +232,10 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    if other.kind ~= 'vararg' then
+    if other.kind ~= 'list' then
         return self.value:onCanCast(other)
     end
-    ---@cast other Node.Vararg
+    ---@cast other Node.List
 
     local rt = self.scope.rt
 

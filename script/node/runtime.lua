@@ -136,7 +136,7 @@ function M:fillAPIs()
         return New 'Node.Table' (scope, fields)
     end
 
-    ---@param values? Node[] | Node.Vararg
+    ---@param values? Node[] | Node.List
     ---@return Node.Tuple
     function self.tuple(values)
         return New 'Node.Tuple' (scope, values)
@@ -145,9 +145,9 @@ function M:fillAPIs()
     ---@param values? Node[]
     ---@param min? integer
     ---@param max? integer
-    ---@return Node.Vararg
-    function self.vararg(values, min, max)
-        return New 'Node.Vararg' (scope, values, min, max)
+    ---@return Node.List
+    function self.list(values, min, max)
+        return New 'Node.List' (scope, values, min, max)
     end
 
     ---@param head string

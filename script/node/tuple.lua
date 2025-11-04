@@ -164,5 +164,5 @@ function M:inferGeneric(other, result)
 end
 
 function M:onView(viewer, options)
-    return '[' .. viewer:viewAsVararg(self.values) .. ']'
+    return '[' .. viewer:viewAsList(self.values) .. ']'
 end

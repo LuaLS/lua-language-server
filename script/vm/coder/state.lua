@@ -113,3 +113,27 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
         end
     end
 end)
+
+ls.vm.registerCoderProvider('return', function (coder, source)
+    ---@cast source LuaParser.Node.Return
+
+    for _, exp in ipairs(source.exps) do
+        coder:compile(exp)
+    end
+    local funcKey = coder:getBlockKV('function')
+    if not funcKey then
+        return
+    end
+    coder:addLine('{funcKey}:addReturnList(rt.list {{values}})' % {
+        funcKey = funcKey,
+        values  = table.concat(ls.util.map(source.exps, function (v)
+            return coder:getKey(v)
+        end), ', '),
+    })
+end)
+
+ls.vm.registerCoderProvider('singleexp', function (coder, source)
+    ---@cast source LuaParser.Node.SingleExp
+
+    coder:compile(source.exp)
+end)

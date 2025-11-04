@@ -354,17 +354,30 @@ function M:onView(viewer, options)
         params[#params+1] = string.format('...: %s', viewer:view(self.varargParamDef))
     end
 
-    local returns = {}
-    for i, v in ipairs(self.returnsDef) do
-        if v.key then
-            returns[i] = string.format('(%s%s: %s)'
-                , v.key
-                , v.optional and '?' or ''
-                , viewer:view(v.value)
-            )
-        else
-            returns[i] = viewer:view(v.value)
+    local returnPart = ''
+    if #self.returnsDef > 0 then
+        local returns = {}
+        for i, v in ipairs(self.returnsDef) do
+            if v.key then
+                returns[i] = string.format('(%s%s: %s)'
+                    , v.key
+                    , v.optional and '?' or ''
+                    , viewer:view(v.value)
+                )
+            else
+                returns[i] = viewer:view(v.value)
+            end
         end
+        returnPart = table.concat(returns, ', ')
+        if #returns > 1 then
+            returnPart = '(' .. returnPart .. ')'
+        end
+        returnPart = ':' .. returnPart
+    elseif #self.returnsPack.values > 0 then
+        returnPart = viewer:viewAsList(self.returnsPack, {
+            needParentheses = true,
+        })
+        returnPart = ':' .. returnPart
     end
 
     local typeParams = ''
@@ -378,22 +391,14 @@ function M:onView(viewer, options)
         end), ', ') .. '>'
     end
 
-    if #returns > 0 then
-        local returnPart = table.concat(returns, ', ')
-        if #returns > 1 then
-            returnPart = '(' .. returnPart .. ')'
-        end
-        return string.format('%sfun%s(%s):%s'
-            , self.async and 'async ' or ''
-            , typeParams
-            , table.concat(params, ', ')
-            , returnPart
-        )
-    else
-        return string.format('%sfun%s(%s)'
-            , self.async and 'async ' or ''
-            , typeParams
-            , table.concat(params, ', ')
-        )
+    local view = string.format('%sfun%s(%s)%s'
+        , self.async and 'async ' or ''
+        , typeParams
+        , table.concat(params, ', ')
+        , returnPart
+    )
+    if options.needParentheses and returnPart ~= '' then
+        view = '(%s)' % { view }
     end
+    return view
 end

@@ -153,6 +153,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         if #source.childs > 0 then
             coder:withIndentation(function ()
                 coder:pushBlock()
+                coder:setBlockKV('function', coder:getKey(source))
                 for _, child in ipairs(source.childs) do
                     coder:compile(child)
                     coder:addLine('')

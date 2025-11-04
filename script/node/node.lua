@@ -97,9 +97,9 @@ end
 
 ---@param options? Node.Viewer.Options
 ---@return string
-function M:viewAsVararg(options)
+function M:viewAsList(options)
     local viewer = self.scope.rt.viewer()
-    return viewer:viewAsVararg(self, options)
+    return viewer:viewAsList(self, options)
 end
 
 ---@param options? Node.Viewer.Options
@@ -344,7 +344,7 @@ end
 ---@param viewer Node.Viewer
 ---@param options Node.Viewer.Options
 ---@return string
-function M:onViewAsVararg(viewer, options)
+function M:onViewAsList(viewer, options)
     error('Cannot view variable of node kind ' .. self.kind)
 end
 

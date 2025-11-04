@@ -30,3 +30,58 @@ do
     assert(Y:view() == '2')
     assert(Z:view() == '3')
 end
+
+do
+    TEST_INDEX [[
+    function F(a, b)
+    end
+    ]]
+
+    local F = rt:globalGet('F')
+    assert(F:view() == 'fun(a: any, b: any)')
+end
+
+do
+    TEST_INDEX [[
+    function F(a, b)
+        return
+    end
+    ]]
+
+    local F = rt:globalGet('F')
+    assert(F:view() == 'fun(a: any, b: any)')
+end
+
+do
+    TEST_INDEX [[
+    function F(a, b)
+        return 1
+    end
+    ]]
+
+    local F = rt:globalGet('F')
+    assert(F:view() == 'fun(a: any, b: any):1')
+end
+
+do
+    TEST_INDEX [[
+    function F(a, b)
+        return 1, 2
+    end
+    ]]
+
+    local F = rt:globalGet('F')
+    assert(F:view() == 'fun(a: any, b: any):(1, 2)')
+end
+
+do
+    TEST_INDEX [[
+    function F(a, b)
+        return 1, 2
+        return 3, 4
+    end
+    ]]
+
+    local F = rt:globalGet('F')
+    assert(F:view() == 'fun(a: any, b: any):(1 | 3, 2 | 4)')
+end

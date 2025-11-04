@@ -73,9 +73,9 @@ end
 ---@param node Node
 ---@param options? Node.Viewer.Options
 ---@return string
-function M:viewAsVararg(node, options)
+function M:viewAsList(node, options)
     return self:wrap(node, options, function ()
-        return node:onViewAsVararg(self, options or {})
+        return node:onViewAsList(self, options or {})
     end)
 end
 

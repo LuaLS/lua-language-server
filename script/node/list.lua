@@ -284,7 +284,7 @@ function M:onCanCast(other)
     return true
 end
 
-function M:onViewAsVararg(viewer, options)
+function M:onViewAsList(viewer, options)
     local values = self.values
     if #values == 0 then
         return 'nil'
@@ -358,7 +358,9 @@ function M:onViewAsVararg(viewer, options)
     end
 
     if options.needParentheses then
-        view = '({})' % { view }
+        if #buf > 1 then
+            view = '({})' % { view }
+        end
     end
 
     return view

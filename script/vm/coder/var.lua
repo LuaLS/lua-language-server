@@ -54,6 +54,40 @@ ls.vm.registerCoderProvider('local', function (coder, source)
     })
 end)
 
+---@param coder VM.Coder
+---@param source LuaParser.Node.Param
+---@return boolean
+---@return LuaParser.Node.Term?
+local function checkSelf(coder, source)
+    if source.isSelf then
+        return true, source.parent.name and source.parent.name.last
+    end
+    if source.id ~= 'self' or source.index ~= 1 then
+        return false, nil
+    end
+    local cat = coder:findMatchedCatParam(source)
+    if cat then
+        return false, nil
+    end
+    local func = source.parent
+    if not func or func.kind ~= 'function' then
+        return false, nil
+    end
+    local assign = func.parent
+    if not assign or assign.kind ~= 'assign' then
+        return false, nil
+    end
+    ---@cast assign LuaParser.Node.Assign
+    if assign.values[func.index] ~= func then
+        return false, nil
+    end
+    local exp = assign.exps and assign.exps[func.index]
+    if not exp or exp.kind ~= 'field' then
+        return false, nil
+    end
+    return true, exp.last
+end
+
 ls.vm.registerCoderProvider('param', function (coder, source)
     ---@cast source LuaParser.Node.Param
     coder:addLine('{key} = rt.variable {name:q}' % {
@@ -65,8 +99,9 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         key      = coder:getKey(source),
     })
 
-    if source.isSelf then
-        local parentVariable = source.parent.name and source.parent.name.last
+    local looksLikeSelf, parentVariable = checkSelf(coder, source)
+
+    if looksLikeSelf then
         if parentVariable then
             coder:addLine('{key}:setMasterVariable({parent})' % {
                 parent = coder:getKey(parentVariable),

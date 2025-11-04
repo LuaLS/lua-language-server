@@ -92,12 +92,14 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
     ---@cast source LuaParser.Node.Assign
 
     local valueKeys = {}
+    for i, exp in ipairs(source.exps) do
+        coder:compile(exp)
+    end
     for i, value in ipairs(source.values) do
         valueKeys[i] = coder:getKey(value)
         coder:compile(value)
     end
     for i, exp in ipairs(source.exps) do
-        coder:compile(exp)
         coder:compileAssign(exp, i, valueKeys[i])
     end
 end)

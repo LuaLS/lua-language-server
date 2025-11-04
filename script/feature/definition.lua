@@ -107,19 +107,6 @@ ls.feature.provider.definition(function (param, push, skip)
     }
 end)
 
--- 局部变量定义处就是自己
-ls.feature.provider.definition(function (param, push, skip)
-    local first = param.sources[1]
-    if first.kind ~= 'local' then
-        return
-    end
-    push {
-        uri = first.ast.source,
-        range = { first.start, first.finish },
-        originRange = { first.start, first.finish },
-    }
-end)
-
 -- 变量的赋值位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]

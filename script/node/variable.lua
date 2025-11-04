@@ -27,6 +27,16 @@ function M:__init(scope, name, parent)
     self.parent = parent
 end
 
+---@type Node.Location?
+M.location = nil
+
+---@param location Node.Location
+---@return self
+function M:setLocation(location)
+    self.location = location
+    return self
+end
+
 ---@type LinkedTable
 M.types = nil
 
@@ -677,6 +687,7 @@ function M:getEquivalentLocations()
     for _, equivalent in ipairs(self.allEquivalents) do
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable
+            locations[#locations+1] = equivalent.location
             if equivalent.assigns then
                 for assign in equivalent.assigns:pairsFast() do
                     ---@cast assign Node.Field
@@ -688,6 +699,7 @@ function M:getEquivalentLocations()
             locations[#locations+1] = equivalent.location
         end
     end
+    ls.util.arrayRemoveDuplicate(locations)
     return locations
 end
 

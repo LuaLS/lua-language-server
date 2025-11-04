@@ -59,6 +59,10 @@ function M:compileAssign(var, index, valueKey)
     tryBindCat(self, var, index)
 
     if not valueKey then
+        self:addLine('{varKey}:setLocation {location}' % {
+            varKey   = self:getKey(var),
+            location = self:makeLocationCode(var),
+        })
         return
     end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
@@ -71,7 +75,7 @@ function M:compileAssign(var, index, valueKey)
 ]] % {
         fieldKey = fieldKey,
         key      = key,
-        value    = valueKey or 'rt.NIL',
+        value    = valueKey,
         location = self:makeLocationCode(var),
     })
     self:addLine('{varKey}:addAssign({fieldKey})' % {

@@ -202,3 +202,44 @@ ls.feature.provider.definition(function (param, push, skip)
         originRange = { source.name.start, source.name.finish },
     }
 end)
+
+-- LuaCats 的类
+ls.feature.provider.definition(function (param, push)
+    local source = param.sources[1]
+    if not source or source.kind ~= 'catid' then
+        return
+    end
+
+    local node = param.scope.vm:getNode(source)
+    if not node or node.kind ~= 'type' then
+        return
+    end
+
+    ---@cast node Node.Type
+    if node.classes then
+        for class in node.classes:pairsFast() do
+            ---@cast class Node.Class
+            local location = class.location
+            if location then
+                push {
+                    uri = location.uri,
+                    range = { location.offset, location.offset + location.length },
+                    originRange = { source.start, source.finish },
+                }
+            end
+        end
+    end
+    if node.aliases then
+        for alias in node.aliases:pairsFast() do
+            ---@cast alias Node.Alias
+            local location = alias.location
+            if location then
+                push {
+                    uri = location.uri,
+                    range = { location.offset, location.offset + location.length },
+                    originRange = { source.start, source.finish },
+                }
+            end
+        end
+    end
+end)

@@ -10,6 +10,11 @@ test.includeCodes['setmetatable'] = [[
 function setmetatable(t, mt) end
 ]]
 
+test.includeCodes['binary'] = [[
+---@alias op.add<A: any, B: any> number
+---@alias op.add<A: integer, B: integer> integer
+]]
+
 ---@param script string
 ---@return File?
 function test.checkInclude(script)

@@ -71,6 +71,13 @@ function M:addCode(code)
     buf[#buf+1] = code
 end
 
+---@param source LuaParser.Node.Base
+function M:addUnknown(source)
+    self:addLine('{key} = rt.UNKNOWN' % {
+        key = self:getKey(source),
+    })
+end
+
 ---@param code string
 function M:addDisposer(code)
     local disposers = self.disposers
@@ -138,8 +145,14 @@ function M:addIndentation(delta)
     self.indentation = self.indentation + delta
 end
 
----@param source LuaParser.Node.Base
-function M:compile(source)
+---@param source? LuaParser.Node.Base
+---@param canBeNil? boolean
+---@return boolean
+function M:compile(source, canBeNil)
+    if not source then
+        assert(canBeNil, 'Source is nil')
+        return false
+    end
     if self.compiled[source] then
         error('Source already compiled: ' .. source.kind)
     end
@@ -147,9 +160,10 @@ function M:compile(source)
     local provider = M.providers[source.kind]
     if not provider then
         self:addLine('--[[!!! ' .. source.kind .. ' !!!]]')
-        return
+        return false
     end
     provider(self, source)
+    return true
 end
 
 function M:pushBlock()

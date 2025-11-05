@@ -125,6 +125,7 @@ t:<?add?>()
 ]]
 
 TEST [[
+--!include setmetatable
 local mt = {}
 mt.__index = mt
 

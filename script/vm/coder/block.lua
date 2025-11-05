@@ -25,6 +25,10 @@ ls.vm.registerCoderProvider('main', function (coder, source)
         })
         coder:addLine('')
     end
+
+    local varargs = source.localMap['...']
+    coder:compile(varargs)
+
     parseBlock(coder, source)
 end)
 

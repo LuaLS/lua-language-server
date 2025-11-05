@@ -386,6 +386,7 @@ M.__getter.hasGeneric = function (self)
     if not self.fields then
         return false, true
     end
+    self.hasGeneric = false
     local hasGeneric = false
     for field in self.fields:pairsFast() do
         field.key:addRef(self)

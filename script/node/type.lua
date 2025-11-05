@@ -491,26 +491,22 @@ end
 
 M.hasGeneric = false
 
+---@private
+---@type PathTable
+M.callCache = nil
+
 ---@param nodes Node[]
 ---@return Node.Type | Node.Call
 function M:call(nodes)
+    if not self.callCache then
+        self.callCache = ls.tools.pathTable.create(true, true)
+    end
     local call = self.callCache:get(nodes)
     if not call then
         call = self.scope.rt.call(self.typeName, nodes)
         self.callCache:set(nodes, call)
     end
     return call
-end
-
----@private
----@type PathTable
-M.callCache = nil
-
----@param self Node.Type
----@return PathTable
----@return true
-M.__getter.callCache = function (self)
-    return ls.tools.pathTable.create(true, true), true
 end
 
 function M:onView(viewer, options)

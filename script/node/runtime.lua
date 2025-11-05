@@ -549,7 +549,7 @@ function M:lockCache()
 end
 
 function M:unlockCache()
-    self.cacheLocked = self.cacheLocked - 1
+    self.cacheLocked = math.max(0, self.cacheLocked - 1)
     if self.cacheLocked == 0 then
         self:flushCacheNow()
     end

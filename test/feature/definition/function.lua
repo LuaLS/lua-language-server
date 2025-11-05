@@ -18,8 +18,8 @@ end
 
 TEST [[
 local <!x!>
-function <!x!>()
-end
+<!function x()
+end!>
 <?x?>()
 ]]
 

@@ -13,6 +13,7 @@ mt:x()
 ]]
 
 TEST [[
+local mt
 function mt:x(<!self!>)
     <?self?>()
 end

@@ -89,40 +89,96 @@ ls.feature.provider.definition(function (param, push, skip)
         return
     end
 
-    for _, location in ipairs(variable:getEquivalentLocations()) do
-        push {
-            uri = location.uri,
-            range = { location.offset, location.offset + location.length },
-            originRange = { var.start, var.finish },
-        }
+    -- 在声明处查询定义，则查询所有等价定义的赋值位置
+    if var.kind == 'local' or var.kind == 'param' then
+        for _, location in ipairs(variable:getEquivalentLocations()) do
+            push {
+                uri = location.uri,
+                range = { location.offset, location.offset + location.length },
+                originRange = { var.start, var.finish },
+            }
+        end
+        return
     end
+
+    ---@cast var LuaParser.Node.Var
+
+    ---@param variable Node.Variable
+    local function findDefinition(variable)
+        ---@cast var LuaParser.Node.Var
+        -- 如果是局部变量，则只查询声明位置
+        local location = variable.location
+        if location then
+            push {
+                uri = location.uri,
+                range = { location.offset, location.offset + location.length },
+                originRange = { var.start, var.finish },
+            }
+            return
+        end
+
+        -- 否则查询所有赋值位置
+        if variable.assigns then
+            for assign in variable.assigns:pairsFast() do
+                ---@cast assign Node.Field
+                local location = assign.location
+                if location then
+                    push {
+                        uri = location.uri,
+                        range = { location.offset, location.offset + location.length },
+                        originRange = { var.start, var.finish },
+                    }
+                end
+            end
+        end
+    end
+
+    -- 如果是 self，则查询父变量的定义位置
+    local p = var.loc
+    if p and p.kind == 'param' then
+        ---@cast p LuaParser.Node.Param
+        local coder = param.scope.vm:getCoder(var)
+        if coder then
+            local looksLikeSelf, parent = coder:looksLikeSelf(p)
+            if looksLikeSelf and parent then
+                local parentVariable = param.scope.vm:getVariable(parent)
+                if parentVariable then
+                    findDefinition(parentVariable)
+                    return
+                end
+            end
+        end
+    end
+
+    -- 否则查询变量本身的定义位置
+    findDefinition(variable)
 end)
 
 -- 字段的赋值位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
-    if first.kind == 'fieldid'
-    or first.kind == 'string'
-    or first.kind == 'integer'
-    or first.kind == 'boolean'
-    or first.kind == 'float' then
-        first = first.parent
+    local field = param.sources[2]
+    if not field or field.kind ~= 'field' then
+        return
     end
-    if not first or first.kind ~= 'field' then
+    ---@cast field LuaParser.Node.Field
+    if field.key ~= first then
         return
     end
     ---@type Node.Variable?
-    local variable = param.scope.vm:getVariable(first)
+    local variable = param.scope.vm:getVariable(field)
 
     if not variable then
         return
     end
 
-    for _, location in ipairs(variable:getEquivalentLocations()) do
+    -- 有个特殊规则，等价位置必须是 field ，且 field 名称要相同
+
+    for _, location in ipairs(variable:getEquivalentLocations(true)) do
         push {
             uri = location.uri,
             range = { location.offset, location.offset + location.length },
-            originRange = { first.start, first.finish },
+            originRange = { field.start, field.finish },
         }
     end
 end)

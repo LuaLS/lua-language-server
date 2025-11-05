@@ -272,6 +272,7 @@ M.hasGeneric = nil
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    self.hasGeneric = false
     if self.value == self then
         return false, true
     end

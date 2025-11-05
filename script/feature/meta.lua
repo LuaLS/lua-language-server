@@ -1,6 +1,8 @@
 ---@meta _
 
----@alias Range [integer, integer]
+---@class Range
+---@field [1] integer # start offset
+---@field [2] integer # end offset
 
 ---@class Location
 ---@field uri Uri

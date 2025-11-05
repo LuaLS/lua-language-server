@@ -485,6 +485,7 @@ M.__getter.value = function (self)
         return self.masterVariable.value, true
     end
     local rt = self.scope.rt
+    self.value = rt.UNKNOWN
     return self.classValue
         or self.parentExpectValue
         or self.typeValue
@@ -680,11 +681,15 @@ M.__getter.equivalentValue = function (self)
     end
 end
 
+---@param onlySameKey? boolean
 ---@return Node.Location[]
-function M:getEquivalentLocations()
+function M:getEquivalentLocations(onlySameKey)
     ---@type Node.Location[]
     local locations = {}
     for _, equivalent in ipairs(self.allEquivalents) do
+        if onlySameKey and equivalent.key ~= self.key then
+            goto continue
+        end
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable
             locations[#locations+1] = equivalent.location
@@ -698,6 +703,7 @@ function M:getEquivalentLocations()
             ---@cast equivalent Node.Field
             locations[#locations+1] = equivalent.location
         end
+        ::continue::
     end
     ls.util.arrayRemoveDuplicate(locations)
     return locations

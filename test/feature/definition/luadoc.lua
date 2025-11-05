@@ -1,5 +1,5 @@
-local config = require "config.config"
-config.set(nil, 'Lua.type.castNumberToInteger', false)
+local config = test.scope.config
+config:set(test.fileUri, 'Lua.type.castNumberToInteger', false)
 TEST [[
 ---@class <!A!>
 ---@class B : <?A?>
@@ -1086,7 +1086,7 @@ local x = {
 print(x.<?a?>)
 ]]
 
-config.set(nil, 'Lua.type.castNumberToInteger', true)
+config:set(test.fileUri, 'Lua.type.castNumberToInteger', true)
 
 TEST [[
 ---@class <!A!>

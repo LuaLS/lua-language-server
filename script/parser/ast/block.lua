@@ -180,6 +180,7 @@ function Ast:mergeStatesAndCats(block)
             break
         end
         cat.used = true
+        cat.parent = block
         needMerge = true
         block.childs[#block.childs+1] = cat
     end

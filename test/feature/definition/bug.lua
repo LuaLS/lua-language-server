@@ -1,5 +1,3 @@
-local config = require "config"
-
 TEST [[
 local <!x!>
 function _(x)

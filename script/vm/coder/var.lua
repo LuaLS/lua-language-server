@@ -48,45 +48,15 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         key = coder:getKey(source),
         name = source.id,
     })
+    coder:addLine('{varKey}:setLocation {location}' % {
+        varKey   = coder:getKey(source),
+        location = coder:makeLocationCode(source),
+    })
     coder:addLine('{variable} = {key}' % {
         variable = coder:getVariableKey(source),
         key      = coder:getKey(source),
     })
 end)
-
----@param coder VM.Coder
----@param source LuaParser.Node.Param
----@return boolean
----@return LuaParser.Node.Term?
-local function checkSelf(coder, source)
-    if source.isSelf then
-        return true, source.parent.name and source.parent.name.last
-    end
-    if source.id ~= 'self' or source.index ~= 1 then
-        return false, nil
-    end
-    local cat = coder:findMatchedCatParam(source)
-    if cat then
-        return false, nil
-    end
-    local func = source.parent
-    if not func or func.kind ~= 'function' then
-        return false, nil
-    end
-    local assign = func.parent
-    if not assign or assign.kind ~= 'assign' then
-        return false, nil
-    end
-    ---@cast assign LuaParser.Node.Assign
-    if assign.values[func.index] ~= func then
-        return false, nil
-    end
-    local exp = assign.exps and assign.exps[func.index]
-    if not exp or exp.kind ~= 'field' then
-        return false, nil
-    end
-    return true, exp.last
-end
 
 ls.vm.registerCoderProvider('param', function (coder, source)
     ---@cast source LuaParser.Node.Param
@@ -94,12 +64,16 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         key = coder:getKey(source),
         name = source.id,
     })
+    coder:addLine('{varKey}:setLocation {location}' % {
+        varKey   = coder:getKey(source),
+        location = coder:makeLocationCode(source),
+    })
     coder:addLine('{variable} = {key}' % {
         variable = coder:getVariableKey(source),
         key      = coder:getKey(source),
     })
 
-    local looksLikeSelf, parentVariable = checkSelf(coder, source)
+    local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 
     if looksLikeSelf then
         if parentVariable then

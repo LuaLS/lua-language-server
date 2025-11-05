@@ -77,44 +77,38 @@ end)
 
 -- 局部变量的定义位置
 ls.feature.provider.definition(function (param, push, skip)
-    local first = param.sources[1]
-    if first.kind ~= 'var' then
-        return
-    end
-    ---@cast first LuaParser.Node.Var
-    local loc = first.loc
-    if not loc then
+    local var = param.sources[1]
+    if  var.kind ~= 'var'
+    and var.kind ~= 'local'
+    and var.kind ~= 'param' then
         return
     end
     skip()
-    if not loc.value and loc.kind ~= 'param' then
-        local results = ls.feature.implementation(param.uri, loc.start)
-        ls.util.map(results, push)
+    local variable = param.scope.vm:getVariable(var)
+    if not variable then
         return
     end
-    if loc.kind == 'param' then
-        ---@cast loc LuaParser.Node.Param
-        if loc.isSelf then
-            local results = ls.feature.definition(param.uri, loc.parent.name.last.finish)
-            ls.util.map(results, push)
-            return
-        end
+
+    for _, location in ipairs(variable:getEquivalentLocations()) do
+        push {
+            uri = location.uri,
+            range = { location.offset, location.offset + location.length },
+            originRange = { var.start, var.finish },
+        }
     end
-    push {
-        uri = first.ast.source,
-        range = { first.loc.start, first.loc.finish },
-        originRange = { first.start, first.finish },
-    }
 end)
 
--- 变量的赋值位置
+-- 字段的赋值位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
     if first.kind == 'fieldid'
-    or first.kind == 'string' then
+    or first.kind == 'string'
+    or first.kind == 'integer'
+    or first.kind == 'boolean'
+    or first.kind == 'float' then
         first = first.parent
     end
-    if not first then
+    if not first or first.kind ~= 'field' then
         return
     end
     ---@type Node.Variable?

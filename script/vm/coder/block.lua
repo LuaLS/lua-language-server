@@ -53,3 +53,33 @@ ls.vm.registerCoderProvider('if', function (coder, source)
         end, child.code)
     end
 end)
+
+ls.vm.registerCoderProvider('for', function (coder, source)
+    ---@cast source LuaParser.Node.For
+
+    for _, var in pairs(source.vars) do
+        coder:compile(var)
+    end
+    for _, exp in pairs(source.exps) do
+        coder:compile(exp)
+    end
+    if source.subtype == 'incomplete' then
+        return
+    end
+
+    parseBlock(coder, source)
+end)
+
+ls.vm.registerCoderProvider('while', function (coder, source)
+    ---@cast source LuaParser.Node.While
+
+    coder:compile(source.condition)
+    parseBlock(coder, source)
+end)
+
+ls.vm.registerCoderProvider('repeat', function (coder, source)
+    ---@cast source LuaParser.Node.Repeat
+
+    parseBlock(coder, source)
+    coder:compile(source.condition)
+end)

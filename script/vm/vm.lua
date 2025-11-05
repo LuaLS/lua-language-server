@@ -75,6 +75,17 @@ function M:findFields(source, key)
     return vfile:findFields(source, key)
 end
 
+---@param source LuaParser.Node.Base
+---@return VM.Coder?
+function M:getCoder(source)
+    local uri = source.ast.source
+    local vfile = self:getFile(uri)
+    if not vfile then
+        return nil
+    end
+    return vfile.coder
+end
+
 ---@param field LuaParser.Node.Term
 ---@return Node.Key
 function M:getKey(field)

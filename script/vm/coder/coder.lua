@@ -308,6 +308,39 @@ function M:getCustomKey(key)
     return string.format('r[%q]', key)
 end
 
+---@param source LuaParser.Node.Param
+---@return boolean
+---@return LuaParser.Node.Term?
+function M:looksLikeSelf(source)
+    if source.isSelf then
+        return true, source.parent.name and source.parent.name.last
+    end
+    if source.id ~= 'self' or source.index ~= 1 then
+        return false, nil
+    end
+    local cat = self:findMatchedCatParam(source)
+    if cat then
+        return false, nil
+    end
+    local func = source.parent
+    if not func or func.kind ~= 'function' then
+        return false, nil
+    end
+    local assign = func.parent
+    if not assign or assign.kind ~= 'assign' then
+        return false, nil
+    end
+    ---@cast assign LuaParser.Node.Assign
+    if assign.values[func.index] ~= func then
+        return false, nil
+    end
+    local exp = assign.exps and assign.exps[func.index]
+    if not exp or exp.kind ~= 'field' then
+        return false, nil
+    end
+    return true, exp.last
+end
+
 ---@return VM.Coder
 function ls.vm.createCoder()
     return New 'VM.Coder' ()

@@ -17,6 +17,7 @@ require 'parser.ast.cats.string'
 require 'parser.ast.cats.tuple'
 require 'parser.ast.cats.param'
 require 'parser.ast.cats.return'
+require 'parser.ast.cats.overload'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string
@@ -40,6 +41,7 @@ Cat.kind = 'cat'
 ---| LuaParser.Node.CatStateReturn
 ---| LuaParser.Node.CatStateGeneric
 ---| LuaParser.Node.CatStateType
+---| LuaParser.Node.CatStateOverload
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
@@ -95,6 +97,10 @@ Ast:registerCatParser('generic', {
 Ast:registerCatParser('vararg', {
     asState = true,
     parser = Ast.parseCatStateVararg,
+})
+Ast:registerCatParser('overload', {
+    asState = true,
+    parser = Ast.parseCatStateOverload,
 })
 
 ---@private

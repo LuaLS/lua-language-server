@@ -59,24 +59,20 @@ ls.feature.provider.definition(function (param, push)
     if not node then
         return
     end
-    node = node:findValue { 'function', 'table' }
-    if not node then
-        return
-    end
-    if node.kind == 'function' then
-        ---@cast node Node.Function
-        if node.location then
-            push(ls.feature.helper.convertLocation(node.location, first))
+    ---@param func Node.Function
+    node:each('function', function (func)
+        if func.location then
+            push(ls.feature.helper.convertLocation(func.location, first))
         end
-    end
-    if node.kind == 'table' then
-        ---@cast node Node.Table
-        if node.locations then
-            for _, location in ipairs(node.locations) do
+    end)
+    ---@param table Node.Table
+    node:each('table', function (table)
+        if table.locations then
+            for _, location in ipairs(table.locations) do
                 push(ls.feature.helper.convertLocation(location, first))
             end
         end
-    end
+    end)
 end)
 
 -- 局部变量的定义位置

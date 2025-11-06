@@ -416,3 +416,10 @@ ls.vm.registerCoderProvider('catstategeneric', function (coder, source)
 
     coder:addToCatGroup(source.parent, true)
 end)
+
+ls.vm.registerCoderProvider('catstateoverload', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateOverload
+
+    coder:compile(source.value)
+    coder:addToCatGroup(source.parent, true)
+end)

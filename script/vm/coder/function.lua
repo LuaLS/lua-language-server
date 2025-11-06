@@ -1,82 +1,46 @@
 ---@class VM.Coder
 local M = Class 'VM.Coder'
 
+---@package
+---@param source LuaParser.Node.Base
+---@param kind string
+---@return LuaParser.Node.Cat[]?
+function M:findNearedCats(source, kind)
+    local catGroup = self:getCatGroup(source)
+    if not catGroup then
+        return nil
+    end
+    local results = {}
+    for _, catState in ipairs(catGroup) do
+        local cat = catState.value
+        if not cat then
+            goto continue
+        end
+        if cat.kind == kind then
+            results[#results+1] = cat
+        end
+        ::continue::
+    end
+    if #results == 0 then
+        return nil
+    end
+    return results
+end
+
 ---@param param LuaParser.Node.Param
 ---@return LuaParser.Node.CatStateParam?
 function M:findMatchedCatParam(param)
-    local catGroup = self:getCatGroup(param)
-    if not catGroup then
+    local params = self:findNearedCats(param, 'catstateparam')
+    if not params then
         return nil
     end
-    for _, catState in ipairs(catGroup) do
-        local cat = catState.value
-        if not cat then
-            goto continue
+    ---@cast params LuaParser.Node.CatStateParam[]
+    for _, catParam in ipairs(params) do
+        if catParam.key.id == param.id then
+            return catParam
         end
-        if cat.kind == 'catstateparam' then
-            ---@cast cat LuaParser.Node.CatStateParam
-            if cat.key.id == param.id then
-                return cat
-            end
-        end
-        ::continue::
     end
-end
-
----@param func LuaParser.Node.Function
----@return LuaParser.Node.CatStateGeneric[]?
-function M:findCatTypeParams(func)
-    local catGroup = self:getCatGroup(func)
-    if not catGroup then
-        return nil
-    end
-    local typeParams = {}
-
-    for _, catState in ipairs(catGroup) do
-        local cat = catState.value
-        if not cat then
-            goto continue
-        end
-        if cat.kind == 'catstategeneric' then
-            ---@cast cat LuaParser.Node.CatStateGeneric
-            typeParams[#typeParams+1] = cat
-        end
-        ::continue::
-    end
-
-    if #typeParams == 0 then
-        return nil
-    end
-
-    return typeParams
-end
-
----@param func LuaParser.Node.Function
----@return LuaParser.Node.CatStateReturn[]?
-function M:findCatReturns(func)
-    local catGroup = self:getCatGroup(func)
-    if not catGroup then
-        return nil
-    end
-    local returns = {}
-
-    for _, catState in ipairs(catGroup) do
-        local cat = catState.value
-        if not cat then
-            goto continue
-        end
-        if cat.kind == 'catstatereturn' then
-            ---@cast cat LuaParser.Node.CatStateReturn
-            returns[#returns+1] = cat
-        end
-        ::continue::
-    end
-
-    if #returns == 0 then
-        return nil
-    end
-
-    return returns
+    return nil
 end
 
 ---@param coder VM.Coder
@@ -102,15 +66,16 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             key      = coder:getKey(source),
             location = coder:makeLocationCode(source),
         })
+
         if source.name then
             coder:withIndentation(function ()
                 coder:addLine('')
                 coder:compile(source.name)
-                coder:compileAssign(source.name, 1, coder:getKey(source))
             end, 'function name --')
         end
 
-        local typeParams = coder:findCatTypeParams(source)
+        ---@type LuaParser.Node.CatStateGeneric[]?
+        local typeParams = coder:findNearedCats(source, 'catstategeneric')
         if typeParams then
             coder:withIndentation(function ()
                 for _, cat in ipairs(typeParams) do
@@ -134,7 +99,8 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             end, 'function params --')
         end
 
-        local returns = coder:findCatReturns(source)
+        ---@type LuaParser.Node.CatStateReturn[]?
+        local returns = coder:findNearedCats(source, 'catstatereturn')
         if returns then
             coder:withIndentation(function ()
                 for _, cat in ipairs(returns) do
@@ -161,5 +127,26 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                 coder:popBlock()
             end, 'function body --')
         end
+
+        ---@type LuaParser.Node.CatStateOverload[]?
+        local overloads = coder:findNearedCats(source, 'catstateoverload')
+        if overloads then
+            local overloadKeys = { coder:getKey(source) }
+
+            for _, overload in ipairs(overloads) do
+                overloadKeys[#overloadKeys+1] = coder:getKey(overload.value)
+            end
+
+            coder:addLine('-- function overloads --')
+            coder:addLine('rawset(r, {funcKey:q}, rt.union { {overloadList} })' % {
+                funcKey      = source.uniqueKey,
+                overloadList = table.concat(overloadKeys, ', '),
+            })
+        end
+
+        if source.name then
+            coder:compileAssign(source.name, 1, coder:getKey(source))
+        end
+
     end, source.code)
 end)

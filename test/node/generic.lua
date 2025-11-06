@@ -301,7 +301,7 @@ do
 
     assert(unit.value:view() == '{ childs: Map<integer, Unit> }')
     assert(unit:get('childs'):view() == 'Map<integer, Unit>')
-    assert(unit:get('childs').value:view() == '{ set: fun(key: integer, value: Unit) }')
+    assert(unit:get('childs'):finalValue():view() == '{ set: fun(key: integer, value: Unit) }')
 end
 
 do
@@ -332,9 +332,9 @@ do
     local unit2 = unit:call { rt.NUMBER }
     assert(unit2.value:view() == '{ childs: Map<number, string> }')
     assert(unit2.value:get('childs'):view() == 'Map<number, string>')
-    assert(unit2.value:get('childs').value:view() == '{ set: fun(key: number, value: string) }')
+    assert(unit2.value:get('childs'):finalValue():view() == '{ set: fun(key: number, value: string) }')
     assert(unit2:get('childs'):view() == 'Map<number, string>')
-    assert(unit2:get('childs').value:view() == '{ set: fun(key: number, value: string) }')
+    assert(unit2:get('childs'):finalValue():view() == '{ set: fun(key: number, value: string) }')
 end
 
 do

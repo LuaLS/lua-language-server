@@ -34,21 +34,21 @@ do
     assert(a:get 'x' == rt.NIL)
 
     ca:addField(field1)
-    assert(a:get 'x' == rt.NUMBER)
+    assert(a:get 'x' :view() == 'number')
 
     local b = rt.type 'B'
-    assert(b:get 'x' == rt.NEVER)
+    assert(b:get 'x' :view() == 'never')
 
     local cb = rt.class 'B'
 
     cb:addExtends(a)
-    assert(b:get 'x' == rt.NUMBER)
-    assert(b:get 'y' == rt.NIL)
+    assert(b:get 'x' :view() == 'number')
+    assert(b:get 'y' :view() == 'nil')
 
     ca:removeField(field1)
     ca:addField(field2)
-    assert(a:get 'x' == rt.STRING)
-    assert(b:get 'x' == rt.STRING)
+    assert(a:get 'x' :view() == 'string')
+    assert(b:get 'x' :view() == 'string')
 end
 
 do

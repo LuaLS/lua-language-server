@@ -49,7 +49,7 @@ do
     }
     arrayT:inferGeneric(table, map)
 
-    assert(map[T] == rt.STRING)
+    assert(map[T]:view() == 'string')
 end
 
 do
@@ -138,8 +138,8 @@ do
     }
     tupleT1T2:inferGeneric(target, map)
 
-    assert(map[T1] == rt.NUMBER)
-    assert(map[T2] == rt.STRING)
+    assert(map[T1]:view() == 'number')
+    assert(map[T2]:view() == 'string')
 end
 
 do
@@ -159,8 +159,8 @@ do
     }
     tableKV:inferGeneric(target, map)
 
-    assert(map[K] == rt.NUMBER)
-    assert(map[V] == rt.STRING)
+    assert(map[K]:view() == 'number')
+    assert(map[V]:view() == 'string')
 end
 
 do

@@ -68,3 +68,14 @@ function M:resolveGeneric(map)
     newField.hideInView = self.hideInView
     return newField
 end
+
+function M:onCanBeCast(other)
+    return other:canCast(self.value)
+end
+
+function M:onCanCast(other)
+    if self == other then
+        return true
+    end
+    return self.value:canCast(other)
+end

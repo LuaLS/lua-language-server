@@ -21,7 +21,8 @@ end
 ---@param callback fun(): string
 ---@return string
 function M:wrap(node, options, callback)
-    self.skipLevel = self.skipLevel + (options and options.skipLevel or 1)
+    local skipLevel = options and options.skipLevel or 1
+    self.skipLevel = self.skipLevel + skipLevel
     self.deep = self.deep + 1
     if self.deep >= 100 then
         self.deep = self.deep - 1
@@ -31,6 +32,7 @@ function M:wrap(node, options, callback)
     local result = callback()
     self.visited[node] = self.visited[node] - 1
     self.deep = self.deep - 1
+    self.skipLevel = self.skipLevel - skipLevel
     return result
 end
 

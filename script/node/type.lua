@@ -257,17 +257,21 @@ M.table = nil
 ---@return Node.Table
 ---@return true
 M.__getter.table = function (self)
-    local table = self.scope.rt.table()
+    local fieldsTable = {}
     if self.classes then
-        local fields = {}
         for _, class in ipairs(self.protoClasses) do
             class:addRef(self)
-            if class.fields then
-                fields[#fields+1] = class.fields
-            end
+            fieldsTable[#fieldsTable+1] = class.fields
         end
-        table:addChilds(fields)
     end
+    if #fieldsTable == 0 then
+        return self.scope.rt.table(), true
+    end
+    if #fieldsTable == 1 then
+        return fieldsTable[1], true
+    end
+    local table = self.scope.rt.table()
+    table:addChilds(fieldsTable)
     return table, true
 end
 

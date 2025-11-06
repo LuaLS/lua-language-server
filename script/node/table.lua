@@ -177,23 +177,11 @@ M.valueMap = nil
 M.__getter.valueMap = function (self)
     local valueMap = {}
     for k, field in pairs(self.fieldMap) do
-        local v
-        if #field > 0 then
-            v = self.scope.rt.union(ls.util.map(field, function (v, k)
-                return v.value
-            end))
-        else
-            v = field.value
-        end
-        if not v then
-            goto continue
-        end
         if k.kind == 'value' then
-            valueMap[k.literal] = v
+            valueMap[k.literal] = field
         else
-            valueMap[k] = v
+            valueMap[k] = field
         end
-        ::continue::
     end
     return valueMap, true
 end

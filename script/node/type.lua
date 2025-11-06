@@ -234,7 +234,8 @@ M.__getter.extendsTable = function (self)
             tables[#tables+1] = v
         elseif v.kind == 'type' then
             ---@cast v Node.Type
-            tables[#tables+1] = v.table
+            tables[#tables+1] = v.fieldTable
+            tables[#tables+1] = v.variableTable
         else
             ---@cast v -Node.Table, -Node.Type
             local vv = v.value
@@ -249,14 +250,14 @@ M.__getter.extendsTable = function (self)
     return table, true
 end
 
---- 类型自身的字段（一般是通过 ---@field 添加）
+--- 类型自身的字段合并表（一般是通过 ---@field 添加）
 ---@type Node.Table
-M.table = nil
+M.fieldTable = nil
 
 ---@param self Node.Type
 ---@return Node.Table
 ---@return true
-M.__getter.table = function (self)
+M.__getter.fieldTable = function (self)
     local fieldsTable = {}
     if self.classes then
         for _, class in ipairs(self.protoClasses) do
@@ -275,6 +276,36 @@ M.__getter.table = function (self)
     return table, true
 end
 
+-- 绑定变量的字段合并表
+---@type Node.Table
+M.variableTable = nil
+
+---@param self Node.Type
+---@return Node.Table
+---@return true
+M.__getter.variableTable = function (self)
+    local variableTables = {}
+    for _, class in ipairs(self.protoClasses) do
+        if class.variables then
+            for variable in class.variables:pairsFast() do
+                variable:addRef(self)
+                if variable.fields then
+                    variableTables[#variableTables+1] = variable.fields
+                end
+            end
+        end
+    end
+    if #variableTables == 0 then
+        return self.scope.rt.table(), true
+    end
+    if #variableTables == 1 then
+        return variableTables[1], true
+    end
+    local table = self.scope.rt.table()
+    table:addChilds(variableTables)
+    return table, true
+end
+
 ---@type Node
 M.value = nil
 
@@ -289,18 +320,9 @@ M.__getter.value = function (self)
     if self:isClassLike() then
         local merging = {}
         -- 1. 直接写在 class 里的字段
-        merging[#merging+1] = self.table
+        merging[#merging+1] = self.fieldTable
         -- 2. 绑定的变量里的字段
-        for _, class in ipairs(self.protoClasses) do
-            if class.variables then
-                for variable in class.variables:pairsFast() do
-                    variable:addRef(self)
-                    if variable.fields then
-                        merging[#merging+1] = variable.fields
-                    end
-                end
-            end
-        end
+        merging[#merging+1] = self.variableTable
         -- 3. 继承来的字段
         if not self.extendsTable:isEmpty() then
             merging[#merging+1] = self.extendsTable
@@ -343,11 +365,7 @@ M.__getter.expectValue = function (self)
     if self:isClassLike() then
         local merging = {}
         -- 1. 直接写在 class 里的字段
-        merging[#merging+1] = self.table
-        -- 2. 继承来的字段
-        if not self.extendsTable:isEmpty() then
-            merging[#merging+1] = self.extendsTable
-        end
+        merging[#merging+1] = self.fieldTable
 
         if #merging == 1 then
             return merging[1], true

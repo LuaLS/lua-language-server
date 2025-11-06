@@ -9,7 +9,7 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
     local classParams = {
         qid = string.format('%q', source.classID.id),
         class = coder:getKey(source),
-        location = coder:makeLocationCode(source),
+        location = coder:makeLocationCode(source.classID),
     }
 
     coder:addLine('{class} = rt.class {qid}' % classParams)
@@ -143,6 +143,10 @@ ls.vm.registerCoderProvider('catstatealias', function (coder, source)
     coder:addLine('{alias} = rt.alias({name:q})' % {
         alias = coder:getKey(source),
         name  = source.aliasID.id,
+    })
+    coder:addLine('{alias}:setLocation {location}' % {
+        alias    = coder:getKey(source),
+        location = coder:makeLocationCode(source.aliasID),
     })
 
     if source.typeParams then
@@ -307,6 +311,10 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
 
     coder:addLine('{key} = rt.func()' % {
         key = coder:getKey(source),
+    })
+    coder:addLine('{key}:setLocation {location}' % {
+        key      = coder:getKey(source),
+        location = coder:makeLocationCode(source),
     })
 
     if source.async then

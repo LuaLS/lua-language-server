@@ -63,15 +63,13 @@ ls.feature.provider.definition(function (param, push)
     if not node then
         return
     end
-    if node.kind == 'function' then
-        ---@cast node Node.Function
-        if node.location then
-            push {
-                uri = node.location.uri,
-                range = { node.location.offset, node.location.offset + node.location.length },
-                originRange = { first.start, first.finish },
-            }
-        end
+    ---@cast node Node.Function
+    if node.location then
+        push {
+            uri = node.location.uri,
+            range = { node.location.offset, node.location.offset + node.location.length },
+            originRange = { first.start, first.finish },
+        }
     end
 end)
 

@@ -100,7 +100,7 @@ M.__getter.extendsTable = function (self)
             tables[#tables+1] = v
         elseif v.kind == 'type' then
             ---@cast v Node.Type
-            tables[#tables+1] = v.table
+            tables[#tables+1] = v.fieldTable
         else
             ---@cast v -Node.Table, -Node.Type
             local vv = v.value

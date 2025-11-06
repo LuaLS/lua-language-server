@@ -399,13 +399,7 @@ function M:getExpect(key)
         return e and r or nil
     end
     if self.types then
-        local expectValue = rt.union(ls.util.map(self.types:toArray(), function (v)
-            if v.kind == 'type' then
-                ---@cast v Node.Type
-                return v.value
-            end
-            return v
-        end))
+        local expectValue = self.value
         local r, e = expectValue:get(key)
         return e and r or nil
     end
@@ -716,6 +710,10 @@ function M:getEquivalentLocations(onlySameKey)
     end
 
     self.value:each('variable', lookIntoEquivalent)
+    self.value:each('field', function (field)
+        ---@cast field Node.Field
+        locations[#locations+1] = field.location
+    end)
 
     ls.util.arrayRemoveDuplicate(locations)
     return locations

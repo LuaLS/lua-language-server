@@ -37,10 +37,6 @@ function M:onCanCast(other)
     return false
 end
 
-M.__getter.asKey = function (self)
-    return self.literal, true
-end
-
 ---@type Node.Type
 M.nodeType = nil
 M.__getter.nodeType = function (self)

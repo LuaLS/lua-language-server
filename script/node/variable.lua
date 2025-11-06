@@ -110,12 +110,13 @@ function M:removeAssign(field)
     if self.assigns:getSize() == 0 then
         self.assigns = nil
 
+        local rt = self.scope.rt
         local parent = self.parent
         for _ = 1, 100 do
             if not parent then
                 break
             end
-            parent.childs[self.key] = nil
+            parent.childs[rt.luaKey(self.key)] = nil
             if not next(parent.childs) then
                 parent.childs = nil
                 parent = parent.parent
@@ -291,10 +292,7 @@ function M:getChild(key1, key2, ...)
     local current = self
     if path then
         for _, k in ipairs(path) do
-            if type(k) ~= 'table' then
-                ---@cast k -Node
-                k = rt.value(k)
-            end
+            k = rt.luaKey(k)
             local child = current.childs and current.childs[k]
             if not child then
                 child = rt.variable(k, current)
@@ -304,10 +302,7 @@ function M:getChild(key1, key2, ...)
             current = child
         end
     end
-    if type(key) ~= 'table' then
-        ---@cast key -Node
-        key = rt.value(key)
-    end
+    key = rt.luaKey(key)
     local child = current.childs and current.childs[key]
     if not child then
         child = rt.variable(key, current)
@@ -333,10 +328,7 @@ function M:addField(field, path)
 
     if path then
         for _, k in ipairs(path) do
-            if type(k) ~= 'table' then
-                ---@cast k -Node
-                k = rt.value(k)
-            end
+            k = rt.luaKey(k)
             if not current.childs[k] then
                 current.childs[k] = rt.variable(k, current)
             end
@@ -347,10 +339,11 @@ function M:addField(field, path)
         end
     end
 
-    if not current.childs[field.key] then
-        current.childs[field.key] = rt.variable(field.key, current)
+    local fieldKey = rt.luaKey(field.key)
+    if not current.childs[fieldKey] then
+        current.childs[fieldKey] = rt.variable(fieldKey, current)
     end
-    current = current.childs[field.key]
+    current = current.childs[fieldKey]
     if field.value then
         current:addAssign(field)
     end
@@ -409,10 +402,7 @@ function M:setChild(key, variable)
         self.masterVariable:setChild(key, variable)
         return self
     end
-    if type(key) ~= 'table' then
-        ---@cast key -Node
-        key = self.scope.rt.value(key)
-    end
+    key = self.scope.rt.luaKey(key)
     if not self.childs then
         self.childs = {}
     end
@@ -441,10 +431,7 @@ function M:removeField(field, path)
     local rt = self.scope.rt
     if path then
         for _, k in ipairs(path) do
-            if type(k) ~= 'table' then
-                ---@cast k -Node
-                k = rt.value(k)
-            end
+            k = rt.luaKey(k)
             ---@type Node.Variable
             current = current.childs[k]
             if not current or not current.childs then
@@ -453,7 +440,8 @@ function M:removeField(field, path)
         end
     end
 
-    current = current.childs[field.key]
+    local fieldKey = rt.luaKey(field.key)
+    current = current.childs[fieldKey]
     if not current then
         return self
     end
@@ -494,6 +482,8 @@ M.__getter.allEquivalents = function (self)
     if self.masterVariable then
         return self.masterVariable.allEquivalents, true
     end
+    local rt = self.scope.rt
+    local key = rt.luaKey(self.key)
     ---@type (Node.Variable | Node.Field)[]
     local results = {}
     local visited = {}
@@ -531,7 +521,7 @@ M.__getter.allEquivalents = function (self)
             return
         end
         visited[value] = true
-        local child = value.fieldMap[self.key]
+        local child = value.fieldMap[rt.nodeKey(self.key)]
         if not child then
             return
         end
@@ -548,7 +538,7 @@ M.__getter.allEquivalents = function (self)
         for _, equivalent in ipairs(parent.allEquivalents) do
             if equivalent.kind == 'variable' then
                 ---@cast equivalent Node.Variable
-                local child = equivalent.childs and equivalent.childs[self.key]
+                local child = equivalent.childs and equivalent.childs[key]
                 if child and child ~= self then
                     results[#results+1] = child
                     equivalent:addRef(self)

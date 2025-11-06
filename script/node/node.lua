@@ -142,13 +142,6 @@ M.__getter.typeOfKey = function (self)
     return self.scope.rt.NEVER, true
 end
 
----@type Node.Key
-M.asKey = nil
-
-M.__getter.asKey = function (self)
-    return self, true
-end
-
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'
 
 function M:refreshCastCache()

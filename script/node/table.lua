@@ -78,17 +78,7 @@ M.__getter.fieldMap = function (self)
         return fieldMap, true
     end
 
-    local function merge(field, old)
-        if not old then
-            return field
-        end
-        if #old == 0 then
-            return { old, field }
-        else
-            old[#old+1] = field
-            return old
-        end
-    end
+    local rt = self.scope.rt
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
@@ -100,10 +90,12 @@ M.__getter.fieldMap = function (self)
         if key.kind == 'union' then
             ---@cast key Node.Union
             for _, k in ipairs(key.values) do
-                fieldMap[k] = merge(field, fieldMap[k])
+                k = rt.nodeKey(k)
+                fieldMap[k] = field
             end
         else
-            fieldMap[key] = merge(field, fieldMap[key])
+            key = rt.nodeKey(key)
+            fieldMap[key] = field
         end
     end
 
@@ -186,9 +178,10 @@ M.valueMap = nil
 ---@return table<Node, Node>
 ---@return true
 M.__getter.valueMap = function (self)
+    local rt = self.scope.rt
     local valueMap = {}
     for k, field in pairs(self.fieldMap) do
-        valueMap[k.asKey] = field
+        valueMap[rt.luaKey(k)] = field
     end
     return valueMap, true
 end
@@ -225,10 +218,11 @@ M.values = nil
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
+    local rt = self.scope.rt
     local values = {}
 
     for i, key in ipairs(self.keys) do
-        values[i] = self.valueMap[key.asKey]
+        values[i] = self.valueMap[rt.luaKey(key)]
     end
 
     return values, true
@@ -242,13 +236,10 @@ function M:get(key)
     if not self.fields then
         return rt.NIL, false
     end
-    if type(key) ~= 'table' then
-        ---@cast key -Node
-        key = rt.value(key)
-    end
+    key = rt.nodeKey(key)
     if key.kind == 'value' then
         ---@cast key Node.Value
-        local result = self.valueMap[key.asKey]
+        local result = self.valueMap[rt.luaKey(key)]
         if result then
             return result, true
         end
@@ -426,6 +417,7 @@ function M:onView(viewer, options)
     end
 
     local fields = {}
+    local rt = self.scope.rt
 
     for _, key in ipairs(self.keys) do
         local field = self.fieldMap[key]
@@ -441,7 +433,7 @@ function M:onView(viewer, options)
             end
         end
         ---@type Node.Key
-        local k = key.asKey
+        local k = rt.luaKey(key)
         local value = self.valueMap[k]
         fields[#fields+1] = string.format('%s: %s'
             , viewer:viewAsKey(key)

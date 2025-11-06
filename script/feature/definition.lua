@@ -245,7 +245,7 @@ local function findDefinitionOfField(parent, key, push, source)
     end)
     ---@param node Node.Variable
     child:each('variable', function (node)
-        if node.key.asKey ~= rt.key(key).asKey then
+        if rt.luaKey(node.key) ~= rt.luaKey(key) then
             return
         end
         push(ls.feature.helper.convertLocation(node.location))

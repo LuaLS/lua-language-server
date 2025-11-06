@@ -88,13 +88,28 @@ function M:fillAPIs()
 
     ---@param v Node.Key
     ---@return Node
-    function self.key(v)
+    function self.nodeKey(v)
         if type(v) == 'table' then
+            if v.kind == 'value' then
+                return self.value(v.literal)
+            end
             return v
         else
             ---@cast v -Node
             return self.value(v)
         end
+    end
+
+    ---@param k Node.Key
+    ---@return Node.Key
+    function self.luaKey(k)
+        if type(k) == 'table' then
+            ---@cast k Node
+            if k.kind == 'value' then
+                return k.literal
+            end
+        end
+        return k
     end
 
     ---@param value Node

@@ -10,6 +10,7 @@ CatStateParam.kind = 'catstateparam'
 ---@class LuaParser.Node.CatParamName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatStateParam
 ---@field id string
+---@field dummy? boolean
 local CatParamName = Class('LuaParser.Node.CatParamName', 'LuaParser.Node.Base')
 
 CatParamName.kind = 'catparamname'
@@ -30,6 +31,36 @@ function Ast:parseCatStateParam()
         key = key,
         start = key.start,
         optional = optional,
+    })
+
+    key.parent = catParam
+
+    self:skipSpace()
+
+    catParam.value = self:parseCatExp(true)
+
+    if catParam.value then
+        catParam.value.parent = catParam
+    end
+
+    catParam.finish = self:getLastPos()
+
+    return catParam
+end
+
+---@private
+---@return LuaParser.Node.CatStateParam?
+function Ast:parseCatStateVararg()
+    local key = self:createNode('LuaParser.Node.CatParamName', {
+        id     = '...',
+        start  = self:getLastPos(),
+        finish = self:getLastPos(),
+        dummy  = true,
+    })
+
+    local catParam = self:createNode('LuaParser.Node.CatStateParam', {
+        key = key,
+        start = key.start,
     })
 
     key.parent = catParam

@@ -39,7 +39,7 @@ function ls.feature.definition(uri, offset)
         end)
     end
 
-    return ls.feature.organizeResults(results)
+    return ls.feature.helper.organizeResults(results)
 end
 
 ---@param callback fun(param: Feature.Definition.Param, push: fun(loc: Location), skip: fun(priority?: integer))
@@ -52,24 +52,30 @@ function ls.feature.provider.definition(callback, priority)
     end
 end
 
--- 函数值的位置
+-- 函数或表的位置
 ls.feature.provider.definition(function (param, push)
     local first = param.sources[1]
     local node = param.scope.vm:getNode(first)
     if not node then
         return
     end
-    node = node:findValue { 'function' }
+    node = node:findValue { 'function', 'table' }
     if not node then
         return
     end
-    ---@cast node Node.Function
-    if node.location then
-        push {
-            uri = node.location.uri,
-            range = { node.location.offset, node.location.offset + node.location.length },
-            originRange = { first.start, first.finish },
-        }
+    if node.kind == 'function' then
+        ---@cast node Node.Function
+        if node.location then
+            push(ls.feature.helper.convertLocation(node.location, first))
+        end
+    end
+    if node.kind == 'table' then
+        ---@cast node Node.Table
+        if node.locations then
+            for _, location in ipairs(node.locations) do
+                push(ls.feature.helper.convertLocation(location, first))
+            end
+        end
     end
 end)
 
@@ -87,14 +93,14 @@ ls.feature.provider.definition(function (param, push, skip)
         return
     end
 
+    if variable.key.literal == '...' then
+        return
+    end
+
     -- 在声明处查询定义，则查询所有等价定义的赋值位置
     if var.kind == 'local' or var.kind == 'param' then
         for _, location in ipairs(variable:getEquivalentLocations()) do
-            push {
-                uri = location.uri,
-                range = { location.offset, location.offset + location.length },
-                originRange = { var.start, var.finish },
-            }
+            push(ls.feature.helper.convertLocation(location, var))
         end
         return
     end
@@ -107,11 +113,7 @@ ls.feature.provider.definition(function (param, push, skip)
         -- 如果是局部变量，则只查询声明位置
         local location = variable.location
         if location then
-            push {
-                uri = location.uri,
-                range = { location.offset, location.offset + location.length },
-                originRange = { var.start, var.finish },
-            }
+            push(ls.feature.helper.convertLocation(location, var))
             return
         end
 
@@ -121,11 +123,7 @@ ls.feature.provider.definition(function (param, push, skip)
                 ---@cast assign Node.Field
                 local location = assign.location
                 if location then
-                    push {
-                        uri = location.uri,
-                        range = { location.offset, location.offset + location.length },
-                        originRange = { var.start, var.finish },
-                    }
+                    push(ls.feature.helper.convertLocation(location, var))
                 end
             end
         end
@@ -173,11 +171,7 @@ ls.feature.provider.definition(function (param, push)
     -- 有个特殊规则，等价位置必须是 field ，且 field 名称要相同
 
     for _, location in ipairs(variable:getEquivalentLocations(true)) do
-        push {
-            uri = location.uri,
-            range = { location.offset, location.offset + location.length },
-            originRange = { field.start, field.finish },
-        }
+        push(ls.feature.helper.convertLocation(location, field))
     end
 end)
 
@@ -219,11 +213,7 @@ ls.feature.provider.definition(function (param, push)
             ---@cast class Node.Class
             local location = class.location
             if location then
-                push {
-                    uri = location.uri,
-                    range = { location.offset, location.offset + location.length },
-                    originRange = { source.start, source.finish },
-                }
+                push(ls.feature.helper.convertLocation(location, source))
             end
         end
     end
@@ -232,11 +222,7 @@ ls.feature.provider.definition(function (param, push)
             ---@cast alias Node.Alias
             local location = alias.location
             if location then
-                push {
-                    uri = location.uri,
-                    range = { location.offset, location.offset + location.length },
-                    originRange = { source.start, source.finish },
-                }
+                push(ls.feature.helper.convertLocation(location, source))
             end
         end
     end

@@ -9,7 +9,7 @@ M.masterVariable = nil
 
 ---@alias Node.Key string | number | boolean | Node
 
----@type Node
+---@type Node.Value
 M.key = nil
 
 ---@param scope Scope
@@ -17,7 +17,7 @@ M.key = nil
 ---@param parent? Node.Variable
 function M:__init(scope, name, parent)
     if type(name) == 'table' then
-        ---@cast name Node
+        ---@cast name Node.Value
         self.key = name
     else
         ---@cast name -Node
@@ -265,13 +265,8 @@ M.__getter.fields = function (self)
     if #childs == 0 then
         return false, true
     end
-    if #childs == 1 then
-        return childs[1], true
-    end
 
-    local t = self.scope.rt.table()
-    t:addChilds(childs)
-    return t, true
+    return self.scope.rt.mergeTables(childs), true
 end
 
 ---@type table<Node, Node.Variable>?
@@ -655,13 +650,7 @@ M.__getter.equivalentValue = function (self)
     ls.util.arrayRemoveDuplicate(tableParts)
 
     if not hasType and #tableParts > 0 then
-        if #tableParts == 1 then
-            unionResults[#unionResults+1] = tableParts[1]
-        else
-            local tableNode = rt.table()
-            tableNode:addChilds(tableParts)
-            unionResults[#unionResults+1] = tableNode
-        end
+        unionResults[#unionResults+1] = rt.mergeTables(tableParts)
     end
 
     local result = #unionResults > 0 and rt.union(unionResults)

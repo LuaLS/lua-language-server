@@ -87,9 +87,8 @@ M.extendsTable = nil
 ---@return Node.Table
 ---@return true
 M.__getter.extendsTable = function (self)
-    local table = self.scope.rt.table()
     if #self.fullExtends == 0 then
-        return table, true
+        return self.scope.rt.table(), true
     end
 
     ---@type Node.Table[]
@@ -101,6 +100,7 @@ M.__getter.extendsTable = function (self)
         elseif v.kind == 'type' then
             ---@cast v Node.Type
             tables[#tables+1] = v.fieldTable
+            tables[#tables+1] = v.variableTable
         else
             ---@cast v -Node.Table, -Node.Type
             local vv = v.value
@@ -110,32 +110,55 @@ M.__getter.extendsTable = function (self)
             end
         end
     end
-    table:addChilds(tables)
+
+    local table = self.scope.rt.mergeTables(tables)
 
     return table, true
 end
 
 --- 类型自身的字段（一般是通过 ---@field 添加）
 ---@type Node.Table
-M.table = nil
+M.fieldTable = nil
 
 ---@param self Node.Call
 ---@return Node.Table
 ---@return true
-M.__getter.table = function (self)
-    local table = self.scope.rt.table()
+M.__getter.fieldTable = function (self)
     local head = self.head
     head:addRef(self)
+    local fieldsTable = {}
     if head.classes then
-        local fields = {}
         for _, class in ipairs(self.protoClasses) do
             if class.fields then
                 class:addRef(self)
-                fields[#fields+1] = class.fields:resolveGeneric(class:makeGenericMap(self.args))
+                fieldsTable[#fieldsTable+1] = class.fields:resolveGeneric(class:makeGenericMap(self.args))
             end
         end
-        table:addChilds(fields)
     end
+    local table = self.scope.rt.mergeTables(fieldsTable)
+    return table, true
+end
+
+-- 绑定变量的字段合并表
+---@type Node.Table
+M.variableTable = nil
+
+---@param self Node.Call
+---@return Node.Table
+---@return true
+M.__getter.variableTable = function (self)
+    local variableTables = {}
+    for _, class in ipairs(self.protoClasses) do
+        if class.variables then
+            for variable in class.variables:pairsFast() do
+                variable:addRef(self)
+                if variable.fields then
+                    variableTables[#variableTables+1] = variable.fields
+                end
+            end
+        end
+    end
+    local table = self.scope.rt.mergeTables(variableTables)
     return table, true
 end
 
@@ -156,29 +179,13 @@ M.__getter.value = function (self)
     if head:isClassLike() then
         local merging = {}
         -- 1. 直接写在 class 里的字段
-        merging[#merging+1] = self.table
+        merging[#merging+1] = self.fieldTable
         -- 2. 绑定的变量里的字段
-        for _, class in ipairs(self.protoClasses) do
-            if class.variables then
-                for variable in class.variables:pairsFast() do
-                    ---@cast variable Node.Variable
-                    if variable.fields then
-                        merging[#merging+1] = variable.fields
-                    end
-                end
-            end
-        end
+        merging[#merging+1] = self.variableTable
         -- 3. 继承来的字段
-        if not self.extendsTable:isEmpty() then
-            merging[#merging+1] = self.extendsTable
-        end
+        merging[#merging+1] = self.extendsTable
 
-        if #merging == 1 then
-            return merging[1], true
-        end
-
-        local value = self.scope.rt.table()
-        value:addChilds(merging)
+        local value = self.scope.rt.mergeTables(merging)
         return value, true
     end
     if head:isAliasLike() then

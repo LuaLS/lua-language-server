@@ -224,6 +224,18 @@ function M:fillAPIs()
     function self.field(key, value)
         return New 'Node.Field' (scope, key, value)
     end
+
+    ---@param childs Node.Table[]
+    ---@return Node.Table
+    function self.mergeTables(childs)
+        if #childs == 0 then
+            return self.table()
+        end
+        if #childs == 1 then
+            return childs[1]
+        end
+        return self.table():addChilds(childs)
+    end
 end
 
 ---@private

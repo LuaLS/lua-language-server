@@ -241,6 +241,10 @@ ls.vm.registerCoderProvider('cattable', function (coder, source)
     coder:addLine('{key} = rt.table()' % {
         key = coder:getKey(source),
     })
+    coder:addLine('{key}:addLocation {location}' % {
+        key      = coder:getKey(source),
+        location = coder:makeLocationCode(source),
+    })
 
     for i, field in ipairs(source.fields) do
         coder:compile(field)

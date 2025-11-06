@@ -221,9 +221,8 @@ M.extendsTable = nil
 ---@return Node.Table
 ---@return true
 M.__getter.extendsTable = function (self)
-    local table = self.scope.rt.table()
     if #self.fullExtends == 0 then
-        return table, true
+        return self.scope.rt.table(), true
     end
 
     ---@type Node.Table[]
@@ -245,7 +244,8 @@ M.__getter.extendsTable = function (self)
             end
         end
     end
-    table:addChilds(tables)
+
+    local table = self.scope.rt.mergeTables(tables)
 
     return table, true
 end
@@ -265,14 +265,7 @@ M.__getter.fieldTable = function (self)
             fieldsTable[#fieldsTable+1] = class.fields
         end
     end
-    if #fieldsTable == 0 then
-        return self.scope.rt.table(), true
-    end
-    if #fieldsTable == 1 then
-        return fieldsTable[1], true
-    end
-    local table = self.scope.rt.table()
-    table:addChilds(fieldsTable)
+    local table = self.scope.rt.mergeTables(fieldsTable)
     return table, true
 end
 
@@ -295,14 +288,7 @@ M.__getter.variableTable = function (self)
             end
         end
     end
-    if #variableTables == 0 then
-        return self.scope.rt.table(), true
-    end
-    if #variableTables == 1 then
-        return variableTables[1], true
-    end
-    local table = self.scope.rt.table()
-    table:addChilds(variableTables)
+    local table = self.scope.rt.mergeTables(variableTables)
     return table, true
 end
 
@@ -324,16 +310,9 @@ M.__getter.value = function (self)
         -- 2. 绑定的变量里的字段
         merging[#merging+1] = self.variableTable
         -- 3. 继承来的字段
-        if not self.extendsTable:isEmpty() then
-            merging[#merging+1] = self.extendsTable
-        end
+        merging[#merging+1] = self.extendsTable
 
-        if #merging == 1 then
-            return merging[1], true
-        end
-
-        local value = self.scope.rt.table()
-        value:addChilds(merging)
+        local value = self.scope.rt.mergeTables(merging)
         return value, true
     end
     if self:isAliasLike() then
@@ -367,13 +346,7 @@ M.__getter.expectValue = function (self)
         -- 1. 直接写在 class 里的字段
         merging[#merging+1] = self.fieldTable
 
-        if #merging == 1 then
-            return merging[1], true
-        end
-
-        local value = self.scope.rt.table()
-        value:addChilds(merging)
-        return value, true
+        return self.scope.rt.mergeTables(merging), true
     end
     if self:isAliasLike() then
         ---@type Node[]

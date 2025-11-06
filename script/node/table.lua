@@ -54,6 +54,17 @@ function M:isEmpty()
     return self.fields:getSize() == 0
 end
 
+---@type Node.Location[]?
+M.locations = nil
+
+---@param location Node.Location
+function M:addLocation(location)
+    if not self.locations then
+        self.locations = {}
+    end
+    self.locations[#self.locations+1] = location
+end
+
 ---@type table<Node, Node.Field|Node.Field[]>
 M.fieldMap = nil
 
@@ -334,7 +345,8 @@ function M:onCanCast(other)
 end
 
 ---越靠前的字段越优先。
----@param childs Node.Table[]
+---@param childs Node
+---@return Node.Table
 function M:addChilds(childs)
     local rt = self.scope.rt
     rt:lockCache()
@@ -343,8 +355,19 @@ function M:addChilds(childs)
     local addedKeys = {}
     for _, child in ipairs(childs) do
         local value = child.value
-        if value.kind == 'table' then
-            ---@cast value Node.Table
+        if value.kind ~= 'table' then
+            value = value:findValue { 'table' }
+            if not value then
+                goto continue
+            end
+        end
+        ---@cast value Node.Table
+        if value.locations then
+            for _, loc in ipairs(value.locations) do
+                self:addLocation(loc)
+            end
+        end
+        if value.fields then
             for key, field in pairs(value.fieldMap) do
                 if  not addedKeys[key]
                 and not fieldMap[key] then
@@ -353,9 +376,11 @@ function M:addChilds(childs)
                 end
             end
         end
+        ::continue::
     end
 
     rt:unlockCache()
+    return self
 end
 
 ---@param self Node.Table

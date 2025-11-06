@@ -92,6 +92,10 @@ Ast:registerCatParser('generic', {
     asState = true,
     parser = Ast.parseCatStateGeneric,
 })
+Ast:registerCatParser('vararg', {
+    asState = true,
+    parser = Ast.parseCatStateVararg,
+})
 
 ---@private
 ---@return boolean

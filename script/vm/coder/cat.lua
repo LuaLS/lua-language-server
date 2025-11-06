@@ -62,11 +62,7 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
 
     local field = coder:getKey(source)
     coder:addLine([[
-{field} = {
-key = {key},
-value = {value},
-location = {location},
-}
+{field} = rt.field({key}, {value}):setLocation {location}
 ]] % {
         field = field,
         key = key,
@@ -259,11 +255,7 @@ ls.vm.registerCoderProvider('cattablefield', function (coder, source)
     coder:compile(source.value)
 
     coder:addLine([[
-{field} = {
-    key      = {key},
-    value    = {value},
-    location = {location},
-}
+{field} = rt.field({key}, {value}):setLocation {location}
 ]] % {
         field    = coder:getKey(source),
         key      = coder:getKey(source.key),

@@ -739,10 +739,7 @@ M.__getter.childsValue = function (self)
     for key, var in pairs(self.childs) do
         var:addRef(self)
         if var.assigns or var.childs then
-            fields[#fields+1] = {
-                key   = key,
-                value = var,
-            }
+            fields[#fields+1] = rt.field(key, var)
         end
     end
     if #fields == 0 then

@@ -63,11 +63,7 @@ function M:compileAssign(var, index, valueKey)
     end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
     self:addLine([[
-{fieldKey} = {
-    key      = {key},
-    value    = {value},
-    location = {location},
-}
+{fieldKey} = rt.field({key}, {value}):setLocation {location}
 ]] % {
         fieldKey = fieldKey,
         key      = key,

@@ -98,7 +98,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         coder:addLine('{key} = rt.func()' % {
             key = coder:getKey(source),
         })
-        coder:addLine('{key}:setLocation({location})' % {
+        coder:addLine('{key}:setLocation {location}' % {
             key      = coder:getKey(source),
             location = coder:makeLocationCode(source),
         })

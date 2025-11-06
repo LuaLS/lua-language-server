@@ -5,14 +5,8 @@ do
 
     assert(t:view() == '{}')
 
-    local field1 = {
-        key = rt.value 'x',
-        value = rt.NUMBER
-    }
-    local field2 = {
-        key = rt.value 'y',
-        value = rt.STRING
-    }
+    local field1 = rt.field('x', rt.NUMBER)
+    local field2 = rt.field('y', rt.STRING)
 
     t:addField(field1)
     assert(t:view() == '{ x: number }')
@@ -34,14 +28,8 @@ do
 
     assert(a:get 'x' == rt.NEVER)
 
-    local field1 = {
-        key = rt.value 'x',
-        value = rt.NUMBER
-    }
-    local field2 = {
-        key = rt.value 'x',
-        value = rt.STRING
-    }
+    local field1 = rt.field('x', rt.NUMBER)
+    local field2 = rt.field('x', rt.STRING)
     local ca = rt.class 'A'
     assert(a:get 'x' == rt.NIL)
 

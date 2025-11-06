@@ -48,13 +48,7 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
     end
     coder:compile(source.value)
 
-    coder:addLine([[
-{field} = {
-    key      = {key},
-    value    = {value},
-    location = {location},
-}
-]] % {
+    coder:addLine('{field} = rt.field({key}, {value}):setLocation {location}' % {
         field    = coder:getKey(source),
         key      = key,
         value    = coder:getKey(source.value),

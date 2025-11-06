@@ -686,9 +686,16 @@ end
 function M:getEquivalentLocations(onlySameKey)
     ---@type Node.Location[]
     local locations = {}
-    for _, equivalent in ipairs(self.allEquivalents) do
+    local visited = {}
+
+    ---@param equivalent Node.Variable | Node.Field
+    local function lookIntoEquivalent(equivalent)
+        if visited[equivalent] then
+            return
+        end
+        visited[equivalent] = true
         if onlySameKey and equivalent.key ~= self.key then
-            goto continue
+            return
         end
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable
@@ -703,8 +710,13 @@ function M:getEquivalentLocations(onlySameKey)
             ---@cast equivalent Node.Field
             locations[#locations+1] = equivalent.location
         end
-        ::continue::
     end
+    for _, equivalent in ipairs(self.allEquivalents) do
+        lookIntoEquivalent(equivalent)
+    end
+
+    self.value:each('variable', lookIntoEquivalent)
+
     ls.util.arrayRemoveDuplicate(locations)
     return locations
 end

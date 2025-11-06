@@ -324,3 +324,18 @@ do
 
     assert(rt:globalGet('X'):view() == '1')
 end
+
+do
+    TEST_INDEX [[
+        ---@class A
+        local m = {}
+        m.x = 1
+
+        ---@type A
+        local n
+
+        V = n.x
+    ]]
+
+    assert(rt:globalGet('V'):view() == '1')
+end

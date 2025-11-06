@@ -402,7 +402,7 @@ function M:getExpect(key)
         local expectValue = rt.union(ls.util.map(self.types:toArray(), function (v)
             if v.kind == 'type' then
                 ---@cast v Node.Type
-                return v.expectValue
+                return v.value
             end
             return v
         end))

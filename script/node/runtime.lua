@@ -86,6 +86,17 @@ function M:fillAPIs()
         return self.VALUE_POOL[v]
     end
 
+    ---@param v Node.Key
+    ---@return Node
+    function self.key(v)
+        if type(v) == 'table' then
+            return v
+        else
+            ---@cast v -Node
+            return self.value(v)
+        end
+    end
+
     ---@param value Node
     ---@return Node.Array
     function self.array(value)

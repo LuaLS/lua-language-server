@@ -188,11 +188,7 @@ M.valueMap = nil
 M.__getter.valueMap = function (self)
     local valueMap = {}
     for k, field in pairs(self.fieldMap) do
-        if k.kind == 'value' then
-            valueMap[k.literal] = field
-        else
-            valueMap[k] = field
-        end
+        valueMap[k.asKey] = field
     end
     return valueMap, true
 end
@@ -232,11 +228,7 @@ M.__getter.values = function (self)
     local values = {}
 
     for i, key in ipairs(self.keys) do
-        if key.kind == 'value' then
-            values[i] = self.valueMap[key.literal]
-        else
-            values[i] = self.valueMap[key]
-        end
+        values[i] = self.valueMap[key.asKey]
     end
 
     return values, true
@@ -256,7 +248,7 @@ function M:get(key)
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
-        local result = self.valueMap[key.literal]
+        local result = self.valueMap[key.asKey]
         if result then
             return result, true
         end
@@ -449,10 +441,7 @@ function M:onView(viewer, options)
             end
         end
         ---@type Node.Key
-        local k = key
-        if k.kind == 'value' then
-            k = k.literal
-        end
+        local k = key.asKey
         local value = self.valueMap[k]
         fields[#fields+1] = string.format('%s: %s'
             , viewer:viewAsKey(key)

@@ -191,19 +191,10 @@ ls.feature.provider.definition(function (param, push, skip)
     }
 end)
 
--- LuaCats 的类
-ls.feature.provider.definition(function (param, push)
-    local source = param.sources[1]
-    if not source or source.kind ~= 'catid' then
-        return
-    end
-
-    local node = param.scope.vm:getNode(source)
-    if not node or node.kind ~= 'type' then
-        return
-    end
-
-    ---@cast node Node.Type
+---@param node Node.Type
+---@param push fun(loc: Location)
+---@param source? LuaParser.Node.Base
+local function findDefinitionOfType(node, push, source)
     if node.classes then
         for class in node.classes:pairsFast() do
             ---@cast class Node.Class
@@ -221,5 +212,62 @@ ls.feature.provider.definition(function (param, push)
                 push(ls.feature.helper.convertLocation(location, source))
             end
         end
+    end
+end
+
+-- LuaCats 的类
+ls.feature.provider.definition(function (param, push)
+    local source = param.sources[1]
+    if not source or source.kind ~= 'catid' then
+        return
+    end
+
+    local node = param.scope.vm:getNode(source)
+    if not node or node.kind ~= 'type' then
+        return
+    end
+
+    ---@cast node Node.Type
+    findDefinitionOfType(node, push)
+end)
+
+---@param parent Node.Type
+---@param key Node.Key
+---@param push fun(loc: Location)
+---@param source? LuaParser.Node.Base
+local function findDefinitionOfField(parent, key, push, source)
+    local rt = parent.scope.rt
+    local child = parent:get(key)
+
+    ---@param node Node.Field
+    child:each('field', function (node)
+        push(ls.feature.helper.convertLocation(node.location))
+    end)
+    ---@param node Node.Variable
+    child:each('variable', function (node)
+        if node.key.asKey ~= rt.key(key).asKey then
+            return
+        end
+        push(ls.feature.helper.convertLocation(node.location))
+    end)
+end
+
+-- see 跳转，这个以后挪到文件符号功能里
+ls.feature.provider.definition(function (param, push)
+    local source = param.sources[1]
+    if not source or source.kind ~= 'catseename' then
+        return
+    end
+    ---@cast source LuaParser.Node.CatSeeName
+    local names = ls.util.split(source.id, '.')
+    local rt = param.scope.rt
+
+    local t = rt.type(names[1])
+    findDefinitionOfType(t, push, source)
+
+    for i = 2, #names do
+        findDefinitionOfField(t, names[i], push, source)
+        t = rt.type(table.concat(names, '.', 1, i))
+        findDefinitionOfType(t, push, source)
     end
 end)

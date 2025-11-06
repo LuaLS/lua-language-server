@@ -89,6 +89,7 @@ local Base = Class 'LuaParser.Node.Base'
 ---| 'catarray'
 ---| 'catcall'
 ---| 'catunion'
+---| 'catseename'
 
 ---@alias LuaParser.OtherKind
 ---| 'param'

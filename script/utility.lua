@@ -1232,4 +1232,22 @@ function m.enableDividStringAsPath()
     end
 end
 
+---@param str string
+---@param sep string
+---@return string[]
+function m.split(str, sep)
+    local result = {}
+    local offset = 1
+    while offset <= #str do
+        local s, e = str:find(sep, offset, true)
+        if not s then
+            result[#result+1] = str:sub(offset)
+            break
+        end
+        result[#result+1] = str:sub(offset, s - 1)
+        offset = e + 1
+    end
+    return result
+end
+
 return m

@@ -64,18 +64,6 @@ function M:getVariable(source)
 end
 
 ---@param source LuaParser.Node.Base
----@param key Node.Key
----@return Node.Field[]?
-function M:findFields(source, key)
-    local uri = source.ast.source
-    local vfile = self:getFile(uri)
-    if not vfile then
-        return nil
-    end
-    return vfile:findFields(source, key)
-end
-
----@param source LuaParser.Node.Base
 ---@return VM.Coder?
 function M:getCoder(source)
     local uri = source.ast.source

@@ -220,7 +220,7 @@ TEST [[
 ---@class A
 local mt
 
-function <!mt:f!>()
+function mt:<!f!>()
 end
 
 ---@see <?A.f?>
@@ -228,7 +228,7 @@ end
 
 TEST [[
 AAA = {}
-<!AAA.BBB!> = 1
+AAA.<!BBB!> = 1
 
 ---@see <?AAA.BBB?>
 ]]

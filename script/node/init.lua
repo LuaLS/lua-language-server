@@ -25,3 +25,4 @@ require 'node.template'
 require 'node.field'
 
 require 'node.runtime'
+require 'node.runtime-helper'

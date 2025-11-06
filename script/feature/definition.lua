@@ -231,43 +231,32 @@ ls.feature.provider.definition(function (param, push)
     findDefinitionOfType(node, push)
 end)
 
----@param parent Node.Type
----@param key Node.Key
----@param push fun(loc: Location)
----@param source? LuaParser.Node.Base
-local function findDefinitionOfField(parent, key, push, source)
-    local rt = parent.scope.rt
-    local child = parent:get(key)
-
-    ---@param node Node.Field
-    child:each('field', function (node)
-        push(ls.feature.helper.convertLocation(node.location))
-    end)
-    ---@param node Node.Variable
-    child:each('variable', function (node)
-        if rt.luaKey(node.key) ~= rt.luaKey(key) then
-            return
-        end
-        push(ls.feature.helper.convertLocation(node.location))
-    end)
-end
-
 -- see 跳转，这个以后挪到文件符号功能里
 ls.feature.provider.definition(function (param, push)
     local source = param.sources[1]
     if not source or source.kind ~= 'catseename' then
         return
     end
+    local rt = param.scope.rt
     ---@cast source LuaParser.Node.CatSeeName
     local names = ls.util.split(source.id, '.')
-    local rt = param.scope.rt
 
-    local t = rt.type(names[1])
-    findDefinitionOfType(t, push, source)
+    findDefinitionOfType(rt.type(source.id), push, source)
+
+    local varFields = rt:findGlobalVariableFields(table.unpack(names))
+    for _, field in ipairs(varFields) do
+        if field.location then
+            push(ls.feature.helper.convertLocation(field.location, source))
+        end
+    end
 
     for i = 2, #names do
-        findDefinitionOfField(t, names[i], push, source)
-        t = rt.type(table.concat(names, '.', 1, i))
-        findDefinitionOfType(t, push, source)
+        local t = rt.type(table.concat(names, '.', 1, i - 1))
+        local fields = rt:findFields(t, names[i])
+        for _, field in ipairs(fields) do
+            if field.location then
+                push(ls.feature.helper.convertLocation(field.location, source))
+            end
+        end
     end
 end)

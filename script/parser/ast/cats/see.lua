@@ -14,10 +14,24 @@ CatSeeName.kind = 'catseename'
 local Ast = Class 'LuaParser.Ast'
 
 function Ast:parseCatStateSee()
-    local value = self:parseID('LuaParser.Node.CatSeeName', true, 'yes')
-    if not value then
+    local _, _, pos = self.lexer:peek()
+    if not pos then
         return nil
     end
+
+    local id = self.code:match('^[%a\x80-\xff_][%w\x80-\xff_%.%*%-]*', pos + 1)
+    if not id then
+        return nil
+    end
+
+    local finish = pos + #id
+    self.lexer:moveTo(finish)
+
+    local value = self:createNode('LuaParser.Node.CatSeeName', {
+        id     = id,
+        start  = pos,
+        finish = finish,
+    })
 
     local catSee = self:createNode('LuaParser.Node.CatStateSee', {
         value  = value,

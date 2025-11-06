@@ -80,14 +80,6 @@ function M:getVariable(source)
     return nil
 end
 
----@param source LuaParser.Node.Base
----@param key Node.Key
----@return Node.Field[]?
-function M:findFields(source, key)
-    error('Not implemented')
-    return nil
-end
-
 function M:remove()
     Delete(self)
 end

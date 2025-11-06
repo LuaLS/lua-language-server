@@ -7,12 +7,6 @@ local M = ls.node.register 'Node.Table'
 
 M.kind = 'table'
 
----@class Node.Field
----@field key Node
----@field value? Node
----@field location? Node.Location
----@field hideInView? boolean
-
 ---@type LinkedTable?
 M.fields = nil
 
@@ -23,13 +17,10 @@ function M:__init(scope, fields)
     if fields and next(fields) then
         self.fields = ls.tools.linkedTable.create()
         for k, v in pairs(fields) do
-            if type(k) ~= 'table' then
-                k = scope.rt.value(k)
-            end
             if type(v) ~= 'table' then
                 v = scope.rt.value(v)
             end
-            self.fields:pushTail { key = k, value = v }
+            self.fields:pushTail(scope.rt.field(k, v))
         end
     end
 end
@@ -389,9 +380,8 @@ M.__getter.hasGeneric = function (self)
     self.hasGeneric = false
     local hasGeneric = false
     for field in self.fields:pairsFast() do
-        field.key:addRef(self)
-        field.value:addRef(self)
-        if field.key.hasGeneric or field.value.hasGeneric then
+        field:addRef(self)
+        if field.hasGeneric then
             hasGeneric = true
         end
     end
@@ -405,15 +395,7 @@ function M:resolveGeneric(map)
     local newTable = self.scope.rt.table()
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        if field.key.hasGeneric
-        or field.value.hasGeneric then
-            newTable:addField {
-                key   = field.key:resolveGeneric(map),
-                value = field.value:resolveGeneric(map),
-            }
-        else
-            newTable:addField(field)
-        end
+        newTable:addField(field:resolveGeneric(map))
     end
     return newTable
 end
@@ -424,18 +406,7 @@ function M:inferGeneric(other, result)
     end
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        if field.key.hasGeneric then
-            -- 仅支持 [K] 这种形式的推导，不支持 [K[]] 等嵌套形式
-            if  field.key.kind == 'generic'
-            and other.typeOfKey ~= self.scope.rt.NEVER then
-                field.key:inferGeneric(other.typeOfKey, result)
-                if field.value.hasGeneric then
-                    field.value:inferGeneric(other:get(self.scope.rt.ANY), result)
-                end
-            end
-        elseif field.value.hasGeneric then
-            field.value:inferGeneric(other:get(field.key), result)
-        end
+        field:inferGeneric(other, result)
     end
 end
 

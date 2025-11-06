@@ -31,6 +31,7 @@ Extends('Node', 'Node.RefModule')
 ---| 'alias'
 ---| 'fcall'
 ---| 'select'
+---| 'field'
 
 ---@class Node.Location
 ---@field uri Uri

@@ -74,20 +74,14 @@ do
     local T = rt.generic 'T'
 
     local ca = rt.class('A', { T })
-        : addField {
-            key = rt.value 'x',
-            value = T,
-        }
+        : addField(rt.field('x', T))
 
     local an = a:call { rt.NUMBER }
     assert(an.value:view() == '{ x: number }')
     assert(an:get('x'):view() == 'number')
     assert(an:get('y'):view() == 'nil')
 
-    ca:addField {
-        key = rt.value 'y',
-        value = rt.STRING,
-    }
+    ca:addField(rt.field('y', rt.STRING))
     assert(an.value:view() == '{ x: number, y: string }')
     assert(an:get('y'):view() == 'string')
 end
@@ -104,14 +98,8 @@ do
     assert(sec:view() == '{ x: 1 } & { y: 2 }')
     assert(sec.value:view() == '{ x: 1, y: 2 }')
 
-    t1:addField {
-        key = rt.value 'xx',
-        value = rt.value(11)
-    }
-    t2:addField {
-        key = rt.value 'yy',
-        value = rt.value(22)
-    }
+    t1:addField(rt.field('xx', rt.value(11)))
+    t2:addField(rt.field('yy', rt.value(22)))
 
     assert(sec:view() == '{ x: 1, xx: 11 } & { y: 2, yy: 22 }')
     assert(sec.value:view() == '{ x: 1, xx: 11, y: 2, yy: 22 }')
@@ -126,9 +114,6 @@ do
     }
     assert((t1 >> t2) == false)
 
-    t1:addField {
-        key = rt.value 'y',
-        value = rt.value(2)
-    }
+    t1:addField(rt.field('y', rt.value(2)))
     assert((t1 >> t2) == true)
 end

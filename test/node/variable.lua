@@ -39,10 +39,7 @@ do
     rt:reset()
     local var = rt.variable('x')
 
-    var:addField {
-        key = rt.value 'n',
-        value = rt.type 'number',
-    }
+    var:addField(rt.field(rt.value 'n', rt.type 'number'))
 
     assert(var:viewAsVariable() == 'x')
     assert(var.value:view() == '{ n: number }')
@@ -57,10 +54,7 @@ do
     ca:addVariable(var)
     assert(a.value:view() == '{ n: number }')
 
-    var:addField {
-        key = rt.value 'self',
-        value = a,
-    }
+    var:addField(rt.field(rt.value 'self', a))
     assert(var.value:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, self: A }')
 
@@ -69,10 +63,7 @@ do
     assert(var.fields:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, self: A }')
 
-    ca:addField {
-        key = rt.value 's',
-        value = rt.type 'string',
-    }
+    ca:addField(rt.field(rt.value 's', rt.type 'string'))
     assert(var.value:view() == 'A')
     assert(var.fields:view() == '{ n: number, self: A }')
     assert(a.value:view() == '{ n: number, s: string, self: A }')
@@ -91,23 +82,14 @@ do
 
     local a = rt.type 'A'
     local ca = rt.class 'A'
-    ca:addField {
-        key = rt.value 'x',
-        value = rt.type 'number',
-    }
+    ca:addField(rt.field(rt.value 'x', rt.type 'number'))
 
     local m = rt.variable 'M'
     ca:addVariable(m)
     m:addClass(ca)
 
-    m:addField {
-        key = rt.value '__index',
-        value = m,
-    }
-    m:addField {
-        key = rt.value 'y',
-        value = rt.value 'abc',
-    }
+    m:addField(rt.field(rt.value '__index', m))
+    m:addField(rt.field(rt.value 'y', rt.value 'abc'))
 
     assert(a.value:view() == '{ x: number, y: "abc", __index: A }')
     assert(m.value:view() == 'A')
@@ -121,10 +103,7 @@ do
     rt:reset()
 
     local a = rt.variable 'a'
-    a:addField ({
-        key = rt.value 'd',
-        value = rt.value(1),
-    }, {'b', 'c'})
+    a:addField(rt.field(rt.value 'd', rt.value(1)), {'b', 'c'})
     assert(a:viewAsVariable() == 'a')
     assert(a:view() == '{ b: { c: { d: 1 } } }')
 
@@ -155,10 +134,7 @@ do
     rt:reset()
 
     local a = rt.variable 'a'
-    local d = a:addField({
-        key = rt.value 'd',
-        value = rt.table(),
-    }, {'b', 'c'})
+    local d = a:addField(rt.field(rt.value 'd', rt.table()), {'b', 'c'})
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == '{}')
     assert(d.fields:view() == '{}')
@@ -172,20 +148,14 @@ do
     assert(d.fields:view() == '{}')
     assert(A.value:view() == '{}')
 
-    local dx = {
-        key = rt.value 'x',
-        value = rt.value(1),
-    }
+    local dx = rt.field(rt.value 'x', rt.value(1))
     d:addField(dx)
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
     assert(d.fields:view() == '{ x: 1 }')
     assert(A.value:view() == '{ x: 1 }')
 
-    local dy = {
-        key = rt.value 'y',
-        value = rt.value(2),
-    }
+    local dy = rt.field(rt.value 'y', rt.value(2))
     a:addField(dy, {'b', 'c', 'd'})
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
@@ -214,16 +184,10 @@ do
     ]]
 
     local X = rt.variable 'X'
-    X:addField {
-        key   = rt.value 'a',
-        value = rt.value(1),
-    }
+    X:addField(rt.field(rt.value 'a', rt.value(1)))
 
     local T = rt.variable 't'
-    T:addAssign {
-        key   = rt.value 't',
-        value = X,
-    }
+    T:addAssign(rt.field(rt.value 't', X))
 
     assert(T.fields == false)
     assert(T:view() == '{ a: 1 }')
@@ -241,16 +205,10 @@ do
     ]]
 
     local X = rt.variable 'X'
-    X:addField({
-        key   = rt.value 'b',
-        value = rt.value(1),
-    }, { 'a' })
+    X:addField(rt.field(rt.value 'b', rt.value(1)), { 'a' })
 
     local T = rt.variable 't'
-    T:addAssign {
-        key   = rt.value 't',
-        value = X,
-    }
+    T:addAssign(rt.field(rt.value 't', X))
 
     assert(T.fields == false)
     assert(T:view() == '{ a: { b: 1 } }')
@@ -268,16 +226,10 @@ do
     ]]
 
     local X = rt.variable 'X'
-    X:addField({
-        key   = rt.value 'b',
-        value = rt.value(1),
-    }, { 'a' })
+    X:addField(rt.field(rt.value 'b', rt.value(1)), { 'a' })
 
     local T = rt.variable 't'
-    T:addAssign {
-        key   = rt.value 't',
-        value = X:getChild 'a',
-    }
+    T:addAssign(rt.field(rt.value 't', X:getChild 'a'))
 
     assert(T.fields == false)
     assert(T:view() == '{ b: 1 }')
@@ -295,21 +247,11 @@ do
     print(z.a)
     ]]
     local X = rt.variable 'x'
-    X:addField {
-        key   = rt.value 'a',
-        value = rt.value(1),
-        location = { uri = test.fileUri, offset = 0 },
-    }
+    X:addField(rt.field(rt.value 'a', rt.value(1)):setLocation({ uri = test.fileUri, offset = 0 }))
     local Y = rt.variable 'y'
-    Y:addAssign {
-        key   = rt.value 'y',
-        value = X,
-    }
+    Y:addAssign(rt.field(rt.value 'y', X))
     local Z = rt.variable 'z'
-    Z:addAssign {
-        key   = rt.value 'z',
-        value = Y,
-    }
+    Z:addAssign(rt.field(rt.value 'z', Y))
     local A = Z:getChild 'a'
 
     assert(Z:view() == '{ a: 1 }')

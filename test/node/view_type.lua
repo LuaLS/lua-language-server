@@ -19,14 +19,8 @@ do
 
     local a = rt.type('A')
     rt.class('A')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field(rt.value 'x', rt.value 'x'))
+        : addField(rt.field(rt.value 'y', rt.value 'y'))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ x: "x", y: "y" }')
@@ -50,22 +44,13 @@ do
     local a = rt.type('A')
     local b = rt.type('B')
     rt.class('B')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
+        : addField(rt.field(rt.value 'x', rt.value 'x'))
     local c = rt.type('C')
     rt.class('C')
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field(rt.value 'y', rt.value 'y'))
     local d = rt.type('D')
     rt.class('D')
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z'
-        }
+        : addField(rt.field(rt.value 'z', rt.value 'z'))
 
     rt.class('A', nil, { b, c, d })
 
@@ -93,39 +78,21 @@ do
 
     local a = rt.type('A')
     rt.class('A')
-        : addField {
-            key   = rt.value 'w',
-            value = rt.value '1'
-        }
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value '2'
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value '3'
-        }
+        : addField(rt.field(rt.value 'w', rt.value '1'))
+        : addField(rt.field(rt.value 'x', rt.value '2'))
+        : addField(rt.field(rt.value 'y', rt.value '3'))
         : addExtends(rt.type 'B')
         : addExtends(rt.type 'C')
         : addExtends(rt.type 'D')
 
     rt.class('B')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
+        : addField(rt.field(rt.value 'x', rt.value 'x'))
 
     rt.class('C')
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field(rt.value 'y', rt.value 'y'))
 
     rt.class('D')
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z'
-        }
+        : addField(rt.field(rt.value 'z', rt.value 'z'))
 
     assert(a:view() == 'A')
     assert(a.value:view() == '{ w: "1", x: "2", y: "3", z: "z" }')
@@ -210,18 +177,12 @@ do
 
     local a = rt.type('A')
     rt.class('A', nil, { rt.type 'B' })
-        : addField {
-            key   = rt.value('x'),
-            value = rt.value(1)
-        }
+        : addField(rt.field(rt.value('x'), rt.value(1)))
 
 
     local b = rt.type('B')
     rt.class('B', nil, { rt.type 'A' })
-        : addField {
-            key   = rt.value('y'),
-            value = rt.value(2)
-        }
+        : addField(rt.field(rt.value('y'), rt.value(2)))
 
 
     assert(a:view() == 'A')

@@ -42,14 +42,8 @@ end
 
 do
     local u = rt.table()
-        : addField {
-            key   = rt.value('x'),
-            value = rt.value(1)
-        }
-        : addField {
-            key   = rt.value('y'),
-            value = rt.value(2)
-        }
+        : addField(rt.field('x', rt.value(1)))
+        : addField(rt.field('y', rt.value(2)))
 
     assert(u:view() == '{ x: 1, y: 2 }')
     assert(u.truly:view() == '{ x: 1, y: 2 }')
@@ -58,15 +52,9 @@ end
 
 do
     local a = rt.table()
-        : addField {
-            key   = rt.value('x'),
-            value = rt.value(1)
-        }
+        : addField(rt.field('x', rt.value(1)))
     local b = rt.table()
-        : addField {
-            key   = rt.value('y'),
-            value = rt.value(2)
-        }
+        : addField(rt.field('y', rt.value(2)))
 
     local u = a & b
     assert(u:view() == '{ x: 1 } & { y: 2 }')
@@ -87,10 +75,7 @@ do
 
     local a = rt.type 'A'
     rt.class('A')
-        : addField {
-            key   = rt.value('x'),
-            value = rt.value(1)
-        }
+        : addField(rt.field('x', rt.value(1)))
 
     assert(a.truly:view() == 'A')
     assert(a.falsy:view() == 'never')

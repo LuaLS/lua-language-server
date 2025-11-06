@@ -22,5 +22,6 @@ require 'node.fcall'
 require 'node.variable'
 require 'node.select'
 require 'node.template'
+require 'node.field'
 
 require 'node.runtime'

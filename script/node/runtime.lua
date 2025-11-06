@@ -217,6 +217,13 @@ function M:fillAPIs()
     function self.viewer(options)
         return New 'Node.Viewer' (options)
     end
+
+    ---@param key Node.Key
+    ---@param value? Node
+    ---@return Node.Field
+    function self.field(key, value)
+        return New 'Node.Field' (scope, key, value)
+    end
 end
 
 ---@private
@@ -279,11 +286,7 @@ function M:fillPresets()
         : setConfig('basicType', true)
 
     local anykv = self.class 'anykv'
-        : addField {
-            key   = self.ANY,
-            value = self.ANY,
-            hideInView = true,
-        }
+        : addField(self.field(self.ANY, self.ANY):setHideInView())
 
     self.ANY:addClass(anykv)
     self.ANY.truly = self.TRULY
@@ -309,23 +312,13 @@ function M:fillPresets()
         local K = self.generic('K', self.ANY, self.ANY)
         local V = self.generic('V', self.ANY, self.ANY)
         local table0 = self.class('table0')
-            : addField {
-                key   = self.ANY,
-                value = self.ANY,
-                hideInView = true,
-            }
+            : addField(self.field(self.ANY, self.ANY):setHideInView())
 
         local table1 = self.class('table1', { K })
-            : addField {
-                key   = K,
-                value = self.TRUE,
-            }
+            : addField(self.field(K, self.TRUE))
 
         local table2 = self.class('table2', { K, V })
-            : addField {
-                key   = K,
-                value = V,
-            }
+            : addField(self.field(K, V))
 
         self.TABLE:addClass(table0)
         self.TABLE:addClass(table1)

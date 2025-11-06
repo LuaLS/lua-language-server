@@ -296,10 +296,7 @@ do
     local K = rt.generic 'K'
     local V = rt.generic 'V'
     rt.class('Map', { K, V })
-        : addField {
-            key   = K,
-            value = V,
-        }
+        : addField(rt.field(K, V))
 
     local T1 = rt.generic 'T1'
     local T2 = rt.generic 'T2'

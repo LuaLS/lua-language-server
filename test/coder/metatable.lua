@@ -39,10 +39,7 @@ do
     CA:addVariable(V)
     V:addClass(CA)
 
-    V:addField {
-        key   = rt.value 'x',
-        value = V,
-    }
+    V:addField(rt.field('x', V))
 
     local r = A:get 'x'
     assert(r:view() == 'A')
@@ -63,10 +60,7 @@ do
 
     local V = rt.variable 't'
 
-    V:addField {
-        key   = rt.value 'x',
-        value = rt.value(1),
-    }
+    V:addField(rt.field('x', rt.value(1)))
 
     local r = V:get 'x'
     assert(r:view() == '1')
@@ -91,10 +85,7 @@ do
     F:addType(FUN)
 
     local TABLE = rt.variable 't'
-    TABLE:addField {
-        key   = rt.value '__index',
-        value = rt.value(1),
-    }
+    TABLE:addField(rt.field('__index', rt.value(1)))
 
     local FCALL = rt.fcall(F, { TABLE })
     local R = FCALL.value
@@ -125,10 +116,7 @@ do
     F:addType(FUN)
 
     local MT = rt.variable 'mt'
-    MT:addField {
-        key   = rt.value '__index',
-        value = rt.value(1),
-    }
+    MT:addField(rt.field('__index', rt.value(1)))
 
     local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
@@ -161,14 +149,8 @@ do
     F:addType(FUN)
 
     local MT = rt.variable 'mt'
-    MT:addField {
-        key   = rt.value '__index',
-        value = MT,
-    }
-    MT:addField {
-        key   = rt.value 'x',
-        value = rt.value(1),
-    }
+    MT:addField(rt.field('__index', MT))
+    MT:addField(rt.field('x', rt.value(1)))
 
     local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
@@ -187,9 +169,7 @@ do
     R1, R2 = F()
     ]]
 
-    local F = rt:globalAdd({
-        key = rt.value 'F',
-    })
+    local F = rt:globalAdd(rt.field('F'))
     F:addType(rt.func()
         : addReturnDef(nil, rt.BOOLEAN)
         : addReturnDef(nil, rt.NUMBER)
@@ -272,14 +252,8 @@ do
     A:addVariable(MT)
     MT:addClass(A)
 
-    MT:addAssign {
-        key   = rt.value 'mt',
-        value = rt.table(),
-    }
-    MT:addField {
-        key   = rt.value '__index',
-        value = MT,
-    }
+    MT:addAssign(rt.field('mt', rt.table()))
+    MT:addField(rt.field('__index', MT))
 
     local R = rt.index(MT, rt.value '__index')
     assert(R:view() == 'A')
@@ -316,10 +290,7 @@ do -- 变量作为参数时要转换为类型
 
     local A = rt.variable('A')
 
-    A:addField {
-        key   = rt.value 'x',
-        value = rt.value(1),
-    }
+    A:addField(rt.field('x', rt.value(1)))
 
     local FCALL = rt.fcall(FUNC, { A })
     local R = FCALL.value

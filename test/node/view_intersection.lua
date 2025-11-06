@@ -73,15 +73,9 @@ end
 
 do
     local a = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
+        : addField(rt.field(rt.value 'x', rt.value 'x'))
     local b = rt.table()
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field(rt.value 'y', rt.value 'y'))
     local c = a & b
 
     assert(c:view() == '{ x: "x" } & { y: "y" }')

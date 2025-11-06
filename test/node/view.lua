@@ -116,12 +116,12 @@ end
 
 do
     local t = rt.table()
-    t:addField({ key = rt.value('x'), value = rt.value(1)})
-    t:addField({ key = rt.value('y'), value = rt.value(2)})
-    t:addField({ key = rt.value('z'), value = rt.value(3)})
-    t:addField({ key = rt.value(1),   value = rt.value('x')})
-    t:addField({ key = rt.value(2),   value = rt.value('y')})
-    t:addField({ key = rt.value(3),   value = rt.value('z')})
+    t:addField(rt.field(rt.value('x'), rt.value(1)))
+    t:addField(rt.field(rt.value('y'), rt.value(2)))
+    t:addField(rt.field(rt.value('z'), rt.value(3)))
+    t:addField(rt.field(rt.value(1),   rt.value('x')))
+    t:addField(rt.field(rt.value(2),   rt.value('y')))
+    t:addField(rt.field(rt.value(3),   rt.value('z')))
 
     assert(t:view() == [[{ [1]: "x", [2]: "y", [3]: "z", x: 1, y: 2, z: 3 }]])
 end

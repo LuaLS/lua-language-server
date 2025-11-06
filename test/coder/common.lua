@@ -189,23 +189,14 @@ do
     local FUNC = rt.func()
     FUNC:addParamDef('self', M)
 
-    M:addField {
-        key   = rt.value 'init',
-        value = FUNC,
-    }
+    M:addField(rt.field('init', FUNC))
 
     local SELF = rt.variable 'self'
     SELF:setMasterVariable(M)
 
-    SELF:addField {
-        key   = rt.value 'x',
-        value = rt.value(1),
-    }
+    SELF:addField(rt.field('x', rt.value(1)))
 
-    SELF:addField {
-        key   = rt.value 'y',
-        value = rt.value(2),
-    }
+    SELF:addField(rt.field('y', rt.value(2)))
 
     assert(rt.type('A'):view() == 'A')
     assert(rt.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')

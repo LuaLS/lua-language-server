@@ -182,10 +182,7 @@ do
     local map = rt.type 'Map'
 
     rt.class('Map', { K, V })
-        : addField {
-            key   = K,
-            value = V,
-        }
+        : addField(rt.field(K, V))
 
     assert(map:view() == 'Map')
     assert(map.value:view() == '{}')
@@ -233,18 +230,14 @@ do
     local map = rt.type 'Map'
 
     rt.class('Map', { K, V })
-        : addField {
-            key   = rt.value 'set',
-            value = rt.func()
+        : addField(rt.field('set', rt.func()
+            : addParamDef('key', K)
+            : addParamDef('value', V)
+        ))
+        : addField(rt.field('get', rt.func()
                 : addParamDef('key', K)
-                : addParamDef('value', V),
-        }
-        : addField {
-            key   = rt.value 'get',
-            value = rt.func()
-                : addParamDef('key', K)
-                : addReturnDef(nil, V),
-        }
+                : addReturnDef(nil, V)
+        ))
 
     local map2 = map:call { rt.STRING, rt.INTEGER }
     assert(map2.value:view() == '{ get: fun(key: string):integer, set: fun(key: string, value: integer) }')
@@ -264,13 +257,11 @@ do
     local V = rt.generic 'V'
     local map = rt.type 'Map'
     rt.class('Map', { K })
-        : addField {
-            key   = rt.value 'set',
-            value = rt.func()
+        : addField(rt.field('set', rt.func()
                 : addTypeParam(V)
                 : addParamDef('key', K)
-                : addParamDef('value', V),
-        }
+                : addParamDef('value', V)
+            ))
 
     local map1 = map:call { rt.STRING }
     assert(map1.value:view() == '{ set: fun<V>(key: string, value: <V>) }')
@@ -299,19 +290,14 @@ do
     local V = rt.generic 'V'
     local map = rt.type 'Map'
     rt.class('Map', { K, V })
-        : addField {
-            key   = rt.value 'set',
-            value = rt.func()
+        : addField(rt.field('set', rt.func()
                 : addParamDef('key', K)
-                : addParamDef('value', V),
-        }
+                : addParamDef('value', V)
+            ))
 
     local unit = rt.type 'Unit'
     rt.class('Unit')
-        : addField {
-            key   = rt.value 'childs',
-            value = map:call { rt.INTEGER, unit },
-        }
+        : addField(rt.field('childs', map:call { rt.INTEGER, unit }))
 
     assert(unit.value:view() == '{ childs: Map<integer, Unit> }')
     assert(unit:get('childs'):view() == 'Map<integer, Unit>')
@@ -333,20 +319,15 @@ do
     local V = rt.generic 'V'
     local map = rt.type 'Map'
     rt.class('Map', { K, V })
-        :addField {
-            key   = rt.value 'set',
-            value = rt.func()
-                : addParamDef('key', K)
-                : addParamDef('value', V),
-        }
+        :addField(rt.field('set', rt.func()
+            : addParamDef('key', K)
+            : addParamDef('value', V)
+        ))
 
     local T = rt.generic 'T'
     local unit = rt.type 'Unit'
     rt.class('Unit', { T })
-        :addField {
-            key   = rt.value 'childs',
-            value = map:call { T, rt.STRING },
-        }
+        :addField(rt.field('childs', map:call { T, rt.STRING }))
 
     local unit2 = unit:call { rt.NUMBER }
     assert(unit2.value:view() == '{ childs: Map<number, string> }')
@@ -370,12 +351,10 @@ do
     local V = rt.generic 'V'
     local map = rt.type 'Map'
     rt.class('Map', { K, V })
-        : addField {
-            key   = rt.value 'set',
-            value = rt.func()
-                : addParamDef('key', K)
-                : addParamDef('value', V),
-        }
+        : addField(rt.field('set', rt.func()
+            : addParamDef('key', K)
+            : addParamDef('value', V)
+        ))
 
     local omap = rt.type 'OrderMap'
     rt.class('OrderMap', nil, { map:call { rt.NUMBER, rt.STRING } })
@@ -397,12 +376,10 @@ do
     local V = rt.generic 'V'
     local map = rt.type 'Map'
     rt.class('Map', { K, V })
-        : addField {
-            key   = rt.value 'set',
-            value = rt.func()
-                : addParamDef('key', K)
-                : addParamDef('value', V),
-        }
+        : addField(rt.field('set', rt.func()
+            : addParamDef('key', K)
+            : addParamDef('value', V)
+        ))
 
     local OK = rt.generic('OK', rt.NUMBER)
     local OV = rt.generic 'OV'

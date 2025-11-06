@@ -1,12 +1,12 @@
-local node = test.scope.rt
+local rt = test.scope.rt
 
 do
-    node:reset()
+    rt:reset()
 
-    local s1 = node.value('hello')
-    local s2 = node.value('hello', '"')
-    local s3 = node.value('hello', "'")
-    local s4 = node.value('hello', '[[')
+    local s1 = rt.value('hello')
+    local s2 = rt.value('hello', '"')
+    local s3 = rt.value('hello', "'")
+    local s4 = rt.value('hello', '[[')
 
     assert(s1:view() == '"hello"')
     assert(s2:view() == '"hello"')
@@ -26,19 +26,13 @@ do
     assert(s4 >> s2)
     assert(s4 >> s3)
 
-    local t = node.table()
-    t:addField {
-        key = s2,
-        value = node.value(1),
-    }
+    local t = rt.table()
+    t:addField(rt.field(s2, rt.value(1)))
 
     local v = t:get(s3)
     assert(v:view() == '1')
 
-    t:addField {
-        key = s4,
-        value = node.value(2),
-    }
+    t:addField(rt.field(s4, rt.value(2)))
 
     local v = t:get(s2)
     assert(v:view() == '2')

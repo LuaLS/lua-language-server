@@ -64,30 +64,15 @@ do
 
     local a = rt.type 'A'
     rt.class('A')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
 
     local ta = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
+        : addField(rt.field('x', rt.value 'x'))
     local tb = rt.table()
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('y', rt.value 'y'))
     local tc = rt.table()
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z',
-        }
+        : addField(rt.field('z', rt.value 'z'))
 
     assert(a >> ta == true)
     assert(a >> tb == true)
@@ -136,29 +121,14 @@ do
 
     local a = rt.type 'A'
     rt.alias('A', nil, rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
     )
     local b = rt.type 'B'
     rt.alias('B', nil, rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
+        : addField(rt.field('z', rt.value 'z'))
     )
 
     assert(a >> b == false)
@@ -170,25 +140,13 @@ do
 
     local a = rt.type 'A'
     rt.alias('A', nil, rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
     )
     local b = rt.type 'B'
     rt.class('B')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
 
     assert(a >> b == true)
     assert(b >> a == true)
@@ -199,27 +157,15 @@ do
 
     local a = rt.type 'A'
     rt.alias('A', nil, rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
     )
     local b = rt.type 'B'
     rt.class('B', nil, { rt.type 'C' })
 
     rt.class 'C'
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
 
 
     assert(a >> b == true)
@@ -231,31 +177,16 @@ do
 
     local a = rt.type 'A'
     rt.alias('A', nil, rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
+        : addField(rt.field('z', rt.value 'z'))
     )
     local b = rt.type 'B'
     rt.class('B', nil, { rt.type 'C' })
 
     rt.class('C')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
 
     assert(a >> b == true)
     assert(b >> a == false)
@@ -266,36 +197,18 @@ do
 
     local a = rt.type 'A'
     rt.alias('A', nil, rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
+        : addField(rt.field('z', rt.value 'z'))
     )
 
     local b = rt.type 'B'
     rt.class('B', nil, { rt.type 'C' })
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z',
-        }
+        : addField(rt.field('z', rt.value 'z'))
 
     rt.class('C')
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x',
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y',
-        }
+        : addField(rt.field('x', rt.value 'x'))
+        : addField(rt.field('y', rt.value 'y'))
 
     assert(a >> b == true)
     assert(b >> a == true)

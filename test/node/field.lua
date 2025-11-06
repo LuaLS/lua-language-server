@@ -10,34 +10,13 @@ end
 
 do
     local t = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.type 'number'
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.type 'boolean'
-        }
-        : addField {
-            key   = rt.value 'z',
-            value = rt.type 'string'
-        }
-        : addField {
-            key   = rt.union { rt.value(1), rt.value(2) },
-            value = rt.value('union')
-        }
-        : addField {
-            key   = rt.type 'string',
-            value = rt.value('string')
-        }
-        : addField {
-            key   = rt.type 'integer',
-            value = rt.value('integer')
-        }
-        : addField {
-            key   = rt.type 'number',
-            value = rt.value('number')
-        }
+        : addField(rt.field('x', rt.type 'number'))
+        : addField(rt.field('y', rt.type 'boolean'))
+        : addField(rt.field('z', rt.type 'string'))
+        : addField(rt.field(rt.union { rt.value(1), rt.value(2) }, rt.value('union')))
+        : addField(rt.field(rt.type 'string', rt.value('string')))
+        : addField(rt.field(rt.type 'integer', rt.value('integer')))
+        : addField(rt.field(rt.type 'number', rt.value('number')))
 
     assert(t:get('x'):view() == 'number')
     assert(t:get('y'):view() == 'boolean')
@@ -61,16 +40,10 @@ end
 
 do
     local a = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
+        : addField(rt.field('x', rt.value 'x'))
 
     local b = rt.table()
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field('y', rt.value 'y'))
 
     local u = a | b
 
@@ -111,10 +84,7 @@ do
     assert(extends[6] == t.A22)
 
     for _, name in ipairs(names) do
-        c[name]:addField {
-            key   = rt.value(name),
-            value = rt.value(name),
-        }
+        c[name]:addField(rt.field(rt.value(name), rt.value(name)))
     end
 
     assert(t.A:get('A1'):view() == '"A1"')
@@ -136,16 +106,10 @@ end
 
 do
     local a = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
+        : addField(rt.field('x', rt.value 'x'))
 
     local b = rt.table()
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field('y', rt.value 'y'))
 
     local u = a & b
 
@@ -159,20 +123,11 @@ end
 
 do
     local a = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
+        : addField(rt.field('x', rt.value 'x'))
 
     local b = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'y'
-        }
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field('x', rt.value 'y'))
+        : addField(rt.field('y', rt.value 'y'))
 
     local u = a & b
 
@@ -186,22 +141,13 @@ end
 
 do
     local a = rt.table()
-        : addField {
-            key   = rt.value 'x',
-            value = rt.value 'x'
-        }
+        : addField(rt.field('x', rt.value 'x'))
 
     local b = rt.table()
-        : addField {
-            key   = rt.value 'y',
-            value = rt.value 'y'
-        }
+        : addField(rt.field('y', rt.value 'y'))
 
     local c = rt.table()
-        : addField {
-            key   = rt.value 'z',
-            value = rt.value 'z'
-        }
+        : addField(rt.field('z', rt.value 'z'))
 
     local u = a & (b | c)
 
@@ -272,14 +218,8 @@ end
 do
     local index = rt.index(
         rt.table()
-            : addField {
-                key   = rt.value 'x',
-                value = rt.value(1)
-            }
-            : addField {
-                key   = rt.value 'y',
-                value = rt.value(2)
-            },
+            : addField(rt.field('x', rt.value(1)))
+            : addField(rt.field('y', rt.value(2))),
         rt.value 'x'
     )
     assert(index:view() == '1')

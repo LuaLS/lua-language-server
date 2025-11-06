@@ -95,7 +95,7 @@ ls.feature.provider.definition(function (param, push, skip)
 
     -- 在声明处查询定义，则查询所有等价定义的赋值位置
     if var.kind == 'local' or var.kind == 'param' then
-        for _, location in ipairs(variable:getEquivalentLocations()) do
+        for _, location in ipairs(variable:getEquivalentLocations(true)) do
             push(ls.feature.helper.convertLocation(location, var))
         end
         return
@@ -166,7 +166,7 @@ ls.feature.provider.definition(function (param, push)
 
     -- 有个特殊规则，等价位置必须是 field ，且 field 名称要相同
 
-    for _, location in ipairs(variable:getEquivalentLocations(true)) do
+    for _, location in ipairs(variable:getEquivalentLocations(false, true)) do
         push(ls.feature.helper.convertLocation(location, field))
     end
 end)

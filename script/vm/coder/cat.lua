@@ -56,6 +56,8 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
     local value = coder:getKey(source.value)
     coder:compile(source.value)
 
+    coder:addToCatGroup(source.parent)
+
     if not classParams then
         return
     end

@@ -664,9 +664,10 @@ M.__getter.equivalentValue = function (self)
     end
 end
 
+---@param onlySameVariable? boolean
 ---@param onlySameKey? boolean
 ---@return Node.Location[]
-function M:getEquivalentLocations(onlySameKey)
+function M:getEquivalentLocations(onlySameVariable, onlySameKey)
     ---@type Node.Location[]
     local locations = {}
     local visited = {}
@@ -682,6 +683,9 @@ function M:getEquivalentLocations(onlySameKey)
         end
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable
+            if onlySameVariable and equivalent ~= self then
+                return
+            end
             locations[#locations+1] = equivalent.location
             if equivalent.assigns then
                 for assign in equivalent.assigns:pairsFast() do

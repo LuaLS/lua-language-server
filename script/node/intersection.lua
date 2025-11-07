@@ -164,9 +164,10 @@ M.value = nil
 M.__getter.value = function (self)
     self.value = self.scope.rt.NEVER
     local values = self.values
+    local rt = self.scope.rt
 
     if #values == 0 then
-        return self.scope.rt.NEVER, true
+        return rt.NEVER, true
     end
 
     for _, value in ipairs(values) do
@@ -183,7 +184,7 @@ M.__getter.value = function (self)
         end
     end
 
-    local valueMap = {}
+    local tableParts = {}
     ---@type Node.Union[]
     local unionParts = {}
     for _, value in ipairs(values) do
@@ -194,17 +195,18 @@ M.__getter.value = function (self)
         end
         if value.kind == 'table' then
             ---@cast value Node.Table
-            for k, v in pairs(value.valueMap) do
-                if valueMap[k] then
-                    valueMap[k] = valueMap[k] & v
-                else
-                    valueMap[k] = v
-                end
-            end
+            tableParts[#tableParts+1] = value
         end
         ::continue::
     end
-    local table = self.scope.rt.table(valueMap)
+    local table = rt.mergeTables(tableParts, function (oldValue, newValue)
+        local field = rt.field(oldValue.key, oldValue.value & newValue.value)
+        local location = oldValue.location or newValue.location
+        if location then
+            field.location = location
+        end
+        return field
+    end)
 
     if #unionParts == 0 then
         return table, true

@@ -624,7 +624,6 @@ M.__getter.equivalentValue = function (self)
     end
 
     -- 尽量合并表的字段
-    local hasTable = false
     local tableParts = {}
     local unionResults = {}
     local hasType = false
@@ -632,11 +631,8 @@ M.__getter.equivalentValue = function (self)
         local t = node:findValue {'table', 'type'}
         if t then
             if t.kind == 'table' then
-                hasTable = true
                 ---@cast t Node.Table
-                if t.fields then
-                    tableParts[#tableParts+1] = t
-                end
+                tableParts[#tableParts+1] = t
             end
             if t.kind == 'type' then
                 ---@cast t Node.Type
@@ -660,11 +656,7 @@ M.__getter.equivalentValue = function (self)
     if result then
         return result, true
     end
-    if hasTable then
-        return rt.table(), true
-    else
-        return rt.UNKNOWN, true
-    end
+    return rt.UNKNOWN, true
 end
 
 ---@param onlySameVariable? boolean

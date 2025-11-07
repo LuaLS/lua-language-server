@@ -258,15 +258,16 @@ function M:fillAPIs()
     end
 
     ---@param childs Node.Table[]
+    ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table
-    function self.mergeTables(childs)
+    function self.mergeTables(childs, onSameKey)
         if #childs == 0 then
             return self.table()
         end
         if #childs == 1 then
             return childs[1]
         end
-        return self.table():addChilds(childs)
+        return self.table():addChilds(childs, onSameKey)
     end
 end
 

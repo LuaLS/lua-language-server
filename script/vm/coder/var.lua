@@ -40,6 +40,15 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         variable = coder:getVariableKey(source),
         var      = coder:getKey(source),
     })
+    if source.subtype == 'index' and not source.key.isLiteral then
+        return
+    end
+    coder:addLine('{r2}, {v2} = {r1}, {v1}' % {
+        r1 = coder:getKey(source),
+        v1 = coder:getVariableKey(source),
+        r2 = coder:getKey(source.key),
+        v2 = coder:getVariableKey(source.key),
+    })
 end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)

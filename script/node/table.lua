@@ -171,17 +171,21 @@ M.__getter.typeOfKey = function (self)
     return self.scope.rt.union(self.keys), true
 end
 
----@type table<Node.Key, Node>
+---@type table<Node.Key, Node.Field>
 M.valueMap = nil
 
 ---@param self Node.Table
----@return table<Node, Node>
+---@return table<Node.Key, Node.Field>
 ---@return true
 M.__getter.valueMap = function (self)
     local rt = self.scope.rt
     local valueMap = {}
     for k, field in pairs(self.fieldMap) do
-        valueMap[rt.luaKey(k)] = field
+        if #field > 0 then
+            ls.util.arrayMerge(valueMap[rt.luaKey(k)], field)
+        else
+            valueMap[rt.luaKey(k)] = field
+        end
     end
     return valueMap, true
 end
@@ -330,13 +334,27 @@ end
 
 ---越靠前的字段越优先。
 ---@param childs Node
+---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
 ---@return Node.Table
-function M:addChilds(childs)
+function M:addChilds(childs, onSameKey)
     local rt = self.scope.rt
     rt:lockCache()
 
-    local fieldMap = self.fieldMap
-    local addedKeys = {}
+    if not onSameKey then
+        ---@param oldField Node.Field
+        ---@param newField Node.Field
+        ---@return Node.Field
+        onSameKey = function (oldField, newField)
+            return oldField
+        end
+    end
+
+    assert(self.fields == nil, 'Must be an empty table when merging childs.')
+
+    ---@type table<Node.Key, Node.Field>
+    local allFields = {}
+    ---@type Node.Key[]
+    local keys = {}
     for _, child in ipairs(childs) do
         local value = child.value
         if value.kind ~= 'table' then
@@ -352,15 +370,22 @@ function M:addChilds(childs)
             end
         end
         if value.fields then
-            for key, field in pairs(value.fieldMap) do
-                if  not addedKeys[key]
-                and not fieldMap[key] then
-                    addedKeys[key] = true
-                    self:addField(field)
+            for k, field in pairs(value.valueMap) do
+                if not allFields[k] then
+                    allFields[k] = field
+                    keys[#keys+1] = k
+                else
+                    local new = onSameKey(allFields[k], field)
+                    allFields[k] = new
                 end
             end
         end
         ::continue::
+    end
+
+    for _, k in ipairs(keys) do
+        local field = allFields[k]
+        self:addField(field)
     end
 
     rt:unlockCache()
@@ -394,6 +419,7 @@ function M:resolveGeneric(map)
     for field in self.fields:pairsFast() do
         newTable:addField(field:resolveGeneric(map))
     end
+    newTable.locations = self.locations
     return newTable
 end
 
@@ -469,13 +495,50 @@ function M:onView(viewer, options)
         return '{}'
     end
 
-    if viewer.visited[self] > 1
+    local visited = viewer.visited
+
+    if visited[self] > 1
     or viewer.skipLevel >= 10 then
-        return '{...}'
+        return '{ ... }'
+    end
+    if self.locations then
+        for _, loc in ipairs(self.locations) do
+            if visited[loc] then
+                return '{ ... }'
+            end
+            visited[loc] = true
+        end
     end
 
     local fields = {}
     local rt = self.scope.rt
+
+    local skipped
+    ---@param field Node.Field
+    ---@return boolean
+    local function checkSkip(field)
+        local location = field.location
+        if location then
+            if visited[location] then
+                skipped = true
+                return true
+            end
+            visited[location] = true
+        end
+        local value = field.value
+        if value.kind == 'variable' then
+            ---@cast value Node.Variable
+            if value.assigns then
+                for assign in value.assigns:pairsFast() do
+                    ---@cast assign Node.Field
+                    if checkSkip(assign) then
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end
 
     for _, key in ipairs(self.keys) do
         local field = self.fieldMap[key]
@@ -483,9 +546,15 @@ function M:onView(viewer, options)
             if field.hideInView then
                 goto continue
             end
+            if checkSkip(field) then
+                goto continue
+            end
         else
             for _, f in ipairs(field) do
                 if f.hideInView then
+                    goto continue
+                end
+                if checkSkip(f) then
                     goto continue
                 end
             end
@@ -498,6 +567,10 @@ function M:onView(viewer, options)
             , viewer:view(value)
         )
         ::continue::
+    end
+
+    if skipped then
+        fields[#fields+1] = '...'
     end
 
     if #fields == 0 then

@@ -20,6 +20,14 @@ ls.vm.registerCoderProvider('string', function (coder, source)
     makeValue(coder, source, source.value)
 end)
 
+ls.vm.registerCoderProvider('nil', function (coder, source)
+    ---@cast source LuaParser.Node.Nil
+
+    coder:addLine('{key} = rt.NIL' % {
+        key = coder:getKey(source),
+    })
+end)
+
 ls.vm.registerCoderProvider('table', function (coder, source)
     ---@cast source LuaParser.Node.Table
 

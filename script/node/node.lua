@@ -25,6 +25,7 @@ Extends('Node', 'Node.RefModule')
 ---| 'generic'
 ---| 'call'
 ---| 'template'
+---| 'oddtemplate'
 ---| 'list'
 ---| 'variable'
 ---| 'class'

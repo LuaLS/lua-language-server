@@ -237,6 +237,12 @@ function M:fillAPIs()
         return New 'Node.Template' (scope, params)
     end
 
+    ---@param params (string|Node.Generic)[]
+    ---@return Node.OddTemplate
+    function self.oddTemplate(params)
+        return New 'Node.OddTemplate' (scope, params)
+    end
+
     ---@param options? Node.Viewer.Options
     ---@return Node.Viewer
     function self.viewer(options)

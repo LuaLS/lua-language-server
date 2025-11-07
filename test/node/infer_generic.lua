@@ -426,3 +426,18 @@ do
     assert(result[T1]:view() == 'number')
     assert(result[T2]:view() == 'unknown')
 end
+
+do
+    rt:reset()
+    --[[
+    abc.`T` @ "X"
+    T -> abc.X
+    ]]
+    local T = rt.generic 'T'
+    local template = rt.oddTemplate {'abc.', T}
+    local results = {}
+    template:inferGeneric(rt.value 'X', results)
+
+    assert(results[T].kind == 'type')
+    assert(results[T]:view() == 'abc.X')
+end

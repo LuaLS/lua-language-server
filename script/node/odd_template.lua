@@ -1,11 +1,11 @@
----@class Node.Template: Node
+---@class Node.OddTemplate: Node
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, params: (string|Node.Generic)[]): Node.Template
-local M = ls.node.register 'Node.Template'
+---@overload fun(scope: Scope, params: (string|Node.Generic)[]): Node.OddTemplate
+local M = ls.node.register 'Node.OddTemplate'
 
-M.kind = 'template'
+M.kind = 'oddtemplate'
 
 M.hasGeneric = true
 
@@ -16,23 +16,24 @@ function M:__init(scope, params)
     self.params = params
 end
 
-function M:resolveGeneric(map)
+function M:inferGeneric(other, result)
     local rt = self.scope.rt
-    local result
+    local node
 
     ---@param index integer
     ---@param current string
     local function nextToken(index, current)
         local token = self.params[index]
         if not token then
-            result = result | rt.type(current)
+            node = node | rt.type(current)
+            return
         end
         if type(token) == 'string' then
             current = current .. token
             nextToken(index + 1, current)
             return
         end
-        local value = map[token]
+        local value = other
         if not value then
             return
         end
@@ -44,7 +45,27 @@ function M:resolveGeneric(map)
 
     nextToken(1, '')
 
-    return result or rt.UNKNOWN
+    if not node then
+        return
+    end
+
+    for _, param in ipairs(self.params) do
+        if type(param) ~= 'string' then
+            result[param] = node
+        end
+    end
+end
+
+function M:resolveGeneric(map)
+    for _, param in ipairs(self.params) do
+        if type(param) ~= 'string' then
+            local value = map[param]
+            if value then
+                return value
+            end
+        end
+    end
+    return self.scope.rt.UNKNOWN
 end
 
 ---@param self Node

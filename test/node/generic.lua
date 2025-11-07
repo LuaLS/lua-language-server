@@ -166,6 +166,20 @@ end
 
 do
     rt:reset()
+    --[[
+    ---@alias Alias<A> abc.`A`
+    ]]
+    local A = rt.generic 'A'
+    local alias = rt.type 'Alias'
+    rt.alias('Alias', { A }, rt.oddTemplate { 'abc', A })
+
+    local alias1 = alias:call { rt.value 'X' }
+    assert(alias1:view() == 'Alias<"X">')
+    assert(alias1.value:view() == '"X"')
+end
+
+do
+    rt:reset()
 
     --[[
     ---@class Map<K, V>

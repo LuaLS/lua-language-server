@@ -254,9 +254,9 @@ function M:makeGenericMap(args)
     if not self.typeParams then
         return map
     end
-    for i, param in ipairs(self.typeParams) do
-        map[param] = args[i] or self.scope.rt.UNKNOWN
-    end
+    local rt = self.scope.rt
+    local argList = rt.list(args)
+    self.paramsPack:inferGeneric(argList, map)
     return map
 end
 

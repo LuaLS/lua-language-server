@@ -277,15 +277,15 @@ end
 function M:makeFieldCode(source)
     if source.kind == 'fieldid' then
         ---@cast source LuaParser.Node.FieldID
-        return string.format('rt.value(%q)', source.id)
+        return string.format('%q', source.id)
     end
     if source.kind == 'tablefieldid' then
         ---@cast source LuaParser.Node.TableFieldID
-        return string.format('rt.value(%q)', source.id)
+        return string.format('%q', source.id)
     end
     if source.isLiteral then
         ---@cast source LuaParser.Node.Literal
-        return string.format('rt.value(%q)', source.value)
+        return string.format('%q', source.value)
     end
     return nil
 end

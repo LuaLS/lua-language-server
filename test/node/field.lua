@@ -224,3 +224,13 @@ do
     )
     assert(index:view() == '1')
 end
+
+do
+    local t = rt.table {
+        [1] = 100,
+        [2] = 200,
+    }
+
+    local v = t:get(rt.INTEGER)
+    assert(v:view() == '100 | 200')
+end

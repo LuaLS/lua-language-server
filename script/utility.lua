@@ -1250,6 +1250,42 @@ function m.split(str, sep)
     return result
 end
 
+---@generic T
+---@param str string
+---@param left string
+---@param right string
+---@param callback fun(content: string, inside: boolean): T
+---@return T[]
+function m.replaceInside(str, left, right, callback)
+    local result = {}
+    local offset = 1
+    while offset <= #str do
+        local ls, le = str:find(left, offset, true)
+        if not ls then
+            if offset <= #str then
+                result[#result+1] = callback(str:sub(offset), false)
+            end
+            break
+        end
+        if ls > offset then
+            result[#result+1] = callback(str:sub(offset, ls - 1), false)
+        end
+
+        local rs, re = str:find(right, le + 1, true)
+        if not rs then
+            if ls < #str then
+                result[#result+1] = callback(str:sub(ls), true)
+            end
+            break
+        end
+        if rs > le + 1 then
+            result[#result+1] = callback(str:sub(le + 1, rs - 1), true)
+        end
+        offset = re + 1
+    end
+    return result
+end
+
 ---@param str string
 ---@return string
 function m.asKey(str)

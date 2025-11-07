@@ -391,6 +391,19 @@ function M:getExpect(key)
         local r, e = expectValue:get(key)
         return e and r or nil
     end
+    if self.assigns then
+        local result
+        for assign in self.assigns:pairsFast() do
+            ---@cast assign Node.Field
+            if assign.value then
+                local r, e = assign.value:get(key)
+                if e then
+                    result = result | r
+                end
+            end
+        end
+        return result
+    end
     return nil
 end
 

@@ -107,15 +107,29 @@ ls.vm.registerCoderProvider('catid', function (coder, source)
             generic = coder:getKey(source.generic),
         })
     elseif source.genericTemplate then
-        local generics = {}
-        for name, generic in ls.util.sortPairs(source.genericTemplate) do
-            generics[#generics+1] = ('%s = %s'):format(ls.util.asKey(name), coder:getKey(generic))
+        local bad
+        local parts = ls.util.replaceInside(source.id, '`', '`', function (content, inside)
+            if inside then
+                local generic = source.genericTemplate[content]
+                if generic then
+                    return coder:getKey(generic)
+                else
+                    bad = true
+                end
+            end
+            return string.format('%q', content)
+        end)
+        if bad then
+            coder:addLine('{id} = rt.UNKNOWN' % {
+                id = coder:getKey(source),
+            })
+        else
+            coder:addLine('{id} = rt.oddTemplate { {parts} }' % {
+                id    = coder:getKey(source),
+                name  = source.id,
+                parts = table.concat(parts, ', '),
+            })
         end
-        coder:addLine('{id} = rt.template({name:q}, { {generics} })' % {
-            id       = coder:getKey(source),
-            name     = source.id,
-            generics = table.concat(generics, ', '),
-        })
     else
         if source.optional then
             coder:addLine('{id} = rt.type {name:q} | rt.NIL' % {

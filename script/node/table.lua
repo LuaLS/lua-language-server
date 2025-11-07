@@ -186,30 +186,6 @@ M.__getter.valueMap = function (self)
     return valueMap, true
 end
 
----@type Node.Field[]
-M.typeFields = nil
-
----@param self Node.Table
----@return Node.Field[]
----@return true
-M.__getter.typeFields = function (self)
-    local fields = {}
-    if not self.fields then
-        return fields, true
-    end
-    ---@param field Node.Field
-    for field in self.fields:pairsFast() do
-        field.key:addRef(self)
-        if field.value then
-            field.value:addRef(self)
-        end
-        if not field.key:findValue { 'value' } then
-            fields[#fields+1] = field
-        end
-    end
-    return fields, true
-end
-
 ---获取所有的值。按key的顺序排序。
 ---@type Node[]
 M.values = nil
@@ -243,7 +219,13 @@ function M:get(key)
         if result then
             return result, true
         end
-        return self:get(key.nodeType)
+        for field in self.fields:pairsFast() do
+            ---@cast field Node.Field
+            if key:canCast(field.key) then
+                return field.value, true
+            end
+        end
+        return rt.NIL, false
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -275,12 +257,23 @@ function M:get(key)
     if value then
         return value, true
     end
-    for _, field in ipairs(self.typeFields) do
-        if key:canCast(field.key) then
-            return field.value, true
+    local result = {}
+    for field in self.fields:pairsFast() do
+        ---@cast field Node.Field
+        if field.key:canCast(key) then
+            result[#result+1] = field.value
+        else
+            -- 在获取字段时允许 number 和 integer 互相转换
+            if  key.kind == 'type' and (key.typeName == 'number' or key.typeName == 'integer')
+            and field.key.kind == 'type' and (field.key.typeName == 'number' or field.key.typeName == 'integer') then
+                result[#result+1] = field.value
+            end
         end
     end
-    return rt.NIL, false
+    if #result == 0 then
+        return rt.NIL, false
+    end
+    return rt.union(result), true
 end
 
 ---@param other Node

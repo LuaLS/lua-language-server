@@ -40,27 +40,30 @@ M.__getter.values = function (self)
     local values = {}
     for i, raw in ipairs(self.raw) do
         raw:addRef(self)
-        if raw.kind == 'list' then
-            ---@cast raw Node.List
-            values[i] = raw.values[1]
+        local value = raw:findValue { 'list' }
+        ---@cast value Node.List?
+        if value then
+            ---@cast value Node.List
+            values[i] = value.values[1]
         else
             values[i] = raw
         end
     end
     local n = #values
     local last = self.raw[n]
-    if last and last.kind == 'list' then
-        ---@cast last Node.List
-        for i = 1, #last.values do
-            values[n + i] = last.values[i + 1]
+    local lastValue = last and last:findValue { 'list' }
+    ---@cast lastValue Node.List?
+    if lastValue then
+        for i = 1, #lastValue.values do
+            values[n + i] = lastValue.values[i + 1]
         end
-        if last.min > 0 then
-            self.min = self.min - 1 + last.min
+        if lastValue.min > 0 then
+            self.min = self.min - 1 + lastValue.min
         elseif self.min == #values then
             self.min = self.min - 1
         end
-        if last.max then
-            local max = n + last.max - 1
+        if lastValue.max then
+            local max = n + lastValue.max - 1
             if not self.max then
                 self.max = max
             elseif max > self.max then
@@ -153,10 +156,12 @@ function M:slice(start)
     else
         values[1] = self.values[#self.values]
     end
-    return self.scope.rt.list(values
+    local new = self.scope.rt.list(values
         , self.min - start + 1
         , self.max and (self.max - start + 1) or false
     )
+    self:addRef(new)
+    return new
 end
 
 ---@param self Node.List

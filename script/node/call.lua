@@ -14,6 +14,7 @@ M.head = nil
 ---@param head string
 ---@param args Node[]
 function M:__init(scope, head, args)
+    assert(type(head) == 'string')
     self.scope = scope
     self.head = scope.rt.type(head)
     self.args = args

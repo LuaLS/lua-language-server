@@ -10,14 +10,17 @@ M.kind = 'select'
 ---@param scope Scope
 ---@param head Node
 ---@param key Node.Key
-function M:__init(scope, head, key)
+---@param rest? boolean
+function M:__init(scope, head, key, rest)
     self.scope = scope
     self.head  = head
     if type(key) ~= 'table' then
         ---@cast key -Node
         key = scope.rt.value(key)
     end
+    ---@type Node
     self.key   = key
+    self.rest  = rest
 end
 
 ---@param self Node.Select
@@ -26,7 +29,25 @@ end
 M.__getter.value = function (self)
     self.head:addRef(self)
     self.key:addRef(self)
-    return self.head:select(self.key), true
+    if not self.rest then
+        return self.head:select(self.key), true
+    end
+    local list = self.head:findValue { 'list' }
+    ---@cast list Node.List?
+    if not list then
+        return self.head:select(self.key), true
+    end
+    local n = self.key:findValue { 'value' }
+    ---@cast n Node.Value?
+    if not n then
+        return self.head:select(self.key), true
+    end
+    local literal = n.literal
+    if math.type(literal) ~= 'integer' or literal < 1 then
+        return self.head:select(self.key), true
+    end
+    ---@cast literal integer
+    return list:slice(literal), true
 end
 
 ---@param self Node.Select

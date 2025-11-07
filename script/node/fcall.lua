@@ -27,7 +27,7 @@ M.value = nil
 ---@return true
 M.__getter.value = function (self)
     self.value = self.scope.rt.NEVER
-    return self.returns:select(1), true
+    return self.returns, true
 end
 
 ---@param key Node.Key
@@ -115,7 +115,7 @@ end
 
 function M:onView(viewer, options)
     return '{}({})' % {
-        self.head.typeName,
+        viewer:view(self.head),
         table.concat(ls.util.map(self.args, function (arg)
             return viewer:view(arg)
         end), ', '),

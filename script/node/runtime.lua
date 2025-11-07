@@ -127,9 +127,10 @@ function M:fillAPIs()
 
     ---@param head Node
     ---@param key Node.Key
+    ---@param rest? boolean
     ---@return Node.Select
-    function self.select(head, key)
-        return New 'Node.Select' (scope, head, key)
+    function self.select(head, key, rest)
+        return New 'Node.Select' (scope, head, key, rest)
     end
 
     function self.func()

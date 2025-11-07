@@ -145,14 +145,9 @@ do
     local alias = rt.type 'Alias'
 
     local aliasValue = rt.union {
-        rt.template('xyz`A`.`B`.xyz', {
-            A = A,
-            B = B,
-        }),
+        rt.template {'xyz', A, '.', B, '.xyz'},
         rt.array(
-            rt.template('`A`', {
-                A = A,
-            })
+            rt.template { A }
         ),
     }
     rt.alias('Alias', { A, B }, aliasValue)

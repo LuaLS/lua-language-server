@@ -1250,4 +1250,13 @@ function m.split(str, sep)
     return result
 end
 
+---@param str string
+---@return string
+function m.asKey(str)
+    if str:match('^[%a_][%w_]*$') and not RESERVED[str] then
+        return str
+    end
+    return ('[%q]'):format(str)
+end
+
 return m

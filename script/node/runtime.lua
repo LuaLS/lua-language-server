@@ -231,11 +231,10 @@ function M:fillAPIs()
         return New 'Node.Variable' (scope, name, parent)
     end
 
-    ---@param name string
-    ---@param params table<string, Node.Generic?>
+    ---@param params (string|Node.Generic)[]
     ---@return Node.Template
-    function self.template(name, params)
-        return New 'Node.Template' (scope, name, params)
+    function self.template(params)
+        return New 'Node.Template' (scope, params)
     end
 
     ---@param options? Node.Viewer.Options

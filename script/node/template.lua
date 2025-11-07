@@ -2,7 +2,7 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(scope: Scope, name: string, params: table<string, Node.Generic?>): Node.Template
+---@overload fun(scope: Scope, params: (string|Node.Generic)[]): Node.Template
 local M = ls.node.register 'Node.Template'
 
 M.kind = 'template'
@@ -10,11 +10,9 @@ M.kind = 'template'
 M.hasGeneric = true
 
 ---@param scope Scope
----@param name string
----@param params table<string, Node.Generic?>
-function M:__init(scope, name, params)
+---@param params (string|Node.Generic)[]
+function M:__init(scope, params)
     self.scope = scope
-    self.name = name
     self.params = params
 end
 
@@ -22,42 +20,26 @@ function M:resolveGeneric(map)
     local rt = self.scope.rt
     local result
 
-    local function nextToken(start, current)
-        local startMark = self.name:find('`', start, true)
-        if not startMark then
-            result = result | rt.type(current .. self.name:sub(start))
+    ---@param index integer
+    ---@param current string
+    local function nextToken(index, current)
+        local token = self.params[index]
+        if not token then
+            result = result | rt.type(current)
+        end
+        if type(token) == 'string' then
+            current = current .. token
+            nextToken(index + 1, current)
             return
         end
-        current = current .. self.name:sub(start, startMark - 1)
-        local endMark = self.name:find('`', startMark + 1, true)
-        if not endMark then
-            return
-        end
-        local paramName = self.name:sub(startMark + 1, endMark - 1)
-        local param = self.params[paramName]
-        if not param then
-            return
-        end
-        local value = map[param]
+        local value = map[token]
         if not value then
             return
         end
-        if value.kind == 'value' then
-            ---@cast value Node.Value
-            nextToken(endMark + 1, current .. tostring(value.literal))
-            return
-        end
-        if value.kind == 'union' then
-            ---@cast value Node.Union
-            for _, v in ipairs(value.values) do
-                if v.kind == 'value' then
-                    ---@cast v Node.Value
-                    nextToken(endMark + 1, current .. tostring(v.literal))
-                else
-                    result = result | rt.UNKNOWN
-                end
-            end
-        end
+        ---@param node Node.Value
+        value:each('value', function (node)
+            nextToken(index + 1, current .. tostring(node.literal))
+        end)
     end
 
     nextToken(1, '')

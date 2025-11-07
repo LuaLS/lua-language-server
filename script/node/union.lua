@@ -138,15 +138,31 @@ M.__getter.falsy = function (self)
 end
 
 function M:narrow(other)
-    return self.scope.rt.union(self.values, function (v)
-        return v:canCast(other)
-    end)
+    local result = {}
+    local others = {}
+    for _, v in ipairs(self.values) do
+        if v:canCast(other) then
+            result[#result+1] = v
+        else
+            others[#others+1] = v
+        end
+    end
+    local rt = self.scope.rt
+    return rt.union(result), rt.union(others)
 end
 
 function M:narrowByField(key, value)
-    return self.scope.rt.union(self.values, function (v)
-        return v:get(key):canCast(value)
-    end)
+    local result = {}
+    local others = {}
+    for _, v in ipairs(self.values) do
+        if v:get(key):canCast(value) then
+            result[#result+1] = v
+        else
+            others[#others+1] = v
+        end
+    end
+    local rt = self.scope.rt
+    return rt.union(result), rt.union(others)
 end
 
 ---@param self Node.Union

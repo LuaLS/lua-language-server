@@ -69,6 +69,9 @@ end
 M.__getter.typeOfKey = function (self)
     return self.scope.rt.INTEGER, true
 end
+function M:keyOf(value)
+    return self.scope.rt.INTEGER
+end
 
 ---@param other Node
 ---@return boolean

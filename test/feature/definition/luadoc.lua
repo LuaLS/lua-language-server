@@ -597,7 +597,7 @@ local function f(x) end
 
 ---@class A
 local a
-a.x = 1
+a.<!x!> = 1
 
 ---@type { [number]: A }
 local b
@@ -682,7 +682,7 @@ local function f(x) end
 
 ---@class A
 local a
-a.x = 1
+a.<!x!> = 1
 
 ---@type { [A]: number }
 local b

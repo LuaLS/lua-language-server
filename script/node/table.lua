@@ -253,27 +253,35 @@ function M:get(key)
         end
         return rt.union(self.values), true
     end
-    local value = self.valueMap[key]
-    if value then
-        return value, true
-    end
     local result = {}
     for field in self.fields:pairsFast() do
         ---@cast field Node.Field
-        if field.key:canCast(key) then
+        if field.key >> key or key >> field.key then
             result[#result+1] = field.value
-        else
-            -- 在获取字段时允许 number 和 integer 互相转换
-            if  key.kind == 'type' and (key.typeName == 'number' or key.typeName == 'integer')
-            and field.key.kind == 'type' and (field.key.typeName == 'number' or field.key.typeName == 'integer') then
-                result[#result+1] = field.value
-            end
         end
     end
     if #result == 0 then
         return rt.NIL, false
     end
     return rt.union(result), true
+end
+
+function M:keyOf(value)
+    local rt = self.scope.rt
+    if not self.fields then
+        return rt.NEVER
+    end
+    local keys = {}
+    for field in self.fields:pairsFast() do
+        ---@cast field Node.Field
+        if field.value >> value or value >> field.value then
+            keys[#keys+1] = field.key
+        end
+    end
+    if #keys == 0 then
+        return rt.NEVER
+    end
+    return rt.union(keys)
 end
 
 ---@param other Node
@@ -393,9 +401,66 @@ function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
+    local rt = self.scope.rt
+    ---@type Node[]
+    local knownKeys   = {}
+    ---@type Node[]
+    local knownValues = {}
+
+    ---@type Node.Field[]
+    local fieldsK  = {}
+    ---@type Node.Field[]
+    local fieldsV  = {}
+    ---@type Node.Field[]
+    local fieldsKV = {}
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        field:inferGeneric(other, result)
+        local key   = field.key
+        local value = field.value
+        if key.hasGeneric and not value.hasGeneric then
+            fieldsK[#fieldsK+1] = field
+        end
+        if not key.hasGeneric and value.hasGeneric then
+            fieldsV[#fieldsV+1] = field
+        end
+        if key.hasGeneric and value.hasGeneric then
+            fieldsKV[#fieldsKV+1] = field
+        end
+        if not key.hasGeneric then
+            knownKeys[#knownKeys+1] = field.key
+        end
+        if not value.hasGeneric then
+            knownValues[#knownValues+1] = field.value
+        end
+    end
+
+    for _, field in ipairs(fieldsK) do
+        local value = field.value
+        local key   = other:keyOf(value)
+        field.key:inferGeneric(key, result)
+    end
+    for _, field in ipairs(fieldsV) do
+        local key   = field.key
+        local value = other:get(key)
+        field.value:inferGeneric(value, result)
+    end
+    for _, field in ipairs(fieldsK) do
+        local key = field.key:resolveGeneric(result)
+        knownKeys[#knownKeys+1] = key
+    end
+    for _, field in ipairs(fieldsV) do
+        local value = field.value:resolveGeneric(result)
+        knownValues[#knownValues+1] = value
+    end
+    if #fieldsKV > 0 then
+        local knownKey   = rt.union(knownKeys)
+        local knownValue = rt.union(knownValues)
+        local _, otherKey   = other.typeOfKey:narrow(knownKey)
+        local _, otherValue = other:get(rt.ANY):narrow(knownValue)
+        for _, field in ipairs(fieldsKV) do
+            field.key:inferGeneric(otherKey, result)
+            field.value:inferGeneric(otherValue, result)
+        end
     end
 end
 

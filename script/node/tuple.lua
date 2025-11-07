@@ -94,6 +94,21 @@ function M:get(key)
     return self.values:select(key)
 end
 
+function M:keyOf(value)
+    local rt = self.scope.rt
+    local max = self.values.max
+    if not max or max > 1000 then
+        return rt.INTEGER, true
+    end
+    local results = {}
+    for i, v in ipairs(self.values.values) do
+        if v >> value or value >> v then
+            results[#results+1] = rt.value(i)
+        end
+    end
+    return rt.union(results)
+end
+
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)

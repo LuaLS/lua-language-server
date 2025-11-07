@@ -251,7 +251,7 @@ end
 ---@return table<Node.Generic, Node>
 function M:makeGenericMap(args)
     local map = {}
-    if not self.typeParams then
+    if not self.hasGeneric then
         return map
     end
     local rt = self.scope.rt

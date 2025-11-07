@@ -441,3 +441,92 @@ do
     assert(results[T].kind == 'type')
     assert(results[T]:view() == 'abc.X')
 end
+
+do
+    rt:reset()
+
+    local A = rt.generic 'A'
+    local B = rt.generic 'B'
+    local t = rt.table {
+        [A] = rt.value(1),
+        [B] = rt.value(2),
+    }
+
+    local results = {}
+    t:inferGeneric(rt.table {
+        x = rt.value(2),
+        y = rt.value(1),
+    }, results)
+
+    assert(results[A]:view() == '"y"')
+    assert(results[B]:view() == '"x"')
+end
+
+do
+    rt:reset()
+
+    local A = rt.generic 'A'
+    local B = rt.generic 'B'
+    local t = rt.table {
+        [1] = A,
+        [2] = B,
+    }
+
+    local results = {}
+    t:inferGeneric(rt.table {
+        [1] = rt.value 'x',
+        [2] = rt.value 'y',
+    }, results)
+
+    assert(results[A]:view() == '"x"')
+    assert(results[B]:view() == '"y"')
+end
+
+do
+    rt:reset()
+
+    local A = rt.generic 'A'
+    local B = rt.generic 'B'
+    local t = rt.table {
+        [1] = A,
+        [B] = rt.value 'y',
+    }
+
+    local results = {}
+    t:inferGeneric(rt.table {
+        [1] = rt.value 'x',
+        [2] = rt.value 'y',
+    }, results)
+
+    assert(results[A]:view() == '"x"')
+    assert(results[B]:view() == '2')
+end
+
+do
+    rt:reset()
+
+    local A = rt.generic 'A'
+    local B = rt.generic 'B'
+    local C = rt.generic 'C'
+    local D = rt.generic 'D'
+    local t = rt.table {
+        [1] = rt.value 'a',
+        [A] = rt.value 'b',
+        [3] = B,
+        [C] = D,
+    }
+
+    local results = {}
+    t:inferGeneric(rt.table {
+        [1] = rt.value 'a',
+        [2] = rt.value 'b',
+        [3] = rt.value 'c',
+        [4] = rt.value 'd',
+        [5] = rt.value 'e',
+    }, results)
+
+    assert(results[A]:view() == '2')
+    assert(results[B]:view() == '"c"')
+    assert(results[C]:view() == '4 | 5')
+    assert(results[D]:view() == '"d" | "e"')
+end

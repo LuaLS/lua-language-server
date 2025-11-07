@@ -42,21 +42,6 @@ M.__getter.hasGeneric = function (self)
     return self.key.hasGeneric or self.value.hasGeneric, true
 end
 
-function M:inferGeneric(other, result)
-    if self.key.hasGeneric then
-        -- 仅支持 [K] 这种形式的推导，不支持 [K[]] 等嵌套形式
-        if  self.key.kind == 'generic'
-        and other.typeOfKey ~= self.scope.rt.NEVER then
-            self.key:inferGeneric(other.typeOfKey, result)
-            if self.value.hasGeneric then
-                self.value:inferGeneric(other:get(self.scope.rt.ANY), result)
-            end
-        end
-    elseif self.value.hasGeneric then
-        self.value:inferGeneric(other:get(self.key), result)
-    end
-end
-
 function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self

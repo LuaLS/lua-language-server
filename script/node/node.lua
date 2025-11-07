@@ -140,7 +140,19 @@ M.typeOfKey = nil
 ---@return Node
 ---@return true
 M.__getter.typeOfKey = function (self)
-    return self.scope.rt.NEVER, true
+    if self.value == self then
+        return self.scope.rt.NEVER, true
+    end
+    return self.value.typeOfKey, true
+end
+
+---@param value Node
+---@return Node
+function M:keyOf(value)
+    if self.value == self then
+        return self.scope.rt.NEVER
+    end
+    return self.value:keyOf(value)
 end
 
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'

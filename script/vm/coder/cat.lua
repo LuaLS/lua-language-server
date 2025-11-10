@@ -1,5 +1,10 @@
 ls.vm.registerCoderProvider('cat', function (coder, source)
     ---@cast source LuaParser.Node.Cat
+
+    if not source.value then
+        --print('未实现：', source.code)
+        return
+    end
     coder:compile(source.value)
 end)
 
@@ -220,6 +225,15 @@ ls.vm.registerCoderProvider('catstring', function (coder, source)
     })
 end)
 
+ls.vm.registerCoderProvider('catboolean', function (coder, source)
+    ---@cast source LuaParser.Node.CatBoolean
+
+    coder:addLine('{key} = rt.value({value})' % {
+        key = coder:getKey(source),
+        value = tostring(source.value),
+    })
+end)
+
 ls.vm.registerCoderProvider('catunion', function (coder, source)
     ---@cast source LuaParser.Node.CatUnion
 
@@ -367,11 +381,13 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
     if source.params then
         for _, param in ipairs(source.params) do
             coder:addLine('')
-            coder:compile(param.value)
+            if param.value then
+                coder:compile(param.value)
+            end
             coder:addLine('{func}:addParamDef({name:q}, {param}, {optional:q})' % {
                 func     = coder:getKey(source),
                 name     = param.name.id,
-                param    = coder:getKey(param.value),
+                param    = param.value and coder:getKey(param.value) or 'rt.UNKNOWN',
                 optional = param.optional,
             })
         end
@@ -452,6 +468,7 @@ end)
 
 ls.vm.registerCoderProvider('catstatecast', function (coder, source)
     ---@cast source LuaParser.Node.CatStateCast
+    coder:compile(source.var)
 
     for _, item in ipairs(source.items) do
         coder:compile(item)
@@ -461,8 +478,11 @@ end)
 ls.vm.registerCoderProvider('catstatecastitem', function (coder, source)
     ---@cast source LuaParser.Node.CatStateCastItem
 
-    coder:compile(source.var)
-    coder:compile(source.type)
+    if source.isOptional then
+    end
+    if source.type then
+        coder:compile(source.type)
+    end
 
     -- TODO
 end)
@@ -471,4 +491,18 @@ ls.vm.registerCoderProvider('catstatesee', function (coder, source)
     ---@cast source LuaParser.Node.CatStateSee
 
     coder:addUnneeded(source)
+end)
+
+ls.vm.registerCoderProvider('catparen', function (coder, source)
+    ---@cast source LuaParser.Node.CatParen
+
+    if not source.value then
+        return
+    end
+    coder:compile(source.value)
+
+    coder:addLine('{key} = {value}' % {
+        key   = coder:getKey(source),
+        value = coder:getKey(source.value),
+    })
 end)

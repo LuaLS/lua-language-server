@@ -14,6 +14,12 @@ ls.vm.registerCoderProvider('integer', function (coder, source)
     makeValue(coder, source, source.value)
 end)
 
+ls.vm.registerCoderProvider('float', function (coder, source)
+    ---@cast source LuaParser.Node.Float
+
+    makeValue(coder, source, source.value)
+end)
+
 ls.vm.registerCoderProvider('string', function (coder, source)
     ---@cast source LuaParser.Node.String
 
@@ -161,7 +167,7 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
         return
     end
 
-    coder:addLine('{key} = rt.call({op:q}, {{arg1}, {arg2}})' % {
+    coder:addLine('{key} = rt.call({op:q}, { {arg1}, {arg2} })' % {
         key   = coder:getKey(source),
         op    = op,
         arg1  = coder:getKey(source.exp1),
@@ -187,7 +193,7 @@ ls.vm.registerCoderProvider('unary', function (coder, source)
         return
     end
 
-    coder:addLine('{key} = rt.call({op:q}, {{arg}})' % {
+    coder:addLine('{key} = rt.call({op:q}, { {arg} })' % {
         key   = coder:getKey(source),
         op    = op,
         arg   = coder:getKey(source.exp),

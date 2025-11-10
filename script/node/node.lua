@@ -130,6 +130,19 @@ function M:getExpect(key)
     return self:get(key)
 end
 
+---@param key1 Node.Key
+---@param key2? Node.Key
+---@param ... Node.Key
+---@return Node.Variable
+function M:getChild(key1, key2, ...)
+    local rt = self.scope.rt
+    local var = rt.variable(key1, self)
+    if key2 then
+        return var:getChild(key2, ...)
+    end
+    return var
+end
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists

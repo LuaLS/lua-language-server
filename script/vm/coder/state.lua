@@ -162,3 +162,9 @@ ls.vm.registerCoderProvider('goto', function (coder, source)
 
     coder:addUnneeded(source)
 end)
+
+ls.vm.registerCoderProvider('break', function (coder, source)
+    ---@cast source LuaParser.Node.Break
+
+    coder:addUnneeded(source)
+end)

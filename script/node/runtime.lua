@@ -227,7 +227,7 @@ function M:fillAPIs()
     end
 
     ---@param name string | number | boolean | Node
-    ---@param parent? Node.Variable
+    ---@param parent? Node
     ---@return Node.Variable
     function self.variable(name, parent)
         return New 'Node.Variable' (scope, name, parent)

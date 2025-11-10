@@ -14,7 +14,7 @@ M.key = nil
 
 ---@param scope Scope
 ---@param name Node.Key
----@param parent? Node.Variable
+---@param parent? Node
 function M:__init(scope, name, parent)
     if type(name) == 'table' then
         ---@cast name Node.Value
@@ -113,9 +113,10 @@ function M:removeAssign(field)
         local rt = self.scope.rt
         local parent = self.parent
         for _ = 1, 100 do
-            if not parent then
+            if not parent or parent.kind ~= 'variable' then
                 break
             end
+            ---@cast parent Node.Variable
             parent.childs[rt.luaKey(self.key)] = nil
             if not next(parent.childs) then
                 parent.childs = nil
@@ -253,9 +254,10 @@ M.__getter.parentFieldValue = function (self)
         return self.masterVariable.parentFieldValue
     end
     local parent = self.parent
-    if not parent then
+    if not parent or parent.kind ~= 'variable' then
         return false, true
     end
+    ---@cast parent Node.Variable
     parent:addRef(self)
     if parent.assigns then
         local result
@@ -570,7 +572,8 @@ M.__getter.allEquivalents = function (self)
     end
 
     local parent = self.parent
-    if parent then
+    if parent and parent.kind == 'variable' then
+        ---@cast parent Node.Variable
         for _, equivalent in ipairs(parent.allEquivalents) do
             if equivalent.kind == 'variable' then
                 ---@cast equivalent Node.Variable
@@ -776,9 +779,16 @@ end
 function M:onViewAsVariable(viewer, options)
     ---@type Node.Variable[]
     local path = {}
+    ---@type Node
     local current = self
+    local notVariableHead
     local tooLong
     while current do
+        if current.kind ~= 'variable' then
+            notVariableHead = current
+            break
+        end
+        ---@cast current Node.Variable
         path[#path+1] = current
         current = current.parent
         if #path >= 8 then
@@ -800,6 +810,11 @@ function M:onViewAsVariable(viewer, options)
     local views = {}
     if tooLong then
         views[#views+1] = '...'
+    end
+    if notVariableHead then
+        views[#views+1] = viewer:view(notVariableHead, {
+            skipLevel = options.skipLevel,
+        })
     end
     views[#views+1] = viewer:viewAsKey(path[#path].key, {
         skipLevel = options.skipLevel,

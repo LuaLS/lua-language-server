@@ -1,5 +1,7 @@
----@class VM.Vfile
+---@class VM.Vfile: GCHost
 local M = Class 'VM.Vfile'
+
+Extends('VM.Vfile', 'GCHost')
 
 M.version = 0
 ---@type Document?
@@ -12,23 +14,12 @@ function M:__init(scope, uri)
     self.uri = uri
 end
 
-function M:__del()
-    self:resetRunners()
-end
-
 ---@param ast LuaParser.Ast
 ---@return VM.Coder
 function M:makeCoder(ast)
     local coder = ls.vm.createCoder()
     coder:makeFromAst(ast)
     return coder
-end
-
-function M:resetRunners()
-    for _, runner in pairs(self.runners) do
-        Delete(runner)
-    end
-    self.runners = {}
 end
 
 function M:index()
@@ -43,6 +34,7 @@ function M:index()
     self.version = self.version + 1
 
     self.coder = self:makeCoder(document.ast)
+    self:bindGC(self.coder)
     self.coder:run(self)
 end
 

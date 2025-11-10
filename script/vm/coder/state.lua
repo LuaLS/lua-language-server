@@ -150,3 +150,15 @@ ls.vm.registerCoderProvider('singleexp', function (coder, source)
 
     coder:compile(source.exp)
 end)
+
+ls.vm.registerCoderProvider('label', function (coder, source)
+    ---@cast source LuaParser.Node.Label
+
+    coder:addUnneeded(source)
+end)
+
+ls.vm.registerCoderProvider('goto', function (coder, source)
+    ---@cast source LuaParser.Node.Goto
+
+    coder:addUnneeded(source)
+end)

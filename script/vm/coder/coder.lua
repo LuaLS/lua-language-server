@@ -17,6 +17,10 @@ function M:__init()
     self.blockStack = {}
 end
 
+function M:__del()
+    self:dispose()
+end
+
 ---@param ast LuaParser.Ast
 function M:makeFromAst(ast)
     self.buf = {}
@@ -78,6 +82,13 @@ function M:addUnknown(source)
     })
 end
 
+---@param source LuaParser.Node.Base
+function M:addUnneeded(source)
+    self:addLine('-- Unneeded: {}' % {
+        source.code,
+    })
+end
+
 ---@param code string
 function M:addDisposer(code)
     local disposers = self.disposers
@@ -88,14 +99,13 @@ end
 ---@type function?
 M.disposer = nil
 
----@param vfile VM.Vfile
-function M:dispose(vfile)
+function M:dispose()
     if self.disposer then
-        vfile.scope.rt:lockCache()
+        self.rt:lockCache()
         xpcall(function ()
             self.disposer()
         end, log.error)
-        vfile.scope.rt:unlockCache()
+        self.rt:unlockCache()
         self.disposer = nil
     end
 end
@@ -121,7 +131,9 @@ end
 
 ---@param vfile VM.Vfile
 function M:run(vfile)
-    self:dispose(vfile)
+    self:dispose()
+    self.rt = vfile.scope.rt
+    self.vfile = vfile
     local map = {}
     local var = {}
     self.map = makeRegistry(map)
@@ -160,6 +172,7 @@ function M:compile(source, canBeNil)
     local provider = M.providers[source.kind]
     if not provider then
         self:addLine('--[[!!! ' .. source.kind .. ' !!!]]')
+        error('No provider for kind: ' .. source.kind)
         return false
     end
     provider(self, source)

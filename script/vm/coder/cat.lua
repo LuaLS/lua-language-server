@@ -466,3 +466,9 @@ ls.vm.registerCoderProvider('catstatecastitem', function (coder, source)
 
     -- TODO
 end)
+
+ls.vm.registerCoderProvider('catstatesee', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateSee
+
+    coder:addUnneeded(source)
+end)

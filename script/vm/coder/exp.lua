@@ -28,6 +28,12 @@ ls.vm.registerCoderProvider('nil', function (coder, source)
     })
 end)
 
+ls.vm.registerCoderProvider('boolean', function (coder, source)
+    ---@cast source LuaParser.Node.Boolean
+
+    makeValue(coder, source, source.value)
+end)
+
 ls.vm.registerCoderProvider('table', function (coder, source)
     ---@cast source LuaParser.Node.Table
 

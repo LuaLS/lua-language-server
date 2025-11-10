@@ -240,10 +240,8 @@ ls.feature.provider.definition(function (param, push)
         return
     end
 
-    local node = param.scope.vm:getNode(source)
-    if not node or node.kind ~= 'type' then
-        return
-    end
+    ---@cast source LuaParser.Node.CatID
+    local node = param.scope.rt.type(source.id)
 
     ---@cast node Node.Type
     findDefinitionOfType(node, push)

@@ -449,3 +449,20 @@ ls.vm.registerCoderProvider('catstateoverload', function (coder, source)
     coder:compile(source.value)
     coder:addToCatGroup(source.parent, true)
 end)
+
+ls.vm.registerCoderProvider('catstatecast', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateCast
+
+    for _, item in ipairs(source.items) do
+        coder:compile(item)
+    end
+end)
+
+ls.vm.registerCoderProvider('catstatecastitem', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateCastItem
+
+    coder:compile(source.var)
+    coder:compile(source.type)
+
+    -- TODO
+end)

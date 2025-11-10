@@ -3,9 +3,10 @@
 local Ast = Class 'LuaParser.Ast'
 
 ---@private
+---@generic T: LuaParser.Node.Base
 ---@param atLeastOne? boolean
 ---@param greedy? boolean
----@param parser function
+---@param parser fun(self: LuaParser.Ast, atLeastOne?: boolean): T
 ---@return any[]
 function Ast:parseList(atLeastOne, greedy, parser)
     local list = {}

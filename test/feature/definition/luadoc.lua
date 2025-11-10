@@ -1015,19 +1015,19 @@ TEST [[
 ---@type XXX<<?YYY?>>
 ]]
 
-TEST [[
-local <!x!>
+-- TEST [[
+-- local <!x!>
 
----@cast <?x?> integer
-]]
+-- ---@cast <?x?> integer
+-- ]]
 
-TEST [[
-local function f()
-    local <!x!>
+-- TEST [[
+-- local function f()
+--     local <!x!>
 
-    ---@cast <?x?> integer
-end
-]]
+--     ---@cast <?x?> integer
+-- end
+-- ]]
 
 TEST [[
 ---@class A

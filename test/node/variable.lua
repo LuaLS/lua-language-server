@@ -257,3 +257,22 @@ do
     assert(Z:view() == '{ a: 1 }')
     assert(#A:getEquivalentLocations() == 1)
 end
+
+do
+    rt:reset()
+
+    --[[
+    local x = { y = {} }
+    x.y.z = 1
+    ]]
+
+    local X = rt.variable 'x'
+
+    X:addAssign(rt.field(rt.value 'x', rt.table {
+        y = rt.table(),
+    }))
+
+    X:addField(rt.field(rt.value 'z', rt.value(1)), { 'y' })
+
+    assert(X:view() == '{ y: { z: 1 } }')
+end

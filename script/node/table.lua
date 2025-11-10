@@ -357,6 +357,33 @@ function M:onCanCast(other)
     return false
 end
 
+---@param a Node.Field
+---@param b Node.Field
+---@return Node.Field
+local function defaultOnSameKey(a, b)
+    if a == b then
+        return a
+    end
+    local v1 = a:findValue { 'type', 'table' }
+    local v2 = b:findValue { 'type', 'table' }
+    if not v1 or v1.kind == 'type' or not v2 or v2.kind == 'type' then
+        return a
+    end
+    if v1 == v2 then
+        return a
+    end
+    ---@cast v1 Node.Table
+    ---@cast v2 Node.Table
+    local rt = a.scope.rt
+    local merged = rt.mergeTables({ v1, v2 })
+    local field = rt.field(a.key, merged)
+    local location = a.location or b.location
+    if location then
+        field:setLocation(location)
+    end
+    return field
+end
+
 ---越靠前的字段越优先。
 ---@param childs Node
 ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
@@ -366,12 +393,7 @@ function M:addChilds(childs, onSameKey)
     rt:lockCache()
 
     if not onSameKey then
-        ---@param oldField Node.Field
-        ---@param newField Node.Field
-        ---@return Node.Field
-        onSameKey = function (oldField, newField)
-            return oldField
-        end
+        onSameKey = defaultOnSameKey
     end
 
     assert(self.fields == nil, 'Must be an empty table when merging childs.')

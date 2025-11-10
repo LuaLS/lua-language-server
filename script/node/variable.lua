@@ -239,6 +239,24 @@ M.__getter.parentExpectValue = function (self)
     if e then
         return r, true
     end
+    return false, true
+end
+
+---@type Node|false
+M.parentFieldValue = nil
+
+---@param self Node.Variable
+---@return Node|false
+---@return true?
+M.__getter.parentFieldValue = function (self)
+    if self.masterVariable then
+        return self.masterVariable.parentFieldValue
+    end
+    local parent = self.parent
+    if not parent then
+        return false, true
+    end
+    parent:addRef(self)
     if parent.assigns then
         local result
         for assign in parent.assigns:pairsFast() do
@@ -484,6 +502,7 @@ M.__getter.value = function (self)
         or self.parentExpectValue
         or self.typeValue
         or self.equivalentValue
+        or self.parentFieldValue
         or rt.UNKNOWN
         , true
 end
@@ -590,15 +609,15 @@ M.__getter.allEquivalents = function (self)
 end
 
 -- 从等价物上获取所有的值
----@type Node
+---@type Node|false
 M.equivalentValue = nil
 
 ---@param self Node.Variable
----@return Node
----@return true
+---@return Node|false
+---@return true?
 M.__getter.equivalentValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.equivalentValue, true
+        return self.masterVariable.equivalentValue
     end
     local rt = self.scope.rt
     ---@type Node[]
@@ -660,7 +679,7 @@ M.__getter.equivalentValue = function (self)
     if result then
         return result, true
     end
-    return rt.UNKNOWN, true
+    return false, true
 end
 
 ---@param onlySameVariable? boolean

@@ -109,6 +109,12 @@ do
 end
 
 do
+    local a = rt.VAR_G
+
+    assert(a:view() == '_G')
+end
+
+do
     local a = rt.value(1) | rt.VAR_G
 
     assert(a:view() == '1 | _G')

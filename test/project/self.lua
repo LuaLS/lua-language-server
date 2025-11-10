@@ -26,6 +26,14 @@ do
     collectgarbage()
     print('索引后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
 
+    for _, uri in ipairs(scope.uris) do
+        local document = scope:getDocument(uri)
+        document.ast = nil
+    end
+
+    collectgarbage()
+    print('去除语法树后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+
     local c1 = os.clock()
     local count = 0
     for _, uri in ipairs(result.uris) do

@@ -258,6 +258,13 @@ function M:fillAPIs()
         return New 'Node.Field' (scope, key, value)
     end
 
+    ---@param func Node
+    ---@param index integer
+    ---@return Node.ParamOf
+    function self.paramOf(func, index)
+        return New 'Node.ParamOf' (scope, func, index)
+    end
+
     ---@param childs Node.Table[]
     ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table
@@ -331,7 +338,7 @@ function M:fillPresets()
     self.THREAD = self.type 'thread'
         : setConfig('basicType', true)
 
-    local anykv = self.class 'anykv'
+    local anykv = self.class '_'
         : addField(self.field(self.ANY, self.ANY):setHideInView())
 
     self.ANY:addClass(anykv)
@@ -357,13 +364,13 @@ function M:fillPresets()
     do
         local K = self.generic('K', self.ANY, self.ANY)
         local V = self.generic('V', self.ANY, self.ANY)
-        local table0 = self.class('table0')
+        local table0 = self.class('_')
             : addField(self.field(self.ANY, self.ANY):setHideInView())
 
-        local table1 = self.class('table1', { K })
+        local table1 = self.class('_', { K })
             : addField(self.field(K, self.TRUE))
 
-        local table2 = self.class('table2', { K, V })
+        local table2 = self.class('_', { K, V })
             : addField(self.field(K, V))
 
         self.TABLE:addClass(table0)

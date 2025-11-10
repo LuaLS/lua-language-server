@@ -19,12 +19,16 @@ function M:__init(scope, name, params, extends)
     self.params = params
     self.extends = extends
 
-    self.masterType = scope.rt.type(name)
-    self.masterType:addClass(self)
+    if name ~= '_' then
+        self.masterType = scope.rt.type(name)
+        self.masterType:addClass(self)
+    end
 end
 
 function M:__del()
-    self.masterType:removeClass(self)
+    if self.masterType then
+        self.masterType:removeClass(self)
+    end
 end
 
 function M:dispose()

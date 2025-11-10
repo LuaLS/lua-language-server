@@ -33,6 +33,7 @@ Extends('Node', 'Node.RefModule')
 ---| 'fcall'
 ---| 'select'
 ---| 'field'
+---| 'paramof'
 
 ---@class Node.Location
 ---@field uri Uri

@@ -230,11 +230,14 @@ end
 ---@return Node
 ---@return boolean exists
 function M:get(key)
+    local rt = self.scope.rt
     local r, e = self:getExpect(key)
     if e then
-        return r, true
+        local tp = r:findValue { 'type' }
+        if tp and tp ~= rt.ANY and tp ~= rt.UNKNOWN and tp ~= rt.NIL then
+            return r, true
+        end
     end
-    local rt = self.scope.rt
     if not self.fields then
         return rt.NIL, false
     end

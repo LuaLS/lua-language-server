@@ -93,6 +93,13 @@ ls.vm.registerCoderProvider('call', function (coder, source)
     for i, arg in ipairs(source.args) do
         coder:compile(arg)
         args[i] = coder:getKey(arg)
+        if arg.kind == 'table' then
+            coder:addLine('{key}:setExpectParent(rt.paramOf({func}, {index}))' % {
+                key   = coder:getKey(arg),
+                func  = coder:getKey(source.node),
+                index = i,
+            })
+        end
     end
     coder:addLine('{key} = rt.fcall({func}, { {args} })' % {
         key   = coder:getKey(source),

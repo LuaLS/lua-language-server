@@ -330,3 +330,21 @@ do
 
     assert(rt:globalGet('V'):view() == '1')
 end
+
+do
+    TEST_INDEX [[
+        x, y, z = f1(), f2()
+    ]]
+end
+
+do
+    TEST_INDEX [[
+        local x, y, z = f1(), f2()
+    ]]
+end
+
+do
+    TEST_INDEX [[
+        local x, y, z = f1()
+    ]]
+end

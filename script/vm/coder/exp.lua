@@ -87,13 +87,13 @@ ls.vm.registerCoderProvider('select', function (coder, source)
     ---@cast source LuaParser.Node.Select
 
     local value = source.value
-    if source.index == 1 then
+    if source.sindex == 1 then
         coder:compile(value)
     end
     coder:addLine('{key} = rt.select({value}, {index})' % {
         key   = coder:getKey(source),
         value = coder:getKey(source.value),
-        index = source.index,
+        index = source.sindex,
     })
 end)
 
@@ -124,7 +124,7 @@ ls.vm.registerCoderProvider('paren', function (coder, source)
     ---@cast source LuaParser.Node.Paren
 
     coder:compile(source.exp)
-    coder:addLine('{key} = rt.select({value}, 1)' % {
+    coder:addLine('{key} = {value}' % {
         key   = coder:getKey(source),
         value = coder:getKey(source.exp),
     })

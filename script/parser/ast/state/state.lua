@@ -26,7 +26,7 @@ local SingleExp = Class('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
 SingleExp.kind = 'singleexp'
 
 ---@class LuaParser.Node.Select: LuaParser.Node.Base
----@field index integer
+---@field sindex integer
 ---@field value LuaParser.Node.Exp
 local Select = Class('LuaParser.Node.Select', 'LuaParser.Node.Base')
 
@@ -37,7 +37,7 @@ Select.kind = 'select'
 ---@return true
 Select.__getter.uniqueKey = function (self)
     return string.format('select#%d@%d:%d'
-        , self.index
+        , self.sindex
         , self.startRow + 1
         , self.startCol + 1
     ), true
@@ -228,16 +228,16 @@ end
 
 ---@private
 ---@param value LuaParser.Node.Exp
----@param index integer
+---@param sindex integer
 ---@return LuaParser.Node.Select?
-function Ast:convertToSelect(value, index)
+function Ast:convertToSelect(value, sindex)
     if value.kind ~= 'call' and value.kind ~= 'varargs' then
         return nil
     end
     local sel = self:createNode('LuaParser.Node.Select', {
         start  = value.start,
         finish = value.finish,
-        index  = index,
+        sindex = sindex,
         value  = value,
         dummy  = true,
     })
@@ -246,11 +246,11 @@ end
 
 ---@private
 ---@param values LuaParser.Node.Exp[]
----@param varCount integer
-function Ast:convertValuesToSelect(values, varCount)
+---@param varNeed integer
+function Ast:convertValuesToSelect(values, varNeed)
     local lastValue
     for i, value in ipairs(values) do
-        local sel = self:convertToSelect(value, i)
+        local sel = self:convertToSelect(value, 1)
         if sel then
             lastValue = value
             values[i] = sel
@@ -259,11 +259,12 @@ function Ast:convertValuesToSelect(values, varCount)
             lastValue = nil
         end
     end
-    if #values >= varCount or not lastValue then
+    local varNum = #values
+    if varNum >= varNeed or not lastValue then
         return
     end
-    for i = #values + 1, varCount do
-        local sel = self:convertToSelect(lastValue, i)
+    for i = varNum + 1, varNeed do
+        local sel = self:convertToSelect(lastValue, i - varNum + 1)
         values[i] = sel
     end
 end

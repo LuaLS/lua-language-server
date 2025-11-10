@@ -396,13 +396,15 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
     if source.returns then
         for _, ret in ipairs(source.returns) do
             coder:addLine('')
-            coder:compile(ret.value)
-            coder:addLine('{func}:addReturnDef({name:q}, {param}, {optional:q})' % {
-                func     = coder:getKey(source),
-                name     = ret.name and ret.name.id or nil,
-                param    = coder:getKey(ret.value),
-                optional = ret.optional,
-            })
+            if ret.value then
+                coder:compile(ret.value)
+                coder:addLine('{func}:addReturnDef({name:q}, {param}, {optional:q})' % {
+                    func     = coder:getKey(source),
+                    name     = ret.name and ret.name.id or nil,
+                    param    = coder:getKey(ret.value),
+                    optional = ret.optional,
+                })
+            end
         end
     end
 end)

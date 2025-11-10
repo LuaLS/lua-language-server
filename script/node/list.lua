@@ -37,6 +37,7 @@ M.__getter.values = function (self)
     if not self.raw then
         return {}, true
     end
+    self.values = {}
     local values = {}
     for i, raw in ipairs(self.raw) do
         raw:addRef(self)

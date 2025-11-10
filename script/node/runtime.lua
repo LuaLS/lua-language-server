@@ -120,9 +120,10 @@ function M:fillAPIs()
 
     ---@param head Node
     ---@param index Node.Key
+    ---@param onlyExpect? boolean
     ---@return Node.Index
-    function self.index(head, index)
-        return New 'Node.Index' (scope, head, index)
+    function self.index(head, index, onlyExpect)
+        return New 'Node.Index' (scope, head, index, onlyExpect)
     end
 
     ---@param head Node

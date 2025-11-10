@@ -125,6 +125,13 @@ end
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists
+function M:getExpect(key)
+    return self:get(key)
+end
+
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:select(key)
     local rt = self.scope.rt
     if key == 1 or key == rt.value(1) then

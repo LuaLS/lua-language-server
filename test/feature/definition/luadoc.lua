@@ -1033,11 +1033,21 @@ TEST [[
 ---@class A
 ---@field <!x!> number
 
+---@type A
+local t = {
+    <?x?> = 1,
+}
+]]
+
+TEST [[
+---@class A
+---@field <!x!> number
+
 ---@param a A
 local function f(a) end
 
 f {
-    <!<?x?>!> = 1,
+    <?x?> = 1,
 }
 ]]
 

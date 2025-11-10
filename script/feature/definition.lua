@@ -171,6 +171,24 @@ ls.feature.provider.definition(function (param, push)
     end
 end)
 
+-- 表中字段的定义位置
+ls.feature.provider.definition(function (param, push)
+    local first = param.sources[1]
+    if first.kind ~= 'tablefieldid' then
+        return
+    end
+    local node = param.scope.vm:getNode(first)
+    if not node then
+        return
+    end
+    ---@param field Node.Field
+    node:each('field', function (field)
+        if field.location and field.value ~= first then
+            push(ls.feature.helper.convertLocation(field.location, first))
+        end
+    end)
+end)
+
 -- 标签
 ls.feature.provider.definition(function (param, push, skip)
     local source = param.sources[2]

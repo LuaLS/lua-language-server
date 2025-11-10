@@ -62,6 +62,13 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
         value    = coder:getKey(source.value),
         location = coder:makeLocationCode(source),
     })
+    if source.subtype == 'field' then
+        coder:addLine('{fieldid} = rt.index({table}, {field:q}, true)' % {
+            fieldid = coder:getKey(source.key),
+            table   = coder:getKey(source.parent),
+            field   = source.key.id,
+        })
+    end
 end)
 
 ls.vm.registerCoderProvider('select', function (coder, source)

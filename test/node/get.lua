@@ -34,3 +34,16 @@ do
     assert(t:get(rt.INTEGER):view() == 'true')
     assert(t:get(rt.NUMBER):view() == 'true')
 end
+
+do
+    local A = rt.class('A')
+    A:addField(rt.field('x', rt.NUMBER))
+
+    local t = rt.table {
+        x = rt.TRUE,
+    }
+
+    t:setExpectParent(rt.type 'A')
+
+    assert(t:get('x'):view() == 'number')
+end

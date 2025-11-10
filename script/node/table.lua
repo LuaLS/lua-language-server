@@ -208,10 +208,32 @@ M.__getter.values = function (self)
     return values, true
 end
 
+---@type Node?
+M.expectParent = nil
+
+---@param parent Node
+function M:setExpectParent(parent)
+    self.expectParent = parent
+end
+
+---@param key Node.Key
+---@return Node
+---@return boolean exists
+function M:getExpect(key)
+    if not self.expectParent then
+        return self.scope.rt.NIL, false
+    end
+    return self.expectParent:getExpect(key)
+end
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists
 function M:get(key)
+    local r, e = self:getExpect(key)
+    if e then
+        return r, true
+    end
     local rt = self.scope.rt
     if not self.fields then
         return rt.NIL, false

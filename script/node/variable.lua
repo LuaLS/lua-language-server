@@ -235,7 +235,26 @@ M.__getter.parentExpectValue = function (self)
         return false, true
     end
     parent:addRef(self)
-    return parent:getExpect(self.key) or false, true
+    local r, e = parent:getExpect(self.key)
+    if e then
+        return r, true
+    end
+    if parent.assigns then
+        local result
+        for assign in parent.assigns:pairsFast() do
+            ---@cast assign Node.Field
+            if assign.value then
+                local r, e = assign.value:get(self.key)
+                if e then
+                    result = result | r
+                end
+            end
+        end
+        if result then
+            return result, true
+        end
+    end
+    return false, true
 end
 
 -- 仅包含自身显式赋值，以及赋值一张字面量表所产生的字段
@@ -367,15 +386,15 @@ function M:get(key)
     return self.value:get(key)
 end
 
----@param key string|number|boolean|Node
----@return Node?
+---@param key Node.Key
+---@return Node
+---@return boolean exists
 function M:getExpect(key)
     if self.masterVariable then
         return self.masterVariable:getExpect(key)
     end
     if self.parentExpectValue then
-        local r, e = self.parentExpectValue:get(key)
-        return e and r or nil
+        return self.parentExpectValue:get(key)
     end
     local rt = self.scope.rt
     if self.classes then
@@ -383,28 +402,13 @@ function M:getExpect(key)
             ---@cast v Node.Class
             return v.masterType.expectValue
         end))
-        local r, e = expectValue:get(key)
-        return e and r or nil
+        return expectValue:get(key)
     end
     if self.types then
         local expectValue = self.value
-        local r, e = expectValue:get(key)
-        return e and r or nil
+        return expectValue:get(key)
     end
-    if self.assigns then
-        local result
-        for assign in self.assigns:pairsFast() do
-            ---@cast assign Node.Field
-            if assign.value then
-                local r, e = assign.value:get(key)
-                if e then
-                    result = result | r
-                end
-            end
-        end
-        return result
-    end
-    return nil
+    return rt.UNKNOWN, false
 end
 
 ---@param key Node.Key

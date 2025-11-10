@@ -14,7 +14,7 @@ require 'parser.ast.cats.cat'
 ---@class LuaParser.Node.Assign: LuaParser.Node.Base
 ---@field symbolPos? integer # 等号的位置
 ---@field exps LuaParser.Node.AssignAble[]
----@field values LuaParser.Node.Var[]
+---@field values LuaParser.Node.Exp[]
 local Assign = Class('LuaParser.Node.Assign', 'LuaParser.Node.Base')
 
 Assign.kind = 'assign'

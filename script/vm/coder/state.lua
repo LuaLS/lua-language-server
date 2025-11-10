@@ -44,7 +44,8 @@ end
 ---@param var LuaParser.Node.AssignAble
 ---@param index integer
 ---@param valueKey? string
-function M:compileAssign(var, index, valueKey)
+---@param isTable? boolean
+function M:compileAssign(var, index, valueKey, isTable)
     local key = 'rt.UNKNOWN'
     if var.kind == 'var' then
         ---@cast var LuaParser.Node.Var
@@ -78,21 +79,29 @@ function M:compileAssign(var, index, valueKey)
         varKey   = self:getKey(var),
         fieldKey = fieldKey,
     })
+    if isTable then
+        self:addLine('{valueKey}:setExpectParent({varKey})' % {
+            valueKey = valueKey,
+            varKey   = self:getKey(var),
+        })
+    end
 end
 
 ls.vm.registerCoderProvider('assign', function (coder, source)
     ---@cast source LuaParser.Node.Assign
 
     local valueKeys = {}
+    local isTable = {}
     for i, exp in ipairs(source.exps) do
         coder:compile(exp)
     end
     for i, value in ipairs(source.values) do
         valueKeys[i] = coder:getKey(value)
+        isTable[i] = value.kind == 'table'
         coder:compile(value)
     end
     for i, exp in ipairs(source.exps) do
-        coder:compileAssign(exp, i, valueKeys[i])
+        coder:compileAssign(exp, i, valueKeys[i], isTable[i])
     end
 end)
 
@@ -100,16 +109,18 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
     ---@cast source LuaParser.Node.LocalDef
 
     local valueKeys = {}
+    local isTable = {}
     if source.values then
         for i, value in ipairs(source.values) do
             valueKeys[i] = coder:getKey(value)
+            isTable[i] = value.kind == 'table'
             coder:compile(value)
         end
     end
     for i, var in ipairs(source.vars) do
         coder:compile(var)
         if valueKeys[i] then
-            coder:compileAssign(var, i, valueKeys[i])
+            coder:compileAssign(var, i, valueKeys[i], isTable[i])
         else
             coder:compileAssign(var, i)
         end

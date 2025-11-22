@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Autodoc generation so it does not include documentation for builtin Lua language features
 * `FIX` Incorrect generation of function signatures with tuple-parameters
 * `NEW` Doc output now contains file paths for `@alias` and `@enum` types
 * `FIX` Typos in a few error messages.

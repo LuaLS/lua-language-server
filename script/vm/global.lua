@@ -516,7 +516,9 @@ end
 function vm.getExportableGlobals()
     local exportableGlobals = {}
     for key, global in pairs(allGlobals) do
-        if not string.find(global.uri, METAPATH, 1, true) then
+        --If the source uri for the global matches the global variable METAPATH
+        --then the global is a builtin Lua language feature and should not be exported
+        if global.uri and not string.find(global.uri, METAPATH, 1, true) then
             exportableGlobals[key] = global
         end
     end

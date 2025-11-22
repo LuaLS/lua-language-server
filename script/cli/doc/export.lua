@@ -274,12 +274,7 @@ end
 ---@async
 ---@return table globals
 function export.gatherGlobals()
-    local globalsMap = vm.getExportableGlobals()
-    local globalsTable = {}
-    for _, g in pairs(globalsMap) do
-        table.insert(globalsTable, g)
-    end
-    return globalsTable
+    return util.valuesOf(vm.getExportableGlobals())
 end
 
 ---builds a lua table of based on `globals` and their elements

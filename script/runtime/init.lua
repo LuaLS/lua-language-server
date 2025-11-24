@@ -2,6 +2,7 @@
 local argparser = require 'runtime.argparser'
 local version   = require 'runtime.version'
 local platform  = require 'bee.platform'
+local fs        = require 'bee.filesystem'
 
 --启动时的命令行参数
 ---@class LuaLS.Args
@@ -55,13 +56,15 @@ local function findRoot()
             break
         end
         currentPath = info.source
-        if currentPath:match '@%a:' then
+        if currentPath:sub(1, 1) == '@' then
             break
         end
     end
     assert(currentPath, 'Can not find root path')
-    local rootPath = currentPath:sub(2):gsub('[/\\]*[^/\\]-$', '')
-    rootPath = (rootPath == '' and '.' or rootPath)
+    local rootPath = fs.path(currentPath:sub(2)):parent_path():parent_path():parent_path():string()
+    if rootPath == '' or rootPath == '.' then
+        rootPath = fs.current_path():string()
+    end
     return rootPath
 end
 

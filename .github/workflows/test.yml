@@ -27,5 +27,4 @@ jobs:
       - name: Build for macOS
         if: ${{ matrix.target == 'darwin' }}
         run: |
-          brew install ninja
           ./make.sh

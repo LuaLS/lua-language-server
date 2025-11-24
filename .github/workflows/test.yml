@@ -22,7 +22,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ninja-build
-          sudo apt install binutils-dev
           ./make.sh
       - name: Build for macOS
         if: ${{ matrix.target == 'darwin' }}

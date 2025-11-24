@@ -1,4 +1,5 @@
-local thread  = require 'bee.thread'
+local thread  = require 'bee-compat'
+local channel = require 'bee.channel'
 local utility = require 'utility'
 local await   = require 'await'
 

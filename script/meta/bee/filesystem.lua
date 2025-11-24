@@ -49,6 +49,7 @@ fs.copy_options = copy_options
 function fs.path(path)
 end
 
+---@deprecated Use bee.sys.exe_path() instead
 ---@return fs.path
 function fs.exe_path()
 end

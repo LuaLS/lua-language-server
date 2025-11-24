@@ -1,4 +1,4 @@
-local thread = require 'bee.thread'
+local thread = require 'bee-compat'
 
 local taskPad = thread.channel('taskpad')
 local waiter  = thread.channel('waiter')

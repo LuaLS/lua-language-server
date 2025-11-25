@@ -1,7 +1,7 @@
 ---@meta
 
 ---@class bee.channel
-local channel_mod = {}
+local channelMod = {}
 
 ---@class bee.channel.object
 local channel = {}
@@ -21,16 +21,16 @@ end
 
 ---@param name string
 ---@return bee.channel.object
-function channel_mod.create(name)
+function channelMod.create(name)
 end
 
 ---@param name string
-function channel_mod.destroy(name)
+function channelMod.destroy(name)
 end
 
 ---@param name string
 ---@return bee.channel.object?
-function channel_mod.query(name)
+function channelMod.query(name)
 end
 
-return channel_mod
+return channelMod

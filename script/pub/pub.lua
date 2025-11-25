@@ -1,14 +1,14 @@
-local thread  = require 'bee-compat'
-local channel = require 'bee.channel'
-local utility = require 'utility'
-local await   = require 'await'
+local thread     = require 'bee.thread'
+local channelMod = require 'bee.channel'
+local selectMod  = require 'bee.select'
+local utility    = require 'utility'
+local await      = require 'await'
 
-thread.newchannel 'taskpad'
-thread.newchannel 'waiter'
+local taskPad = channelMod.create('taskpad')
+local waiter  = channelMod.create('waiter')
+local selector = selectMod.create()
+selector:event_add(waiter:fd(), selectMod.SELECT_READ)
 
-local errLog  = thread.channel 'errlog'
-local taskPad = thread.channel 'taskpad'
-local waiter  = thread.channel 'waiter'
 local type    = type
 local counter = utility.counter()
 
@@ -51,7 +51,7 @@ function m.recruitBraves(num, privatePad)
         log.debug('Create brave:', id)
         m.braves[id] = {
             id      = id,
-            thread  = thread.thread(braveTemplate:format(
+            thread  = thread.create(braveTemplate:format(
                 package.path,
                 package.cpath,
                 DEVELOP,
@@ -67,11 +67,12 @@ function m.recruitBraves(num, privatePad)
         }
     end
     if privatePad and not m.prvtPad[privatePad] then
-        thread.newchannel('req:' .. privatePad)
-        thread.newchannel('res:' .. privatePad)
+        local reqCh = channelMod.create('req:' .. privatePad)
+        local resCh = channelMod.create('res:' .. privatePad)
+        selector:event_add(resCh:fd(), selectMod.SELECT_READ)
         m.prvtPad[privatePad] = {
-            req = thread.channel('req:' .. privatePad),
-            res = thread.channel('res:' .. privatePad),
+            req = reqCh,
+            res = resCh,
         }
     end
 end
@@ -167,11 +168,18 @@ end
 --- 接收反馈
 function m.recieve(block)
     if block then
-        local id, name, result = waiter:bpop()
-        if type(name) == 'string' then
-            m.popReport(m.braves[id], name, result)
-        else
-            m.popTask(m.braves[id], name, result)
+        -- 使用 select 等待数据
+        while true do
+            local ok, id, name, result = waiter:pop()
+            if ok then
+                if type(name) == 'string' then
+                    m.popReport(m.braves[id], name, result)
+                else
+                    m.popTask(m.braves[id], name, result)
+                end
+                break
+            end
+            selector:wait(-1)
         end
     else
         while true do
@@ -195,8 +203,8 @@ end
 --- 检查伤亡情况
 function m.checkDead()
     while true do
-        local suc, err = errLog:pop()
-        if not suc then
+        local err = thread.errlog()
+        if not err then
             break
         end
         log.error('Brave is dead!: ' .. err)

@@ -1,7 +1,12 @@
-local thread = require 'bee-compat'
+local thread     = require 'bee.thread'
+local channelMod = require 'bee.channel'
+local selectMod  = require 'bee.select'
 
-local taskPad = thread.channel('taskpad')
-local waiter  = thread.channel('waiter')
+local taskPad = channelMod.query('taskpad')
+local waiter  = channelMod.query('waiter')
+
+assert(taskPad, 'taskpad channel not found')
+assert(waiter, 'waiter channel not found')
 
 ---@class pub_brave
 local m = {}
@@ -42,11 +47,24 @@ end
 
 --- 开始找工作
 function m.start(privatePad)
-    local reqPad = privatePad and thread.channel('req:' .. privatePad) or taskPad
-    local resPad = privatePad and thread.channel('res:' .. privatePad) or waiter
+    local reqPad = privatePad and channelMod.query('req:' .. privatePad) or taskPad
+    local resPad = privatePad and channelMod.query('res:' .. privatePad) or waiter
+    local selector = selectMod.create()
+    selector:event_add(reqPad:fd(), selectMod.SELECT_READ)
+    
     m.push('mem', collectgarbage 'count')
     while true do
-        local name, id, params = reqPad:bpop()
+        -- 使用 select 实现阻塞等待
+        local name, id, params
+        while true do
+            local ok, n, i, p = reqPad:pop()
+            if ok then
+                name, id, params = n, i, p
+                break
+            end
+            selector:wait(-1)
+        end
+        
         local ability = m.ability[name]
         -- TODO
         if not ability then

@@ -35,6 +35,11 @@ jobs:
     container:
       image: ${{ matrix.container }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actboy168/setup-luamake@master
+
       - name: Install aarch64-linux-gnu
         if: ${{ matrix.platform == 'linux-arm64' && matrix.libc != 'musl' }}
         run: |
@@ -53,10 +58,6 @@ jobs:
           sudo apt update
           sudo apt install ninja-build
 
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
       - name: Build for Windows
         if: ${{ matrix.target == 'windows' }}
         run: .\make.bat ${{ matrix.platform }}
@@ -69,7 +70,6 @@ jobs:
       - name: Build for macOS
         if: ${{ matrix.target == 'darwin' }}
         run: |
-          brew install ninja
           ./make.sh ${{ matrix.platform }}
 
       - name: Build for x64 glibc

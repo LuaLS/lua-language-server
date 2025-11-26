@@ -216,12 +216,12 @@ function m.task(name, params, callback)
 end
 
 function m.reciveFromPad(brave)
-    local suc, name, id, result = brave.replyCh:pop()
+    local suc, name, result = brave.replyCh:pop()
     if not suc then
         return false
     end
     if type(name) == 'string' then
-        m.popReport(brave, name, id)
+        m.popReport(brave, name, result)
     else
         m.popTask(brave, name, result)
     end

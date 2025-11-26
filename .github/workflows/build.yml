@@ -24,11 +24,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-22.04,   target: linux,   platform: linux-x64    }
-          - { os: macos-latest,   target: darwin,  platform: darwin-x64   }
-          - { os: macos-latest,   target: darwin,  platform: darwin-arm64 }
-          - { os: windows-latest, target: windows, platform: win32-ia32   }
-          - { os: windows-latest, target: windows, platform: win32-x64    }
+          - { os: ubuntu-22.04,     target: linux,   platform: linux-x64    }
+          - { os: ubuntu-24.04-arm, target: linux,   platform: linux-arm64  }
+          - { os: macos-latest,     target: darwin,  platform: darwin-x64   }
+          - { os: macos-latest,     target: darwin,  platform: darwin-arm64 }
+          - { os: windows-latest,   target: windows, platform: win32-ia32   }
+          - { os: windows-latest,   target: windows, platform: win32-x64    }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +39,7 @@ jobs:
       - uses: actboy168/setup-luamake@master
 
       - name: Build
-        run: luamake
+        run: luamake -platform ${{ matrix.platform }}
 
       - name: Setting up workflow variables
         id: vars

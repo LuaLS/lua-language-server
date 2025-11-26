@@ -18,4 +18,4 @@ jobs:
       - uses: actboy168/setup-luamake@master
 
       - name: Build
-        run: luamake
+        run: luamake -platform ${{ matrix.platform }}

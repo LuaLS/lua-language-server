@@ -35,11 +35,6 @@ jobs:
     container:
       image: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: actboy168/setup-luamake@master
-
       - name: Install aarch64-linux-gnu
         if: ${{ matrix.platform == 'linux-arm64' && matrix.libc != 'musl' }}
         run: |
@@ -59,6 +54,11 @@ jobs:
           sudo apt install ninja-build
           sudo apt-get update
           sudo apt-get install -y git
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actboy168/setup-luamake@master
 
       - name: Build for Windows
         if: ${{ matrix.target == 'windows' }}

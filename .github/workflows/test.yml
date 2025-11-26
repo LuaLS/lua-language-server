@@ -14,17 +14,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
       - uses: actboy168/setup-luamake@master
-      - name: Build for Windows
-        if: ${{ matrix.target == 'windows' }}
-        run: .\make.bat
-      - name: Build for Linux
-        if: ${{ matrix.target == 'linux' }}
-        run: |
-          sudo apt update
-          sudo apt install ninja-build
-          ./make.sh
-      - name: Build for macOS
-        if: ${{ matrix.target == 'darwin' }}
-        run: |
-          ./make.sh
+
+      - name: Build
+        run: luamake

@@ -351,12 +351,13 @@ function m.compileCodes(codes)
     return lines
 end
 
+---@param fileDir fs.path
 function m.build_single(codes, fileDir, uri)
     local texts = m.compileCodes(codes)
     if not texts then
         return
     end
-    local fullPath = fileDir /ws.getRelativePath(uri)
+    local fullPath = fileDir / ws.getRelativePath(uri)
 
     if fullPath:stem():string():find '%.' then
         local newPath = fullPath:parent_path() / (fullPath:stem():string():gsub('%.', '/') .. ".lua")

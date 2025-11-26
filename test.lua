@@ -2,7 +2,8 @@ package.path  = package.path
       .. ';./test/?.lua'
       .. ';./test/?/init.lua'
 local fs = require 'bee.filesystem'
-local rootPath = fs.exe_path():parent_path():parent_path():string()
+local sys = require 'bee.sys'
+local rootPath = sys.exe_path():parent_path():parent_path():string()
 ROOT = fs.path(rootPath)
 TEST = true
 DEVELOP = true
@@ -86,6 +87,7 @@ local files = require "files"
 
 local function main()
     require 'utility'.enableCloseFunction()
+    require 'utility'.enableFormatString()
     require 'client' .client 'VSCode'
 
     local lclient = require 'lclient'
@@ -127,6 +129,6 @@ end
 loadAllLibs()
 main()
 
-log.debug('test finish.')
+print('test finish.')
 require 'bee.thread'.sleep(1000)
 os.exit()

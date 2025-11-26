@@ -21,7 +21,7 @@ collectgarbage 'generational'
 
 log = require 'brave.log'
 
-xpcall(dofile, log.error, (ROOT / 'debugger.lua'):string())
+xpcall(dofile, log.error, {debugger:q})
 local brave = require 'brave'
 brave.register({id}, {taskChName:q}, {replyChName:q})
 ]]
@@ -77,6 +77,7 @@ function m.recruitBraves(num, privatePad)
                 DEVELOP = DEVELOP,
                 DBGPORT = DBGPORT or 11412,
                 DBGWAIT = DBGWAIT or 'nil',
+                debugger = (ROOT / 'debugger.lua'):string(),
                 id = id,
                 taskChName = taskChName,
                 replyChName = replyChName,

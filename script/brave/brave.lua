@@ -51,7 +51,7 @@ function m.start(privatePad)
     local resPad = privatePad and channelMod.query('res:' .. privatePad) or waiter
     local selector = selectMod.create()
     selector:event_add(reqPad:fd(), selectMod.SELECT_READ)
-    
+
     m.push('mem', collectgarbage 'count')
     while true do
         -- 使用 select 实现阻塞等待
@@ -64,7 +64,7 @@ function m.start(privatePad)
             end
             selector:wait(-1)
         end
-        
+
         local ability = m.ability[name]
         -- TODO
         if not ability then

@@ -87,6 +87,7 @@ local files = require "files"
 
 local function main()
     require 'utility'.enableCloseFunction()
+    require 'utility'.enableFormatString()
     require 'client' .client 'VSCode'
 
     local lclient = require 'lclient'

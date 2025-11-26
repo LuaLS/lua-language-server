@@ -2,11 +2,8 @@ local thread     = require 'bee.thread'
 local channelMod = require 'bee.channel'
 local selectMod  = require 'bee.select'
 
-local taskPad = channelMod.query('taskpad')
-local waiter  = channelMod.query('waiter')
-
-assert(taskPad, 'taskpad channel not found')
-assert(waiter, 'waiter channel not found')
+local reqPad
+local resPad
 
 ---@class pub_brave
 local m = {}
@@ -15,17 +12,26 @@ m.ability = {}
 m.queue = {}
 
 --- 注册成为勇者
-function m.register(id, privatePad)
+---@param id integer
+---@param taskChName string
+---@param replyChName string
+function m.register(id, taskChName, replyChName)
     m.id = id
+
+    reqPad = channelMod.query(taskChName)
+    resPad = channelMod.query(replyChName)
+
+    assert(reqPad, 'task channel not found: ' .. taskChName)
+    assert(resPad, 'reply channel not found: ' .. replyChName)
 
     if #m.queue > 0 then
         for _, info in ipairs(m.queue) do
-            waiter:push(m.id, info.name, info.params)
+            resPad:push(info.name, info.params)
         end
     end
     m.queue = nil
 
-    m.start(privatePad)
+    m.start()
 end
 
 --- 注册能力
@@ -35,8 +41,8 @@ end
 
 --- 报告
 function m.push(name, params)
-    if m.id then
-        waiter:push(m.id, name, params)
+    if m.id and resPad then
+        resPad:push(name, params)
     else
         m.queue[#m.queue+1] = {
             name   = name,
@@ -46,9 +52,7 @@ function m.push(name, params)
 end
 
 --- 开始找工作
-function m.start(privatePad)
-    local reqPad = privatePad and channelMod.query('req:' .. privatePad) or taskPad
-    local resPad = privatePad and channelMod.query('res:' .. privatePad) or waiter
+function m.start()
     local selector = selectMod.create()
     selector:event_add(reqPad:fd(), selectMod.SELECT_READ)
 
@@ -68,15 +72,15 @@ function m.start(privatePad)
         local ability = m.ability[name]
         -- TODO
         if not ability then
-            resPad:push(m.id, id)
+            resPad:push(id)
             log.error('Brave can not handle this work: ' .. name)
             goto CONTINUE
         end
         local ok, res = xpcall(ability, log.error, params)
         if ok then
-            resPad:push(m.id, id, res)
+            resPad:push(id, res)
         else
-            resPad:push(m.id, id)
+            resPad:push(id)
         end
         m.push('mem', collectgarbage 'count')
         ::CONTINUE::

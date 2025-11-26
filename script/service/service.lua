@@ -28,7 +28,7 @@ local function countMemory()
     local total  = 0
     mems[0] = collectgarbage 'count'
     total = total + collectgarbage 'count'
-    for id, brave in ipairs(pub.braves) do
+    for id, brave in ipairs(pub.allBraves) do
         mems[id] = brave.memory
         total = total + brave.memory
     end

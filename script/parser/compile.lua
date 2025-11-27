@@ -1411,6 +1411,12 @@ local function isKeyWord(word, nextToken)
         end
         return true
     end
+    if word == 'global' then
+        if State.version == 'Lua 5.5' then
+            return true
+        end
+        return false
+    end
     return false
 end
 
@@ -3122,6 +3128,177 @@ local function parseLocal()
     return loc
 end
 
+local function parseGlobal()
+    local globalPos = getPosition(Tokens[Index], 'left')
+    Index = Index + 2
+    skipSpace()
+    local word = peekWord()
+    
+    -- global function Name funcbody
+    if word == 'function' then
+        local func = parseFunction(false, true)
+        local name = func.name
+        if name then
+            func.name    = nil
+            name.type    = 'setglobal'
+            name.value   = func
+            name.vstart  = func.start
+            name.range   = func.finish
+            func.parent  = name
+            pushActionIntoCurrentChunk(name)
+            return name
+        else
+            missName(func.keyword[2])
+            pushActionIntoCurrentChunk(func)
+            return func
+        end
+    end
+
+    -- Check for global [attrib] '*'
+    local attrs = parseLocalAttrs()
+    skipSpace()
+    if Tokens[Index + 1] == '*' then
+        local action = {
+            type   = 'globalall',
+            start  = globalPos,
+            finish = getPosition(Tokens[Index], 'right'),
+            attrs  = attrs,
+        }
+        if attrs then
+            attrs.parent = action
+        end
+        Index = Index + 2
+        pushActionIntoCurrentChunk(action)
+        return action
+    end
+
+    -- global attnamelist
+    -- attnamelist ::= [attrib] Name [attrib] {',' Name [attrib]}
+    local name = parseName(true)
+    if not name then
+        missName()
+        return nil
+    end
+    
+    local glob = {
+        type   = 'setglobal',
+        start  = name.start,
+        finish = name.finish,
+        [1]    = name[1],
+    }
+    
+    if attrs then
+        glob.attrs = attrs
+        attrs.parent = glob
+        glob.start = globalPos
+    else
+        glob.start = name.start
+    end
+    
+    -- Parse optional attribute after name
+    local attrsAfter = parseLocalAttrs()
+    if attrsAfter then
+        if glob.attrs then
+            -- merge attributes
+            for i = 1, #attrsAfter do
+                glob.attrs[#glob.attrs + 1] = attrsAfter[i]
+            end
+        else
+            glob.attrs = attrsAfter
+            attrsAfter.parent = glob
+        end
+        glob.finish = attrsAfter[#attrsAfter].finish
+    end
+    
+    pushActionIntoCurrentChunk(glob)
+    skipSpace()
+    
+    -- Handle multiple global variables: global a, b, c
+    local n2, nrest
+    if Tokens[Index + 1] == ',' then
+        Index = Index + 2
+        skipSpace()
+        
+        -- Parse second name with attributes
+        local attrs2 = parseLocalAttrs()
+        skipSpace()
+        local name2 = parseName(true)
+        if name2 then
+            n2 = {
+                type   = 'setglobal',
+                start  = attrs2 and attrs2.start or name2.start,
+                finish = name2.finish,
+                [1]    = name2[1],
+            }
+            if attrs2 then
+                n2.attrs = attrs2
+                attrs2.parent = n2
+            end
+            local attrs2After = parseLocalAttrs()
+            if attrs2After then
+                if n2.attrs then
+                    for i = 1, #attrs2After do
+                        n2.attrs[#n2.attrs + 1] = attrs2After[i]
+                    end
+                else
+                    n2.attrs = attrs2After
+                    attrs2After.parent = n2
+                end
+                n2.finish = attrs2After[#attrs2After].finish
+            end
+            pushActionIntoCurrentChunk(n2)
+            skipSpace()
+        else
+            missName()
+        end
+        
+        -- Parse remaining names
+        while Tokens[Index + 1] == ',' do
+            Index = Index + 2
+            skipSpace()
+            
+            local attrsN = parseLocalAttrs()
+            skipSpace()
+            local nameN = parseName(true)
+            if nameN then
+                local gN = {
+                    type   = 'setglobal',
+                    start  = attrsN and attrsN.start or nameN.start,
+                    finish = nameN.finish,
+                    [1]    = nameN[1],
+                }
+                if attrsN then
+                    gN.attrs = attrsN
+                    attrsN.parent = gN
+                end
+                local attrsNAfter = parseLocalAttrs()
+                if attrsNAfter then
+                    if gN.attrs then
+                        for i = 1, #attrsNAfter do
+                            gN.attrs[#gN.attrs + 1] = attrsNAfter[i]
+                        end
+                    else
+                        gN.attrs = attrsNAfter
+                        attrsNAfter.parent = gN
+                    end
+                    gN.finish = attrsNAfter[#attrsNAfter].finish
+                end
+                if not nrest then
+                    nrest = {}
+                end
+                nrest[#nrest + 1] = gN
+                pushActionIntoCurrentChunk(gN)
+                skipSpace()
+            else
+                missName()
+                break
+            end
+        end
+    end
+
+    return glob
+end
+
 local function parseDo()
     local doLeft  = getPosition(Tokens[Index], 'left')
     local doRight = getPosition(Tokens[Index] + 1, 'right')
@@ -3935,6 +4112,10 @@ function parseAction()
 
     if token == 'local' then
         return parseLocal()
+    end
+
+    if token == 'global' and isKeyWord('global', Tokens[Index + 3]) then
+        return parseGlobal()
     end
 
     if token == 'if'

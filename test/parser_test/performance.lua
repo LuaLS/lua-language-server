@@ -48,7 +48,8 @@ print(('Loaded %d files, total size = %.3f KB'):format(#files, size / 1000))
 print('Start parsing...')
 local clock = os.clock()
 for _, file in ipairs(files) do
-    local ast = parser.compile(file)
+    local state = parser.compile(file, 'Lua', 'Lua 5.4')
+    parser.luadoc(state)
 end
 local passed = os.clock() - clock
 

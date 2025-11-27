@@ -1,24 +1,9 @@
-local class = require 'class'
+local parser = require 'parser'
 
-local function removeErrors(errors, code)
-    for i = #errors, 1, -1 do
-        if errors[i].code == code then
-            table.remove(errors, i)
-        end
-    end
-end
-
-local function checkStr(code, name, mode)
-    ---@class LuaParser.Ast
-    local ast = class.new 'LuaParser.Ast' (code)
-    local parser = 'parse' .. mode
-    if mode == 'Dirty' then
-        parser = 'parseMain'
-    end
-    local node = ast[parser](ast)
-    assert(node)
-    removeErrors(ast.errors, 'UNEXPECT_DOTS')
-    if #ast.errors > 0 and mode ~= 'Dirty' then
+local function check_str(str, name, mode)
+    local ast = parser.compile(str, mode, 'Lua 5.3')
+    assert(ast)
+    if #ast.errs > 0 and mode ~= 'Dirty' then
         error(([[
 [%s]测试失败:
 %s
@@ -27,7 +12,7 @@ local function checkStr(code, name, mode)
 ]]):format(
     name,
     ('='):rep(30),
-    code,
+    str,
     ('='):rep(30)
 ))
     end
@@ -36,7 +21,7 @@ end
 local function check(mode)
     return function (list)
         for i, str in ipairs(list) do
-            checkStr(str, mode .. '-' .. i, mode)
+            check_str(str, mode .. '-' .. i, mode)
         end
     end
 end
@@ -53,6 +38,20 @@ check 'Comment'
 123
 123]]]===],
 [===[-- [[Abc]]a]===],
+}
+
+check 'Sp'
+{
+'',
+' ',
+'  ',
+'\t',
+'--',
+'--123',
+' \t',
+[===[--[[123
+123
+123]]]===],
 }
 
 check 'Nil'
@@ -128,7 +127,7 @@ check 'Number'
 '9.'
 }
 
-check 'ID'
+check 'Name'
 {
 '_',
 'And',
@@ -212,7 +211,7 @@ check 'Exp'
 '{1, 2, 3,}',
 }
 
-check 'State'
+check 'Action'
 {
 'x = 1',
 'x, y, z = 1, 2, 3',
@@ -303,7 +302,7 @@ until 1]],
 end]],
 }
 
-check 'Main'
+check 'Lua'
 {
 '',
 [[

@@ -1,10 +1,6 @@
 local fs = require 'bee.filesystem'
-local thread = require 'bee.thread'
 local parser = require 'parser'
 local utility = require 'utility'
-
-thread.newchannel 'TEST'
-local ch = thread.channel 'TEST'
 
 local function scanDirectory(path)
     local files = {}
@@ -41,10 +37,11 @@ local function performTest()
     end
     local clock = os.clock()
     for path, buf in pairs(files) do
-        local ast = parser.compile(buf, 'Lua 5.4')
-        if not ast then
+        local state = parser.compile(buf, 'Lua', 'Lua 5.4')
+        if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
+        parser.luadoc(state)
         --local dump = utility.unpack(state.root)
         --utility.pack(dump)
 
@@ -61,11 +58,11 @@ local function test(path)
         return
     end
     local testTimes = 10
-    local ast
+    local state
     local clock = os.clock()
     for i = 1, testTimes do
-        ast = parser.compile(buf, 'Lua 5.4')
-        if not ast then
+        state = parser.compile(buf, 'Lua', 'Lua 5.4')
+        if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
         if os.clock() - clock > 1.0 then
@@ -90,12 +87,12 @@ local function test(path)
 end
 
 collectgarbage 'stop'
-test[[test\perform\1.txt]]
-test[[test\perform\2.txt]]
-test[[test\perform\3.txt]]
-test[[test\perform\4.txt]]
-test[[test\perform\5.txt]]
-test[[test\perform\6.txt]]
-test[[test\perform\7.txt]]
+test[[parser_test\perform\1.txt]]
+test[[parser_test\perform\2.txt]]
+test[[parser_test\perform\3.txt]]
+test[[parser_test\perform\4.txt]]
+test[[parser_test\perform\5.txt]]
+test[[parser_test\perform\6.txt]]
+test[[parser_test\perform\7.txt]]
 performTest()
 collectgarbage 'restart'

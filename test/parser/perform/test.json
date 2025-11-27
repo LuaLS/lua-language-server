@@ -1,0 +1,893 @@
+{
+    "$id": 0,
+    "$type": "0|Sirenix.OdinInspector.Demos.RPGEditor.TriggerFunctionConfig, Assembly-CSharp",
+    "serializationData": {
+        "$type": "1|Sirenix.Serialization.SerializationData, Assembly-CSharp",
+        "SerializedFormat": 1,
+        "SerializedBytes": {
+            "$id": 1,
+            "$type": "2|System.Byte[], mscorlib",
+            "$plength": 0,
+            "$pcontent": [
+            ]
+        },
+        "ReferencedUnityObjects": {
+            "$id": 2,
+            "$type": "3|System.Collections.Generic.List`1[[UnityEngine.Object, UnityEngine.CoreModule]], mscorlib",
+            "$rlength": 0,
+            "$rcontent": [
+            ]
+        },
+        "SerializedBytesString": "",
+        "Prefab": null,
+        "PrefabModificationsReferencedUnityObjects": {
+            "$id": 3,
+            "$type": 3,
+            "$rlength": 0,
+            "$rcontent": [
+            ]
+        },
+        "PrefabModifications": {
+            "$id": 4,
+            "$type": "4|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib",
+            "$rlength": 0,
+            "$rcontent": [
+            ]
+        },
+        "SerializationNodes": {
+            "$id": 5,
+            "$type": "5|System.Collections.Generic.List`1[[Sirenix.Serialization.SerializationNode, Assembly-CSharp]], mscorlib",
+            "$rlength": 0,
+            "$rcontent": [
+            ]
+        }
+    },
+    "ItemName": "\u57fa\u7840",
+    "ID": "\u57fa\u7840",
+    "guid": "227792496872fc34fb5831f0a7c51d67",
+    "_type": 9,
+    "hide": false,
+    "categary": "\u57fa\u7840",
+    "myFunctionTemplate": {
+        "$id": 6,
+        "$type": "6|System.Collections.Generic.List`1[[Sirenix.OdinInspector.Demos.RPGEditor.FunctionTemplate, Assembly-CSharp]], mscorlib",
+        "$rlength": 5,
+        "$rcontent": [
+            {
+                "$id": 7,
+                "$type": "7|Sirenix.OdinInspector.Demos.RPGEditor.FunctionTemplate, Assembly-CSharp",
+                "functionId": "custom_function",
+                "description": "\u521b\u5efa\u51fd\u6570",
+                "icon": "\u51fd\u6570",
+                "detail": "\u51fd\u6570 {1} , \u8fd4\u56de {2} ",
+                "hidden_self": false,
+                "code": "{@function_env}function {@name}({@arg})\r\n  <?{@locals}?>\r\n  <?{@set_arg}?>\r\n  <?{action}?>\r\n  <?return {@returns}?>\r\nend\r",
+                "comment": "\u521b\u5efa\u4e00\u4e2a\u51fd\u6570\u65b9\u6cd5\uff0c\u53ef\u4ee5\u5728\u5176\u4ed6\u89e6\u53d1\u4e2d\u8c03\u7528\u8fd9\u4e2a\u65b9\u6cd5\u3002",
+                "category": "\u57fa\u7840",
+                "isCallBack": false,
+                "hasReturn": false,
+                "returnValue": 0,
+                "has_locals": false,
+                "is_event_mode": false,
+                "varirable_locals": {
+                    "$id": 8,
+                    "$type": "8|Sirenix.OdinInspector.Demos.RPGEditor.LocalsParamTamplate[], Assembly-CSharp",
+                    "$rlength": 0,
+                    "$rcontent": [
+                    ]
+                },
+                "paramList": {
+                    "$id": 9,
+                    "$type": "9|Sirenix.OdinInspector.Demos.RPGEditor.FunctionParam[], Assembly-CSharp",
+                    "$rlength": 4,
+                    "$rcontent": [
+                        {
+                            "$id": 10,
+                            "$type": "10|Sirenix.OdinInspector.Demos.RPGEditor.FunctionParam, Assembly-CSharp",
+                            "name": "",
+                            "type": 4,
+                            "type_name": "String",
+                            "typeList": {
+                                "$id": 11,
+                                "$type": "11|System.Collections.Generic.List`1[[Sirenix.OdinInspector.Demos.RPGEditor.TypeEnum, Assembly-CSharp]], mscorlib",
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "____",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 2,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": false,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 12,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 13,
+                            "$type": 10,
+                            "name": "",
+                            "type": 6,
+                            "type_name": "Dynamic",
+                            "typeList": {
+                                "$id": 14,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u8fd4\u56de\u503c\u7c7b\u578b",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 0,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": true,
+                            "code": "",
+                            "arg_list": false,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 15,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 16,
+                            "$type": 10,
+                            "name": "params",
+                            "type": 6,
+                            "type_name": "Dynamic",
+                            "typeList": {
+                                "$id": 17,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u53c2\u6570",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "\u6761\u4ef6",
+                            "default_source": 2,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 18,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 19,
+                            "$type": 10,
+                            "name": "action",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 20,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u52a8\u4f5c",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "\u52a8\u4f5c",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 21,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$id": 22,
+                "$type": 7,
+                "functionId": "if_then_else",
+                "description": "If / Then / Else\uff08\u6761\u4ef6\u8868\u8fbe\u5f0f\uff09",
+                "icon": "\u903b\u8f91",
+                "detail": "\u5982\u679c (\u6240\u6709\u7684\u6761\u4ef6\u6210\u7acb) \u6210\u7acb\uff0c\u5219\u8fd0\u884c {2}\uff0c\u5426\u5219\u8fd0\u884c {3}",
+                "hidden_self": true,
+                "code": "if {1} then\r\n  <?{2}?><?\r\nelse\r\n    {3}?>\r\nend\r",
+                "comment": "",
+                "category": "\u57fa\u7840",
+                "isCallBack": false,
+                "hasReturn": false,
+                "returnValue": 0,
+                "has_locals": true,
+                "is_event_mode": false,
+                "varirable_locals": {
+                    "$id": 23,
+                    "$type": 8,
+                    "$rlength": 0,
+                    "$rcontent": [
+                    ]
+                },
+                "paramList": {
+                    "$id": 24,
+                    "$type": 9,
+                    "$rlength": 3,
+                    "$rcontent": [
+                        {
+                            "$id": 25,
+                            "$type": 10,
+                            "name": "",
+                            "type": 3,
+                            "type_name": "Boolean",
+                            "typeList": {
+                                "$id": 26,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "If--\u5982\u679c",
+                            "child_description": "\u6761\u4ef6",
+                            "need_tag": "",
+                            "icon": "\u6761\u4ef6",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "{}<? and {}?>",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": true,
+                            "varirable_locals": {
+                                "$id": 27,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 28,
+                            "$type": 10,
+                            "name": "",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 29,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "then--\u5219",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "\u52a8\u4f5c",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "<?{}?>",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": true,
+                            "varirable_locals": {
+                                "$id": 30,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 31,
+                            "$type": 10,
+                            "name": "",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 32,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "Else--\u5426\u5219",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "\u52a8\u4f5c",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "<?{}?>",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": true,
+                            "varirable_locals": {
+                                "$id": 33,
+                                "$type": 8,
+                                "$rlength": 2,
+                                "$rcontent": [
+                                    {
+                                        "$id": 34,
+                                        "$type": "12|Sirenix.OdinInspector.Demos.RPGEditor.LocalsParamTamplate, Assembly-CSharp",
+                                        "name": "varTest",
+                                        "type": 2,
+                                        "description": "\u7cfb\u7edf\u6d4b\u8bd5\u53d8\u91cf3",
+                                        "tag": "",
+                                        "default_value": "0",
+                                        "array": false
+                                    },
+                                    {
+                                        "$id": 35,
+                                        "$type": 12,
+                                        "name": "varKey1",
+                                        "type": 1,
+                                        "description": "\u6d4b\u8bd5\u7cfb\u7edf\u5c40\u90e8",
+                                        "tag": "\u5355\u4f4d",
+                                        "default_value": "0",
+                                        "array": false
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$id": 36,
+                "$type": 7,
+                "functionId": "event_condition_action",
+                "description": "\u4e8b\u4ef6-\u6761\u4ef6-\u52a8\u4f5c",
+                "icon": "\u4e8b\u4ef6",
+                "detail": "{player} \u7684\u5355\u4f4d {event}",
+                "hidden_self": false,
+                "code": "<?local {var} = ?>{player}:event('{event}', function({@args})\r\n    {@locals}\r\n<?{@code}?>\r\n    <?\r\n    if not {filter} then\r\n        return\r\n    end\r\n    ?>\r\n  <?{action}?>\r\nend)",
+                "comment": "",
+                "category": "\u57fa\u7840",
+                "isCallBack": false,
+                "hasReturn": false,
+                "returnValue": 0,
+                "has_locals": true,
+                "is_event_mode": false,
+                "varirable_locals": {
+                    "$id": 37,
+                    "$type": 8,
+                    "$rlength": 0,
+                    "$rcontent": [
+                    ]
+                },
+                "paramList": {
+                    "$id": 38,
+                    "$type": 9,
+                    "$rlength": 4,
+                    "$rcontent": [
+                        {
+                            "$id": 39,
+                            "$type": 10,
+                            "name": "player",
+                            "type": 41,
+                            "type_name": "Player",
+                            "typeList": {
+                                "$id": 40,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u6307\u5b9a\u73a9\u5bb6",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 2,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": false,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 41,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 42,
+                            "$type": 10,
+                            "name": "event",
+                            "type": 20,
+                            "type_name": "UnitEvent",
+                            "typeList": {
+                                "$id": 43,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u89e6\u53d1\u4e8b\u4ef6",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "\u4e8b\u4ef6",
+                            "default_source": 1,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": false,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 44,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 45,
+                            "$type": 10,
+                            "name": "filter",
+                            "type": 3,
+                            "type_name": "Boolean",
+                            "typeList": {
+                                "$id": 46,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u6761\u4ef6",
+                            "child_description": "\u6761\u4ef6",
+                            "need_tag": "",
+                            "icon": "\u6761\u4ef6",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "(%s[ and %s])",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": true,
+                            "varirable_locals": {
+                                "$id": 47,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 48,
+                            "$type": 10,
+                            "name": "action",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 49,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u52a8\u4f5c",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "\u52a8\u4f5c",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "%s[\r\n%s]\r",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": true,
+                            "varirable_locals": {
+                                "$id": 50,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$id": 51,
+                "$type": 7,
+                "functionId": "player_get",
+                "description": "\u83b7\u53d6\u73a9\u5bb6\u5c5e\u6027",
+                "icon": "\u5c5e\u6027",
+                "detail": "{1} \u7684 {2}",
+                "hidden_self": false,
+                "code": "{1}:get({2})",
+                "comment": "\u83b7\u53d6\u73a9\u5bb6\u5c5e\u6027",
+                "category": "\u73a9\u5bb6",
+                "isCallBack": false,
+                "hasReturn": false,
+                "returnValue": 0,
+                "has_locals": false,
+                "is_event_mode": false,
+                "varirable_locals": {
+                    "$id": 52,
+                    "$type": 8,
+                    "$rlength": 0,
+                    "$rcontent": [
+                    ]
+                },
+                "paramList": {
+                    "$id": 53,
+                    "$type": 9,
+                    "$rlength": 2,
+                    "$rcontent": [
+                        {
+                            "$id": 54,
+                            "$type": 10,
+                            "name": "",
+                            "type": 41,
+                            "type_name": "Player",
+                            "typeList": {
+                                "$id": 55,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u73a9\u5bb6",
+                            "child_description": "",
+                            "need_tag": "\u73a9\u5bb6",
+                            "icon": "",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": false,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 56,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 57,
+                            "$type": 10,
+                            "name": "",
+                            "type": 30,
+                            "type_name": "PlayerAttribute",
+                            "typeList": {
+                                "$id": 58,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "__",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 1,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": false,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 59,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "$id": 60,
+                "$type": 7,
+                "functionId": "custom_skill",
+                "description": "\u6280\u80fd\u5b9a\u4e49",
+                "icon": "\u6280\u80fd",
+                "detail": "\u5b9a\u4e49\u6280\u80fd",
+                "hidden_self": true,
+                "code": "local mt = ac.skill[{@name}]\r\n<?{@args}?>\r\nfunction mt:on_add()\r\n    self.gc = ac.gc()\r\n  <?{@locals}?>\r\n  <?{on_add}?>\r\nend\r\nfunction mt:on_remove()\r\n    self.gc:flush()\r\n  <?{on_remove}?>\r\nend\r\n<?{on_upgrade}?>\r\n<?{on_cooldown}?>\r\n<?{on_enable}?>\r\n<?{on_disable}?>\r\n<?\r\nfunction mt:on_can_cast()\r\n  <?{@exlocals}?>\r\n  <?{on_can_cast}?>\r\nend\r\n?>\r\n<?{on_can_break}?>\r\n<?{on_cast_start}?>\r\n<?{on_cast_break}?>\r\n<?{on_cast_channel}?>\r\n<?{on_cast_shot}?>\r\n<?{on_cast_finish}?>\r\n<?{on_cast_stop}?>",
+                "comment": "\u81ea\u5b9a\u4e49\u6280\u80fd",
+                "category": "\u6280\u80fd",
+                "isCallBack": false,
+                "hasReturn": false,
+                "returnValue": 0,
+                "has_locals": true,
+                "is_event_mode": true,
+                "varirable_locals": {
+                    "$id": 61,
+                    "$type": 8,
+                    "$rlength": 3,
+                    "$rcontent": [
+                        {
+                            "$id": 62,
+                            "$type": 12,
+                            "name": "self",
+                            "type": 46,
+                            "description": "\u5f53\u524d\u6280\u80fd",
+                            "tag": "\u6280\u80fd",
+                            "default_value": "",
+                            "array": false
+                        },
+                        {
+                            "$id": 63,
+                            "$type": 12,
+                            "name": "self.owner",
+                            "type": 40,
+                            "description": "\u6280\u80fd\u62e5\u6709\u8005",
+                            "tag": "\u5355\u4f4d",
+                            "default_value": "",
+                            "array": false
+                        },
+                        {
+                            "$id": 64,
+                            "$type": 12,
+                            "name": "new_skill",
+                            "type": 46,
+                            "description": "\u65b0\u7684\u6280\u80fd",
+                            "tag": "\u6280\u80fd",
+                            "default_value": "",
+                            "array": false
+                        }
+                    ]
+                },
+                "paramList": {
+                    "$id": 65,
+                    "$type": 9,
+                    "$rlength": 5,
+                    "$rcontent": [
+                        {
+                            "$id": 66,
+                            "$type": 10,
+                            "name": "params",
+                            "type": 6,
+                            "type_name": "Dynamic",
+                            "typeList": {
+                                "$id": 67,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u65bd\u6cd5\u53c2\u6570",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 2,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": false,
+                            "code": "",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 68,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 69,
+                            "$type": 10,
+                            "name": "on_add",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 70,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u83b7\u5f97",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": true,
+                            "code": "%s[\r\n%s]",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 71,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 72,
+                            "$type": 10,
+                            "name": "on_remove",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 73,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u5931\u53bb",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 0,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": true,
+                            "code": "%s[\r%s]",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 74,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 75,
+                            "$type": 10,
+                            "name": "on_upgrade",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 76,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u5347\u7ea7",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": true,
+                            "code": "function mt:on_upgrade()\r\n    %s[\r\n    %s]\r\nend",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 77,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        },
+                        {
+                            "$id": 78,
+                            "$type": 10,
+                            "name": "on_enable",
+                            "type": 0,
+                            "type_name": "None",
+                            "typeList": {
+                                "$id": 79,
+                                "$type": 11,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            },
+                            "description": "\u542f\u7528",
+                            "child_description": "",
+                            "need_tag": "",
+                            "icon": "",
+                            "default_source": 3,
+                            "array": false,
+                            "default_value": "",
+                            "ignore_system_locals": false,
+                            "link_arg": "",
+                            "optional": true,
+                            "code": "function mt:on_enable()\r\n    %s[\r\n    %s]\r\nend",
+                            "arg_list": true,
+                            "return_param": 0,
+                            "has_locals": false,
+                            "varirable_locals": {
+                                "$id": 80,
+                                "$type": 8,
+                                "$rlength": 0,
+                                "$rcontent": [
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -508,11 +508,11 @@ math.floor                  =
 math.fmod                   =
 'Returns the remainder of the division of `x` by `y` that rounds the quotient towards zero.'
 math.frexp                  =
-'Decompose `x` into tails and exponents. Returns `m` and `e` such that `x = m * (2 ^ e)`, `e` is an integer and the absolute value of `m` is in the range [0.5, 1) (or zero when `x` is zero).'
+'Returns two numbers `m` and `e` such that `x = m * (2 ^ e)`, where `e` is an integer. When `x` is zero, NaN, +inf, or -inf, `m` is equal to `x`; otherwise, the absolute value of `m` is in the range [0.5, 1).'
 math.huge                   =
 'A value larger than any other numeric value.'
 math.ldexp                  =
-'Returns `m * (2 ^ e)` .'
+'Returns `m * (2 ^ e)`, where `e` is an integer.'
 math.log['<5.1']            =
 'Returns the natural logarithm of `x` .'
 math.log['>5.2']            =

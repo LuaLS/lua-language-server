@@ -2910,13 +2910,12 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
             if n.isGlobalDecl then
                 -- duplicate initialization check (only for global declarations with value)
                 local info = gi.names[nameKey]
-                if n.value then
+                if v then
                     if info and info.initialized then
                         pushError {
                             type   = 'GLOBAL_DUPLICATE_INIT',
                             start  = n.start,
                             finish = n.finish,
-                            info   = { name = nameKey },
                         }
                     else
                         if info then
@@ -2933,7 +2932,6 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
                             type   = 'UNDEFINED_IN_GLOBAL_SCOPE',
                             start  = n.start,
                             finish = n.finish,
-                            info   = { name = nameKey },
                         }
                     end
                     local isConst = (info and info.const) or gi.allConst
@@ -2942,7 +2940,6 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
                             type   = 'ASSIGN_CONST_GLOBAL',
                             start  = n.start,
                             finish = n.finish,
-                            info   = { name = nameKey },
                         }
                     end
                 end
@@ -3226,6 +3223,21 @@ local function parseGlobal()
             name.vstart  = func.start
             name.range   = func.finish
             func.parent  = name
+            name.isGlobalDecl = true
+            local gi = State.globalInfo
+            gi.active = true
+            local nameKey = name[1]
+            local info = gi.names[nameKey]
+            if info and info.initialized then
+                pushError {
+                    type   = 'GLOBAL_DUPLICATE_INIT',
+                    start  = name.start,
+                    finish = name.finish,
+                }
+            else
+                gi.names[nameKey] = gi.names[nameKey] or { declared = true, const = false, initialized = false }
+                gi.names[nameKey].initialized = true
+            end
             pushActionIntoCurrentChunk(name)
             return name
         else

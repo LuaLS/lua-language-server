@@ -809,3 +809,161 @@ TestWith 'LuaJIT' [[
 local function f(x, goto, y) end
 ]]
 (nil)
+
+Version = 'Lua 5.5'
+
+TEST [[
+global <!<close>!> x
+]]
+{
+    type = 'GLOBAL_CLOSE_ATTRIBUTE',
+}
+
+TEST [[
+global x = 1
+global <!x!> = 2
+]]
+{
+    type = 'GLOBAL_DUPLICATE_INIT',
+}
+
+-- Duplicate global definitions: multiple initializations of the same name
+TEST [[
+global x = 1
+global function <!x!>() end
+]]
+{
+    type = 'GLOBAL_DUPLICATE_INIT',
+}
+
+TEST [[
+global function f() end
+global function <!f!>() end
+]]
+{
+    type = 'GLOBAL_DUPLICATE_INIT',
+}
+
+TEST [[
+global <const> x = 1
+global <!x!> = 2
+]]
+{
+    type = 'GLOBAL_DUPLICATE_INIT',
+}
+
+TEST [[
+global x = 1
+global x
+global <!x!> = 2
+]]
+{
+    type = 'GLOBAL_DUPLICATE_INIT',
+}
+
+TEST [[
+global x = 1
+do
+    global <!x!> = 2
+end
+]]
+{
+    type = 'GLOBAL_DUPLICATE_INIT',
+}
+
+TEST [[
+global <const> x = 1
+<!x!> = 2
+]]
+{
+    type = 'ASSIGN_CONST_GLOBAL',
+}
+
+TEST [[
+global <const> *
+<!x!> = 1
+]]
+{
+    type = 'ASSIGN_CONST_GLOBAL',
+}
+
+TEST [[
+global x
+<!y!> = 1
+]]
+{
+    type = 'UNDEFINED_IN_GLOBAL_SCOPE',
+}
+
+TEST [[
+global *
+x = 1
+]]
+(nil)
+
+TEST [[
+global function f() end
+]]
+(nil)
+
+TEST [[
+global x, y = 1, 2
+]]
+(nil)
+
+TEST [[
+global <const> x = 1
+]]
+(nil)
+
+-- Shadowing rules (Lua 5.5): local variables shadow globals within lexical scope
+
+TEST [[
+global x
+local x = 1
+x = 2
+]]
+(nil)
+
+TEST [[
+global x
+do
+    local x = 1
+    x = 2
+end
+]]
+(nil)
+
+TEST [[
+global <const> x = 1
+local x = 2
+x = 3
+]]
+(nil)
+
+TEST [[
+global <const> *
+local x = 1
+x = 2
+]]
+(nil)
+
+TEST [[
+global x
+function f()
+    local x
+    x = 1
+end
+]]
+(nil)
+
+-- Still error when assigning to truly undefined name under strict global scope
+TEST [[
+global x
+do
+    <!y!> = 1
+end
+]]
+{
+    type = 'UNDEFINED_IN_GLOBAL_SCOPE',
+}

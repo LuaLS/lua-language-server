@@ -2904,6 +2904,50 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
                 }
             end
         end
+        if n.type == 'setglobal' then
+            local gi = State.globalInfo
+            local nameKey = n[1]
+            if n.isGlobalDecl then
+                -- duplicate initialization check (only for global declarations with value)
+                local info = gi.names[nameKey]
+                if n.value then
+                    if info and info.initialized then
+                        pushError {
+                            type   = 'GLOBAL_DUPLICATE_INIT',
+                            start  = n.start,
+                            finish = n.finish,
+                            info   = { name = nameKey },
+                        }
+                    else
+                        if info then
+                            info.initialized = true
+                        end
+                    end
+                end
+            else
+                -- assignment / definition in strict global scope
+                if gi.active then
+                    local info = gi.names[nameKey]
+                    if not gi.hasAll and not info then
+                        pushError {
+                            type   = 'UNDEFINED_IN_GLOBAL_SCOPE',
+                            start  = n.start,
+                            finish = n.finish,
+                            info   = { name = nameKey },
+                        }
+                    end
+                    local isConst = (info and info.const) or gi.allConst
+                    if isConst then
+                        pushError {
+                            type   = 'ASSIGN_CONST_GLOBAL',
+                            start  = n.start,
+                            finish = n.finish,
+                            info   = { name = nameKey },
+                        }
+                    end
+                end
+            end
+        end
     end
     if not v and lastValue then
         if lastValue.type == 'call'
@@ -2988,6 +3032,43 @@ local function parseMultiVars(n1, parser, isLocal)
         if nrest then
             for i = 1, #nrest do
                 nrest[i].effect = effect
+            end
+        end
+
+        -- Lua 5.4: only one <close> attribute allowed across a local declaration
+        -- Lua 5.5: multiple <close> are allowed
+        if State.version == 'Lua 5.4' then
+            local function collectCloseAttrs(node, list)
+                local attrs = node and node.attrs
+                if not attrs then
+                    return
+                end
+                for i = 1, #attrs do
+                    local a = attrs[i]
+                    if a[1] == 'close' then
+                        list[#list + 1] = a
+                    end
+                end
+            end
+
+            local closeList = {}
+            collectCloseAttrs(n1, closeList)
+            if n2 then
+                collectCloseAttrs(n2, closeList)
+            end
+            if nrest then
+                for i = 1, #nrest do
+                    collectCloseAttrs(nrest[i], closeList)
+                end
+            end
+
+            if #closeList > 1 then
+                local second = closeList[2]
+                pushError {
+                    type   = 'MULTI_CLOSE',
+                    start  = second.start,
+                    finish = second.finish,
+                }
             end
         end
     end
@@ -3133,7 +3214,7 @@ local function parseGlobal()
     Index = Index + 2
     skipSpace()
     local word = peekWord()
-    
+
     -- global function Name funcbody
     if word == 'function' then
         local func = parseFunction(false, true)
@@ -3154,7 +3235,7 @@ local function parseGlobal()
         end
     end
 
-    -- Check for global [attrib] '*'
+    -- Parse optional attributes before '*'
     local attrs = parseLocalAttrs()
     skipSpace()
     if Tokens[Index + 1] == '*' then
@@ -3164,44 +3245,83 @@ local function parseGlobal()
             finish = getPosition(Tokens[Index], 'right'),
             attrs  = attrs,
         }
+        local gi = State.globalInfo
+        gi.active = true
+        gi.hasAll = true
         if attrs then
             attrs.parent = action
+            for i = 1, #attrs do
+                local a = attrs[i]
+                if a[1] == 'close' then
+                    pushError {
+                        type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                        start  = a.start,
+                        finish = a.finish,
+                    }
+                elseif a[1] == 'const' then
+                    gi.allConst = true
+                end
+            end
         end
         Index = Index + 2
         pushActionIntoCurrentChunk(action)
         return action
     end
 
-    -- global attnamelist
-    -- attnamelist ::= [attrib] Name [attrib] {',' Name [attrib]}
+    -- global attnamelist ['=' explist]
     local name = parseName(true)
     if not name then
         missName()
         return nil
     end
-    
+
     local glob = {
         type   = 'setglobal',
         start  = name.start,
         finish = name.finish,
         [1]    = name[1],
     }
-    
+    glob.isGlobalDecl = true
+    local gi = State.globalInfo
+    gi.active = true
+    gi.names[glob[1]] = gi.names[glob[1]] or { declared = true, const = false, initialized = false }
+
     if attrs then
         glob.attrs = attrs
         attrs.parent = glob
         glob.start = globalPos
+        for i = 1, #attrs do
+            if attrs[i][1] == 'close' then
+                pushError {
+                    type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                    start  = attrs[i].start,
+                    finish = attrs[i].finish,
+                }
+            elseif attrs[i][1] == 'const' then
+                gi.names[glob[1]].const = true
+            end
+        end
     else
         glob.start = name.start
     end
-    
-    -- Parse optional attribute after name
+
+    -- attributes after name
     local attrsAfter = parseLocalAttrs()
     if attrsAfter then
+        for i = 1, #attrsAfter do
+            if attrsAfter[i][1] == 'close' then
+                pushError {
+                    type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                    start  = attrsAfter[i].start,
+                    finish = attrsAfter[i].finish,
+                }
+            elseif attrsAfter[i][1] == 'const' then
+                gi.names[glob[1]].const = true
+            end
+        end
         if glob.attrs then
-            -- merge attributes
             for i = 1, #attrsAfter do
-                glob.attrs[#glob.attrs + 1] = attrsAfter[i]
+                glob.attrs[#glob.attrs+1] = attrsAfter[i]
             end
         else
             glob.attrs = attrsAfter
@@ -3209,93 +3329,67 @@ local function parseGlobal()
         end
         glob.finish = attrsAfter[#attrsAfter].finish
     end
-    
+
     pushActionIntoCurrentChunk(glob)
     skipSpace()
-    
-    -- Handle multiple global variables: global a, b, c
-    local n2, nrest
-    if Tokens[Index + 1] == ',' then
-        Index = Index + 2
+
+    local function parseGlobalVar()
+        local attrsN = parseLocalAttrs()
         skipSpace()
-        
-        -- Parse second name with attributes
-        local attrs2 = parseLocalAttrs()
-        skipSpace()
-        local name2 = parseName(true)
-        if name2 then
-            n2 = {
+        local nameN = parseName(true)
+        if nameN then
+            local gN = {
                 type   = 'setglobal',
-                start  = attrs2 and attrs2.start or name2.start,
-                finish = name2.finish,
-                [1]    = name2[1],
+                start  = attrsN and attrsN.start or nameN.start,
+                finish = nameN.finish,
+                [1]    = nameN[1],
             }
-            if attrs2 then
-                n2.attrs = attrs2
-                attrs2.parent = n2
+            gN.isGlobalDecl = true
+            gi.names[gN[1]] = gi.names[gN[1]] or { declared = true, const = false, initialized = false }
+            if attrsN then
+                gN.attrs = attrsN
+                attrsN.parent = gN
+                for i = 1, #attrsN do
+                    if attrsN[i][1] == 'close' then
+                        pushError {
+                            type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                            start  = attrsN[i].start,
+                            finish = attrsN[i].finish,
+                        }
+                    elseif attrsN[i][1] == 'const' then
+                        gi.names[gN[1]].const = true
+                    end
+                end
             end
-            local attrs2After = parseLocalAttrs()
-            if attrs2After then
-                if n2.attrs then
-                    for i = 1, #attrs2After do
-                        n2.attrs[#n2.attrs + 1] = attrs2After[i]
+            local attrsNAfter = parseLocalAttrs()
+            if attrsNAfter then
+                for i = 1, #attrsNAfter do
+                    if attrsNAfter[i][1] == 'close' then
+                        pushError {
+                            type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                            start  = attrsNAfter[i].start,
+                            finish = attrsNAfter[i].finish,
+                        }
+                    elseif attrsNAfter[i][1] == 'const' then
+                        gi.names[gN[1]].const = true
+                    end
+                end
+                if gN.attrs then
+                    for i = 1, #attrsNAfter do
+                        gN.attrs[#gN.attrs+1] = attrsNAfter[i]
                     end
                 else
-                    n2.attrs = attrs2After
-                    attrs2After.parent = n2
+                    gN.attrs = attrsNAfter
+                    attrsNAfter.parent = gN
                 end
-                n2.finish = attrs2After[#attrs2After].finish
+                gN.finish = attrsNAfter[#attrsNAfter].finish
             end
-            pushActionIntoCurrentChunk(n2)
-            skipSpace()
-        else
-            missName()
+            return gN
         end
-        
-        -- Parse remaining names
-        while Tokens[Index + 1] == ',' do
-            Index = Index + 2
-            skipSpace()
-            
-            local attrsN = parseLocalAttrs()
-            skipSpace()
-            local nameN = parseName(true)
-            if nameN then
-                local gN = {
-                    type   = 'setglobal',
-                    start  = attrsN and attrsN.start or nameN.start,
-                    finish = nameN.finish,
-                    [1]    = nameN[1],
-                }
-                if attrsN then
-                    gN.attrs = attrsN
-                    attrsN.parent = gN
-                end
-                local attrsNAfter = parseLocalAttrs()
-                if attrsNAfter then
-                    if gN.attrs then
-                        for i = 1, #attrsNAfter do
-                            gN.attrs[#gN.attrs + 1] = attrsNAfter[i]
-                        end
-                    else
-                        gN.attrs = attrsNAfter
-                        attrsNAfter.parent = gN
-                    end
-                    gN.finish = attrsNAfter[#attrsNAfter].finish
-                end
-                if not nrest then
-                    nrest = {}
-                end
-                nrest[#nrest + 1] = gN
-                pushActionIntoCurrentChunk(gN)
-                skipSpace()
-            else
-                missName()
-                break
-            end
-        end
+        return nil
     end
 
+    parseMultiVars(glob, parseGlobalVar, false)
     return glob
 end
 
@@ -4298,6 +4392,13 @@ local function initState(lua, version, options)
         errs[#errs+1] = err
         return err
     end
+    -- Lua 5.5 global keyword semantic tracking (syntax-level errors)
+    state.globalInfo = {
+        names    = {},   -- map name -> { declared=true, const=bool, initialized=bool }
+        hasAll   = false, -- global * encountered
+        allConst = false, -- global <const> * encountered
+        active   = false, -- any global declaration activates strict global scope
+    }
 end
 
 return function (lua, mode, version, options)

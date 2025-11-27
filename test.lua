@@ -66,6 +66,7 @@ end
 
 local function testAll()
     test 'basic'
+    test 'parser_test'
     test 'definition'
     test 'type_inference'
     test 'implementation'

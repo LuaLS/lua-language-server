@@ -29,7 +29,7 @@ local function performTest()
     local files = {}
     local size = 0
     for path in scanDirectory(targetPath) do
-        if path:extension():string() == '.lua' then
+        if path:extension() == '.lua' then
             local buf = utility.loadFile(path:string())
             files[path] = buf
             size = size + #buf

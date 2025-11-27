@@ -143,10 +143,13 @@ local global = 10  -- 'global' 作为变量名
 
 2. **parseGlobal 函数** (约第 3123 行，新增)
    - 完整实现了三种 global 语法的解析
+   - 支持初始化赋值：`global x = 10`
    - 处理属性（attrib）的解析和关联
-   - 支持多变量声明的解析
+   - 支持多变量声明的解析：`global a, b, c = 1, 2, 3`
+   - 检查 global 不能有 close 属性
+   - 使用 parseMultiVars 处理初始化赋值
 
-3. **parseAction 函数** (约第 4044 行)
+3. **parseAction 函数** (约第 4117 行)
    - 添加了 global 关键字的分发逻辑
    - 使用 `isKeyWord` 检查确保版本正确性
 
@@ -160,25 +163,55 @@ global function myGlobalFunction()
     return 42
 end
 
--- 示例 2: 声明全局变量
+-- 示例 2: 声明全局变量（无初始化）
 global x
 
--- 示例 3: 声明带常量属性的全局变量
+-- 示例 3: 声明并初始化全局变量
+global y = 100
+
+-- 示例 4: 声明带常量属性的全局变量
 global <const> PI = 3.14159
 
--- 示例 4: 声明多个全局变量
+-- 示例 5: 声明多个全局变量
 global width, height, depth
 
--- 示例 5: 声明带不同属性的多个全局变量
-global <const> MAX_SIZE, <close> file, counter
+-- 示例 6: 声明并初始化多个全局变量
+global a, b, c = 1, 2, 3
 
--- 示例 6: 声明所有后续变量为全局
+-- 示例 7: 声明带不同属性的多个全局变量
+global <const> MAX_SIZE = 100, counter = 0
+
+-- 示例 8: 属性可以在变量名前后
+global x <const>, <const> y
+
+-- 示例 9: 声明所有后续变量为全局（可读写）
 global *
-x = 1  -- x 是全局变量
-y = 2  -- y 是全局变量
+x = 1  -- x 自动成为全局变量
+y = 2  -- y 自动成为全局变量
 
--- 示例 7: 带属性的全局所有
+-- 示例 10: 声明所有后续变量为只读全局
 global <const> *
+print(math.pi)  -- OK，print 和 math 自动为只读
+z = 1           -- 错误！z 被声明为只读
+```
+
+### 错误示例
+
+```lua
+-- 错误 1: global 不能有 close 属性
+global x <close>  -- 解析错误！
+
+-- 错误 2: 在隐式 global * 失效的作用域内使用未声明变量
+global x
+y = 1  -- 错误：y 未声明（需要语义分析支持）
+
+-- 错误 3: 赋值给 const 变量
+global <const> PI = 3.14
+PI = 3.15  -- 错误：不能赋值给常量（需要语义分析支持）
+
+-- 错误 4: 初始化已存在的全局变量
+X = 10
+global X = 20  -- 运行时错误：X 已定义（需要语义分析支持）
 ```
 
 ## 后续工作

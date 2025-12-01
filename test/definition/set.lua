@@ -38,3 +38,17 @@ else
 end
 print(<?x?>)
 ]]
+
+TEST([[
+local x
+global <!x!> = 1
+
+<?x?>
+]], 'Lua 5.5')
+
+TEST([[
+global x = 1
+local <!x!>
+
+<?x?>
+]], 'Lua 5.5')

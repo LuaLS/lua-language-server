@@ -43,6 +43,9 @@ return function (uri, callback)
     local definedGlobalRegex = config.get(uri, 'Lua.diagnostics.globalsRegex')
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
+        if source.declare then
+            return
+        end
         local name = guide.getKeyName(source)
         if not name or definedGlobal[name] then
             return

@@ -753,9 +753,156 @@ local function createLocal(obj, attrs)
     return obj
 end
 
+local function getLocal(name, pos)
+    for i = #Chunk, 1, -1 do
+        local chunk  = Chunk[i]
+        local locals = chunk.locals
+        if locals then
+            local res
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.effect > pos then
+                    break
+                end
+                if loc[1] == name then
+                    if not res or res.effect < loc.effect then
+                        res = loc
+                    end
+                end
+            end
+            if res then
+                return res
+            end
+        end
+    end
+end
+
+local function getVariable(name, pos)
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        local resLocal
+        local resGlobal
+
+        -- Find most recent local in this chunk
+        local locals = chunk.locals
+        if locals then
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.effect > pos then
+                    break
+                end
+                if loc[1] == name then
+                    if not resLocal or resLocal.effect < loc.effect then
+                        resLocal = loc
+                    end
+                end
+            end
+        end
+
+        -- Find global in this chunk (globals don't have effect time, just find the last one)
+        local globals = chunk.globals
+        if globals then
+            for n = #globals, 1, -1 do
+                local glob = globals[n]
+                if glob[1] == name then
+                    resGlobal = glob
+                    break
+                end
+            end
+        end
+
+        -- Return the one declared later (compare by start position)
+        if resLocal and resGlobal then
+            if resLocal.start > resGlobal.start then
+                return resLocal
+            else
+                return resGlobal
+            end
+        end
+        if resLocal then
+            return resLocal
+        end
+        if resGlobal then
+            return resGlobal
+        end
+    end
+
+    -- If not found, look for global *
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        local globals = chunk.globals
+        if globals then
+            for n = #globals, 1, -1 do
+                local glob = globals[n]
+                if glob[1] == '*' then
+                    return glob
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
+local function linkGlobalToEnv(node, var)
+    -- Lua 5.5: Check VARIABLE_NOT_DECLARED
+    if State.version == 'Lua 5.5' and not var then
+        -- Check if there's any global declaration in scope
+        local hasAnyGlobal = false
+        for i = #Chunk, 1, -1 do
+            local chunk = Chunk[i]
+            if chunk.globals and #chunk.globals > 0 then
+                hasAnyGlobal = true
+                break
+            end
+        end
+
+        if hasAnyGlobal then
+            pushError {
+                type   = 'VARIABLE_NOT_DECLARED',
+                start  = node.start,
+                finish = node.finish,
+            }
+        end
+    end
+
+    -- Lua 5.5: Use getVariable to find _ENV, check if it's global
+    local env
+    if State.version == 'Lua 5.5' then
+        env = getVariable(State.ENVMode, node.start)
+        if env and env.type == 'global' then
+            pushError {
+                type   = 'RUNTIME_ERROR',
+                start  = node.start,
+                finish = node.finish,
+                info   = {
+                    message = '_ENV is global when accessing variable'
+                }
+            }
+        end
+        if env and env.type == 'local' then
+            node.node = env
+            if not env.ref then
+                env.ref = {}
+            end
+            env.ref[#env.ref+1] = node
+        end
+    else
+        env = getLocal(State.ENVMode, node.start)
+        if env then
+            node.node = env
+            if not env.ref then
+                env.ref = {}
+            end
+            env.ref[#env.ref+1] = node
+        end
+    end
+end
+
 ---@param obj table
-local function createGlobal(obj, attrs)
-    obj.type = 'globaldeclare'
+local function createGlobalDeclare(obj, attrs)
+    obj.type = 'setglobal'
+    obj.declare = true
 
     if attrs then
         obj.attrs = attrs
@@ -771,6 +918,9 @@ local function createGlobal(obj, attrs)
         end
         globals[#globals+1] = obj
     end
+
+    linkGlobalToEnv(obj, obj)
+
     return obj
 end
 
@@ -2111,97 +2261,6 @@ local function parseParen()
     return paren
 end
 
-local function getLocal(name, pos)
-    for i = #Chunk, 1, -1 do
-        local chunk  = Chunk[i]
-        local locals = chunk.locals
-        if locals then
-            local res
-            for n = 1, #locals do
-                local loc = locals[n]
-                if loc.effect > pos then
-                    break
-                end
-                if loc[1] == name then
-                    if not res or res.effect < loc.effect then
-                        res = loc
-                    end
-                end
-            end
-            if res then
-                return res
-            end
-        end
-    end
-end
-
-local function getVariable(name, pos)
-    for i = #Chunk, 1, -1 do
-        local chunk = Chunk[i]
-        local resLocal
-        local resGlobal
-
-        -- Find most recent local in this chunk
-        local locals = chunk.locals
-        if locals then
-            for n = 1, #locals do
-                local loc = locals[n]
-                if loc.effect > pos then
-                    break
-                end
-                if loc[1] == name then
-                    if not resLocal or resLocal.effect < loc.effect then
-                        resLocal = loc
-                    end
-                end
-            end
-        end
-
-        -- Find global in this chunk (globals don't have effect time, just find the last one)
-        local globals = chunk.globals
-        if globals then
-            for n = #globals, 1, -1 do
-                local glob = globals[n]
-                if glob[1] == name then
-                    resGlobal = glob
-                    break
-                end
-            end
-        end
-
-        -- Return the one declared later (compare by start position)
-        if resLocal and resGlobal then
-            if resLocal.start > resGlobal.start then
-                return resLocal
-            else
-                return resGlobal
-            end
-        end
-        if resLocal then
-            return resLocal
-        end
-        if resGlobal then
-            return resGlobal
-        end
-    end
-
-    -- If not found, look for global *
-    for i = #Chunk, 1, -1 do
-        local chunk = Chunk[i]
-        local globals = chunk.globals
-        if globals then
-            for n = #globals, 1, -1 do
-                local glob = globals[n]
-                if glob[1] == '*' then
-                    return glob
-                end
-            end
-        end
-    end
-
-    return nil
-end
-
 local function resolveName(node)
     if not node then
         return nil
@@ -2221,58 +2280,7 @@ local function resolveName(node)
         node.type = 'getglobal'
         node.var = var
 
-        -- Lua 5.5: Check VARIABLE_NOT_DECLARED
-        if State.version == 'Lua 5.5' and not var then
-            -- Check if there's any global declaration in scope
-            local hasAnyGlobal = false
-            for i = #Chunk, 1, -1 do
-                local chunk = Chunk[i]
-                if chunk.globals and #chunk.globals > 0 then
-                    hasAnyGlobal = true
-                    break
-                end
-            end
-
-            if hasAnyGlobal then
-                pushError {
-                    type   = 'VARIABLE_NOT_DECLARED',
-                    start  = node.start,
-                    finish = node.finish,
-                }
-            end
-        end
-
-        -- Lua 5.5: Use getVariable to find _ENV, check if it's global
-        local env
-        if State.version == 'Lua 5.5' then
-            env = getVariable(State.ENVMode, node.start)
-            if env and env.type == 'global' then
-                pushError {
-                    type   = 'RUNTIME_ERROR',
-                    start  = node.start,
-                    finish = node.finish,
-                    info   = {
-                        message = '_ENV is global when accessing variable'
-                    }
-                }
-            end
-            if env and env.type == 'local' then
-                node.node = env
-                if not env.ref then
-                    env.ref = {}
-                end
-                env.ref[#env.ref+1] = node
-            end
-        else
-            env = getLocal(State.ENVMode, node.start)
-            if env then
-                node.node = env
-                if not env.ref then
-                    env.ref = {}
-                end
-                env.ref[#env.ref+1] = node
-            end
-        end
+        linkGlobalToEnv(node, var)
     end
     local name = node[1]
     bindSpecial(node, name)
@@ -3344,7 +3352,7 @@ local function parseGlobal()
             name.vstart  = func.start
             name.range   = func.finish
             func.parent  = name
-            createGlobal(name)
+            createGlobalDeclare(name)
             pushActionIntoCurrentChunk(name)
             return name
         else
@@ -3378,7 +3386,7 @@ local function parseGlobal()
                 end
             end
         end
-        createGlobal(action, attrs)
+        createGlobalDeclare(action, attrs)
         Index = Index + 2
         pushActionIntoCurrentChunk(action)
         return action
@@ -3437,7 +3445,7 @@ local function parseGlobal()
         glob.finish = attrsAfter[#attrsAfter].finish
     end
 
-    createGlobal(glob, glob.attrs)
+    createGlobalDeclare(glob, glob.attrs)
     pushActionIntoCurrentChunk(glob)
     skipSpace()
 
@@ -3485,7 +3493,7 @@ local function parseGlobal()
                 end
                 gN.finish = attrsNAfter[#attrsNAfter].finish
             end
-            createGlobal(gN, gN.attrs)
+            createGlobalDeclare(gN, gN.attrs)
             return gN
         end
         return nil

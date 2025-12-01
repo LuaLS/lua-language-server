@@ -157,7 +157,7 @@ print(x)              --> 10 (外层全局 x 未改变)
 
 ## 需要添加的诊断类型
 
-### 1. UNDEFINED_IN_GLOBAL_SCOPE
+### 1. VARIABLE_NOT_DECLARED
 在显式 global 作用域内使用未声明的变量。
 
 ```lua
@@ -237,7 +237,7 @@ global x <close>  -- 错误：global 不能有 close 属性
 3. **ASSIGN_TO_CONST** - 赋值给 const 全局变量
 
 **P1 - 中优先级（作用域错误）：**
-4. **UNDEFINED_IN_GLOBAL_SCOPE** - 在显式 global 作用域内使用未声明变量
+4. **VARIABLE_NOT_DECLARED** - 在显式 global 作用域内使用未声明变量
 
 **P2 - 低优先级（警告）：**
 5. **POSSIBLE_GLOBAL_REDEFINITION** - 可能的跨文件重复初始化（警告）
@@ -266,7 +266,7 @@ global <const> PI = 3.14
 PI = 3.15  -- 错误！PI 是常量
 ```
 
-**UNDEFINED_IN_GLOBAL_SCOPE**:
+**VARIABLE_NOT_DECLARED**:
 ```lua
 -- 检测逻辑：
 -- 1. 跟踪当前作用域是否有显式 global 声明
@@ -291,7 +291,7 @@ Y = 1  -- 错误！Y 未声明（隐式 global * 已失效）
 ### 阶段 1：基础作用域支持
 1. 实现隐式 `global *` 的跟踪
 2. 实现 global 声明使隐式 `global *` 失效
-3. 添加 UNDEFINED_IN_GLOBAL_SCOPE 诊断
+3. 添加 VARIABLE_NOT_DECLARED 诊断
 
 ### 阶段 2：属性支持
 1. 实现 const 属性的跟踪

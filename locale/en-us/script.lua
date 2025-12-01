@@ -44,12 +44,10 @@ DIAG_AMBIGUITY_1        =
 'Compute `{}` first. You may need to add brackets.'
 DIAG_LOWERCASE_GLOBAL   =
 'Global variable in lowercase initial, Did you miss `local` or misspell it?'
-GLOBAL_DUPLICATE_INIT   =
-'Duplicate initialization of global variable `{}`.'
 ASSIGN_CONST_GLOBAL     =
 'Cannot assign to <const> global variable `{}`.'
-UNDEFINED_IN_GLOBAL_SCOPE =
-'Undefined global variable `{}` (global declarations active).'
+VARIABLE_NOT_DECLARED =
+'Variable `{}` not declared (global declarations active).'
 DIAG_EMPTY_BLOCK        =
 'Empty block.'
 DIAG_DIAGNOSTICS        =

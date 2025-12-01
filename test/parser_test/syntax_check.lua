@@ -820,58 +820,6 @@ global <!<close>!> x
 }
 
 TEST [[
-global x = 1
-global <!x!> = 2
-]]
-{
-    type = 'GLOBAL_DUPLICATE_INIT',
-}
-
--- Duplicate global definitions: multiple initializations of the same name
-TEST [[
-global x = 1
-global function <!x!>() end
-]]
-{
-    type = 'GLOBAL_DUPLICATE_INIT',
-}
-
-TEST [[
-global function f() end
-global function <!f!>() end
-]]
-{
-    type = 'GLOBAL_DUPLICATE_INIT',
-}
-
-TEST [[
-global <const> x = 1
-global <!x!> = 2
-]]
-{
-    type = 'GLOBAL_DUPLICATE_INIT',
-}
-
-TEST [[
-global x = 1
-global x
-global <!x!> = 2
-]]
-{
-    type = 'GLOBAL_DUPLICATE_INIT',
-}
-
-TEST [[
-global x = 1
-do
-    global <!x!> = 2
-end
-]]
-{
-    type = 'GLOBAL_DUPLICATE_INIT',
-}
-
-TEST [[
 global <const> x = 1
 <!x!> = 2
 ]]
@@ -892,7 +840,7 @@ global x
 <!y!> = 1
 ]]
 {
-    type = 'UNDEFINED_IN_GLOBAL_SCOPE',
+    type = 'VARIABLE_NOT_DECLARED',
 }
 
 TEST [[
@@ -965,5 +913,55 @@ do
 end
 ]]
 {
-    type = 'UNDEFINED_IN_GLOBAL_SCOPE',
+    type = 'VARIABLE_NOT_DECLARED',
+}
+
+TEST [[
+global X <const> = 1
+global X
+
+X = 2
+]]
+(nil)
+
+TEST [[
+global X
+
+do
+    global X <const> = 1
+end
+
+X = 2
+]]
+(nil)
+
+TEST [[
+do
+    global X
+    <!Y!> = 1
+end
+
+Y = 1
+]]
+{
+    type = 'VARIABLE_NOT_DECLARED',
+}
+
+TEST [[
+global *
+
+do
+    global X
+    do
+        global X <const> = 10
+        <!X!> = 1
+        Y = 1
+    end
+    X = 1
+end
+
+Y = 1
+]]
+{
+    type = 'ASSIGN_CONST_GLOBAL',
 }

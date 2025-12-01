@@ -44,12 +44,10 @@ DIAG_AMBIGUITY_1        =
 '会优先运算 `{}`，你可能需要加个括号。'
 DIAG_LOWERCASE_GLOBAL   =
 '首字母小写的全局变量，你是否漏了 `local` 或是有拼写错误？'
-GLOBAL_DUPLICATE_INIT   =
-'重复初始化全局变量 `{}`。'
 ASSIGN_CONST_GLOBAL     =
 '不能赋值给 <const> 全局变量 `{}`。'
-UNDEFINED_IN_GLOBAL_SCOPE =
-'未声明的全局变量 `{}`（当前已使用 global 语法声明作用域）。'
+VARIABLE_NOT_DECLARED =
+'未声明的变量 `{}`（当前已使用 global 语法声明作用域）。'
 DIAG_EMPTY_BLOCK        =
 '空代码块'
 DIAG_DIAGNOSTICS        =

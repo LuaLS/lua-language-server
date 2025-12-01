@@ -32,7 +32,7 @@ function selector:event_mod(fd, events, callback) end
 function selector:event_del(fd) end
 
 ---Wait for events on registered file descriptors
----@param timeout? integer # Timeout in milliseconds (ms), -1 for infinite wait, default 0 (non-blocking)
+---@param timeout integer # Timeout in milliseconds (ms), -1 for infinite wait
 ---@return fun():any, integer # Iterator function returning (callback_data, event_flags)
 function selector:wait(timeout) end
 

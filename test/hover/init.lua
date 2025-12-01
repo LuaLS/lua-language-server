@@ -2501,3 +2501,14 @@ local t = {
 [[
 local f: A
 ]]
+
+TEST [[
+---@param a number
+---@param b string
+---@param ... boolean
+function <?f?>(a, b, ...args)
+end
+]]
+[[
+function f(a: number, b: string, ...args: boolean)
+]]

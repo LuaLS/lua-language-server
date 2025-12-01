@@ -247,6 +247,8 @@ PARSER_MISS_METHOD      =
 '缺少方法名。'
 PARSER_ARGS_AFTER_DOTS  =
 '`...`必须是最后一个参数。'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'{version} 开始支持 `(...name)` 语法。'
 PARSER_KEYWORD          =
 '关键字无法作为名称。'
 PARSER_EXP_IN_ACTION    =

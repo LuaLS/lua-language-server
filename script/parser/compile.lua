@@ -2405,6 +2405,31 @@ local function parseParams(params, isLambda)
             end
             hasDots = true
             Index = Index + 2
+
+            -- Lua 5.5: check for (...args) syntax
+            skipSpace()
+            local nextToken = Tokens[Index + 1]
+            if nextToken and CharMapWord[ssub(nextToken, 1, 1)] then
+                if State.version ~= 'Lua 5.5' then
+                    pushError {
+                        type   = 'UNSUPPORT_NAMED_VARARG',
+                        start  = getPosition(Tokens[Index], 'left'),
+                        finish = getPosition(Tokens[Index] + #nextToken - 1, 'right'),
+                        version = 'Lua 5.5',
+                    }
+                end
+                -- Create local variable for vararg
+                local varargName = createLocal {
+                    start  = getPosition(Tokens[Index], 'left'),
+                    finish = getPosition(Tokens[Index] + #nextToken - 1, 'right'),
+                    parent = params,
+                    [1]    = nextToken,
+                }
+                varargName.varargRef = vararg
+                vararg.name = varargName
+                Index = Index + 2
+            end
+
             goto CONTINUE
         end
         if CharMapWord[ssub(token, 1, 1)] then

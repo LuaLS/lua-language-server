@@ -1367,6 +1367,13 @@ end
 local function compileLocal(source)
     local myNode = vm.setNode(source, source)
 
+    -- Lua 5.5: named vararg (...args) -> args is table
+    if source.varargRef then
+        vm.setNode(source, vm.declareGlobal('type', 'table'))
+        myNode.hasDefined = true
+        return
+    end
+
     local hasMarkDoc
     if source.bindDocs then
         hasMarkDoc = vm.bindDocs(source)

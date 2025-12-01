@@ -243,6 +243,8 @@ PARSER_MISS_METHOD      =
 '缺少方法名。'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` 必須是最後一個引數。'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'{version} 開始支援 `(...name)` 語法。'
 PARSER_KEYWORD          =
 '關鍵字無法作為名稱。'
 PARSER_EXP_IN_ACTION    =

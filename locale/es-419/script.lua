@@ -241,6 +241,8 @@ PARSER_MISS_METHOD      =
 'Se esperaba <method>.'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` should be the last arg.'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'La sintaxis `(...name)` es compatible con {version}.'
 PARSER_KEYWORD          =
 '<keyword> cannot be used as name.'
 PARSER_EXP_IN_ACTION    =

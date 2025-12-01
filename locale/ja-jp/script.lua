@@ -243,6 +243,8 @@ PARSER_MISS_METHOD      =
 'メソッド名が不足しています。'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` は最後の引数でなければなりません。'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'`(...name)` 構文は {version} でサポートされています。'
 PARSER_KEYWORD          =
 'キーワードは名前として使用できません。'
 PARSER_EXP_IN_ACTION    =

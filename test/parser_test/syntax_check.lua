@@ -983,3 +983,20 @@ end
 {
     type = 'VARIABLE_NOT_DECLARED',
 }
+
+Version = 'Lua 5.4'
+TEST [[
+function f(...<!args!>)
+end
+]]
+{
+    type = 'UNSUPPORT_NAMED_VARARG',
+    version = 'Lua 5.5',
+}
+
+Version = 'Lua 5.5'
+TEST [[
+function f(...args)
+end
+]]
+(nil)

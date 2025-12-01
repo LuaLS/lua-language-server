@@ -2207,7 +2207,7 @@ local function resolveName(node)
         return nil
     end
     local var = getVariable(node[1], node.start)
-    if var and var.type == 'local' then
+    if var and (var.type == 'local' or var.type == 'self') then
         node.type = 'getlocal'
         node.node = var
         if not var.ref then

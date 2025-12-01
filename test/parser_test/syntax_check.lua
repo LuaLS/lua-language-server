@@ -898,12 +898,14 @@ x = 2
 
 TEST [[
 global x
-function f()
+function <!f!>()
     local x
     x = 1
 end
 ]]
-(nil)
+{
+    type = 'VARIABLE_NOT_DECLARED',
+}
 
 -- Still error when assigning to truly undefined name under strict global scope
 TEST [[

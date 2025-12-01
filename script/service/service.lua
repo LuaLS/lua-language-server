@@ -168,8 +168,13 @@ function m.eventLoop()
         end
     end
 
+    local lastNetUpdateTime = 0
     local function doSomething()
-        net.update()
+        local now = time.monotonic()
+        if now - lastNetUpdateTime >= 100 then
+            net.update()
+            lastNetUpdateTime = now
+        end
         timer.update()
         pub.step(false)
         if await.step() then

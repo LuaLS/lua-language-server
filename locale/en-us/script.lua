@@ -237,12 +237,18 @@ PARSER_MISS_EXPONENT    =
 'Missed digits for the exponent.'
 PARSER_MISS_EXP         =
 '<exp> expected.'
+PARSER_MISS_LOOP_MIN    =
+'Missing start value of the loop.'
+PARSER_MISS_LOOP_MAX    =
+'Missing limit value of the loop.'
 PARSER_MISS_FIELD       =
 '<field> expected.'
 PARSER_MISS_METHOD      =
 '<method> expected.'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` should be the last arg.'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'`(...name)` syntax is supported in {version}.'
 PARSER_KEYWORD          =
 '<keyword> cannot be used as name.'
 PARSER_EXP_IN_ACTION    =
@@ -317,6 +323,8 @@ PARSER_LOCAL_LIMIT        =
 'Only 200 active local variables and upvalues can be existed at the same time.'
 PARSER_VARIABLE_NOT_DECLARED =
 'Variable `{name}` is not declared. (Use `global *` to allow undefined variables, or declare it with `global {name}`)'
+PARSER_ENV_IS_GLOBAL         =
+'_ENV is global when accessing variable `{name}`.'
 PARSER_ASSIGN_CONST_GLOBAL   =
 'Cannot assign to const global variable `{name}`.'
 PARSER_LUADOC_MISS_CLASS_NAME           =

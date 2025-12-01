@@ -233,12 +233,18 @@ PARSER_MISS_EXPONENT    =
 'Dígitos perdidos para o expoente.'
 PARSER_MISS_EXP         =
 '<exp> esperada.'
+PARSER_MISS_LOOP_MIN    =
+'Falta o valor inicial do loop.'
+PARSER_MISS_LOOP_MAX    =
+'Falta o valor limite do loop.'
 PARSER_MISS_FIELD       =
 '<field> esperado.'
 PARSER_MISS_METHOD      =
 '<method> esperado.'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` deve ser o último argumento.'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'A sintaxe `(...name)` é suportada em {version}.'
 PARSER_KEYWORD          =
 '<keyword> não pode ser usado como nome.'
 PARSER_EXP_IN_ACTION    =
@@ -313,6 +319,8 @@ PARSER_LOCAL_LIMIT        = -- TODO: need translate!
 'Only 200 active local variables and upvalues can be existed at the same time.'
 PARSER_VARIABLE_NOT_DECLARED =
 'Variável `{name}` não foi declarada. (Use `global *` para permitir variáveis indefinidas, ou declare com `global {name}`)'
+PARSER_ENV_IS_GLOBAL         =
+'_ENV é global ao acessar a variável `{name}`.'
 PARSER_ASSIGN_CONST_GLOBAL   =
 'Não é possível atribuir à variável global constante `{name}`.'
 PARSER_LUADOC_MISS_CLASS_NAME           =

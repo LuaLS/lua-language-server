@@ -233,12 +233,18 @@ PARSER_MISS_EXPONENT    =
 '指数部が不足しています。'
 PARSER_MISS_EXP         =
 '式が不足しています。'
+PARSER_MISS_LOOP_MIN    =
+'ループの開始値が不足しています。'
+PARSER_MISS_LOOP_MAX    =
+'ループの終了値が不足しています。'
 PARSER_MISS_FIELD       =
 'フィールド/プロパティ名が不足しています。'
 PARSER_MISS_METHOD      =
 'メソッド名が不足しています。'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` は最後の引数でなければなりません。'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'`(...name)` 構文は {version} でサポートされています。'
 PARSER_KEYWORD          =
 'キーワードは名前として使用できません。'
 PARSER_EXP_IN_ACTION    =
@@ -313,6 +319,8 @@ PARSER_LOCAL_LIMIT        =
 '同時に存在できるローカル変数とアップバリューの数は200個までです。'
 PARSER_VARIABLE_NOT_DECLARED =
 '変数 `{name}` は宣言されていません。（`global *` を使用して未定義の変数を許可するか、`global {name}` で宣言してください）'
+PARSER_ENV_IS_GLOBAL         =
+'変数 `{name}` にアクセスする際、_ENV がグローバル変数です。'
 PARSER_ASSIGN_CONST_GLOBAL   =
 '定数グローバル変数 `{name}` に代入できません。'
 PARSER_LUADOC_MISS_CLASS_NAME           =

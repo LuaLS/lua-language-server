@@ -841,6 +841,9 @@ global x
 ]]
 {
     type = 'VARIABLE_NOT_DECLARED',
+    info = {
+        name = 'y',
+    }
 }
 
 TEST [[
@@ -905,6 +908,9 @@ end
 ]]
 {
     type = 'VARIABLE_NOT_DECLARED',
+    info = {
+        name = 'f',
+    }
 }
 
 -- Still error when assigning to truly undefined name under strict global scope
@@ -916,6 +922,9 @@ end
 ]]
 {
     type = 'VARIABLE_NOT_DECLARED',
+    info = {
+        name = 'y',
+    }
 }
 
 TEST [[
@@ -947,6 +956,9 @@ Y = 1
 ]]
 {
     type = 'VARIABLE_NOT_DECLARED',
+    info = {
+        name = 'Y',
+    }
 }
 
 TEST [[
@@ -974,3 +986,43 @@ global x, y, z = 1, 2, 3
 local n = x + y + z
 ]]
 (nil)
+
+TEST [[
+global function f()
+    <!print!>(1)
+end
+]]
+{
+    type = 'VARIABLE_NOT_DECLARED',
+    info = {
+        name = 'print',
+    }
+}
+
+Version = 'Lua 5.4'
+TEST [[
+function f(...<!args!>)
+end
+]]
+{
+    type = 'UNSUPPORT_NAMED_VARARG',
+    version = 'Lua 5.5',
+}
+
+Version = 'Lua 5.5'
+TEST [[
+function f(...args)
+end
+]]
+(nil)
+
+TEST [[
+global _ENV
+global <!X!>
+]]
+{
+    type = 'ENV_IS_GLOBAL',
+    info = {
+        name = 'X',
+    }
+}

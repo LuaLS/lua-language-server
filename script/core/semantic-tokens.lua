@@ -18,6 +18,9 @@ local Care = util.switch()
         end
 
         local name = source[1]
+        if source.declare and name == '*' then
+            return
+        end
         local isLib = options.libGlobals[name]
         if isLib == nil then
             isLib = false
@@ -37,6 +40,10 @@ local Care = util.switch()
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
         local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.global
+
+        if source.declare then
+            modifier = modifier | define.TokenModifiers.declaration
+        end
 
         results[#results+1] = {
             start      = source.start,

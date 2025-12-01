@@ -76,11 +76,6 @@ end
 
 ---@param path fs.path
 ---@return fs.path
-function fs.fullpath(path)
-end
-
----@param path fs.path
----@return fs.path
 function fs.absolute(path)
 end
 

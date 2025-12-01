@@ -231,12 +231,18 @@ PARSER_MISS_EXPONENT    =
 'Faltan los dígitos para el exponente.'
 PARSER_MISS_EXP         =
 'Se esperaba <exp>.'
+PARSER_MISS_LOOP_MIN    =
+'Falta el valor inicial del bucle.'
+PARSER_MISS_LOOP_MAX    =
+'Falta el valor límite del bucle.'
 PARSER_MISS_FIELD       =
 'Se esperaba <field>.'
 PARSER_MISS_METHOD      =
 'Se esperaba <method>.'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` should be the last arg.'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'La sintaxis `(...name)` es compatible con {version}.'
 PARSER_KEYWORD          =
 '<keyword> cannot be used as name.'
 PARSER_EXP_IN_ACTION    =
@@ -311,6 +317,8 @@ PARSER_LOCAL_LIMIT        =
 'Solo 200 variables locales activas y valores anteriores pueden existir al mismo tiempo.'
 PARSER_VARIABLE_NOT_DECLARED =
 'Variable `{name}` no está declarada. (Use `global *` para permitir variables indefinidas, o declárela con `global {name}`)'
+PARSER_ENV_IS_GLOBAL         =
+'_ENV es global al acceder a la variable `{name}`.'
 PARSER_ASSIGN_CONST_GLOBAL   =
 'No se puede asignar a la variable global constante `{name}`.'
 PARSER_LUADOC_MISS_CLASS_NAME          =

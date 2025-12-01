@@ -663,6 +663,8 @@ local function parseLocalAttrs()
         if not attrs then
             attrs = {
                 type = 'localattrs',
+                start = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index], 'right'),
             }
         end
         local attr = {
@@ -718,6 +720,7 @@ local function parseLocalAttrs()
                 }
             }
         end
+        attrs.finish = attr.finish
     end
     return attrs
 end
@@ -802,11 +805,15 @@ local function getVariable(name, pos)
         -- Find global in this chunk (globals don't have effect time, just find the last one)
         local globals = chunk.globals
         if globals then
-            for n = #globals, 1, -1 do
+            for n = 1, #globals do
                 local glob = globals[n]
-                if glob[1] == name then
-                    resGlobal = glob
+                if glob.effect > pos then
                     break
+                end
+                if glob[1] == name then
+                    if not resGlobal or resGlobal.effect < glob.effect then
+                        resGlobal = glob
+                    end
                 end
             end
         end
@@ -862,6 +869,9 @@ local function linkGlobalToEnv(node, var)
                 type   = 'VARIABLE_NOT_DECLARED',
                 start  = node.start,
                 finish = node.finish,
+                info   = {
+                    name = node[1],
+                }
             }
         end
     end
@@ -870,13 +880,13 @@ local function linkGlobalToEnv(node, var)
     local env
     if State.version == 'Lua 5.5' then
         env = getVariable(State.ENVMode, node.start)
-        if env and env.type == 'global' then
+        if env and env.type == 'setglobal' then
             pushError {
-                type   = 'RUNTIME_ERROR',
+                type   = 'ENV_IS_GLOBAL',
                 start  = node.start,
                 finish = node.finish,
                 info   = {
-                    message = '_ENV is global when accessing variable'
+                    name = node[1],
                 }
             }
         end
@@ -903,6 +913,7 @@ end
 local function createGlobalDeclare(obj, attrs)
     obj.type = 'setglobal'
     obj.declare = true
+    obj.effect = obj.finish
 
     if attrs then
         obj.attrs = attrs
@@ -2402,6 +2413,32 @@ local function parseParams(params, isLambda)
             end
             hasDots = true
             Index = Index + 2
+
+            -- Lua 5.5: check for (...args) syntax
+            skipSpace()
+            local nextToken = Tokens[Index + 1]
+            if nextToken and CharMapWord[ssub(nextToken, 1, 1)] then
+                if State.version ~= 'Lua 5.5' then
+                    pushError {
+                        type   = 'UNSUPPORT_NAMED_VARARG',
+                        start  = getPosition(Tokens[Index], 'left'),
+                        finish = getPosition(Tokens[Index] + #nextToken - 1, 'right'),
+                        version = 'Lua 5.5',
+                    }
+                end
+                -- Create local variable for vararg
+                local varargName = createLocal {
+                    start  = getPosition(Tokens[Index], 'left'),
+                    finish = getPosition(Tokens[Index] + #nextToken - 1, 'right'),
+                    parent = params,
+                    [1]    = nextToken,
+                }
+                varargName.varargRef = vararg
+                vararg.name = varargName
+                vararg.finish = varargName.finish
+                Index = Index + 2
+            end
+
             goto CONTINUE
         end
         if CharMapWord[ssub(token, 1, 1)] then
@@ -2441,7 +2478,7 @@ local function parseParams(params, isLambda)
     return params
 end
 
-local function parseFunction(isLocal, isAction)
+local function parseFunction(declareType, isAction)
     local funcLeft  = getPosition(Tokens[Index], 'left')
     local funcRight = getPosition(Tokens[Index] + 7, 'right')
     local func = {
@@ -2461,13 +2498,24 @@ local function parseFunction(isLocal, isAction)
         local name = parseName()
         if name then
             local simple = parseSimple(name, true)
-            if isLocal then
+            if declareType == 'local' then
                 if simple == name then
                     createLocal(name)
                 else
                     resolveName(name)
                     pushError {
                         type   = 'UNEXPECT_LFUNC_NAME',
+                        start  = simple.start,
+                        finish = simple.finish,
+                    }
+                end
+            elseif declareType == 'global' then
+                if simple == name then
+                    createGlobalDeclare(name)
+                else
+                    resolveName(name)
+                    pushError {
+                        type   = 'UNEXPECT_GFUNC_NAME',
                         start  = simple.start,
                         finish = simple.finish,
                     }
@@ -3149,18 +3197,18 @@ local function parseMultiVars(n1, parser, isLocal)
         end
     end
 
-    if isLocal then
-        local effect = lastValue and lastValue.finish or lastVar.finish
-        n1.effect = effect
-        if n2 then
-            n2.effect = effect
+    local effect = lastValue and lastValue.finish or lastVar.finish
+    n1.effect = effect
+    if n2 then
+        n2.effect = effect
+    end
+    if nrest then
+        for i = 1, #nrest do
+            nrest[i].effect = effect
         end
-        if nrest then
-            for i = 1, #nrest do
-                nrest[i].effect = effect
-            end
-        end
+    end
 
+    do
         -- Lua 5.4: only one <close> attribute allowed across a local declaration
         -- Lua 5.5: multiple <close> are allowed
         if State.version == 'Lua 5.4' then
@@ -3302,7 +3350,7 @@ local function parseLocal()
     end
 
     if word == 'function' then
-        local func = parseFunction(true, true)
+        local func = parseFunction('local', true)
         local name = func.name
         if name then
             func.name    = nil
@@ -3343,7 +3391,7 @@ local function parseGlobal()
 
     -- global function Name funcbody
     if word == 'function' then
-        local func = parseFunction(false, true)
+        local func = parseFunction('global', true)
         local name = func.name
         if name then
             func.name    = nil
@@ -3352,7 +3400,6 @@ local function parseGlobal()
             name.vstart  = func.start
             name.range   = func.finish
             func.parent  = name
-            createGlobalDeclare(name)
             pushActionIntoCurrentChunk(name)
             return name
         else
@@ -3368,7 +3415,7 @@ local function parseGlobal()
     if Tokens[Index + 1] == '*' then
         local action = {
             type   = 'globalall',
-            start  = globalPos,
+            start  = getPosition(Tokens[Index], 'left'),
             finish = getPosition(Tokens[Index], 'right'),
             attrs  = attrs,
             [1]    = '*',
@@ -3934,6 +3981,8 @@ local function parseFor()
             if State.version == 'Lua 5.5' then
                 attrs = {
                     type = 'localattrs',
+                    start = name.start,
+                    finish = name.finish,
                     [1] = {
                         type = 'localattr',
                         start = name.start,
@@ -4054,6 +4103,8 @@ local function parseFor()
                 if State.version == 'Lua 5.5' then
                     attrs = {
                         type = 'localattrs',
+                        start = obj.start,
+                        finish = obj.finish,
                         [1] = {
                             type = 'localattr',
                             start = obj.start,

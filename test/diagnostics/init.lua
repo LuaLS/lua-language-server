@@ -33,7 +33,10 @@ local function founded(targets, results)
 end
 
 ---@diagnostic disable: await-in-sync
-function TEST(script)
+function TEST(script, version)
+    if version then
+        config.set(nil, 'Lua.runtime.version', version)
+    end
     local newScript, catched = catch(script, '!')
     files.setText(TESTURI, newScript)
     files.open(TESTURI)
@@ -58,6 +61,9 @@ function TEST(script)
     end
 
     files.remove(TESTURI)
+    if version then
+        config.set(nil, 'Lua.runtime.version', nil)
+    end
 
     return function (callback)
         callback(filteds)

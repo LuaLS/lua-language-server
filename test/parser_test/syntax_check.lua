@@ -967,3 +967,10 @@ Y = 1
 {
     type = 'ASSIGN_CONST_GLOBAL',
 }
+
+TEST [[
+global x, y, z = 1, 2, 3
+
+local n = x + y + z
+]]
+(nil)

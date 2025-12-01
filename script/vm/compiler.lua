@@ -1694,7 +1694,7 @@ local compilerSwitch = util.switch()
         if vm.bindDocs(source) then
             return
         end
-        if source.node[1] ~= '_ENV' then
+        if source.node and source.node[1] ~= '_ENV' then
             return
         end
         if not source.value then

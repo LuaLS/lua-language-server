@@ -2512,3 +2512,12 @@ end
 [[
 function f(a: number, b: string, ...args: boolean)
 ]]
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.5')
+TEST [[
+global <?*?>
+]]
+[[
+(global) any
+]]
+config.set(nil, 'Lua.runtime.version', nil)

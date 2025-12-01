@@ -3415,7 +3415,7 @@ local function parseGlobal()
     if Tokens[Index + 1] == '*' then
         local action = {
             type   = 'globalall',
-            start  = globalPos,
+            start  = getPosition(Tokens[Index], 'left'),
             finish = getPosition(Tokens[Index], 'right'),
             attrs  = attrs,
             [1]    = '*',

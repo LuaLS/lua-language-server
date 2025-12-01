@@ -1022,4 +1022,7 @@ global <!X!>
 ]]
 {
     type = 'ENV_IS_GLOBAL',
+    info = {
+        name = 'X',
+    }
 }

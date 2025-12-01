@@ -755,7 +755,7 @@ end
 
 ---@param obj table
 local function createGlobal(obj, attrs)
-    obj.type = 'global'
+    obj.type = 'globaldeclare'
 
     if attrs then
         obj.attrs = attrs

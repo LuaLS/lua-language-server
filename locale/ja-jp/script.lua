@@ -311,6 +311,10 @@ PARSER_NESTING_LONG_MARK  =
 'Lua 5.1 ではネストされた `[[...]]` は使用できません。'
 PARSER_LOCAL_LIMIT        =
 '同時に存在できるローカル変数とアップバリューの数は200個までです。'
+PARSER_VARIABLE_NOT_DECLARED =
+'変数 `{name}` は宣言されていません。（`global *` を使用して未定義の変数を許可するか、`global {name}` で宣言してください）'
+PARSER_ASSIGN_CONST_GLOBAL   =
+'定数グローバル変数 `{name}` に代入できません。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 'クラス名が不足しています。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

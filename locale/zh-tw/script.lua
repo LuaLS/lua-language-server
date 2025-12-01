@@ -311,6 +311,10 @@ PARSER_NESTING_LONG_MARK  =
 'Lua 5.1 不允許使用巢狀的 `[[...]]` 。'
 PARSER_LOCAL_LIMIT        =
 '只能同時存在200個活躍的區域變數與上值。'
+PARSER_VARIABLE_NOT_DECLARED =
+'變數 `{name}` 未宣告。（使用 `global *` 允許未定義變數，或使用 `global {name}` 宣告）'
+PARSER_ASSIGN_CONST_GLOBAL   =
+'無法對常數全域變數 `{name}` 賦值。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

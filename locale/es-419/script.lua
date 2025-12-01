@@ -309,6 +309,10 @@ PARSER_NESTING_LONG_MARK  =
 'La anidación de `[[...]]` no está permitida en Lua 5.1 .'
 PARSER_LOCAL_LIMIT        =
 'Solo 200 variables locales activas y valores anteriores pueden existir al mismo tiempo.'
+PARSER_VARIABLE_NOT_DECLARED =
+'Variable `{name}` no está declarada. (Use `global *` para permitir variables indefinidas, o declárela con `global {name}`)'
+PARSER_ASSIGN_CONST_GLOBAL   =
+'No se puede asignar a la variable global constante `{name}`.'
 PARSER_LUADOC_MISS_CLASS_NAME          =
 'Se esperaba <class name>.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL      =

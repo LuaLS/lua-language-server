@@ -753,8 +753,41 @@ local function createLocal(obj, attrs)
     return obj
 end
 
+---@param obj table
+local function createGlobal(obj, attrs)
+    obj.type = 'global'
+
+    if attrs then
+        obj.attrs = attrs
+        attrs.parent = obj
+    end
+
+    local chunk = Chunk[#Chunk]
+    if chunk then
+        local globals = chunk.globals
+        if not globals then
+            globals = {}
+            chunk.globals = globals
+        end
+        globals[#globals+1] = obj
+    end
+    return obj
+end
+
 local function pushChunk(chunk)
     Chunk[#Chunk+1] = chunk
+end
+
+local function hasAttr(attrs, attrName)
+    if not attrs then
+        return false
+    end
+    for i = 1, #attrs do
+        if attrs[i][1] == attrName then
+            return true
+        end
+    end
+    return false
 end
 
 local function resolveLable(label, obj)
@@ -2102,23 +2135,77 @@ local function getLocal(name, pos)
     end
 end
 
+local function getVariable(name, pos)
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        local resLocal
+        local resGlobal
+
+        -- Find most recent local in this chunk
+        local locals = chunk.locals
+        if locals then
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.effect > pos then
+                    break
+                end
+                if loc[1] == name then
+                    if not resLocal or resLocal.effect < loc.effect then
+                        resLocal = loc
+                    end
+                end
+            end
+        end
+
+        -- Find global in this chunk (globals don't have effect time, just find the last one)
+        local globals = chunk.globals
+        if globals then
+            for n = #globals, 1, -1 do
+                local glob = globals[n]
+                if glob[1] == name then
+                    resGlobal = glob
+                    break
+                end
+            end
+        end
+
+        -- Return the one declared later (compare by start position)
+        if resLocal and resGlobal then
+            if resLocal.start > resGlobal.start then
+                return resLocal
+            else
+                return resGlobal
+            end
+        end
+        if resLocal then
+            return resLocal
+        end
+        if resGlobal then
+            return resGlobal
+        end
+    end
+
+    return nil
+end
+
 local function resolveName(node)
     if not node then
         return nil
     end
-    local loc = getLocal(node[1], node.start)
-    if loc then
+    local var = getVariable(node[1], node.start)
+    if var and var.type == 'local' then
         node.type = 'getlocal'
-        node.node = loc
-        if not loc.ref then
-            loc.ref = {}
+        node.node = var
+        if not var.ref then
+            var.ref = {}
         end
-        loc.ref[#loc.ref+1] = node
-        if loc.special then
-            addSpecial(loc.special, node)
+        var.ref[#var.ref+1] = node
+        if var.special then
+            addSpecial(var.special, node)
         end
     else
         node.type = 'getglobal'
+        node.var = var
         local env = getLocal(State.ENVMode, node.start)
         if env then
             node.node = env
@@ -2905,19 +2992,45 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
             end
         end
         if n.type == 'setglobal' then
-            local gi = State.globalInfo
             local nameKey = n[1]
-            -- assignment / definition in strict global scope
-            if gi.active then
-                local info = gi.names[nameKey]
-                if not gi.hasAll and not info then
+            -- check if in strict global scope (any chunk has globals declared)
+            local hasGlobalDecl = false
+            local hasGlobalAll = false
+            local globalAllConst = false
+            local declaredGlobal = nil
+            
+            for i = #Chunk, 1, -1 do
+                local chunk = Chunk[i]
+                if chunk.globals then
+                    hasGlobalDecl = true
+                    for j = 1, #chunk.globals do
+                        if chunk.globals[j][1] == nameKey then
+                            declaredGlobal = chunk.globals[j]
+                            break
+                        end
+                    end
+                end
+                if chunk.hasGlobalAll then
+                    hasGlobalAll = true
+                    if chunk.globalAllConst then
+                        globalAllConst = true
+                    end
+                end
+                if declaredGlobal or hasGlobalAll then
+                    break
+                end
+            end
+            
+            -- assignment in strict global scope
+            if hasGlobalDecl or hasGlobalAll then
+                if not hasGlobalAll and not declaredGlobal then
                     pushError {
                         type   = 'UNDEFINED_IN_GLOBAL_SCOPE',
                         start  = n.start,
                         finish = n.finish,
                     }
                 end
-                local isConst = (info and info.const) or gi.allConst
+                local isConst = (declaredGlobal and declaredGlobal.attrs and hasAttr(declaredGlobal.attrs, 'const')) or globalAllConst
                 if isConst then
                     pushError {
                         type   = 'ASSIGN_CONST_GLOBAL',
@@ -3205,10 +3318,7 @@ local function parseGlobal()
             name.vstart  = func.start
             name.range   = func.finish
             func.parent  = name
-            local gi = State.globalInfo
-            gi.active = true
-            local nameKey = name[1]
-            gi.names[nameKey] = gi.names[nameKey] or { declared = true, const = false }
+            createGlobal(name)
             pushActionIntoCurrentChunk(name)
             return name
         else
@@ -3228,9 +3338,18 @@ local function parseGlobal()
             finish = getPosition(Tokens[Index], 'right'),
             attrs  = attrs,
         }
-        local gi = State.globalInfo
-        gi.active = true
-        gi.hasAll = true
+        local chunk = Chunk[#Chunk]
+        if chunk then
+            chunk.hasGlobalAll = true
+            if attrs then
+                for i = 1, #attrs do
+                    if attrs[i][1] == 'const' then
+                        chunk.globalAllConst = true
+                        break
+                    end
+                end
+            end
+        end
         if attrs then
             attrs.parent = action
             for i = 1, #attrs do
@@ -3241,8 +3360,6 @@ local function parseGlobal()
                         start  = a.start,
                         finish = a.finish,
                     }
-                elseif a[1] == 'const' then
-                    gi.allConst = true
                 end
             end
         end
@@ -3259,14 +3376,10 @@ local function parseGlobal()
     end
 
     local glob = {
-        type   = 'setglobal',
         start  = name.start,
         finish = name.finish,
         [1]    = name[1],
     }
-    local gi = State.globalInfo
-    gi.active = true
-    gi.names[glob[1]] = gi.names[glob[1]] or { declared = true, const = false }
 
     if attrs then
         glob.attrs = attrs
@@ -3279,8 +3392,6 @@ local function parseGlobal()
                     start  = attrs[i].start,
                     finish = attrs[i].finish,
                 }
-            elseif attrs[i][1] == 'const' then
-                gi.names[glob[1]].const = true
             end
         end
     else
@@ -3297,8 +3408,6 @@ local function parseGlobal()
                     start  = attrsAfter[i].start,
                     finish = attrsAfter[i].finish,
                 }
-            elseif attrsAfter[i][1] == 'const' then
-                gi.names[glob[1]].const = true
             end
         end
         if glob.attrs then
@@ -3312,6 +3421,7 @@ local function parseGlobal()
         glob.finish = attrsAfter[#attrsAfter].finish
     end
 
+    createGlobal(glob, glob.attrs)
     pushActionIntoCurrentChunk(glob)
     skipSpace()
 
@@ -3321,12 +3431,10 @@ local function parseGlobal()
         local nameN = parseName(true)
         if nameN then
             local gN = {
-                type   = 'setglobal',
                 start  = attrsN and attrsN.start or nameN.start,
                 finish = nameN.finish,
                 [1]    = nameN[1],
             }
-            gi.names[gN[1]] = gi.names[gN[1]] or { declared = true, const = false }
             if attrsN then
                 gN.attrs = attrsN
                 attrsN.parent = gN
@@ -3337,8 +3445,6 @@ local function parseGlobal()
                             start  = attrsN[i].start,
                             finish = attrsN[i].finish,
                         }
-                    elseif attrsN[i][1] == 'const' then
-                        gi.names[gN[1]].const = true
                     end
                 end
             end
@@ -3351,8 +3457,6 @@ local function parseGlobal()
                             start  = attrsNAfter[i].start,
                             finish = attrsNAfter[i].finish,
                         }
-                    elseif attrsNAfter[i][1] == 'const' then
-                        gi.names[gN[1]].const = true
                     end
                 end
                 if gN.attrs then
@@ -3365,6 +3469,7 @@ local function parseGlobal()
                 end
                 gN.finish = attrsNAfter[#attrsNAfter].finish
             end
+            createGlobal(gN, gN.attrs)
             return gN
         end
         return nil
@@ -4373,13 +4478,6 @@ local function initState(lua, version, options)
         errs[#errs+1] = err
         return err
     end
-    -- Lua 5.5 global keyword semantic tracking (syntax-level errors)
-    state.globalInfo = {
-        names    = {},   -- map name -> { declared=true, const=bool }
-        hasAll   = false, -- global * encountered
-        allConst = false, -- global <const> * encountered
-        active   = false, -- any global declaration activates strict global scope
-    }
 end
 
 return function (lua, mode, version, options)

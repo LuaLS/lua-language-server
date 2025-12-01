@@ -2185,6 +2185,20 @@ local function getVariable(name, pos)
         end
     end
 
+    -- If not found, look for global *
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        local globals = chunk.globals
+        if globals then
+            for n = #globals, 1, -1 do
+                local glob = globals[n]
+                if glob[1] == '*' then
+                    return glob
+                end
+            end
+        end
+    end
+
     return nil
 end
 
@@ -2206,13 +2220,58 @@ local function resolveName(node)
     else
         node.type = 'getglobal'
         node.var = var
-        local env = getLocal(State.ENVMode, node.start)
-        if env then
-            node.node = env
-            if not env.ref then
-                env.ref = {}
+
+        -- Lua 5.5: Check VARIABLE_NOT_DECLARED
+        if State.version == 'Lua 5.5' and not var then
+            -- Check if there's any global declaration in scope
+            local hasAnyGlobal = false
+            for i = #Chunk, 1, -1 do
+                local chunk = Chunk[i]
+                if chunk.globals and #chunk.globals > 0 then
+                    hasAnyGlobal = true
+                    break
+                end
             end
-            env.ref[#env.ref+1] = node
+
+            if hasAnyGlobal then
+                pushError {
+                    type   = 'VARIABLE_NOT_DECLARED',
+                    start  = node.start,
+                    finish = node.finish,
+                }
+            end
+        end
+
+        -- Lua 5.5: Use getVariable to find _ENV, check if it's global
+        local env
+        if State.version == 'Lua 5.5' then
+            env = getVariable(State.ENVMode, node.start)
+            if env and env.type == 'global' then
+                pushError {
+                    type   = 'RUNTIME_ERROR',
+                    start  = node.start,
+                    finish = node.finish,
+                    info   = {
+                        message = '_ENV is global when accessing variable'
+                    }
+                }
+            end
+            if env and env.type == 'local' then
+                node.node = env
+                if not env.ref then
+                    env.ref = {}
+                end
+                env.ref[#env.ref+1] = node
+            end
+        else
+            env = getLocal(State.ENVMode, node.start)
+            if env then
+                node.node = env
+                if not env.ref then
+                    env.ref = {}
+                end
+                env.ref[#env.ref+1] = node
+            end
         end
     end
     local name = node[1]
@@ -2992,52 +3051,19 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
             end
         end
         if n.type == 'setglobal' then
-            local nameKey = n[1]
-            -- check if in strict global scope (any chunk has globals declared)
-            local hasGlobalDecl = false
-            local hasGlobalAll = false
-            local globalAllConst = false
-            local declaredGlobal = nil
-            
-            for i = #Chunk, 1, -1 do
-                local chunk = Chunk[i]
-                if chunk.globals then
-                    hasGlobalDecl = true
-                    for j = 1, #chunk.globals do
-                        if chunk.globals[j][1] == nameKey then
-                            declaredGlobal = chunk.globals[j]
-                            break
-                        end
-                    end
-                end
-                if chunk.hasGlobalAll then
-                    hasGlobalAll = true
-                    if chunk.globalAllConst then
-                        globalAllConst = true
-                    end
-                end
-                if declaredGlobal or hasGlobalAll then
-                    break
-                end
-            end
-            
-            -- assignment in strict global scope
-            if hasGlobalDecl or hasGlobalAll then
-                if not hasGlobalAll and not declaredGlobal then
-                    pushError {
-                        type   = 'UNDEFINED_IN_GLOBAL_SCOPE',
-                        start  = n.start,
-                        finish = n.finish,
-                    }
-                end
-                local isConst = (declaredGlobal and declaredGlobal.attrs and hasAttr(declaredGlobal.attrs, 'const')) or globalAllConst
-                if isConst then
+            -- n.var is set by resolveName, contains the found global declaration or global *
+            if n.var then
+                -- Check if it's const
+                if n.var.attrs and hasAttr(n.var.attrs, 'const') then
                     pushError {
                         type   = 'ASSIGN_CONST_GLOBAL',
                         start  = n.start,
                         finish = n.finish,
                     }
                 end
+            else
+                -- No var means no global declaration found at all (not even global *)
+                -- This means we're not in strict global scope, allow free assignment
             end
         end
     end
@@ -3337,19 +3363,8 @@ local function parseGlobal()
             start  = globalPos,
             finish = getPosition(Tokens[Index], 'right'),
             attrs  = attrs,
+            [1]    = '*',
         }
-        local chunk = Chunk[#Chunk]
-        if chunk then
-            chunk.hasGlobalAll = true
-            if attrs then
-                for i = 1, #attrs do
-                    if attrs[i][1] == 'const' then
-                        chunk.globalAllConst = true
-                        break
-                    end
-                end
-            end
-        end
         if attrs then
             attrs.parent = action
             for i = 1, #attrs do
@@ -3363,6 +3378,7 @@ local function parseGlobal()
                 end
             end
         end
+        createGlobal(action, attrs)
         Index = Index + 2
         pushActionIntoCurrentChunk(action)
         return action

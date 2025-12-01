@@ -319,6 +319,8 @@ PARSER_LOCAL_LIMIT        =
 '同時に存在できるローカル変数とアップバリューの数は200個までです。'
 PARSER_VARIABLE_NOT_DECLARED =
 '変数 `{name}` は宣言されていません。（`global *` を使用して未定義の変数を許可するか、`global {name}` で宣言してください）'
+PARSER_ENV_IS_GLOBAL         =
+'変数 `{name}` にアクセスする際、_ENV がグローバル変数です。'
 PARSER_ASSIGN_CONST_GLOBAL   =
 '定数グローバル変数 `{name}` に代入できません。'
 PARSER_LUADOC_MISS_CLASS_NAME           =

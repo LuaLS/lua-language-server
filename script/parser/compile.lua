@@ -805,11 +805,15 @@ local function getVariable(name, pos)
         -- Find global in this chunk (globals don't have effect time, just find the last one)
         local globals = chunk.globals
         if globals then
-            for n = #globals, 1, -1 do
+            for n = 1, #globals do
                 local glob = globals[n]
-                if glob[1] == name then
-                    resGlobal = glob
+                if glob.effect > pos then
                     break
+                end
+                if glob[1] == name then
+                    if not resGlobal or resGlobal.effect < glob.effect then
+                        resGlobal = glob
+                    end
                 end
             end
         end
@@ -865,6 +869,9 @@ local function linkGlobalToEnv(node, var)
                 type   = 'VARIABLE_NOT_DECLARED',
                 start  = node.start,
                 finish = node.finish,
+                info   = {
+                    name = node[1],
+                }
             }
         end
     end
@@ -873,13 +880,13 @@ local function linkGlobalToEnv(node, var)
     local env
     if State.version == 'Lua 5.5' then
         env = getVariable(State.ENVMode, node.start)
-        if env and env.type == 'global' then
+        if env and env.type == 'setglobal' then
             pushError {
-                type   = 'RUNTIME_ERROR',
+                type   = 'ENV_IS_GLOBAL',
                 start  = node.start,
                 finish = node.finish,
                 info   = {
-                    message = '_ENV is global when accessing variable'
+                    name = node[1],
                 }
             }
         end
@@ -906,6 +913,7 @@ end
 local function createGlobalDeclare(obj, attrs)
     obj.type = 'setglobal'
     obj.declare = true
+    obj.effect = obj.finish
 
     if attrs then
         obj.attrs = attrs
@@ -3188,18 +3196,18 @@ local function parseMultiVars(n1, parser, isLocal)
         end
     end
 
-    if isLocal then
-        local effect = lastValue and lastValue.finish or lastVar.finish
-        n1.effect = effect
-        if n2 then
-            n2.effect = effect
+    local effect = lastValue and lastValue.finish or lastVar.finish
+    n1.effect = effect
+    if n2 then
+        n2.effect = effect
+    end
+    if nrest then
+        for i = 1, #nrest do
+            nrest[i].effect = effect
         end
-        if nrest then
-            for i = 1, #nrest do
-                nrest[i].effect = effect
-            end
-        end
+    end
 
+    do
         -- Lua 5.4: only one <close> attribute allowed across a local declaration
         -- Lua 5.5: multiple <close> are allowed
         if State.version == 'Lua 5.4' then

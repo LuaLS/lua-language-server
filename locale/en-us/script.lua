@@ -323,6 +323,8 @@ PARSER_LOCAL_LIMIT        =
 'Only 200 active local variables and upvalues can be existed at the same time.'
 PARSER_VARIABLE_NOT_DECLARED =
 'Variable `{name}` is not declared. (Use `global *` to allow undefined variables, or declare it with `global {name}`)'
+PARSER_ENV_IS_GLOBAL         =
+'_ENV is global when accessing variable `{name}`.'
 PARSER_ASSIGN_CONST_GLOBAL   =
 'Cannot assign to const global variable `{name}`.'
 PARSER_LUADOC_MISS_CLASS_NAME           =

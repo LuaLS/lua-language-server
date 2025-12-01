@@ -323,6 +323,8 @@ PARSER_LOCAL_LIMIT        =
 '只能同时存在200个活跃的局部变量与上值。'
 PARSER_VARIABLE_NOT_DECLARED =
 '变量 `{name}` 未声明。（使用 `global *` 允许未定义变量,或使用 `global {name}` 声明）'
+PARSER_ENV_IS_GLOBAL         =
+'访问变量 `{name}` 时 _ENV 是全局变量。'
 PARSER_ASSIGN_CONST_GLOBAL   =
 '无法对常量全局变量 `{name}` 赋值。'
 PARSER_LUADOC_MISS_CLASS_NAME           =

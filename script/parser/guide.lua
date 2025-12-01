@@ -162,6 +162,7 @@ local childMap = {
     ['list']        = {'#'},
     ['binary']      = {1, 2},
     ['unary']       = {1},
+    ['...']         = {'name'},
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', '#signs', 'docAttr', 'comment'},

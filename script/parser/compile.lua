@@ -2435,6 +2435,7 @@ local function parseParams(params, isLambda)
                 }
                 varargName.varargRef = vararg
                 vararg.name = varargName
+                vararg.finish = varargName.finish
                 Index = Index + 2
             end
 

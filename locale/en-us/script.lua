@@ -44,6 +44,10 @@ DIAG_AMBIGUITY_1        =
 'Compute `{}` first. You may need to add brackets.'
 DIAG_LOWERCASE_GLOBAL   =
 'Global variable in lowercase initial, Did you miss `local` or misspell it?'
+ASSIGN_CONST_GLOBAL     =
+'Cannot assign to <const> global variable `{}`.'
+VARIABLE_NOT_DECLARED =
+'Variable `{}` not declared (global declarations active).'
 DIAG_EMPTY_BLOCK        =
 'Empty block.'
 DIAG_DIAGNOSTICS        =
@@ -311,6 +315,10 @@ PARSER_NESTING_LONG_MARK  =
 'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
 PARSER_LOCAL_LIMIT        =
 'Only 200 active local variables and upvalues can be existed at the same time.'
+PARSER_VARIABLE_NOT_DECLARED =
+'Variable `{name}` is not declared. (Use `global *` to allow undefined variables, or declare it with `global {name}`)'
+PARSER_ASSIGN_CONST_GLOBAL   =
+'Cannot assign to const global variable `{name}`.'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

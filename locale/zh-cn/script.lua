@@ -44,6 +44,10 @@ DIAG_AMBIGUITY_1        =
 '会优先运算 `{}`，你可能需要加个括号。'
 DIAG_LOWERCASE_GLOBAL   =
 '首字母小写的全局变量，你是否漏了 `local` 或是有拼写错误？'
+ASSIGN_CONST_GLOBAL     =
+'不能赋值给 <const> 全局变量 `{}`。'
+VARIABLE_NOT_DECLARED =
+'未声明的变量 `{}`（当前已使用 global 语法声明作用域）。'
 DIAG_EMPTY_BLOCK        =
 '空代码块'
 DIAG_DIAGNOSTICS        =
@@ -311,6 +315,10 @@ PARSER_NESTING_LONG_MARK  =
 'Lua 5.1 中不允许使用嵌套的 `[[...]]` 。'
 PARSER_LOCAL_LIMIT        =
 '只能同时存在200个活跃的局部变量与上值。'
+PARSER_VARIABLE_NOT_DECLARED =
+'变量 `{name}` 未声明。（使用 `global *` 允许未定义变量,或使用 `global {name}` 声明）'
+PARSER_ASSIGN_CONST_GLOBAL   =
+'无法对常量全局变量 `{name}` 赋值。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

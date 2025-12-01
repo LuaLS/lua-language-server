@@ -237,6 +237,10 @@ PARSER_MISS_EXPONENT    =
 'Missed digits for the exponent.'
 PARSER_MISS_EXP         =
 '<exp> expected.'
+PARSER_MISS_LOOP_MIN    =
+'Missing start value of the loop.'
+PARSER_MISS_LOOP_MAX    =
+'Missing limit value of the loop.'
 PARSER_MISS_FIELD       =
 '<field> expected.'
 PARSER_MISS_METHOD      =

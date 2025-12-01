@@ -237,6 +237,10 @@ PARSER_MISS_EXPONENT    =
 '缺少指数部分。'
 PARSER_MISS_EXP         =
 '缺少表达式。'
+PARSER_MISS_LOOP_MIN    =
+'缺少循环的起始值。'
+PARSER_MISS_LOOP_MAX    =
+'缺少循环的终止值。'
 PARSER_MISS_FIELD       =
 '缺少字段/属性名。'
 PARSER_MISS_METHOD      =

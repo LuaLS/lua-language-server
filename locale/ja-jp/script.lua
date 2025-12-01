@@ -233,6 +233,10 @@ PARSER_MISS_EXPONENT    =
 '指数部が不足しています。'
 PARSER_MISS_EXP         =
 '式が不足しています。'
+PARSER_MISS_LOOP_MIN    =
+'ループの開始値が不足しています。'
+PARSER_MISS_LOOP_MAX    =
+'ループの終了値が不足しています。'
 PARSER_MISS_FIELD       =
 'フィールド/プロパティ名が不足しています。'
 PARSER_MISS_METHOD      =

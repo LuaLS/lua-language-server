@@ -233,6 +233,10 @@ PARSER_MISS_EXPONENT    =
 'Dígitos perdidos para o expoente.'
 PARSER_MISS_EXP         =
 '<exp> esperada.'
+PARSER_MISS_LOOP_MIN    =
+'Falta o valor inicial do loop.'
+PARSER_MISS_LOOP_MAX    =
+'Falta o valor limite do loop.'
 PARSER_MISS_FIELD       =
 '<field> esperado.'
 PARSER_MISS_METHOD      =

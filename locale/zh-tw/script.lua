@@ -233,6 +233,10 @@ PARSER_MISS_EXPONENT    =
 '缺少指數部分。'
 PARSER_MISS_EXP         =
 '缺少表達式。'
+PARSER_MISS_LOOP_MIN    =
+'缺少迴圈的起始值。'
+PARSER_MISS_LOOP_MAX    =
+'缺少迴圈的終止值。'
 PARSER_MISS_FIELD       =
 '缺少欄位/屬性名。'
 PARSER_MISS_METHOD      =

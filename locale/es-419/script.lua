@@ -231,6 +231,10 @@ PARSER_MISS_EXPONENT    =
 'Faltan los dígitos para el exponente.'
 PARSER_MISS_EXP         =
 'Se esperaba <exp>.'
+PARSER_MISS_LOOP_MIN    =
+'Falta el valor inicial del bucle.'
+PARSER_MISS_LOOP_MAX    =
+'Falta el valor límite del bucle.'
 PARSER_MISS_FIELD       =
 'Se esperaba <field>.'
 PARSER_MISS_METHOD      =

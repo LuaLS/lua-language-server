@@ -663,6 +663,8 @@ local function parseLocalAttrs()
         if not attrs then
             attrs = {
                 type = 'localattrs',
+                start = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index], 'right'),
             }
         end
         local attr = {
@@ -718,6 +720,7 @@ local function parseLocalAttrs()
                 }
             }
         end
+        attrs.finish = attr.finish
     end
     return attrs
 end
@@ -3934,6 +3937,8 @@ local function parseFor()
             if State.version == 'Lua 5.5' then
                 attrs = {
                     type = 'localattrs',
+                    start = name.start,
+                    finish = name.finish,
                     [1] = {
                         type = 'localattr',
                         start = name.start,
@@ -4054,6 +4059,8 @@ local function parseFor()
                 if State.version == 'Lua 5.5' then
                     attrs = {
                         type = 'localattrs',
+                        start = obj.start,
+                        finish = obj.finish,
                         [1] = {
                             type = 'localattr',
                             start = obj.start,

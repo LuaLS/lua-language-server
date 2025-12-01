@@ -73,6 +73,8 @@ CHECK'local x <close> <const> = 1'
     },
     attrs  = {
         type   = "localattrs",
+        start  = 8,
+        finish = 23,
         parent = "<IGNORE>",
         [1]    = {
             type   = "localattr",
@@ -108,6 +110,8 @@ CHECK'local x < const > = 1'
     },
     attrs  = {
         type   = "localattrs",
+        start  = 8,
+        finish = 17,
         parent = "<IGNORE>",
         [1]    = {
             type   = "localattr",

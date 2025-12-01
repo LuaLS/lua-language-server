@@ -512,6 +512,8 @@ CHECK'local x <const>, y <close> = 1'
         },
         attrs  = {
             type   = "localattrs",
+            start  = 8,
+            finish = 15,
             parent = "<IGNORE>",
             [1]    = {
                 type   = "localattr",
@@ -531,6 +533,8 @@ CHECK'local x <const>, y <close> = 1'
         parent = "<IGNORE>",
         attrs  = {
             type   = "localattrs",
+            start  = 19,
+            finish = 26,
             parent = "<IGNORE>",
             [1]    = {
                 type   = "localattr",

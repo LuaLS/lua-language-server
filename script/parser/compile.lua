@@ -2907,41 +2907,23 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
         if n.type == 'setglobal' then
             local gi = State.globalInfo
             local nameKey = n[1]
-            if n.isGlobalDecl then
-                -- duplicate initialization check (only for global declarations with value)
+            -- assignment / definition in strict global scope
+            if gi.active then
                 local info = gi.names[nameKey]
-                if v then
-                    if info and info.initialized then
-                        pushError {
-                            type   = 'GLOBAL_DUPLICATE_INIT',
-                            start  = n.start,
-                            finish = n.finish,
-                        }
-                    else
-                        if info then
-                            info.initialized = true
-                        end
-                    end
+                if not gi.hasAll and not info then
+                    pushError {
+                        type   = 'UNDEFINED_IN_GLOBAL_SCOPE',
+                        start  = n.start,
+                        finish = n.finish,
+                    }
                 end
-            else
-                -- assignment / definition in strict global scope
-                if gi.active then
-                    local info = gi.names[nameKey]
-                    if not gi.hasAll and not info then
-                        pushError {
-                            type   = 'UNDEFINED_IN_GLOBAL_SCOPE',
-                            start  = n.start,
-                            finish = n.finish,
-                        }
-                    end
-                    local isConst = (info and info.const) or gi.allConst
-                    if isConst then
-                        pushError {
-                            type   = 'ASSIGN_CONST_GLOBAL',
-                            start  = n.start,
-                            finish = n.finish,
-                        }
-                    end
+                local isConst = (info and info.const) or gi.allConst
+                if isConst then
+                    pushError {
+                        type   = 'ASSIGN_CONST_GLOBAL',
+                        start  = n.start,
+                        finish = n.finish,
+                    }
                 end
             end
         end
@@ -3223,21 +3205,10 @@ local function parseGlobal()
             name.vstart  = func.start
             name.range   = func.finish
             func.parent  = name
-            name.isGlobalDecl = true
             local gi = State.globalInfo
             gi.active = true
             local nameKey = name[1]
-            local info = gi.names[nameKey]
-            if info and info.initialized then
-                pushError {
-                    type   = 'GLOBAL_DUPLICATE_INIT',
-                    start  = name.start,
-                    finish = name.finish,
-                }
-            else
-                gi.names[nameKey] = gi.names[nameKey] or { declared = true, const = false, initialized = false }
-                gi.names[nameKey].initialized = true
-            end
+            gi.names[nameKey] = gi.names[nameKey] or { declared = true, const = false }
             pushActionIntoCurrentChunk(name)
             return name
         else
@@ -3293,10 +3264,9 @@ local function parseGlobal()
         finish = name.finish,
         [1]    = name[1],
     }
-    glob.isGlobalDecl = true
     local gi = State.globalInfo
     gi.active = true
-    gi.names[glob[1]] = gi.names[glob[1]] or { declared = true, const = false, initialized = false }
+    gi.names[glob[1]] = gi.names[glob[1]] or { declared = true, const = false }
 
     if attrs then
         glob.attrs = attrs
@@ -3356,8 +3326,7 @@ local function parseGlobal()
                 finish = nameN.finish,
                 [1]    = nameN[1],
             }
-            gN.isGlobalDecl = true
-            gi.names[gN[1]] = gi.names[gN[1]] or { declared = true, const = false, initialized = false }
+            gi.names[gN[1]] = gi.names[gN[1]] or { declared = true, const = false }
             if attrsN then
                 gN.attrs = attrsN
                 attrsN.parent = gN
@@ -4406,7 +4375,7 @@ local function initState(lua, version, options)
     end
     -- Lua 5.5 global keyword semantic tracking (syntax-level errors)
     state.globalInfo = {
-        names    = {},   -- map name -> { declared=true, const=bool, initialized=bool }
+        names    = {},   -- map name -> { declared=true, const=bool }
         hasAll   = false, -- global * encountered
         allConst = false, -- global <const> * encountered
         active   = false, -- any global declaration activates strict global scope

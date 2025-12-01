@@ -233,27 +233,15 @@ global x <close>  -- 错误：global 不能有 close 属性
 
 **P0 - 高优先级（确定性错误）：**
 1. **GLOBAL_CLOSE_ATTRIBUTE** - global 不能有 close 属性（✅ 已在 parser 实现）
-2. **GLOBAL_DUPLICATE_INIT** - 同一文件中同一全局变量的多次初始化
-3. **ASSIGN_TO_CONST** - 赋值给 const 全局变量
+2. **ASSIGN_TO_CONST** - 赋值给 const 全局变量
 
 **P1 - 中优先级（作用域错误）：**
-4. **VARIABLE_NOT_DECLARED** - 在显式 global 作用域内使用未声明变量
+3. **VARIABLE_NOT_DECLARED** - 在显式 global 作用域内使用未声明变量
 
 **P2 - 低优先级（警告）：**
 5. **POSSIBLE_GLOBAL_REDEFINITION** - 可能的跨文件重复初始化（警告）
 
 #### 详细实现说明：
-
-**GLOBAL_DUPLICATE_INIT**:
-```lua
--- 检测逻辑：
--- 1. 扫描 AST，找到所有 setglobal 节点
--- 2. 对于有 value 的节点（初始化），记录变量名和位置
--- 3. 如果同一变量名出现第二次初始化，报错
-
-global X = 10   -- 记录：X 在此初始化
-global X = 20   -- 错误！X 已在第 1 行初始化
-```
 
 **ASSIGN_TO_CONST**:
 ```lua

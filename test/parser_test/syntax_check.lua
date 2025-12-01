@@ -974,3 +974,12 @@ global x, y, z = 1, 2, 3
 local n = x + y + z
 ]]
 (nil)
+
+TEST [[
+global function f()
+    <!print!>(1)
+end
+]]
+{
+    type = 'VARIABLE_NOT_DECLARED',
+}

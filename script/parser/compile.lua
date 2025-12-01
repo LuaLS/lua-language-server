@@ -2444,7 +2444,7 @@ local function parseParams(params, isLambda)
     return params
 end
 
-local function parseFunction(isLocal, isAction)
+local function parseFunction(declareType, isAction)
     local funcLeft  = getPosition(Tokens[Index], 'left')
     local funcRight = getPosition(Tokens[Index] + 7, 'right')
     local func = {
@@ -2464,13 +2464,24 @@ local function parseFunction(isLocal, isAction)
         local name = parseName()
         if name then
             local simple = parseSimple(name, true)
-            if isLocal then
+            if declareType == 'local' then
                 if simple == name then
                     createLocal(name)
                 else
                     resolveName(name)
                     pushError {
                         type   = 'UNEXPECT_LFUNC_NAME',
+                        start  = simple.start,
+                        finish = simple.finish,
+                    }
+                end
+            elseif declareType == 'global' then
+                if simple == name then
+                    createGlobalDeclare(name)
+                else
+                    resolveName(name)
+                    pushError {
+                        type   = 'UNEXPECT_GFUNC_NAME',
                         start  = simple.start,
                         finish = simple.finish,
                     }
@@ -3305,7 +3316,7 @@ local function parseLocal()
     end
 
     if word == 'function' then
-        local func = parseFunction(true, true)
+        local func = parseFunction('local', true)
         local name = func.name
         if name then
             func.name    = nil
@@ -3346,7 +3357,7 @@ local function parseGlobal()
 
     -- global function Name funcbody
     if word == 'function' then
-        local func = parseFunction(false, true)
+        local func = parseFunction('global', true)
         local name = func.name
         if name then
             func.name    = nil
@@ -3355,7 +3366,6 @@ local function parseGlobal()
             name.vstart  = func.start
             name.range   = func.finish
             func.parent  = name
-            createGlobalDeclare(name)
             pushActionIntoCurrentChunk(name)
             return name
         else

@@ -38,19 +38,19 @@ end
 
 ---@param functionName string
 ---@param source parser.object
----@param bindDocsSource parser.object? sometimes the object with the bindDocs isn't the function, use this to specify what has them
+---@param diagnosticRangeSource? parser.object sometimes the object with the data isn't the one that needs the diagnostics
 ---@param callback fun(result: any)
 ---@param commentId string
 ---@param paramId string
 ---@param returnId string
-local function checkFunctionNamed(functionName, source, bindDocsSource, callback, commentId, paramId, returnId)
-    local argCount = source.args and #source.args or 0
-    bindDocsSource = bindDocsSource or source
+local function checkFunctionNamed(functionName, source, diagnosticRangeSource, callback, commentId, paramId, returnId)
+    diagnosticRangeSource = diagnosticRangeSource or source
+    local argCount = diagnosticRangeSource.args and #diagnosticRangeSource.args or 0
 
-    if argCount == 0 and not source.returns and not bindDocsSource.bindDocs then
+    if argCount == 0 and not source.returns and not source.bindDocs then
         callback {
-            start   = source.start,
-            finish  = source.finish,
+            start   = diagnosticRangeSource.start,
+            finish  = diagnosticRangeSource.finish,
             message = lang.script(commentId, functionName),
         }
     end
@@ -60,7 +60,7 @@ local function checkFunctionNamed(functionName, source, bindDocsSource, callback
             local argName = arg[1]
             if  argName ~= 'self'
             and argName ~= '_' then
-                if not findParam(bindDocsSource.bindDocs, argName) then
+                if not findParam(source.bindDocs, argName) then
                     callback {
                         start   = arg.start,
                         finish  = arg.finish,
@@ -104,7 +104,7 @@ end
 ---@param returnId string
 local function checkMethod(source, callback, commentId, paramId, returnId)
     local functionName = source.method[1]
-    checkFunctionNamed(functionName, source.method, source.value, callback, commentId, paramId, returnId)
+    checkFunctionNamed(functionName, source.value, source.method, callback, commentId, paramId, returnId)
 end
 
 m.CheckFunction = checkFunction

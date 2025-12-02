@@ -24,59 +24,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-22.04,   target: linux,   platform: linux-x64,   container: 'alpine:latest', libc: musl }
-          - { os: ubuntu-22.04,   target: linux,   platform: linux-x64    }
-          - { os: ubuntu-22.04,   target: linux,   platform: linux-arm64  }
-          - { os: macos-latest,   target: darwin,  platform: darwin-x64   }
-          - { os: macos-latest,   target: darwin,  platform: darwin-arm64 }
-          - { os: windows-latest, target: windows, platform: win32-ia32   }
-          - { os: windows-latest, target: windows, platform: win32-x64    }
+          - { os: ubuntu-22.04,     target: linux,   platform: linux-x64    }
+          - { os: ubuntu-24.04-arm, target: linux,   platform: linux-arm64  }
+          - { os: macos-latest,     target: darwin,  platform: darwin-x64   }
+          - { os: macos-latest,     target: darwin,  platform: darwin-arm64 }
+          - { os: windows-latest,   target: windows, platform: win32-ia32   }
+          - { os: windows-latest,   target: windows, platform: win32-x64    }
     runs-on: ${{ matrix.os }}
-    container:
-      image: ${{ matrix.container }}
     steps:
-      - name: Install aarch64-linux-gnu
-        if: ${{ matrix.platform == 'linux-arm64' && matrix.libc != 'musl' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-      - name: Prepare container for musl
-        if: ${{ matrix.target == 'linux' && matrix.libc == 'musl' }}
-        run: |
-          apk update
-          apk add git ninja bash build-base nodejs linux-headers
-
-      - name: Prepare for Linux
-        if: ${{ matrix.target == 'linux' && matrix.libc != 'musl' }}
-        run: |
-          sudo apt update
-          sudo apt install ninja-build
-
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Build for Windows
-        if: ${{ matrix.target == 'windows' }}
-        run: .\make.bat ${{ matrix.platform }}
+      - uses: actboy168/setup-luamake@master
 
-      - name: Build for Linux
-        if: ${{ matrix.target == 'linux' }}
-        run: |
-          ./make.sh ${{ matrix.platform }}
-          
-      - name: Build for macOS
-        if: ${{ matrix.target == 'darwin' }}
-        run: |
-          brew install ninja
-          ./make.sh ${{ matrix.platform }}
-
-      - name: Build for x64 glibc
-        if: ${{ matrix.platform == 'linux-x64' && matrix.libc != 'musl' }}
-        run: |
-          docker build -t ubuntu-18.04 .
-          docker run --rm -v $(pwd):$(pwd) -w $(pwd) ubuntu-18.04 bash -c './make.sh'
+      - name: Build
+        run: luamake -platform ${{ matrix.platform }}
 
       - name: Setting up workflow variables
         id: vars
@@ -98,9 +61,6 @@ jobs:
 
           # Package name w/ version
           PKG_BASENAME="${{ env.PROJECT }}-${PKG_VERSION}-${{ matrix.platform }}"
-          if [[ "${{ matrix.libc }}" = musl ]]; then
-            PKG_BASENAME="${PKG_BASENAME}-${{matrix.libc}}"
-          fi
 
           # Full name of the tarball asset
           PKG_NAME="${PKG_BASENAME}.${PKG_SUFFIX}"

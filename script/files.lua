@@ -1,5 +1,6 @@
 local platform = require 'bee.platform'
 local fs       = require 'bee.filesystem'
+local sys      = require 'bee.sys'
 local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
@@ -68,7 +69,10 @@ local function getRealParent(path)
     == path  :string():gsub('^%w+:', string.lower) then
         return path
     end
-    local res = fs.fullpath(path)
+    local res = sys.fullpath(path)
+    if not res then
+        return path
+    end
     return getRealParent(parent) / res:filename()
 end
 

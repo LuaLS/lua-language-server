@@ -571,6 +571,9 @@ local function checkIsUndefinedGlobal(src)
     end
 
     local node = src.node
+    if not node then
+        return false
+    end
     if node.tag ~= '_ENV' then
         return false
     end

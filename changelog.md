@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Support Lua 5.5
 * `FIX` Incorrect generation of function signatures with tuple-parameters
 * `NEW` Doc output now contains file paths for `@alias` and `@enum` types
 * `FIX` Typos in a few error messages.

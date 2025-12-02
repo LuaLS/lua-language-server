@@ -28,7 +28,7 @@ local function countMemory()
     local total  = 0
     mems[0] = collectgarbage 'count'
     total = total + collectgarbage 'count'
-    for id, brave in ipairs(pub.braves) do
+    for id, brave in ipairs(pub.allBraves) do
         mems[id] = brave.memory
         total = total + brave.memory
     end
@@ -168,8 +168,13 @@ function m.eventLoop()
         end
     end
 
+    local lastNetUpdateTime = 0
     local function doSomething()
-        net.update()
+        local now = time.monotonic()
+        if now - lastNetUpdateTime >= 100 then
+            net.update()
+            lastNetUpdateTime = now
+        end
         timer.update()
         pub.step(false)
         if await.step() then

@@ -8,4 +8,7 @@
         //"--shownode",
         //"--lazy",
     ],
+    "files.associations": {
+        "thread": "cpp"
+    },
 }

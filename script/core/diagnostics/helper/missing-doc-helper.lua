@@ -107,7 +107,7 @@ end
 ---@param returnId string
 local function checkMethod(source, callback, commentId, paramId, returnId)
     local functionName = source.method[1]
-    checkFunctionNamed(functionName, source.value, source.method, nil, callback, commentId, paramId, returnId)
+    checkFunctionNamed(functionName, source.value, source, nil, callback, commentId, paramId, returnId)
 end
 
 m.CheckFunction = checkFunction

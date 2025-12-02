@@ -19,7 +19,13 @@ return function (uri, callback)
     guide.eachSourceType(state.ast, 'setfield', function (source)
         await.delay()
         if source.value.type ~= "function" then return end
-        helper.CheckFunctionNamed(source.field[1], source.value, nil, source, callback,
+
+        -- TODO: find a better way to distinguish a.b = function and function a.b, or alternatively make them both work
+        -- the same way?
+        -- the issue is they have very similar ASTs but bindDocs is either inside or outside value
+
+        helper.CheckFunctionNamed(source.field[1], source.value, nil, source.bindDocs and source or source.value,
+            callback,
             'DIAG_MISSING_EXPORTED_FIELD_DOC_COMMENT',
             'DIAG_MISSING_EXPORTED_FIELD_DOC_PARAM',
             'DIAG_MISSING_EXPORTED_FIELD_DOC_RETURN')

@@ -23,24 +23,25 @@ lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
-    includes = "bee.lua/3rd/lua",
+    includes = "bee.lua/3rd/lua54",
     sources = "lpeglabel/*.c",
     defines = {
         'MAXRECLEVEL=1000',
     },
+    deps = "source_lua",
 }
 
 lm:executable "lua-language-server" {
     deps = {
-        "lpeglabel",
         "source_bee",
         "source_lua",
+        "lpeglabel",
         "source_bootstrap",
         includeCodeFormat and "code_format" or nil,
     },
     includes = {
         "3rd/bee.lua",
-        "3rd/bee.lua/3rd/lua",
+        "3rd/bee.lua/3rd/lua54",
     },
     sources = "make/modules.cpp",
     windows = {
@@ -53,6 +54,7 @@ lm:executable "lua-language-server" {
     },
     linux = {
         crt = "static",
+        ldflags = { "-rdynamic" },
     }
 }
 
@@ -60,7 +62,7 @@ local platform = require 'bee.platform'
 local exe      = platform.os == 'windows' and ".exe" or ""
 
 lm:copy "copy_lua-language-server" {
-    inputs = lm.bindir .. "/lua-language-server" .. exe,
+    inputs = "$bin/lua-language-server" .. exe,
     outputs = "bin/lua-language-server" .. exe,
 }
 
@@ -95,7 +97,7 @@ if lm.notest then
 end
 
 lm:rule "run-bee-test" {
-    args = { lm.bindir .. "/lua-language-server" .. exe, "$in" },
+    args = { "$bin/lua-language-server" .. exe, "$in" },
     description = "Run test: $in.",
     pool = "console",
 }

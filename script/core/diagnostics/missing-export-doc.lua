@@ -18,14 +18,16 @@ return function (uri, callback)
     ---@async
     guide.eachSourceType(state.ast, 'setfield', function (source)
         await.delay()
-        helper.CheckFunction(source.value, callback, 'DIAG_MISSING_GLOBAL_DOC_COMMENT', 'DIAG_MISSING_GLOBAL_DOC_PARAM',
-            'DIAG_MISSING_GLOBAL_DOC_RETURN')
+        helper.CheckFunctionNamed(source.field[1], source.value, callback, 'DIAG_MISSING_EXPORTED_FIELD_DOC_COMMENT',
+            'DIAG_MISSING_EXPORTED_FIELD_DOC_PARAM',
+            'DIAG_MISSING_EXPORTED_FIELD_DOC_RETURN')
     end)
 
     ---@async
     guide.eachSourceType(state.ast, 'setmethod', function (source)
         await.delay()
-        helper.CheckFunction(source.method, callback, 'DIAG_MISSING_GLOBAL_DOC_COMMENT', 'DIAG_MISSING_GLOBAL_DOC_PARAM',
-            'DIAG_MISSING_GLOBAL_DOC_RETURN')
+        helper.CheckMethod(source.method, callback, 'DIAG_MISSING_EXPORTED_METHOD_DOC_COMMENT',
+            'DIAG_MISSING_EXPORTED_METHOD_DOC_PARAM',
+            'DIAG_MISSING_EXPORTED_METHOD_DOC_RETURN')
     end)
 end

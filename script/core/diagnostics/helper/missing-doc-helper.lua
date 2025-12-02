@@ -36,8 +36,13 @@ local function findReturn(docs, index)
     return false
 end
 
-local function checkFunction(source, callback, commentId, paramId, returnId)
-    local functionName = source.parent[1]
+---@param functionName string
+---@param source parser.object
+---@param callback fun(result: any)
+---@param commentId string
+---@param paramId string
+---@param returnId string
+local function checkFunctionNamed(functionName, source, callback, commentId, paramId, returnId)
     local argCount = source.args and #source.args or 0
 
     if argCount == 0 and not source.returns and not source.bindDocs then
@@ -79,5 +84,22 @@ local function checkFunction(source, callback, commentId, paramId, returnId)
     end
 end
 
+---@param source parser.object
+---@param callback fun(result: any)
+---@param commentId string
+---@param paramId string
+---@param returnId string
+local function checkFunction(source, callback, commentId, paramId, returnId)
+    local functionName = source.parent[1]
+    checkFunctionNamed(functionName, source, callback, commentId, paramId, returnId)
+end
+
+local function checkMethod(source, callback, commentId, paramId, returnId)
+    local functionName = source[1]
+    checkFunctionNamed(functionName, source, callback, commentId, paramId, returnId)
+end
+
 m.CheckFunction = checkFunction
+m.CheckFunctionNamed = checkFunctionNamed
+m.CheckMethod = checkMethod
 return m

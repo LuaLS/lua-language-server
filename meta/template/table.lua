@@ -39,6 +39,7 @@ function table.move(a1, f, e, t, a2) end
 
 ---@version >5.2, JIT
 ---#DES 'table.pack'
+---@param ... any
 ---@return table
 ---@nodiscard
 function table.pack(...) end

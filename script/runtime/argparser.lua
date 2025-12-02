@@ -44,11 +44,11 @@ function M.parseOne(argv, nextArg)
     end
     local value = tail:match '=(.+)'
     if value then
-        value = M.parseValue(value)
-        return key, value, false
+        local nvalue = M.parseValue(value)
+        return key, nvalue, false
     elseif nextArg and nextArg:sub(1, 2) ~= '--' then
-        value = M.parseValue(nextArg)
-        return key, value, true
+        local nvalue = M.parseValue(nextArg)
+        return key, nvalue, true
     end
     return key, true, false
 end

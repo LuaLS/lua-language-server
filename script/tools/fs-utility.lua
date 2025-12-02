@@ -592,11 +592,11 @@ function m.fileList(state)
     local keyMap = {}
     local fileList = {}
     local function computeKey(path)
-        path = fsAbsolute(path, state)
-        if not path then
+        local abpath = fsAbsolute(path, state)
+        if not abpath then
             return nil
         end
-        return path:string()
+        return abpath:string()
     end
     return setmetatable({}, {
         __index = function (_, path)

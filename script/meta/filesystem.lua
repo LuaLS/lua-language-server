@@ -1,31 +1,47 @@
 ---@meta bee.filesystem
 
----@class fs.path
----@operator div: fs.path
-local fsPath = {}
+---@class bee.path
+---@operator div: bee.path
+local path = {}
 
 ---@return string
-function fsPath:string()
+function path:string()
 end
 
----@return fs.path
-function fsPath:parent_path()
+---@return bee.path
+function path:parent_path()
 end
 
 ---@return boolean
-function fsPath:is_relative()
+function path:is_relative()
 end
 
----@return fs.path
-function fsPath:filename()
+---@return boolean
+function path:is_absolute()
 end
 
----@return fs.path
-function fsPath:stem()
+---@return bee.path
+function path:filename()
+end
+
+---@return bee.path
+function path:remove_filename()
+end
+
+---@return bee.path
+function path:replace_filename()
+end
+
+---@return bee.path
+function path:stem()
 end
 
 ---@return string
-function fsPath:extension()
+function path:extension()
+end
+
+---@return bee.path
+function path:lexically_normal()
 end
 
 ---@class fs.status
@@ -46,81 +62,90 @@ local copy_options
 
 fs.copy_options = copy_options
 
----@param path string|fs.path
----@return fs.path
+---@param path string|bee.path
+---@return bee.path
 function fs.path(path)
 end
 
----@return fs.path
+---@return bee.path
 function fs.exe_path()
 end
 
----@param path fs.path
+---@param path bee.path
 ---@return boolean
 function fs.exists(path)
 end
 
----@param path fs.path
+---@param path bee.path
 ---@return boolean
 function fs.is_directory(path)
 end
 
----@param path fs.path
----@return fun():fs.path, fs.status
+---@param path bee.path
+---@return boolean
+function fs.is_regular_file(path)
+end
+
+---@param path bee.path
+---@return fun():bee.path, fs.status
 function fs.pairs(path)
 end
 
----@param path fs.path
----@return fs.path
+---@param path bee.path
+---@return bee.path
 function fs.canonical(path)
 end
 
----@param path fs.path
----@return fs.path
-function fs.fullpath(path)
-end
-
----@param path fs.path
----@return fs.path
+---@param path bee.path
+---@return bee.path
 function fs.absolute(path)
 end
 
----@param path fs.path
+---@param path bee.path | string
 function fs.create_directories(path)
 end
 
----@param path fs.path
+---@param path bee.path | string
+function fs.create_directory(path)
+end
+
+---@param path bee.path
 ---@return fs.status
 function fs.symlink_status(path)
 end
 
----@param path fs.path
+---@param path bee.path
 ---@return fs.status
 function fs.status(path)
 end
 
----@param path fs.path
+---@param path bee.path
 ---@return fs.status.typenames
 function fs.type(path)
 end
 
----@param path fs.path
+---@param path bee.path | string
 ---@return boolean
 function fs.remove(path)
 end
 
----@param source fs.path
----@param target fs.path
+---@param path bee.path | string
+---@return boolean
+function fs.remove_all(path)
+end
+
+---@param source bee.path
+---@param target bee.path
 ---@param options? integer | `fs.copy_options.overwrite_existing`
 function fs.copy_file(source, target, options)
 end
 
----@param oldPath fs.path
----@param newPath fs.path
+---@param oldPath bee.path
+---@param newPath bee.path
 function fs.rename(oldPath, newPath)
 end
 
----@return fs.path
+---@return bee.path
 function fs.current_path()
 end
 

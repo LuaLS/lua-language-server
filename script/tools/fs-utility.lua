@@ -12,7 +12,7 @@ local tableSort    = table.sort
 
 _ENV = nil
 
----@alias fsu.path string|fs.path|fsu.dummyfs
+---@alias fsu.path string|bee.path|fsu.dummyfs
 
 ---@class fsu
 local m = {}
@@ -65,9 +65,9 @@ function m.saveFile(path, content)
     end
 end
 
----@param path fs.path
----@param base fs.path
----@return fs.path?
+---@param path bee.path
+---@param base bee.path
+---@return bee.path?
 function m.relative(path, base)
     local sPath = fs.absolute(path):string()
     local sBase = fs.absolute(base):string()
@@ -112,7 +112,7 @@ local function split(str, sep)
 end
 
 ---@class fsu.dummyfs
----@operator div(string|fs.path|fsu.dummyfs): fsu.dummyfs
+---@operator div(string|bee.path|fsu.dummyfs): fsu.dummyfs
 ---@field files table
 local dfs = {}
 dfs.__index = dfs
@@ -282,9 +282,9 @@ function dfs:saveFile(path, text)
     return true
 end
 
----@param path   string|fs.path|fsu.dummyfs
+---@param path   string|bee.path|fsu.dummyfs
 ---@param state table
----@return fs.path|fsu.dummyfs?
+---@return bee.path|fsu.dummyfs?
 local function fsAbsolute(path, state)
     if type(path) == 'string' then
         local suc, res = pcall(fs.path, path)
@@ -316,9 +316,9 @@ local function fsIsDirectory(path)
     return status == 'directory'
 end
 
----@param path fs.path|fsu.dummyfs|nil
+---@param path bee.path|fsu.dummyfs|nil
 ---@param state table
----@return fun(): fs.path|fsu.dummyfs|nil
+---@return fun(): bee.path|fsu.dummyfs|nil
 local function fsPairs(path, state)
     if not path then
         return function () end
@@ -368,7 +368,7 @@ local function fsSave(path, text, state)
         return false
     end
     if path.type == 'dummy' then
-        ---@cast path -fs.path
+        ---@cast path -bee.path
         local dir = path:_open(-2)
         if not dir then
             state.err[#state.err+1] = '无法打开:' .. path:string()
@@ -449,7 +449,7 @@ local function fsCopy(source, target, state)
     return true
 end
 
----@param path fsu.dummyfs|fs.path
+---@param path fsu.dummyfs|bee.path
 ---@param state fsu.state
 ---@return boolean
 local function fsCreateDirectories(path, state)
@@ -484,8 +484,8 @@ local function fileRemove(path, state)
     end
 end
 
----@param source fs.path|fsu.dummyfs?
----@param target fs.path|fsu.dummyfs?
+---@param source bee.path|fsu.dummyfs?
+---@param target bee.path|fsu.dummyfs?
 ---@param state fsu.state
 local function fileCopy(source, target, state)
     if not source or not target then
@@ -520,8 +520,8 @@ local function fileCopy(source, target, state)
     end
 end
 
----@param source fs.path|fsu.dummyfs?
----@param target fs.path|fsu.dummyfs?
+---@param source bee.path|fsu.dummyfs?
+---@param target bee.path|fsu.dummyfs?
 ---@param state fsu.state
 local function fileSync(source, target, state)
     if not source or not target then
@@ -539,7 +539,7 @@ local function fileSync(source, target, state)
                     fileList[filePath] = true
                 end
             else
-                ---@cast target fs.path
+                ---@cast target bee.path
                 for filePath in fs.pairs(target) do
                     fileList[filePath] = true
                 end
@@ -665,8 +665,8 @@ function m.fileSync(source, target, state)
     return state
 end
 
----@param dir string|fs.path
----@param callback fun(fullPath: fs.path)
+---@param dir string|bee.path
+---@param callback fun(fullPath: bee.path)
 function m.scanDirectory(dir, callback)
     if type(dir) == 'string' then
         dir = fs.path(dir)
@@ -682,7 +682,7 @@ function m.scanDirectory(dir, callback)
 end
 
 ---@param dir fsu.path
----@return fun(): fs.path
+---@return fun(): bee.path
 function m.listDirectory(dir)
     if dir.type == 'dummy' then
         ---@cast dir fsu.dummyfs
@@ -691,7 +691,7 @@ function m.listDirectory(dir)
         if type(dir) == 'string' then
             dir = fs.path(dir)
         end
-        ---@cast dir fs.path
+        ---@cast dir bee.path
         return fs.pairs(dir)
     end
 end

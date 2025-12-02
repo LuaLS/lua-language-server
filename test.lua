@@ -35,6 +35,7 @@ test.scope    = ls.scope.create(test.rootUri)
 ls.await.call(function ()
     local suc, err = pcall(function ()
         print('开始测试')
+        dofile 'test/tools/afs.lua'
         require 'test.parser'
         require 'test.node'
         require 'test.coder'

@@ -71,6 +71,13 @@ function ls.afs.write(uri, content)
     return request('write', { uri, content })
 end
 
+---@async
+---@param uri Uri
+---@return boolean
+function ls.afs.remove(uri)
+    return request('remove', { uri })
+end
+
 ls.eventLoop.addTask(function ()
     if not next(requestMap) then
         return

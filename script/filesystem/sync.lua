@@ -68,6 +68,12 @@ function ls.fs.parent(uri)
     return parent
 end
 
+---@param uri Uri
+---@return boolean
+function ls.fs.remove(uri)
+    return fs.remove(fs.path(ls.uri.decode(uri)))
+end
+
 ---@return table<string, any>
 function ls.fs.newMap()
     if ls.env.IGNORE_CASE then

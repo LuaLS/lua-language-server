@@ -39,15 +39,18 @@ end
 ---@param functionName string
 ---@param source parser.object
 ---@param diagnosticRangeSource? parser.object sometimes the object with the data isn't the one that needs the diagnostics
+---@param bindDocsSource? parser.object sometimes the object with the bind docs isn't the value (`a.b = c` syntax)
 ---@param callback fun(result: any)
 ---@param commentId string
 ---@param paramId string
 ---@param returnId string
-local function checkFunctionNamed(functionName, source, diagnosticRangeSource, callback, commentId, paramId, returnId)
+local function checkFunctionNamed(functionName, source, diagnosticRangeSource, bindDocsSource, callback, commentId,
+                                  paramId, returnId)
     diagnosticRangeSource = diagnosticRangeSource or source
+    bindDocsSource = bindDocsSource or source
     local argCount = diagnosticRangeSource.args and #diagnosticRangeSource.args or 0
 
-    if argCount == 0 and not source.returns and not source.bindDocs then
+    if argCount == 0 and not source.returns and not bindDocsSource.bindDocs then
         callback {
             start   = diagnosticRangeSource.start,
             finish  = diagnosticRangeSource.finish,
@@ -60,7 +63,7 @@ local function checkFunctionNamed(functionName, source, diagnosticRangeSource, c
             local argName = arg[1]
             if  argName ~= 'self'
             and argName ~= '_' then
-                if not findParam(source.bindDocs, argName) then
+                if not findParam(bindDocsSource.bindDocs, argName) then
                     callback {
                         start   = arg.start,
                         finish  = arg.finish,
@@ -74,7 +77,7 @@ local function checkFunctionNamed(functionName, source, diagnosticRangeSource, c
     if source.returns then
         for _, ret in ipairs(source.returns) do
             for index, expr in ipairs(ret) do
-                if not findReturn(source.bindDocs, index) then
+                if not findReturn(bindDocsSource.bindDocs, index) then
                     callback {
                         start   = expr.start,
                         finish  = expr.finish,
@@ -93,7 +96,7 @@ end
 ---@param returnId string
 local function checkFunction(source, callback, commentId, paramId, returnId)
     local functionName = source.parent[1]
-    checkFunctionNamed(functionName, source, nil, callback, commentId, paramId, returnId)
+    checkFunctionNamed(functionName, source, nil, nil, callback, commentId, paramId, returnId)
 end
 
 
@@ -104,7 +107,7 @@ end
 ---@param returnId string
 local function checkMethod(source, callback, commentId, paramId, returnId)
     local functionName = source.method[1]
-    checkFunctionNamed(functionName, source.value, source.method, callback, commentId, paramId, returnId)
+    checkFunctionNamed(functionName, source.value, source.method, nil, callback, commentId, paramId, returnId)
 end
 
 m.CheckFunction = checkFunction

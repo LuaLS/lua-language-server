@@ -19,7 +19,8 @@ return function (uri, callback)
     guide.eachSourceType(state.ast, 'setfield', function (source)
         await.delay()
         if source.value.type ~= "function" then return end
-        helper.CheckFunctionNamed(source.field[1], source.value, callback, 'DIAG_MISSING_EXPORTED_FIELD_DOC_COMMENT',
+        helper.CheckFunctionNamed(source.field[1], source.value, source.value, callback,
+            'DIAG_MISSING_EXPORTED_FIELD_DOC_COMMENT',
             'DIAG_MISSING_EXPORTED_FIELD_DOC_PARAM',
             'DIAG_MISSING_EXPORTED_FIELD_DOC_RETURN')
     end)
@@ -27,7 +28,7 @@ return function (uri, callback)
     ---@async
     guide.eachSourceType(state.ast, 'setmethod', function (source)
         await.delay()
-        helper.CheckMethod(source.method, callback, 'DIAG_MISSING_EXPORTED_METHOD_DOC_COMMENT',
+        helper.CheckMethod(source, callback, 'DIAG_MISSING_EXPORTED_METHOD_DOC_COMMENT',
             'DIAG_MISSING_EXPORTED_METHOD_DOC_PARAM',
             'DIAG_MISSING_EXPORTED_METHOD_DOC_RETURN')
     end)

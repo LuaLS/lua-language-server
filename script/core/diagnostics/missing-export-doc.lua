@@ -18,6 +18,7 @@ return function (uri, callback)
     ---@async
     guide.eachSourceType(state.ast, 'setfield', function (source)
         await.delay()
+        if not source.value then return end -- if the assignment is unbalanced then there is no value
         if source.value.type ~= "function" then return end
 
         -- TODO: find a better way to distinguish a.b = function and function a.b, or alternatively make them both work

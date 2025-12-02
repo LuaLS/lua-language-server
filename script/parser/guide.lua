@@ -74,6 +74,7 @@ local type         = type
 ---@field hasReturn?            true
 ---@field hasBreak?             true
 ---@field hasExit?              true
+---@field virtual?              boolean
 ---@field [integer]             parser.object|any
 ---@field dot                   { type: string, start: integer, finish: integer }
 ---@field colon                 { type: string, start: integer, finish: integer }

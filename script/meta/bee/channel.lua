@@ -1,4 +1,4 @@
----@meta
+---@meta bee.channel
 
 ---@class bee.channel
 local channelMod = {}

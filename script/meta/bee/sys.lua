@@ -1,4 +1,4 @@
----@meta
+---@meta bee.sys
 
 ---@class bee.sys
 local sys = {}

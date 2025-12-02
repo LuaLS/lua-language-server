@@ -1,4 +1,4 @@
----@meta
+---@meta bee.socket
 
 ---@alias bee.socket.protocol
 ---| 'tcp'

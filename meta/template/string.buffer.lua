@@ -262,7 +262,7 @@ function buf:ref() end
 --- Serializes (encodes) the Lua object to the buffer
 ---
 --- This function may throw an error when attempting to serialize unsupported object types, circular references or deeply nested tables.
----@param obj string.buffer.data
+---@param obj any
 ---@return string.buffer
 function buf:encode(obj) end
 
@@ -277,14 +277,14 @@ function buf:encode(obj) end
 ---
 --- Attempting to de-serialize an FFI type will throw an error, if the FFI library is not built-in or has not been loaded, yet.
 ---
----@return string.buffer.data|nil obj
+---@return any obj
 function buf:decode() end
 
 
 --- Serializes (encodes) the Lua object obj
 ---
 --- This function may throw an error when attempting to serialize unsupported object types, circular references or deeply nested tables.
----@param obj string.buffer.data
+---@param obj any
 ---@return string
 function buffer.encode(obj) end
 
@@ -298,7 +298,7 @@ function buffer.encode(obj) end
 --- Attempting to de-serialize an FFI type will throw an error, if the FFI library is not built-in or has not been loaded, yet.
 ---
 ---@param str string
----@return string.buffer.data|nil obj
+---@return any obj
 function buffer.decode(str) end
 
 

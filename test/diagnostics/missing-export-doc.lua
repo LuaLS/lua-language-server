@@ -1,8 +1,7 @@
 TEST [[
 local M = {}
 
-<!function M.f1()!>
-end
+<!function M.f1() end!>
 
 ---comment
 function M.f2()
@@ -36,8 +35,7 @@ end
 TEST [[
 local M = {}
 
-<!M.f1 = function()!>
-end
+<!M.f1 = function() end!>
 
 ---comment
 M.f1 = function()
@@ -72,8 +70,7 @@ end
 TEST [[
 local M = {}
 
-<!function M:f1()!>
-end
+<!function M:f1() end!>
 
 ---comment
 function M:f2()

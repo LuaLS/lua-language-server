@@ -70,7 +70,7 @@ end
 TEST [[
 local M = {}
 
-function <!M:f1()!> end
+function <!M:f1!>() end
 
 ---comment
 function M:f2()

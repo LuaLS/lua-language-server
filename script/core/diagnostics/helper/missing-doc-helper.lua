@@ -48,7 +48,7 @@ local function checkFunctionNamed(functionName, source, diagnosticRangeSource, b
                                   paramId, returnId)
     diagnosticRangeSource = diagnosticRangeSource or source
     bindDocsSource = bindDocsSource or source
-    local argCount = diagnosticRangeSource.args and #diagnosticRangeSource.args or 0
+    local argCount = source.args and #source.args or 0
 
     if argCount == 0 and not source.returns and not bindDocsSource.bindDocs then
         callback {

@@ -1,4 +1,4 @@
-local git_ref = '3.15.1'
+local git_ref = '3.16.0'
 local modrev = 'scm'
 local specrev = '1'
 

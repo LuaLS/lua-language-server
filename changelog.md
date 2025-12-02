@@ -2,13 +2,16 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` Plugin virtual comment style and behavior issues
+
+## 3.16.0
+`2025-12-2`
 * `NEW` Support Lua 5.5
+* `CHG` Doc output now contains file paths for `@alias` and `@enum` types
+* `CHG` Rename configuration option `Lua.diagnostics.disableScheme` to `Lua.diagnostics.validScheme` and improve its description. Now it enables diagnostics for Lua files that use the specified scheme.
+* `FIX` Plugin virtual comment style and behavior issues
 * `FIX` Incorrect generation of function signatures with tuple-parameters
-* `NEW` Doc output now contains file paths for `@alias` and `@enum` types
 * `FIX` Typos in a few error messages.
 * `FIX` Incorrect inject-field message for extra table field in exact class
-* `CHG` Rename configuration option `Lua.diagnostics.disableScheme` to `Lua.diagnostics.validScheme` and improve its description. Now it enables diagnostics for Lua files that use the specified scheme.
 * `FIX` adds the `|lambda|` operator to the `Lua.runtime.nonstandardSymbol` configuration template, which allows the use of that option. Previously, support for it existed in the parser, but we could not actually use the option because it is not recognised in the configuration.
 * `FIX` Typed `@field` (eg `---@field [string] boolean`) should not override other defined field [#2171](https://github.com/LuaLS/lua-language-server/issues/2171), [#2711](https://github.com/LuaLS/lua-language-server/issues/2711)
 * `FIX` don't return empty hover doc when luals failed to find definition

@@ -15,6 +15,9 @@ return function (state, position, accept)
     local len = math.huge
     local result
     guide.eachSourceContain(state.ast, position, function (source)
+        if source.virtual then
+            return
+        end
         if source.type == 'function' then
             if not isValidFunctionPos(source, position) then
                 return

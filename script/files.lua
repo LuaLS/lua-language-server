@@ -70,6 +70,9 @@ local function getRealParent(path)
         return path
     end
     local res = sys.fullpath(path)
+    if not res then
+        return path
+    end
     return getRealParent(parent) / res:filename()
 end
 

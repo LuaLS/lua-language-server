@@ -49,8 +49,9 @@ local function checkFunctionNamed(functionName, source, diagnosticRangeSource, b
     diagnosticRangeSource = diagnosticRangeSource or source
     bindDocsSource = bindDocsSource or source
     local argCount = source.args and #source.args or 0
+    local noRealArgs = argCount == 0 or (argCount == 1 and source.args[1][1] == 'self')
 
-    if argCount == 0 and not source.returns and not bindDocsSource.bindDocs then
+    if noRealArgs and not source.returns and not bindDocsSource.bindDocs then
         callback {
             start   = diagnosticRangeSource.start,
             finish  = diagnosticRangeSource.finish,

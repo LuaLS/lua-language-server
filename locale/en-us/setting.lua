@@ -413,6 +413,8 @@ config.diagnostics['missing-global-doc']    =
 'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-local-export-doc'] =
 'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
+config.diagnostics['missing-export-doc'] =
+'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-parameter']     =
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
 config.diagnostics['missing-return']        =

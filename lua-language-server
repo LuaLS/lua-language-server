@@ -1,0 +1,16 @@
+#!/usr/bin/env lua
+local f = '%q'
+local args = {
+    'bee',
+    debug.getinfo(1).source:match("@?(.*/)[^/]+/") .. 'main.lua',
+}
+for _, v in ipairs(arg) do
+    table.insert(args, f:format(v))
+end
+local isok, reason, ret = os.execute(table.concat(args, ' '))
+if type(isok) == type(0) then
+    ret = isok
+end
+if ret ~= 0 then
+    os.exit(1)
+end

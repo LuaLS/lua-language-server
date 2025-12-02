@@ -1,0 +1,2410 @@
+ yes = {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.vomit
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.stimtrap
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "BIG GAME HUNTER"
+    [reward] = "HunterS"
+    [desc] = "DEAL 4000 MELEE DAMAGE TOTAL"
+    [reqamount] = 4000
+    [req] = "DamageDealt"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.tank
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "airdroppage"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "BadBat"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "HunterS"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = function: 0xbfea5de53c6214a9, is lua closure: true
+  };
+  [Constants] =  {
+   [1] = "airdroppage"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.cowboy
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "DEUS VULT"
+    [reward] = "TGarment"
+    [desc] = "DECAPITATE 80 PLAYERS WITH THE GREAT SWORD"
+    [reqamount] = 80
+    [req] = "GreatswordDecaps"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.trapper
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.AmyGotANewJob
+   [2] = workspace
+   [3] = Players.AmyGotANewJob
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "PBaton"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "TJavelin"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "CHammer"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.ByDracoton
+   [2] = workspace
+   [3] = Players.ByDracoton
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "SPECIAL OPERATIVE"
+    [reward] = "GSuit"
+    [desc] = "GET 4 HEADSHOTS WITH RIFLE"
+    [reqamount] = 4
+    [req] = "RifleHeadshots"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "HAZARDOUS SURVIVOR"
+    [reward] = "HevS"
+    [desc] = "LAND 33 CHARGED BACKSTABS WITH THE CROWBAR"
+    [reqamount] = 33
+    [req] = "LandedCrowbars"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.1buggyfresh
+   [2] = workspace
+   [3] = Players.1buggyfresh
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "SAxe"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x797771a78f38bb51, is lua closure: true
+   [2] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.spectateframe
+   [4] = Workspace.Camera.Blur
+   [5] = workspace
+   [6] = 1
+  };
+  [Constants] =  {
+   [1] = "spawn"
+   [2] = spawn
+   [3] = "Visible"
+   [4] = "Enabled"
+   [5] = "CurrentCamera"
+   [6] = "Crossroads"
+   [7] = "Cameras"
+   [8] = "cam"
+   [9] = "look"
+   [10] = "CFrame"
+   [11] = "FieldOfView"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "PFork"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "PilotG"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "Hotline"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.pistol
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x797771a78f38bb51, is lua closure: true
+   [2] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.spectateframe
+   [4] = Workspace.Camera.Blur
+   [5] = workspace
+  };
+  [Constants] =  {
+   [1] = "spawn"
+   [2] = spawn
+   [3] = "Visible"
+   [4] = "Enabled"
+   [5] = "CurrentCamera"
+   [6] = "cpart"
+   [7] = "CFrame"
+   [8] = "FieldOfView"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x888c30bb001129f9, is lua closure: true
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [Trackers] =  {
+     [DBPellets] = 79
+     [ChargedFists] = 58
+     [LandedCharges] = 875
+     [DamageDealt] = 38653.76475
+     [GreatswordDecaps] = 50
+     [Headshots] = 41
+     [LandedCrowbars] = 2
+     [LandedSMG] = 23
+     [LandedBludgeons] = 234
+     [Lockers] = 1032
+     [Backstabs] = 330
+     [JumpHits] = 26
+    };
+    [ChosenAirdrop] = "default"
+    [HandInventory] =  {
+     [SOutfit] = true
+     [PraeS] = true
+     [Hotline] = true
+     [POveralls] = true
+     [PilotG] = true
+     [PSuit] = true
+     [HunterS] = true
+    };
+    [Deaths] = 20
+    [LastWep] = "Shovel"
+    [SpecialRoles] =  {
+     [Shamed] = false
+    };
+    [Hands] = "POveralls"
+    [WeaponsFound] =  {
+     [Fist] = true
+     [PAxe] = true
+     [CHammer] = true
+     [BBat] = true
+     [PFork] = true
+     [RPier] = true
+     [IPick] = true
+     [LPipe] = true
+     [CBar] = true
+     [THawk] = true
+     [GSword] = true
+     [SAxe] = true
+     [TSpear] = true
+     [BKnuckles] = true
+     [CCleaver] = true
+     [BadBat] = true
+     [FAxe] = true
+     [HKnife] = true
+     [SHammer] = true
+     [Shovel] = true
+     [HBerd] = true
+     [MMachete] = true
+     [NSword] = true
+     [CKnife] = true
+     [PBaton] = true
+     [KaramB] = true
+     [BSpear] = true
+     [TJavelin] = true
+    };
+    [Kills] = 5
+   };
+  };
+  [Constants] =  {
+   [1] = "stats"
+   [2] = "Position"
+   [3] = "UDim2"
+   [4] = "new"
+   [5] = new
+   [6] = 0.75
+   [7] = "HIDE PLAYER STATS"
+   [8] = "Text"
+   [9] = "base"
+   [10] = "kills"
+   [11] = "TOTAL KILLS: "
+   [12] = "Kills"
+   [13] = "deaths"
+   [14] = "TOTAL DEATHS: "
+   [15] = "Deaths"
+   [16] = "Trackers"
+   [17] = "Backstabs"
+   [18] = "backstabs"
+   [19] = "TOTAL BACKSTABS: "
+   [20] = "Headshots"
+   [21] = "headshots"
+   [22] = "TOTAL HEADSHOTS: "
+   [23] = "LandedCharges"
+   [24] = "chargelanded"
+   [25] = "CHARGED HITS LANDED: "
+   [26] = "Lockers"
+   [27] = "lockersopen"
+   [28] = "TOTAL LOCKERS OPENED: "
+   [29] = "DamageDealt"
+   [30] = "damage"
+   [31] = "TOTAL MELEE DAMAGE DEALT: "
+   [32] = "math"
+   [33] = "ceil"
+   [34] = ceil
+   [35] = "handslist"
+   [36] = "Visible"
+   [37] = "equippedhands"
+   [38] = "ipairs"
+   [39] = ipairs
+   [40] = "GetChildren"
+   [41] = "Name"
+   [42] = "example"
+   [43] = "Destroy"
+   [44] = "SHOW PLAYER STATS"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "TSpear"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.ninja
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "PSuit"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.Captain_Chezeon
+   [2] = workspace
+   [3] = Players.Captain_Chezeon
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.trolo97685
+   [2] = workspace
+   [3] = Players.trolo97685
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "KEEPING IT STYLISH"
+    [reward] = "PSuit"
+    [desc] = "PERFORM 50 BACKSTABS"
+    [reqamount] = 50
+    [req] = "Backstabs"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.starDestroyer1015
+   [2] = workspace
+   [3] = Players.starDestroyer1015
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "DISTINGUISHED CONTESTANT"
+    [reward] = "GOveralls"
+    [desc] = "DEAL 350000 GRAND TOTAL MELEE DAMAGE"
+    [reqamount] = 350000
+    [req] = "DamageDealt"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.swat
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.rainbow
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "SPECIAL RIOT OPERATIVE"
+    [reward] = "RGear"
+    [desc] = "LAND 40 HITS WITH THE SUBMACHINE GUN"
+    [reqamount] = 40
+    [req] = "LandedSMG"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.default
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.bait
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.survivor
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.SilverShrimp73
+   [2] = workspace
+   [3] = Players.SilverShrimp73
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "hideduels"
+   [2] = "Text"
+   [3] = "HIDE DUEL LIST"
+   [4] = "SHOW DUEL LIST"
+   [5] = "duellist"
+   [6] = "Visible"
+   [7] = "dueltitle"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.ZxphyrEdit
+   [2] = workspace
+   [3] = ZxphyrEdit
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "normal"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "spawnPlayer"
+   [3] = "FireServer"
+   [4] = "ipairs"
+   [5] = ipairs
+   [6] = "CurrentCamera"
+   [7] = "GetChildren"
+   [8] = "Destroy"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.1321DAVID1231
+   [2] = workspace
+   [3] = 1321DAVID1231
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "NSword"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "AVIATOR MERCENARY"
+    [reward] = "PilotG"
+    [desc] = "LAND 20 CHARGED HITS WHILE IN THE AIR"
+    [reqamount] = 20
+    [req] = "JumpHits"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "RPier"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.ZxphyrEdit
+   [2] = workspace
+   [3] = ZxphyrEdit
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "Shovel"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x888c30bb001129f9, is lua closure: true
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.doomguy
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "PUGILIST"
+    [reward] = "BGloves"
+    [desc] = "LAND 80 FULLY CHARGED FIST HITS"
+    [reqamount] = 80
+    [req] = "ChargedFists"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "1-800-HOTLINE"
+    [reward] = "Hotline"
+    [desc] = "LAND 100 CHARGED HITS WITH BLUDGEON WEAPONS"
+    [reqamount] = 100
+    [req] = "LandedBludgeons"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "CBar"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.1321DAVID1231
+   [2] = workspace
+   [3] = 1321DAVID1231
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.jumbledflower24
+   [2] = workspace
+   [3] = Players.jumbledflower24
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.1buggyfresh
+   [2] = workspace
+   [3] = 1buggyfresh
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "BBat"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.templar
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.Zulu_B
+   [2] = workspace
+   [3] = Zulu_B
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "SHammer"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "IPick"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "LOCKER SCAVENGER"
+    [reward] = "SOutfit"
+    [desc] = "OPEN 800 LOCKERS"
+    [reqamount] = 800
+    [req] = "Lockers"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "FAxe"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] =  {
+    [name] = "DOUBLE BARREL SLAYER"
+    [reward] = "PraeS"
+    [desc] = "HIT 30 DOUBLE BARREL SHOTGUN PELLETS"
+    [reqamount] = 30
+    [req] = "DBPellets"
+   };
+   [3] = game
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+   [3] = "baseframe"
+   [4] = "name"
+   [5] = "Text"
+   [6] = "desc"
+   [7] = "ReplicatedStorage"
+   [8] = "skins"
+   [9] = "firstperson"
+   [10] = "reward"
+   [11] = "FindFirstChild"
+   [12] = "rewardframe"
+   [13] = "handname"
+   [14] = "Value"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "Fist"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "duellist"
+   [2] = "Name"
+   [3] = "FindFirstChild"
+   [4] = "button"
+   [5] = "BackgroundColor3"
+   [6] = "Color3"
+   [7] = "new"
+   [8] = new
+   [9] = 0.1921568627451
+   [10] = 0.65098039215686
+   [11] = 0.090196078431373
+   [12] = "delay"
+   [13] = delay
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "GSword"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = function: 0xe62662cc30449ff9, is lua closure: true
+   [3] = workspace
+   [4] = "normal"
+  };
+  [Constants] =  {
+   [1] = "weaponlist"
+   [2] = "example"
+   [3] = "Destroy"
+   [4] = "GetChildren"
+   [5] = "math"
+   [6] = "random"
+   [7] = random
+   [8] = "Name"
+   [9] = "ServerStuff"
+   [10] = "spawnPlayer"
+   [11] = "FireServer"
+   [12] = "ipairs"
+   [13] = ipairs
+   [14] = "CurrentCamera"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "SOutfit"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "PraeS"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "KaramB"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "CCleaver"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = workspace
+   [2] = "POveralls"
+   [3] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [4] = game
+  };
+  [Constants] =  {
+   [1] = "ServerStuff"
+   [2] = "adjustStats"
+   [3] = "changehands"
+   [4] = "FireServer"
+   [5] = "equippedhands"
+   [6] = "CURRENTLY WEARING: "
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "ReplicatedStorage"
+   [11] = "skins"
+   [12] = "firstperson"
+   [13] = "FindFirstChild"
+   [14] = "handname"
+   [15] = "Value"
+   [16] = "Text"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "LPipe"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.Conoxr
+   [2] = workspace
+   [3] = Players.Conoxr
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "THawk"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.hunter
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.stimmer
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.Sovietkrieg
+   [2] = workspace
+   [3] = Players.Sovietkrieg
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.knife
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "BKnuckles"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "Visible"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "HKnife"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "CKnife"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe.duellist.plsunbansugingmelon
+   [2] = workspace
+   [3] = Players.plsunbansugingmelon
+  };
+  [Constants] =  {
+   [1] = "button"
+   [2] = "BackgroundColor3"
+   [3] = "Color3"
+   [4] = "new"
+   [5] = new
+   [6] = 0.1921568627451
+   [7] = "string"
+   [8] = "upper"
+   [9] = upper
+   [10] = "INVITE SENT"
+   [11] = "Text"
+   [12] = 0.78039215686275
+   [13] = 0.17254901960784
+   [14] = "ServerStuff"
+   [15] = "duel"
+   [16] = "invite"
+   [17] = "FireServer"
+   [18] = "delay"
+   [19] = delay
+   [20] = 0.65098039215686
+   [21] = 0.090196078431373
+   [22] = "ACCEPTED DUEL"
+   [23] = 0.75294117647059
+   [24] = 0.074509803921569
+   [25] = "accept"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "MMachete"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "PAxe"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.defense
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "BSpear"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xe62662cc30449ff9, is lua closure: true
+   [2] = "HBerd"
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0x76d5d365ab363181, is lua closure: true
+   [2] = ReplicatedStorage.airdrops.teamer
+  };
+  [Constants] =  {
+   [1] = "Name"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = function: 0xa98a318fcb7fce11, is lua closure: true
+  };
+  [Constants] =  nil
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+   [2] = Instance
+  };
+  [Constants] =  {
+   [1] = "challengehover"
+   [2] = "UDim2"
+   [3] = "new"
+   [4] = new
+   [5] = "X"
+   [6] = "Y"
+   [7] = "Position"
+  };
+ };
+ {
+  [Variables] =  {
+   [script] = Players.ViniDalvino.PlayerGui.mainGui.main
+  };
+  [Upvalues] =  {
+   [1] = Players.ViniDalvino.PlayerGui.mainGui.mainframe
+  };
+  [Constants] =  {
+   [1] = "challenges"
+   [2] = "Position"
+   [3] = "UDim2"
+   [4] = "new"
+   [5] = new
+   [6] = 0.3
+   [7] = "challengelist"
+   [8] = "Visible"
+   [9] = 0.72
+   [10] = "HIDE CHALLENGES"
+   [11] = "Text"
+   [12] = "VIEW CHALLENGES"
+  };
+ };

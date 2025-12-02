@@ -663,6 +663,8 @@ local function parseLocalAttrs()
         if not attrs then
             attrs = {
                 type = 'localattrs',
+                start = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index], 'right'),
             }
         end
         local attr = {
@@ -718,6 +720,7 @@ local function parseLocalAttrs()
                 }
             }
         end
+        attrs.finish = attr.finish
     end
     return attrs
 end
@@ -753,8 +756,199 @@ local function createLocal(obj, attrs)
     return obj
 end
 
+local function getLocal(name, pos)
+    for i = #Chunk, 1, -1 do
+        local chunk  = Chunk[i]
+        local locals = chunk.locals
+        if locals then
+            local res
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.effect > pos then
+                    break
+                end
+                if loc[1] == name then
+                    if not res or res.effect < loc.effect then
+                        res = loc
+                    end
+                end
+            end
+            if res then
+                return res
+            end
+        end
+    end
+end
+
+local function getVariable(name, pos)
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        local resLocal
+        local resGlobal
+
+        -- Find most recent local in this chunk
+        local locals = chunk.locals
+        if locals then
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.effect > pos then
+                    break
+                end
+                if loc[1] == name then
+                    if not resLocal or resLocal.effect < loc.effect then
+                        resLocal = loc
+                    end
+                end
+            end
+        end
+
+        -- Find global in this chunk (globals don't have effect time, just find the last one)
+        local globals = chunk.globals
+        if globals then
+            for n = 1, #globals do
+                local glob = globals[n]
+                if glob.effect > pos then
+                    break
+                end
+                if glob[1] == name then
+                    if not resGlobal or resGlobal.effect < glob.effect then
+                        resGlobal = glob
+                    end
+                end
+            end
+        end
+
+        -- Return the one declared later (compare by start position)
+        if resLocal and resGlobal then
+            if resLocal.start > resGlobal.start then
+                return resLocal
+            else
+                return resGlobal
+            end
+        end
+        if resLocal then
+            return resLocal
+        end
+        if resGlobal then
+            return resGlobal
+        end
+    end
+
+    -- If not found, look for global *
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        local globals = chunk.globals
+        if globals then
+            for n = #globals, 1, -1 do
+                local glob = globals[n]
+                if glob[1] == '*' then
+                    return glob
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
+local function linkGlobalToEnv(node, var)
+    -- Lua 5.5: Check VARIABLE_NOT_DECLARED
+    if State.version == 'Lua 5.5' and not var then
+        -- Check if there's any global declaration in scope
+        local hasAnyGlobal = false
+        for i = #Chunk, 1, -1 do
+            local chunk = Chunk[i]
+            if chunk.globals and #chunk.globals > 0 then
+                hasAnyGlobal = true
+                break
+            end
+        end
+
+        if hasAnyGlobal then
+            pushError {
+                type   = 'VARIABLE_NOT_DECLARED',
+                start  = node.start,
+                finish = node.finish,
+                info   = {
+                    name = node[1],
+                }
+            }
+        end
+    end
+
+    -- Lua 5.5: Use getVariable to find _ENV, check if it's global
+    local env
+    if State.version == 'Lua 5.5' then
+        env = getVariable(State.ENVMode, node.start)
+        if env and env.type == 'setglobal' then
+            pushError {
+                type   = 'ENV_IS_GLOBAL',
+                start  = node.start,
+                finish = node.finish,
+                info   = {
+                    name = node[1],
+                }
+            }
+        end
+        if env and env.type == 'local' then
+            node.node = env
+            if not env.ref then
+                env.ref = {}
+            end
+            env.ref[#env.ref+1] = node
+        end
+    else
+        env = getLocal(State.ENVMode, node.start)
+        if env then
+            node.node = env
+            if not env.ref then
+                env.ref = {}
+            end
+            env.ref[#env.ref+1] = node
+        end
+    end
+end
+
+---@param obj table
+local function createGlobalDeclare(obj, attrs)
+    obj.type = 'setglobal'
+    obj.declare = true
+    obj.effect = obj.finish
+
+    if attrs then
+        obj.attrs = attrs
+        attrs.parent = obj
+    end
+
+    local chunk = Chunk[#Chunk]
+    if chunk then
+        local globals = chunk.globals
+        if not globals then
+            globals = {}
+            chunk.globals = globals
+        end
+        globals[#globals+1] = obj
+    end
+
+    linkGlobalToEnv(obj, obj)
+
+    return obj
+end
+
 local function pushChunk(chunk)
     Chunk[#Chunk+1] = chunk
+end
+
+local function hasAttr(attrs, attrName)
+    if not attrs then
+        return false
+    end
+    for i = 1, #attrs do
+        if attrs[i][1] == attrName then
+            return true
+        end
+    end
+    return false
 end
 
 local function resolveLable(label, obj)
@@ -1410,6 +1604,12 @@ local function isKeyWord(word, nextToken)
             return false
         end
         return true
+    end
+    if word == 'global' then
+        if State.version == 'Lua 5.5' then
+            return true
+        end
+        return false
     end
     return false
 end
@@ -2072,55 +2272,26 @@ local function parseParen()
     return paren
 end
 
-local function getLocal(name, pos)
-    for i = #Chunk, 1, -1 do
-        local chunk  = Chunk[i]
-        local locals = chunk.locals
-        if locals then
-            local res
-            for n = 1, #locals do
-                local loc = locals[n]
-                if loc.effect > pos then
-                    break
-                end
-                if loc[1] == name then
-                    if not res or res.effect < loc.effect then
-                        res = loc
-                    end
-                end
-            end
-            if res then
-                return res
-            end
-        end
-    end
-end
-
 local function resolveName(node)
     if not node then
         return nil
     end
-    local loc = getLocal(node[1], node.start)
-    if loc then
+    local var = getVariable(node[1], node.start)
+    if var and (var.type == 'local' or var.type == 'self') then
         node.type = 'getlocal'
-        node.node = loc
-        if not loc.ref then
-            loc.ref = {}
+        node.node = var
+        if not var.ref then
+            var.ref = {}
         end
-        loc.ref[#loc.ref+1] = node
-        if loc.special then
-            addSpecial(loc.special, node)
+        var.ref[#var.ref+1] = node
+        if var.special then
+            addSpecial(var.special, node)
         end
     else
         node.type = 'getglobal'
-        local env = getLocal(State.ENVMode, node.start)
-        if env then
-            node.node = env
-            if not env.ref then
-                env.ref = {}
-            end
-            env.ref[#env.ref+1] = node
-        end
+        node.var = var
+
+        linkGlobalToEnv(node, var)
     end
     local name = node[1]
     bindSpecial(node, name)
@@ -2242,6 +2413,32 @@ local function parseParams(params, isLambda)
             end
             hasDots = true
             Index = Index + 2
+
+            -- Lua 5.5: check for (...args) syntax
+            skipSpace()
+            local nextToken = Tokens[Index + 1]
+            if nextToken and CharMapWord[ssub(nextToken, 1, 1)] then
+                if State.version ~= 'Lua 5.5' then
+                    pushError {
+                        type   = 'UNSUPPORT_NAMED_VARARG',
+                        start  = getPosition(Tokens[Index], 'left'),
+                        finish = getPosition(Tokens[Index] + #nextToken - 1, 'right'),
+                        version = 'Lua 5.5',
+                    }
+                end
+                -- Create local variable for vararg
+                local varargName = createLocal {
+                    start  = getPosition(Tokens[Index], 'left'),
+                    finish = getPosition(Tokens[Index] + #nextToken - 1, 'right'),
+                    parent = params,
+                    [1]    = nextToken,
+                }
+                varargName.varargRef = vararg
+                vararg.name = varargName
+                vararg.finish = varargName.finish
+                Index = Index + 2
+            end
+
             goto CONTINUE
         end
         if CharMapWord[ssub(token, 1, 1)] then
@@ -2281,7 +2478,7 @@ local function parseParams(params, isLambda)
     return params
 end
 
-local function parseFunction(isLocal, isAction)
+local function parseFunction(declareType, isAction)
     local funcLeft  = getPosition(Tokens[Index], 'left')
     local funcRight = getPosition(Tokens[Index] + 7, 'right')
     local func = {
@@ -2301,13 +2498,24 @@ local function parseFunction(isLocal, isAction)
         local name = parseName()
         if name then
             local simple = parseSimple(name, true)
-            if isLocal then
+            if declareType == 'local' then
                 if simple == name then
                     createLocal(name)
                 else
                     resolveName(name)
                     pushError {
                         type   = 'UNEXPECT_LFUNC_NAME',
+                        start  = simple.start,
+                        finish = simple.finish,
+                    }
+                end
+            elseif declareType == 'global' then
+                if simple == name then
+                    createGlobalDeclare(name)
+                else
+                    resolveName(name)
+                    pushError {
+                        type   = 'UNEXPECT_GFUNC_NAME',
                         start  = simple.start,
                         finish = simple.finish,
                     }
@@ -2898,6 +3106,22 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
                 }
             end
         end
+        if n.type == 'setglobal' then
+            -- n.var is set by resolveName, contains the found global declaration or global *
+            if n.var then
+                -- Check if it's const
+                if n.var.attrs and hasAttr(n.var.attrs, 'const') then
+                    pushError {
+                        type   = 'ASSIGN_CONST_GLOBAL',
+                        start  = n.start,
+                        finish = n.finish,
+                    }
+                end
+            else
+                -- No var means no global declaration found at all (not even global *)
+                -- This means we're not in strict global scope, allow free assignment
+            end
+        end
     end
     if not v and lastValue then
         if lastValue.type == 'call'
@@ -2973,15 +3197,52 @@ local function parseMultiVars(n1, parser, isLocal)
         end
     end
 
-    if isLocal then
-        local effect = lastValue and lastValue.finish or lastVar.finish
-        n1.effect = effect
-        if n2 then
-            n2.effect = effect
+    local effect = lastValue and lastValue.finish or lastVar.finish
+    n1.effect = effect
+    if n2 then
+        n2.effect = effect
+    end
+    if nrest then
+        for i = 1, #nrest do
+            nrest[i].effect = effect
         end
-        if nrest then
-            for i = 1, #nrest do
-                nrest[i].effect = effect
+    end
+
+    do
+        -- Lua 5.4: only one <close> attribute allowed across a local declaration
+        -- Lua 5.5: multiple <close> are allowed
+        if State.version == 'Lua 5.4' then
+            local function collectCloseAttrs(node, list)
+                local attrs = node and node.attrs
+                if not attrs then
+                    return
+                end
+                for i = 1, #attrs do
+                    local a = attrs[i]
+                    if a[1] == 'close' then
+                        list[#list + 1] = a
+                    end
+                end
+            end
+
+            local closeList = {}
+            collectCloseAttrs(n1, closeList)
+            if n2 then
+                collectCloseAttrs(n2, closeList)
+            end
+            if nrest then
+                for i = 1, #nrest do
+                    collectCloseAttrs(nrest[i], closeList)
+                end
+            end
+
+            if #closeList > 1 then
+                local second = closeList[2]
+                pushError {
+                    type   = 'MULTI_CLOSE',
+                    start  = second.start,
+                    finish = second.finish,
+                }
             end
         end
     end
@@ -3089,7 +3350,7 @@ local function parseLocal()
     end
 
     if word == 'function' then
-        local func = parseFunction(true, true)
+        local func = parseFunction('local', true)
         local name = func.name
         if name then
             func.name    = nil
@@ -3120,6 +3381,173 @@ local function parseLocal()
     parseMultiVars(loc, parseName, true)
 
     return loc
+end
+
+local function parseGlobal()
+    local globalPos = getPosition(Tokens[Index], 'left')
+    Index = Index + 2
+    skipSpace()
+    local word = peekWord()
+
+    -- global function Name funcbody
+    if word == 'function' then
+        local func = parseFunction('global', true)
+        local name = func.name
+        if name then
+            func.name    = nil
+            name.type    = 'setglobal'
+            name.value   = func
+            name.vstart  = func.start
+            name.range   = func.finish
+            func.parent  = name
+            pushActionIntoCurrentChunk(name)
+            return name
+        else
+            missName(func.keyword[2])
+            pushActionIntoCurrentChunk(func)
+            return func
+        end
+    end
+
+    -- Parse optional attributes before '*'
+    local attrs = parseLocalAttrs()
+    skipSpace()
+    if Tokens[Index + 1] == '*' then
+        local action = {
+            type   = 'globalall',
+            start  = getPosition(Tokens[Index], 'left'),
+            finish = getPosition(Tokens[Index], 'right'),
+            attrs  = attrs,
+            [1]    = '*',
+        }
+        if attrs then
+            attrs.parent = action
+            for i = 1, #attrs do
+                local a = attrs[i]
+                if a[1] == 'close' then
+                    pushError {
+                        type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                        start  = a.start,
+                        finish = a.finish,
+                    }
+                end
+            end
+        end
+        createGlobalDeclare(action, attrs)
+        Index = Index + 2
+        pushActionIntoCurrentChunk(action)
+        return action
+    end
+
+    -- global attnamelist ['=' explist]
+    local name = parseName(true)
+    if not name then
+        missName()
+        return nil
+    end
+
+    local glob = {
+        start  = name.start,
+        finish = name.finish,
+        [1]    = name[1],
+    }
+
+    if attrs then
+        glob.attrs = attrs
+        attrs.parent = glob
+        glob.start = globalPos
+        for i = 1, #attrs do
+            if attrs[i][1] == 'close' then
+                pushError {
+                    type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                    start  = attrs[i].start,
+                    finish = attrs[i].finish,
+                }
+            end
+        end
+    else
+        glob.start = name.start
+    end
+
+    -- attributes after name
+    local attrsAfter = parseLocalAttrs()
+    if attrsAfter then
+        for i = 1, #attrsAfter do
+            if attrsAfter[i][1] == 'close' then
+                pushError {
+                    type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                    start  = attrsAfter[i].start,
+                    finish = attrsAfter[i].finish,
+                }
+            end
+        end
+        if glob.attrs then
+            for i = 1, #attrsAfter do
+                glob.attrs[#glob.attrs+1] = attrsAfter[i]
+            end
+        else
+            glob.attrs = attrsAfter
+            attrsAfter.parent = glob
+        end
+        glob.finish = attrsAfter[#attrsAfter].finish
+    end
+
+    createGlobalDeclare(glob, glob.attrs)
+    pushActionIntoCurrentChunk(glob)
+    skipSpace()
+
+    local function parseGlobalVar()
+        local attrsN = parseLocalAttrs()
+        skipSpace()
+        local nameN = parseName(true)
+        if nameN then
+            local gN = {
+                start  = attrsN and attrsN.start or nameN.start,
+                finish = nameN.finish,
+                [1]    = nameN[1],
+            }
+            if attrsN then
+                gN.attrs = attrsN
+                attrsN.parent = gN
+                for i = 1, #attrsN do
+                    if attrsN[i][1] == 'close' then
+                        pushError {
+                            type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                            start  = attrsN[i].start,
+                            finish = attrsN[i].finish,
+                        }
+                    end
+                end
+            end
+            local attrsNAfter = parseLocalAttrs()
+            if attrsNAfter then
+                for i = 1, #attrsNAfter do
+                    if attrsNAfter[i][1] == 'close' then
+                        pushError {
+                            type   = 'GLOBAL_CLOSE_ATTRIBUTE',
+                            start  = attrsNAfter[i].start,
+                            finish = attrsNAfter[i].finish,
+                        }
+                    end
+                end
+                if gN.attrs then
+                    for i = 1, #attrsNAfter do
+                        gN.attrs[#gN.attrs+1] = attrsNAfter[i]
+                    end
+                else
+                    gN.attrs = attrsNAfter
+                    attrsNAfter.parent = gN
+                end
+                gN.finish = attrsNAfter[#attrsNAfter].finish
+            end
+            createGlobalDeclare(gN, gN.attrs)
+            return gN
+        end
+        return nil
+    end
+
+    parseMultiVars(glob, parseGlobalVar, false)
+    return glob
 end
 
 local function parseDo()
@@ -3553,6 +3981,8 @@ local function parseFor()
             if State.version == 'Lua 5.5' then
                 attrs = {
                     type = 'localattrs',
+                    start = name.start,
+                    finish = name.finish,
                     [1] = {
                         type = 'localattr',
                         start = name.start,
@@ -3673,6 +4103,8 @@ local function parseFor()
                 if State.version == 'Lua 5.5' then
                     attrs = {
                         type = 'localattrs',
+                        start = obj.start,
+                        finish = obj.finish,
                         [1] = {
                             type = 'localattr',
                             start = obj.start,
@@ -3935,6 +4367,10 @@ function parseAction()
 
     if token == 'local' then
         return parseLocal()
+    end
+
+    if token == 'global' and isKeyWord('global', Tokens[Index + 3]) then
+        return parseGlobal()
     end
 
     if token == 'if'

@@ -6,7 +6,7 @@ digraph AST {
 	]
 	"setglobal:0:3" [
 		label="setglobal\lfoo\l"
-		tooltip="start: 0\nfinish: 3\nrange: 35\nvalue: <node table>\nnode: <node local>\n1: foo\n"
+		tooltip="start: 0\nfinish: 3\nnode: <node local>\nrange: 35\nvalue: <node table>\neffect: 35\n1: foo\n"
 	]
 	"main:0:300000" -> "setglobal:0:3"
 	"table:6:35" [
@@ -61,7 +61,7 @@ digraph AST {
 	"tableindex:23:30" -> "integer:33:34"
 	"setfield:10000:10005" [
 		label="setfield\ly\l"
-		tooltip="start: 10000\nfinish: 10005\nrange: 10017\nfield: <node field>\nnode: <node getglobal>\ndot: <node .>\nvalue: <node binary>\n"
+		tooltip="start: 10000\nfinish: 10005\nrange: 10017\nfield: <node field>\nnode: <node getglobal>\ndot: <node .>\nvalue: <node binary>\neffect: 10017\n"
 	]
 	"main:0:300000" -> "setfield:10000:10005"
 	"getglobal:10000:10003" [
@@ -101,7 +101,7 @@ digraph AST {
 	"binary:10008:10017" -> "integer:10016:10017"
 	"setindex:20000:20006" [
 		label="setindex\l1\l"
-		tooltip="start: 20000\nfinish: 20006\nrange: 20015\nnode: <node getglobal>\nvalue: <node getindex>\nindex: <node integer>\n"
+		tooltip="start: 20000\nfinish: 20006\nrange: 20015\nnode: <node getglobal>\nvalue: <node getindex>\nindex: <node integer>\neffect: 20015\n"
 	]
 	"main:0:300000" -> "setindex:20000:20006"
 	"getglobal:20000:20003" [
@@ -201,7 +201,7 @@ digraph AST {
 	"binary:50006:50012" -> "integer:50010:50012"
 	"setlocal:60001:60002" [
 		label="setlocal\ls\l"
-		tooltip="start: 60001\nfinish: 60002\nrange: 60038\nvalue: <node binary>\nnode: <node local>\n1: s\n"
+		tooltip="start: 60001\nfinish: 60002\nnode: <node local>\nrange: 60038\nvalue: <node binary>\neffect: 60038\n1: s\n"
 	]
 	"while:50000:70003" -> "setlocal:60001:60002"
 	"binary:60005:60038" [

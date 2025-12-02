@@ -66,7 +66,7 @@ brave.on('loadProtoBySocket', function (param)
     end
 
     while true do
-        net.update(10)
+        net.update(10000)
     end
 end)
 

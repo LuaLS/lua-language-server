@@ -98,6 +98,9 @@ end
 ---@async
 ---@param level integer
 local function asGlobal(source, level)
+    if source.declare and source[1] == '*' then
+        return '(global) any', 0
+    end
     return asValue(source, '(global)', level)
 end
 

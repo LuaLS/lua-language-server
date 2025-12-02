@@ -15,22 +15,58 @@ cgopt.restart       =
 cgopt.count         =
 'Returns the total memory in Kbytes.'
 cgopt.step          =
-'Performs a garbage-collection step.'
+[[
+Performs a garbage-collection step. This option may be followed by an integer `size`.
+If `size` is a positive n, the collector acts as if n new bytes have been allocated; if `size` is zero, the collector performs a basic step.
+In incremental mode, a basic step corresponds to the current step size; in generational mode, a basic step performs a full minor collection,
+or an incremental step if the collector has scheduled one.
+In incremental mode, the function returns `true` if the step finished a collection cycle; in generational mode, it returns `true` if the step finished a major collection.
+]]
 cgopt.setpause      =
 'Set `pause`.'
 cgopt.setstepmul    =
 'Set `step multiplier`.'
 cgopt.incremental   =
-'Change the collector mode to incremental.'
+'Changes the collector mode to incremental and returns the previous mode (either `"generational"` or `"incremental"`).'
 cgopt.generational  =
-'Change the collector mode to generational.'
+'Changes the collector mode to generational and returns the previous mode (either `"generational"` or `"incremental"`).'
 cgopt.param         =
-'Changes and/or retrieves the values of a parameter of the collector. This option must be followed by one or two extra arguments: The name of the parameter and an optional new value.'
+[[
+Changes and/or retrieves the values of a collector parameter. This option must be followed by one or two extra arguments:
+the parameter name (a string) and an optional new value (an integer in the range [0,100000]).
+The call always returns the previous value of the parameter; if no new value is given, the value is left unchanged.
+Lua stores these values in a compressed format, so the value returned as the previous value may not be exactly the last value set.
+]]
+
+gcparam.minormul    =
+'The minor multiplier.'
+gcparam.majorminor  =
+'The major-minor multiplier.'
+gcparam.minormajor  =
+'The minor-major multiplier.'
+gcparam.pause       =
+'The garbage-collector pause.'
+gcparam.stepmul     =
+'The step multiplier.'
+gcparam.stepsize    =
+'The step size.'
+
 cgopt.isrunning     =
 'Returns whether the collector is running.'
 
 collectgarbage      =
-'This function is a generic interface to the garbage collector. It performs different functions according to its first argument, `opt`.'
+[[
+Generic interface to the garbage collector. According to the first argument `opt`, it performs:
+• `"collect"`: Performs a full garbage-collection cycle (default option).
+• `"stop"`: Stops automatic execution of the collector; it runs only when explicitly invoked, until `"restart"`.
+• `"restart"`: Restarts automatic execution of the collector.
+• `"count"`: Returns the total memory in use by Lua in Kbytes (fractional; multiply by 1024 for bytes).
+• `"step"`: Performs a garbage-collection step; optional integer `size` controls behavior and return value (see `cgopt.step`).
+• `"isrunning"`: Returns whether the collector is running (i.e., not stopped).
+• `"incremental"`: Changes the mode to incremental and returns the previous mode.
+• `"generational"`: Changes the mode to generational and returns the previous mode.
+• `"param"`: Changes/reads collector parameters (see `gcparam.*`), always returns the previous value.
+]]
 
 dofile              =
 'Opens the named file and executes its content as a Lua chunk. When called without arguments, `dofile` executes the content of the standard input (`stdin`). Returns all values returned by the chunk. In case of errors, `dofile` propagates the error to its caller. (That is, `dofile` does not run in protected mode.)'
@@ -508,11 +544,11 @@ math.floor                  =
 math.fmod                   =
 'Returns the remainder of the division of `x` by `y` that rounds the quotient towards zero.'
 math.frexp                  =
-'Decompose `x` into tails and exponents. Returns `m` and `e` such that `x = m * (2 ^ e)`, `e` is an integer and the absolute value of `m` is in the range [0.5, 1) (or zero when `x` is zero).'
+'Returns two numbers `m` and `e` such that `x = m * (2 ^ e)`, where `e` is an integer. When `x` is zero, NaN, +inf, or -inf, `m` is equal to `x`; otherwise, the absolute value of `m` is in the range [0.5, 1).'
 math.huge                   =
 'A value larger than any other numeric value.'
 math.ldexp                  =
-'Returns `m * (2 ^ e)` .'
+'Returns `m * (2 ^ e)`, where `e` is an integer.'
 math.log['<5.1']            =
 'Returns the natural logarithm of `x` .'
 math.log['>5.2']            =

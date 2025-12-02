@@ -38,10 +38,14 @@ return function (uri, callback)
         return
     end
 
+    ---@type table<string, boolean?>
     local definedGlobal = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
     local definedGlobalRegex = config.get(uri, 'Lua.diagnostics.globalsRegex')
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
+        if source.declare then
+            return
+        end
         local name = guide.getKeyName(source)
         if not name or definedGlobal[name] then
             return

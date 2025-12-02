@@ -15,22 +15,58 @@ cgopt.restart       =
 cgopt.count         =
 'Retorna, em Kbytes, a quantidade total de memória utilizada pela linguagem Lua.'
 cgopt.step          =
-'Executa a coleta de lixo (i.e., garbage-collection) em uma única etapa. A quantidade de execuções por etapa é controlada via `arg`.'
+[[
+Executa um passo do coletor de lixo. Esta opção pode ser seguida por um inteiro `size`.
+Se `size` for um n positivo, o coletor age como se n novos bytes tivessem sido alocados; se `size` for zero, o coletor executa um passo básico.
+No modo incremental, um passo básico corresponde ao tamanho de passo atual; no modo geracional, um passo básico executa uma coleta menor completa,
+ou um passo incremental, se o coletor tiver agendado um.
+No modo incremental, a função retorna `true` se o passo terminou um ciclo de coleta; no modo geracional, retorna `true` se o passo terminou uma coleta maior.
+]]
 cgopt.setpause      =
 'Estabelece pausa. Defina via `arg` o intervalo de pausa do coletor de lixo (i.e., garbage-collection).'
 cgopt.setstepmul    =
 'Estabelece um multiplicador para etapa de coleta de lixo (i.e., garbage-collection). Defina via `arg` o valor multiplicador.'
 cgopt.incremental   =
-'Altera o modo do coletor para incremental.'
+'Altera o modo do coletor para incremental e retorna o modo anterior (ou `"generational"` ou `"incremental"`).'
 cgopt.generational  =
-'Altera o modo do coletor para geracional.'
+'Altera o modo do coletor para geracional e retorna o modo anterior (ou `"generational"` ou `"incremental"`).'
 cgopt.param         =
-'Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras: O nome do parâmetro e um novo valor opcional.'
+[[
+Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras:
+o nome do parâmetro (uma string) e um novo valor opcional (um inteiro no intervalo [0,100000]).
+A chamada sempre retorna o valor anterior do parâmetro; se nenhum novo valor for dado, o valor permanece inalterado.
+O Lua armazena esses valores em um formato compactado, portanto o valor retornado como anterior pode não ser exatamente o último valor definido.
+]]
+
+gcparam.minormul    =
+'O multiplicador menor.'
+gcparam.majorminor  =
+'O multiplicador maior-menor.'
+gcparam.minormajor  =
+'O multiplicador menor-maior.'
+gcparam.pause       =
+'A pausa do coletor de lixo.'
+gcparam.stepmul     =
+'O multiplicador de passo.'
+gcparam.stepsize    =
+'O tamanho do passo.'
+
 cgopt.isrunning     =
 'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
 
 collectgarbage      =
-'Esta função é uma interface genérica para o coletor de lixo (i.e., garbage-collection). Ela executa diferentes funções de acordo com seu primeiro argumento, `opt`.'
+[[
+Interface genérica para o coletor de lixo. De acordo com o primeiro argumento `opt`, executa:
+• `"collect"`: Executa um ciclo completo de coleta de lixo (opção padrão).
+• `"stop"`: Para a execução automática; o coletor só roda quando invocado explicitamente, até `"restart"`.
+• `"restart"`: Reinicia a execução automática.
+• `"count"`: Retorna a memória total usada pelo Lua em Kbytes (fracionário; multiplique por 1024 para bytes).
+• `"step"`: Executa um passo de coleta; inteiro opcional `size` controla comportamento e retorno (veja `cgopt.step`).
+• `"isrunning"`: Retorna se o coletor está rodando (ou seja, não parado).
+• `"incremental"`: Altera para modo incremental e retorna o modo anterior.
+• `"generational"`: Altera para modo geracional e retorna o modo anterior.
+• `"param"`: Altera/lê parâmetros do coletor (veja `gcparam.*`), sempre retorna o valor anterior.
+]]
 
 dofile              =
 'Abre o arquivo fornecido por argumento e executa seu conteúdo como código Lua. Quando chamado sem argumentos, `dofile` executa o conteúdo da entrada padrão (`stdin`). Retorna todos os valores retornados pelo trecho de código contido no arquivo. Em caso de erros, o `dofile` propaga o erro para seu chamador. Ou seja, o `dofile` não funciona em modo protegido.'

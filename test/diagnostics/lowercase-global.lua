@@ -37,3 +37,7 @@ TEST [[
 ---@diagnostic enable
 x = 1
 ]]
+
+TEST([[
+global x, y, z
+]], 'Lua 5.5')

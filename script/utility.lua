@@ -1,5 +1,7 @@
 local tableSort    = table.sort
 local stringRep    = string.rep
+local stringByte   = string.byte
+local stringFormat = string.format
 local tableConcat  = table.concat
 local tostring     = tostring
 local type         = type
@@ -23,6 +25,7 @@ local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
 local error        = error
+local assert       = assert
 
 _ENV = nil
 
@@ -79,6 +82,7 @@ local RESERVED = {
     ['while']    = true,
 }
 
+---@class Utility
 local m = {}
 
 --- 打印表的结构
@@ -692,6 +696,41 @@ function m.sortCallbackOfIndex(arr)
     end
 end
 
+---使用多个排序器排序，如果前一个排序器返回相等，则使用后一个排序器。
+---排序器返回 `true` 表示 `a` 在 `b` 前面，返回 `false` 表示 `a` 在 `b` 后面。
+---返回 `nil` 表示排序器无法比较 `a` 和 `b`或者 `a` 和 `b` 相等。
+---@generic T
+---@param tbl T[]
+---@param sorter fun(a: T, b: T): boolean?
+---@param ... fun(a: T, b: T): boolean?
+function m.sort(tbl, sorter, ...)
+    local sorters = { sorter, ... }
+    tableSort(tbl, function (a, b)
+        for _, f in ipairs(sorters) do
+            local res = f(a, b)
+            if res ~= nil then
+                return res
+            end
+        end
+        return false
+    end)
+end
+
+---@param datas any[]
+---@param scores integer[]
+---@return SortByScoreCallback
+function m.sortCallbackOfScore(datas, scores)
+    local map = {}
+    for i = 1, #datas do
+        local data = datas[i]
+        local score = scores[i]
+        map[data] = score
+    end
+    return function (v)
+        return map[v]
+    end
+end
+
 ---裁剪字符串
 ---@param str string
 ---@param mode? '"left"'|'"right"'
@@ -725,6 +764,9 @@ function m.expandPath(path, env)
     return path
 end
 
+---@generic T
+---@param l T[]
+---@return { [T]: true }
 function m.arrayToHash(l)
     local t = {}
     for i = 1, #l do
@@ -814,12 +856,40 @@ function m.getUpvalue(f, name)
     return nil, false
 end
 
-function m.stringStartWith(str, head)
-    return str:sub(1, #head) == head
+---@param str string
+---@param head string
+---@param ignoreCase? boolean
+---@return boolean
+function m.stringStartWith(str, head, ignoreCase)
+    if ignoreCase then
+        return str:sub(1, #head):lower() == head:lower()
+    else
+        return str:sub(1, #head) == head
+    end
 end
 
-function m.stringEndWith(str, tail)
-    return str:sub(-#tail) == tail
+---@param str string
+---@param tail string
+---@param ignoreCase? boolean
+---@return boolean
+function m.stringEndWith(str, tail, ignoreCase)
+    if ignoreCase then
+        return str:sub(-#tail):lower() == tail:lower()
+    else
+        return str:sub(-#tail) == tail
+    end
+end
+
+---@param str1 string
+---@param str2 string
+---@param ignoreCase? boolean
+---@return boolean
+function m.stringEqual(str1, str2, ignoreCase)
+    if ignoreCase then
+        return str1:lower() == str2:lower()
+    else
+        return str1 == str2
+    end
 end
 
 function m.defaultTable(default)
@@ -833,37 +903,31 @@ function m.defaultTable(default)
     end })
 end
 
-function m.multiTable(count, default)
-    local current
-    if default then
-        current = setmetatable({}, { __index = function (t, k)
-            if k == nil then
-                return nil
-            end
-            local v = default(k)
-            t[k] = v
-            return v
-        end })
-    else
-        current = setmetatable({}, { __index = function (t, k)
-            if k == nil then
-                return nil
-            end
-            local v = {}
-            t[k] = v
-            return v
-        end })
+function m.multiTable(max, default)
+    local mts = {}
+    for i = 1, max - 1 do
+        if i < max - 1 then
+            mts[i] = { __index = function (t, k)
+                local v = setmetatable({}, mts[i + 1])
+                t[k] = v
+                return v
+            end }
+        elseif default then
+            mts[i] = { __index = function (t, k)
+                local v = default(k)
+                t[k] = v
+                return v
+            end }
+        else
+            mts[i] = { __index = function (t, k)
+                local v = {}
+                t[k] = v
+                return v
+            end }
+        end
     end
-    for _ = 3, count do
-        current = setmetatable({}, { __index = function (t, k)
-            if k == nil then
-                return nil
-            end
-            t[k] = current
-            return current
-        end })
-    end
-    return current
+
+    return setmetatable({}, mts[1])
 end
 
 ---@param t table
@@ -913,6 +977,21 @@ function m.arrayRemove(array, value)
             return
         end
     end
+end
+
+---@param a1 any[]
+---@param a2 any[]
+---@return any[]
+function m.arrayOverlap(a1, a2)
+    local result = {}
+    local set = m.arrayToHash(a2)
+    for i = 1, #a1 do
+        local v = a1[i]
+        if set[v] then
+            result[#result+1] = v
+        end
+    end
+    return result
 end
 
 m.MODE_K  = { __mode = 'k' }
@@ -1001,6 +1080,219 @@ function m.arrayRemoveDuplicate(arr)
     for i = len - offset + 1, len do
         arr[i] = nil
     end
+end
+
+---@generic V, R
+---@param t V[]
+---@param callback fun(v: V, k: integer): R
+---@return R[]
+function m.map(t, callback)
+    local nt = {}
+    for k, v in ipairs(t) do
+        nt[k] = callback(v, k)
+    end
+    return nt
+end
+
+local sbyteMap = {
+    [stringByte '_'] = 200,
+}
+
+---@param a string
+---@param b string
+---@return boolean
+function m.stringLess(a, b)
+    for i = 1, #a do
+        if i > #b then
+            return false
+        end
+        local c1 = stringByte(a, i, i)
+        local c2 = stringByte(b, i, i)
+        c1 = sbyteMap[c1] or c1
+        c2 = sbyteMap[c2] or c2
+        if c1 ~= c2 then
+            return c1 < c2
+        end
+    end
+    return true
+end
+
+---@param v any
+---@param d any
+---@return any
+function m.default(v, d)
+    if v == nil then
+        return d
+    end
+    return v
+end
+
+---@generic T
+---@param arr T[]
+---@param k integer
+---@param sorter? fun(a: T, b: T): boolean
+---@return T[]
+function m.sortK(arr, k, sorter)
+    if not sorter then
+        sorter = function (a, b)
+            return a < b
+        end
+    end
+    if k <= 0 then
+        return arr
+    end
+    if k >= (#arr // 2) then
+        tableSort(arr, sorter)
+        return arr
+    end
+
+    local offset = 1
+
+    local function sort(left, right)
+        if left >= right then
+            return
+        end
+        if left > k then
+            return
+        end
+        -- 对这部分进行快排
+        local index = left + offset % (right - left)
+        local pivot = arr[index]
+        offset = offset << 1
+        if offset == 0 then
+            offset = 1
+        end
+        arr[index], arr[right] = arr[right], arr[index]
+        local i = left
+        for j = left, right - 1 do
+            if sorter(arr[j], pivot) then
+                arr[i], arr[j] = arr[j], arr[i]
+                i = i + 1
+            end
+        end
+        arr[i], arr[right] = arr[right], arr[i]
+        sort(i + 1, right)
+        sort(left, i - 1)
+    end
+
+    sort(1, #arr)
+    return arr
+end
+
+---@class string
+---@operator mod(table): string
+---@operator div(string): string
+
+function m.enableFormatString()
+    local mt = getmetatable('')
+    mt.__mod = function (str, args)
+        local count = 0
+        return str:gsub('%b{}', function (key)
+            local k, fmt = key:match('^{(.-):(.+)}$')
+            if not k then
+                k = key:sub(2, -2)
+            end
+            local value
+            if k == '' then
+                count = count + 1
+                value = args[count]
+            else
+                value = args[k]
+            end
+            if value == nil and k:find('{', 1, true) then
+                return '{' .. k % args .. '}'
+            end
+            if fmt then
+                value = stringFormat('%' .. fmt, value)
+            else
+                value = tostring(value)
+            end
+            return value
+        end)
+    end
+end
+
+function m.enableDividStringAsPath()
+    local mt = getmetatable('')
+    mt.__div = function (str, path)
+        assert(type(path) == 'string', 'Path must be a string')
+        if str == '' then
+            return path
+        end
+        if path == '' then
+            return str
+        end
+        if path:sub(1, 1) == '/' then
+            path = path:sub(2)
+        end
+        if str:sub(-1) == '/' then
+            str = str:sub(1, -2)
+        end
+        return str .. '/' .. path
+    end
+end
+
+---@param str string
+---@param sep string
+---@return string[]
+function m.split(str, sep)
+    local result = {}
+    local offset = 1
+    while offset <= #str do
+        local s, e = str:find(sep, offset, true)
+        if not s then
+            result[#result+1] = str:sub(offset)
+            break
+        end
+        result[#result+1] = str:sub(offset, s - 1)
+        offset = e + 1
+    end
+    return result
+end
+
+---@generic T
+---@param str string
+---@param left string
+---@param right string
+---@param callback fun(content: string, inside: boolean): T
+---@return T[]
+function m.replaceInside(str, left, right, callback)
+    local result = {}
+    local offset = 1
+    while offset <= #str do
+        local ls, le = str:find(left, offset, true)
+        if not ls then
+            if offset <= #str then
+                result[#result+1] = callback(str:sub(offset), false)
+            end
+            break
+        end
+        if ls > offset then
+            result[#result+1] = callback(str:sub(offset, ls - 1), false)
+        end
+
+        local rs, re = str:find(right, le + 1, true)
+        if not rs then
+            if ls < #str then
+                result[#result+1] = callback(str:sub(ls), true)
+            end
+            break
+        end
+        if rs > le + 1 then
+            result[#result+1] = callback(str:sub(le + 1, rs - 1), true)
+        end
+        offset = re + 1
+    end
+    return result
+end
+
+---@param str string
+---@return string
+function m.asKey(str)
+    if str:match('^[%a_][%w_]*$') and not RESERVED[str] then
+        return str
+    end
+    return ('[%q]'):format(str)
 end
 
 ---@param ... table

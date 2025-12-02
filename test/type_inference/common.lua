@@ -4903,3 +4903,9 @@ local <?callback?> = make_callback(function()
     return success, ""
 end)
 ]]
+
+TEST 'table' [[
+function f(...args)
+    print(<?args?>)
+end
+]]

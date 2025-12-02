@@ -233,12 +233,18 @@ PARSER_MISS_EXPONENT    =
 '缺少指數部分。'
 PARSER_MISS_EXP         =
 '缺少表達式。'
+PARSER_MISS_LOOP_MIN    =
+'缺少迴圈的起始值。'
+PARSER_MISS_LOOP_MAX    =
+'缺少迴圈的終止值。'
 PARSER_MISS_FIELD       =
 '缺少欄位/屬性名。'
 PARSER_MISS_METHOD      =
 '缺少方法名。'
 PARSER_ARGS_AFTER_DOTS  =
 '`...` 必須是最後一個引數。'
+PARSER_UNSUPPORT_NAMED_VARARG =
+'{version} 開始支援 `(...name)` 語法。'
 PARSER_KEYWORD          =
 '關鍵字無法作為名稱。'
 PARSER_EXP_IN_ACTION    =
@@ -311,6 +317,12 @@ PARSER_NESTING_LONG_MARK  =
 'Lua 5.1 不允許使用巢狀的 `[[...]]` 。'
 PARSER_LOCAL_LIMIT        =
 '只能同時存在200個活躍的區域變數與上值。'
+PARSER_VARIABLE_NOT_DECLARED =
+'變數 `{name}` 未宣告。（使用 `global *` 允許未定義變數，或使用 `global {name}` 宣告）'
+PARSER_ENV_IS_GLOBAL         =
+'存取變數 `{name}` 時 _ENV 是全域變數。'
+PARSER_ASSIGN_CONST_GLOBAL   =
+'無法對常數全域變數 `{name}` 賦值。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

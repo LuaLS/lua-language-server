@@ -10,6 +10,9 @@ return function (uri, callback)
 
     local function check(source)
         local node = source.node
+        if not node then
+            return
+        end
         if node.tag == '_ENV' then
             return
         end

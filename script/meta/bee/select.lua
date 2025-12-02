@@ -1,4 +1,4 @@
----@meta
+---@meta bee.select
 
 ---@class bee.select
 local select = {}

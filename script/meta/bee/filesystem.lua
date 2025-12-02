@@ -1,4 +1,4 @@
----@meta
+---@meta bee.filesystem
 
 ---@class fs.path
 ---@operator div: fs.path

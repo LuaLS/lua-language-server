@@ -1,6 +1,6 @@
-local lang    = require 'language'
+local lang = require 'language'
 
-local m = {}
+local m    = {}
 
 local function findParam(docs, param)
     if not docs then
@@ -94,6 +94,12 @@ local function checkFunction(source, callback, commentId, paramId, returnId)
     checkFunctionNamed(functionName, source, callback, commentId, paramId, returnId)
 end
 
+
+---@param source parser.object
+---@param callback fun(result: any)
+---@param commentId string
+---@param paramId string
+---@param returnId string
 local function checkMethod(source, callback, commentId, paramId, returnId)
     local functionName = source[1]
     checkFunctionNamed(functionName, source, callback, commentId, paramId, returnId)

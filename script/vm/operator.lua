@@ -127,11 +127,7 @@ end
 function vm.runOperator(op, exp, value)
     local node = vm.compileNode(exp)
     local operators = vm.getOperators(op, node)
-    ---@type vm.node?
-    local result
-    for _, operator in ipairs(operators) do
-        result = checkOperators(operators, op, value, result)
-    end
+    local result = checkOperators(operators, op, value, nil)
     return result
 end
 

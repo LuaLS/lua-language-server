@@ -1,13 +1,10 @@
 local fs     = require 'bee.filesystem'
 local time   = require 'bee.time'
-local server = require 'master.language-server'
 
 ls.threadName = 'master'
 
 --语言服务器自身的状态
----@class LuaLS.Runtime
-ls.runtime = require 'runtime'
-ls.API = require 'master.api'
+require 'runtime'
 
 fs.create_directories(fs.path(ls.env.LOG_PATH))
 
@@ -40,7 +37,3 @@ xpcall(function ()
 end, log.warn)
 
 print = log.debug
-
-server.create():start()
-
-ls.eventLoop.start()

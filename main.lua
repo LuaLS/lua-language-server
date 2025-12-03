@@ -1,7 +1,11 @@
 collectgarbage('generational', 10, 50)
 
-require 'luals'
-require 'master'
-
 ---@class never
 ---@field never never
+
+require 'luals'
+require 'master'
+local server = require 'languag-server'
+server.create():start()
+
+ls.eventLoop.start()

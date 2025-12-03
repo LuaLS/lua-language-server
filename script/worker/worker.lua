@@ -1,7 +1,0 @@
-require 'config'
-require 'filesystem'
-require 'file'
-require 'node'
-require 'vm'
-require 'scope'
-require 'feature'

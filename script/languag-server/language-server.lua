@@ -1,3 +1,5 @@
+local transport = require 'transport'
+
 ---@class LanguageServer
 local M = Class 'LanguageServer'
 
@@ -20,7 +22,11 @@ end
 
 ---@private
 function M:startTransport()
-    
+    self.transport = transport.create()
+
+    if not self.options.transport or self.options.transport == 'stdio' then
+        self.transport:useStdio()
+    end
 end
 
 ---@class LanguageServer.API

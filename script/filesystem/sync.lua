@@ -73,6 +73,24 @@ function ls.fs.remove(uri)
     return fs.remove(fs.path(ls.uri.decode(uri)))
 end
 
+---@param std 'stdin' | 'stdout' |'stderr'
+---@param ... any
+---@return string?
+function ls.fs.stdRead(std, ...)
+    return io[std]:read(...)
+end
+
+---@param std 'stdin' | 'stdout' |'stderr'
+---@param ... string | number
+---@return boolean
+function ls.fs.stdWrite(std, ...)
+    if io[std]:write(...) then
+        return true
+    else
+        return false
+    end
+end
+
 ---@return table<string, any>
 function ls.fs.newMap()
     if ls.env.IGNORE_CASE then

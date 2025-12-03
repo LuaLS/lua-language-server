@@ -36,7 +36,7 @@ ls.timer         = require 'tools.timer'
 ls.await         = require 'tools.await'
 ls.eventLoop     = require 'tools.event-loop'
 
-ls.parser        = require 'parser'
+require 'async'
 
 ls.await.setErrorHandler(function (traceback)
     log.error(traceback)

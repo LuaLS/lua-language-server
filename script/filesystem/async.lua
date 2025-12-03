@@ -1,34 +1,4 @@
-local thread  = require 'bee.thread'
-local channel = require 'bee.channel'
-local requestChannel  = channel.create('filesystem-request')
-local responseChannel = channel.create('filesystem-response')
-
-local thd = thread.create([[
-package.path = {packagepath:q}
-require 'filesystem.async-worker'
-]] % {
-    packagepath = package.path,
-})
-
-local id = 0
-local requestMap = {}
-
----@async
----@param method string
----@param params table
----@return any
-local function request(method, params)
-    id = id + 1
-    local data = {
-        id = id,
-        method = method,
-        params = params,
-    }
-    requestChannel:push(data)
-    return ls.await.yield(function (resume)
-        requestMap[id] = resume
-    end)
-end
+local master = ls.async.create('afs', 2, 'filesystem.async-worker', true)
 
 ---@class AsyncFileSystem: FileSystem
 ls.afs = Class('AsyncFileSystem', 'FileSystem')
@@ -39,28 +9,28 @@ ls.afs.mode = 'async'
 ---@param uri Uri
 ---@return Uri[]?
 function ls.afs.getChilds(uri)
-    return request('getChilds', { uri })
+    return master:awaitRequest('getChilds', { uri })
 end
 
 ---@async
 ---@param uri Uri
 ---@return 'file'|'directory'|'symlink'|nil
 function ls.afs.getTypeWithSymlink(uri)
-    return request('getTypeWithSymlink', { uri })
+    return master:awaitRequest('getTypeWithSymlink', { uri })
 end
 
 ---@async
 ---@param uri Uri
 ---@return 'file'|'directory'|nil
 function ls.afs.getType(uri)
-    return request('getType', { uri })
+    return master:awaitRequest('getType', { uri })
 end
 
 ---@async
 ---@param uri Uri
 ---@return string?
 function ls.afs.read(uri)
-    return request('read', { uri })
+    return master:awaitRequest('read', { uri })
 end
 
 ---@async
@@ -68,34 +38,28 @@ end
 ---@param content string
 ---@return boolean
 function ls.afs.write(uri, content)
-    return request('write', { uri, content })
+    return master:awaitRequest('write', { uri, content })
 end
 
 ---@async
 ---@param uri Uri
 ---@return boolean
 function ls.afs.remove(uri)
-    return request('remove', { uri })
+    return master:awaitRequest('remove', { uri })
 end
 
-ls.eventLoop.addTask(function ()
-    if not next(requestMap) then
-        return
-    end
-    while true do
-        local ok, data = responseChannel:pop()
-        if not ok then
-            break
-        end
-        local resume = requestMap[data.id]
-        if not resume then
-            goto continue
-        end
-        requestMap[data.id] = nil
-        if data.error then
-            log.warn(data.error)
-        end
-        resume(data.result)
-        ::continue::
-    end
-end)
+---@async
+---@param std 'stdin' | 'stdout' |'stderr'
+---@param ... any
+---@return string?
+function ls.afs.stdRead(std, ...)
+    return master:awaitRequest('stdRead', { std, ... })
+end
+
+---@async
+---@param std 'stdin' | 'stdout' |'stderr'
+---@param ... string | number
+---@return boolean
+function ls.afs.stdWrite(std, ...)
+    return master:awaitRequest('stdWrite', { std, ... })
+end

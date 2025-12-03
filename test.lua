@@ -1,5 +1,4 @@
 local fs     = require 'bee.filesystem'
-local thread = require 'bee.thread'
 
 collectgarbage('generational', 10, 50)
 
@@ -8,7 +7,14 @@ package.path = package.path.. ';./?.lua;./?/init.lua'
 
 require 'luals'
 require 'runtime'
-require 'worker'
+ls.parser = require 'parser'
+require 'scope'
+require 'config'
+require 'filesystem'
+require 'node'
+require 'vm'
+require 'file'
+require 'feature'
 
 fs.create_directories(fs.path(ls.env.LOG_PATH))
 

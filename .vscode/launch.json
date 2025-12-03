@@ -7,7 +7,7 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "${workspaceRoot}/test.lua",
+			"program": "test.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"windows": {
 				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",

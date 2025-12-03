@@ -9,7 +9,7 @@ lm:source_set 'code_format' {
         "Util/include",
         "CodeFormatCore/include",
         "LuaParser/include",
-        "../bee.lua/3rd/lua",
+        "../bee.lua/3rd/lua54",
         "3rd/wildcards/include"
     },
     sources = {

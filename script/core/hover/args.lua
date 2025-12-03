@@ -17,27 +17,39 @@ local function asFunction(source)
             if arg.type == 'self' then
                 goto CONTINUE
             end
-            local name = arg.name or guide.getKeyName(arg)
-            if name then
-                local argNode = vm.compileNode(arg)
-                local optional
-                if argNode:isOptional() then
-                    optional = true
-                    argNode = argNode:copy()
-                    argNode:removeOptional()
+            if arg.type == '...' then
+                -- Lua 5.5: check for named vararg (...args)
+                if arg.name then
+                    local varargName = guide.getKeyName(arg.name)
+                    args[#args+1] = ('%s%s: %s'):format(
+                        '...',
+                        varargName,
+                        vm.getInfer(arg):view(guide.getUri(source), 'any')
+                    )
+                else
+                    args[#args+1] = ('%s%s'):format(
+                        '...',
+                        vm.getInfer(arg):view(guide.getUri(source), 'any')
+                    )
                 end
-                args[#args+1] = ('%s%s: %s'):format(
-                    name,
-                    optional and '?' or '',
-                    vm.getInfer(argNode):view(guide.getUri(source), 'any')
-                )
-            elseif arg.type == '...' then
-                args[#args+1] = ('%s%s'):format(
-                    '...',
-                    vm.getInfer(arg):view(guide.getUri(source), 'any')
-                )
             else
-                args[#args+1] = ('%s'):format(vm.getInfer(arg):view(guide.getUri(source), 'any'))
+                local name = arg.name or guide.getKeyName(arg)
+                if name then
+                    local argNode = vm.compileNode(arg)
+                    local optional
+                    if argNode:isOptional() then
+                        optional = true
+                        argNode = argNode:copy()
+                        argNode:removeOptional()
+                    end
+                    args[#args+1] = ('%s%s: %s'):format(
+                        name,
+                        optional and '?' or '',
+                        vm.getInfer(argNode):view(guide.getUri(source), 'any')
+                    )
+                else
+                    args[#args+1] = ('%s'):format(vm.getInfer(arg):view(guide.getUri(source), 'any'))
+                end
             end
             ::CONTINUE::
         end

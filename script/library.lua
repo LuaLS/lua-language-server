@@ -149,7 +149,7 @@ local function compileSingleMetaDoc(uri, script, metaLang, status)
             if not des then
                 des = ('Miss locale <%s>'):format(name)
             end
-            compileBuf[#compileBuf+1] = convertLink(uri, des)
+            compileBuf[#compileBuf+1] = convertLink(uri, des):gsub('[\r\n]', '...')
             compileBuf[#compileBuf+1] = '\n'
         end,
         ALIVE   = function (str)

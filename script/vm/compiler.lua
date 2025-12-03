@@ -1367,6 +1367,13 @@ end
 local function compileLocal(source)
     local myNode = vm.setNode(source, source)
 
+    -- Lua 5.5: named vararg (...args) -> args is table
+    if source.varargRef then
+        vm.setNode(source, vm.declareGlobal('type', 'table'))
+        myNode.hasDefined = true
+        return
+    end
+
     local hasMarkDoc
     if source.bindDocs then
         hasMarkDoc = vm.bindDocs(source)
@@ -1694,7 +1701,7 @@ local compilerSwitch = util.switch()
         if vm.bindDocs(source) then
             return
         end
-        if source.node[1] ~= '_ENV' then
+        if source.node and source.node[1] ~= '_ENV' then
             return
         end
         if not source.value then
@@ -1705,6 +1712,9 @@ local compilerSwitch = util.switch()
     : case 'getglobal'
     : call(function (source)
         if vm.bindAs(source) then
+            return
+        end
+        if not source.node then
             return
         end
         if source.node[1] ~= '_ENV' then

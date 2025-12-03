@@ -25,7 +25,7 @@ return function (uri, callback)
 
         for _, arg in ipairs(args) do
             if arg.type == '...' then
-                if not arg.ref then
+                if not arg.ref and not arg.name then
                     callback {
                         start   = arg.start,
                         finish  = arg.finish,

@@ -39,6 +39,7 @@ return function (uri, callback)
         return
     end
 
+    ---@type table<string, boolean?>
     local definedGlobal = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
     local definedGlobalRegex = config.get(uri, 'Lua.diagnostics.globalsRegex')
 

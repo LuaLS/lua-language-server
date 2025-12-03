@@ -100,7 +100,7 @@ function math.floor(x) end
 ---@nodiscard
 function math.fmod(x, y) end
 
----@version <5.2
+---@version <5.2, >5.5
 ---#DES 'math.frexp'
 ---@param x number
 ---@return number m
@@ -108,7 +108,7 @@ function math.fmod(x, y) end
 ---@nodiscard
 function math.frexp(x) end
 
----@version <5.2
+---@version <5.2, >5.5
 ---#DES 'math.ldexp'
 ---@param m number
 ---@param e number

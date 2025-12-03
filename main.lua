@@ -53,6 +53,9 @@ ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')
 METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
 
+util.enableCloseFunction()
+util.enableFormatString()
+
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)
 collectgarbage('generational', 10, 50)

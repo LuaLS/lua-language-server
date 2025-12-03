@@ -15,22 +15,58 @@ cgopt.restart       =
 cgopt.count         =
 'Retorna el total de memoria en Kbytes.'
 cgopt.step          =
-'Realiza un paso de recolección de basura.'
+[[
+Realiza un paso de recolección de basura. Esta opción puede seguirse por un entero `size`.
+Si `size` es un n positivo, el recolector actúa como si se hubieran asignado n nuevos bytes; si `size` es cero, realiza un paso básico.
+En modo incremental, un paso básico corresponde al tamaño de paso actual; en modo generacional, un paso básico realiza una recolección menor completa,
+o un paso incremental si el recolector ha agendado uno.
+En modo incremental, la función retorna `true` si el paso terminó un ciclo de recolección; en modo generacional, retorna `true` si el paso terminó una recolección mayor.
+]]
 cgopt.setpause      =
 'Establece la pausa.'
 cgopt.setstepmul    =
 'Establece el multiplicador para el paso de recolección de basura.'
 cgopt.incremental   =
-'Cambia el modo de recolección a incremental.'
+'Cambia el modo del recolector a incremental y retorna el modo anterior (sea `"generational"` o `"incremental"`).'
 cgopt.generational  =
-'Cambia el modo de recolección a generacional.'
+'Cambia el modo del recolector a generacional y retorna el modo anterior (sea `"generational"` o `"incremental"`).'
 cgopt.param         =
-'Cambia y/o recupera los valores de un parámetro del recolector. Esta opción debe ser seguida por uno o dos argumentos extra: El nombre del parámetro y un nuevo valor opcional.'
+[[
+Cambia y/o recupera los valores de un parámetro del recolector. Esta opción debe ir seguida de uno o dos argumentos adicionales:
+el nombre del parámetro (una cadena) y un nuevo valor opcional (un entero en el rango [0,100000]).
+La llamada siempre retorna el valor anterior del parámetro; si no se da un nuevo valor, el valor se mantiene sin cambios.
+Lua almacena estos valores en un formato comprimido, por lo que el valor retornado como anterior puede no ser exactamente el último valor establecido.
+]]
+
+gcparam.minormul    =
+'El multiplicador menor.'
+gcparam.majorminor  =
+'El multiplicador mayor-menor.'
+gcparam.minormajor  =
+'El multiplicador menor-mayor.'
+gcparam.pause       =
+'La pausa del recolector de basura.'
+gcparam.stepmul     =
+'El multiplicador de paso.'
+gcparam.stepsize    =
+'El tamaño del paso.'
+
 cgopt.isrunning     =
 'Retorna si el recolector está corriendo.'
 
 collectgarbage      =
-'Esta función es una interfaz genérica al recolector de basura. Realiza diferentes funcionalidades según su primer argumento `opt`'
+[[
+Interfaz genérica al recolector de basura. Según el primer argumento `opt`, realiza:
+• `"collect"`: Realiza un ciclo completo de recolección de basura (opción predeterminada).
+• `"stop"`: Detiene la ejecución automática; el recolector corre sólo cuando se invoca explícitamente, hasta `"restart"`.
+• `"restart"`: Reinicia la ejecución automática.
+• `"count"`: Retorna la memoria total usada por Lua en Kbytes (fraccionario; multiplique por 1024 para bytes).
+• `"step"`: Realiza un paso de recolección; entero opcional `size` controla el comportamiento y el retorno (vea `cgopt.step`).
+• `"isrunning"`: Retorna si el recolector está corriendo (es decir, no detenido).
+• `"incremental"`: Cambia el modo a incremental y retorna el modo anterior.
+• `"generational"`: Cambia el modo a generacional y retorna el modo anterior.
+• `"param"`: Cambia/lee parámetros del recolector (vea `gcparam.*`), siempre retorna el valor anterior.
+]]
 
 dofile              =
 'Abre el archivo mencionado y ejecuta su contenido como un bloque Lua. Cuando es llamada sin argumentos, `dofile` ejecuta el contenido de la entrada estándar (`stdin`). Retorna todos los valores retornado por el bloque. En caso de error `dofile` propaga el error a la función que la llama. (Eso sí, `dofile` no corre en modo protegido.)'

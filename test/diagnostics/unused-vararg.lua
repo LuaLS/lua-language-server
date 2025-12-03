@@ -4,3 +4,9 @@ local function f(<!...!>)
 end
 f()
 ]]
+
+TEST [[
+local function f(...args)
+    return 'something'
+end
+]]

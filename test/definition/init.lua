@@ -2,6 +2,7 @@ local core  = require 'core.definition'
 local files = require 'files'
 local vm    = require 'vm'
 local catch = require 'catch'
+local config = require 'config.config'
 
 rawset(_G, 'TEST', true)
 
@@ -22,9 +23,12 @@ local function founded(targets, results)
 end
 
 ---@async
-function TEST(script)
+function TEST(script, version)
     local newScript, catched = catch(script, '!?')
 
+    if version then
+        config.set(nil, 'Lua.runtime.version', version)
+    end
     files.setText(TESTURI, newScript)
 
     local results = core(TESTURI, catched['?'][1][1])
@@ -41,6 +45,9 @@ function TEST(script)
     end
 
     files.remove(TESTURI)
+    if version then
+        config.set(nil, 'Lua.runtime.version', nil)
+    end
 end
 
 require 'definition.local'

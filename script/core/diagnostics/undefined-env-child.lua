@@ -25,6 +25,9 @@ return function (uri, callback)
     end
 
     guide.eachSourceType(state.ast, 'getglobal', function (source)
+        if not source.node then
+            return
+        end
         if source.node.tag == '_ENV' then
             return
         end

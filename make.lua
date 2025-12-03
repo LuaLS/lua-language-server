@@ -23,22 +23,25 @@ lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
-    includes = "bee.lua/3rd/lua",
+    includes = "bee.lua/3rd/lua54",
     sources = "lpeglabel/*.c",
     defines = {
         'MAXRECLEVEL=1000',
     },
+    deps = "source_lua",
 }
 
 lm:executable "lua-language-server" {
     deps = {
+        "source_bee",
+        "source_lua",
         "lpeglabel",
         "source_bootstrap",
         includeCodeFormat and "code_format" or nil,
     },
     includes = {
         "3rd/bee.lua",
-        "3rd/bee.lua/3rd/lua",
+        "3rd/bee.lua/3rd/lua54",
     },
     sources = "make/modules.cpp",
     windows = {

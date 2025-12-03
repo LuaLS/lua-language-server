@@ -1,7 +1,7 @@
-#include <binding/binding.h>
+#include <bee/lua/module.h>
 
 extern "C" int luaopen_lpeglabel (lua_State *L);
-static ::bee::lua::callfunc _init(::bee::lua::register_module, "lpeglabel", luaopen_lpeglabel);
+static ::bee::lua::callfunc _init_lpeg(::bee::lua::register_module, "lpeglabel", luaopen_lpeglabel);
 
 #ifdef CODE_FORMAT
 extern "C" int luaopen_code_format(lua_State *L);

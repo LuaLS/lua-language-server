@@ -1,0 +1,12 @@
+---
+- id: lua-language-server-check
+  language: lua
+  name: lua language server check
+  description: >
+    use lua language server to check lua files
+  entry: lua-language-server
+  types:
+    - lua
+  args:
+    - --check
+    - .

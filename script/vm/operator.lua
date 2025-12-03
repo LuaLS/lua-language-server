@@ -1,15 +1,15 @@
 ---@class vm
-local vm     = require 'vm.vm'
-local util   = require 'utility'
-local guide  = require 'parser.guide'
-local config = require 'config'
+local vm         = require 'vm.vm'
+local util       = require 'utility'
+local guide      = require 'parser.guide'
+local config     = require 'config'
 
-vm.UNARY_OP  = {
+vm.UNARY_OP      = {
     'unm',
     'bnot',
     'len',
 }
-vm.BINARY_OP = {
+vm.BINARY_OP     = {
     'add',
     'sub',
     'mul',
@@ -24,17 +24,17 @@ vm.BINARY_OP = {
     'shr',
     'concat',
 }
-vm.OTHER_OP = {
+vm.OTHER_OP      = {
     'call',
 }
 
-local unaryMap = {
+local unaryMap   = {
     ['-'] = 'unm',
     ['~'] = 'bnot',
     ['#'] = 'len',
 }
 
-local binaryMap = {
+local binaryMap  = {
     ['+']  = 'add',
     ['-']  = 'sub',
     ['*']  = 'mul',
@@ -50,7 +50,7 @@ local binaryMap = {
     ['..'] = 'concat',
 }
 
-local otherMap = {
+local otherMap   = {
     ['()'] = 'call',
 }
 
@@ -96,12 +96,12 @@ end
 
 ---@param op string
 ---@param exp parser.object
----@param value? parser.object
----@return vm.node?
-function vm.runOperator(op, exp, value)
+---@return parser.object[]
+function vm.getOperators(op, exp)
     local uri = guide.getUri(exp)
     local node = vm.compileNode(exp)
-    local result
+    ---@type parser.object[]
+    local operators = {}
     for c in node:eachObject() do
         if c.type == 'string'
         or c.type == 'doc.type.string' then
@@ -111,10 +111,26 @@ function vm.runOperator(op, exp, value)
             ---@cast c vm.global
             for _, set in ipairs(c:getSets(uri)) do
                 if set.operators and #set.operators > 0 then
-                    result = checkOperators(set.operators, op, value, result)
+                    for _, operator in ipairs(set.operators) do
+                        table.insert(operators, operator)
+                    end
                 end
             end
         end
+    end
+    return operators
+end
+
+---@param op string
+---@param exp parser.object
+---@param value? parser.object
+---@return vm.node?
+function vm.runOperator(op, exp, value)
+    local operators = vm.getOperators(op, exp)
+    ---@type vm.node?
+    local result
+    for _, operator in ipairs(operators) do
+        result = checkOperators(operators, op, value, result)
     end
     return result
 end
@@ -247,10 +263,10 @@ vm.binarySwitch = util.switch()
         local op = source.op.type
         if a and b then
             local result = op == '<<' and a << b
-                        or op == '>>' and a >> b
-                        or op == '&'  and a &  b
-                        or op == '|'  and a |  b
-                        or op == '~'  and a ~  b
+                or op == '>>' and a >> b
+                or op == '&' and a & b
+                or op == '|' and a |  b
+                or op == '~' and a ~ b
             ---@diagnostic disable-next-line: missing-fields
             vm.setNode(source, {
                 type   = 'integer',
@@ -281,18 +297,18 @@ vm.binarySwitch = util.switch()
         local b = vm.getNumber(source[2])
         local op = source.op.type
         local zero = b == 0
-                and (  op == '%'
-                    or op == '/'
-                    or op == '//'
-                )
+            and (op == '%'
+                or op == '/'
+                or op == '//'
+            )
         if a and b and not zero then
-            local result = op == '+'  and a +  b
-                        or op == '-'  and a -  b
-                        or op == '*'  and a *  b
-                        or op == '/'  and a /  b
-                        or op == '%'  and a %  b
-                        or op == '//' and a // b
-                        or op == '^'  and a ^  b
+            local result = op == '+' and a + b
+                or op == '-' and a - b
+                or op == '*' and a * b
+                or op == '/' and a / b
+                or op == '%' and a % b
+                or op == '//' and a // b
+                or op == '^' and a ^ b
             ---@diagnostic disable-next-line: missing-fields
             vm.setNode(source, {
                 type   = (op == '//' or math.type(result) == 'integer') and 'integer' or 'number',
@@ -353,10 +369,10 @@ vm.binarySwitch = util.switch()
     end)
     : case '..'
     : call(function (source)
-        local a =  vm.getString(source[1])
-                or vm.getNumber(source[1])
-        local b =  vm.getString(source[2])
-                or vm.getNumber(source[2])
+        local a = vm.getString(source[1])
+            or vm.getNumber(source[1])
+        local b = vm.getString(source[2])
+            or vm.getNumber(source[2])
         if a and b then
             if type(a) == 'number' or type(b) == 'number' then
                 local uri     = guide.getUri(source)
@@ -390,13 +406,13 @@ vm.binarySwitch = util.switch()
             local infer2 = vm.getInfer(source[2])
             if  (
                 infer1:hasType(uri, 'integer')
-            or  infer1:hasType(uri, 'number')
-            or  infer1:hasType(uri, 'string')
+                or infer1:hasType(uri, 'number')
+                or infer1:hasType(uri, 'string')
             )
             and (
                 infer2:hasType(uri, 'integer')
-            or  infer2:hasType(uri, 'number')
-            or  infer2:hasType(uri, 'string')
+                or infer2:hasType(uri, 'number')
+                or infer2:hasType(uri, 'string')
             ) then
                 vm.setNode(source, vm.declareGlobal('type', 'string'))
                 return
@@ -419,17 +435,17 @@ vm.binarySwitch = util.switch()
         local b = vm.getNumber(source[2])
         if a and b then
             local op = source.op.type
-            local result = op == '>'  and a >  b
-                        or op == '<'  and a <  b
-                        or op == '>=' and a >= b
-                        or op == '<=' and a <= b
+            local result = op == '>' and a > b
+                or op == '<' and a < b
+                or op == '>=' and a >= b
+                or op == '<=' and a <= b
             ---@diagnostic disable-next-line: missing-fields
             vm.setNode(source, {
                 type   = 'boolean',
                 start  = source.start,
                 finish = source.finish,
                 parent = source,
-                [1]    =result,
+                [1]    = result,
             })
         else
             vm.setNode(source, vm.declareGlobal('type', 'boolean'))

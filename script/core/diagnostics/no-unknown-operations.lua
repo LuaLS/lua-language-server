@@ -21,9 +21,7 @@ return function (uri, callback)
         if inferred ~= 'unknown' then return end
         local functionType = vm.getInfer(source.node)
         if functionType:view(uri) == 'unknown' then return end -- we can't say anything about what unknown types support
-        local operators = vm.getOperators("call", source.node)
-        local canCall = functionType:hasFunction(uri) or #operators ~= 0
-        if canCall then return end
+        if functionType:isCallable(uri) then return end
         callback {
             start   = source.start,
             finish  = source.finish,

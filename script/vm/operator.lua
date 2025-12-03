@@ -95,11 +95,10 @@ local function checkOperators(operators, op, value, result)
 end
 
 ---@param op string
----@param exp parser.object
+---@param node vm.node
 ---@return parser.object[]
-function vm.getOperators(op, exp)
-    local uri = guide.getUri(exp)
-    local node = vm.compileNode(exp)
+function vm.getOperators(op, node)
+    local uri = guide.getUri(node)
     ---@type parser.object[]
     local operators = {}
     for c in node:eachObject() do
@@ -126,7 +125,8 @@ end
 ---@param value? parser.object
 ---@return vm.node?
 function vm.runOperator(op, exp, value)
-    local operators = vm.getOperators(op, exp)
+    local node = vm.compileNode(exp)
+    local operators = vm.getOperators(op, node)
     ---@type vm.node?
     local result
     for _, operator in ipairs(operators) do

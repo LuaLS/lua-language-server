@@ -5,7 +5,7 @@ collectgarbage('generational', 10, 50)
 
 require 'luals'
 require 'master'
-local server = require 'languag-server'
+local server = require 'language-server.init'
 server.create():start()
 
 ls.eventLoop.start()

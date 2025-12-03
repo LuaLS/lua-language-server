@@ -47,19 +47,3 @@ end
 function ls.afs.remove(uri)
     return master:awaitRequest('remove', { uri })
 end
-
----@async
----@param std 'stdin' | 'stdout' |'stderr'
----@param ... any
----@return string?
-function ls.afs.stdRead(std, ...)
-    return master:awaitRequest('stdRead', { std, ... })
-end
-
----@async
----@param std 'stdin' | 'stdout' |'stderr'
----@param ... string | number
----@return boolean
-function ls.afs.stdWrite(std, ...)
-    return master:awaitRequest('stdWrite', { std, ... })
-end

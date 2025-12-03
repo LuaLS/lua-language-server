@@ -1,5 +1,8 @@
 local platform = require 'bee.platform'
 
+local readMaster  = ls.async.create('stdio', 1, 'transport.stdio-worker', true)
+local writeMaster = ls.async.create('stdio', 1, 'transport.stdio-worker', true)
+
 ---@class Transport.Stdio
 local M = Class 'Transport.Stdio'
 
@@ -14,7 +17,15 @@ function M:__init()
 end
 
 ---@param data string
-function M:send(data)
+function M:write(data)
+    writeMaster:notify('write', { 'stdout', data })
+end
+
+---@async
+---@param ... string | integer
+---@return string?
+function M:read(...)
+    return readMaster:awaitRequest('read', { 'stdin', ... })
 end
 
 local API = {}

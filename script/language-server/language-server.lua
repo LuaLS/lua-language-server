@@ -1,4 +1,5 @@
 local transport = require 'transport'
+local spec      = require 'lsp.spec'
 
 ---@class LanguageServer
 local M = Class 'LanguageServer'
@@ -27,6 +28,17 @@ function M:startTransport()
     if not self.options.transport or self.options.transport == 'stdio' then
         self.transport:useStdio()
     end
+
+    ---@async
+    ls.await.call(function ()
+        for task in self.transport:listen() do
+            ---@async
+            task:execute(function ()
+                local method = task.params.method
+                local params = task.params.params
+            end)
+        end
+    end)
 end
 
 ---@class LanguageServer.API

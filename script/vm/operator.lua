@@ -111,7 +111,9 @@ function vm.getOperators(op, node, uri)
             for _, set in ipairs(c:getSets(uri)) do
                 if set.operators and #set.operators > 0 then
                     for _, operator in ipairs(set.operators) do
-                        table.insert(operators, operator)
+                        if operator.op[1] == op then
+                            table.insert(operators, operator)
+                        end
                     end
                 end
             end

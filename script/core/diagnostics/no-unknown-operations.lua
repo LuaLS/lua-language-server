@@ -17,8 +17,9 @@ return function (uri, callback)
     ---@async
     guide.eachSourceType(state.ast, 'call', function (source)
         await.delay()
-        local inferred = vm.getInfer(source):view(uri)
-        if inferred ~= 'unknown' then return end
+
+        local resultInfer = vm.getInfer(source):view(uri)
+        if resultInfer ~= 'unknown' then return end
         local functionType = vm.getInfer(source.node)
         if functionType:view(uri) == 'unknown' then return end -- we can't say anything about what unknown types support
         if functionType:isCallable(uri) then return end
@@ -27,5 +28,28 @@ return function (uri, callback)
             finish  = source.finish,
             message = lang.script('DIAG_UNKNOWN_OPERATION_CALL', functionType:view(uri)),
         }
+    end)
+
+    -- binary operators are quite similar to function calls, they introduce an unknown if the result is unknown and none of the
+    -- parameters are unknown, or if the left side is known to not implement the operator
+
+    ---@async
+    guide.eachSourceType(state.ast, 'binary', function (source)
+        await.delay()
+
+        local resultInfer = vm.getInfer(source)
+        if resultInfer:view(uri) ~= 'unknown' then return end
+        local left, right = source[1], source[2]
+        local leftInfer, rightInfer = vm.getInfer(left), vm.getInfer(right)
+        if leftInfer:view(uri) == 'unknown' then return end
+        if rightInfer:view(uri) ~= 'unknown' then
+            -- the operator doesn't work for these types
+            callback {
+                start   = source.start,
+                finish  = source.finish,
+                message = lang.script('DIAG_UNKNOWN_OPERATION_OPERATOR', source.op.type, leftInfer:view(uri), rightInfer:view(uri)),
+            }
+            return
+        end
     end)
 end

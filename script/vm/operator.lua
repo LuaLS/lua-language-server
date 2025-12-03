@@ -96,6 +96,7 @@ end
 
 ---@param op string
 ---@param node vm.node
+---@param uri string
 ---@return parser.object[]
 function vm.getOperators(op, node, uri)
     ---@type parser.object[]

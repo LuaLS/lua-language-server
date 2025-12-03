@@ -386,7 +386,7 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:isCallable(uri)
-    return self:hasFunction(uri) or #vm.getOperators("call", self.node) ~= 0
+    return self:hasFunction(uri) or #vm.getOperators("call", self.node, uri) ~= 0
 end
 
 ---@param uri uri

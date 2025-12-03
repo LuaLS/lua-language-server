@@ -51,5 +51,8 @@ return function (uri, callback)
             }
             return
         end
+
+        -- TODO: it seems that if the operator is defined and the other arg is unkown it is always inferred as the
+        -- return type of the operator, so we can't check that case currently
     end)
 end

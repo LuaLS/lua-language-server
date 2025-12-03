@@ -1,5 +1,6 @@
 local fs     = require 'bee.filesystem'
 local time   = require 'bee.time'
+local server = require 'master.language-server'
 
 ls.threadName = 'master'
 
@@ -39,5 +40,7 @@ xpcall(function ()
 end, log.warn)
 
 print = log.debug
+
+server.create():start()
 
 ls.eventLoop.start()

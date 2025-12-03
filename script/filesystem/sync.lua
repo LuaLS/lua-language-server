@@ -19,7 +19,7 @@ end
 ---@param uri Uri
 ---@return 'file'|'directory'|'symlink'|nil
 function ls.fs.getTypeWithSymlink(uri)
-    local ftype = fs.type(fs.path(ls.uri.decode(uri)))
+    local ftype = fs.status(fs.path(ls.uri.decode(uri))):type()
     if ftype == 'regular' then
         return 'file'
     end
@@ -35,8 +35,7 @@ end
 ---@param uri Uri
 ---@return 'file'|'directory'|nil
 function ls.fs.getType(uri)
-    local status = fs.status(fs.path(ls.uri.decode(uri)))
-    local ftype = status:type()
+    local ftype = fs.status(fs.path(ls.uri.decode(uri))):type()
     if ftype == 'regular' then
         return 'file'
     end

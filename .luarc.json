@@ -39,7 +39,10 @@
             "/.vscode",
             "/meta"
         ],
-        "checkThirdParty": false
+        "checkThirdParty": false,
+        "library": [
+            "3rd/bee.lua/meta"
+        ]
     },
     "typeFormat": {
         "config": {
@@ -57,5 +60,8 @@
         "privateName": [
             "_*"
         ]
-    }
+    },
+    "diagnostics.globals": [
+        "jit"
+    ]
 }

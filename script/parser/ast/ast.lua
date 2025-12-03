@@ -212,6 +212,7 @@ end
 ---@return T
 function M:createNode(kind, data)
     data.ast = self
+    ---@type any
     local node = New(kind, data)
 
     local nodeMap = self.nodesMap[node.kind]

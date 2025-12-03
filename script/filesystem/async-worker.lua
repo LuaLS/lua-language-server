@@ -26,7 +26,7 @@ local function resolve(request)
     return result
 end
 
-local epfd <close> = epoll.create(16)
+local epfd <close> = assert(epoll.create(16))
 epfd:event_add(requestChannel:fd(), epoll.EPOLLIN)
 while true do
     for _, event in epfd:wait() do

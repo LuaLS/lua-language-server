@@ -192,7 +192,7 @@ end
 ---@generic T: string
 ---@param name `T`
 ---@param tbl? table
----@return T
+---@return T | fun(...):T
 function M.new(name, tbl)
     local class = M._classes[name]
     if not class then

@@ -7,7 +7,7 @@ ls.capability.register('initialize', function (server, params, task)
         capabilities = {},
         serverInfo = {
             name    = 'lua-language-server',
-            version = '4.0.0',
+            version = ls.env.version,
         }
     }
 end, { needInitialized = false })

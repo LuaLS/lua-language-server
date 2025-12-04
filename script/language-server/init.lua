@@ -1,4 +1,3 @@
-require 'language-server.master'
 require 'language-server.task'
 require 'language-server.capability'
 

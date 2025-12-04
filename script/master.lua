@@ -16,7 +16,8 @@ log = New 'Log' {
     time  = function ()
         return time.time() // 1000
     end,
-    path = ls.uri.decode(ls.env.LOG_URI) .. '/service.log',
+    path = ls.env.LOG_PATH / 'service.log',
+    level = ls.args.LOGLEVEL,
 }
 
 log.info('Lua Lsp startup!')

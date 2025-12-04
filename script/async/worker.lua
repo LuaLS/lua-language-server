@@ -43,6 +43,7 @@ require 'async.worker-init' (...)
             self.requestMap[data.id] = nil
             if data.error then
                 log.warn(data.error)
+                goto continue
             end
             callback(table.unpack(data.result, 1, data.result.n))
             ::continue::

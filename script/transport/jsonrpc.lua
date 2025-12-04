@@ -6,6 +6,7 @@ local M = {}
 function M.encode(luaTable)
     luaTable['jsonrpc'] = '2.0'
     local json = ls.json.encode(luaTable)
+    log.verb('jsonrpc encode:', json)
     local buf = {}
     buf[#buf+1] = "Content-Length: "
     buf[#buf+1] = #json
@@ -62,6 +63,7 @@ function M.decode(reader)
     local _ <close> = ls.util.defer(function ()
         ls.json.null = null
     end)
+    log.verb('jsonrpc decode:', content)
     local res = ls.json.decode(content)
     return res --[[@as table]]
 end

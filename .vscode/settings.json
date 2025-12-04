@@ -4,7 +4,7 @@
         //"--preview",
         "--develop=true",
         "--dbgport=11418",
-        "--loglevel=verb",
+        "--loglevel=trace",
         //"--shownode",
         //"--lazy",
     ],

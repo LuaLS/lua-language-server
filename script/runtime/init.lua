@@ -3,6 +3,7 @@ local argparser = require 'runtime.argparser'
 local version   = require 'runtime.version'
 local platform  = require 'bee.platform'
 local fs        = require 'bee.filesystem'
+local sys       = require 'bee.sys'
 
 --启动时的命令行参数
 ---@class LuaLS.Args
@@ -20,7 +21,9 @@ ls.args = {
     -- 等待调试器连接
     DBGWAIT = false,
     -- 显示语言
-    LOCALE = 'en-us',
+    LOCALE = 'auto',
+    -- 日志等级
+    LOGLEVEL = 'debug',
     -- 全局配置文件的路径
     CONFIGPATH = '',
     -- 在日志中记录RPC信息

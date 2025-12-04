@@ -51,6 +51,7 @@ function M:resolveTask(task)
         local registered = ls.capability.registered[method]
         if not registered then
             task:rejectWithCode(spec.ErrorCodes.MethodNotFound, 'Method not found: ' .. tostring(method))
+            return
         end
         local callback = registered.callback
         local options  = registered.options

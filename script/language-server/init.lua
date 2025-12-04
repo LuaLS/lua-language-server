@@ -14,6 +14,8 @@ require 'language-server.capability.lifecycle.shutdown'
 require 'language-server.capability.lifecycle.exit'
 require 'language-server.capability.lifecycle.initialized'
 
+require 'language-server.capability.features.hover'
+
 local server = require 'language-server.language-server'
 
 return server

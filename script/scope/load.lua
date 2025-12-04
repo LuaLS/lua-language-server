@@ -75,6 +75,7 @@ end
 ---@field loaded integer
 ---@field indexed integer
 ---@field uris Uri[]
+---@field indexTimes table<Uri, number>
 
 ---@async
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
@@ -91,6 +92,7 @@ function M:load(callback)
         loaded = 0,
         indexed = 0,
         uris = self.uris,
+        indexTimes = {},
     }
 
     xpcall(callback, log.error, 'start', status)
@@ -116,39 +118,36 @@ function M:loadFiles(callback, status)
     end)
     xpcall(callback, log.error, 'found', status)
 
-    local loadedUris = ls.tools.linkedTable.create()
     local loadTasks = {}
 
     for _, uri in ipairs(self.uris) do
+        ---@async
         loadTasks[#loadTasks+1] = function ()
             local content = self.fs.read(uri)
             if content then
                 ls.file.setText(uri, content)
             end
             status.loaded = status.loaded + 1
-            loadedUris:pushTail(uri)
+
             xpcall(callback, log.error, 'loading', status, uri)
+
+            if status.loaded == status.found then
+                xpcall(callback, log.error, 'loaded', status)
+            end
+
+            ls.await.sleep(0)
+
+            local c1 = os.clock()
+            self.vm:indexFile(uri)
+            local c2 = os.clock()
+            status.indexTimes[uri] = c2 - c1
+            status.indexed = status.indexed + 1
+
+            xpcall(callback, log.error, 'indexing', status, uri)
         end
     end
-    ---@async
-    ls.await.call(function ()
-        ls.await.waitAll(loadTasks)
-        xpcall(callback, log.error, 'loaded', status)
-    end)
 
-    repeat
-        while true do
-            local uri = loadedUris:getHead()
-            if not uri then
-                break
-            end
-            loadedUris:pop(uri)
-            self.vm:indexFile(uri)
-            status.indexed = status.indexed + 1
-            xpcall(callback, log.error, 'indexing', status, uri)
-            ls.await.sleep(0)
-        end
-        ls.await.sleep(0.1)
-    until status.indexed >= status.found
+    ls.await.waitAll(loadTasks)
+
     xpcall(callback, log.error, 'indexed', status)
 end

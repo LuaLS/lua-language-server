@@ -1,4 +1,5 @@
 local fs     = require 'bee.filesystem'
+local thread = require 'bee.thread'
 
 collectgarbage('generational', 10, 50)
 
@@ -59,4 +60,5 @@ end)
 
 ls.eventLoop.start(function ()
     ls.timer.update(1000)
+    thread.sleep(1)
 end)

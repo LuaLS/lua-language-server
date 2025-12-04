@@ -1,10 +1,10 @@
 ls.capability.register('initialize', function (server, params, task)
     ---@cast params LSP.InitializeParams
 
-    server:setClientParams(params)
+    server:initializing(params)
 
     task:resolve {
-        capabilities = {},
+        capabilities = ls.capability.serverCapabilities,
         serverInfo = {
             name    = 'lua-language-server',
             version = ls.env.version,

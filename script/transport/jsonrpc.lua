@@ -15,7 +15,7 @@ function M.encode(luaTable)
     return table.concat(buf)
 end
 
----@alias JSONRPC.Reader fun(len: number): string?
+---@alias JSONRPC.Reader fun(len: number | 'L'): string?
 
 ---@param reader JSONRPC.Reader
 ---@return table<string, string>
@@ -23,7 +23,7 @@ local function decodeHead(reader)
     local head = {}
     local buf = ''
     while true do
-        local char = reader(1)
+        local char = reader('L')
         if char == nil then
             error('RPC Disconnected!')
         end

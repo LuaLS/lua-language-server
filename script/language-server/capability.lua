@@ -11,6 +11,9 @@ ls.capability.defaultOptions = {
     validAfterShutdown = false,
 }
 
+---@type LSP.ServerCapabilities
+ls.capability.serverCapabilities = {}
+
 ls.capability.registered = {}
 
 ---@param method string

@@ -23,6 +23,18 @@ do
         end
     end)
 
+    local totalSize = 0
+    local totalTime = 0
+    for _, uri in ipairs(result.uris) do
+        totalSize = totalSize + ls.file.get(uri):getText():len() / 1024 / 1024
+        totalTime = totalTime + result.indexTimes[uri]
+    end
+    print('总大小为: {:.2f} MB，索引总时间为: {:.2f} 秒，速度： {:.2f} MB/s' % {
+        totalSize,
+        totalTime,
+        totalSize / totalTime,
+    })
+
     collectgarbage()
     print('索引后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
 

@@ -18,12 +18,7 @@ function M:start(options)
     self.options = options or {}
     log.info('Language Server starting with options: ', ls.inspect(self.options))
 
-    self:createWorkers()
     self:startTransport()
-end
-
-function M:createWorkers()
-    self.compiler = ls.async.create('compiler', 4, 'compiler', true)
 end
 
 ---@private
@@ -69,16 +64,21 @@ function M:resolveTask(task)
     end)
 end
 
-function M:shutdown()
-    if self.status == 'shutdown' then
-        return
-    end
-    self.status = 'shutdown'
+---@param params LSP.InitializeParams
+function M:initializing(params)
+    assert(self.status == 'starting', 'Invalid server state when initializing: ' .. self.status)
+    self.clientParams = params
+    self.status = 'initializing'
 end
 
----@param params LSP.InitializeParams
-function M:setClientParams(params)
-    self.clientParams = params
+function M:initialized()
+    assert(self.status == 'initializing', 'Invalid server state when initialized: ' .. self.status)
+    self.status = 'initialized'
+end
+
+function M:shutdown()
+    assert(self.status ~= 'shutdown', 'Invalid server state when shutting down: ' .. self.status)
+    self.status = 'shutdown'
 end
 
 ---@class LanguageServer.API

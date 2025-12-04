@@ -1,9 +1,13 @@
 ---@class Scope
 local M = Class 'Scope'
 
+M.ready = false
+
+---@param name string
 ---@param uri? Uri
 ---@param fs? FileSystem
-function M:__init(uri, fs)
+function M:__init(name, uri, fs)
+    self.name = name
     self.uri = uri
     self.fs  = fs or ls.fs
     table.insert(ls.scope.all, self)
@@ -28,6 +32,49 @@ end
 
 function M:__close()
     self:remove()
+end
+
+function M:start()
+    -- TODO: 需要先读配置文件
+    ---@async
+    ls.await.call(function ()
+        self:load(function (event, status, uri)
+            if event == 'start' then
+                log.info('[Scope] Start loading: {}' % { self.name })
+                return
+            end
+            if event == 'finding' then
+                log.debug('[Scope]({}) Found file({}): {}' % { self.name, status.found, uri })
+                return
+            end
+            if event == 'found' then
+                log.info('[Scope]({}) Found {} files.' % { self.name, status.found })
+                return
+            end
+            if event == 'loading' then
+                log.debug('[Scope]({}) Loading file({}/{}): {}' % { self.name, status.loaded, status.found, uri })
+                return
+            end
+            if event == 'loaded' then
+                log.info('[Scope]({}) Loaded {} files.' % { self.name, status.loaded })
+                return
+            end
+            if event == 'indexing' then
+                log.debug('[Scope]({}) Indexing file({}/{}): {}' % { self.name, status.indexed, status.loaded, uri })
+                return
+            end
+            if event == 'indexed' then
+                log.info('[Scope]({}) Indexed {} files.' % { self.name, status.indexed })
+                return
+            end
+            if event == 'finish' then
+                log.info('[Scope] Finished loading: {}' % { self.name })
+                return
+            end
+        end)
+    end)
+
+    self.ready = true
 end
 
 ---@param uri Uri
@@ -99,11 +146,12 @@ end
 ---@type Scope[]
 ls.scope.all = {}
 
+---@param name string
 ---@param uri? Uri
 ---@param fs? FileSystem
 ---@return Scope
-function ls.scope.create(uri, fs)
-    return New 'Scope' (uri, fs)
+function ls.scope.create(name, uri, fs)
+    return New 'Scope' (name, uri, fs)
 end
 
 ---@param uri Uri

@@ -1,5 +1,5 @@
 do
-    local scope <close> = ls.scope.create()
+    local scope <close> = ls.scope.create('test afs')
 
     local file <close> = ls.file.setText(test.fileUri, [[
 GlobalA = 1

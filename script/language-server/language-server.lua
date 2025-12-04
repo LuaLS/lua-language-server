@@ -1,7 +1,7 @@
 local transport = require 'transport'
 local spec      = require 'lsp.spec'
 
----@class LanguageServer
+---@class LanguageServer: Class.Base
 local M = Class 'LanguageServer'
 
 ---@type 'starting' | 'initializing' | 'initialized' | 'shutdown'
@@ -11,6 +11,20 @@ M.status = 'starting'
 ---@field transport? 'stdio' | 'socket' # 通讯方式，默认为 'stdio'
 ---@field port? integer # 当 transport 为 'socket' 时使用的端口
 ---@field workers? integer # 编译线程数，默认为4
+
+function M:__init()
+    ---@type Scope[]
+    self.scopes = {}
+end
+
+---@type Scope
+M.fallbackScope = nil
+
+M.__getter.fallbackScope = function (self)
+    local scope = ls.scope.create('<Fallback>', nil, ls.afs)
+    scope:start()
+    return scope, true
+end
 
 ---@param options? LanguageServer.Options
 function M:start(options)
@@ -74,6 +88,14 @@ end
 function M:initialized()
     assert(self.status == 'initializing', 'Invalid server state when initialized: ' .. self.status)
     self.status = 'initialized'
+
+    if self.clientParams.workspaceFolders then
+        for i, folder in ipairs(self.clientParams.workspaceFolders) do
+            local scope = ls.scope.create(folder.name, folder.uri, ls.afs)
+            scope:start()
+            self.scopes[i] = scope
+        end
+    end
 end
 
 function M:shutdown()

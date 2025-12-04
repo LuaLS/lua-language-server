@@ -19,7 +19,7 @@ end, log.warn)
 
 print = log.debug
 
-local server = require 'language-server.init'
+local server = require 'language-server'
 server.create():start()
 
 ls.eventLoop.start()

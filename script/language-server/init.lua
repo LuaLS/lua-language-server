@@ -1,3 +1,11 @@
+require 'scope'
+require 'config'
+require 'filesystem'
+require 'node'
+require 'vm'
+require 'file'
+require 'feature'
+
 require 'language-server.task'
 require 'language-server.capability'
 

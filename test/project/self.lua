@@ -68,7 +68,7 @@ end
 
 do
     local root = ls.env.ROOT_URI
-    local scope <close> = ls.scope.create(root, ls.afs)
+    local scope <close> = ls.scope.create('test', root, ls.afs)
 
     collectgarbage()
     print('加载项目前的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })

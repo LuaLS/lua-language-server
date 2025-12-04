@@ -19,13 +19,16 @@ end
 ---@param data string
 function M:write(data)
     writeMaster:notify('write', { 'stdout', data })
+    log.verb('stdio:write: ', data)
 end
 
 ---@async
 ---@param ... string | integer
 ---@return string?
 function M:read(...)
-    return readMaster:awaitRequest('read', { 'stdin', ... })
+    local data = readMaster:awaitRequest('read', { 'stdin', ... })
+    log.verb('stdio:read: ', data)
+    return data
 end
 
 local API = {}

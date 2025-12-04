@@ -62,12 +62,18 @@ function M:next()
             -- request or notification
 
             local task = ls.task.create(data.method, data.params, function (result, error)
+                if not data.id then
+                    return
+                end
                 self.io:write(jsonrpc.encode {
                     id     = data.id,
                     result = result,
                     error  = error,
                 })
             end)
+            if not data.id then
+                task:doNotNeedResolve()
+            end
             return task, data.id
         end
         if data.id then

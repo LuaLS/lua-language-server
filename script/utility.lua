@@ -1021,6 +1021,15 @@ function m.tableMerge(a, b)
     return a
 end
 
+function m.tableDefault(a, b)
+    for k, v in pairs(b) do
+        if a[k] == nil then
+            a[k] = v
+        end
+    end
+    return a
+end
+
 ---@param a any[]
 ---@param b any[]
 ---@return any[]

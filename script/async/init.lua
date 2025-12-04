@@ -1,4 +1,4 @@
----@class Async.Master
+---@class Async
 ls.async = {}
 
 require 'async.master'

@@ -3,8 +3,8 @@
     "Lua.misc.parameters": [
         //"--preview",
         "--develop=true",
-        "--dbgport=11413",
-        "--loglevel=trace",
+        "--dbgport=11418",
+        "--loglevel=verb",
         //"--shownode",
         //"--lazy",
     ],

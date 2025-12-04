@@ -4,6 +4,7 @@ local spec = require 'lsp.spec'
 local M = Class 'Task'
 
 M.resolved = false
+M.needResolve = true
 
 ---@alias Task.Callback fun(result?: any, error?: LSP.ResponseError)
 
@@ -14,10 +15,32 @@ function M:__init(method, params, callback)
     self.method = method
     self.params = params
     self.callback = callback
+    self.threads = {}
+end
+
+function M:__del()
+    for _, co in ipairs(self.threads) do
+        local state = coroutine.status(co)
+        if state == 'suspended' then
+            coroutine.close(co)
+        end
+    end
 end
 
 function M:__close(err)
-    self:reject(err)
+    if self.needResolve and not self.resolved then
+        if err then
+            self:reject(err)
+        else
+            self:rejectWithCode(spec.ErrorCodes.InternalError, 'Miss to resolve the task: ' .. tostring(self.method))
+        end
+    end
+
+    Delete(self)
+end
+
+function M:doNotNeedResolve()
+    self.needResolve = false
 end
 
 ---@param result any
@@ -27,7 +50,11 @@ function M:resolve(result)
     end
     self.resolved = true
 
-    self.callback(result, nil)
+    if self.needResolve then
+        self.callback(result, nil)
+    end
+
+    Delete(self)
 end
 
 ---@param err integer | string
@@ -52,9 +79,10 @@ function M:reject(err)
         return
     end
     self:rejectWithCode(spec.ErrorCodes.InternalError, 'Unknown error.')
+
+    Delete(self)
 end
 
----@private
 ---@param code integer
 ---@param err string
 ---@param data? any
@@ -63,17 +91,27 @@ function M:rejectWithCode(code, err, data)
         return
     end
     self.resolved = true
-    self.callback(nil, {
-        code    = code,
-        message = err,
-        data    = data,
-    })
+
+    if self.needResolve then
+        self.callback(nil, {
+            code    = code,
+            message = err,
+            data    = data,
+        })
+    end
 end
+
+---@type table<thread, Task>
+local taskMap = setmetatable({}, { __mode = 'k' })
 
 ---@param func async fun()
 function M:execute(func)
+    ---@async
     ls.await.call(function ()
-        
+        local co = coroutine.running()
+        taskMap[co] = self
+        table.insert(self.threads, co)
+        func()
     end)
 end
 
@@ -85,4 +123,9 @@ ls.task = {}
 ---@return Task
 function ls.task.create(method, params, callback)
     return New 'Task' (method, params, callback)
+end
+
+---@return Task?
+function ls.task.getCurrentTask()
+    return taskMap[coroutine.running()]
 end

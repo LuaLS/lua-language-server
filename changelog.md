@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Fix diagnostic completions incorrect textEdit.finish
 
 ## 3.16.0
 `2025-12-2`

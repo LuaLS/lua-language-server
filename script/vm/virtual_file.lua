@@ -14,11 +14,20 @@ function M:__init(scope, uri)
     self.uri = uri
 end
 
----@param ast LuaParser.Ast
+---@param document Document
 ---@return VM.Coder
-function M:makeCoder(ast)
+function M:makeCoder(document)
     local coder = ls.vm.createCoder()
-    coder:makeFromAst(ast)
+    coder:makeFromAst(document.ast)
+    return coder
+end
+
+---@async
+---@param document Document
+---@return VM.Coder
+function M:awaitMakeCoder(document)
+    local coder = ls.vm.createCoder()
+    coder:makeFromFile(document.file)
     return coder
 end
 
@@ -33,7 +42,24 @@ function M:index()
     self.document = document
     self.version = self.version + 1
 
-    self.coder = self:makeCoder(document.ast)
+    self.coder = self:makeCoder(document)
+    self:bindGC(self.coder)
+    self.coder:run(self)
+end
+
+---@async
+function M:awaitIndex()
+    local document = self.scope:getDocument(self.uri)
+    if not document then
+        return
+    end
+    if self.document == document then
+        return
+    end
+    self.document = document
+    self.version = self.version + 1
+
+    self.coder = self:awaitMakeCoder(document)
     self:bindGC(self.coder)
     self.coder:run(self)
 end

@@ -17,6 +17,16 @@ function M:indexFile(uri)
     return file
 end
 
+---@async
+---@param uri Uri
+---@return VM.Vfile
+function M:awaitIndexFile(uri)
+    local file = self:getFile(uri)
+              or self:createFile(uri)
+    file:awaitIndex()
+    return file
+end
+
 ---@param uri Uri
 ---@return VM.Vfile?
 function M:getFile(uri)

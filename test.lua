@@ -8,6 +8,7 @@ package.path = package.path.. ';./?.lua;./?/init.lua'
 
 require 'luals'
 require 'runtime'
+require 'master'
 ls.parser = require 'parser'
 require 'scope'
 require 'config'
@@ -16,8 +17,6 @@ require 'node'
 require 'vm'
 require 'file'
 require 'feature'
-
-fs.create_directories(fs.path(ls.env.LOG_PATH))
 
 ---@class Log
 log = New 'Log' {

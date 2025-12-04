@@ -75,7 +75,6 @@ end
 ---@field loaded integer
 ---@field indexed integer
 ---@field uris Uri[]
----@field indexTimes table<Uri, number>
 
 ---@async
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
@@ -92,7 +91,6 @@ function M:load(callback)
         loaded = 0,
         indexed = 0,
         uris = self.uris,
-        indexTimes = {},
     }
 
     xpcall(callback, log.error, 'start', status)
@@ -137,10 +135,7 @@ function M:loadFiles(callback, status)
 
             ls.await.sleep(0)
 
-            local c1 = os.clock()
-            self.vm:indexFile(uri)
-            local c2 = os.clock()
-            status.indexTimes[uri] = c2 - c1
+            self.vm:awaitIndexFile(uri)
             status.indexed = status.indexed + 1
 
             xpcall(callback, log.error, 'indexing', status, uri)

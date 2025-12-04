@@ -1,6 +1,10 @@
 ---@class VM.Coder
 local M = Class 'VM.Coder'
 
+if ls.threadName == 'master' then
+    M.coderMaster = ls.async.create('coder', 8, 'vm.coder.coder-worker', true)
+end
+
 M.code = '-- Not made yet --'
 ---@type function?
 M.func = nil
@@ -49,7 +53,17 @@ function M:makeFromAst(ast)
     self.code = table.concat(self.buf)
     self.compiled = nil
 
-    self.func = load(self.code, self.code, 't', self.env)
+    self.func = assert(load(self.code, self.code, 't', self.env))
+end
+
+---@async
+---@param file File
+function M:makeFromFile(file)
+    self.code = assert(self.coderMaster:awaitRequest('makeCode', {
+        text = file:getText(),
+        source = file.uri,
+    }))
+    self.func = assert(load(self.code, self.code, 't', self.env))
 end
 
 ---@param code string

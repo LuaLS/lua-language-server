@@ -3,8 +3,8 @@ local M = Class 'VM'
 
 ---@param scope Scope
 function M:__init(scope)
-    self.scope  = scope
-    self.node   = scope.rt
+    self.scope = scope
+    self.rt    = scope.rt
     ---@type table<Uri, VM.Vfile>
     self.vfiles = ls.fs.newMap()
 end
@@ -101,15 +101,15 @@ function M:getKey(field)
             ---@cast key LuaParser.Node.Exp
             if key.isLiteral then
                 ---@cast key LuaParser.Node.Literal
-                return key.value or self.node.UNKNOWN
+                return key.value or self.rt.UNKNOWN
             end
-            return self.node.UNKNOWN
+            return self.rt.UNKNOWN
         end
     elseif field.kind == 'var' then
         ---@cast field LuaParser.Node.Var
         return field.id
     else
-        return self.node.UNKNOWN
+        return self.rt.UNKNOWN
     end
 end
 

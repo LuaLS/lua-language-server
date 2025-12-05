@@ -89,6 +89,7 @@ function M:addAssign(field)
         self.assigns = ls.tools.linkedTable.create()
     end
     self.assigns:pushTail(field)
+    self.scope.rt.REF_POOL[self] = true
 
     self:flushCache()
 
@@ -110,21 +111,23 @@ function M:removeAssign(field)
     if self.assigns:getSize() == 0 then
         self.assigns = nil
 
-        local rt = self.scope.rt
-        local parent = self.parent
-        for _ = 1, 100 do
-            if not parent or parent.kind ~= 'variable' then
-                break
-            end
-            ---@cast parent Node.Variable
-            parent.childs[rt.luaKey(self.key)] = nil
-            if not next(parent.childs) then
-                parent.childs = nil
-                parent = parent.parent
-            else
-                break
-            end
-        end
+        self.scope.rt.REF_POOL[self] = nil
+
+        -- local rt = self.scope.rt
+        -- local parent = self.parent
+        -- for _ = 1, 100 do
+        --     if not parent or parent.kind ~= 'variable' then
+        --         break
+        --     end
+        --     ---@cast parent Node.Variable
+        --     parent.childs[rt.luaKey(self.key)] = nil
+        --     if not next(parent.childs) then
+        --         parent.childs = nil
+        --         parent = parent.parent
+        --     else
+        --         break
+        --     end
+        -- end
     end
     self:flushCache()
 
@@ -335,7 +338,7 @@ function M:getChild(key1, key2, ...)
             local child = current.childs and current.childs[k]
             if not child then
                 child = rt.variable(k, current)
-                current.childs = current.childs or {}
+                current.childs = current.childs or ls.util.weakVTable()
                 current.childs[k] = child
             end
             current = child
@@ -345,7 +348,7 @@ function M:getChild(key1, key2, ...)
     local child = current.childs and current.childs[key]
     if not child then
         child = rt.variable(key, current)
-        current.childs = current.childs or {}
+        current.childs = current.childs or ls.util.weakVTable()
         current.childs[key] = child
     end
     return child
@@ -362,7 +365,7 @@ function M:addField(field, path)
     local rt = self.scope.rt
     local current = self
     if not current.childs then
-        current.childs = {}
+        current.childs = ls.util.weakVTable()
     end
 
     if path then
@@ -373,7 +376,7 @@ function M:addField(field, path)
             end
             current = current.childs[k]
             if not current.childs then
-                current.childs = {}
+                current.childs = ls.util.weakVTable()
             end
         end
     end

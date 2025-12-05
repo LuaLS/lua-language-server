@@ -998,6 +998,18 @@ m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }
 
+function m.weakTable(t)
+    return setmetatable(t or {}, m.MODE_KV)
+end
+
+function m.weakKTable(t)
+    return setmetatable(t or {}, m.MODE_K)
+end
+
+function m.weakVTable(t)
+    return setmetatable(t or {}, m.MODE_V)
+end
+
 ---@generic T: fun(param: any):any
 ---@param func T
 ---@return T

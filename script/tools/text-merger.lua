@@ -11,7 +11,7 @@ local M = {}
 M.__index = M
 
 local function getOffsetEncoding(encoding)
-    return encoding or 'utf16'
+    return encoding or 'utf-16'
 end
 
 local function splitRows(text)

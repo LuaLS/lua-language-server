@@ -15,6 +15,7 @@ end
 ---@private
 function M:createPools()
     local scope = self.scope
+    self.REF_POOL = {}
     self.TYPE_POOL  = setmetatable({}, {
         __mode = 'v',
         __index = function (t, k)

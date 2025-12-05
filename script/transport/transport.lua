@@ -65,7 +65,10 @@ function M:next()
                 if not data.id then
                     return
                 end
-                if result then
+                if not err then
+                    if result == nil then
+                        result = ls.json.null
+                    end
                     self.io:write(jsonrpc.encode {
                         id     = data.id,
                         result = result,

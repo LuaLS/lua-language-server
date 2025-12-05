@@ -75,7 +75,7 @@ ls.feature.provider.definition(function (param, push)
     end)
 end)
 
--- 局部变量的定义位置
+-- 变量的定义位置
 ls.feature.provider.definition(function (param, push, skip)
     local var = param.sources[1]
     if  var.kind ~= 'var'

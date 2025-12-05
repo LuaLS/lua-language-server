@@ -42,6 +42,9 @@ function M:index()
         return
     end
     self.version = document.version
+    if self.coder then
+        self.coder:dispose()
+    end
 
     self.coder = self:makeCoder(document)
     self:bindGC(self.coder)
@@ -60,6 +63,10 @@ function M:awaitIndex()
     self.version = document.version
 
     local version = self.version
+    if self.coder then
+        self.coder:dispose()
+    end
+
     self.coder = self:awaitMakeCoder(document)
     if self.version ~= version then
         return

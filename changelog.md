@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Added `completion.maxFieldCount` which lets you increase the amount of fields to analyze before requiring more specific input
 
 ## 3.16.0
 `2025-12-2`

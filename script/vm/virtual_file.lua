@@ -12,6 +12,10 @@ function M:__init(scope, uri)
     self.uri = uri
 end
 
+function M:__close()
+    self:remove()
+end
+
 ---@param document Document
 ---@return VM.Coder
 function M:makeCoder(document)

@@ -197,21 +197,23 @@ function ls.scope.findSources(uri, offset, accepts)
     return sources, scope, doc
 end
 
-ls.file.onDidChange:on(function (uri)
-    local scope = ls.scope.find(uri)
-    if not scope then
-        return
-    end
-    ---@async
-    ls.await.call(function ()
-        scope.vm:awaitIndexFile(uri)
+function ls.scope.watchFiles()
+    ls.file.onDidChange:on(function (uri)
+        local scope = ls.scope.find(uri)
+        if not scope then
+            return
+        end
+        ---@async
+        ls.await.call(function ()
+            scope.vm:awaitIndexFile(uri)
+        end)
     end)
-end)
 
-ls.file.onDidRemove:on(function (uri)
-    local scope = ls.scope.find(uri)
-    if not scope then
-        return
-    end
-    scope.vm:removeFile(uri)
-end)
+    ls.file.onDidRemove:on(function (uri)
+        local scope = ls.scope.find(uri)
+        if not scope then
+            return
+        end
+        scope.vm:removeFile(uri)
+    end)
+end

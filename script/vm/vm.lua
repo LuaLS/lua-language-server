@@ -39,6 +39,9 @@ end
 function M:createFile(uri)
     local vfile = ls.vm.createVfile(self.scope, uri)
     self.vfiles[uri] = vfile
+    vfile:bindGC(function ()
+        self.vfiles[uri] = nil
+    end)
     return vfile
 end
 

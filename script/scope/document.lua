@@ -7,7 +7,7 @@ local M = Class 'Document'
 
 Extends('Document', 'GCHost')
 
-M.version = -1
+M.version = 0
 
 ---@param file File
 function M:__init(file)

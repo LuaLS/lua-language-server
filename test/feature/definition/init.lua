@@ -20,8 +20,8 @@ function TEST(script)
     local _ <close> = test.checkInclude(script)
     local newScript, catched = test.catch(script, '!?')
 
-    local file <close> = ls.file.setServerText(test.fileUri, newScript)
-    test.scope.vm:indexFile(test.fileUri)
+    local file <close>  = ls.file.setServerText(test.fileUri, newScript)
+    local vfile <close> = test.scope.vm:indexFile(test.fileUri)
 
     local results = ls.feature.definition(test.fileUri, catched['?'][1][1])
     local ranges = ls.util.map(results, function (v, k)

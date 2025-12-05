@@ -17,15 +17,6 @@ function M:__init()
     self.scopes = {}
 end
 
----@type Scope
-M.fallbackScope = nil
-
-M.__getter.fallbackScope = function (self)
-    local scope = ls.scope.create('<Fallback>', nil, ls.afs)
-    scope:start()
-    return scope, true
-end
-
 ---@param options? LanguageServer.Options
 function M:start(options)
     ---@type LanguageServer.Options

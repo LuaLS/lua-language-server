@@ -19,6 +19,9 @@ end, log.warn)
 
 print = log.debug
 
+require 'scope'
+ls.scope.watchFiles()
+
 local server = require 'language-server'
 server.create():start()
 

@@ -16,7 +16,7 @@ test.includeCodes['binary'] = [[
 ]]
 
 ---@param script string
----@return File?
+---@return function?
 function test.checkInclude(script)
     local buf = {}
     for include in script:gmatch('%-%-!include%s+([%w_]+)') do
@@ -31,7 +31,10 @@ function test.checkInclude(script)
 
     local text = table.concat(buf, '\n')
     local file = ls.file.setServerText(test.includeUri, text)
-    test.scope.vm:indexFile(test.includeUri)
+    local vfile = test.scope.vm:indexFile(test.includeUri)
 
-    return file
+    return function ()
+        file:remove()
+        vfile:remove()
+    end
 end

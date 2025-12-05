@@ -51,4 +51,17 @@ ls.await.setSleepWaker(function (time, callback)
 end)
 ls.eventLoop.addTask(ls.timer.update)
 
+local nonil = require 'tools.without-check-nil'
+---@generic T
+---@param callback fun(): T
+---@return T
+function ls.optional(callback)
+    local oldMT = debug.getmetatable(nil)
+    local _ <close> = function ()
+        debug.setmetatable(nil, oldMT)
+    end
+    debug.setmetatable(nil, nonil.mt)
+    return callback()
+end
+
 return ls

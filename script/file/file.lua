@@ -73,13 +73,14 @@ end
 
 ---@param changes LSP.TextDocumentContentChangeEvent[]
 ---@param version integer
-function M:applyClientChanges(changes, version)
+---@param encoding? Encoder.Encoding
+function M:applyClientChanges(changes, version, encoding)
     if version <= self.clientVersion then
         return
     end
     self.clientVersion = version
     if not self.merger then
-        self.merger = tmerger.create(self.clientText, 'utf16')
+        self.merger = tmerger.create(self.clientText, encoding or 'utf-16')
     end
     self.merger:applyChanges(changes)
     local oldText = self:getText()
@@ -161,11 +162,12 @@ end
 ---@param uri Uri
 ---@param changes LSP.TextDocumentContentChangeEvent[]
 ---@param version integer
+---@param encoding? Encoder.Encoding
 ---@return File
-function ls.file.applyClientChanges(uri, changes, version)
+function ls.file.applyClientChanges(uri, changes, version, encoding)
     local file = ls.file.get(uri)
             or   ls.file.create(uri)
-    file:applyClientChanges(changes, version)
+    file:applyClientChanges(changes, version, encoding)
     return file
 end
 

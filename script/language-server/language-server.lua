@@ -105,6 +105,25 @@ function M:shutdown()
     self.status = 'shutdown'
 end
 
+---@type Encoder.Encoding
+M.encoding = nil
+
+---@param self LanguageServer
+---@return Encoder.Encoding
+---@return boolean
+M.__getter.encoding = function (self)
+    if not self.clientParams then
+        return 'utf-16', false
+    end
+    local clientEncodings = ls.optional(function ()
+        return self.clientParams.capabilities.general.positionEncodings or {}
+    end)
+    if ls.util.arrayHas(clientEncodings, 'utf-8') then
+        return 'utf-8', true
+    end
+    return 'utf-16', true
+end
+
 ---@class LanguageServer.API
 local API = {}
 

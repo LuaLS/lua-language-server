@@ -1,3 +1,5 @@
+require 'file'
+
 ---@class Scope
 local M = Class 'Scope'
 
@@ -21,7 +23,7 @@ function M:__init(name, uri, fs)
     self.rt:reset()
 
     ---@type table<Uri, Document?>
-    self.documents = setmetatable({}, ls.util.MODE_V)
+    self.documents = {}
 
     self.vm = ls.vm.create(self)
 end
@@ -101,13 +103,6 @@ function M:getDocument(uri)
         return nil
     end
     local document = self.documents[file.uri]
-    if document then
-        if document.serverVersion ~= file.serverVersion
-        or document.file ~= file then
-            document:remove()
-            document = nil
-        end
-    end
     if not document then
         ---@type Document
         document = New 'Document' (file)
@@ -201,3 +196,22 @@ function ls.scope.findSources(uri, offset, accepts)
     end
     return sources, scope, doc
 end
+
+ls.file.onDidChange:on(function (uri)
+    local scope = ls.scope.find(uri)
+    if not scope then
+        return
+    end
+    ---@async
+    ls.await.call(function ()
+        scope.vm:awaitIndexFile(uri)
+    end)
+end)
+
+ls.file.onDidRemove:on(function (uri)
+    local scope = ls.scope.find(uri)
+    if not scope then
+        return
+    end
+    scope.vm:removeFile(uri)
+end)

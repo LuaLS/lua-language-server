@@ -1,7 +1,7 @@
 do
     local scope <close> = ls.scope.create('test afs')
 
-    local file <close> = ls.file.setText(test.fileUri, [[
+    local file <close> = ls.file.setServerText(test.fileUri, [[
 GlobalA = 1
 ]])
 

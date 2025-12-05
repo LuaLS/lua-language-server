@@ -5,6 +5,7 @@ local M = Class 'VM'
 function M:__init(scope)
     self.scope  = scope
     self.node   = scope.rt
+    ---@type table<Uri, VM.Vfile>
     self.vfiles = ls.fs.newMap()
 end
 

@@ -1030,6 +1030,22 @@ function m.tableDefault(a, b)
     return a
 end
 
+---@param a table
+---@param b table
+---@param recursive boolean
+function m.tableExtends(a, b, recursive)
+    for k, v in pairs(b) do
+        if recursive and type(v) == 'table' then
+            if type(a[k]) ~= 'table' then
+                a[k] = {}
+            end
+            m.tableExtends(a[k], v, true)
+        else
+            a[k] = v
+        end
+    end
+end
+
 ---@param a any[]
 ---@param b any[]
 ---@return any[]

@@ -1,13 +1,15 @@
+require 'filesystem'
+
 ---@class File: Class.Base, GCHost
----@field text string
+---@field serverText string
+---@field clientText? string
 ---@field clientVersion? integer
 ---@overload fun(uri:string): self
 local M = Class 'File'
 
-Extends('File', 'GCHost')
+M.clientVersion = -1
 
-M.openedByClient = false
-M.serverVersion = 0
+Extends('File', 'GCHost')
 
 ---@param uri Uri
 function M:__init(uri)
@@ -19,42 +21,67 @@ end
 
 function M:__del()
     ls.file.all[self.uri] = nil
+    ls.file.onDidRemove:fire(self.uri)
 end
 
 function M:__close()
     self:remove()
 end
 
-function M:openByClient()
-    self.openedByClient = true
-end
-
-function M:closeByClient()
-    self.openedByClient = false
-end
-
 function M:isOpenedByClient()
-    return self.openedByClient
+    return self.clientText ~= nil
 end
 
 ---@return string?
 function M:getText()
-    return self.text
+    return self.clientText or self.serverText
 end
 
 ---@param text string
-function M:setText(text)
-    if self.text == text then
+function M:setServerText(text)
+    if self.serverText == text then
         return
     end
-    self.text = text
-    self.serverVersion = self.serverVersion + 1
+    local oldText = self:getText()
+    self.serverText = text
+    if self:getText() == oldText then
+        return
+    end
     self.onDidChange:fire()
+    ls.file.onDidChange:fire(self.uri)
 end
 
+---@param text string
 ---@param version integer
-function M:updateClientVersion(version)
+function M:setClientText(text, version)
+    if version <= self.clientVersion then
+        return
+    end
     self.clientVersion = version
+    if self.clientText == text then
+        return
+    end
+    local oldText = self:getText()
+    self.clientText = text
+    if self:getText() == oldText then
+        return
+    end
+    self.onDidChange:fire()
+    ls.file.onDidChange:fire(self.uri)
+end
+
+function M:removeByClient()
+    self.clientText = nil
+    if not self.serverText then
+        self:remove()
+    end
+end
+
+function M:removeByServer()
+    self.serverText = nil
+    if not self.clientText then
+        self:remove()
+    end
 end
 
 function M:remove()
@@ -63,6 +90,9 @@ end
 
 ---@type table<Uri, File>
 ls.file.all = ls.fs.newMap()
+
+ls.file.onDidRemove = ls.sevent.create()
+ls.file.onDidChange = ls.sevent.create()
 
 ---@param uri Uri
 ---@return File
@@ -77,59 +107,52 @@ function ls.file.get(uri)
 end
 
 ---@param uri Uri
----@param clientVersion? integer
----@return File
-function ls.file.openByClient(uri, clientVersion)
-    local file = ls.file.get(uri)
-            or   ls.file.create(uri)
-    file:openByClient()
-    if clientVersion then
-        file:updateClientVersion(clientVersion)
-    end
-    return file
-end
-
----@param uri Uri
----@return File?
-function ls.file.closeByClient(uri)
-    local file = ls.file.get(uri)
-    if not file then
-        return nil
-    end
-    file:closeByClient()
-    return file
-end
-
----@param uri Uri
 ---@return boolean
 function ls.file.isOpenedByClient(uri)
     local file = ls.file.get(uri)
     if not file then
         return false
     end
-    return file:openedByClient()
+    return file:isOpenedByClient()
 end
 
 ---@param uri Uri
 ---@param text string
----@param clientVersion? integer
 ---@return File
-function ls.file.setText(uri, text, clientVersion)
+function ls.file.setServerText(uri, text)
     local file = ls.file.get(uri)
             or   ls.file.create(uri)
-    file:setText(text)
-    if clientVersion then
-        file:updateClientVersion(clientVersion)
+    file:setServerText(text)
+    return file
+end
+
+---@param uri Uri
+---@param text string
+---@param version integer
+---@return File
+function ls.file.setClientText(uri, text, version)
+    local file = ls.file.get(uri)
+            or   ls.file.create(uri)
+    file:setClientText(text, version)
+    return file
+end
+
+---@param uri Uri
+---@return File?
+function ls.file.removeByServer(uri)
+    local file = ls.file.get(uri)
+    if file then
+        file:removeByServer()
     end
     return file
 end
 
 ---@param uri Uri
 ---@return File?
-function ls.file.remove(uri)
+function ls.file.removeByClient(uri)
     local file = ls.file.get(uri)
     if file then
-        file:remove()
+        file:removeByClient()
     end
     return file
 end

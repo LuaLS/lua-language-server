@@ -1,6 +1,6 @@
 local markdown = require 'tools.markdown'
 
-ls.capability.serverCapabilities.hoverProvider = true
+ls.capability.registerCapability.hoverProvider = true
 
 ls.capability.register('textDocument/hover', function (server, params, task)
     ---@cast params LSP.HoverParams

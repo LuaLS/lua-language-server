@@ -9,12 +9,16 @@ require 'feature'
 require 'language-server.task'
 require 'language-server.capability'
 
-require 'language-server.capability.lifecycle.initialize'
-require 'language-server.capability.lifecycle.shutdown'
-require 'language-server.capability.lifecycle.exit'
-require 'language-server.capability.lifecycle.initialized'
+require 'language-server.capability.lifecycle-messages.initialize'
+require 'language-server.capability.lifecycle-messages.shutdown'
+require 'language-server.capability.lifecycle-messages.exit'
+require 'language-server.capability.lifecycle-messages.initialized'
 
-require 'language-server.capability.features.hover'
+require 'language-server.capability.document-synchronization.did-open-text-document'
+require 'language-server.capability.document-synchronization.did-change-text-document'
+require 'language-server.capability.document-synchronization.did-close-text-document'
+
+require 'language-server.capability.language-features.hover'
 
 local server = require 'language-server.language-server'
 

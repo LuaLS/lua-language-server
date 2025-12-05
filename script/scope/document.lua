@@ -7,13 +7,15 @@ local M = Class 'Document'
 
 Extends('Document', 'GCHost')
 
+M.version = -1
+
 ---@param file File
 function M:__init(file)
     self.file = file
-    self.serverVersion = file.serverVersion
-    self.clientVersion = file.clientVersion
+    self.version = 1
 
     file.onDidChange:on(function ()
+        self.version = self.version + 1
         class.flush(self)
     end)
 

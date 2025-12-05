@@ -3,9 +3,7 @@ local M = Class 'VM.Vfile'
 
 Extends('VM.Vfile', 'GCHost')
 
-M.version = 0
----@type Document?
-M.document = nil
+M.version = -1
 
 ---@param scope Scope
 ---@param uri Uri
@@ -36,11 +34,10 @@ function M:index()
     if not document then
         return
     end
-    if self.document == document then
+    if self.version >= document.version then
         return
     end
-    self.document = document
-    self.version = self.version + 1
+    self.version = document.version
 
     self.coder = self:makeCoder(document)
     self:bindGC(self.coder)
@@ -53,13 +50,16 @@ function M:awaitIndex()
     if not document then
         return
     end
-    if self.document == document then
+    if self.version >= document.version then
         return
     end
-    self.document = document
-    self.version = self.version + 1
+    self.version = document.version
 
+    local version = self.version
     self.coder = self:awaitMakeCoder(document)
+    if self.version ~= version then
+        return
+    end
     self:bindGC(self.coder)
     self.coder:run(self)
 end

@@ -123,7 +123,7 @@ function M:loadFiles(callback, status)
         loadTasks[#loadTasks+1] = function ()
             local content = self.fs.read(uri)
             if content then
-                ls.file.setText(uri, content)
+                ls.file.setServerText(uri, content)
             end
             status.loaded = status.loaded + 1
 

@@ -30,7 +30,7 @@ function test.checkInclude(script)
     end
 
     local text = table.concat(buf, '\n')
-    local file = ls.file.setText(test.includeUri, text)
+    local file = ls.file.setServerText(test.includeUri, text)
     test.scope.vm:indexFile(test.includeUri)
 
     return file

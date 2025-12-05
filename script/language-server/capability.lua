@@ -14,10 +14,17 @@ ls.capability.defaultOptions = {
 ---@type LSP.ServerCapabilities
 ls.capability.serverCapabilities = {}
 
+---@type LSP.ServerCapabilities
+ls.capability.registerCapability = setmetatable({}, {
+    __newindex = function (t, k, v)
+        ls.util.tableExtends(ls.capability.serverCapabilities, { [k] = v }, true)
+    end
+})
+
 ls.capability.registered = {}
 
 ---@param method string
----@param callback fun(server: LanguageServer, params: table, task: Task)
+---@param callback async fun(server: LanguageServer, params: table, task: Task)
 ---@param options? Capability.Options
 function ls.capability.register(method, callback, options)
     ls.capability.registered[method] = {

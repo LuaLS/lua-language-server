@@ -425,6 +425,8 @@ config.diagnostics['unnecessary-assert']    =
 'Enable diagnostics for redundant assertions on truthy values.'
 config.diagnostics['no-unknown']            =
 'Enable diagnostics for cases in which the type cannot be inferred.'
+config.diagnostics['no-unknown-operations']            =
+'Enable diagnostics for cases in which the result type of an operation cannot be inferred.'
 config.diagnostics['not-yieldable']         =
 'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
 config.diagnostics['param-type-mismatch']   =

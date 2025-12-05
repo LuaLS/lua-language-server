@@ -384,6 +384,12 @@ function mt:hasFunction(uri)
 end
 
 ---@param uri uri
+---@return boolean
+function mt:isCallable(uri)
+    return self:hasFunction(uri) or #vm.getOperators("call", self.node, uri) ~= 0
+end
+
+---@param uri uri
 function mt:_computeViews(uri)
     if self.views then
         return

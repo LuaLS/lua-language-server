@@ -133,6 +133,12 @@ function M:isValidUri(uri)
     return false
 end
 
+---@param encoding Encoder.Encoding
+---@return Scope.LSPConverter
+function M:makeLSPConverter(encoding)
+    return New 'Scope.LSPConverter' (self, encoding)
+end
+
 function M:remove()
     Delete(self)
 end

@@ -11,5 +11,5 @@ ls.capability.register('textDocument/didChange', function (server, params, task)
     local changes = params.contentChanges
     local version = params.textDocument.version
 
-    ls.file.applyClientChanges(uri, changes, version, server.encoding)
+    ls.file.applyClientChanges(uri, changes, version, server.positionEncoding)
 end)

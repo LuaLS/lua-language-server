@@ -18,6 +18,7 @@ require 'language-server.capability.document-synchronization.did-open-text-docum
 require 'language-server.capability.document-synchronization.did-change-text-document'
 require 'language-server.capability.document-synchronization.did-close-text-document'
 
+require 'language-server.capability.language-features.go-to-definition'
 require 'language-server.capability.language-features.hover'
 
 local server = require 'language-server.language-server'

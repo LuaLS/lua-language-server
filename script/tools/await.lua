@@ -11,6 +11,7 @@ local function presume(co, ...)
     local suc, err = coroutine.resume(co, ...)
     if not suc then
         errorHandler(debug.traceback(co, err))
+        coroutine.close(co)
     end
 end
 

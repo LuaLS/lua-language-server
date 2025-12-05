@@ -54,29 +54,10 @@ M.__getter.positionConverter = function (self)
     return positionConverter.parse(text), true
 end
 
----@param position LSP.Position
----@return integer offset # 0-based
-function M:at(position)
-    local pc = self.positionConverter
-    return pc:positionToOffset(position.line, position.character)
-end
-
----@param offset integer # 0-based
----@return LSP.Position
-function M:positionOf(offset)
-    local pc = self.positionConverter
-    local line, character = pc:offsetToPosition(offset)
-    return { line = line, character = character }
-end
-
----@param startOffset integer # 0-based
----@param endOffset integer # 0-based
----@return LSP.Range
-function M:rangeOf(startOffset, endOffset)
-    return {
-        start = self:positionOf(startOffset),
-        ['end'] = self:positionOf(endOffset),
-    }
+---@param positionEncoding Encoder.Encoding
+---@return Document.LSPConverter
+function M:makeLSPConverter(positionEncoding)
+    return New 'Document.LSPConverter' (self, positionEncoding)
 end
 
 function M:remove()

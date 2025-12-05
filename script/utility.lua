@@ -1257,6 +1257,14 @@ function m.enableDividStringAsPath()
     end
 end
 
+function m.enableFalswallow()
+    setmetatable(false, {
+        __index = function ()
+            return false
+        end
+    })
+end
+
 ---@param str string
 ---@param sep string
 ---@return string[]

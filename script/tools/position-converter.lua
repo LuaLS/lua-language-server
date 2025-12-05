@@ -1,8 +1,6 @@
-local type         = type
-local pairs        = pairs
-local setmetatable = setmetatable
+local encoder = require 'tools.encoder'
 
-_ENV = nil
+local setmetatable = setmetatable
 
 ---@class PositionConverter
 ---@field private _text string
@@ -32,10 +30,11 @@ function M:parse(text)
 end
 
 --- 将偏移位置（0-based）转换为行列（0-based）
----@param offset integer
+---@param offset integer # 字节位置
+---@param encoding? Encoder.Encoding
 ---@return integer row # 第一行是0
----@return integer col # 第一列是0
-function M:offsetToPosition(offset)
+---@return integer col # 第一列是0，根据编码的字符位置
+function M:offsetToPosition(offset, encoding)
     local lineStarts = self._lineStarts
 
     if offset < 0 then
@@ -44,12 +43,17 @@ function M:offsetToPosition(offset)
 
     local textLen = #self._text
     if offset >= textLen then
-        -- 返回最后一行，列为文本长度减去最后一行起始位置
-        return #lineStarts - 1, textLen - lineStarts[#lineStarts]
+        -- 返回最后一行
+        local row = #lineStarts - 1
+        local lineStart = lineStarts[#lineStarts]
+        local lineText = self._text:sub(lineStart + 1)
+        local col = encoding and encoder.len(encoding, lineText) or (textLen - lineStart)
+        return row, col
     end
 
     if #lineStarts == 1 then
-        return 0, offset
+        local col = encoding and encoder.len(encoding, self._text, 1, offset) or offset
+        return 0, col
     end
 
     -- 二分查找行号
@@ -69,15 +73,25 @@ function M:offsetToPosition(offset)
         end
     end
 
-    local col = offset - lineStarts[row + 1]
-    return row, col
+    local lineStart = lineStarts[row + 1]
+
+    if encoding then
+        -- 计算从行首到当前位置的字符数
+        local lineText = self._text:sub(lineStart + 1, offset)
+        local col = encoder.len(encoding, lineText)
+        return row, col
+    else
+        local col = offset - lineStart
+        return row, col
+    end
 end
 
 --- 将行列（0-based）转换为偏移位置（0-based）
 ---@param row integer # 第一行是0
----@param col integer # 第一列是0
----@return integer offset
-function M:positionToOffset(row, col)
+---@param col integer # 第一列是0，根据编码的字符位置
+---@param encoding? Encoder.Encoding
+---@return integer offset # 字节位置
+function M:positionToOffset(row, col, encoding)
     local lineStarts = self._lineStarts
 
     if row < 0 then
@@ -92,22 +106,42 @@ function M:positionToOffset(row, col)
         return lineStart
     end
 
-    local offset = lineStart + col
-
-    -- 确保不超过当前行的末尾
+    -- 获取当前行的文本范围
+    local lineEnd
     if row + 1 < #lineStarts then
-        local nextLineStart = lineStarts[row + 2]
-        if offset >= nextLineStart then
-            offset = nextLineStart - 1
-        end
+        lineEnd = lineStarts[row + 2] - 1
     else
-        local textLen = #self._text
-        if offset >= textLen then
-            offset = textLen
-        end
+        lineEnd = #self._text
     end
 
-    return offset
+    local lineText = self._text:sub(lineStart + 1, lineEnd)
+
+    if encoding then
+        -- 使用 encoder.offset 将字符位置转换为字节位置
+        local byteOffset = encoder.offset(encoding, lineText, col + 1, 1)
+        if not byteOffset then
+            -- 如果超出行尾，返回行尾位置
+            return lineEnd
+        end
+        local offset = lineStart + byteOffset - 1
+
+        -- 确保不超过当前行的末尾
+        if offset > lineEnd then
+            return lineEnd
+        end
+
+        return offset
+    else
+        -- 无编码时，col 直接是字节偏移
+        local offset = lineStart + col
+
+        -- 确保不超过当前行的末尾
+        if offset > lineEnd then
+            return lineEnd
+        end
+
+        return offset
+    end
 end
 
 ---@param text string

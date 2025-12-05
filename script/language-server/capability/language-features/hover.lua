@@ -10,8 +10,9 @@ ls.capability.register('textDocument/hover', function (server, params, task)
     if not document then
         return
     end
+    local converter = document:makeLSPConverter(server.positionEncoding)
 
-    local sources = ls.scope.findSources(uri, document:at(params.position))
+    local sources = ls.scope.findSources(uri, converter:at(params.position))
     local source = sources and sources[1]
     if not source then
         return
@@ -25,7 +26,7 @@ ls.capability.register('textDocument/hover', function (server, params, task)
                 : append('lua', source.code)
                 : string(),
         },
-        range = document:rangeOf(source.start, source.finish)
+        range = converter:range(source.start, source.finish)
     }
 
     task:resolve(hover)

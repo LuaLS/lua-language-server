@@ -84,6 +84,10 @@ end
 function M:initializing(params)
     assert(self.status == 'starting', 'Invalid server state when initializing: ' .. self.status)
     self.clientParams = params
+    self.clientCapabilities = setmetatable(params.capabilities or {}, {
+        -- `false` 是全局swallow，省的判空了
+        __index = function () return false end
+    })
     self.status = 'initializing'
 end
 
@@ -106,18 +110,16 @@ function M:shutdown()
 end
 
 ---@type Encoder.Encoding
-M.encoding = nil
+M.positionEncoding = nil
 
 ---@param self LanguageServer
 ---@return Encoder.Encoding
 ---@return boolean
-M.__getter.encoding = function (self)
+M.__getter.positionEncoding = function (self)
     if not self.clientParams then
         return 'utf-16', false
     end
-    local clientEncodings = ls.optional(function ()
-        return self.clientParams.capabilities.general.positionEncodings or {}
-    end)
+    local clientEncodings =  self.clientCapabilities.general.positionEncodings or {}
     if ls.util.arrayHas(clientEncodings, 'utf-8') then
         return 'utf-8', true
     end

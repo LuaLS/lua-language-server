@@ -1,5 +1,5 @@
-local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local math = _tl_compat and _tl_compat.math or math; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table
-local inspect = {Options = {}, }
+local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local math = _tl_compat and _tl_compat.math or math; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table; local type = type
+local inspect = { Options = {} }
 
 
 
@@ -54,6 +54,13 @@ local char = string.char
 local gsub = string.gsub
 local fmt = string.format
 
+local _rawget
+if rawget then
+   _rawget = rawget
+else
+   _rawget = function(t, k) return t[k] end
+end
+
 local function rawpairs(t)
    return next, t, nil
 end
@@ -87,8 +94,35 @@ local function escape(str)
    "%c", shortControlCharEscapes))
 end
 
+local luaKeywords = {
+   ['and'] = true,
+   ['break'] = true,
+   ['do'] = true,
+   ['else'] = true,
+   ['elseif'] = true,
+   ['end'] = true,
+   ['false'] = true,
+   ['for'] = true,
+   ['function'] = true,
+   ['goto'] = true,
+   ['if'] = true,
+   ['in'] = true,
+   ['local'] = true,
+   ['nil'] = true,
+   ['not'] = true,
+   ['or'] = true,
+   ['repeat'] = true,
+   ['return'] = true,
+   ['then'] = true,
+   ['true'] = true,
+   ['until'] = true,
+   ['while'] = true,
+}
+
 local function isIdentifier(str)
-   return type(str) == "string" and not not str:match("^[_%a][_%a%d]*$")
+   return type(str) == "string" and
+   not not str:match("^[_%a][_%a%d]*$") and
+   not luaKeywords[str]
 end
 
 local flr = math.floor
@@ -122,7 +156,7 @@ end
 local function getKeys(t)
 
    local seqLen = 1
-   while rawget(t, seqLen) ~= nil do
+   while _rawget(t, seqLen) ~= nil do
       seqLen = seqLen + 1
    end
    seqLen = seqLen - 1

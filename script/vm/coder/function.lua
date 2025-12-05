@@ -148,5 +148,5 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             coder:compileAssign(source.name, 1, coder:getKey(source))
         end
 
-    end, source.code)
+    end, source)
 end)

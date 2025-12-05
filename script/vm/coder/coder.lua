@@ -160,7 +160,7 @@ function M:run(vfile)
     self.map = map
     self.var = var
     if not suc then
-        log.debug(self.code)
+        ls.util.saveFile(ls.env.LOG_PATH / 'last_failed_coder.log', self.code)
     end
 
     LAST_CODE = self.code
@@ -206,10 +206,16 @@ function M:currentBlock()
 end
 
 ---@param callback function
----@param comment? string
+---@param comment? string | LuaParser.Node.Base
 function M:withIndentation(callback, comment)
-    if comment then
+    if type(comment) == 'string' then
         self:addLine('do -- ' .. comment:match('[^\r\n]*'))
+    elseif type(comment) == 'table' then
+        ---@cast comment LuaParser.Node.Base
+        self:addLine('do -- :{} -- {}' % {
+            comment.startRow,
+            comment.code:match('[^\r\n]*'),
+        })
     else
         self:addLine 'do'
     end

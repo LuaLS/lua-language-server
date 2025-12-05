@@ -17,7 +17,6 @@ ls.util.enableDividStringAsPath()
 ls.util.enableFalswallow()
 
 ls.fsu     = require 'tools.fs-utility'
-ls.inspect = require 'tools.inspect'
 ls.encoder = require 'tools.encoder'
 ls.gc      = require 'tools.gc'
 ls.json    = require 'tools.json'
@@ -52,5 +51,30 @@ ls.await.setSleepWaker(function (time, callback)
     end
 end)
 ls.eventLoop.addTask(ls.timer.update)
+
+local inspect = require 'tools.inspect'
+
+local inspectOptions = {
+    process = function (item, path)
+        -- don't inspect metatable
+        if path[#path] == inspect.METATABLE then
+            return nil
+        end
+        -- don't show text
+        if path[#path] == 'text' then
+            return '***'
+        end
+        if item == _G then
+            return '<_G>'
+        end
+        if type(item) == 'string' and #item > 1000 then
+            return item:sub(1, 450) .. '...' .. item:sub(-450)
+        end
+        return item
+    end
+}
+function ls.inspect(root)
+    return inspect.inspect(root, inspectOptions)
+end
 
 return ls

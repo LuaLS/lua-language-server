@@ -5,7 +5,7 @@ local function parseBlock(coder, block)
     for _, child in ipairs(block.childs) do
         coder:withIndentation(function ()
             coder:compile(child)
-        end, child.code)
+        end, child)
         coder:addLine('')
     end
     coder:popBlock()
@@ -50,7 +50,7 @@ ls.vm.registerCoderProvider('if', function (coder, source)
         end
         coder:withIndentation(function ()
             parseBlock(coder, child)
-        end, child.code)
+        end, child)
     end
 end)
 

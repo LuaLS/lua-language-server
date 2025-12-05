@@ -54,7 +54,7 @@ ls.vm.registerCoderProvider('table', function (coder, source)
                 key   = coder:getKey(source),
                 field = coder:getKey(field),
             })
-        end, field.code)
+        end, field)
     end
 end)
 

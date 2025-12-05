@@ -1,4 +1,5 @@
 require 'filesystem'
+local tmerger = require 'tools.text-merger'
 
 ---@class File: Class.Base, GCHost
 ---@field serverText string
@@ -70,6 +71,26 @@ function M:setClientText(text, version)
     ls.file.onDidChange:fire(self.uri)
 end
 
+---@param changes LSP.TextDocumentContentChangeEvent[]
+---@param version integer
+function M:applyClientChanges(changes, version)
+    if version <= self.clientVersion then
+        return
+    end
+    self.clientVersion = version
+    if not self.merger then
+        self.merger = tmerger.create(self.clientText, 'utf16')
+    end
+    self.merger:applyChanges(changes)
+    local oldText = self:getText()
+    self.clientText = self.merger:getText()
+    if self:getText() == oldText then
+        return
+    end
+    self.onDidChange:fire()
+    ls.file.onDidChange:fire(self.uri)
+end
+
 function M:removeByClient()
     self.clientText = nil
     if not self.serverText then
@@ -134,6 +155,17 @@ function ls.file.setClientText(uri, text, version)
     local file = ls.file.get(uri)
             or   ls.file.create(uri)
     file:setClientText(text, version)
+    return file
+end
+
+---@param uri Uri
+---@param changes LSP.TextDocumentContentChangeEvent[]
+---@param version integer
+---@return File
+function ls.file.applyClientChanges(uri, changes, version)
+    local file = ls.file.get(uri)
+            or   ls.file.create(uri)
+    file:applyClientChanges(changes, version)
     return file
 end
 

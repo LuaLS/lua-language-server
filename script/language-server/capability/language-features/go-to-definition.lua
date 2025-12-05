@@ -15,7 +15,7 @@ ls.capability.register('textDocument/definition', function (server, params, task
     local locations = {}
 
     local sconverter = scope:makeLSPConverter(server.positionEncoding)
-    local linkSupport = server.clientCapabilities.textDocument.definition.linkSupport
+    local linkSupport = server.client.capabilities.textDocument.definition.linkSupport
     for _, res in ipairs(results) do
         if linkSupport then
             locations[#locations+1] = sconverter:locationLink(res)

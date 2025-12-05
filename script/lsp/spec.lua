@@ -1,3 +1,5 @@
+-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/
+
 ---@class LSP
 local M = {}
 
@@ -4920,7 +4922,7 @@ M.FileChangeType = {
 ---@field message string
 
 
----@enum LSP.MessageType
+---@enum(key) LSP.MessageType
 M.MessageType = {
     --- An error message.
     Error = 1,

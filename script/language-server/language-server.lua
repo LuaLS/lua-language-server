@@ -1,5 +1,6 @@
 local transport = require 'transport'
 local spec      = require 'lsp.spec'
+local client    = require 'language-server.language-client'
 
 ---@class LanguageServer: Class.Base
 local M = Class 'LanguageServer'
@@ -15,6 +16,7 @@ M.status = 'starting'
 function M:__init()
     ---@type Scope[]
     self.scopes = {}
+    self.client = client.create()
 end
 
 ---@param options? LanguageServer.Options
@@ -29,6 +31,7 @@ end
 ---@private
 function M:startTransport()
     self.transport = transport.create()
+    self.client:setTransport(self.transport)
 
     if not self.options.transport or self.options.transport == 'stdio' then
         self.transport:useStdio()
@@ -83,11 +86,7 @@ end
 ---@param params LSP.InitializeParams
 function M:initializing(params)
     assert(self.status == 'starting', 'Invalid server state when initializing: ' .. self.status)
-    self.clientParams = params
-    self.clientCapabilities = setmetatable(params.capabilities or {}, {
-        -- `false` 是全局swallow，省的判空了
-        __index = function () return false end
-    })
+    self.client:initialize(params)
     self.status = 'initializing'
 end
 
@@ -95,8 +94,8 @@ function M:initialized()
     assert(self.status == 'initializing', 'Invalid server state when initialized: ' .. self.status)
     self.status = 'initialized'
 
-    if self.clientParams.workspaceFolders then
-        for i, folder in ipairs(self.clientParams.workspaceFolders) do
+    if self.client.params.workspaceFolders then
+        for i, folder in ipairs(self.client.params.workspaceFolders) do
             local scope = ls.scope.create(folder.name, folder.uri, ls.afs)
             scope:start()
             self.scopes[i] = scope
@@ -116,10 +115,10 @@ M.positionEncoding = nil
 ---@return Encoder.Encoding
 ---@return boolean
 M.__getter.positionEncoding = function (self)
-    if not self.clientParams then
+    if not self.client.params then
         return 'utf-16', false
     end
-    local clientEncodings =  self.clientCapabilities.general.positionEncodings or {}
+    local clientEncodings =  self.client.capabilities.general.positionEncodings or {}
     if ls.util.arrayHas(clientEncodings, 'utf-8') then
         return 'utf-8', true
     end

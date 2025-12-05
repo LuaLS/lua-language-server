@@ -318,7 +318,9 @@ function M:makeFieldCode(source)
     end
     if source.isLiteral then
         ---@cast source LuaParser.Node.Literal
-        return string.format('%q', source.value)
+        if source.value ~= nil then
+            return string.format('%q', source.value)
+        end
     end
     return nil
 end

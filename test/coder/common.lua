@@ -348,3 +348,9 @@ do
         local x, y, z = f1()
     ]]
 end
+
+do
+    TEST_INDEX [[
+        a[nil] = 10
+    ]]
+end

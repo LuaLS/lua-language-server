@@ -40,7 +40,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         variable = coder:getVariableKey(source),
         var      = coder:getKey(source),
     })
-    if source.subtype == 'index' and not source.key.isLiteral then
+    if fieldCode == 'rt.UNKNOWN' then
         return
     end
     coder:addLine('{r2}, {v2} = {r1}, {v1}' % {

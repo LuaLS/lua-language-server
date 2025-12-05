@@ -61,19 +61,41 @@ function M:next()
         if data.method then
             -- request or notification
 
-            local task = ls.task.create(data.method, data.params, function (result, error)
+            local task = ls.task.create(data, function (result, err)
                 if not data.id then
                     return
                 end
-                self.io:write(jsonrpc.encode {
-                    id     = data.id,
-                    result = result,
-                    error  = error,
-                })
+                if result then
+                    self.io:write(jsonrpc.encode {
+                        id     = data.id,
+                        result = result,
+                    })
+                else
+                    local function pushError(code, message)
+                        self.io:write(jsonrpc.encode {
+                            id    = data.id,
+                            error = {
+                                code    = code,
+                                message = message,
+                            },
+                        })
+                    end
+                    if err == ls.task.REJECT_CLOSED then
+                        pushError(spec.ErrorCodes.InternalError, 'Method `{method}` forgot response.' % data)
+                        return
+                    end
+                    if type(err) == 'table' then
+                        xpcall(function ()
+                            pushError(err.code, err.message)
+                        end, function (...)
+                            local msg = log.error(...)
+                            pushError(spec.ErrorCodes.InternalError, msg)
+                        end)
+                        return
+                    end
+                    pushError(spec.ErrorCodes.InternalError, ls.inspect(err))
+                end
             end)
-            if not data.id then
-                task:doNotNeedResolve()
-            end
             return task, data.id
         end
         if data.id then

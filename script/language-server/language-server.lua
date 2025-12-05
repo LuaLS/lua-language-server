@@ -56,25 +56,34 @@ end
 function M:resolveTask(task)
     task:execute(function ()
         local _ <close> = task
-        local method = task.method
+        local method = task.context.method
         local registered = ls.capability.registered[method]
         if not registered then
-            task:rejectWithCode(spec.ErrorCodes.MethodNotFound, 'Method not found: ' .. tostring(method))
+            task:reject {
+                code = spec.ErrorCodes.MethodNotFound,
+                message = 'Method not found: ' .. tostring(method),
+            }
             return
         end
         local callback = registered.callback
         local options  = registered.options
 
         if self.status ~= 'initialized' and options.needInitialized then
-            task:rejectWithCode(spec.ErrorCodes.ServerNotInitialized, 'Server not initialized.')
+            task:reject {
+                code = spec.ErrorCodes.ServerNotInitialized,
+                message = 'Server not initialized.',
+            }
             return
         end
         if self.status == 'shutdown' and not options.validAfterShutdown then
-            task:rejectWithCode(spec.ErrorCodes.InvalidRequest, 'Server is shut down.')
+            task:reject {
+                code = spec.ErrorCodes.InvalidRequest,
+                message = 'Server is shut down.',
+            }
             return
         end
 
-        callback(self, task.params, task)
+        callback(self, task.context.params, task)
     end)
 end
 

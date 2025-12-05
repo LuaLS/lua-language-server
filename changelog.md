@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Comparison crash in doc export CLI [#3111](https://github.com/LuaLS/lua-language-server/issues/3111)
 
 ## 3.16.0
 `2025-12-2`

@@ -72,11 +72,11 @@ function export.positionOf(rowcol)
 end
 
 function export.sortDoc(a,b)
-    if a.name ~= b.name then
+    if a.name and b.name and a.name ~= b.name then
         return a.name < b.name
     end
 
-    if a.file ~= b.file then
+    if a.file and b.file and a.file ~= b.file then
         return a.file < b.file
     end
 

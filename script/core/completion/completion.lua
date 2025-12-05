@@ -1925,7 +1925,7 @@ local function tryluaDocBySource(state, position, source, results)
                     kind     = define.CompletionItemKind.Enum,
                     textEdit = {
                         start   = source.start,
-                        finish  = source.start + #source.mode - 1,
+                        finish  = source.start + #source.mode,
                         newText = mode,
                     },
                 }
@@ -1940,7 +1940,7 @@ local function tryluaDocBySource(state, position, source, results)
                     kind     = define.CompletionItemKind.Value,
                     textEdit = {
                         start   = source.start,
-                        finish  = source.start + #source[1] - 1,
+                        finish  = source.start + #source[1],
                         newText = name,
                     },
                 }

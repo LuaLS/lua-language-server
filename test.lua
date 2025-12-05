@@ -1,4 +1,3 @@
-local fs     = require 'bee.filesystem'
 local thread = require 'bee.thread'
 
 collectgarbage('generational', 10, 50)
@@ -9,7 +8,6 @@ package.path = package.path.. ';./?.lua;./?/init.lua'
 require 'luals'
 require 'runtime'
 require 'master'
-ls.parser = require 'parser'
 require 'scope'
 require 'config'
 require 'filesystem'

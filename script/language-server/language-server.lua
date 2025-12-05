@@ -84,6 +84,8 @@ function M:resolveTask(task)
         end
 
         callback(self, task.context.params, task)
+
+        task:resolve(nil)
     end)
 end
 

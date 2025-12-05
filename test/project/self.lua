@@ -1,3 +1,5 @@
+local parser = require 'parser'
+
 ---@param uris Uri[]
 local function testSyncTime(uris)
     local c1 = os.clock()
@@ -5,7 +7,7 @@ local function testSyncTime(uris)
     local coders = {}
     for _, uri in ipairs(uris) do
         local file = ls.file.get(uri) --[[@as File]]
-        local ast = ls.parser.compile(file:getText()--[[@as string]], uri)
+        local ast = parser.compile(file:getText()--[[@as string]], uri)
         local coder = ls.vm.createCoder()
         coder:makeFromAst(ast)
         coders[#coders+1] = coder

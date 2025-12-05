@@ -35,6 +35,7 @@ ls.uri           = require 'tools.uri'
 ls.timer         = require 'tools.timer'
 ls.await         = require 'tools.await'
 ls.eventLoop     = require 'tools.event-loop'
+ls.sevent        = require 'tools.simple-event'
 
 require 'async'
 

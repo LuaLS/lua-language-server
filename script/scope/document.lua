@@ -1,3 +1,7 @@
+local positionConverter = require 'tools.position-converter'
+local class = require 'class'
+local parser = require 'parser'
+
 ---@class Document: Class.Base, GCHost
 local M = Class 'Document'
 
@@ -9,7 +13,18 @@ function M:__init(file)
     self.serverVersion = file.serverVersion
     self.clientVersion = file.clientVersion
 
+    file.onDidChange:on(function ()
+        class.flush(self)
+    end)
+
     file:bindGC(self)
+end
+
+---@type string
+M.text = nil
+
+M.__getter.text = function (self)
+    return self.file:getText() or ''
 end
 
 ---@type LuaParser.Ast
@@ -19,11 +34,47 @@ M.ast = nil
 ---@return LuaParser.Ast | false
 ---@return true
 M.__getter.ast = function (self)
-    local suc, ast = xpcall(ls.parser.compile, log.error, self.file:getText(), self.file.uri)
+    local suc, ast = xpcall(parser.compile, log.error, self.text, self.file.uri)
     if not suc then
         return false, true
     end
     return ast, true
+end
+
+---@type PositionConverter
+M.positionConverter = nil
+
+---@param self Document
+---@return PositionConverter
+---@return true
+M.__getter.positionConverter = function (self)
+    local text = self.file:getText() or ''
+    return positionConverter.parse(text), true
+end
+
+---@param position LSP.Position
+---@return integer offset # 0-based
+function M:at(position)
+    local pc = self.positionConverter
+    return pc:positionToOffset(position.line, position.character)
+end
+
+---@param offset integer # 0-based
+---@return LSP.Position
+function M:positionOf(offset)
+    local pc = self.positionConverter
+    local line, character = pc:offsetToPosition(offset)
+    return { line = line, character = character }
+end
+
+---@param startOffset integer # 0-based
+---@param endOffset integer # 0-based
+---@return LSP.Range
+function M:rangeOf(startOffset, endOffset)
+    return {
+        start = self:positionOf(startOffset),
+        ['end'] = self:positionOf(endOffset),
+    }
 end
 
 function M:remove()

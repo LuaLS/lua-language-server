@@ -489,4 +489,13 @@ function M.isInstanceOf(obj, targetName)
     return isInstanceMap[myName][targetName]
 end
 
+--- 清理一个对象的缓存数据（对应 `__getter` 的字段）
+---@param obj Class.Base
+function M.flush(obj)
+    local getter = obj.__getter
+    for k in pairs(getter) do
+        obj[k] = nil
+    end
+end
+
 return M

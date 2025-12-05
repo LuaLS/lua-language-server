@@ -23,7 +23,7 @@ end
 
 ---@param value string
 ---@return Markdown
-function M:appendPaintext(value)
+function M:appendText(value)
     table.insert(self.contents, {
         value = value,
     })

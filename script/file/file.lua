@@ -12,6 +12,7 @@ M.serverVersion = 0
 ---@param uri Uri
 function M:__init(uri)
     self.uri = uri
+    self.onDidChange = ls.sevent.create()
 
     ls.file.all[uri] = self
 end
@@ -48,6 +49,7 @@ function M:setText(text)
     end
     self.text = text
     self.serverVersion = self.serverVersion + 1
+    self.onDidChange:fire()
 end
 
 ---@param version integer

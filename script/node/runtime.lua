@@ -1,3 +1,5 @@
+local class = require 'class'
+
 ---@class Node.Runtime: Class.Base
 ---@overload fun(scope: Scope): Node.Runtime
 local M = Class 'Node.Runtime'
@@ -455,10 +457,7 @@ function M:flushCacheNow()
         end
         flushed[node] = true
 
-        local getter = node.__getter
-        for k in pairs(getter) do
-            node[k] = nil
-        end
+        class.flush(node)
 
         local refMap = node.refMap
         if refMap then

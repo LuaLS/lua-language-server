@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Autodoc generation so it does not include documentation for builtin Lua language features
 
 ## 3.16.0
 `2025-12-2`

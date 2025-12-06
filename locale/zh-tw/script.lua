@@ -122,6 +122,12 @@ DIAG_MISSING_GLOBAL_DOC_PARAM         =
 '全域函式 `{2}` 的參數 `{1}` 缺少 @param 標註。'
 DIAG_MISSING_GLOBAL_DOC_RETURN        =
 '全域函式 `{2}` 的第 `{1}` 個回傳值缺少 @return 標註。'
+DIAG_MISSING_LOCAL_DOC_COMMENT        = -- TODO: need translate!
+'Missing comment for local function `{}`.'
+DIAG_MISSING_LOCAL_DOC_PARAM          = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in local function `{}`.'
+DIAG_MISSING_LOCAL_DOC_RETURN         = -- TODO: need translate!
+'Missing @return annotation at index `{}` in local function `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT =
 '輸出的區域函式 `{}` 缺少註解。'
 DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   =

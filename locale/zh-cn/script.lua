@@ -126,6 +126,12 @@ DIAG_MISSING_GLOBAL_DOC_PARAM         =
 '全局函数 `{2}` 的参数 `{1}` 缺少 @param 注解。'
 DIAG_MISSING_GLOBAL_DOC_RETURN        =
 '全局函数 `{2}` 的第 `{1}` 个返回值缺少 @return 注解。'
+DIAG_MISSING_LOCAL_DOC_COMMENT        = -- TODO: need translate!
+'Missing comment for local function `{}`.'
+DIAG_MISSING_LOCAL_DOC_PARAM          = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in local function `{}`.'
+DIAG_MISSING_LOCAL_DOC_RETURN         = -- TODO: need translate!
+'Missing @return annotation at index `{}` in local function `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT =
 '导出的局部函数 `{}` 缺少注释。'
 DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   =

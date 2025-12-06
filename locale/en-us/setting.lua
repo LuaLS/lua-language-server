@@ -411,6 +411,8 @@ config.diagnostics['invisible']             =
 'Enable diagnostics for accesses to fields which are invisible.'
 config.diagnostics['missing-global-doc']    =
 'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
+config.diagnostics['missing-local-doc']     =
+'Missing annotations for locals! Local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-local-export-doc'] =
 'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-parameter']     =

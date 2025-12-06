@@ -413,6 +413,8 @@ config.diagnostics['invisible']             =
 'Habilita el diagnóstico para accesos a campos que son invisibles.'
 config.diagnostics['missing-global-doc']    =
 'Habilita el diagnóstico para globales faltantes. Las funciones globales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.'
+config.diagnostics['missing-local-doc']     = -- TODO: need translate!
+'Missing annotations for locals! Local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-local-export-doc'] =
 'Habilita el diagnóstico para locales exportadas. Las funciones locales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.'
 config.diagnostics['missing-parameter']     =

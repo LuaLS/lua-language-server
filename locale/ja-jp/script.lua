@@ -122,6 +122,12 @@ DIAG_MISSING_GLOBAL_DOC_PARAM         =
 'グローバル関数 `{2}` のパラメータ `{1}` に @param 注釈がありません。'
 DIAG_MISSING_GLOBAL_DOC_RETURN        =
 'グローバル関数 `{2}` の第 `{1}` の戻り値に @return 注釈がありません。'
+DIAG_MISSING_LOCAL_DOC_COMMENT        = -- TODO: need translate!
+'Missing comment for local function `{}`.'
+DIAG_MISSING_LOCAL_DOC_PARAM          = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in local function `{}`.'
+DIAG_MISSING_LOCAL_DOC_RETURN         = -- TODO: need translate!
+'Missing @return annotation at index `{}` in local function `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT  =
 'エクスポートされたローカル関数 `{}` に注釈がありません。'
 DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM    =

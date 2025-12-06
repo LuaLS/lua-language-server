@@ -26,6 +26,7 @@ local inf          = 1 / 0
 local nan          = 0 / 0
 local error        = error
 local assert       = assert
+local clock        = os.clock
 
 _ENV = nil
 
@@ -1338,6 +1339,17 @@ function m.asKey(str)
         return str
     end
     return ('[%q]'):format(str)
+end
+
+---@param job function
+---@param finish fun(duration: number)
+---@return any
+function m.withDuration(job, finish)
+    local startTime = clock()
+    local result = job()
+    local endTime = clock()
+    finish(endTime - startTime)
+    return result
 end
 
 return m

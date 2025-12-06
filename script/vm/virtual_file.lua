@@ -46,9 +46,29 @@ function M:index()
         self.coder:dispose()
     end
 
-    self.coder = self:makeCoder(document)
+    self.indexing = true
+
+    ls.util.withDuration(function ()
+        self.coder = self:makeCoder(document)
+    end, function (duration)
+        if duration > 0.1 then
+            log.warn('Index {} took {:.2f} seconds.', self.uri, duration)
+        else
+            log.debug('Index {} in {:.2f} seconds.', self.uri, duration)
+        end
+    end)
     self:bindGC(self.coder)
-    self.coder:run(self)
+    ls.util.withDuration(function ()
+        self.coder:run(self)
+    end, function (duration)
+        if duration > 0.1 then
+            log.warn('Run coder for {} took {:.2f} seconds.', self.uri, duration)
+        else
+            log.debug('Run coder for {} in {:.2f} seconds.', self.uri, duration)
+        end
+    end)
+
+    self.indexing = false
 end
 
 ---@async
@@ -58,6 +78,10 @@ function M:awaitIndex()
         return
     end
     if self.version >= document.version then
+        -- 等待之前的编译任务完成
+        while self.indexing do
+            ls.await.sleep(0.01)
+        end
         return
     end
     self.version = document.version
@@ -67,12 +91,33 @@ function M:awaitIndex()
         self.coder:dispose()
     end
 
-    self.coder = self:awaitMakeCoder(document)
+    self.indexing = true
+
+    ---@async
+    ls.util.withDuration(function ()
+        self.coder = self:awaitMakeCoder(document)
+    end, function (duration)
+        if duration > 0.1 then
+            log.warn('Index (async) {} took {:.3f} seconds.' % { self.uri, duration })
+        else
+            log.debug('Index (async) {} in {:.3f} seconds.' % { self.uri, duration })
+        end
+    end)
     if self.version ~= version then
         return
     end
     self:bindGC(self.coder)
-    self.coder:run(self)
+    ls.util.withDuration(function ()
+        self.coder:run(self)
+    end, function (duration)
+        if duration > 0.1 then
+            log.warn('Run coder for {} took {:.3f} seconds.' % { self.uri, duration })
+        else
+            log.debug('Run coder for {} in {:.3f} seconds.' % { self.uri, duration })
+        end
+    end)
+
+    self.indexing = false
 end
 
 ---@param source LuaParser.Node.Base

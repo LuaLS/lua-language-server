@@ -12,31 +12,63 @@ function M:__init(name, num, entry, useDebugger)
     self.num     = num
     self.entry   = entry
     self.workers = {}
-    ---@type Async.Worker[]
-    self.idles   = {}
+    self.idles   = ls.tools.linkedTable.create()
+    self.queue   = ls.tools.linkedTable.create()
     self.useDebugger = useDebugger
 
     for i = 1, num do
         local workerName = '{}-{}' % { name, i }
         self.workers[i] = New 'Async.Worker' (workerName, entry, useDebugger)
-        self.idles[i] = self.workers[i]
+        self.idles:pushHead(self.workers[i])
     end
+end
+
+---@private
+function M:pickJob()
+    local job    = self.queue:getHead()
+    ---@type Async.Worker
+    local worker = self.idles:getHead()
+    if not job or not worker then
+        return
+    end
+    self.queue:pop(job)
+    self.idles:pop(worker)
+
+    if job.callback then
+        worker:request(job.method, job.params, function (...)
+            -- 完成一个请求的worker一定很空闲，放到队首
+            self.idles:pushHead(worker)
+            job.callback(...)
+            self:pickJob()
+        end)
+    else
+        worker:notify(job.method, job.params)
+        -- 不确定执行通知的worker是否空闲，放到队尾
+        self.idles:pushTail(worker)
+    end
+    return self:pickJob()
 end
 
 ---@param method string
 ---@param params table
 ---@param callback function
 function M:request(method, params, callback)
-    local idles = self.idles
-    ---@type Async.Worker
-    local idle = table.remove(idles)
-    if not idle then
-        idle = self.workers[math.random(1, self.num)]
-    end
-    idle:request(method, params, function (...)
-        table.insert(idles, idle)
-        callback(...)
-    end)
+    self.queue:pushTail {
+        method   = method,
+        params   = params,
+        callback = callback,
+    }
+    self:pickJob()
+end
+
+---@param method string
+---@param params table
+function M:notify(method, params)
+    self.queue:pushTail {
+        method   = method,
+        params   = params,
+    }
+    self:pickJob()
 end
 
 ---@async
@@ -45,21 +77,8 @@ end
 ---@return any
 function M:awaitRequest(method, params)
     return ls.await.yield(function (resume)
-        self:request(method, params, function (...)
-            resume(...)
-        end)
+        self:request(method, params, resume)
     end)
-end
----@param method string
----@param params table
-function M:notify(method, params)
-    local idles = self.idles
-    ---@type Async.Worker
-    local idle = idles[#idles]
-    if not idle then
-        idle = self.workers[math.random(1, self.num)]
-    end
-    idle:notify(method, params)
 end
 
 ---@param name string

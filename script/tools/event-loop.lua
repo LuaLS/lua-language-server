@@ -16,8 +16,10 @@ function M.start(sleeper)
     M.started = true
     while M.started do
         M.runTask()
-        M.runDelayQueue()
-        sleeper(0.01)
+        local busy = M.runDelayQueue(100)
+        if not busy then
+            sleeper(0.01)
+        end
     end
 end
 
@@ -37,17 +39,26 @@ function M.runTask()
 end
 
 ---@private
-function M.runDelayQueue()
+---@param max integer
+---@return boolean # 是否还有剩余任务
+function M.runDelayQueue(max)
     local queue = M.delayQueue
     if not queue then
-        return
+        return false
     end
-    local index = 1
-    while index <= #queue do
-        xpcall(queue[index], log.error)
-        index = index + 1
+    for i = 1, max do
+        if not queue[i] then
+            break
+        end
+        xpcall(queue[i], log.error)
     end
-    M.delayQueue = nil
+    if not queue[max + 1] then
+        M.delayQueue = nil
+        return false
+    end
+    M.delayQueue = {}
+    table.move(queue, max + 1, #queue, 1, M.delayQueue)
+    return true
 end
 
 ---@param callback fun()

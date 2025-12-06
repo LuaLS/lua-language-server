@@ -12,7 +12,9 @@ M.hang = 0
 ---@param useDebugger? boolean
 function M:__init(name, entry, useDebugger)
     self.name = name
+    log.info('Create channel: {}' % { name .. '-request' })
     self.requestChannel  = channel.create(name .. '-request')
+    log.info('Create channel: {}' % { name .. '-response' })
     self.responseChannel = channel.create(name .. '-response')
     self.requestMap = {}
 
@@ -45,7 +47,7 @@ require 'async.worker-init' (...)
                 log.warn(data.error)
                 goto continue
             end
-            callback(table.unpack(data.result, 1, data.result.n))
+            xpcall(callback, log.error, table.unpack(data.result, 1, data.result.n))
             ::continue::
         end
     end)

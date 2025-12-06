@@ -99,7 +99,7 @@ function API.waitAll(callbacks)
     end
     for i = 1, count do
         local co = cos[i]
-        coroutine.resume(co)
+        presume(co)
     end
     if count > 0 then
         coroutine.yield()

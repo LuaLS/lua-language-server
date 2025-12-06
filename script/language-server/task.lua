@@ -1,5 +1,3 @@
-local spec = require 'lsp.spec'
-
 ---@class Task
 local M = Class 'Task'
 

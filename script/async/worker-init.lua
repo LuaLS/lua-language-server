@@ -1,47 +1,60 @@
-return function (...)
-    local name, entry, debugger = ...
+local channel = require 'bee.channel'
+local time    = require 'bee.time'
+
+return function (options)
 
     require 'luals'
 
-    ls.threadName = name
+    ls.threadName = options.name
+
+    local logChannel = channel.query('log')
+    assert(logChannel, 'log channel not found')
 
     ---@diagnostic disable-next-line: lowercase-global
     log = New 'Log' {
-        print = function (level, message, timeStamp)
-            
+        clock = function ()
+            return time.monotonic() / 1000.0
+        end,
+        time  = function ()
+            return time.time() // 1000
+        end,
+        level = options.logLevel,
+        print = function (timeStamp, level, sourceStr, message)
+            logChannel:push(options.name, timeStamp, level, sourceStr, message)
+            return true
         end,
     }
 
     log.info('Worker ready!')
 
     xpcall(function ()
-        if not debugger then
+        if not options.debugger then
             return
         end
         local dbg = require 'debugger'
-        dbg:start(debugger.address)
-        if debugger.wait then
+        dbg:start(options.debugger.address)
+        if options.debugger.wait then
             dbg:event 'wait'
         end
     end, log.warn)
 
     local channel = require 'bee.channel'
     local epoll   = require 'bee.epoll'
-    local requestChannel  = channel.query(name .. '-request')
-    local responseChannel = channel.query(name .. '-response')
+    local requestChannel  = channel.query(options.name .. '-request')
+    local responseChannel = channel.query(options.name .. '-response')
 
-    assert(requestChannel,  name .. '-request channel not found')
-    assert(responseChannel, name .. '-response channel not found')
-
-    local module = require(entry)
+    assert(requestChannel,  options.name .. '-request channel not found')
+    assert(responseChannel, options.name .. '-response channel not found')
+    local module = require(options.entry)
 
     local function resolve(request)
+        log.verb('Recieved request:', request.method)
         local method = request.method
         local params = request.params
         local result = table.pack(module.resolve(method, params))
+        log.verb('Resolved result:', request.method)
         return result
     end
-
 
     local epfd <close> = assert(epoll.create(16))
     epfd:event_add(requestChannel:fd(), epoll.EPOLLIN)
@@ -50,7 +63,7 @@ return function (...)
             if event & epoll.EPOLLIN ~= 0 then
                 local ok, request = requestChannel:pop()
                 if ok then
-                    local suc, result = xpcall(resolve, debug.traceback, request)
+                    local suc, result = xpcall(resolve, log.error, request)
                     if request.id then
                         if suc then
                             responseChannel:push({

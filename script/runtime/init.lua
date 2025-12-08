@@ -3,7 +3,6 @@ local argparser = require 'runtime.argparser'
 local version   = require 'runtime.version'
 local platform  = require 'bee.platform'
 local fs        = require 'bee.filesystem'
-local sys       = require 'bee.sys'
 
 --启动时的命令行参数
 ---@class LuaLS.Args
@@ -68,6 +67,7 @@ local function findRoot()
     if rootPath == '' or rootPath == '.' then
         rootPath = fs.current_path():string()
     end
+    rootPath = rootPath:gsub('[/\\]', package.config:sub(1, 1))
     return rootPath
 end
 

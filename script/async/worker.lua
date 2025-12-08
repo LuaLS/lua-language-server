@@ -19,13 +19,41 @@ function M:__init(name, entry, useDebugger)
     self.requestMap = {}
 
     self.thread = thread.create([[
+local options = ...
+local root = options.root
 package.path = {packagepath:q}
-require 'async.worker-init' (...)
+
+package.searchers[2] = function (name)
+    local filename, err = package.searchpath(name, package.path)
+    if not filename then
+        return err
+    end
+    local f = io.open(filename)
+    if not f then
+        return 'cannot open file:' .. filename
+    end
+    local buf = f:read '*a'
+    f:close()
+    local relative = filename:sub(1, #root) == root and filename:sub(#root + 2) or filename
+    local init, err = load(buf, '@' .. relative)
+    if not init then
+        return err
+    end
+    return init, filename
+end
+
+require 'async.worker-init' (options)
     ]] % {
         packagepath = package.path,
-    }, name, entry, useDebugger and ls.args.DEVELOP and {
-        address = ls.args.DBGADDRESS .. ':' .. tostring(ls.args.DBGPORT),
-        wait    = ls.args.DBGWAIT,
+    }, {
+        name = name,
+        root = ls.env.ROOT_PATH,
+        entry = entry,
+        logLevel = log.level,
+        debugger = useDebugger and ls.args.DEVELOP and {
+            address = ls.args.DBGADDRESS .. ':' .. tostring(ls.args.DBGPORT),
+            wait    = ls.args.DBGWAIT,
+        }
     } or false)
 
     ls.eventLoop.addTask(function ()
@@ -45,6 +73,7 @@ require 'async.worker-init' (...)
             self.requestMap[data.id] = nil
             if data.error then
                 log.warn(data.error)
+                xpcall(callback, log.error, nil)
                 goto continue
             end
             xpcall(callback, log.error, table.unpack(data.result, 1, data.result.n))

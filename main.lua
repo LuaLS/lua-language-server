@@ -23,13 +23,7 @@ require 'scope'
 ls.scope.watchFiles()
 
 local languageServer = require 'language-server'
-local server = languageServer.create()
-server:start()
-
-log.option.print = function (level, message, timeStamp)
-    if level == 'error' or level == 'fatal' then
-        server.client:logMessage('Error', message)
-    end
-end
+ls.server = languageServer.create()
+ls.server:start()
 
 ls.eventLoop.start()

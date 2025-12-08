@@ -69,7 +69,7 @@ end
 ---@field maxSize? integer # 日志文件的最大大小
 ---@field path? string # 日志文件的路径，与file二选一
 ---@field file? file* # 日志文件对象，与path二选一
----@field print? fun(level: Log.Level, message: string, timeStamp: string) # 额外的打印回调
+---@field print? fun(timeStamp: string, level: string, sourceStr: string, message: string): boolean? # 额外的打印回调，返回true可以阻止原来的日志输出
 ---@field level? Log.Level # 日志等级，低于此等级的日志将不会被记录
 ---@field logLevel? table<Log.Level, integer> # 自定义日志等级
 ---@field needTraceBack? table<Log.Level, boolean> # 是否需要打印堆栈信息
@@ -109,13 +109,8 @@ function M:__init(option)
         self.file = option.file
     else
         if option.path then
-            local file, err = ioOpen(option.path, 'w+b')
-            if file then
-                self.file = file
-                self.file:setvbuf 'no'
-            elseif err then
-                self:applyPrint('warn', err, self:getTimeStamp())
-            end
+            self.file = assert(ioOpen(option.path, 'w+b'))
+            self.file:setvbuf 'no'
         end
     end
     ---@private
@@ -152,17 +147,20 @@ end
 M.lockPrint = false
 
 ---@private
----@param level string
----@param message string
 ---@param timeStamp string
-function M:applyPrint(level, message, timeStamp)
+---@param level string
+---@param sourceStr string
+---@param message string
+---@return boolean?
+function M:applyPrint(timeStamp, level, sourceStr, message)
     if self.option.print then
         if M.lockPrint then
             return
         end
         M.lockPrint = true
-        pcall(self.option.print, level, message, timeStamp)
+        local suc, prevent = pcall(self.option.print, timeStamp, level, sourceStr, message)
         M.lockPrint = false
+        return suc and prevent
     end
 end
 
@@ -193,12 +191,6 @@ function M:build(level, exStack, ...)
         return message, timeStamp
     end
 
-    self:applyPrint(level, message, timeStamp)
-
-    if not self.file then
-        return message, timeStamp
-    end
-
     if not self.enable then
         return message, timeStamp
     end
@@ -212,12 +204,19 @@ function M:build(level, exStack, ...)
     end
     local fullMessage = self.messageFormat:format(timeStamp, level, sourceStr, message)
 
-    self:write(fullMessage)
+    local prevent = self:applyPrint(timeStamp, level, sourceStr, message)
+
+    if not prevent then
+        self:write(fullMessage)
+    end
 
     return message, timeStamp
 end
 
 function M:write(message)
+    if not self.file or not self.enable then
+        return
+    end
     self.usedSize = self.usedSize + #message
     if self.usedSize > self.maxSize then
         self.file:write('[REACH MAX SIZE]!')

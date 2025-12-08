@@ -151,7 +151,7 @@ do
 
     local u = a & (b | c)
 
-    assert(u:view() == '{ x: "x" } & ({ y: "y" } | { z: "z" })')
+    assert(u:view() == '{ x: "x", y: "y" } | { x: "x", z: "z" }')
     assert(u.kind == 'intersection')
     ---@cast u Node.Intersection
     assert(u.value:view() == '{ x: "x", y: "y" } | { x: "x", z: "z" }')

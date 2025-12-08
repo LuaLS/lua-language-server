@@ -340,6 +340,9 @@ end
 ---@return boolean
 function M:onCanCast(other)
     local rt = self.scope.rt
+    if not other:isTableLike() then
+        return false
+    end
     if other.kind == 'array' then
         ---@cast other Node.Array
         local myType = self:get(rt.INTEGER)
@@ -360,6 +363,9 @@ function M:onCanCast(other)
             end
         end
         return true
+    end
+    if other.value ~= other then
+        return self:canCast(other.value)
     end
     return false
 end

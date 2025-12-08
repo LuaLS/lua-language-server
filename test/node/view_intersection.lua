@@ -97,7 +97,7 @@ do
     rt.TYPE_POOL['D'] = nil
     local a = rt.type('A') & (rt.type('B') | rt.type('C')) & rt.type('D')
 
-    assert(a:view() == 'A & (B | C) & D')
+    assert(a:view() == '(A & B & D) | (A & C & D)')
 end
 
 do
@@ -106,7 +106,7 @@ do
     rt.TYPE_POOL['C'] = nil
     local a = rt.type('A') & (rt.type('B') | rt.type('C')) & rt.type('A')
 
-    assert(a:view() == 'A & (B | C)')
+    assert(a:view() == '(A & B) | (A & C)')
 end
 
 do

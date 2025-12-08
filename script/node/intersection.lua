@@ -37,142 +37,93 @@ M.values = nil
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
-    for _, node in ipairs(self.rawNodes) do
-        node:addRef(self)
-    end
-
-    ---@param n Node
-    ---@return boolean
-    local function canMerge(n)
-        if n.kind == 'value' then
-            return true
-        end
-        if  n.kind == 'type' then
-            ---@cast n Node.Type
-            return n.isBasicType
-        end
-        return false
-    end
-
-    ---@param x Node
-    ---@param y Node
-    ---@return boolean
-    ---@return Node?
-    local function merge(x, y)
-        if x.kind == 'union' then
-            ---@cast x Node.Union
-            x = x.value
-        end
-        if y.kind == 'union' then
-            ---@cast y Node.Union
-            y = y.value
-        end
-        if x.kind == 'generic'
-        or y.kind == 'generic' then
-            return false
-        end
-        if x.kind == 'variable'
-        or y.kind == 'variable' then
-            return false
-        end
-        if x.kind == 'type' and y.kind == 'type' then
-            ---@cast x Node.Type
-            ---@cast y Node.Type
-            if not x.isBasicType and not y.isBasicType then
-                return false
-            end
-        end
-        if x >> y then
-            return true, x
-        end
-        if y >> x then
-            return true, y
-        end
-        if  x.kind == 'union'
-        and canMerge(y) then
-            local result = {}
-            ---@cast x Node.Union
-            for i, v in ipairs(x.values) do
-                result[i] = v & y
-            end
-            if #result == 1 then
-                return true, result[1]
-            end
-            if #result == 0 then
-                return true, self.scope.rt.NEVER
-            end
-            return true, self.scope.rt.union(result)
-        end
-        if  y.kind == 'union'
-        and canMerge(x) then
-            local result = {}
-            ---@cast y Node.Union
-            for i, v in ipairs(y.values) do
-                result[i] = x & v
-            end
-            if #result == 1 then
-                return true, result[1]
-            end
-            if #result == 0 then
-                return true, self.scope.rt.NEVER
-            end
-            return true, self.scope.rt.union(result)
-        end
-        if x.kind == 'type' then
-            ---@cast x Node.Type
-            if x.isBasicType then
-                return true, self.scope.rt.NEVER
-            end
-        end
-        if y.kind == 'type' then
-            ---@cast y Node.Type
-            if y.isBasicType then
-                return true, self.scope.rt.NEVER
-            end
-        end
-        if x.kind == 'table'
-        or x.kind == 'type'
-        or x.kind == 'union'
-        or y.kind == 'table'
-        or y.kind == 'type'
-        or y.kind == 'union' then
-            return false
-        end
-
-        return true, self.scope.rt.NEVER
-    end
-
+    local rt = self.scope.rt
     local values = {}
-    local function pushValue(raw)
-        local value = raw:findValue { 'union', 'type', 'value', 'table', 'function', 'generic' }
-        if not value then
-            return
+    local tables = {}
+    local literalPart
+    local basicTypePart
+
+    for i, raw in ipairs(self.rawNodes) do
+        raw:addRef(self)
+        if raw.hasGeneric then
+            goto continue
         end
-        if value.typeName == 'nil' then
-            return
-        end
-        values[#values+1] = value
-    end
-    for _, rawNode in ipairs(self.rawNodes) do
-        pushValue(rawNode)
-    end
-    local result = { values[1] }
-    for i = 2, #values do
-        local current = result[#result]
-        local target = values[i]
-        local suc, new = merge(current, target)
-        if suc then
-            ---@cast new Node
-            if new.typeName == 'never' then
-                return {}, true
+        local union = raw:findValue { 'union' }
+        if union and union.kind == 'union' then
+            ---@cast union Node.Union
+            local newValues = {}
+            for j, uv in ipairs(union.values) do
+                local parts = {}
+                table.move(self.rawNodes, 1, i - 1, 1, parts)
+                parts[i] = uv
+                table.move(self.rawNodes, i + 1, #self.rawNodes, i + 1, parts)
+                local newValue = rt.intersection(parts)
+                if newValue.value ~= rt.NEVER then
+                    newValues[#newValues+1] = newValue
+                end
             end
-            result[#result] = new
+            return { rt.union(newValues) }, true
+        end
+        ::continue::
+    end
+
+    for _, raw in ipairs(self.rawNodes) do
+        if raw.kind == 'table' then
+            tables[#tables+1] = raw
+        elseif raw == rt.NIL then
+            goto continue
         else
-            result[#result+1] = target
+            values[#values+1] = raw
+            local literal = raw:findValue { 'value', 'function' }
+            if literal then
+                if literalPart then
+                    return {}, true
+                end
+                literalPart = literal
+            end
+            ---@diagnostic disable-next-line: undefined-field
+            if raw.isBasicType then
+                if basicTypePart then
+                    return {}, true
+                end
+                basicTypePart = raw
+            end
+        end
+        ::continue::
+    end
+
+    if literalPart then
+        if basicTypePart and not (literalPart >> basicTypePart) then
+            return {}, true
+        end
+        for i, v in ipairs(values) do
+            if literalPart ~= v and literalPart >> v then
+                values[i] = false
+            end
         end
     end
 
-    return result, true
+    for i, tbl in ipairs(tables) do
+        for _, v in ipairs(values) do
+            if v >> tbl then
+                tables[i] = false
+                break
+            end
+        end
+    end
+
+    local merged = {}
+    for _, tbl in ipairs(tables) do
+        if tbl then
+            merged[#merged+1] = tbl
+        end
+    end
+    for _, v in ipairs(values) do
+        if v then
+            merged[#merged+1] = v
+        end
+    end
+    return merged, true
 end
 
 ---@type Node
@@ -182,45 +133,27 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    self.value = self.scope.rt.NEVER
-    local values = self.values
     local rt = self.scope.rt
+    self.value = rt.NEVER
 
-    if #values == 0 then
+    if #self.values == 0 then
         return rt.NEVER, true
     end
-
-    for _, value in ipairs(values) do
-        value:addRef(self)
-    end
-
-    if #values == 1 then
-        return values[1], true
-    end
-
-    for _, value in ipairs(values) do
-        if value.kind == 'generic' then
-            return self, true
-        end
+    if #self.values == 1 then
+        return self.values[1], true
     end
 
     local tableParts = {}
-    ---@type Node.Union[]
-    local unionParts = {}
-    for _, value in ipairs(values) do
-        if value.kind == 'union' then
-            ---@cast value Node.Union
-            unionParts[#unionParts+1] = value
-            goto continue
+    for _, value in ipairs(self.values) do
+        local tbl = value:findValue { 'table', 'type' }
+        if tbl and tbl.kind == 'table' then
+            tableParts[#tableParts+1] = tbl
+        else
+            self.otherParts[#self.otherParts+1] = value
         end
-        if value.kind == 'table' then
-            ---@cast value Node.Table
-            tableParts[#tableParts+1] = value
-            goto continue
-        end
-        ::continue::
     end
-    local table = rt.mergeTables(tableParts, function (oldValue, newValue)
+
+    self.tablePart = rt.mergeTables(tableParts, function (oldValue, newValue)
         local field = rt.field(oldValue.key, oldValue.value & newValue.value)
         local location = oldValue.location or newValue.location
         if location then
@@ -229,24 +162,38 @@ M.__getter.value = function (self)
         return field
     end)
 
-    if #unionParts == 0 then
-        return table, true
+    if #self.otherParts == 0 then
+        return self.tablePart, true
     end
 
-    local unionValue = self.scope.rt.union(unionParts)
+    return self, true
+end
 
-    if unionValue.kind ~= 'union' then
-        local result = table & unionValue
-        return result.value, true
+---@type Node.Table
+M.tablePart = nil
+
+---@param self Node.Intersection
+---@return Node.Table
+---@return true
+M.__getter.tablePart = function (self)
+    return self.scope.rt.table(), true
+end
+
+---@type Node[]
+M.otherParts = nil
+
+---@param self Node.Intersection
+---@return Node[]
+---@return true
+M.__getter.otherParts = function (self)
+    return {}, true
+end
+
+function M:get(key)
+    if self.value ~= self then
+        return self.value:get(key)
     end
-
-    local results = {}
-    ---@cast unionValue Node.Union
-    for i, n in ipairs(unionValue.values) do
-        results[i] = table & n
-    end
-
-    return self.scope.rt.union(results), true
+    return self.tablePart:get(key)
 end
 
 ---@param self Node.Intersection

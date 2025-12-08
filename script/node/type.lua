@@ -49,6 +49,9 @@ function M:isTableLike()
     if self:isClassLike() then
         return true
     end
+    if self.value == self then
+        return false
+    end
     return self.value:isTableLike()
 end
 

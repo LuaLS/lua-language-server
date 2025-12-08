@@ -214,3 +214,29 @@ print(12345)
         text = "",
     },
 }
+
+local text = string.rep('abcdefghijklmnopqrstuvwxyz\n', 10000)
+local changes = {}
+for i = 1, 100 do
+    changes[#changes+1] = {
+        range = {
+            start = { line = i * 10, character = 0 },
+            ['end'] = { line = i * 10, character = 5 },
+        },
+        text = 'changed words',
+    }
+end
+for i = 1, 100 do
+    changes[#changes+1] = {
+        range = {
+            start = { line = i * 10 + 5000, character = 10 },
+            ['end'] = { line = i * 10 + 5 + 5000, character = 20 },
+        },
+        text = '',
+    }
+end
+
+local c1 = os.clock()
+tm(text, nil, changes)
+local c2 = os.clock()
+print('text-merger Large test time:', c2 - c1)

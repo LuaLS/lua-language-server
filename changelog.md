@@ -1,6 +1,7 @@
 # changelog
 
 ## Unreleased
+* `NEW` diagnostic: `no-unknown-operations`
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.16.1

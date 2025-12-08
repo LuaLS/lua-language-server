@@ -90,6 +90,10 @@ DIAG_COUNT_DOWN_LOOP    =
 'Do you mean `{}` ?'
 DIAG_UNKNOWN            =
 'Can not infer type.'
+DIAG_UNKNOWN_OPERATION_CALL =
+'Cannot infer call result for type {}.'
+DIAG_UNKNOWN_OPERATION_OPERATOR =
+'Cannot infer `{}` result for types {} and {}.'
 DIAG_DEPRECATED         =
 'Deprecated.'
 DIAG_DIFFERENT_REQUIRES =

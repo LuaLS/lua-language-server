@@ -12,10 +12,18 @@ ls.capability.register('textDocument/hover', function (server, params, task)
     end
     local converter = document:makeLSPConverter(server.positionEncoding)
 
-    local sources = ls.scope.findSources(uri, converter:at(params.position))
+    local sources, scope = ls.scope.findSources(uri, converter:at(params.position))
     local source = sources and sources[1]
-    if not source then
+    if not source or not scope then
         return
+    end
+
+    local type = scope.vm:getNode(source)
+    local view
+    if type then
+        view = type:view()
+    else
+        view = source.code
     end
 
     ---@type LSP.Hover
@@ -23,7 +31,7 @@ ls.capability.register('textDocument/hover', function (server, params, task)
         contents = {
             kind  = 'markdown',
             value = markdown.create()
-                : append('lua', source.code)
+                : append('lua', view)
                 : string(),
         },
         range = converter:range(source.start, source.finish)

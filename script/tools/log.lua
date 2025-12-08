@@ -211,14 +211,19 @@ function M:build(level, exStack, ...)
         sourceStr = ('%s:%d'):format(info.short_src, info.currentline)
     end
     local fullMessage = self.messageFormat:format(timeStamp, level, sourceStr, message)
-    self.usedSize = self.usedSize + #fullMessage
+
+    self:write(fullMessage)
+
+    return message, timeStamp
+end
+
+function M:write(message)
+    self.usedSize = self.usedSize + #message
     if self.usedSize > self.maxSize then
         self.file:write('[REACH MAX SIZE]!')
         self.file:close()
         self.file = nil
     else
-        self.file:write(fullMessage)
+        self.file:write(message)
     end
-
-    return message, timeStamp
 end

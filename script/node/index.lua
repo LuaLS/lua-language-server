@@ -55,3 +55,16 @@ function M:resolveGeneric(map)
     end
     return self.scope.rt.index(head, index)
 end
+
+function M:onView(viewer, options)
+    if self.head.kind == 'generic' then
+        return '{}[{}]' % {
+            viewer:view(self.head),
+            viewer:view(self.index),
+        }
+    else
+        return viewer:view(self.value, {
+            skipLevel = 0,
+        })
+    end
+end

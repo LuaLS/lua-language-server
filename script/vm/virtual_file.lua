@@ -26,7 +26,7 @@ end
 ---@param document Document
 ---@return VM.Coder
 function M:makeCoder(document)
-    local coder = ls.vm.createCoder()
+    local coder = self.coder or ls.vm.createCoder()
     coder:makeFromAst(document.ast)
     return coder
 end
@@ -35,7 +35,7 @@ end
 ---@param document Document
 ---@return VM.Coder
 function M:awaitMakeCoder(document)
-    local coder = ls.vm.createCoder()
+    local coder = self.coder or ls.vm.createCoder()
     coder:makeFromFile(document.file)
     return coder
 end
@@ -49,9 +49,6 @@ function M:index()
     local version = document.version
     if self.version >= version then
         return
-    end
-    if self.coder then
-        self.coder:dispose()
     end
 
     ls.util.withDuration(function ()
@@ -112,10 +109,6 @@ function M:awaitIndex()
             -- 有更新的版本，跳过
             return
         end
-    end
-
-    if self.coder then
-        self.coder:dispose()
     end
 
     self.indexingVersion = version

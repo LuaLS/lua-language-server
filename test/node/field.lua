@@ -234,3 +234,12 @@ do
     local v = t:get(rt.INTEGER)
     assert(v:view() == '100 | 200')
 end
+
+do
+    local index = rt.index(
+        rt.generic 'T',
+        rt.value 'xyz'
+    )
+
+    assert(index:view() == '<T>["xyz"]')
+end

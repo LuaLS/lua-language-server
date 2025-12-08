@@ -47,6 +47,9 @@
 					]
 				],
 			},
+			"skipFiles": [
+				"script/class.lua"
+			]
 		},
 		{
 			"name": "📝locale",

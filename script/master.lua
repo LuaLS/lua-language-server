@@ -30,7 +30,7 @@ log = New 'Log' {
     time  = function ()
         return time.time() // 1000
     end,
-    path = ls.env.LOG_PATH / 'service.log',
+    path = ls.env.LOG_FILE,
     level = ls.args.LOGLEVEL,
     print = function (timeStamp, level, sourceStr, message)
         writeLog('master', timeStamp, level, sourceStr, message)

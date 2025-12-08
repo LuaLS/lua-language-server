@@ -83,6 +83,10 @@ function M:onCanCast(other)
     return false
 end
 
+function M:isTableLike()
+    return true
+end
+
 ---@param self Node.Array
 ---@return boolean
 ---@return true

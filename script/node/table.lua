@@ -208,6 +208,10 @@ M.__getter.values = function (self)
     return values, true
 end
 
+function M:isTableLike()
+    return true
+end
+
 ---@type Node?
 M.expectParent = nil
 
@@ -318,6 +322,9 @@ end
 function M:onCanBeCast(other)
     if self == other then
         return true
+    end
+    if not other:isTableLike() then
+        return false
     end
     for _, key in ipairs(self.keys) do
         local v = other:get(key)

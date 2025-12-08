@@ -45,6 +45,13 @@ function M:isAliasLike()
     return self.aliases ~= nil
 end
 
+function M:isTableLike()
+    if self:isClassLike() then
+        return true
+    end
+    return self.value:isTableLike()
+end
+
 ---@type LinkedTable?
 M.classes = nil
 

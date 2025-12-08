@@ -7,6 +7,7 @@ package.path = package.path.. ';./?.lua;./?/init.lua'
 
 require 'luals'
 require 'runtime'
+ls.env.LOG_FILE = ls.util.expandPath('$LOG_PATH/test.log', ls.env)
 require 'master'
 require 'scope'
 require 'config'

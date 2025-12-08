@@ -251,6 +251,13 @@ function M:findValue(types)
     return nil
 end
 
+function M:isTableLike()
+    if self.value == self then
+        return false
+    end
+    return self.value:isTableLike()
+end
+
 ---@type Node
 M.value = nil
 

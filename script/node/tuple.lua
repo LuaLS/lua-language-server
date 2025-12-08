@@ -133,6 +133,9 @@ function M:onCanBeCast(other)
     if not self.values.max then
         return false
     end
+    if not other:isTableLike() then
+        return false
+    end
     for i = 1, math.min(100, self.values.max) do
         local v = self.values:select(i)
         local value = other:get(i)
@@ -152,6 +155,10 @@ function M:onCanCast(other)
         return self.values:canCast(arrayVararg)
     end
     return false
+end
+
+function M:isTableLike()
+    return true
 end
 
 ---@param self Node.Tuple

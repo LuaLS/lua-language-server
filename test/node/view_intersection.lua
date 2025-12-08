@@ -3,7 +3,7 @@ local rt = test.scope.rt
 do
     local a = rt.NIL & rt.value(1)
 
-    assert(a:view() == 'never')
+    assert(a:view() == '1')
 end
 
 do
@@ -107,4 +107,16 @@ do
     local a = rt.type('A') & (rt.type('B') | rt.type('C')) & rt.type('A')
 
     assert(a:view() == 'A & (B | C)')
+end
+
+do
+    local a = rt.table() & rt.NIL
+
+    assert(a:view() == '{}')
+end
+
+do
+    local a = rt.table() & rt.func()
+
+    assert(a:view() == '{} & fun()')
 end

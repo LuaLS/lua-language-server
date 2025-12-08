@@ -75,6 +75,13 @@ M.__getter.values = function (self)
         or y.kind == 'variable' then
             return false
         end
+        if x.kind == 'type' and y.kind == 'type' then
+            ---@cast x Node.Type
+            ---@cast y Node.Type
+            if not x.isBasicType and not y.isBasicType then
+                return false
+            end
+        end
         if x >> y then
             return true, x
         end
@@ -135,7 +142,20 @@ M.__getter.values = function (self)
         return true, self.scope.rt.NEVER
     end
 
-    local values = self.rawNodes
+    local values = {}
+    local function pushValue(raw)
+        local value = raw:findValue { 'union', 'type', 'value', 'table', 'function', 'generic' }
+        if not value then
+            return
+        end
+        if value.typeName == 'nil' then
+            return
+        end
+        values[#values+1] = value
+    end
+    for _, rawNode in ipairs(self.rawNodes) do
+        pushValue(rawNode)
+    end
     local result = { values[1] }
     for i = 2, #values do
         local current = result[#result]
@@ -196,6 +216,7 @@ M.__getter.value = function (self)
         if value.kind == 'table' then
             ---@cast value Node.Table
             tableParts[#tableParts+1] = value
+            goto continue
         end
         ::continue::
     end

@@ -11,6 +11,8 @@ ls.args = {
     LOGPATH = '$ROOT_PATH/log',
     -- 指定meta文件的生成目录，默认为 `./meta`
     METAPATH = '$ROOT_PATH/meta',
+    -- 初始日志路径
+    LOGFILE = '$LOG_PATH/service.log',
     -- 是否为开发模式
     DEVELOP = false,
     -- 调试器端口号，默认为 11411
@@ -78,6 +80,7 @@ ls.env = {}
 ls.env.ROOT_PATH   = ls.util.expandPath(findRoot())
 ls.env.LOG_PATH    = ls.util.expandPath(ls.args.LOGPATH, ls.env)
 ls.env.META_PATH   = ls.util.expandPath(ls.args.METAPATH, ls.env)
+ls.env.LOG_FILE    = ls.util.expandPath(ls.args.LOGFILE, ls.env)
 ls.env.ROOT_URI    = ls.uri.encode(ls.env.ROOT_PATH)
 ls.env.LOG_URI     = ls.uri.encode(ls.env.LOG_PATH)
 ls.env.META_URI    = ls.uri.encode(ls.env.META_PATH)

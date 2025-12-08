@@ -2,6 +2,10 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.16.1
+`2025-12-8`
+* `FIX` Broken in Linux
 * `FIX` Fix diagnostic completions incorrect textEdit.finish
 * `FIX` Comparison crash in doc export CLI [#3111](https://github.com/LuaLS/lua-language-server/issues/3111)
 

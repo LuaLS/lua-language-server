@@ -3,7 +3,14 @@ local M = Class 'VM.Vfile'
 
 Extends('VM.Vfile', 'GCHost')
 
+--- 已编译的版本
 M.version = -1
+--- 正在编译中的版本
+---@type integer?
+M.indexingVersion = nil
+--- 即将要编译的最新版本
+---@type integer
+M.nextVersion = -1
 
 ---@param scope Scope
 ---@param uri Uri
@@ -38,15 +45,14 @@ function M:index()
     if not document then
         return
     end
-    if self.version >= document.version then
+
+    local version = document.version
+    if self.version >= version then
         return
     end
-    self.version = document.version
     if self.coder then
         self.coder:dispose()
     end
-
-    self.indexing = true
 
     ls.util.withDuration(function ()
         self.coder = self:makeCoder(document)
@@ -68,7 +74,7 @@ function M:index()
         end
     end)
 
-    self.indexing = false
+    self.version = version
 end
 
 ---@async
@@ -78,20 +84,41 @@ function M:awaitIndex()
         return
     end
     if self.version >= document.version then
-        -- 等待之前的编译任务完成
-        while self.indexing do
+        local indexingVersion = self.indexingVersion
+        if not indexingVersion then
+            -- 没在编译？直接返回
+            return
+        end
+        -- 等待上个编译任务完成
+        while indexingVersion == self.indexingVersion do
             ls.await.sleep(0.01)
         end
         return
     end
-    self.version = document.version
 
-    local version = self.version
+    local version = document.version
+
+    if self.indexingVersion then
+        -- 正在编译？
+        if version > self.nextVersion then
+            self.nextVersion = version
+        end
+        -- 等待前一个编译完成再编译新的，防抖
+        local indexingVersion = self.indexingVersion
+        while indexingVersion == self.indexingVersion do
+            ls.await.sleep(0.01)
+        end
+        if self.nextVersion ~= version then
+            -- 有更新的版本，跳过
+            return
+        end
+    end
+
     if self.coder then
         self.coder:dispose()
     end
 
-    self.indexing = true
+    self.indexingVersion = version
 
     ---@async
     ls.util.withDuration(function ()
@@ -103,9 +130,7 @@ function M:awaitIndex()
             log.debug('Index (async) {} in {:.3f} seconds.' % { self.uri, duration })
         end
     end)
-    if self.version ~= version then
-        return
-    end
+
     self:bindGC(self.coder)
     ls.util.withDuration(function ()
         self.coder:run(self)
@@ -117,7 +142,8 @@ function M:awaitIndex()
         end
     end)
 
-    self.indexing = false
+    self.indexingVersion = nil
+    self.version = version
 end
 
 ---@param source LuaParser.Node.Base

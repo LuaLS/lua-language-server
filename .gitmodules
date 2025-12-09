@@ -7,12 +7,6 @@
 [submodule "3rd/lpeglabel"]
 	path = 3rd/lpeglabel
 	url = https://github.com/sqmedeiros/lpeglabel
-[submodule "3rd/love-api"]
-	path = 3rd/love-api
-	url = https://github.com/love2d-community/love-api
-[submodule "3rd/lovr-api"]
-	path = 3rd/lovr-api
-	url = https://github.com/bjornbytes/lovr-docs
 [submodule "3rd/EmmyLuaCodeStyle"]
 	path = 3rd/EmmyLuaCodeStyle
 	url = https://github.com/CppCXY/EmmyLuaCodeStyle

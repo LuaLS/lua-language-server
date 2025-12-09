@@ -48,8 +48,8 @@ M.__getter.values = function (self)
         if raw.hasGeneric then
             goto continue
         end
-        local union = raw:findValue { 'union' }
-        if union and union.kind == 'union' then
+        local union = raw:simplify()
+        if union.kind == 'union' then
             ---@cast union Node.Union
             local newValues = {}
             for j, uv in ipairs(union.values) do
@@ -68,25 +68,25 @@ M.__getter.values = function (self)
     end
 
     for _, raw in ipairs(self.rawNodes) do
-        if raw.kind == 'table' then
-            tables[#tables+1] = raw
-        elseif raw == rt.NIL then
+        local value = raw:simplify()
+        if value.kind == 'table' then
+            tables[#tables+1] = value
+        elseif value == rt.NIL then
             goto continue
         else
-            values[#values+1] = raw
-            local literal = raw:findValue { 'value', 'function' }
-            if literal then
+            values[#values+1] = value
+            if value.kind == 'value' or value.kind == 'function' then
                 if literalPart then
                     return {}, true
                 end
-                literalPart = literal
+                literalPart = value
             end
             ---@diagnostic disable-next-line: undefined-field
-            if raw.isBasicType then
+            if value.isBasicType then
                 if basicTypePart then
                     return {}, true
                 end
-                basicTypePart = raw
+                basicTypePart = value
             end
         end
         ::continue::
@@ -145,9 +145,8 @@ M.__getter.value = function (self)
 
     local tableParts = {}
     for _, value in ipairs(self.values) do
-        local tbl = value:findValue { 'table', 'type' }
-        if tbl and tbl.kind == 'table' then
-            tableParts[#tableParts+1] = tbl
+        if value.kind == 'table' then
+            tableParts[#tableParts+1] = value
         else
             self.otherParts[#self.otherParts+1] = value
         end
@@ -271,7 +270,7 @@ function M:onView(viewer, options)
         })
     end
     local elements = {}
-    for _, v in ipairs(self.rawNodes) do
+    for _, v in ipairs(values) do
         if v.kind == 'variable' then
             v = v.value
         end

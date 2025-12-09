@@ -30,6 +30,13 @@ M.__getter.value = function (self)
     return self.returns, true
 end
 
+function M:simplify()
+    if self.value == self then
+        return self
+    end
+    return self.value:simplify()
+end
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists

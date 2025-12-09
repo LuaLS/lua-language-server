@@ -311,7 +311,7 @@ function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
-    local value = other.value
+    local value = other.value:simplify()
     if value.kind == 'union' then
         ---@cast value Node.Union
         for _, sub in ipairs(value.values) do

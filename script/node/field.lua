@@ -33,6 +33,10 @@ function M:setHideInView()
     return self
 end
 
+function M:simplify()
+    return self.value:simplify()
+end
+
 ---@param self Node.Field
 ---@return boolean
 ---@return true

@@ -32,14 +32,13 @@ M.__getter.value = function (self)
     if not self.rest then
         return self.head:select(self.key), true
     end
-    local list = self.head:findValue { 'list' }
-    ---@cast list Node.List?
-    if not list then
+    local list = self.head:simplify()
+    if list.kind ~= 'list' then
         return self.head:select(self.key), true
     end
-    local n = self.key:findValue { 'value' }
-    ---@cast n Node.Value?
-    if not n then
+    ---@cast list Node.List
+    local n = self.key:simplify()
+    if n.kind ~= 'value' then
         return self.head:select(self.key), true
     end
     local literal = n.literal
@@ -48,6 +47,13 @@ M.__getter.value = function (self)
     end
     ---@cast literal integer
     return list:slice(literal), true
+end
+
+function M:simplify()
+    if self.value == self then
+        return self
+    end
+    return self.value:simplify()
 end
 
 ---@param self Node.Select

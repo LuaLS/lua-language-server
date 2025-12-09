@@ -64,13 +64,13 @@ M.__getter.values = function (self)
         if v.kind == 'union' then
             ---@cast v Node.Union
             for _, vv in ipairs(v.values) do
-                values[#values+1] = vv:findValue { 'type', 'generic' } or vv:finalValue()
+                values[#values+1] = vv:simplify()
                 if #values >= 1000 then
                     return values, true
                 end
             end
         else
-            values[#values+1] = v:findValue { 'type', 'generic' } or v:finalValue()
+            values[#values+1] = v:simplify()
             if #values >= 1000 then
                 return values, true
             end

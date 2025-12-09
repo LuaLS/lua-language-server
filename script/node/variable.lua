@@ -688,6 +688,13 @@ M.__getter.equivalentValue = function (self)
     return false, true
 end
 
+-- function M:simplify()
+--     if self.value == self then
+--         return self
+--     end
+--     return self.value:simplify()
+-- end
+
 ---@param onlySameVariable? boolean
 ---@param onlySameKey? boolean
 ---@return Node.Location[]

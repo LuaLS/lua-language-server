@@ -41,9 +41,8 @@ M.__getter.values = function (self)
     local values = {}
     for i, raw in ipairs(self.raw) do
         raw:addRef(self)
-        local value = raw:findValue { 'list' }
-        ---@cast value Node.List?
-        if value then
+        local value = raw:simplify()
+        if value.kind == 'list' then
             ---@cast value Node.List
             values[i] = value.values[1]
         else
@@ -52,9 +51,9 @@ M.__getter.values = function (self)
     end
     local n = #values
     local last = self.raw[n]
-    local lastValue = last and last:findValue { 'list' }
-    ---@cast lastValue Node.List?
-    if lastValue then
+    local lastValue = last and last:simplify()
+    if lastValue and lastValue.kind == 'list' then
+        ---@cast lastValue Node.List
         for i = 1, #lastValue.values do
             values[n + i] = lastValue.values[i + 1]
         end

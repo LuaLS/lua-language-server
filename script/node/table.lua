@@ -82,7 +82,7 @@ M.__getter.fieldMap = function (self)
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        local key = field.key:findValue { 'union' } or field.key
+        local key = field.key:simplify()
         key:addRef(self)
         if field.value then
             field.value:addRef(self)
@@ -237,8 +237,8 @@ function M:get(key)
     local rt = self.scope.rt
     local r, e = self:getExpect(key)
     if e then
-        local tp = r:findValue { 'type' }
-        if tp and tp ~= rt.ANY and tp ~= rt.UNKNOWN and tp ~= rt.NIL then
+        local tp = r:simplify()
+        if tp.kind == 'type' and tp ~= rt.ANY and tp ~= rt.UNKNOWN and tp ~= rt.NIL then
             return r, true
         end
     end

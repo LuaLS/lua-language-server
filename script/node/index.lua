@@ -44,6 +44,13 @@ M.__getter.hasGeneric = function (self)
     return self.head.hasGeneric or self.index.hasGeneric, true
 end
 
+function M:simplify()
+    if self.value == self then
+        return self
+    end
+    return self.value:simplify()
+end
+
 function M:resolveGeneric(map)
     if not self.hasGeneric then
         return self

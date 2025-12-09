@@ -18,3 +18,5 @@ require 'test.node.fcall'
 require 'test.node.flush'
 
 require 'test.node.variable'
+
+require 'test.node.flow'

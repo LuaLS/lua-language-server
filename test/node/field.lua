@@ -27,7 +27,7 @@ do
     assert(t:get(3):view() == '"integer"')
     assert(t:get(0.5):view() == '"number"')
     assert(t:get(true):view() == 'nil')
-    assert(t:get(rt.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
+    assert(t:get(rt.ANY):view() == [["union" | "integer" | "number" | "string" | number | boolean | string]])
     assert(t.keys[1] == rt.value(1))
     assert(t.keys[2] == rt.value(2))
     assert(t.keys[3] == rt.value 'x')

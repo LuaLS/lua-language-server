@@ -655,7 +655,7 @@ function m.eachLine(text, keepNL)
     end
 end
 
----@alias SortByScoreCallback fun(o: any): integer
+---@alias SortByScoreCallback fun(o: any): number
 
 -- 按照分数排序，分数越高越靠前
 ---@param tbl any[]

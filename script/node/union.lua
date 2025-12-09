@@ -206,10 +206,6 @@ function M:each(kind, callback)
     end
 end
 
-local sortScore = {
-    ['nil'] = -1000,
-}
-
 function M:onView(viewer, options)
     local values = self.values
     if #values == 0 then
@@ -242,7 +238,33 @@ function M:onView(viewer, options)
     ls.util.arrayRemoveDuplicate(view)
     ls.util.sortByScore(view, {
         function (v)
-            return sortScore[v] or 0
+            if tonumber(v) then
+                return 100
+            end
+            if v == 'true' then
+                return 99
+            end
+            if v == 'false' then
+                return 98
+            end
+            if v == 'nil' then
+                return -1
+            end
+            local firstChar = v:sub(1,1)
+            if firstChar == '"' or firstChar == "'" then
+                return 97
+            end
+            if firstChar == '{' or firstChar == '[' then
+                return 96
+            end
+            return 0
+        end,
+        function (v)
+            local num = tonumber(v)
+            if num then
+                return -num
+            end
+            return 0
         end,
         ls.util.sortCallbackOfIndex(view),
     })

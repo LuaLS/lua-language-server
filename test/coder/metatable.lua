@@ -329,6 +329,19 @@ end
 
 do
     TEST_INDEX [[
+local mt = {}
+mt.__index = mt
+
+mt.xxx = 1
+
+MT = mt
+    ]]
+
+    assert(rt:globalGet('MT'):view() == '{ xxx: 1, __index: { ... } }')
+end
+
+do
+    TEST_INDEX [[
 ---@generic T, MT
 ---@param t T
 ---@param mt MT

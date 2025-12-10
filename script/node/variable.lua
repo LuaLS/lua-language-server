@@ -183,20 +183,6 @@ function M:setMasterVariable(var)
     self:flushCache()
 end
 
----@param currentValue Node?
----@return Node.Variable
-function M:shadow(currentValue)
-    if self.masterVariable then
-        return self.masterVariable:shadow(currentValue)
-    end
-    local var = self.scope.rt.variable(self.key)
-    var:setMasterVariable(self)
-    if currentValue then
-        var.currentValue = currentValue
-    end
-    return var
-end
-
 ---@type Node|false
 M.classValue = nil
 
@@ -505,9 +491,6 @@ function M:removeField(field, path)
     return current
 end
 
----@type Node?
-M.currentValue = nil
-
 ---@type Node
 M.value = nil
 
@@ -515,24 +498,16 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
+    if self.masterVariable then
+        return self.masterVariable.value, true
+    end
     local rt = self.scope.rt
-    local master = self.masterVariable or self
     self.value = rt.UNKNOWN
-    local value = master.classValue
-        or master.parentExpectValue
-        or master.typeValue
-
-    if value then
-        return value, true
-    end
-
-    if self.currentValue then
-        self.currentValue:addRef(self)
-        return self.currentValue, true
-    end
-
-    return master.equivalentValue
-        or master.parentFieldValue
+    return self.classValue
+        or self.parentExpectValue
+        or self.typeValue
+        or self.equivalentValue
+        or self.parentFieldValue
         or rt.UNKNOWN
         , true
 end

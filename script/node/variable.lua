@@ -183,13 +183,17 @@ function M:setMasterVariable(var)
     self:flushCache()
 end
 
+---@param currentValue Node?
 ---@return Node.Variable
-function M:shadow()
+function M:shadow(currentValue)
     if self.masterVariable then
-        return self.masterVariable:shadow()
+        return self.masterVariable:shadow(currentValue)
     end
     local var = self.scope.rt.variable(self.key)
     var:setMasterVariable(self)
+    if currentValue then
+        var.currentValue = currentValue
+    end
     return var
 end
 
@@ -514,11 +518,20 @@ M.__getter.value = function (self)
     local rt = self.scope.rt
     local master = self.masterVariable or self
     self.value = rt.UNKNOWN
-    return master.classValue
+    local value = master.classValue
         or master.parentExpectValue
         or master.typeValue
-        or self.currentValue
-        or master.equivalentValue
+
+    if value then
+        return value, true
+    end
+
+    if self.currentValue then
+        self.currentValue:addRef(self)
+        return self.currentValue, true
+    end
+
+    return master.equivalentValue
         or master.parentFieldValue
         or rt.UNKNOWN
         , true

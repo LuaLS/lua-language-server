@@ -491,6 +491,28 @@ function M:removeField(field, path)
     return current
 end
 
+---@return Node?
+function M:getExpectValue()
+    local master = self.masterVariable or self
+    master:addRef(self)
+    return master.classValue
+        or master.parentExpectValue
+        or master.typeValue
+        or nil
+end
+
+---@return Node?
+function M:getGuessValue()
+    local master = self.masterVariable or self
+    master:addRef(self)
+    return master.equivalentValue
+        or master.parentFieldValue
+        or nil
+end
+
+---@type Node.Flow?
+M.flow = nil
+
 ---@type Node
 M.value = nil
 
@@ -498,16 +520,10 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
-    if self.masterVariable then
-        return self.masterVariable.value, true
-    end
     local rt = self.scope.rt
     self.value = rt.UNKNOWN
-    return self.classValue
-        or self.parentExpectValue
-        or self.typeValue
-        or self.equivalentValue
-        or self.parentFieldValue
+    return self:getExpectValue()
+        or self:getGuessValue()
         or rt.UNKNOWN
         , true
 end

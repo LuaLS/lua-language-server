@@ -2,11 +2,11 @@
 ---@field scope Scope
 local M = Class 'Node.RefModule'
 
----@type table<Node, true>?
+---@type table<Node.RefModule, true>?
 M.refMap = nil
 
 -- 注册缓存清理链
----@param child Node
+---@param child Node.RefModule
 function M:addRef(child)
     if self == child then
         return

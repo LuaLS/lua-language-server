@@ -33,6 +33,13 @@ function M:resolveGeneric(map)
     return self.scope.rt.paramOf(func, self.index)
 end
 
+function M:simplify()
+    if self.value == self then
+        return self
+    end
+    return self.value:simplify()
+end
+
 ---@param self Node.ParamOf
 ---@return Node
 ---@return true

@@ -280,6 +280,12 @@ function M:fillAPIs()
         end
         return self.table():addChilds(childs, onSameKey)
     end
+
+    ---@param location Node.Location
+    ---@return Node.Flow
+    function self.flow(location)
+        return New 'Node.Flow' (scope, location)
+    end
 end
 
 ---@private

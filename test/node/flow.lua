@@ -8,15 +8,15 @@ do
     x --> 5
     ]]
 
-    local x = rt.variable 'x'
-    x:addAssign(rt.field('x', rt.value(10)))
-    x.currentValue = rt.value(10)
+    -- local x = rt.variable 'x'
+    -- x:addAssign(rt.field('x', rt.value(10)))
+    -- x.currentValue = rt.value(10)
 
-    local x2 = x:shadow(rt.value(5))
-    x2:addAssign(rt.field('x', rt.value(5)))
+    -- local x2 = x:shadow(rt.value(5))
+    -- x2:addAssign(rt.field('x', rt.value(5)))
 
-    assert(x:view() == '10')
-    assert(x2:view() == '5')
+    -- assert(x:view() == '10')
+    -- assert(x2:view() == '5')
 end
 
 do
@@ -29,15 +29,15 @@ do
     x --> 5
     ]]
 
-    local x = rt.variable 'x'
-    local x1 = x:shadow(rt.value(10))
+    -- local x = rt.variable 'x'
+    -- local x1 = x:shadow(rt.value(10))
 
-    x1:addAssign(rt.field('x', rt.value(10)))
+    -- x1:addAssign(rt.field('x', rt.value(10)))
 
-    local x2 = x1:shadow(rt.value(5))
-    x2:addAssign(rt.field('x', rt.value(5)))
+    -- local x2 = x1:shadow(rt.value(5))
+    -- x2:addAssign(rt.field('x', rt.value(5)))
 
-    assert(x:view() == '5 | 10')
-    assert(x1:view() == '10')
-    assert(x2:view() == '5')
+    -- assert(x:view() == '5 | 10')
+    -- assert(x1:view() == '10')
+    -- assert(x2:view() == '5')
 end

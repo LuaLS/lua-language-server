@@ -107,20 +107,17 @@ ls.feature.provider.definition(function (param, push, skip)
     local function findDefinition(variable)
         ---@cast var LuaParser.Node.Var
         -- 如果是局部变量，则只查询声明位置
-        local location = variable.location
+        local location = variable:getLocation()
         if location then
             push(ls.feature.helper.convertLocation(location, var))
             return
         end
 
         -- 否则查询所有赋值位置
-        if variable.assigns then
-            for assign in variable.assigns:pairsFast() do
-                ---@cast assign Node.Field
-                local location = assign.location
-                if location then
-                    push(ls.feature.helper.convertLocation(location, var))
-                end
+        for assign in variable:eachAssign() do
+            local location = assign.location
+            if location then
+                push(ls.feature.helper.convertLocation(location, var))
             end
         end
     end

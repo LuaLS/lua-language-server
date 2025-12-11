@@ -98,4 +98,5 @@ function M:variable(var, offset)
     if not infos then
         return var.scope.rt.UNKNOWN
     end
+    return var
 end

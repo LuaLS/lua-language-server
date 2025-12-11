@@ -131,14 +131,11 @@ function M:findFields(parent, key)
         if self.luaKey(node.key) ~= self.luaKey(key) then
             return
         end
-        if node.location then
-            results[#results+1] = self.field(key):setLocation(node.location)
+        if node:getLocation() then
+            results[#results+1] = self.field(key):setLocation(node:getLocation())
         end
-        if node.assigns then
-            for assign in node.assigns:pairsFast() do
-                ---@cast assign Node.Field
-                results[#results+1] = assign
-            end
+        for assign in node:eachAssign() do
+            results[#results+1] = assign
         end
     end)
 
@@ -151,14 +148,11 @@ end
 function M:findGlobalVariableFields(key, ...)
     local fields = {}
     local variable = self:globalGet(key, ...)
-    if variable.location then
-        fields[#fields+1] = self.field(key):setLocation(variable.location)
+    if variable:getLocation() then
+        fields[#fields+1] = self.field(key):setLocation(variable:getLocation())
     end
-    if variable.assigns then
-        for assign in variable.assigns:pairsFast() do
-            ---@cast assign Node.Field
-            fields[#fields+1] = assign
-        end
+    for assign in variable:eachAssign() do
+        fields[#fields+1] = assign
     end
     return fields
 end

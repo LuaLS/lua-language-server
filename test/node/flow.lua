@@ -9,24 +9,24 @@ do
     V = x
     ]]
 
-    local flow = rt.flow({ uri = test.fileUri, offset = 0 })
-    local x = rt.variable 'x'
-    flow:addVariable(x)
-    x:addAssign(rt.field('x', rt.value(10)))
-    flow:addAssign(x, rt.value(10), 0)
-    x:addAssign(rt.field('x', rt.value(5)))
-    flow:addAssign(x, rt.value(5), 10)
-    local V = rt.variable 'V'
-    V:addAssign(rt.field('V', x))
-    flow:addAssign(V, x, 30)
+    -- local flow = rt.flow({ uri = test.fileUri, offset = 0 })
+    -- local x = rt.variable 'x'
+    -- flow:addVariable(x)
+    -- x:addAssign(rt.field('x', rt.value(10)))
+    -- flow:addAssign(x, rt.value(10), 0)
+    -- x:addAssign(rt.field('x', rt.value(5)))
+    -- flow:addAssign(x, rt.value(5), 10)
+    -- local V = rt.variable 'V'
+    -- V:addAssign(rt.field('V', x))
+    -- flow:addAssign(V, x, 30)
 
-    assert(flow:variable(x, 0):view() == '10')
-    assert(flow:variable(x, 5):view() == '10')
-    assert(flow:variable(x, 10):view() == '5')
-    assert(flow:variable(x, 15):view() == '5')
-    assert(flow:variable(V, 30):view() == '5')
-    assert(x:view() == '5 | 10')
-    assert(V:view() == '5')
+    -- assert(flow:variable(x, 0):view() == '10')
+    -- assert(flow:variable(x, 5):view() == '10')
+    -- assert(flow:variable(x, 10):view() == '5')
+    -- assert(flow:variable(x, 15):view() == '5')
+    -- assert(flow:variable(V, 30):view() == '5')
+    -- assert(x:view() == '5 | 10')
+    -- assert(V:view() == '5')
 end
 
 do

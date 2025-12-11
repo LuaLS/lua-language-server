@@ -27,6 +27,7 @@ function M:__init(scope, name, parent)
     self.parent = parent
 end
 
+---@private
 ---@type Node.Location?
 M.location = nil
 
@@ -35,6 +36,13 @@ M.location = nil
 function M:setLocation(location)
     self.location = location
     return self
+end
+
+function M:getLocation()
+    if self.masterVariable then
+        return self.masterVariable:getLocation()
+    end
+    return self.location
 end
 
 ---@type LinkedTable
@@ -75,6 +83,7 @@ function M:removeType(node)
     return self
 end
 
+---@package
 ---@type LinkedTable
 M.assigns = nil
 
@@ -132,6 +141,18 @@ function M:removeAssign(field)
     self:flushCache()
 
     return self
+end
+
+---@return fun(): Node.Field?
+---@return ...
+function M:eachAssign()
+    if self.masterVariable then
+        return self.masterVariable:eachAssign()
+    end
+    if not self.assigns then
+        return function () end
+    end
+    return self.assigns:pairsFast()
 end
 
 ---@type LinkedTable
@@ -513,6 +534,13 @@ end
 ---@type Node.Flow?
 M.flow = nil
 
+function M:shadow()
+    local rt = self.scope.rt
+    local var = rt.variable(self.key, self.parent)
+    var:setMasterVariable(self)
+    return var
+end
+
 ---@type Node
 M.value = nil
 
@@ -733,7 +761,7 @@ function M:getEquivalentLocations(onlySameVariable, onlySameKey)
             if onlySameVariable and equivalent ~= self then
                 return
             end
-            locations[#locations+1] = equivalent.location
+            locations[#locations+1] = equivalent:getLocation()
             if equivalent.assigns then
                 for assign in equivalent.assigns:pairsFast() do
                     ---@cast assign Node.Field

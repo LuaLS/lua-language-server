@@ -588,12 +588,9 @@ function M:onView(viewer, options)
         local value = field.value
         if value.kind == 'variable' then
             ---@cast value Node.Variable
-            if value.assigns then
-                for assign in value.assigns:pairsFast() do
-                    ---@cast assign Node.Field
-                    if checkSkip(assign) then
-                        return true
-                    end
+            for assign in value:eachAssign() do
+                if checkSkip(assign) then
+                    return true
                 end
             end
         end

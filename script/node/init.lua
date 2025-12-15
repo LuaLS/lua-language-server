@@ -25,6 +25,7 @@ require 'node.template'
 require 'node.odd_template'
 require 'node.field'
 require 'node.param_of'
+require 'node.narrow'
 
 require 'node.flow'
 

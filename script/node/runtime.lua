@@ -268,6 +268,12 @@ function M:fillAPIs()
         return New 'Node.ParamOf' (scope, func, index)
     end
 
+    ---@param node Node
+    ---@return Node.Narrow
+    function self.narrow(node)
+        return New 'Node.Narrow' (scope, node)
+    end
+
     ---@param childs Node.Table[]
     ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table

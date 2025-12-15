@@ -34,6 +34,7 @@ Extends('Node', 'Node.RefModule')
 ---| 'select'
 ---| 'field'
 ---| 'paramof'
+---| 'narrow'
 
 ---@class Node.Location
 ---@field uri Uri

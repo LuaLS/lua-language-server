@@ -75,3 +75,41 @@ do
     assert(flow:variable(x, 25) == x2)
     assert(flow:variable(V, 30) == V)
 end
+
+do
+    --[[
+    ---@type integer?
+    local x
+    x --> integer | nil
+
+    if x then
+        x --> integer
+    else
+        x --> nil
+    end
+
+    x --> integer | nil
+    ]]
+
+    local flow = rt.flow({ uri = test.fileUri, offset = 0 })
+
+    local x = rt.variable 'x'
+    x:addType(rt.INTEGER | rt.NIL)
+    flow:addVariable(x, 0)
+
+    local xNarrow = rt.narrow(x):truly()
+
+    local x1 = x:shadow(xNarrow)
+    flow:addVariable(x1, 10)
+
+    local x2 = x:shadow(xNarrow:otherHand())
+    flow:addVariable(x2, 20)
+
+    local x3 = x:shadow(x)
+    flow:addVariable(x3, 30)
+
+    assert(x:view() == 'integer | nil')
+    assert(x1:view() == 'integer')
+    assert(x2:view() == 'nil')
+    assert(x3:view() == 'integer | nil')
+end

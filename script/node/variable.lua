@@ -542,8 +542,9 @@ M.currentValue = nil
 ---@return Node.Variable
 function M:shadow(currentValue)
     local rt = self.scope.rt
+    local master = self.masterVariable or self
     local var = rt.variable(self.key, self.parent)
-    var:setMasterVariable(self)
+    var:setMasterVariable(master)
     var.currentValue = currentValue
     return var
 end

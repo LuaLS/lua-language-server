@@ -113,3 +113,85 @@ do
     assert(x2:view() == 'nil')
     assert(x3:view() == 'integer | nil')
 end
+
+do
+    --[[
+    ---@type integer?
+    local x
+    x --> integer | nil
+
+    if x then
+        x --> integer
+    else
+        x --> nil
+        x = 'string'
+    end
+
+    x --> integer | 'string'
+    ]]
+
+    local flow = rt.flow({ uri = test.fileUri, offset = 0 })
+
+    local x = rt.variable 'x'
+    x:addType(rt.INTEGER | rt.NIL)
+    flow:addVariable(x, 0)
+
+    local xNarrow = rt.narrow(x):truly()
+
+    local x1 = x:shadow(xNarrow)
+    flow:addVariable(x1, 10)
+
+    local x2 = x:shadow(xNarrow:otherHand())
+    flow:addVariable(x2, 20)
+
+    local x21 = x2:shadow(rt.value 'string')
+    x21:addAssign(rt.field('x', rt.value 'string'))
+    flow:addVariable(x21, 25)
+
+    local x3 = x:shadow(x1 | x21)
+    flow:addVariable(x3, 30)
+
+    assert(x:view() == 'integer | nil')
+    assert(x1:view() == 'integer')
+    assert(x2:view() == 'nil')
+    assert(x21:view() == '"string"')
+    assert(x3:view() == '"string" | integer')
+end
+
+do
+    --[[
+    ---@type { a: 1 } | { a: 2 }
+    local x
+    x --> { a: 1 } | { a: 2 }
+
+    if x.a == 1 then
+        x --> { a: 1 }
+    else
+        x --> { a: 2 }
+    end
+
+    x --> { a: 1 } | { a: 2 }
+    ]]
+
+    local flow = rt.flow({ uri = test.fileUri, offset = 0 })
+
+    local x = rt.variable 'x'
+    x:addType(rt.table { a = rt.value(1) } | rt.table { a = rt.value(2) })
+    flow:addVariable(x, 0)
+
+    local xNarrow = rt.narrow(x):matchField('a', rt.value(1))
+
+    local x1 = x:shadow(xNarrow)
+    flow:addVariable(x1, 10)
+
+    local x2 = x:shadow(xNarrow:otherHand())
+    flow:addVariable(x2, 20)
+
+    local x3 = x:shadow(x)
+    flow:addVariable(x3, 30)
+
+    assert(x:view() == '{ a: 1 } | { a: 2 }')
+    assert(x1:view() == '{ a: 1 }')
+    assert(x2:view() == '{ a: 2 }')
+    assert(x3:view() == '{ a: 1 } | { a: 2 }')
+end

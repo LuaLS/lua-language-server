@@ -277,15 +277,27 @@ end
 ---@type Node
 M.truly = nil
 
+---@param self Node
+---@return Node
+---@return true
 M.__getter.truly = function (self)
-    return self
+    if self.value == self then
+        return self, true
+    end
+    return self.value.truly, true
 end
 
 ---@type Node
 M.falsy = nil
 
+---@param self Node
+---@return Node
+---@return true
 M.__getter.falsy = function (self)
-    return self.scope.rt.NEVER
+    if self.value == self then
+        return self.scope.rt.NEVER, true
+    end
+    return self.value.falsy, true
 end
 
 ---@type boolean | number | string | nil
@@ -295,6 +307,11 @@ M.literal = nil
 ---@return Node narrowed
 ---@return Node otherHand
 function M:narrow(other)
+    local union = self:findValue { 'union' }
+    if union then
+        ---@cast union Node.Union
+        return union:narrow(other)
+    end
     if self:canCast(other) then
         return self, self.scope.rt.NEVER
     end
@@ -306,6 +323,11 @@ end
 ---@return Node narrowed
 ---@return Node otherHand
 function M:narrowByField(key, value)
+    local union = self:findValue { 'union' }
+    if union then
+        ---@cast union Node.Union
+        return union:narrowByField(key, value)
+    end
     local myValue = self:get(key)
     if myValue:canCast(value) then
         return self, self.scope.rt.NEVER

@@ -26,7 +26,7 @@ end
 
 ---@param value Node
 ---@return Node.Narrow
-function M:withValue(value)
+function M:matchValue(value)
     self.narrowType = 'value'
     self.nvalue = value
     return self
@@ -35,7 +35,7 @@ end
 ---@param key Node.Key
 ---@param value Node
 ---@return Node.Narrow
-function M:withField(key, value)
+function M:matchField(key, value)
     self.narrowType = 'field'
     self.field = key
     self.nvalue = value
@@ -84,7 +84,7 @@ M.__getter.value = function (self)
 
     local rt = self.scope.rt
     local narrowType = self.narrowType
-    local value = self.node:finalValue()
+    local value = self.node
     if self.isOtherHand then
         if narrowType == 'truly' then
             return value.falsy, true

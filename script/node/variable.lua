@@ -204,6 +204,11 @@ function M:setMasterVariable(var)
     self:flushCache()
 end
 
+---@return Node.Variable
+function M:getMasterVariable()
+    return self.masterVariable or self
+end
+
 ---@type Node|false
 M.classValue = nil
 
@@ -531,14 +536,31 @@ function M:getGuessValue()
         or nil
 end
 
----@type Node.Flow?
-M.flow = nil
+M.currentValue = nil
 
-function M:shadow()
+---@param currentValue Node
+---@return Node.Variable
+function M:shadow(currentValue)
     local rt = self.scope.rt
     local var = rt.variable(self.key, self.parent)
     var:setMasterVariable(self)
+    var.currentValue = currentValue
     return var
+end
+
+---@param value Node
+function M:setCurrentValue(value)
+    self.currentValue = value
+end
+
+---@return Node?
+function M:getCurrentValue()
+    local node = self.currentValue
+    if not node then
+        return nil
+    end
+    node:addRef(self)
+    return node
 end
 
 ---@type Node
@@ -550,7 +572,8 @@ M.value = nil
 M.__getter.value = function (self)
     local rt = self.scope.rt
     self.value = rt.UNKNOWN
-    return self:getExpectValue()
+    return self:getCurrentValue()
+        or self:getExpectValue()
         or self:getGuessValue()
         or rt.UNKNOWN
         , true

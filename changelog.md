@@ -1,6 +1,8 @@
 # changelog
 
 ## Unreleased
+`2025-12-15`
+* `FIX` Lower the version of linked glibc for arm64 linux
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.16.1

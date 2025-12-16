@@ -23,6 +23,7 @@ local globalSubs = util.multiTable(2)
 ---@field links table<uri, vm.global.link>
 ---@field setsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
+---@field uri string
 local mt = {}
 mt.__index = mt
 mt.type = 'global'
@@ -155,10 +156,11 @@ end
 
 ---@param cate vm.global.cate
 ---@return vm.global
-local function createGlobal(name, cate)
+local function createGlobal(name, cate, uri)
     return setmetatable({
         name  = name,
         cate  = cate,
+        uri   = uri,
         links = util.multiTable(2, function ()
             return {
                 sets = {},
@@ -444,7 +446,7 @@ function vm.declareGlobal(cate, name, uri)
         globalSubs[uri][key] = true
     end
     if not allGlobals[key] then
-        allGlobals[key] = createGlobal(name, cate)
+        allGlobals[key] = createGlobal(name, cate, uri)
     end
     return allGlobals[key]
 end
@@ -508,6 +510,19 @@ end
 ---@return table<string, vm.global>
 function vm.getAllGlobals()
     return allGlobals
+end
+
+---@return table<string, vm.global>
+function vm.getExportableGlobals()
+    local exportableGlobals = {}
+    for key, global in pairs(allGlobals) do
+        --If the source uri for the global matches the global variable METAPATH
+        --then the global is a builtin Lua language feature and should not be exported
+        if global.uri and not string.find(global.uri, METAPATH, 1, true) then
+            exportableGlobals[key] = global
+        end
+    end
+    return exportableGlobals
 end
 
 ---@param suri uri

@@ -2,7 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `NEW` Added `completion.maxFieldCount` which lets you increase the amount of fields to analyze before requiring more specific input
+* `NEW` Added `completion.maxSuggestCount` which lets you increase the amount of fields to analyze before requiring more specific input
 * `New` Omit parameter hints when the argument name matches
 * `FIX` Fix a typo in `no-unknown` diagnostic message
 * `FIX` Autodoc generation so it does not include documentation for builtin Lua language features

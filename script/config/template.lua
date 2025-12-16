@@ -347,7 +347,7 @@ local template = {
                                                 'Disable',
                                             },
     ['Lua.completion.autoRequire']          = Type.Boolean >> true,
-    ['Lua.completion.maxFieldCount']        = Type.Integer >> 100,
+    ['Lua.completion.maxSuggestCount']      = Type.Integer >> 100,
     ['Lua.completion.showParams']           = Type.Boolean >> true,
     ['Lua.completion.requireSeparator']     = Type.String  >> '.',
     ['Lua.completion.postfix']              = Type.String  >> '@',

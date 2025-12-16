@@ -43,6 +43,10 @@ jobs:
         run:
           sudo snap install zig --classic --beta
 
+      - name: Prepare zig wrapper
+        if: matrix.target == 'linux'
+        run: chmod +x zig-cc-wrapper.sh
+
       - name: Build
         env:
           USE_ZIG: ${{ matrix.target == 'linux' && '1' || '0' }}

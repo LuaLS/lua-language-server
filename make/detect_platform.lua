@@ -24,9 +24,10 @@ elseif platform.os == 'linux' then
     -- Use Zig for Linux builds to ensure glibc 2.17 compatibility
     local use_zig = os.getenv("USE_ZIG")
     if use_zig and use_zig ~= "0" and use_zig ~= "false" then
-        -- Set compiler to zig (handles both C and C++)
-        -- Use a wrapper script to filter out -lstdc++fs which doesn't work with Zig
-        lm.cc = 'bash -c \'exec zig c++ "${@/#-lstdc++fs/}"\' --'
+        -- Set compiler to zig wrapper script that filters out -lstdc++fs
+        -- The wrapper is needed because bee.lua requires stdc++fs but Zig's libc++ already includes it
+        local wrapper = lm.workdir .. '/zig-cc-wrapper.sh'
+        lm.cc = wrapper
         lm.ar = 'zig ar'
         
         if     lm.platform == nil then

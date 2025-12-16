@@ -25,7 +25,8 @@ elseif platform.os == 'linux' then
     local use_zig = os.getenv("USE_ZIG")
     if use_zig and use_zig ~= "0" and use_zig ~= "false" then
         -- Set compiler to zig (handles both C and C++)
-        lm.cc = 'zig c++'
+        -- Use a wrapper script to filter out -lstdc++fs which doesn't work with Zig
+        lm.cc = 'bash -c \'exec zig c++ "${@/#-lstdc++fs/}"\' --'
         lm.ar = 'zig ar'
         
         if     lm.platform == nil then

@@ -307,10 +307,8 @@ M.literal = nil
 ---@return Node narrowed
 ---@return Node otherHand
 function M:narrow(other)
-    local union = self:findValue { 'union' }
-    if union then
-        ---@cast union Node.Union
-        return union:narrow(other)
+    if self.value ~= self then
+        return self.value:narrow(other)
     end
     if self:canCast(other) then
         return self, self.scope.rt.NEVER
@@ -323,10 +321,8 @@ end
 ---@return Node narrowed
 ---@return Node otherHand
 function M:narrowByField(key, value)
-    local union = self:findValue { 'union' }
-    if union then
-        ---@cast union Node.Union
-        return union:narrowByField(key, value)
+    if self.value ~= self then
+        return self.value:narrowByField(key, value)
     end
     local myValue = self:get(key)
     if myValue:canCast(value) then

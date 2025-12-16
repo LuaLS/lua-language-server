@@ -76,3 +76,23 @@ do
 
     assert(r:view() == 'fun(x: number)')
 end
+
+do
+    rt:reset()
+
+    rt.alias('A', nil, rt.value(1) | rt.value(2))
+
+    local b = rt.type('A').truly
+
+    assert(b:view() == 'A')
+end
+
+do
+    rt:reset()
+
+    rt.alias('A', nil, rt.value(1) | rt.value(2) | rt.NIL)
+
+    local b = rt.type('A').truly
+
+    assert(b:view() == '1 | 2')
+end

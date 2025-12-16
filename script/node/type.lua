@@ -303,13 +303,13 @@ M.__getter.variableTable = function (self)
 end
 
 ---@type Node
-M.value = nil
+M.extendsValue = nil
 
 ---@param self Node.Type
 ---@return Node
 ---@return true
-M.__getter.value = function (self)
-    self.value = self.scope.rt.NEVER
+M.__getter.extendsValue = function (self)
+    self.extendsValue = self.scope.rt.NEVER
     if not self:isComplex() then
         return self, true
     end
@@ -338,6 +338,19 @@ M.__getter.value = function (self)
         return union, true
     end
     return self, true
+end
+
+---@type Node
+M.value = nil
+
+---@param self Node.Type
+---@return Node
+---@return true
+M.__getter.value = function (self)
+    if self.isBasicType then
+        return self, true
+    end
+    return self.extendsValue, true
 end
 
 ---@type Node
@@ -378,7 +391,12 @@ end
 ---@return true
 M.__getter.truly = function (self)
     if self:isAliasLike() then
-        return self.value.truly, true
+        local truly = self.value.truly
+        if truly == self.value then
+            return self, true
+        else
+            return truly, true
+        end
     end
     return self, true
 end
@@ -388,7 +406,12 @@ end
 ---@return true
 M.__getter.falsy = function (self)
     if self:isAliasLike() then
-        return self.value.falsy, true
+        local falsy = self.value.falsy
+        if falsy == self.value then
+            return self, true
+        else
+            return falsy, true
+        end
     end
     return self.scope.rt.NEVER, true
 end
@@ -488,10 +511,10 @@ end
 ---@return Node
 ---@return boolean exists
 function M:get(key)
-    if self.value == self then
+    if self.extendsValue == self then
         return self.scope.rt.NEVER, false
     end
-    return self.value:get(key)
+    return self.extendsValue:get(key)
 end
 
 M.hasGeneric = false

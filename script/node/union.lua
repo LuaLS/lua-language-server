@@ -120,8 +120,15 @@ end
 ---@return true
 M.__getter.truly = function (self)
     local result = {}
+    local changed = false
     for _, v in ipairs(self.values) do
         result[#result+1] = v.truly
+        if v ~= v.truly then
+            changed = true
+        end
+    end
+    if not changed then
+        return self, true
     end
     return self.scope.rt.union(result), true
 end
@@ -131,8 +138,15 @@ end
 ---@return true
 M.__getter.falsy = function (self)
     local result = {}
+    local changed = false
     for _, v in ipairs(self.values) do
         result[#result+1] = v.falsy
+        if v ~= v.truly then
+            changed = true
+        end
+    end
+    if not changed then
+        return self, true
     end
     return self.scope.rt.union(result), true
 end

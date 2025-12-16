@@ -25,6 +25,7 @@ elseif platform.os == 'linux' then
     local use_zig = os.getenv("USE_ZIG")
     if use_zig and use_zig ~= "0" and use_zig ~= "false" then
         lm.cc = 'zig cc'
+        lm.cxx = 'zig c++'
         lm.ar = 'zig ar'
         
         if     lm.platform == nil then

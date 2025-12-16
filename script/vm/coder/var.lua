@@ -6,7 +6,7 @@ ls.vm.registerCoderProvider('var', function (coder, source)
             loc = coder:getKey(source.loc),
         })
     else
-        coder:addLine('{key} = rt:globalGet {name:q}' % {
+        coder:addLine('{key} = rt:globalGet {name%q}' % {
             key = coder:getKey(source),
             name = source.id,
         })
@@ -53,7 +53,7 @@ end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)
     ---@cast source LuaParser.Node.Local
-    coder:addLine('{key} = rt.variable {name:q}' % {
+    coder:addLine('{key} = rt.variable {name%q}' % {
         key = coder:getKey(source),
         name = source.id,
     })
@@ -69,7 +69,7 @@ end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
     ---@cast source LuaParser.Node.Param
-    coder:addLine('{key} = rt.variable {name:q}' % {
+    coder:addLine('{key} = rt.variable {name%q}' % {
         key = coder:getKey(source),
         name = source.id,
     })

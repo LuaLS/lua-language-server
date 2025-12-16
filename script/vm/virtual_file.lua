@@ -55,9 +55,9 @@ function M:index()
         self.coder = self:makeCoder(document)
     end, function (duration)
         if duration > 0.1 then
-            log.warn('Index {} took {:.2f} seconds.' % { self.uri, duration })
+            log.warn('Index {} took {%.2f} seconds.' % { self.uri, duration })
         else
-            log.debug('Index {} in {:.2f} seconds.' % { self.uri, duration })
+            log.debug('Index {} in {%.2f} seconds.' % { self.uri, duration })
         end
     end)
     self:bindGC(self.coder)
@@ -65,9 +65,9 @@ function M:index()
         self.coder:run(self)
     end, function (duration)
         if duration > 0.1 then
-            log.warn('Run coder for {} took {:.2f} seconds.' % { self.uri, duration })
+            log.warn('Run coder for {} took {%.2f} seconds.' % { self.uri, duration })
         else
-            log.debug('Run coder for {} in {:.2f} seconds.' % { self.uri, duration })
+            log.debug('Run coder for {} in {%.2f} seconds.' % { self.uri, duration })
         end
     end)
 
@@ -118,9 +118,9 @@ function M:awaitIndex()
         self.coder = self:awaitMakeCoder(document)
     end, function (duration)
         if duration > 0.1 then
-            log.warn('Index (async) {} took {:.3f} seconds.' % { self.uri, duration })
+            log.warn('Index (async) {} took {%.3f} seconds.' % { self.uri, duration })
         else
-            log.debug('Index (async) {} in {:.3f} seconds.' % { self.uri, duration })
+            log.debug('Index (async) {} in {%.3f} seconds.' % { self.uri, duration })
         end
     end)
 
@@ -129,9 +129,9 @@ function M:awaitIndex()
         self.coder:run(self)
     end, function (duration)
         if duration > 0.1 then
-            log.warn('Run coder for {} took {:.3f} seconds.' % { self.uri, duration })
+            log.warn('Run coder for {} took {%.3f} seconds.' % { self.uri, duration })
         else
-            log.debug('Run coder for {} in {:.3f} seconds.' % { self.uri, duration })
+            log.debug('Run coder for {} in {%.3f} seconds.' % { self.uri, duration })
         end
     end)
 

@@ -21,7 +21,7 @@ function M:__init(name, entry, useDebugger)
     self.thread = thread.create([[
 local options = ...
 local root = options.root
-package.path = {packagepath:q}
+package.path = {packagepath%q}
 
 package.searchers[2] = function (name)
     local filename, err = package.searchpath(name, package.path)

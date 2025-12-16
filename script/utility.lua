@@ -1226,7 +1226,7 @@ function m.enableFormatString()
     mt.__mod = function (str, args)
         local count = 0
         return str:gsub('%b{}', function (key)
-            local k, fmt = key:match('^{(.-):(.+)}$')
+            local k, fmt = key:match('^{(.-)(%%.+)}$')
             if not k then
                 k = key:sub(2, -2)
             end
@@ -1241,7 +1241,7 @@ function m.enableFormatString()
                 return '{' .. k % args .. '}'
             end
             if fmt then
-                value = stringFormat('%' .. fmt, value)
+                value = stringFormat(fmt, value)
             else
                 value = tostring(value)
             end

@@ -2,7 +2,7 @@
 ---@param source LuaParser.Node.Base
 ---@param value string | number | boolean
 local function makeValue(coder, source, value)
-    coder:addLine('{key} = rt.value({value:q})' % {
+    coder:addLine('{key} = rt.value({value%q})' % {
         key   = coder:getKey(source),
         value = value,
     })
@@ -75,7 +75,7 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
         location = coder:makeLocationCode(source),
     })
     if source.subtype == 'field' then
-        coder:addLine('{fieldid} = rt.index({table}, {field:q}, true)' % {
+        coder:addLine('{fieldid} = rt.index({table}, {field%q}, true)' % {
             fieldid = coder:getKey(source.key),
             table   = coder:getKey(source.parent),
             field   = source.key.id,
@@ -167,7 +167,7 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
         return
     end
 
-    coder:addLine('{key} = rt.call({op:q}, { {arg1}, {arg2} })' % {
+    coder:addLine('{key} = rt.call({op%q}, { {arg1}, {arg2} })' % {
         key   = coder:getKey(source),
         op    = op,
         arg1  = coder:getKey(source.exp1),
@@ -193,7 +193,7 @@ ls.vm.registerCoderProvider('unary', function (coder, source)
         return
     end
 
-    coder:addLine('{key} = rt.call({op:q}, { {arg} })' % {
+    coder:addLine('{key} = rt.call({op%q}, { {arg} })' % {
         key   = coder:getKey(source),
         op    = op,
         arg   = coder:getKey(source.exp),

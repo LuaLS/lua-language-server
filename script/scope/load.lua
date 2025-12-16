@@ -99,7 +99,7 @@ function M:load(callback)
     ls.util.withDuration(function ()
         self:loadFiles(callback, status)
     end, function (duration)
-        log.info('Load files for "{}" in {:.2f} seconds.' % { self.name, duration })
+        log.info('Load files for "{}" in {%.2f} seconds.' % { self.name, duration })
     end)
 
     xpcall(callback, log.error, 'finish', status)

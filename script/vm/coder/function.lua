@@ -48,7 +48,7 @@ end
 ---@param param LuaParser.Node.Param
 local function resolveParam(coder, source, param)
     coder:compile(param)
-    coder:addLine('{funcKey}:addParamDef({paramKey:q}, {paramNode})' % {
+    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode})' % {
         funcKey   = coder:getKey(source),
         paramKey  = param.id,
         paramNode = coder:getKey(param),
@@ -138,7 +138,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             end
 
             coder:addLine('-- function overloads --')
-            coder:addLine('rawset(r, {funcKey:q}, rt.union { {overloadList} })' % {
+            coder:addLine('rawset(r, {funcKey%q}, rt.union { {overloadList} })' % {
                 funcKey      = source.uniqueKey,
                 overloadList = table.concat(overloadKeys, ', '),
             })

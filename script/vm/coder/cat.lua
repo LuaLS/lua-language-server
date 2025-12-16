@@ -91,7 +91,7 @@ end)
 ---@param coder VM.Coder
 ---@param source { id: string }
 local function compileID(coder, source)
-    coder:addLine('{key} = rt.value {name:q}' % {
+    coder:addLine('{key} = rt.value {name%q}' % {
         key = coder:getKey(source),
         name = source.id,
     })
@@ -137,12 +137,12 @@ ls.vm.registerCoderProvider('catid', function (coder, source)
         end
     else
         if source.optional then
-            coder:addLine('{id} = rt.type {name:q} | rt.NIL' % {
+            coder:addLine('{id} = rt.type {name%q} | rt.NIL' % {
                 id = coder:getKey(source),
                 name = source.id,
             })
         else
-            coder:addLine('{id} = rt.type {name:q}' % {
+            coder:addLine('{id} = rt.type {name%q}' % {
                 id = coder:getKey(source),
                 name = source.id,
             })
@@ -171,7 +171,7 @@ end)
 ls.vm.registerCoderProvider('catstatealias', function (coder, source)
     ---@cast source LuaParser.Node.CatStateAlias
 
-    coder:addLine('{alias} = rt.alias({name:q})' % {
+    coder:addLine('{alias} = rt.alias({name%q})' % {
         alias = coder:getKey(source),
         name  = source.aliasID.id,
     })
@@ -219,7 +219,7 @@ end)
 ls.vm.registerCoderProvider('catstring', function (coder, source)
     ---@cast source LuaParser.Node.CatString
 
-    coder:addLine('{key} = rt.value {value:q}' % {
+    coder:addLine('{key} = rt.value {value%q}' % {
         key = coder:getKey(source),
         value = source.value,
     })
@@ -343,7 +343,7 @@ ls.vm.registerCoderProvider('catcall', function (coder, source)
         args[i] = coder:getKey(arg)
     end
 
-    coder:addLine('{key} = rt.call({type:q}, { {args} })' % {
+    coder:addLine('{key} = rt.call({type%q}, { {args} })' % {
         key  = coder:getKey(source),
         type = source.node.id,
         args = table.concat(args, ', '),
@@ -384,7 +384,7 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
             if param.value then
                 coder:compile(param.value)
             end
-            coder:addLine('{func}:addParamDef({name:q}, {param}, {optional:q})' % {
+            coder:addLine('{func}:addParamDef({name%q}, {param}, {optional%q})' % {
                 func     = coder:getKey(source),
                 name     = param.name.id,
                 param    = param.value and coder:getKey(param.value) or 'rt.UNKNOWN',
@@ -398,7 +398,7 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
             coder:addLine('')
             if ret.value then
                 coder:compile(ret.value)
-                coder:addLine('{func}:addReturnDef({name:q}, {param}, {optional:q})' % {
+                coder:addLine('{func}:addReturnDef({name%q}, {param}, {optional%q})' % {
                     func     = coder:getKey(source),
                     name     = ret.name and ret.name.id or nil,
                     param    = coder:getKey(ret.value),
@@ -414,13 +414,13 @@ ls.vm.registerCoderProvider('catgeneric', function (coder, source)
 
     if source.extends then
         coder:compile(source.extends)
-        coder:addLine('{key} = rt.generic({name:q}, {extends})' % {
+        coder:addLine('{key} = rt.generic({name%q}, {extends})' % {
             key     = coder:getKey(source),
             name    = source.id.id,
             extends = coder:getKey(source.extends),
         })
     else
-        coder:addLine('{key} = rt.generic {name:q}' % {
+        coder:addLine('{key} = rt.generic {name%q}' % {
             key = coder:getKey(source),
             name = source.id.id,
         })

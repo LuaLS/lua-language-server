@@ -56,7 +56,7 @@ function M:getName(var)
                     if parser.isName(value) then
                         return '{}.{}' % { parentName, value }
                     else
-                        return '{}[{:q}]' % { parentName, value }
+                        return '{}[{%q}]' % { parentName, value }
                     end
                 else
                     return '{}[{}]' % { parentName, tostring(value) }

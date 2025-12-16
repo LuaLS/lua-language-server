@@ -25,7 +25,7 @@ local function testSyncTime(uris)
         totalSize = totalSize + ls.file.get(uri):getText():len() / 1024 / 1024
     end
     print('=== 同步解析 ===')
-    print('总大小为: {:.2f} MB，索引总时间为: {:.2f} 秒，速度： {:.2f} MB/s' % {
+    print('总大小为: {%.2f} MB，索引总时间为: {%.2f} 秒，速度： {%.2f} MB/s' % {
         totalSize,
         duration,
         totalSize / duration,
@@ -61,7 +61,7 @@ local function testAsyncTime(uris)
         totalSize = totalSize + ls.file.get(uri):getText():len() / 1024 / 1024
     end
     print('=== 异步解析 ===')
-    print('总大小为: {:.2f} MB，索引总时间为: {:.2f} 秒，速度： {:.2f} MB/s' % {
+    print('总大小为: {%.2f} MB，索引总时间为: {%.2f} 秒，速度： {%.2f} MB/s' % {
         totalSize,
         duration,
         totalSize / duration,
@@ -73,7 +73,7 @@ do
     local scope <close> = ls.scope.create('test', root, ls.afs)
 
     collectgarbage()
-    print('加载项目前的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+    print('加载项目前的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
     local result = scope:load(function (event, status, uri)
         if event == 'found' then
@@ -94,7 +94,7 @@ do
     end)
 
     collectgarbage()
-    print('索引后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+    print('索引后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
     for _, uri in ipairs(scope.uris) do
         local document = scope:getDocument(uri)
@@ -102,7 +102,7 @@ do
     end
 
     collectgarbage()
-    print('去除语法树后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+    print('去除语法树后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
     local c1 = os.clock()
     local count = 0
@@ -121,10 +121,10 @@ do
     local c2 = os.clock()
 
     local duration = c2 - c1
-    print('解析 {} 个token耗时: {:.2f} 秒' % { count, duration })
+    print('解析 {} 个token耗时: {%.2f} 秒' % { count, duration })
 
     collectgarbage()
-    print('全量解析后的内存为： {:.2f} MB' % { collectgarbage 'count' / 1024 })
+    print('全量解析后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
     testSyncTime(result.uris)
     testAsyncTime(result.uris)

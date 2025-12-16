@@ -27,7 +27,7 @@ local function tryBindCat(coder, var, index)
                     var   = coder:getKey(var),
                     class = coder:getKey(cat),
                 })
-                return 'rt.type {:q}' % { cat.classID.id }
+                return 'rt.type {%q}' % { cat.classID.id }
             end
         elseif cat.kind == 'catstatetype' then
             ---@cast cat LuaParser.Node.CatStateType

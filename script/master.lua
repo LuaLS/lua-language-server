@@ -12,7 +12,7 @@ fs.create_directories(fs.path(ls.env.LOG_PATH))
 local logChannel = channel.create('log')
 
 local function writeLog(name, timeStamp, level, sourceStr, message)
-    local fullMessage = '[{}][{:5s}][{}]<{}>: {}\n' % {
+    local fullMessage = '[{}][{%5s}][{}]<{}>: {}\n' % {
         timeStamp,
         level,
         sourceStr,

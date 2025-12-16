@@ -24,8 +24,8 @@ elseif platform.os == 'linux' then
     -- Use Zig for Linux builds to ensure glibc 2.17 compatibility
     local use_zig = os.getenv("USE_ZIG")
     if use_zig and use_zig ~= "0" and use_zig ~= "false" then
-        lm.cc = 'zig cc'
-        lm.cxx = 'zig c++'
+        -- Set compiler to zig (handles both C and C++)
+        lm.cc = 'zig c++'
         lm.ar = 'zig ar'
         
         if     lm.platform == nil then

@@ -89,7 +89,7 @@ DIAG_COSE_NON_OBJECT    =
 DIAG_COUNT_DOWN_LOOP    =
 'Do you mean `{}` ?'
 DIAG_UNKNOWN            =
-'Can not infer type.'
+'Cannot infer type.'
 DIAG_DEPRECATED         =
 'Deprecated.'
 DIAG_DIFFERENT_REQUIRES =

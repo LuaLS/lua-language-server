@@ -613,7 +613,7 @@ M.__getter.allEquivalents = function (self)
             if not value then
                 goto continue
             end
-            local subVar = value:findValue { 'variable' }
+            local subVar = value:findValue(ls.node.kind['variable'])
             if subVar then
                 ---@cast subVar Node.Variable
                 lookIntoVariable(subVar)
@@ -658,7 +658,7 @@ M.__getter.allEquivalents = function (self)
                         ---@cast assign Node.Field
                         local value = assign.value
                         if value then
-                            local t = value:findValue { 'type', 'table' }
+                            local t = value:findValue(ls.node.kind['type'] | ls.node.kind['table'])
                             if t and t.kind == 'table' then
                                 ---@cast t Node.Table
                                 lookIntoTable(t)
@@ -669,7 +669,7 @@ M.__getter.allEquivalents = function (self)
             else
                 ---@cast equivalent Node.Field
                 if equivalent.value then
-                    local t = equivalent.value:findValue { 'type', 'table' }
+                    local t = equivalent.value:findValue(ls.node.kind['type'] | ls.node.kind['table'])
                     if t and t.kind == 'table' then
                         ---@cast t Node.Table
                         lookIntoTable(t)
@@ -725,7 +725,7 @@ M.__getter.equivalentValue = function (self)
     local unionResults = {}
     local hasType = false
     for _, node in ipairs(results) do
-        local t = node:findValue {'table', 'type'}
+        local t = node:findValue(ls.node.kind['table'] | ls.node.kind['type'])
         if t then
             if t.kind == 'table' then
                 ---@cast t Node.Table

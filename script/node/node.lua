@@ -11,30 +11,32 @@ local M = Class 'Node'
 
 Extends('Node', 'Node.RefModule')
 
----@alias Node.Kind
----|'type'
----| 'value'
----| 'table'
----| 'tuple'
----| 'array'
----| 'index'
----| 'function'
----| 'union'
----| 'intersection'
----| 'unsolve'
----| 'generic'
----| 'call'
----| 'template'
----| 'oddtemplate'
----| 'list'
----| 'variable'
----| 'class'
----| 'alias'
----| 'fcall'
----| 'select'
----| 'field'
----| 'paramof'
----| 'narrow'
+---@enum(key) Node.Kind
+ls.node.kind = {
+    ['type']         = 1 << 0,
+    ['value']        = 1 << 1,
+    ['table']        = 1 << 2,
+    ['tuple']        = 1 << 3,
+    ['array']        = 1 << 4,
+    ['index']        = 1 << 5,
+    ['function']     = 1 << 6,
+    ['union']        = 1 << 7,
+    ['intersection'] = 1 << 8,
+    ['unsolve']      = 1 << 9,
+    ['generic']      = 1 << 10,
+    ['call']         = 1 << 11,
+    ['template']     = 1 << 12,
+    ['oddtemplate']  = 1 << 13,
+    ['list']         = 1 << 14,
+    ['variable']     = 1 << 15,
+    ['class']        = 1 << 16,
+    ['alias']        = 1 << 17,
+    ['fcall']        = 1 << 18,
+    ['select']       = 1 << 19,
+    ['field']        = 1 << 20,
+    ['paramof']      = 1 << 21,
+    ['narrow']       = 1 << 22,
+}
 
 ---@class Node.Location
 ---@field uri Uri
@@ -232,16 +234,12 @@ function M:finalValue()
     return value
 end
 
----@param types string[]
+---@param kinds integer
 ---@return Node?
-function M:findValue(types)
-    local map = {}
-    for _, v in ipairs(types) do
-        map[v] = true
-    end
+function M:findValue(kinds)
     local value = self
     for _ = 1, 1000 do
-        if map[value.kind] then
+        if (kinds & ls.node.kind[value.kind]) ~= 0 then
             return value
         end
         if value == value.value then

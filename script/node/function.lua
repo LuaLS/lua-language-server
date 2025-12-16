@@ -319,7 +319,7 @@ function M:inferGeneric(other, result)
         end
         return
     end
-    local func = value:findValue { 'function' }
+    local func = value:findValue(ls.node.kind['function'])
     if not func then
         return
     end

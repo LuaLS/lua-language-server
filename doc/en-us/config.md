@@ -314,6 +314,7 @@ Array<string>
 * ``"miss-symbol"``
 * ``"missing-fields"``
 * ``"missing-global-doc"``
+* ``"missing-local-doc"``
 * ``"missing-local-export-doc"``
 * ``"missing-parameter"``
 * ``"missing-return"``
@@ -504,6 +505,7 @@ object<string, string>
     * duplicate-doc-param
     * incomplete-signature-doc
     * missing-global-doc
+    * missing-local-doc
     * missing-local-export-doc
     * undefined-doc-class
     * undefined-doc-name
@@ -633,6 +635,7 @@ object<string, string>
     * duplicate-doc-param
     * incomplete-signature-doc
     * missing-global-doc
+    * missing-local-doc
     * missing-local-export-doc
     * undefined-doc-class
     * undefined-doc-name
@@ -869,6 +872,10 @@ object<string, string>
     Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
     "missing-global-doc": "None",
+    /*
+    Missing annotations for locals! Local functions must have a comment and annotations for all parameters and return values.
+    */
+    "missing-local-export-doc": "None",
     /*
     Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
     */

@@ -409,6 +409,8 @@ config.diagnostics['invisible']             =
 '嘗試存取不可見的欄位'
 config.diagnostics['missing-global-doc']    =
 '全域變數缺少標註（全域函式必須為所有參數和回傳值提供標註）'
+config.diagnostics['missing-local-doc']     = -- TODO: need translate!
+'Missing annotations for locals! Local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-local-export-doc'] =
 '匯出的區域函式缺少標註（匯出的區域函式、所有的參數和回傳值都必須有標註）'
 config.diagnostics['missing-parameter']     =

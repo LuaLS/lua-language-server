@@ -409,6 +409,8 @@ config.diagnostics['invisible']             =
 '使用不可见的值'
 config.diagnostics['missing-global-doc']    =
 '全局变量的注释缺失(全局函数必须为所有参数和返回值提供注释和注释)'
+config.diagnostics['missing-local-doc']     = -- TODO: need translate!
+'Missing annotations for locals! Local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-local-export-doc'] =
 '导出的本地函数缺少注释(导出的本地函数必须有包括本身以及所有参数和返回值的注释)'
 config.diagnostics['missing-parameter']     =

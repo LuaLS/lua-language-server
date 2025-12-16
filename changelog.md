@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` diagnostic: `missing-local-doc`
 
 ## 3.16.1
 `2025-12-8`

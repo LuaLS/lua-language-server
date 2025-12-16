@@ -106,6 +106,7 @@ m.register {
 m.register {
     'incomplete-signature-doc',
     'missing-global-doc',
+    'missing-local-doc',
     'missing-local-export-doc',
 } {
     group    = 'luadoc',

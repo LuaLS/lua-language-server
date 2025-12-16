@@ -1,7 +1,7 @@
 # changelog
 
 ## Unreleased
-<!-- Add all new changes here. They will be moved under a version at release -->
+* `New` Omit parameter hints when the argument name matches
 
 ## 3.16.1
 `2025-12-8`

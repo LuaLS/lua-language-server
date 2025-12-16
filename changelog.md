@@ -1,8 +1,15 @@
 # changelog
 
 ## Unreleased
-* `FIX` Fix a typo in `no-unknown` diagnostic message
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `New` Omit parameter hints when the argument name matches
+* `FIX` Fix a typo in `no-unknown` diagnostic message
+
+## 3.16.1
+`2025-12-8`
+* `FIX` Broken in Linux
+* `FIX` Fix diagnostic completions incorrect textEdit.finish
+* `FIX` Comparison crash in doc export CLI [#3111](https://github.com/LuaLS/lua-language-server/issues/3111)
 
 ## 3.16.0
 `2025-12-2`

@@ -76,6 +76,7 @@ local function testAll()
     test 'diagnostics'
     test 'crossfile'
     test 'highlight'
+    test 'inlay_hint'
     test 'rename'
     test 'signature'
     test 'command'

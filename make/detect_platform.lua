@@ -21,12 +21,37 @@ elseif platform.os == 'windows' then
         error "unknown platform"
     end
 elseif platform.os == 'linux' then
-    if     lm.platform == nil then
-    elseif lm.platform == "linux-x64" then
-    elseif lm.platform == "linux-arm64" then
-        lm.cc = 'aarch64-linux-gnu-gcc'
+    -- Use Zig for Linux builds to ensure glibc 2.17 compatibility
+    local use_zig = os.getenv("USE_ZIG")
+    if use_zig and use_zig ~= "0" and use_zig ~= "false" then
+        -- Set compiler to zig wrapper script that filters out -lstdc++fs
+        -- The wrapper is needed because bee.lua requires stdc++fs but Zig's libc++ already includes it
+        local wrapper = lm.workdir .. '/zig-cc-wrapper.sh'
+        lm.cc = wrapper
+        lm.ar = 'zig ar'
+        
+        if     lm.platform == nil then
+            -- Auto-detect and set target
+        elseif lm.platform == "linux-x64" then
+            -- Target glibc 2.17 for x86_64
+            lm.flags = { '-target', 'x86_64-linux-gnu.2.17' }
+            lm.ldflags = { '-target', 'x86_64-linux-gnu.2.17', '-lc++' }
+        elseif lm.platform == "linux-arm64" then
+            -- Target glibc 2.17 for aarch64
+            lm.flags = { '-target', 'aarch64-linux-gnu.2.17' }
+            lm.ldflags = { '-target', 'aarch64-linux-gnu.2.17', '-lc++' }
+        else
+            error "unknown platform"
+        end
     else
-        error "unknown platform"
+        -- Use default GCC
+        if     lm.platform == nil then
+        elseif lm.platform == "linux-x64" then
+        elseif lm.platform == "linux-arm64" then
+            lm.cc = 'aarch64-linux-gnu-gcc'
+        else
+            error "unknown platform"
+        end
     end
 end
 

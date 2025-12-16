@@ -38,7 +38,18 @@ jobs:
 
       - uses: actboy168/setup-luamake@master
 
+      - name: Install zig
+        if: matrix.target == 'linux'
+        run:
+          sudo snap install zig --classic --beta
+
+      - name: Prepare zig wrapper
+        if: matrix.target == 'linux'
+        run: chmod +x zig-cc-wrapper.sh
+
       - name: Build
+        env:
+          USE_ZIG: ${{ matrix.target == 'linux' && '1' || '0' }}
         run: luamake -platform ${{ matrix.platform }}
 
       - name: Setting up workflow variables

@@ -565,8 +565,9 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     local fields = {}
     local funcs  = {}
     local count  = 0
+    local maxSuggestCount = config.get(state.uri, 'Lua.completion.maxSuggestCount')
     for _, src in ipairs(refs) do
-        if count > 100 then
+        if count > maxSuggestCount then
             results.incomplete = true
             break
         end

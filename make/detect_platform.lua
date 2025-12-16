@@ -33,11 +33,11 @@ elseif platform.os == 'linux' then
         elseif lm.platform == "linux-x64" then
             -- Target glibc 2.17 for x86_64
             lm.flags = { '-target', 'x86_64-linux-gnu.2.17' }
-            lm.ldflags = { '-target', 'x86_64-linux-gnu.2.17' }
+            lm.ldflags = { '-target', 'x86_64-linux-gnu.2.17', '-lc++' }
         elseif lm.platform == "linux-arm64" then
             -- Target glibc 2.17 for aarch64
             lm.flags = { '-target', 'aarch64-linux-gnu.2.17' }
-            lm.ldflags = { '-target', 'aarch64-linux-gnu.2.17' }
+            lm.ldflags = { '-target', 'aarch64-linux-gnu.2.17', '-lc++' }
         else
             error "unknown platform"
         end

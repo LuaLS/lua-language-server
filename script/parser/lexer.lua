@@ -281,4 +281,10 @@ function API.new()
     return class.new 'Lexer' ()
 end
 
+---@param str string
+---@return boolean
+function API.isWord(str)
+    return Lexer.Word:match(str) == #str
+end
+
 return API

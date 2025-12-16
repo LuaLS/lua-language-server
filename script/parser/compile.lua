@@ -1,3 +1,4 @@
+local lexer = require 'parser.lexer'
 require 'parser.ast.ast'
 
 ---@class LuaParser
@@ -39,4 +40,10 @@ function LuaParser.compile(code, source, options)
     ast:checkAssignConst()
 
     return ast
+end
+
+---@param str string
+---@return boolean
+function LuaParser.isName(str)
+    return lexer.isWord(str)
 end

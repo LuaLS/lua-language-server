@@ -4,10 +4,11 @@ local M = Class 'VM.Coder'
 ---@param coder VM.Coder
 ---@param var LuaParser.Node.AssignAble
 ---@param index integer
+---@return string?
 local function tryBindCat(coder, var, index)
     local catGroup = coder:getCatGroup(var)
     if not catGroup then
-        return
+        return nil
     end
     for _, catState in ipairs(catGroup) do
         local cat = catState.value
@@ -26,6 +27,7 @@ local function tryBindCat(coder, var, index)
                     var   = coder:getKey(var),
                     class = coder:getKey(cat),
                 })
+                return 'rt.type {:q}' % { cat.classID.id }
             end
         elseif cat.kind == 'catstatetype' then
             ---@cast cat LuaParser.Node.CatStateType
@@ -35,6 +37,7 @@ local function tryBindCat(coder, var, index)
                     var  = coder:getKey(var),
                     type = coder:getKey(cat.exp),
                 })
+                return coder:getKey(cat.exp)
             end
         end
         ::continue::
@@ -46,6 +49,12 @@ end
 ---@param valueKey? string
 ---@param isTable? boolean
 function M:compileAssign(var, index, valueKey, isTable)
+    local catKey = tryBindCat(self, var, index)
+
+    if not valueKey then
+        return
+    end
+
     local key = 'rt.UNKNOWN'
     if var.kind == 'var' then
         ---@cast var LuaParser.Node.Var
@@ -56,11 +65,6 @@ function M:compileAssign(var, index, valueKey, isTable)
     elseif var.kind == 'field' then
         ---@cast var LuaParser.Node.Field
         key = self:makeFieldCode(var.key) or 'rt.UNKNOWN'
-    end
-    tryBindCat(self, var, index)
-
-    if not valueKey then
-        return
     end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
     self:addLine([[
@@ -83,6 +87,13 @@ function M:compileAssign(var, index, valueKey, isTable)
         self:addLine('{valueKey}:setExpectParent({varKey})' % {
             valueKey = valueKey,
             varKey   = self:getKey(var),
+        })
+    end
+
+    if var.kind == 'local' and not isTable then
+        self:addLine('{varKey}:setCurrentValue({valueKey})' % {
+            varKey   = self:getKey(var),
+            valueKey = catKey or valueKey,
         })
     end
 end

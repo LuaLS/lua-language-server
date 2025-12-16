@@ -16,9 +16,6 @@ M.providers = {}
 
 function M:__init()
     self.env   = _G
-    self.indentation = 0
-
-    self.blockStack = {}
 end
 
 function M:__del()
@@ -28,8 +25,11 @@ end
 ---@param ast LuaParser.Ast
 function M:makeFromAst(ast)
     self.buf = {}
+    self.indentation = 0
     self.disposers = {}
     self.compiled = {}
+    self.blockStack = {}
+    self.flow = New 'VM.Coder.Flow' ()
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'local coder, vfile = ...'

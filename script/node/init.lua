@@ -27,7 +27,5 @@ require 'node.field'
 require 'node.param_of'
 require 'node.narrow'
 
-require 'node.flow'
-
 require 'node.runtime'
 require 'node.runtime-helper'

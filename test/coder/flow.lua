@@ -27,7 +27,7 @@ do
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
-    assert(X0:view() == '10 | 5')
+    assert(X0:view() == '5 | 10')
     assert(X1:view() == '10')
     assert(X2:view() == '5')
 end

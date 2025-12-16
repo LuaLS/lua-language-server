@@ -151,3 +151,23 @@ do
     assert(x2:view() == '{ a: 2 }')
     assert(x3:view() == '{ a: 1 } | { a: 2 }')
 end
+
+do
+    --[[
+    local x = 10
+    local y = x
+    x = 20
+    ]]
+
+    local x = rt.variable 'x'
+    x:setCurrentValue(rt.value(10))
+
+    local y = rt.variable 'y'
+    y:addAssign(rt.field('y', x))
+    y:setCurrentValue(x)
+
+    local x2 = x:shadow(rt.value(20))
+    x2:addAssign(rt.field('x', rt.value(20)))
+
+    assert(y:view() == '10')
+end

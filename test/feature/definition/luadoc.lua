@@ -943,14 +943,14 @@ print(t.<?x?>)
 
 TEST [[
 ---@class A
----@field [1]? <!{}!>
+---@field [<!1!>]? <!{}!>
 local t
 
 local <!<?v?>!> = t[1]
 ]]
 
 TEST [[
----@type { [1]?: <!{}!> }
+---@type { [<!1!>]?: <!{}!> }
 local t
 
 local <!<?v?>!> = t[1]

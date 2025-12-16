@@ -1,4 +1,5 @@
 require 'vm.coder.coder'
+require 'vm.coder.flow'
 require 'vm.coder.block'
 require 'vm.coder.cat'
 require 'vm.coder.state'

@@ -31,3 +31,24 @@ do
     assert(X1:view() == '10')
     assert(X2:view() == '5')
 end
+
+do
+    TEST_INDEX [[
+    a.b.c = 1
+    X0 = a.b.c
+    a.b.c = 2
+    X1 = a.b.c
+    a.b.c = 3
+    X2 = a.b.c
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    assert(X0:view() == '1')
+    assert(X1:view() == '2')
+    assert(X2:view() == '3')
+
+    local abc = rt:globalGet('a', 'b', 'c')
+    assert(abc:view() == '1 | 2 | 3')
+end

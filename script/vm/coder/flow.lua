@@ -85,7 +85,7 @@ function M:setVarKey(source, key)
     return true
 end
 
----@param var LuaParser.Node.AssignAble
+---@param var LuaParser.Node.Term | LuaParser.Node.AssignAble
 ---@return string?
 function M:getName(var)
     if var.kind == 'local' or var.kind == 'param' then
@@ -111,14 +111,14 @@ function M:getName(var)
     end
     if var.kind == 'field' then
         ---@cast var LuaParser.Node.Field
-        local parentName = self:getName(var.parent)
-        if not parentName then
+        local lastName = self:getName(var.last)
+        if not lastName then
             return nil
         end
         local key = var.key
         if var.subtype == 'field' or var.subtype == 'method' then
             ---@cast key LuaParser.Node.FieldID
-            return '{}.{}' % { parentName, key.id }
+            return '{}.{}' % { lastName, key.id }
         end
         if var.subtype == 'index' then
             ---@cast key LuaParser.Node.Exp
@@ -127,15 +127,16 @@ function M:getName(var)
                 local value = key.value
                 if type(value) == 'string' then
                     if parser.isName(value) then
-                        return '{}.{}' % { parentName, value }
+                        return '{}.{}' % { lastName, value }
                     else
-                        return '{}[{%q}]' % { parentName, value }
+                        return '{}[{%q}]' % { lastName, value }
                     end
                 else
-                    return '{}[{}]' % { parentName, tostring(value) }
+                    return '{}[{}]' % { lastName, tostring(value) }
                 end
             end
             return nil
         end
     end
+    return nil
 end

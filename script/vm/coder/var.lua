@@ -36,16 +36,24 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         coder:compile(source.key)
     end
 
-    coder:addLine('{var} = {last}:getChild({field}){shadow}' % {
+    local value =  coder.flow:getVarKey(source)
+                or '{last}:getChild({field})' % {
+                    last  = coder:getKey(last),
+                    field = fieldCode,
+                }
+
+    coder:addLine('{var} = {value}{shadow}' % {
         var    = coder:getKey(source),
-        last   = coder:getKey(last),
-        field  = fieldCode,
+        value  = value,
         shadow = source.value and ':shadow()' or '',
     })
     coder:addLine('{variable} = {var}' % {
         variable = coder:getVariableKey(source),
         var      = coder:getKey(source),
     })
+    if source.value then
+        coder.flow:setVarKey(source, coder:getKey(source))
+    end
     if fieldCode == 'rt.UNKNOWN' then
         return
     end

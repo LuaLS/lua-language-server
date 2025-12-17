@@ -5,14 +5,87 @@ local M = Class 'VM.Coder.Flow'
 
 ---@class VM.Coder.Variable
 ---@field name string
----@field isTable? boolean
+---@field currentKey? string
 
-function M:__init()
+---@class VM.Coder.Flow.Stack
+local S = Class 'VM.Coder.Flow.Stack'
+
+function S:__init()
     ---@type table<string, VM.Coder.Variable>
     self.variables = {}
 end
 
----@param var LuaParser.Node.Var | LuaParser.Node.Local | LuaParser.Node.Param | LuaParser.Node.Field
+function M:__init()
+    ---@type VM.Coder.Flow.Stack[]
+    self.stacks = {}
+
+    self:pushStack()
+end
+
+function M:pushStack()
+    self.stacks[#self.stacks+1] = New 'VM.Coder.Flow.Stack' ()
+end
+
+function M:popStack()
+    local lastStack = table.remove(self.stacks)
+end
+
+function M:currentStack()
+    return self.stacks[#self.stacks]
+end
+
+---@param source LuaParser.Node.AssignAble
+---@param create? boolean
+---@return VM.Coder.Variable?
+function M:getVar(source, create)
+    local name = self:getName(source)
+    if not name then
+        return nil
+    end
+    if create then
+        local stack = self:currentStack()
+        local var = stack.variables[name]
+        if not var then
+            var = {
+                name = name,
+            }
+            stack.variables[name] = var
+        end
+        return var
+    end
+    for i = #self.stacks, 1, -1 do
+        local stack = self.stacks[i]
+        local var = stack.variables[name]
+        if var then
+            return var
+        end
+    end
+    return nil
+end
+
+---@param source LuaParser.Node.AssignAble
+---@return string?
+function M:getVarKey(source)
+    local var = self:getVar(source)
+    if not var then
+        return nil
+    end
+    return var.currentKey
+end
+
+---@param source LuaParser.Node.AssignAble
+---@param key string
+---@return boolean
+function M:setVarKey(source, key)
+    local var = self:getVar(source, true)
+    if not var then
+        return false
+    end
+    var.currentKey = key
+    return true
+end
+
+---@param var LuaParser.Node.AssignAble
 ---@return string?
 function M:getName(var)
     if var.kind == 'local' or var.kind == 'param' then

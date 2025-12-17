@@ -364,7 +364,8 @@ end
 
 ---@param kind string
 ---@param callback fun(node: Node)
-function M:each(kind, callback)
+---@param visited? table<Node, boolean>
+function M:each(kind, callback, visited)
     if self.kind == kind then
         callback(self)
         return
@@ -372,7 +373,14 @@ function M:each(kind, callback)
     if self.value == self then
         return
     end
-    self.value:each(kind, callback)
+    if not visited then
+        visited = {}
+    end
+    if visited[self] then
+        return
+    end
+    visited[self] = true
+    self.value:each(kind, callback, visited)
 end
 
 ---@param viewer Node.Viewer

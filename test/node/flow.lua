@@ -4,6 +4,7 @@ do
     --[[
     local x = 10
     x --> 10
+    W = x
     x = 5
     x --> 5
     V = x
@@ -11,6 +12,9 @@ do
 
     local x = rt.variable 'x'
     x:setCurrentValue(rt.value(10))
+
+    local W = rt.variable 'W'
+    W:addAssign(rt.field('W', x))
 
     local x2 = x:shadow(rt.value(5))
     x2:addAssign(rt.field('x', rt.value(5)))
@@ -20,6 +24,7 @@ do
 
     assert(x:view() == '10')
     assert(x2:view() == '5')
+    assert(W:view() == '10')
     assert(V:view() == '5')
 end
 

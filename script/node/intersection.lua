@@ -258,6 +258,20 @@ function M:inferGeneric(other, result)
     end
 end
 
+function M:each(kind, callback, visited)
+    if not visited then
+        visited = {}
+    end
+    if visited[self] then
+        return
+    end
+    visited[self] = true
+    local values = self.values
+    for _, v in ipairs(values) do
+        v:each(kind, callback, visited)
+    end
+end
+
 function M:onView(viewer, options)
     local values = self.values
     if #values == 0 then

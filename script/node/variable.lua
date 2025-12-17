@@ -536,9 +536,10 @@ function M:getGuessValue()
         or nil
 end
 
+---@type Node?
 M.currentValue = nil
 
----@param currentValue Node
+---@param currentValue? Node
 ---@return Node.Variable
 function M:shadow(currentValue)
     local rt = self.scope.rt
@@ -699,6 +700,11 @@ M.__getter.equivalentValue = function (self)
     for _, equivalent in ipairs(self.allEquivalents) do
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable
+            local currentValue = equivalent:getCurrentValue()
+            if currentValue then
+                results[#results+1] = currentValue
+                goto continue
+            end
             if equivalent.assigns then
                 equivalent:addRef(self)
                 for assign in equivalent.assigns:pairsFast() do
@@ -718,6 +724,7 @@ M.__getter.equivalentValue = function (self)
                 equivalent.value:addRef(self)
             end
         end
+        ::continue::
     end
 
     -- 尽量合并表的字段

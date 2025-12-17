@@ -1,15 +1,20 @@
 ls.vm.registerCoderProvider('var', function (coder, source)
     ---@cast source LuaParser.Node.Var
-    if source.loc then
-        coder:addLine('{key} = {loc}' % {
-            key = coder:getKey(source),
-            loc = coder:getKey(source.loc),
-        })
-    else
-        coder:addLine('{key} = rt:globalGet {name%q}' % {
-            key = coder:getKey(source),
-            name = source.id,
-        })
+    local value = coder.flow:getVarKey(source)
+    if not value then
+        if source.loc then
+            value = coder:getKey(source.loc)
+        else
+            value = 'rt:globalGet({%q})' % { source.id }
+        end
+    end
+    coder:addLine('{key} = {value}{shadow}' % {
+        key = coder:getKey(source),
+        value = value,
+        shadow = source.value and ':shadow()' or '',
+    })
+    if source.value then
+        coder.flow:setVarKey(source, coder:getKey(source))
     end
     coder:addLine('{variable} = {key}' % {
         variable = coder:getVariableKey(source),
@@ -31,10 +36,11 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         coder:compile(source.key)
     end
 
-    coder:addLine('{var} = {last}:getChild({field})' % {
+    coder:addLine('{var} = {last}:getChild({field}){shadow}' % {
         var    = coder:getKey(source),
         last   = coder:getKey(last),
         field  = fieldCode,
+        shadow = source.value and ':shadow()' or '',
     })
     coder:addLine('{variable} = {var}' % {
         variable = coder:getVariableKey(source),

@@ -56,25 +56,29 @@ M.values = nil
 M.__getter.values = function (self)
     ---@type Node[]
     local values = {}
+
+    ---@param v Node
+    local function insertValue(v)
+        if #values >= 1000 then
+            return
+        end
+        local nv = v:findValue(ls.node.kind['union'] | ls.node.kind['type'] | ls.node.kind['generic'])
+                or v:simplify()
+        if nv.kind == 'union' then
+            ---@cast nv Node.Union
+            for _, vv in ipairs(nv.values) do
+                insertValue(vv)
+            end
+            return
+        end
+        values[#values+1] = nv
+    end
     for _, v in ipairs(self.rawNodes) do
         v:addRef(self)
         if v.typeName == 'never' then
             goto continue
         end
-        if v.kind == 'union' then
-            ---@cast v Node.Union
-            for _, vv in ipairs(v.values) do
-                values[#values+1] = vv:simplify()
-                if #values >= 1000 then
-                    return values, true
-                end
-            end
-        else
-            values[#values+1] = v:simplify()
-            if #values >= 1000 then
-                return values, true
-            end
-        end
+        insertValue(v)
         ::continue::
     end
 
@@ -213,10 +217,17 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:each(kind, callback)
+function M:each(kind, callback, visited)
+    if not visited then
+        visited = {}
+    end
+    if visited[self] then
+        return
+    end
+    visited[self] = true
     local values = self.values
     for _, v in ipairs(values) do
-        v:each(kind, callback)
+        v:each(kind, callback, visited)
     end
 end
 

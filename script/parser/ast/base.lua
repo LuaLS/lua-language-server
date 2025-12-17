@@ -111,6 +111,7 @@ local Base = Class 'LuaParser.Node.Base'
 ---| LuaParser.Node.Local
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.Field
+---| LuaParser.Node.Param
 
 ---@type LuaParser.StateKind | LuaParser.ExpKind | LuaParser.CatKind | LuaParser.OtherKind
 Base.kind = nil

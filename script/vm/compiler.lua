@@ -3,6 +3,7 @@ local util       = require 'utility'
 local config     = require 'config'
 local rpath      = require 'workspace.require-path'
 local files      = require 'files'
+local scope      = require 'workspace.scope'
 ---@class vm
 local vm         = require 'vm.vm'
 local plugin     = require 'plugin'
@@ -2204,9 +2205,13 @@ local compilerSwitch = util.switch()
         ---@type vm.global
         local global = source.global
         local uri = guide.getUri(source)
+        local scp = scope.getScope(uri)
         vm.setNode(source, global)
         if global.cate == 'variable' then
             for luri, link in pairs(global.links) do
+                if not scp:isVisible(luri) then
+                    goto continue
+                end
                 local firstSet = link.sets[1]
                 if firstSet then
                     local setNode = vm.compileNode(firstSet)
@@ -2218,6 +2223,7 @@ local compilerSwitch = util.switch()
                         end
                     end
                 end
+                ::continue::
             end
         end
         if global.cate == 'type' then

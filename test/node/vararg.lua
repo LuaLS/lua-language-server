@@ -39,7 +39,7 @@ do
         node.value(9),
         node.value(10),
     }
-    assert(V5:viewAsList() == '1, 2, 3, 4, ...(+3), 8, 9, 10')
+    assert(V5:viewAsList() == '1, 2, 3, 4, ...(+3)..., 8, 9, 10')
     assert(V5.value:view() == '1')
     assert(V5:getLastValue():view() == '10')
 
@@ -55,7 +55,7 @@ do
         node.value(9),
         node.value(10),
     }, 10, 100)
-    assert(V6:viewAsList() == '1, 2, 3, 4, ...(+3), 8, 9, 10...(+90)')
+    assert(V6:viewAsList() == '1, 2, 3, 4, ...(+3)..., 8, 9, 10...(+90)')
     assert(V6.value:view() == '1')
     assert(V6:getLastValue():view() == '10')
 end

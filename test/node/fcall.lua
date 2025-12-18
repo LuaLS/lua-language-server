@@ -111,7 +111,7 @@ do
     assert(r2:view() == '2 | 4')
 end
 
-do
+do -- 方案1
     rt:reset()
     --[[
     ---@overload fun(x: number): 'number'
@@ -144,9 +144,97 @@ do
         }
     )
 
-    assert(rt.fcall(f, { rt.value(123) }).value:view() == '"number"')
-    assert(rt.fcall(f, { rt.value('hello') }).value:view() == '"string"')
-    assert(rt.fcall(f, { rt.value(true) }).value:view() == '"boolean"')
-    assert(rt.fcall(f, { rt.table {} }).value:view() == '"table"')
-    assert(rt.fcall(f, { rt.variable 'X' }).value:view() == '"number" | "string" | "boolean" | "table"')
+    assert(rt.fcall(f, { rt.value(123) }):simplify():view() == '"number"')
+    assert(rt.fcall(f, { rt.value('hello') }):simplify():view() == '"string"')
+    assert(rt.fcall(f, { rt.value(true) }):simplify():view() == '"boolean"')
+    assert(rt.fcall(f, { rt.table {} }):simplify():view() == '"table"')
+    assert(rt.fcall(f, { rt.variable 'X' }):simplify():view() == '"number" | "string" | "boolean" | "table"')
+end
+
+do -- 方案2
+    rt:reset()
+    --[[
+    ---@alias TypeViewMap {
+    ---    [number]: 'number',
+    ---    [string]: 'string',
+    ---    [boolean]: 'boolean',
+    ---    [table]: 'table',
+    ---}
+    
+    ---@generic T
+    ---@param x T
+    ---@return TypeViewMap[T]
+    local function type(x) end
+
+    type(123) --> "number"
+    type('hello') --> "string"
+    type(true) --> "boolean"
+    type({}) --> "table"
+    type(X) --> "number" | "string" | "boolean" | "table"
+    ]]
+
+    local map = rt.alias 'TypeViewMap'
+    map:setValue(rt.table()
+        : addField(rt.field(rt.NUMBER, rt.value('number')))
+        : addField(rt.field(rt.STRING, rt.value('string')))
+        : addField(rt.field(rt.BOOLEAN, rt.value('boolean')))
+        : addField(rt.field(rt.TABLE, rt.value('table')))
+    )
+
+    local T = rt.generic 'T'
+    local f = rt.func()
+        : addTypeParam(T)
+        : addParamDef('x', T)
+        : addReturnDef(nil, rt.index(rt.type 'TypeViewMap', T))
+
+    assert(rt.fcall(f, { rt.value(123) }):simplify():view() == '"number"')
+    assert(rt.fcall(f, { rt.value('hello') }):simplify():view() == '"string"')
+    assert(rt.fcall(f, { rt.value(true) }):simplify():view() == '"boolean"')
+    assert(rt.fcall(f, { rt.table {} }):simplify():view() == '"table"')
+    assert(rt.fcall(f, { rt.variable 'X' }):simplify():view() == '"number" | "string" | "boolean" | "table"')
+end
+
+do -- 方案3
+    rt:reset()
+    --[[
+    ---@alias TypeView<T> {
+    ---    [number]: 'number',
+    ---    [string]: 'string',
+    ---    [boolean]: 'boolean',
+    ---    [table]: 'table',
+    ---}[T]
+    
+    ---@generic T
+    ---@param x T
+    ---@return TypeView<T>
+    local function type(x) end
+
+    type(123) --> "number"
+    type('hello') --> "string"
+    type(true) --> "boolean"
+    type({}) --> "table"
+    type(X) --> "number" | "string" | "boolean" | "table"
+    ]]
+
+    local T1 = rt.generic 'T'
+    local view = rt.alias 'TypeView'
+    view:addTypeParam(T1)
+    view:setValue(rt.index(rt.table()
+        : addField(rt.field(rt.NUMBER, rt.value('number')))
+        : addField(rt.field(rt.STRING, rt.value('string')))
+        : addField(rt.field(rt.BOOLEAN, rt.value('boolean')))
+        : addField(rt.field(rt.TABLE, rt.value('table')))
+    , T1))
+
+    local T2 = rt.generic 'T'
+    local f = rt.func()
+        : addTypeParam(T2)
+        : addParamDef('x', T2)
+        : addReturnDef(nil, rt.call('TypeView', { T2 }))
+
+    assert(rt.fcall(f, { rt.value(123) }):simplify():view() == '"number"')
+    assert(rt.fcall(f, { rt.value('hello') }):simplify():view() == '"string"')
+    assert(rt.fcall(f, { rt.value(true) }):simplify():view() == '"boolean"')
+    assert(rt.fcall(f, { rt.table {} }):simplify():view() == '"table"')
+    assert(rt.fcall(f, { rt.variable 'X' }):simplify():view() == '"number" | "string" | "boolean" | "table"')
 end

@@ -553,6 +553,7 @@ end
 ---@param value Node
 function M:setCurrentValue(value)
     self.currentValue = value
+    self:flushCache()
 end
 
 ---@return Node?

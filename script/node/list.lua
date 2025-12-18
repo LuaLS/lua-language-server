@@ -41,7 +41,7 @@ M.__getter.values = function (self)
     local values = {}
     for i, raw in ipairs(self.raw) do
         raw:addRef(self)
-        local value = raw:simplify()
+        local value = raw:findValue(ls.node.kind['list']) or raw
         if value.kind == 'list' then
             ---@cast value Node.List
             values[i] = value.values[1]
@@ -51,7 +51,7 @@ M.__getter.values = function (self)
     end
     local n = #values
     local last = self.raw[n]
-    local lastValue = last and last:simplify()
+    local lastValue = last and last:findValue(ls.node.kind['list']) or last
     if lastValue and lastValue.kind == 'list' then
         ---@cast lastValue Node.List
         for i = 1, #lastValue.values do
@@ -169,6 +169,13 @@ end
 ---@return true
 M.__getter.value = function (self)
     return self:select(1), true
+end
+
+function M:simplify()
+    if self.value == self then
+        return self
+    end
+    return self.value:simplify()
 end
 
 ---@param self Node.List
@@ -343,7 +350,7 @@ function M:onViewAsList(viewer, options)
                 break
             end
         end
-        buf[#buf+1] = '...(+{})' % { #values - maxLen + 1 }
+        buf[#buf+1] = '...(+{})...' % { #values - maxLen + 1 }
         for i = #values - maxLen // 2 + 2, #values do
             if push(i) then
                 break

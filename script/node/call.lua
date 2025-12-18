@@ -204,7 +204,30 @@ M.__getter.value = function (self)
     return self, true
 end
 
+function M:simplify()
+    if self.value == self then
+        return self
+    end
+    return self.value:simplify()
+end
+
+---@param self Node.Call
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    for _, arg in ipairs(self.args) do
+        arg:addRef(self)
+        if arg.hasGeneric then
+            return true, true
+        end
+    end
+    return false, true
+end
+
 function M:resolveGeneric(map)
+    if not self.hasGeneric then
+        return self
+    end
     local args = ls.util.map(self.args, function (arg)
         return arg:resolveGeneric(map)
     end)

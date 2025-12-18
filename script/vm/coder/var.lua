@@ -60,10 +60,12 @@ ls.vm.registerCoderProvider('field', function (coder, source)
     if fieldCode == 'rt.UNKNOWN' then
         return
     end
-    coder:addLine('{r2}, {v2} = {r1}, {v1}' % {
+    coder:addLine('{r2} = {r1}' % {
         r1 = coder:getKey(source),
-        v1 = coder:getVariableKey(source),
         r2 = coder:getKey(source.key),
+    })
+    coder:addLine('{v2} = {v1}' % {
+        v1 = coder:getVariableKey(source),
         v2 = coder:getVariableKey(source.key),
     })
 end)

@@ -43,27 +43,21 @@ function M:findMatchedCatParam(param)
     return nil
 end
 
----@param coder VM.Coder
----@param source LuaParser.Node.Function
----@param param LuaParser.Node.Param
-local function resolveParam(coder, source, param)
-    coder:compile(param)
-    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode})' % {
-        funcKey   = coder:getKey(source),
-        paramKey  = param.id,
-        paramNode = coder:getKey(param),
-    })
-end
-
 ls.vm.registerCoderProvider('function', function (coder, source)
     ---@cast source LuaParser.Node.Function
 
     coder:withIndentation(function ()
+        ---@type LuaParser.Node.CatStateOverload[]?
+        local overloads = coder:findNearedCats(source, 'catstateoverload')
+
+        local funcKey = overloads
+                    and coder:getCustomKey('origin|' .. source.uniqueKey)
+                    or  coder:getKey(source)
         coder:addLine('{key} = rt.func()' % {
-            key = coder:getKey(source),
+            key = funcKey,
         })
         coder:addLine('{key}:setLocation {location}' % {
-            key      = coder:getKey(source),
+            key      = funcKey,
             location = coder:makeLocationCode(source),
         })
 
@@ -85,7 +79,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     for _, param in ipairs(cat.typeParams) do
                         coder:addLine('-- ' .. param.code)
                         coder:addLine('{func}:addTypeParam({param})' % {
-                            func  = coder:getKey(source),
+                            func  = funcKey,
                             param = coder:getKey(param),
                         })
                     end
@@ -97,7 +91,12 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             coder:withIndentation(function ()
                 for i, param in ipairs(source.params) do
                     coder:addLine('-- ' .. param.code)
-                    resolveParam(coder, source, param)
+                    coder:compile(param)
+                    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode})' % {
+                        funcKey   = funcKey,
+                        paramKey  = param.id,
+                        paramNode = coder:getKey(param),
+                    })
                 end
             end, 'function params --')
         end
@@ -110,7 +109,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     if cat.value then
                         coder:addLine('-- ' .. cat.code)
                         coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
-                            funcKey    = coder:getKey(source),
+                            funcKey    = funcKey,
                             returnKey  = cat.key and ('%q'):format(cat.key.id) or 'nil',
                             returnType = coder:getKey(cat.value),
                         })
@@ -122,7 +121,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         if #source.childs > 0 then
             coder:withIndentation(function ()
                 coder:pushBlock()
-                coder:setBlockKV('function', coder:getKey(source))
+                coder:setBlockKV('function', funcKey)
                 for _, child in ipairs(source.childs) do
                     coder:compile(child)
                     coder:addLine('')
@@ -131,18 +130,17 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             end, 'function body --')
         end
 
-        ---@type LuaParser.Node.CatStateOverload[]?
-        local overloads = coder:findNearedCats(source, 'catstateoverload')
         if overloads then
-            local overloadKeys = { coder:getKey(source) }
+            local overloadKeys = { funcKey }
 
             for _, overload in ipairs(overloads) do
                 overloadKeys[#overloadKeys+1] = coder:getKey(overload.value)
             end
 
             coder:addLine('-- function overloads --')
-            coder:addLine('rawset(r, {funcKey%q}, rt.union { {overloadList} })' % {
-                funcKey      = source.uniqueKey,
+            coder:addLine('{key} = rt.union { {overloadList} }' % {
+                key          = coder:getKey(source),
+                funcKey      = funcKey,
                 overloadList = table.concat(overloadKeys, ', '),
             })
         end

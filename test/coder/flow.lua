@@ -64,3 +64,29 @@ do
     local W = rt:globalGet('W')
     assert(W:view() == 'op.add<0, 1>')
 end
+
+do
+    TEST_INDEX [[
+    ---@type integer?
+    local x
+    X0 = x --> integer | nil
+
+    if x then
+        X1 = x --> integer
+    else
+        X2 = x --> nil
+    end
+
+    X3 = x --> integer | nil
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+
+    assert(X0:view() == 'integer | nil')
+    assert(X1:view() == 'integer')
+    assert(X2:view() == 'nil')
+    assert(X3:view() == 'integer | nil')
+end

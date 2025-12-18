@@ -212,7 +212,7 @@ function M:withIndentation(callback, comment)
         self:addLine('do -- ' .. comment:match('[^\r\n]*'))
     elseif type(comment) == 'table' then
         ---@cast comment LuaParser.Node.Base
-        self:addLine('do -- :{} -- {}' % {
+        self:addLine('do -- :{}: {}' % {
             comment.startRow,
             comment.code:match('[^\r\n]*'),
         })

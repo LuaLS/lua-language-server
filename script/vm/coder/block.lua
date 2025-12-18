@@ -11,6 +11,49 @@ local function parseBlock(coder, block)
     coder:popBlock()
 end
 
+---@param coder VM.Coder
+---@param condition LuaParser.Node.Exp
+local function compileCondition(coder, condition)
+    coder:compile(condition)
+
+    local exp = condition:trim()
+
+    local var = coder.flow:getVar(exp, true)
+    if var then
+        local value = coder:getCustomKey('narrow|' .. exp.uniqueKey)
+        local shadow = coder:getCustomKey('shadow|' .. exp.uniqueKey)
+        coder:addLine('{value} = rt.narrow({varKey}):truly()' % {
+            value  = value,
+            varKey = coder:getKey(exp),
+        })
+        coder:addLine('{shadow} = {var}:shadow({value})' % {
+            shadow = shadow,
+            var    = coder:getKey(exp),
+            value  = value,
+        })
+        var.narrowedValue = value
+        var.currentKey = shadow
+    end
+end
+
+---@param coder VM.Coder
+---@param var VM.Coder.Variable
+local function compileOtherHand(coder, var)
+        local value = coder:getCustomKey('narrow|' .. var.narrowedValue)
+        local shadow = coder:getCustomKey('shadow|' .. var.narrowedValue)
+        coder:addLine('{value} = {narrow}:otherHand()' % {
+            value  = value,
+            narrow = var.narrowedValue,
+        })
+        coder:addLine('{shadow} = {var}:shadow({value})' % {
+            shadow = shadow,
+            var    = var.currentKey,
+            value  = value,
+        })
+        var.narrowedValue = value
+        var.currentKey = shadow
+end
+
 ls.vm.registerCoderProvider('main', function (coder, source)
     ---@cast source LuaParser.Node.Main
 
@@ -41,17 +84,27 @@ end)
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
 
+    coder.flow:pushStack()
     for _, child in ipairs(source.childs) do
         if child.subtype == 'if' then
-            coder:compile(child.condition)
+            compileCondition(coder, child.condition)
         end
         if child.subtype == 'elseif' then
-            coder:compile(child.condition)
+            compileCondition(coder, child.condition)
         end
         coder:withIndentation(function ()
+            coder.flow:pushStack()
             parseBlock(coder, child)
+            coder.flow:popStack()
         end, child)
+
+        for _, var in pairs(coder.flow:currentStack().variables) do
+            if var.narrowedValue then
+                compileOtherHand(coder, var)
+            end
+        end
     end
+    coder.flow:popStack()
 end)
 
 ls.vm.registerCoderProvider('for', function (coder, source)

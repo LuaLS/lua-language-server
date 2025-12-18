@@ -5,7 +5,10 @@ local M = Class 'VM.Coder.Flow'
 
 ---@class VM.Coder.Variable
 ---@field name string
+--- 当前变量使用的key，key一定代表一个 Node.Variable
 ---@field currentKey? string
+--- 当前变量的收窄结果。再进入下一个分支时需要取 otherHand
+---@field narrowedValue? string
 
 ---@class VM.Coder.Flow.Stack
 local S = Class 'VM.Coder.Flow.Stack'
@@ -34,7 +37,7 @@ function M:currentStack()
     return self.stacks[#self.stacks]
 end
 
----@param source LuaParser.Node.AssignAble
+---@param source LuaParser.Node.Base
 ---@param create? boolean
 ---@return VM.Coder.Variable?
 function M:getVar(source, create)
@@ -73,7 +76,7 @@ function M:getVarKey(source)
     return var.currentKey
 end
 
----@param source LuaParser.Node.AssignAble
+---@param source LuaParser.Node.Base
 ---@param key string
 ---@return boolean
 function M:setVarKey(source, key)
@@ -85,10 +88,11 @@ function M:setVarKey(source, key)
     return true
 end
 
----@param var LuaParser.Node.Term | LuaParser.Node.AssignAble
+---@param var LuaParser.Node.Base
 ---@return string?
 function M:getName(var)
     if var.kind == 'local' or var.kind == 'param' then
+        ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
         return '{}@{}:{}' % {
             var.id,
             var.startRow,

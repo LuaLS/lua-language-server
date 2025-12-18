@@ -218,13 +218,10 @@ function M:inferGeneric(other, result)
 end
 
 function M:each(kind, callback, visited)
+    visited = ls.util.visited(self, visited)
     if not visited then
-        visited = {}
-    end
-    if visited[self] then
         return
     end
-    visited[self] = true
     local values = self.values
     for _, v in ipairs(values) do
         v:each(kind, callback, visited)

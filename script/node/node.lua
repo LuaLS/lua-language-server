@@ -373,13 +373,10 @@ function M:each(kind, callback, visited)
     if self.value == self then
         return
     end
+    visited = ls.util.visited(self, visited)
     if not visited then
-        visited = {}
-    end
-    if visited[self] then
         return
     end
-    visited[self] = true
     self.value:each(kind, callback, visited)
 end
 

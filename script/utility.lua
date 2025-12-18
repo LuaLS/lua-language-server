@@ -1352,4 +1352,20 @@ function m.withDuration(job, finish)
     return result
 end
 
+---@generic T
+---@param obj T
+---@param visited? table<T, boolean>
+---@return table<T, boolean>?
+function m.visited(obj, visited)
+    if visited then
+        if visited[obj] then
+            return nil
+        end
+        visited[obj] = true
+        return visited
+    else
+        return { [obj] = true }
+    end
+end
+
 return m

@@ -247,6 +247,10 @@ function Base.__getter.referFunction(self)
     return self.parentFunction, true
 end
 
+function Base:trim()
+    return self
+end
+
 ---@class LuaParser.Node.Literal: LuaParser.Node.Base
 ---@field value? nil|boolean|number|string|integer
 local Literal = Class('LuaParser.Node.Literal', 'LuaParser.Node.Base')

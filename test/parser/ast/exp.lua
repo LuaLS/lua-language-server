@@ -384,7 +384,7 @@ TEST '(1)'
 {
     start  = 0,
     finish = 3,
-    exp    = {
+    value  = {
         start  = 1,
         finish = 2,
         value  = 1,
@@ -393,7 +393,7 @@ TEST '(1)'
 
 TEST '(1 + 2)'
 {
-    exp = {
+    value = {
         op   = '+',
         exp1 = {
             value = 1,
@@ -533,7 +533,7 @@ TEST '(...)[1]'
         value = 1,
     },
     last    = {
-        exp = {
+        value = {
             __class__ = 'LuaParser.Node.Select',
         }
     }

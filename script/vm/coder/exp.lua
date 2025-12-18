@@ -123,10 +123,10 @@ end)
 ls.vm.registerCoderProvider('paren', function (coder, source)
     ---@cast source LuaParser.Node.Paren
 
-    coder:compile(source.exp)
+    coder:compile(source.value)
     coder:addLine('{key} = {value}' % {
         key   = coder:getKey(source),
-        value = coder:getKey(source.exp),
+        value = coder:getKey(source.value),
     })
 end)
 

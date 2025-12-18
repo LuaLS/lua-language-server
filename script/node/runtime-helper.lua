@@ -71,6 +71,7 @@ function M:getBestMatchs(params, n)
         return a2b
     end
 
+    local cannotDecide = {}
     table.sort(matchs, function (a, b)
         local paramsA = params[a]
         local paramsB = params[b]
@@ -80,8 +81,24 @@ function M:getBestMatchs(params, n)
                 return moreExact
             end
         end
+        cannotDecide[a] = true
+        cannotDecide[b] = true
         return false
     end)
+
+    local function isCannotDecideAll()
+        for _, v in ipairs(matchs) do
+            if not cannotDecide[v] then
+                return false
+            end
+        end
+        return true
+    end
+
+    if isCannotDecideAll() then
+        table.sort(matchs)
+        return matchs
+    end
 
     local bestN = 1
     local bestI = matchs[1]
@@ -109,6 +126,8 @@ function M:getBestMatchs(params, n)
     for i = bestN + 1, #matchs do
         matchs[i] = nil
     end
+
+    table.sort(matchs)
 
     return matchs
 end

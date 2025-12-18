@@ -110,3 +110,43 @@ do
     local r2 = fcall:select(2)
     assert(r2:view() == '2 | 4')
 end
+
+do
+    rt:reset()
+    --[[
+    ---@overload fun(x: number): 'number'
+    ---@overload fun(x: string): 'string'
+    ---@overload fun(x: boolean): 'boolean'
+    ---@overload fun(x: table): 'table'
+    local function type(x) end
+
+    type(123) --> "number"
+    type('hello') --> "string"
+    type(true) --> "boolean"
+    type({}) --> "table"
+    type(X) --> "number" | "string" | "boolean" | "table"
+    ]]
+
+    local f = rt.variable 'type'
+    f:setCurrentValue(rt.union {
+        rt.func()
+            : addParamDef('x', rt.NUMBER)
+            : addReturnDef(nil, rt.value('number')),
+        rt.func()
+            : addParamDef('x', rt.STRING)
+            : addReturnDef(nil, rt.value('string')),
+        rt.func()
+            : addParamDef('x', rt.BOOLEAN)
+            : addReturnDef(nil, rt.value('boolean')),
+        rt.func()
+            : addParamDef('x', rt.TABLE)
+            : addReturnDef(nil, rt.value('table')),
+        }
+    )
+
+    assert(rt.fcall(f, { rt.value(123) }).value:view() == '"number"')
+    assert(rt.fcall(f, { rt.value('hello') }).value:view() == '"string"')
+    assert(rt.fcall(f, { rt.value(true) }).value:view() == '"boolean"')
+    assert(rt.fcall(f, { rt.table {} }).value:view() == '"table"')
+    assert(rt.fcall(f, { rt.variable 'X' }).value:view() == '"number" | "string" | "boolean" | "table"')
+end

@@ -181,7 +181,7 @@ TEST [[x, y = (call())]]
     values = {
         [1] = {
             kind = 'paren',
-            exp = {
+            value = {
                 kind = 'select',
             }
         },
@@ -238,7 +238,7 @@ TEST [[x, y = (...)]]
     values = {
         [1] = {
             kind = 'paren',
-            exp = {
+            value = {
                 kind = 'select',
             },
         },

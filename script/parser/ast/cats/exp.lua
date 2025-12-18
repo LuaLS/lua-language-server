@@ -21,6 +21,13 @@ local CatParen = Class('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
 
 CatParen.kind = 'catparen'
 
+function CatParen:trim()
+    if not self.value then
+        return self
+    end
+    return self.value:trim()
+end
+
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatExp
 ---@field symbolPos1 integer # 左括号的位置

@@ -1,47 +1,55 @@
 
 ---@class LuaParser.Node.ParenBase: LuaParser.Node.Base
+---@field value? LuaParser.Node.Base
 local ParenBase = Class('LuaParser.Node.ParenBase', 'LuaParser.Node.Base')
 
 ParenBase.kind = 'parenbase'
 
 function ParenBase.__getter.asNumber(self)
-    return self.exp.asNumber, true
+    return self.value.asNumber, true
 end
 
 function ParenBase.__getter.asString(self)
-    return self.exp.asString, true
+    return self.value.asString, true
 end
 
 function ParenBase.__getter.asBoolean(self)
-    return self.exp.asBoolean, true
+    return self.value.asBoolean, true
 end
 
 function ParenBase.__getter.asInteger(self)
-    return self.exp.asInteger, true
+    return self.value.asInteger, true
 end
 
 function ParenBase.__getter.toNumber(self)
-    return self.exp.toNumber, true
+    return self.value.toNumber, true
 end
 
 function ParenBase.__getter.toString(self)
-    return self.exp.toString, true
+    return self.value.toString, true
 end
 
 function ParenBase.__getter.toInteger(self)
-    return self.exp.toInteger, true
+    return self.value.toInteger, true
 end
 
 function ParenBase.__getter.isTruly(self)
-    return self.exp.isTruly, true
+    return self.value.isTruly, true
 end
 
 ---@class LuaParser.Node.Paren: LuaParser.Node.ParenBase
----@field exp? LuaParser.Node.Exp
+---@field value? LuaParser.Node.Exp
 ---@field next? LuaParser.Node.Field
 local Paren = Class('LuaParser.Node.Paren', 'LuaParser.Node.ParenBase')
 
 Paren.kind = 'paren'
+
+function Paren:trim()
+    if not self.value then
+        return self
+    end
+    return self.value:trim()
+end
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -185,7 +193,7 @@ function Ast:parseParen()
         start  = pos,
     })
     if exp then
-        paren.exp = self:convertToSelect(exp, 1) or exp
+        paren.value = self:convertToSelect(exp, 1) or exp
         exp.parent = paren
     end
     self:skipSpace()

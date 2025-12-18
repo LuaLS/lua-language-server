@@ -400,7 +400,7 @@ function M:onView(viewer, options)
         , returnPart
     )
     if options.needParentheses and returnPart ~= '' then
-        view = '(%s)' % { view }
+        view = '({%s})' % { view }
     end
     return view
 end

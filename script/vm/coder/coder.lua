@@ -50,8 +50,12 @@ function M:makeFromAst(ast)
     self:addIndentation(-1)
     self:addLine 'end'
 
+    -- self:simplifyCode()
+
     self.code = table.concat(self.buf)
     self.compiled = nil
+    self.blockStack = nil
+    self.flow = nil
 
     self.func = assert(load(self.code, self.code, 't', self.env))
 end
@@ -83,10 +87,75 @@ function M:addLine(code)
     buf[#buf+1] = '\n'
 end
 
----@param code string
-function M:addCode(code)
-    local buf = self.buf
-    buf[#buf+1] = code
+function M:simplifyCode()
+    local main = {}
+    local refs = {}
+
+    ---@param code string
+    local function collectUsedKeys(code)
+        local key, value = code:match('^%s*r%[(%b""%)]%s*=%s*(.+)')
+        local map = main
+        if key then
+            if not refs[key] then
+                refs[key] = {}
+            end
+            map = refs[key]
+        else
+            value = code
+        end
+
+        for k in value:gmatch('r%[(%b"")%]') do
+            map[k] = true
+        end
+    end
+
+    for _, line in ipairs(self.buf) do
+        collectUsedKeys(line)
+    end
+
+    local usedKeys = {}
+    local function markUsed(key)
+        if usedKeys[key] then
+            return
+        end
+        usedKeys[key] = true
+        local map = refs[key]
+        if map then
+            for k in pairs(map) do
+                markUsed(k)
+            end
+        end
+    end
+
+    for k in pairs(main) do
+        markUsed(k)
+    end
+
+    ---@param code string
+    ---@return boolean
+    local function isNoUsed(code)
+        local key = code:match('^%s*r%[(%b"")%]%s*=')
+        if not key then
+            return false
+        end
+        return not usedKeys[key]
+    end
+
+    for i, line in ipairs(self.buf) do
+        if isNoUsed(line) then
+            self.buf[i] = '-- No used key: ' .. self.buf[i]
+        end
+    end
+end
+
+function M:simplifyMap()
+    local map = self.map
+    for k in pairs(map) do
+        local dummyType = k:match('(.-)|')
+        if dummyType and dummyType ~= 'field' then
+            map[k] = nil
+        end
+    end
 end
 
 ---@param source LuaParser.Node.Base
@@ -159,6 +228,7 @@ function M:run(vfile)
     vfile.scope.rt:unlockCache()
     self.map = map
     self.var = var
+    -- self:simplifyMap()
     if not suc then
         ls.util.saveFile(ls.env.LOG_PATH / 'last_failed_coder.log', self.code)
     end

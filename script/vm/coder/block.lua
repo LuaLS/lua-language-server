@@ -12,16 +12,18 @@ local function parseBlock(coder, block)
 end
 
 ---@param coder Coder
+---@param index integer
 ---@param condition LuaParser.Node.Exp
-local function compileCondition(coder, condition)
+---@param mainStack Coder.Flow.Stack
+local function compileCondition(coder, index, condition, mainStack)
     coder:compile(condition)
 
     local exp = condition:trim()
 
-    local var = coder.flow:getVar(exp, true)
-    if var then
-        local value = coder:getCustomKey('narrow|' .. exp.uniqueKey)
-        local shadow = coder:getCustomKey('shadow|' .. exp.uniqueKey)
+    local mainVar = mainStack:getVar(exp, true)
+    if mainVar then
+        local value  = coder:getCustomKey('narrow|b:{}|{}' % { index, exp.uniqueKey })
+        local shadow = coder:getCustomKey('shadow|b:{}|{}' % { index, exp.uniqueKey })
         coder:addLine('{value} = rt.narrow({varKey}):truly()' % {
             value  = value,
             varKey = coder:getKey(exp),
@@ -31,26 +33,31 @@ local function compileCondition(coder, condition)
             var    = coder:getKey(exp),
             value  = value,
         })
-        var.narrowedValue = value
-        var.currentKey = shadow
+        mainVar.narrowedValue = value
+        mainVar.currentKey = shadow
+
+        local var = coder.flow:getVar(exp, true)
+        if var then
+            var.currentKey = shadow
+        end
     end
+
 end
 
 ---@param coder Coder
----@param var Coder.Variable
 ---@param index integer
-local function compileOtherHand(coder, var, index)
+---@param var Coder.Variable
+local function compileOtherHand(coder, index, var)
     local narrowedValue = var.narrowedValue
     if not narrowedValue then
         return
     end
-    local gsubCount = 0
-    narrowedValue, gsubCount = narrowedValue:gsub('|oh:%d+|', '|oh:' .. index .. '|', 1)
-    if gsubCount == 0 then
-        narrowedValue = narrowedValue:gsub('narrow|', 'narrow|oh:' .. index .. '|', 1)
+    local ohValue, count = narrowedValue:gsub('|b:%d+|', '|oh:' .. index .. '|', 1)
+    if count == 0 then
+        return
     end
-    local value  = narrowedValue
-    local shadow = narrowedValue:gsub('narrow|', 'shadow|', 1)
+    local value  = ohValue
+    local shadow = ohValue:gsub('narrow|', 'shadow|', 1)
     coder:addLine('{value} = {narrow}:otherHand()' % {
         value  = value,
         narrow = var.narrowedValue,
@@ -62,6 +69,41 @@ local function compileOtherHand(coder, var, index)
     })
     var.narrowedValue = value
     var.currentKey = shadow
+end
+
+---@param var Coder.Variable
+---@param stacks Coder.Flow.Stack[]
+---@return string?
+local function mergeChanges(var, stacks)
+    local hasChanged = false
+
+    for _, stack in ipairs(stacks) do
+        local svar = stack.variables[var.name]
+        if svar then
+            hasChanged = true
+            break
+        end
+    end
+
+    if not hasChanged then
+        return nil
+    end
+
+    local originKey = var.narrowedValue:gmatch('^r%[narrow|oh:%d+|(.-)%]$')
+    if not originKey then
+        return nil
+    end
+
+    local unions = {}
+    for i, stack in ipairs(stacks) do
+        local svar = stack.variables[var.name]
+        local key = svar and svar.currentKey
+        if key then
+            unions[#unions+1] = key
+        else
+            unions[#unions+1] = 'r[narrow]'
+        end
+    end
 end
 
 ls.vm.registerCoderProvider('main', function (coder, source)
@@ -94,32 +136,34 @@ end)
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
 
-    coder.flow:pushStack()
+    local mainStack = coder.flow:pushStack()
     ---@type Coder.Flow.Stack[]
     local childStacks = {}
     for i, child in ipairs(source.childs) do
+        local childStack = coder.flow:pushStack()
         if child.subtype == 'if' then
-            compileCondition(coder, child.condition)
+            compileCondition(coder, i, child.condition, mainStack)
         end
         if child.subtype == 'elseif' then
-            compileCondition(coder, child.condition)
+            compileCondition(coder, i, child.condition, mainStack)
         end
         coder:withIndentation(function ()
-            local newStack = coder.flow:pushStack()
-            childStacks[#childStacks+1] = newStack
+            childStacks[#childStacks+1] = childStack
             parseBlock(coder, child)
-            coder.flow:popStack()
         end, child)
+        coder.flow:popStack()
 
         for _, var in pairs(coder.flow:currentStack().variables) do
             if var.narrowedValue then
-                compileOtherHand(coder, var, i)
+                compileOtherHand(coder, i, var)
             end
         end
     end
 
+    local changedVars = {}
     for _, var in pairs(coder.flow:currentStack().variables) do
         if var.narrowedValue then
+            changedVars[var.name] = mergeChanges(var, childStacks)
         end
     end
     coder.flow:popStack()

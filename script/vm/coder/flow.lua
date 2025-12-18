@@ -3,6 +3,64 @@ local parser = require 'parser'
 ---@class Coder.Flow
 local M = Class 'Coder.Flow'
 
+---@param var LuaParser.Node.Base
+---@return string?
+local function getName(var)
+    if var.kind == 'local' or var.kind == 'param' then
+        ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
+        return '{}@{}:{}' % {
+            var.id,
+            var.startRow,
+            var.startCol,
+        }
+    end
+    if var.kind == 'var' then
+        ---@cast var LuaParser.Node.Var
+        if var.loc then
+            return getName(var.loc)
+        end
+        if var.env then
+            local envName = getName(var.env)
+            if not envName then
+                return nil
+            end
+            return '{}.{}' % { envName, var.id }
+        end
+        return '_G.{}' % { var.id }
+    end
+    if var.kind == 'field' then
+        ---@cast var LuaParser.Node.Field
+        local lastName = getName(var.last)
+        if not lastName then
+            return nil
+        end
+        local key = var.key
+        if var.subtype == 'field' or var.subtype == 'method' then
+            ---@cast key LuaParser.Node.FieldID
+            return '{}.{}' % { lastName, key.id }
+        end
+        if var.subtype == 'index' then
+            ---@cast key LuaParser.Node.Exp
+            if key.isLiteral then
+                ---@cast key LuaParser.Node.Literal
+                local value = key.value
+                if type(value) == 'string' then
+                    if parser.isName(value) then
+                        return '{}.{}' % { lastName, value }
+                    else
+                        return '{}[{%q}]' % { lastName, value }
+                    end
+                else
+                    return '{}[{}]' % { lastName, tostring(value) }
+                end
+            end
+            return nil
+        end
+    end
+    return nil
+end
+
+
 ---@class Coder.Variable
 ---@field name string
 --- 当前变量使用的key，key一定代表一个 Node.Variable
@@ -16,6 +74,24 @@ local S = Class 'Coder.Flow.Stack'
 function S:__init()
     ---@type table<string, Coder.Variable>
     self.variables = {}
+end
+
+---@param source LuaParser.Node.Base
+---@param create? boolean
+---@return Coder.Variable?
+function S:getVar(source, create)
+    local name = getName(source)
+    if not name then
+        return nil
+    end
+    local var = self.variables[name]
+    if not var then
+        var = {
+            name = name,
+        }
+        self.variables[name] = var
+    end
+    return var
 end
 
 function M:__init()
@@ -46,20 +122,13 @@ end
 ---@param create? boolean
 ---@return Coder.Variable?
 function M:getVar(source, create)
-    local name = self:getName(source)
-    if not name then
-        return nil
-    end
     if create then
         local stack = self:currentStack()
-        local var = stack.variables[name]
-        if not var then
-            var = {
-                name = name,
-            }
-            stack.variables[name] = var
-        end
-        return var
+        return stack:getVar(source, true)
+    end
+    local name = getName(source)
+    if not name then
+        return nil
     end
     for i = #self.stacks, 1, -1 do
         local stack = self.stacks[i]
@@ -91,61 +160,4 @@ function M:setVarKey(source, key)
     end
     var.currentKey = key
     return true
-end
-
----@param var LuaParser.Node.Base
----@return string?
-function M:getName(var)
-    if var.kind == 'local' or var.kind == 'param' then
-        ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
-        return '{}@{}:{}' % {
-            var.id,
-            var.startRow,
-            var.startCol,
-        }
-    end
-    if var.kind == 'var' then
-        ---@cast var LuaParser.Node.Var
-        if var.loc then
-            return self:getName(var.loc)
-        end
-        if var.env then
-            local envName = self:getName(var.env)
-            if not envName then
-                return nil
-            end
-            return '{}.{}' % { envName, var.id }
-        end
-        return '_G.{}' % { var.id }
-    end
-    if var.kind == 'field' then
-        ---@cast var LuaParser.Node.Field
-        local lastName = self:getName(var.last)
-        if not lastName then
-            return nil
-        end
-        local key = var.key
-        if var.subtype == 'field' or var.subtype == 'method' then
-            ---@cast key LuaParser.Node.FieldID
-            return '{}.{}' % { lastName, key.id }
-        end
-        if var.subtype == 'index' then
-            ---@cast key LuaParser.Node.Exp
-            if key.isLiteral then
-                ---@cast key LuaParser.Node.Literal
-                local value = key.value
-                if type(value) == 'string' then
-                    if parser.isName(value) then
-                        return '{}.{}' % { lastName, value }
-                    else
-                        return '{}[{%q}]' % { lastName, value }
-                    end
-                else
-                    return '{}[{}]' % { lastName, tostring(value) }
-                end
-            end
-            return nil
-        end
-    end
-    return nil
 end

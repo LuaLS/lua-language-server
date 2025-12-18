@@ -374,15 +374,17 @@ SYMBOL_ANONYMOUS        =
 HOVER_VIEW_DOCUMENTS    =
 '查看文档'
 HOVER_DOCUMENT_LUA51    =
-'http://www.lua.org/manual/5.1/manual.html#{}'
+'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
-'http://www.lua.org/manual/5.2/manual.html#{}'
+'https://www.lua.org/manual/5.2/manual.html#{}'
 HOVER_DOCUMENT_LUA53    =
-'http://cloudwu.github.io/lua53doc/manual.html#{}'
+'https://cloudwu.github.io/lua53doc/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
-'http://www.lua.org/manual/5.4/manual.html#{}'
+'https://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUA55    =
+'https://www.lua.org/work/doc/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
-'http://www.lua.org/manual/5.1/manual.html#{}'
+'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -391,6 +393,8 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["zh-cn/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA55     =
+'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =

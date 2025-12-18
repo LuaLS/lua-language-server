@@ -80,8 +80,8 @@ local function convertLink(uri, text)
     end)
 end
 
-local function createViewDocument(name)
-    local fmt = getDocFormater()
+local function createViewDocument(uri, name)
+    local fmt = getDocFormater(uri)
     if not fmt then
         return nil
     end
@@ -136,7 +136,7 @@ local function compileSingleMetaDoc(uri, script, metaLang, status)
                 compileBuf[#compileBuf+1] = convertLink(uri, line)
                 compileBuf[#compileBuf+1] = '\n'
             end
-            local viewDocument = createViewDocument(name)
+            local viewDocument = createViewDocument(uri, name)
             if viewDocument then
                 compileBuf[#compileBuf+1] = '---\n---'
                 compileBuf[#compileBuf+1] = viewDocument

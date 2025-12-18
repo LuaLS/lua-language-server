@@ -1,36 +1,41 @@
 local parser = require 'parser'
 
----@class VM.Coder.Flow
-local M = Class 'VM.Coder.Flow'
+---@class Coder.Flow
+local M = Class 'Coder.Flow'
 
----@class VM.Coder.Variable
+---@class Coder.Variable
 ---@field name string
 --- 当前变量使用的key，key一定代表一个 Node.Variable
 ---@field currentKey? string
 --- 当前变量的收窄结果。再进入下一个分支时需要取 otherHand
 ---@field narrowedValue? string
 
----@class VM.Coder.Flow.Stack
-local S = Class 'VM.Coder.Flow.Stack'
+---@class Coder.Flow.Stack
+local S = Class 'Coder.Flow.Stack'
 
 function S:__init()
-    ---@type table<string, VM.Coder.Variable>
+    ---@type table<string, Coder.Variable>
     self.variables = {}
 end
 
 function M:__init()
-    ---@type VM.Coder.Flow.Stack[]
+    ---@type Coder.Flow.Stack[]
     self.stacks = {}
 
     self:pushStack()
 end
 
+---@return Coder.Flow.Stack
 function M:pushStack()
-    self.stacks[#self.stacks+1] = New 'VM.Coder.Flow.Stack' ()
+    local newStack = New 'Coder.Flow.Stack' ()
+    self.stacks[#self.stacks+1] = newStack
+    return newStack
 end
 
+---@return Coder.Flow.Stack
 function M:popStack()
     local lastStack = table.remove(self.stacks)
+    return lastStack
 end
 
 function M:currentStack()
@@ -39,7 +44,7 @@ end
 
 ---@param source LuaParser.Node.Base
 ---@param create? boolean
----@return VM.Coder.Variable?
+---@return Coder.Variable?
 function M:getVar(source, create)
     local name = self:getName(source)
     if not name then

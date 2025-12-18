@@ -3,7 +3,7 @@ local parser = require 'parser'
 ---@param uris Uri[]
 local function testSyncTime(uris)
     local c1 = os.clock()
-    ---@type VM.Coder[]
+    ---@type Coder[]
     local coders = {}
     for _, uri in ipairs(uris) do
         local file = ls.file.get(uri) --[[@as File]]

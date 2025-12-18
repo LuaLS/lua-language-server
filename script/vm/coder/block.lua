@@ -1,4 +1,4 @@
----@param coder VM.Coder
+---@param coder Coder
 ---@param block LuaParser.Node.Block
 local function parseBlock(coder, block)
     coder:pushBlock()
@@ -11,7 +11,7 @@ local function parseBlock(coder, block)
     coder:popBlock()
 end
 
----@param coder VM.Coder
+---@param coder Coder
 ---@param condition LuaParser.Node.Exp
 local function compileCondition(coder, condition)
     coder:compile(condition)
@@ -36,22 +36,32 @@ local function compileCondition(coder, condition)
     end
 end
 
----@param coder VM.Coder
----@param var VM.Coder.Variable
-local function compileOtherHand(coder, var)
-        local value = coder:getCustomKey('narrow|' .. var.narrowedValue)
-        local shadow = coder:getCustomKey('shadow|' .. var.narrowedValue)
-        coder:addLine('{value} = {narrow}:otherHand()' % {
-            value  = value,
-            narrow = var.narrowedValue,
-        })
-        coder:addLine('{shadow} = {var}:shadow({value})' % {
-            shadow = shadow,
-            var    = var.currentKey,
-            value  = value,
-        })
-        var.narrowedValue = value
-        var.currentKey = shadow
+---@param coder Coder
+---@param var Coder.Variable
+---@param index integer
+local function compileOtherHand(coder, var, index)
+    local narrowedValue = var.narrowedValue
+    if not narrowedValue then
+        return
+    end
+    local gsubCount = 0
+    narrowedValue, gsubCount = narrowedValue:gsub('|oh:%d+|', '|oh:' .. index .. '|', 1)
+    if gsubCount == 0 then
+        narrowedValue = narrowedValue:gsub('narrow|', 'narrow|oh:' .. index .. '|', 1)
+    end
+    local value  = narrowedValue
+    local shadow = narrowedValue:gsub('narrow|', 'shadow|', 1)
+    coder:addLine('{value} = {narrow}:otherHand()' % {
+        value  = value,
+        narrow = var.narrowedValue,
+    })
+    coder:addLine('{shadow} = {var}:shadow({value})' % {
+        shadow = shadow,
+        var    = var.currentKey,
+        value  = value,
+    })
+    var.narrowedValue = value
+    var.currentKey = shadow
 end
 
 ls.vm.registerCoderProvider('main', function (coder, source)
@@ -85,7 +95,9 @@ ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
 
     coder.flow:pushStack()
-    for _, child in ipairs(source.childs) do
+    ---@type Coder.Flow.Stack[]
+    local childStacks = {}
+    for i, child in ipairs(source.childs) do
         if child.subtype == 'if' then
             compileCondition(coder, child.condition)
         end
@@ -93,15 +105,21 @@ ls.vm.registerCoderProvider('if', function (coder, source)
             compileCondition(coder, child.condition)
         end
         coder:withIndentation(function ()
-            coder.flow:pushStack()
+            local newStack = coder.flow:pushStack()
+            childStacks[#childStacks+1] = newStack
             parseBlock(coder, child)
             coder.flow:popStack()
         end, child)
 
         for _, var in pairs(coder.flow:currentStack().variables) do
             if var.narrowedValue then
-                compileOtherHand(coder, var)
+                compileOtherHand(coder, var, i)
             end
+        end
+    end
+
+    for _, var in pairs(coder.flow:currentStack().variables) do
+        if var.narrowedValue then
         end
     end
     coder.flow:popStack()

@@ -1,5 +1,5 @@
----@class VM.Coder
-local M = Class 'VM.Coder'
+---@class Coder
+local M = Class 'Coder'
 
 ---@package
 ---@param source LuaParser.Node.Base

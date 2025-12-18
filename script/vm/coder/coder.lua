@@ -1,5 +1,5 @@
----@class VM.Coder
-local M = Class 'VM.Coder'
+---@class Coder
+local M = Class 'Coder'
 
 if ls.threadName == 'master' then
     M.coderMaster = ls.async.create('coder', 8, 'vm.coder.coder-worker', true)
@@ -9,7 +9,7 @@ M.code = '-- Not made yet --'
 ---@type function?
 M.func = nil
 
----@alias VM.CoderProvider fun(coder: VM.Coder, source: LuaParser.Node.Base)
+---@alias VM.CoderProvider fun(coder: Coder, source: LuaParser.Node.Base)
 
 ---@type table<string, VM.CoderProvider?>
 M.providers = {}
@@ -29,7 +29,7 @@ function M:makeFromAst(ast)
     self.disposers = {}
     self.compiled = {}
     self.blockStack = {}
-    self.flow = New 'VM.Coder.Flow' ()
+    self.flow = New 'Coder.Flow' ()
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'local coder, vfile = ...'
@@ -446,9 +446,9 @@ function M:looksLikeSelf(source)
     return true, exp.last
 end
 
----@return VM.Coder
+---@return Coder
 function ls.vm.createCoder()
-    return New 'VM.Coder' ()
+    return New 'Coder' ()
 end
 
 ---@param kind string

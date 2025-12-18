@@ -88,7 +88,7 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
     -- })
 end)
 
----@param coder VM.Coder
+---@param coder Coder
 ---@param source { id: string }
 local function compileID(coder, source)
     coder:addLine('{key} = rt.value {name%q}' % {

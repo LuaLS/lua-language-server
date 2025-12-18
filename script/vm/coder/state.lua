@@ -1,7 +1,7 @@
----@class VM.Coder
-local M = Class 'VM.Coder'
+---@class Coder
+local M = Class 'Coder'
 
----@param coder VM.Coder
+---@param coder Coder
 ---@param var LuaParser.Node.AssignAble
 ---@param index integer
 ---@return string?

@@ -78,7 +78,7 @@ function M:getVariable(source)
 end
 
 ---@param source LuaParser.Node.Base
----@return VM.Coder?
+---@return Coder?
 function M:getCoder(source)
     local uri = source.ast.source
     local vfile = self:getFile(uri)

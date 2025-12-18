@@ -24,7 +24,7 @@ function M:__close()
 end
 
 ---@param document Document
----@return VM.Coder
+---@return Coder
 function M:makeCoder(document)
     local coder = self.coder or ls.vm.createCoder()
     coder:makeFromAst(document.ast)
@@ -33,7 +33,7 @@ end
 
 ---@async
 ---@param document Document
----@return VM.Coder
+---@return Coder
 function M:awaitMakeCoder(document)
     local coder = self.coder or ls.vm.createCoder()
     coder:makeFromFile(document.file)

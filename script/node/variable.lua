@@ -701,9 +701,10 @@ M.__getter.equivalentValue = function (self)
     for _, equivalent in ipairs(self.allEquivalents) do
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable
-            local currentValue = equivalent:getCurrentValue()
-            if currentValue then
-                results[#results+1] = currentValue
+            local activeValue = equivalent:getCurrentValue()
+                            or  equivalent:getExpectValue()
+            if activeValue then
+                results[#results+1] = activeValue
                 goto continue
             end
             if equivalent.assigns then

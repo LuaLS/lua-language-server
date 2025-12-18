@@ -1,4 +1,4 @@
----@param coder VM.Coder
+---@param coder Coder
 ---@param source LuaParser.Node.Base
 ---@param value string | number | boolean
 local function makeValue(coder, source, value)

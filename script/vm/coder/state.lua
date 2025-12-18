@@ -104,7 +104,9 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
     local valueKeys = {}
     local isTable = {}
     for i, exp in ipairs(source.exps) do
-        coder:compile(exp)
+        if exp.last then
+            coder:compile(exp.last)
+        end
     end
     for i, value in ipairs(source.values) do
         valueKeys[i] = coder:getKey(value)
@@ -112,6 +114,7 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
         coder:compile(value)
     end
     for i, exp in ipairs(source.exps) do
+        coder:compile(exp)
         coder:compileAssign(exp, i, valueKeys[i], isTable[i])
     end
 end)

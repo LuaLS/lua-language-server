@@ -70,6 +70,9 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         if source.name then
             coder:withIndentation(function ()
                 coder:addLine('')
+                if source.name.last then
+                    coder:compile(source.name.last)
+                end
                 coder:compile(source.name)
             end, 'function name --')
         end

@@ -29,7 +29,10 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         return
     end
 
-    coder:compile(last)
+    if not source.value then
+        -- 有 value 的情况在 assign 里处理
+        coder:compile(last)
+    end
     local fieldCode = coder:makeFieldCode(source.key)
     if not fieldCode then
         fieldCode = 'rt.UNKNOWN'

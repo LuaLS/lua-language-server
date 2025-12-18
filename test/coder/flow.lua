@@ -52,3 +52,15 @@ do
     local abc = rt:globalGet('a', 'b', 'c')
     assert(abc:view() == '1 | 2 | 3')
 end
+
+do
+    TEST_INDEX [[
+    local x = 0
+    x = x + 1
+
+    W = x
+    ]]
+
+    local W = rt:globalGet('W')
+    assert(W:view() == 'op.add<0, 1>')
+end

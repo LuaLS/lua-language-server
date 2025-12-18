@@ -176,3 +176,25 @@ do
 
     assert(y:view() == '10')
 end
+
+do
+    --[[
+    local x = 0
+    x = x + 1
+
+    W = x
+    ]]
+
+    local x = rt.variable 'x'
+    x:setCurrentValue(rt.value(0))
+
+    local x2 = x:shadow()
+    x2:setCurrentValue(rt.call('op.add', { x, rt.value(1) }))
+    x2:addAssign(rt.field('x', x2:getCurrentValue()))
+
+    local W = rt:globalGet('W'):shadow()
+    W:setCurrentValue(x2)
+    W:addAssign(rt.field('W', x2))
+
+    assert(W:view() == 'op.add<0, 1>')
+end

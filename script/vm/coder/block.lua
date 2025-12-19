@@ -40,7 +40,7 @@ end)
 
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
-    local branch <close> = coder.flow:createBranch()
+    local branch <close> = coder.flow:createBranch(source)
     for _, child in ipairs(source.childs) do
         if child.subtype == 'if' then
             if child.condition then

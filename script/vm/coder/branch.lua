@@ -140,8 +140,10 @@ function C:preprocessStack(stack)
 end
 
 ---@param flow Coder.Flow
-function M:__init(flow)
+---@param node LuaParser.Node.Base
+function M:__init(flow, node)
     self.flow = flow
+    self.node = node
     self.coder = self.flow.coder
     --- 保存关心的变量及其初始key
     ---@type table<string, string>
@@ -184,10 +186,55 @@ function M:finish()
     end
     self.finished = true
 
-    for _, child in ipairs(self.childs) do
-        local newStack = self.flow:pushStack()
-        child:preprocessStack(newStack)
-        child.callback()
-        self.flow:popStack()
+    local function runCallbacks()
+        for _, child in ipairs(self.childs) do
+            local newStack = self.flow:pushStack()
+            child:preprocessStack(newStack)
+            child.callback()
+            self.flow:popStack()
+        end
     end
+
+    local function collectChangedVars()
+        ---@type table<string, boolean>
+        local changed = {}
+        for name in ls.util.sortPairs(self.cares) do
+            for _, child in ipairs(self.childs) do
+                local before = child:getVarKeyAfterNarrow(name)
+                local after  = child:getVarKeyAfterCallback(name)
+                if before ~= after then
+                    changed[name] = true
+                end
+            end
+        end
+        return changed
+    end
+
+    ---@param changed table<string, boolean>
+    local function applyChangedVars(changed)
+        for name in ls.util.sortPairs(changed) do
+            local unions = {}
+            for i, child in ipairs(self.childs) do
+                unions[i] = child:getVarKeyAfterCallback(name)
+            end
+            local valueKey = self.coder:getCustomKey('value-apply|{}|{}' % { name, self.node.uniqueKey })
+            self.coder:addLine('{value} = rt.union { {unions} }' % {
+                value  = valueKey,
+                unions = table.concat(unions, ', '),
+            })
+            local shadowKey = self.coder:getCustomKey('shadow-apply|{}|{}' % { name, self.node.uniqueKey })
+            self.coder:addLine('{shadow} = {var}:shadow({value})' % {
+                shadow = shadowKey,
+                var    = self.cares[name],
+                value  = valueKey,
+            })
+            self.flow:setVarKeyByName(name, shadowKey)
+        end
+    end
+
+    runCallbacks()
+
+    local changedVars = collectChangedVars()
+
+    applyChangedVars(changedVars)
 end

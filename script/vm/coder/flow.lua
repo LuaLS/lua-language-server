@@ -10,8 +10,8 @@ local function getName(var)
         ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
         return '{}@{}:{}' % {
             var.id,
-            var.startRow,
-            var.startCol,
+            var.startRow + 1,
+            var.startCol + 1,
         }
     end
     if var.kind == 'var' then
@@ -184,6 +184,13 @@ function M:getVarByName(name, createKey)
     return nil
 end
 
+---@param name string
+---@param varKey string
+function M:setVarKeyByName(name, varKey)
+    local stack = self:currentStack()
+    stack:setVarKeyByName(name, varKey)
+end
+
 ---@param source LuaParser.Node.AssignAble
 ---@return string?
 function M:getVarKey(source)
@@ -206,8 +213,9 @@ function M:setVarKey(source, key)
     return true
 end
 
+---@param node LuaParser.Node.Base
 ---@return Coder.Branch
-function M:createBranch()
-    local branch = New 'Coder.Branch' (self)
+function M:createBranch(node)
+    local branch = New 'Coder.Branch' (self, node)
     return branch
 end

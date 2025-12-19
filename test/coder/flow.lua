@@ -115,5 +115,5 @@ do
     assert(X0:view() == 'integer | nil')
     assert(X1:view() == 'integer')
     assert(X2:view() == 'nil')
-    -- assert(X3:view() == 'integer | "string"')
+    assert(X3:view() == '"string" | integer')
 end

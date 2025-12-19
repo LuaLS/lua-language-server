@@ -32,9 +32,13 @@ return function (options)
             return
         end
         local dbg = require 'debugger'
-        dbg:start(options.debugger.address)
-        if options.debugger.wait then
-            dbg:event 'wait'
+        if options.debugger.attach then
+            dbg:attach {}
+        else
+            dbg:start(options.debugger.address)
+            if options.debugger.wait then
+                dbg:event 'wait'
+            end
         end
     end, log.warn)
 

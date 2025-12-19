@@ -4,6 +4,8 @@ collectgarbage('generational', 10, 50)
 
 package.path = package.path.. ';./?.lua;./?/init.lua'
 
+---@class Test
+test = {}
 
 require 'luals'
 require 'runtime'
@@ -44,8 +46,6 @@ log = New 'Log' {
 }
 
 
----@class Test
-test = {}
 test.catch = require 'test.catch'
 
 test.rootPath = ls.env.ROOT_PATH .. '/test_root'

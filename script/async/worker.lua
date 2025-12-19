@@ -7,6 +7,21 @@ local M = Class 'Async.Worker'
 M.requestID = 0
 M.hang = 0
 
+local function debugger(useDebugger)
+    if test then
+        return {
+            attach = true,
+        }
+    end
+    if useDebugger and ls.args.DEVELOP then
+        return {
+            address = ls.args.DBGADDRESS .. ':' .. tostring(ls.args.DBGPORT),
+            wait    = ls.args.DBGWAIT,
+        }
+    end
+    return nil
+end
+
 ---@param name string
 ---@param entry string
 ---@param useDebugger? boolean
@@ -50,11 +65,8 @@ require 'async.worker-init' (options)
         root = ls.env.ROOT_PATH,
         entry = entry,
         logLevel = log.level,
-        debugger = useDebugger and ls.args.DEVELOP and {
-            address = ls.args.DBGADDRESS .. ':' .. tostring(ls.args.DBGPORT),
-            wait    = ls.args.DBGWAIT,
-        }
-    } or false)
+        debugger = debugger(useDebugger),
+    })
 
     ls.eventLoop.addTask(function ()
         if not next(self.requestMap) then

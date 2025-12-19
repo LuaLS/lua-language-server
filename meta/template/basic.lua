@@ -36,6 +36,7 @@ function assert(v, message, ...) end
 ---#if VERSION == 5.4 then
 ---#DES 'collectgarbage'
 ---@param opt? gcoptions
+---@param ... integer
 ---@return any
 function collectgarbage(opt, ...) end
 ---#else

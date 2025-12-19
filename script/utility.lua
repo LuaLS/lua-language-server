@@ -995,6 +995,24 @@ function m.arrayOverlap(a1, a2)
     return result
 end
 
+---@generic T
+---@param total T[]
+---@param part T[]
+---@return T[]
+function m.arrayDiff(total, part)
+    local diff = {}
+
+    local partSet = m.arrayToHash(part)
+    for i = 1, #total do
+        local v = total[i]
+        if not partSet[v] then
+            diff[#diff+1] = v
+        end
+    end
+
+    return diff
+end
+
 m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }

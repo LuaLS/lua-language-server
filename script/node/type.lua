@@ -507,6 +507,19 @@ function M:onCanCast(other)
     return false
 end
 
+function M:narrowEqual(other)
+    if self == other then
+        return self, self.scope.rt.NEVER
+    end
+
+    local l = self:findValue(ls.node.kind['value'] | ls.node.kind['union'])
+    if l then
+        return l:narrowEqual(other)
+    end
+
+    return self.scope.rt.NEVER, self
+end
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists

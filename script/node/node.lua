@@ -314,8 +314,8 @@ function M:narrow(other)
     return self.scope.rt.NEVER, self
 end
 
----@param key string | number | boolean | Node
----@param value string | number | boolean | Node
+---@param key Node.Key
+---@param value Node.Key
 ---@return Node narrowed
 ---@return Node otherSide
 function M:narrowByField(key, value)
@@ -325,6 +325,17 @@ function M:narrowByField(key, value)
     local myValue = self:get(key)
     if myValue:canCast(value) then
         return self, self.scope.rt.NEVER
+    end
+    return self.scope.rt.NEVER, self
+end
+
+---@param other Node
+---@return Node narrowed
+---@return Node otherSide
+function M:narrowEqual(other)
+    local v = self:findValue(ls.node.kind['value'] | ls.node.kind['type'] | ls.node.kind['union'])
+    if v then
+        return v:narrowEqual(other)
     end
     return self.scope.rt.NEVER, self
 end

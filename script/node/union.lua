@@ -183,6 +183,24 @@ function M:narrowByField(key, value)
     return rt.union(result), rt.union(others)
 end
 
+function M:narrowEqual(other)
+    local rt = self.scope.rt
+    local matched = {}
+    for _, v in ipairs(self.values) do
+        local l = v:findValue(ls.node.kind['value'] | ls.node.kind['type'])
+        if l and l:narrowEqual(other) ~= rt.NEVER then
+            matched[#matched+1] = v
+        end
+    end
+    if #matched == 0 then
+        return rt.NEVER, self
+    end
+    if #matched == #self.values then
+        return self, rt.NEVER
+    end
+    return rt.union(matched), rt.union(ls.util.arrayDiff(self.values, matched))
+end
+
 ---@param self Node.Union
 ---@return boolean
 ---@return true

@@ -25,28 +25,67 @@ end
 
 ---@package
 ---@param exp LuaParser.Node.Base
+---@return boolean
 function C:checkCondition(exp)
+    self:tryTruly(exp)
+
+    if exp.kind == 'binary' then
+        ---@cast exp LuaParser.Node.Binary
+        if exp.op == '==' and exp.exp1 and exp.exp2 then
+            return self:tryEqual(exp.exp1:trim(), exp.exp2:trim())
+                or self:tryEqual(exp.exp2:trim(), exp.exp1:trim())
+        end
+    end
+
+    return false
+end
+
+---@param exp LuaParser.Node.Base
+---@param method string
+---@return boolean
+function C:narrow(exp, method)
     local var = self.branch.flow:getVar(exp)
 
-    if var then
-        self.branch:careVar(var.name, var.currentKey)
-
-        -- truly
-        local value = self.branch.coder:getCustomKey('narrow|{}|{}' % { self.index, exp.uniqueKey })
-        self.branch.coder:addLine('{narrow} = rt.narrow({value}):truly()' % {
-            narrow = value,
-            value  = self:getValueBeforeNarrow(var.name),
-        })
-        local shadow = self.branch.coder:getCustomKey('shadow|{}|{}' % { self.index, exp.uniqueKey })
-        self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
-            shadow = shadow,
-            var    = self:getVarKeyBeforeNarrow(var.name),
-            value  = value,
-        })
-        self.varKeyAfterNarrow[var.name] = shadow
-        self.valueAfterNarrow[var.name]  = value
-        self.narrowReasons[var.name] = exp
+    if not var then
+        return false
     end
+    self.branch:careVar(var.name, var.currentKey)
+
+    -- truly
+    local value = self.branch.coder:getCustomKey('narrow|{}|{}' % { self.index, exp.uniqueKey })
+    self.branch.coder:addLine('{narrow} = rt.narrow({value}):{method}' % {
+        narrow = value,
+        value  = self:getValueBeforeNarrow(var.name),
+        method = method,
+    })
+    local shadow = self.branch.coder:getCustomKey('shadow|{}|{}' % { self.index, exp.uniqueKey })
+    self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
+        shadow = shadow,
+        var    = self:getVarKeyBeforeNarrow(var.name),
+        value  = value,
+    })
+    self.varKeyAfterNarrow[var.name] = shadow
+    self.valueAfterNarrow[var.name]  = value
+    self.narrowReasons[var.name] = exp
+
+    return true
+end
+
+---@package
+---@param exp LuaParser.Node.Base
+---@return boolean
+function C:tryTruly(exp)
+    return self:narrow(exp, 'truly()')
+end
+
+---@package
+---@param exp LuaParser.Node.Base
+---@param other LuaParser.Node.Base
+---@return boolean
+function C:tryEqual(exp, other)
+    return self:narrow(exp, 'equalValue({other})' % {
+        other = self.branch.coder:getKey(other),
+    })
 end
 
 ---@param name string
@@ -166,6 +205,7 @@ function M:addChild(condition, callback)
     self.childs[#self.childs+1] = child
 
     if exp then
+        self.coder:compile(exp)
         child:checkCondition(exp)
     end
 end

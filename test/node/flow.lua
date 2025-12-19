@@ -127,6 +127,40 @@ end
 
 do
     --[[
+    ---@type 1 | 2 | 3 | 4
+    local x
+    x --> 1 | 2 | 3 | 4
+
+    if x == 1 then
+        x --> 1
+    elseif x == 2 then
+        x --> 2
+    else
+        x --> 3 | 4
+    end
+
+    x --> 1 | 2 | 3 | 4
+    ]]
+
+    local x = rt.variable 'x'
+    x:addType(rt.value(1) | rt.value(2) | rt.value(3) | rt.value(4))
+
+    local v1 = rt.narrow(x):equalValue(rt.value(1))
+    local x1 = x:shadow(v1)
+
+    local v2 = rt.narrow(v1:otherSide()):equalValue(rt.value(2))
+    local x2 = x:shadow(v2)
+
+    local x3 = x:shadow(v2:otherSide())
+
+    assert(x:view() == '1 | 2 | 3 | 4')
+    assert(x1:view() == '1')
+    assert(x2:view() == '2')
+    assert(x3:view() == '3 | 4')
+end
+
+do
+    --[[
     ---@type { a: 1 } | { a: 2 }
     local x
     x --> { a: 1 } | { a: 2 }

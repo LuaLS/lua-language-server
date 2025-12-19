@@ -1,6 +1,6 @@
 ---@class Node.Narrow: Node
 ---@field node Node
----@field narrowType? 'value' | 'field' | 'truly' | 'falsy'
+---@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal'
 ---@field nvalue? Node
 ---@field field? Node.Key
 local M = ls.node.register 'Node.Narrow'
@@ -19,11 +19,6 @@ function M:truly()
     return self
 end
 
-function M:falsy()
-    self.narrowType = 'falsy'
-    return self
-end
-
 ---@param value Node
 ---@return Node.Narrow
 function M:matchValue(value)
@@ -38,6 +33,14 @@ end
 function M:matchField(key, value)
     self.narrowType = 'field'
     self.field = key
+    self.nvalue = value
+    return self
+end
+
+---@param value Node
+---@return Node.Narrow
+function M:equalValue(value)
+    self.narrowType = 'equal'
     self.nvalue = value
     return self
 end
@@ -89,9 +92,6 @@ M.__getter.value = function (self)
         if narrowType == 'truly' then
             return value.falsy, true
         end
-        if narrowType == 'falsy' then
-            return value.truly, true
-        end
         if narrowType == 'value' then
             local _, otherSide = value:narrow(self.nvalue)
             return otherSide, true
@@ -100,19 +100,23 @@ M.__getter.value = function (self)
             local _, otherSide = value:narrowByField(self.field, self.nvalue)
             return otherSide, true
         end
+        if narrowType == 'equal' then
+            local _, otherSide = value:narrowEqual(self.nvalue)
+            return otherSide, true
+        end
         return rt.NEVER, true
     else
         if narrowType == 'truly' then
             return value.truly, true
-        end
-        if narrowType == 'falsy' then
-            return value.falsy, true
         end
         if narrowType == 'value' then
             return value:narrow(self.nvalue), true
         end
         if narrowType == 'field' then
             return value:narrowByField(self.field, self.nvalue), true
+        end
+        if narrowType == 'equal' then
+            return value:narrowEqual(self.nvalue), true
         end
         return value, true
     end
@@ -124,6 +128,6 @@ function M:otherSide()
     new.narrowType = self.narrowType
     new.field = self.field
     new.nvalue = self.nvalue
-    new.isOtherSide = true
+    new.isOtherSide = not self.isOtherSide
     return new
 end

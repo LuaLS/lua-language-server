@@ -37,6 +37,15 @@ function M:onCanCast(other)
     return false
 end
 
+function M:narrowEqual(other)
+    local v = other:findValue(ls.node.kind['value'])
+    if v and self.literal == v.literal then
+        return self, self.scope.rt.NEVER
+    else
+        return self.scope.rt.NEVER, self
+    end
+end
+
 ---@type Node.Type
 M.nodeType = nil
 M.__getter.nodeType = function (self)

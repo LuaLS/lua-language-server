@@ -78,7 +78,7 @@ do
 
     local x1 = x:shadow(xNarrow)
 
-    local x2 = x:shadow(xNarrow:otherHand())
+    local x2 = x:shadow(xNarrow:otherSide())
 
     local x3 = x:shadow(x)
 
@@ -111,7 +111,7 @@ do
 
     local x1 = x:shadow(xNarrow)
 
-    local x2 = x:shadow(xNarrow:otherHand())
+    local x2 = x:shadow(xNarrow:otherSide())
 
     local x21 = x2:shadow(rt.value 'string')
     x21:addAssign(rt.field('x', rt.value 'string'))
@@ -147,7 +147,7 @@ do
 
     local x1 = x:shadow(xNarrow)
 
-    local x2 = x:shadow(xNarrow:otherHand())
+    local x2 = x:shadow(xNarrow:otherSide())
 
     local x3 = x:shadow(x)
 

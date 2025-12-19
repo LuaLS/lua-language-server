@@ -65,7 +65,7 @@ end
 ---@field name string
 --- 当前变量使用的key，key一定代表一个 Node.Variable
 ---@field currentKey? string
---- 当前变量的收窄结果。再进入下一个分支时需要取 otherHand
+--- 当前变量的收窄结果。再进入下一个分支时需要取 otherSide
 ---@field narrowedValue? string
 
 ---@class Coder.Flow.Stack

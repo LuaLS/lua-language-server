@@ -303,7 +303,7 @@ M.literal = nil
 
 ---@param other Node
 ---@return Node narrowed
----@return Node otherHand
+---@return Node otherSide
 function M:narrow(other)
     if self.value ~= self then
         return self.value:narrow(other)
@@ -317,7 +317,7 @@ end
 ---@param key string | number | boolean | Node
 ---@param value string | number | boolean | Node
 ---@return Node narrowed
----@return Node otherHand
+---@return Node otherSide
 function M:narrowByField(key, value)
     if self.value ~= self then
         return self.value:narrowByField(key, value)

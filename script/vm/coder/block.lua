@@ -47,7 +47,7 @@ end
 ---@param coder Coder
 ---@param index integer
 ---@param var Coder.Variable
-local function compileOtherHand(coder, index, var)
+local function compileOtherSide(coder, index, var)
     local narrowedValue = var.narrowedValue
     if not narrowedValue then
         return
@@ -58,7 +58,7 @@ local function compileOtherHand(coder, index, var)
     end
     local value  = ohValue
     local shadow = ohValue:gsub('narrow|', 'shadow|', 1)
-    coder:addLine('{value} = {narrow}:otherHand()' % {
+    coder:addLine('{value} = {narrow}:otherSide()' % {
         value  = value,
         narrow = var.narrowedValue,
     })
@@ -155,7 +155,7 @@ ls.vm.registerCoderProvider('if', function (coder, source)
 
         for _, var in pairs(coder.flow:currentStack().variables) do
             if var.narrowedValue then
-                compileOtherHand(coder, i, var)
+                compileOtherSide(coder, i, var)
             end
         end
     end

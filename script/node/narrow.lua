@@ -71,7 +71,7 @@ function M:resolveGeneric(map)
 end
 
 ---@type boolean
-M.isOtherHand = false
+M.isOtherSide = false
 
 ---@param self Node.Narrow
 ---@return Node
@@ -85,7 +85,7 @@ M.__getter.value = function (self)
     local rt = self.scope.rt
     local narrowType = self.narrowType
     local value = self.node
-    if self.isOtherHand then
+    if self.isOtherSide then
         if narrowType == 'truly' then
             return value.falsy, true
         end
@@ -93,12 +93,12 @@ M.__getter.value = function (self)
             return value.truly, true
         end
         if narrowType == 'value' then
-            local _, otherHand = value:narrow(self.nvalue)
-            return otherHand, true
+            local _, otherSide = value:narrow(self.nvalue)
+            return otherSide, true
         end
         if narrowType == 'field' then
-            local _, otherHand = value:narrowByField(self.field, self.nvalue)
-            return otherHand, true
+            local _, otherSide = value:narrowByField(self.field, self.nvalue)
+            return otherSide, true
         end
         return rt.NEVER, true
     else
@@ -119,11 +119,11 @@ M.__getter.value = function (self)
 end
 
 ---@return Node.Narrow
-function M:otherHand()
+function M:otherSide()
     local new = self.scope.rt.narrow(self.node)
     new.narrowType = self.narrowType
     new.field = self.field
     new.nvalue = self.nvalue
-    new.isOtherHand = true
+    new.isOtherSide = true
     return new
 end

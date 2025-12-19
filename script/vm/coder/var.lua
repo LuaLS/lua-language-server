@@ -1,13 +1,7 @@
 ls.vm.registerCoderProvider('var', function (coder, source)
     ---@cast source LuaParser.Node.Var
     local value = coder.flow:getVarKey(source)
-    if not value then
-        if source.loc then
-            value = coder:getKey(source.loc)
-        else
-            value = 'rt:globalGet({%q})' % { source.id }
-        end
-    end
+    assert(value, 'Variable key not found for var')
     coder:addLine('{key} = {value}{shadow}' % {
         key = coder:getKey(source),
         value = value,
@@ -33,41 +27,48 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         -- 有 value 的情况在 assign 里处理
         coder:compile(last)
     end
-    local fieldCode = coder:makeFieldCode(source.key)
-    if not fieldCode then
-        fieldCode = 'rt.UNKNOWN'
+    if source.subtype == 'index' then
         coder:compile(source.key)
     end
 
-    local value =  coder.flow:getVarKey(source)
-                or '{last}:getChild({field})' % {
-                    last  = coder:getKey(last),
-                    field = fieldCode,
-                }
+    local varKey = coder.flow:getVarKey(source)
 
-    coder:addLine('{var} = {value}{shadow}' % {
-        var    = coder:getKey(source),
-        value  = value,
-        shadow = source.value and ':shadow()' or '',
-    })
-    coder:addLine('{variable} = {var}' % {
-        variable = coder:getVariableKey(source),
-        var      = coder:getKey(source),
-    })
-    if source.value then
-        coder.flow:setVarKey(source, coder:getKey(source))
+    if varKey then
+        coder:addLine('{var} = {varKey}{shadow}' % {
+            var    = coder:getKey(source),
+            varKey = varKey,
+            shadow = source.value and ':shadow()' or '',
+        })
+        coder:addLine('{variable} = {var}' % {
+            variable = coder:getVariableKey(source),
+            var      = coder:getKey(source),
+        })
+        if source.value then
+            coder.flow:setVarKey(source, coder:getKey(source))
+        end
+    else
+        -- 无法追踪变量，如 t[func()] , t:func().xxx 之类的
+        coder:addLine('{var} = {value}' % {
+            var   = coder:getKey(source),
+            value = coder:makeVarKey(source),
+        })
+        coder:addLine('{variable} = {var}' % {
+            variable = coder:getVariableKey(source),
+            var      = coder:getKey(source),
+        })
     end
-    if fieldCode == 'rt.UNKNOWN' then
-        return
+
+    if source.subtype ~= 'index' then
+        -- 字段的id即为整个字段
+        coder:addLine('{r2} = {r1}' % {
+            r1 = coder:getKey(source),
+            r2 = coder:getKey(source.key),
+        })
+        coder:addLine('{v2} = {v1}' % {
+            v1 = coder:getVariableKey(source),
+            v2 = coder:getVariableKey(source.key),
+        })
     end
-    coder:addLine('{r2} = {r1}' % {
-        r1 = coder:getKey(source),
-        r2 = coder:getKey(source.key),
-    })
-    coder:addLine('{v2} = {v1}' % {
-        v1 = coder:getVariableKey(source),
-        v2 = coder:getVariableKey(source.key),
-    })
 end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)

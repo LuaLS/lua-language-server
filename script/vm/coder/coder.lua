@@ -29,7 +29,7 @@ function M:makeFromAst(ast)
     self.disposers = {}
     self.compiled = {}
     self.blockStack = {}
-    self.flow = New 'Coder.Flow' ()
+    self.flow = New 'Coder.Flow' (self)
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'local coder, vfile = ...'
@@ -283,7 +283,7 @@ function M:withIndentation(callback, comment)
     elseif type(comment) == 'table' then
         ---@cast comment LuaParser.Node.Base
         self:addLine('do -- :{}: {}' % {
-            comment.startRow,
+            comment.startRow + 1,
             comment.code:match('[^\r\n]*'),
         })
     else
@@ -395,12 +395,14 @@ function M:makeFieldCode(source)
     return nil
 end
 
+--- 形如 `r["uniqueKey"]`，表示某个节点的值
 ---@param source LuaParser.Node.Base
 ---@return string
 function M:getKey(source)
     return string.format('r[%q]', source.uniqueKey)
 end
 
+--- 形如 `v["uniqueKey"]`，导出的变量
 ---@param source LuaParser.Node.Base
 ---@return string
 function M:getVariableKey(source)
@@ -444,6 +446,29 @@ function M:looksLikeSelf(source)
         return false, nil
     end
     return true, exp.last
+end
+
+---@param source LuaParser.Node.Base
+---@return string
+function M:makeVarKey(source)
+    if source.kind == 'var' then
+        ---@cast source LuaParser.Node.Var
+        if source.loc then
+            return self:getKey(source.loc) or error('Cannot make var key')
+        else
+            return 'rt:globalGet({%q})' % { source.id }
+        end
+    end
+    if source.kind == 'field' then
+        ---@cast source LuaParser.Node.Field
+        local fieldCode =  self:makeFieldCode(source.key)
+                        or 'rt.UNKNOWN'
+        return '{last}:getChild({field})' % {
+            last  = self:getKey(source.last),
+            field = fieldCode,
+        }
+    end
+    error('Cannot make var key for kind ' .. tostring(source.kind))
 end
 
 ---@return Coder

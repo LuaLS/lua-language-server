@@ -11,101 +11,6 @@ local function parseBlock(coder, block)
     coder:popBlock()
 end
 
----@param coder Coder
----@param index integer
----@param condition LuaParser.Node.Exp
----@param mainStack Coder.Flow.Stack
-local function compileCondition(coder, index, condition, mainStack)
-    coder:compile(condition)
-
-    local exp = condition:trim()
-
-    local mainVar = mainStack:getVar(exp, true)
-    if mainVar then
-        local value  = coder:getCustomKey('narrow|b:{}|{}' % { index, exp.uniqueKey })
-        local shadow = coder:getCustomKey('shadow|b:{}|{}' % { index, exp.uniqueKey })
-        coder:addLine('{value} = rt.narrow({varKey}):truly()' % {
-            value  = value,
-            varKey = coder:getKey(exp),
-        })
-        coder:addLine('{shadow} = {var}:shadow({value})' % {
-            shadow = shadow,
-            var    = coder:getKey(exp),
-            value  = value,
-        })
-        mainVar.narrowedValue = value
-        mainVar.currentKey = shadow
-
-        local var = coder.flow:getVar(exp, true)
-        if var then
-            var.currentKey = shadow
-        end
-    end
-
-end
-
----@param coder Coder
----@param index integer
----@param var Coder.Variable
-local function compileOtherSide(coder, index, var)
-    local narrowedValue = var.narrowedValue
-    if not narrowedValue then
-        return
-    end
-    local ohValue, count = narrowedValue:gsub('|b:%d+|', '|oh:' .. index .. '|', 1)
-    if count == 0 then
-        return
-    end
-    local value  = ohValue
-    local shadow = ohValue:gsub('narrow|', 'shadow|', 1)
-    coder:addLine('{value} = {narrow}:otherSide()' % {
-        value  = value,
-        narrow = var.narrowedValue,
-    })
-    coder:addLine('{shadow} = {var}:shadow({value})' % {
-        shadow = shadow,
-        var    = var.currentKey,
-        value  = value,
-    })
-    var.narrowedValue = value
-    var.currentKey = shadow
-end
-
----@param var Coder.Variable
----@param stacks Coder.Flow.Stack[]
----@return string?
-local function mergeChanges(var, stacks)
-    local hasChanged = false
-
-    for _, stack in ipairs(stacks) do
-        local svar = stack.variables[var.name]
-        if svar then
-            hasChanged = true
-            break
-        end
-    end
-
-    if not hasChanged then
-        return nil
-    end
-
-    local originKey = var.narrowedValue:gmatch('^r%[narrow|oh:%d+|(.-)%]$')
-    if not originKey then
-        return nil
-    end
-
-    local unions = {}
-    for i, stack in ipairs(stacks) do
-        local svar = stack.variables[var.name]
-        local key = svar and svar.currentKey
-        if key then
-            unions[#unions+1] = key
-        else
-            unions[#unions+1] = 'r[narrow]'
-        end
-    end
-end
-
 ls.vm.registerCoderProvider('main', function (coder, source)
     ---@cast source LuaParser.Node.Main
 
@@ -135,38 +40,24 @@ end)
 
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
-
-    local mainStack = coder.flow:pushStack()
-    ---@type Coder.Flow.Stack[]
-    local childStacks = {}
-    for i, child in ipairs(source.childs) do
-        local childStack = coder.flow:pushStack()
+    local branch <close> = coder.flow:createBranch()
+    for _, child in ipairs(source.childs) do
         if child.subtype == 'if' then
-            compileCondition(coder, i, child.condition, mainStack)
-        end
-        if child.subtype == 'elseif' then
-            compileCondition(coder, i, child.condition, mainStack)
-        end
-        coder:withIndentation(function ()
-            childStacks[#childStacks+1] = childStack
-            parseBlock(coder, child)
-        end, child)
-        coder.flow:popStack()
-
-        for _, var in pairs(coder.flow:currentStack().variables) do
-            if var.narrowedValue then
-                compileOtherSide(coder, i, var)
+            if child.condition then
+                coder:compile(child.condition)
             end
         end
-    end
-
-    local changedVars = {}
-    for _, var in pairs(coder.flow:currentStack().variables) do
-        if var.narrowedValue then
-            changedVars[var.name] = mergeChanges(var, childStacks)
+        if child.subtype == 'elseif' then
+            if child.condition then
+                coder:compile(child.condition)
+            end
         end
+        branch:addChild(child.condition, function ()
+            coder:withIndentation(function ()
+                parseBlock(coder, child)
+            end, child)
+        end)
     end
-    coder.flow:popStack()
 end)
 
 ls.vm.registerCoderProvider('for', function (coder, source)

@@ -46,6 +46,23 @@ end
 
 do
     TEST_INDEX [[
+        A[func()].C = 1
+    ]]
+
+    local g = rt.type '_G'
+    assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
+    assert(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable() == 'A[unknown].C')
+    assert(rt:globalGet('A', rt.UNKNOWN, 'C').value:view() == '1')
+end
+
+do
+    TEST_INDEX [[
+        root = mainPath:parent_path():string()
+    ]]
+end
+
+do
+    TEST_INDEX [[
         ---@class _G
         ---@field A 1
     ]]

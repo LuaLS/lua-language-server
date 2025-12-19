@@ -1,8 +1,10 @@
 local fs      = require 'bee.filesystem'
 local time    = require 'bee.time'
 local channel = require 'bee.channel'
+local thread  = require 'bee.thread'
 
 ls.threadName = 'master'
+thread.setname('master')
 
 --语言服务器自身的状态
 require 'runtime'

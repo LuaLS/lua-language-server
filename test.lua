@@ -71,6 +71,8 @@ ls.await.call(function ()
     else
         print('测试失败：\n' .. err)
     end
+    thread.sleep(1000)
+    os.exit(true)
 end)
 
 ls.eventLoop.start(function ()

@@ -1,11 +1,13 @@
 local channel = require 'bee.channel'
 local time    = require 'bee.time'
+local thread  = require 'bee.thread'
 
 return function (options)
 
     require 'luals'
 
     ls.threadName = options.name
+    thread.setname(options.name)
 
     local logChannel = channel.query('log')
     assert(logChannel, 'log channel not found')

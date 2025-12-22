@@ -6,66 +6,103 @@ arg                 =
 assert              =
 'Raises an error if the value of its argument v is false (i.e., `nil` or `false`); otherwise, returns all its arguments. In case of error, `message` is the error object; when absent, it defaults to `"assertion failed!"`'
 
-cgopt.collect       =
-'Performs a full garbage-collection cycle.'
-cgopt.stop          =
-'Stops automatic execution.'
-cgopt.restart       =
-'Restarts automatic execution.'
-cgopt.count         =
-'Returns the total memory in Kbytes.'
-cgopt.step          =
+collectgarbage51    =
 [[
-Performs a garbage-collection step. This option may be followed by an integer `size`.
-If `size` is a positive n, the collector acts as if n new bytes have been allocated; if `size` is zero, the collector performs a basic step.
-In incremental mode, a basic step corresponds to the current step size; in generational mode, a basic step performs a full minor collection,
-or an incremental step if the collector has scheduled one.
-In incremental mode, the function returns `true` if the step finished a collection cycle; in generational mode, it returns `true` if the step finished a major collection.
-]]
-cgopt.setpause      =
-'Set `pause`.'
-cgopt.setstepmul    =
-'Set `step multiplier`.'
-cgopt.incremental   =
-'Changes the collector mode to incremental and returns the previous mode (either `"generational"` or `"incremental"`).'
-cgopt.generational  =
-'Changes the collector mode to generational and returns the previous mode (either `"generational"` or `"incremental"`).'
-cgopt.param         =
-[[
-Changes and/or retrieves the values of a collector parameter. This option must be followed by one or two extra arguments:
-the parameter name (a string) and an optional new value (an integer in the range [0,100000]).
-The call always returns the previous value of the parameter; if no new value is given, the value is left unchanged.
-Lua stores these values in a compressed format, so the value returned as the previous value may not be exactly the last value set.
+This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
+
+* `"collect"`: performs a full garbage-collection cycle. This is the default option.
+* `"stop"`: stops the garbage collector.
+* `"restart"`: restarts the garbage collector.
+* `"count"`: returns the total memory in use by Lua (in Kbytes).
+* `"step"`: performs a garbage-collection step. The step "size" is controlled by arg (larger values mean more steps) in a non-specified way. If you want to control the step size you must experimentally tune the value of arg. Returns true if the step finished a collection cycle.
+* `"setpause"`: sets arg as the new value for the pause of the collector (see §2.10). Returns the previous value for pause.
+* `"setstepmul"`: sets arg as the new value for the step multiplier of the collector (see §2.10). Returns the previous value for step.
 ]]
 
-gcparam.minormul    =
-'The minor multiplier.'
-gcparam.majorminor  =
-'The major-minor multiplier.'
-gcparam.minormajor  =
-'The minor-major multiplier.'
-gcparam.pause       =
-'The garbage-collector pause.'
-gcparam.stepmul     =
-'The step multiplier.'
-gcparam.stepsize    =
-'The step size.'
-
-cgopt.isrunning     =
-'Returns whether the collector is running.'
-
-collectgarbage      =
+collectgarbage52    =
 [[
-Generic interface to the garbage collector. According to the first argument `opt`, it performs:
-• `"collect"`: Performs a full garbage-collection cycle (default option).
-• `"stop"`: Stops automatic execution of the collector; it runs only when explicitly invoked, until `"restart"`.
-• `"restart"`: Restarts automatic execution of the collector.
-• `"count"`: Returns the total memory in use by Lua in Kbytes (fractional; multiply by 1024 for bytes).
-• `"step"`: Performs a garbage-collection step; optional integer `size` controls behavior and return value (see `cgopt.step`).
-• `"isrunning"`: Returns whether the collector is running (i.e., not stopped).
-• `"incremental"`: Changes the mode to incremental and returns the previous mode.
-• `"generational"`: Changes the mode to generational and returns the previous mode.
-• `"param"`: Changes/reads collector parameters (see `gcparam.*`), always returns the previous value.
+This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
+
+* `"collect"`: performs a full garbage-collection cycle. This is the default option.
+* `"stop"`: stops automatic execution of the garbage collector. The collector will run only when explicitly invoked, until a call to restart it.
+* `"restart"`: restarts automatic execution of the garbage collector.
+* `"count"`: returns the total memory in use by Lua (in Kbytes) and a second value with the total memory in bytes modulo 1024. The first value has a fractional part, so the following equality is always true:
+    ```lua
+     k, b = collectgarbage("count")
+     assert(k*1024 == math.floor(k)*1024 + b)
+     ```
+    (The second result is useful when Lua is compiled with a non floating-point type for numbers.)
+* `"step"`: performs a garbage-collection step. The step "size" is controlled by arg (larger values mean more steps) in a non-specified way. If you want to control the step size you must experimentally tune the value of arg. Returns true if the step finished a collection cycle.
+* `"setpause"`: sets arg as the new value for the pause of the collector (see §2.5). Returns the previous value for pause.
+* `"setstepmul"`: sets arg as the new value for the step multiplier of the collector (see §2.5). Returns the previous value for step.
+* `"isrunning"`: returns a boolean that tells whether the collector is running (i.e., not stopped).
+* `"generational"`: changes the collector to generational mode. This is an experimental feature (see §2.5).
+* `"incremental"`: changes the collector to incremental mode. This is the default mode.
+]]
+
+collectgarbage53    =
+[[
+This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
+
+* `"collect"`: performs a full garbage-collection cycle. This is the default option.
+* `"stop"`: stops automatic execution of the garbage collector. The collector will run only when explicitly invoked, until a call to restart it.
+* `"restart"`: restarts automatic execution of the garbage collector.
+* `"count"`: returns the total memory in use by Lua in Kbytes. The value has a fractional part, so that it multiplied by 1024 gives the exact number of bytes in use by Lua (except for overflows).
+* `"step"`: performs a garbage-collection step. The step "size" is controlled by arg. With a zero value, the collector will perform one basic (indivisible) step. For non-zero values, the collector will perform as if that amount of memory (in KBytes) had been allocated by Lua. Returns true if the step finished a collection cycle.
+* `"setpause"`: sets arg as the new value for the pause of the collector (see §2.5). Returns the previous value for pause.
+* `"setstepmul"`: sets arg as the new value for the step multiplier of the collector (see §2.5). Returns the previous value for step.
+* "isrunning"`: returns a boolean that tells whether the collector is running (i.e., not stopped).
+]]
+
+collectgarbage54    =
+[[
+This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
+
+* `"collect"`: Performs a full garbage-collection cycle. This is the default option.
+* `"stop"`: Stops automatic execution of the garbage collector. The collector will run only when explicitly invoked, until a call to restart it.
+* `"restart"`: Restarts automatic execution of the garbage collector.
+* `"count"`: Returns the total memory in use by Lua in Kbytes. The value has a fractional part, so that it multiplied by 1024 gives the exact number of bytes in use by Lua.
+* `"step"`: Performs a garbage-collection step. The step "size" is controlled by arg. With a zero value, the collector will perform one basic (indivisible) step. For non-zero values, the collector will perform as if that amount of memory (in Kbytes) had been allocated by Lua. Returns true if the step finished a collection cycle.
+* `"isrunning"`: Returns a boolean that tells whether the collector is running (i.e., not stopped).
+* `"incremental"`: Change the collector mode to incremental. This option can be followed by three numbers: the garbage-collector pause, the step multiplier, and the step size (see §2.5.1). A zero means to not change that value.
+* `"generational"`: Change the collector mode to generational. This option can be followed by two numbers: the garbage-collector minor multiplier and the major multiplier (see §2.5.2). A zero means to not change that value.
+See §2.5 for more details about garbage collection and some of these options.
+
+This function should not be called by a finalizer.
+]]
+
+collectgarbage55    =
+[[
+This function is a generic interface to the garbage collector. It performs different functions according to its first argument, opt:
+
+* `"collect"`: Performs a full garbage-collection cycle. This is the default option.
+* `"stop"`: Stops automatic execution of the garbage collector. The collector will run only when explicitly invoked, until a call to restart it.
+* `"restart"`: Restarts automatic execution of the garbage collector.
+* `"count"`: Returns the total memory in use by Lua in Kbytes. The value has a fractional part, so that it multiplied by 1024 gives the exact number of bytes in use by Lua.
+* `"step"`: Performs a garbage-collection step. This option may be followed by an extra argument, an integer with the step size.
+
+    If the size is a positive n, the collector acts as if n new bytes have been allocated. If the size is zero, the collector performs a basic step. In incremental mode, a basic step corresponds to the current step size. In generational mode, a basic step performs a full minor collection or an incremental step, if the collector has scheduled one.
+
+    In incremental mode, the function returns true if the step finished a collection cycle. In generational mode, the function returns true if the step finished a major collection.
+
+* `"isrunning"`: Returns a boolean that tells whether the collector is running (i.e., not stopped).
+* `"incremental"`: Changes the collector mode to incremental and returns the previous mode.
+* `"generational"`: Changes the collector mode to generational and returns the previous mode.
+* `"param"`: Changes and/or retrieves the values of a parameter of the collector. This option must be followed by one or two extra arguments: The name of the parameter being changed or retrieved (a string) and an optional new value for that parameter, an integer in the range [0,100000]. The first argument must have one of the following values:
+    * `"minormul"`: The minor multiplier.
+    * `"majorminor"`: The major-minor multiplier.
+    * `"minormajor"`: The minor-major multiplier.
+    * `"pause"`: The garbage-collector pause.
+    * `"stepmul"`: The step multiplier.
+    * `"stepsize"`: The step size.
+
+    The call always returns the previous value of the parameter. If the call does not give a new value, the value is left unchanged.
+
+    Lua stores these values in a compressed format, so, the value returned as the previous value may not be exactly the last value set.
+
+See §2.5 for more details about garbage collection and some of these options.
+
+This function should not be called by a finalizer.
 ]]
 
 dofile              =

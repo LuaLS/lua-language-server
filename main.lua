@@ -1,4 +1,4 @@
-collectgarbage('generational', 10, 50)
+--collectgarbage('generational', 10, 50)
 
 ---@class never
 ---@field never never

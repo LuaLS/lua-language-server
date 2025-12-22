@@ -23,7 +23,8 @@ local function loadLocaleFile(filePath)
     end
     local current
     local inLongString
-    for line, lineCount in util.eachLine(fileContent) do
+    for currentLine, lineCount in util.eachLine(fileContent) do
+        local line = currentLine
         if inLongString then
             current.content[#current.content+1] = line
             if isLongStringFinish(line, inLongString) then

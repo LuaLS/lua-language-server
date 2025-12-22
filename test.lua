@@ -1,6 +1,7 @@
+print(_VERSION)
 local thread = require 'bee.thread'
 
-collectgarbage('generational', 10, 50)
+--collectgarbage('generational', 10, 50)
 
 package.path = package.path.. ';./?.lua;./?/init.lua'
 

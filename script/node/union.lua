@@ -259,7 +259,8 @@ function M:onView(viewer, options)
     end
     ---@type string[]
     local view = {}
-    for _, v in ipairs(values) do
+    for _, value in ipairs(values) do
+        local v = value
         if v.kind == 'variable' then
             v = v.value
         end

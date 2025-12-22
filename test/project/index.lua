@@ -5,12 +5,12 @@ do
 GlobalA = 1
 ]])
 
-    local global = scope.rt:globalGet('GlobalA')
-    assert(global.value:view() == 'unknown')
+    local globalA = scope.rt:globalGet('GlobalA')
+    assert(globalA.value:view() == 'unknown')
 
     local vfile = scope.vm:indexFile(test.fileUri)
-    assert(global.value:view() == '1')
+    assert(globalA.value:view() == '1')
 
     vfile:remove()
-    assert(global.value:view() == 'unknown')
+    assert(globalA.value:view() == 'unknown')
 end

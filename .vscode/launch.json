@@ -12,7 +12,7 @@
 			"windows": {
 				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
 			},
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "openOnSessionStart",

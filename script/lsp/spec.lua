@@ -2805,7 +2805,7 @@ M.UniquenessLevel = {
     --- The moniker is unique inside the moniker scheme.
     scheme = 'scheme',
     --- The moniker is globally unique.
-    global = 'global',
+    ['global'] = 'global',
 }
 
 

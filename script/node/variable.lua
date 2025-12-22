@@ -360,12 +360,12 @@ function M:getChild(key1, key2, ...)
     local current = self
     if path then
         for _, k in ipairs(path) do
-            k = rt.luaKey(k)
-            local child = current.childs and current.childs[k]
+            local nk = rt.luaKey(k)
+            local child = current.childs and current.childs[nk]
             if not child then
-                child = rt.variable(k, current)
+                child = rt.variable(nk, current)
                 current.childs = current.childs or ls.util.weakVTable()
-                current.childs[k] = child
+                current.childs[nk] = child
             end
             current = child
         end
@@ -396,11 +396,11 @@ function M:addField(field, path)
 
     if path then
         for _, k in ipairs(path) do
-            k = rt.luaKey(k)
-            if not current.childs[k] then
-                current.childs[k] = rt.variable(k, current)
+            local nk = rt.luaKey(k)
+            if not current.childs[nk] then
+                current.childs[nk] = rt.variable(nk, current)
             end
-            current = current.childs[k]
+            current = current.childs[nk]
             if not current.childs then
                 current.childs = ls.util.weakVTable()
             end
@@ -497,9 +497,9 @@ function M:removeField(field, path)
     local rt = self.scope.rt
     if path then
         for _, k in ipairs(path) do
-            k = rt.luaKey(k)
+            local nk = rt.luaKey(k)
             ---@type Node.Variable
-            current = current.childs[k]
+            current = current.childs[nk]
             if not current or not current.childs then
                 return self
             end

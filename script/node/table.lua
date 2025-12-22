@@ -16,7 +16,8 @@ function M:__init(scope, fields)
     self.scope = scope
     if fields and next(fields) then
         self.fields = ls.tools.linkedTable.create()
-        for k, v in pairs(fields) do
+        for k, value in pairs(fields) do
+            local v = value
             if type(v) ~= 'table' then
                 v = scope.rt.value(v)
             end
@@ -90,8 +91,8 @@ M.__getter.fieldMap = function (self)
         if key.kind == 'union' then
             ---@cast key Node.Union
             for _, k in ipairs(key.values) do
-                k = rt.nodeKey(k)
-                fieldMap[k] = field
+                local nk = rt.nodeKey(k)
+                fieldMap[nk] = field
             end
         else
             key = rt.nodeKey(key)

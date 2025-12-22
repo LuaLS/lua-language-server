@@ -2,6 +2,7 @@ local lm = require 'luamake'
 
 lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
 lm.cxx = 'c++17'
+lm.lua = "55"
 
 if lm.sanitize then
     lm.mode = "debug"
@@ -23,7 +24,7 @@ lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
-    includes = "bee.lua/3rd/lua54",
+    includes = "bee.lua/3rd/lua55",
     sources = "lpeglabel/*.c",
     defines = {
         'MAXRECLEVEL=1000',
@@ -41,7 +42,7 @@ lm:executable "lua-language-server" {
     },
     includes = {
         "3rd/bee.lua",
-        "3rd/bee.lua/3rd/lua54",
+        "3rd/bee.lua/3rd/lua55",
     },
     sources = "make/modules.cpp",
     windows = {

@@ -299,10 +299,11 @@ function M:checkPatternByRange(path, pat)
         end
     end
     for _, single in ipairs(pat.singles) do
+        local v = single
         if ignoreCase then
-            single = single:lower()
+            v = v:lower()
         end
-        if char == single then
+        if char == v then
             return true, path:sub(2)
         end
     end

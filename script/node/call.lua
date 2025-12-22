@@ -151,7 +151,7 @@ M.__getter.variableTable = function (self)
     local variableTables = {}
     for _, class in ipairs(self.protoClasses) do
         if class.variables then
-            for variable in class.variables:pairsFast() do
+            for _, variable in ipairs(class.variables) do
                 variable:addRef(self)
                 if variable.fields then
                     variableTables[#variableTables+1] = variable.fields

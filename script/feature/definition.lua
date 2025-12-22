@@ -211,8 +211,7 @@ end)
 ---@param source? LuaParser.Node.Base
 local function findDefinitionOfType(node, push, source)
     if node.classes then
-        for class in node.classes:pairsFast() do
-            ---@cast class Node.Class
+        for _, class in ipairs(node.classes) do
             local location = class.location
             if location then
                 push(ls.feature.helper.convertLocation(location, source))
@@ -220,8 +219,7 @@ local function findDefinitionOfType(node, push, source)
         end
     end
     if node.aliases then
-        for alias in node.aliases:pairsFast() do
-            ---@cast alias Node.Alias
+        for _, alias in ipairs(node.aliases) do
             local location = alias.location
             if location then
                 push(ls.feature.helper.convertLocation(location, source))

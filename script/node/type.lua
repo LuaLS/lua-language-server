@@ -55,16 +55,16 @@ function M:isTableLike()
     return self.value:isTableLike()
 end
 
----@type LinkedTable?
+---@type Node.Class[]?
 M.classes = nil
 
 ---@param class Node.Class
 ---@return Node.Type
 function M:addClass(class)
     if not self.classes then
-        self.classes = ls.tools.linkedTable.create()
+        self.classes = {}
     end
-    self.classes:pushTail(class)
+    table.insert(self.classes, class)
 
     self:flushCache()
     class:addRef(self)
@@ -77,24 +77,24 @@ function M:removeClass(class)
     if not self.classes then
         return
     end
-    self.classes:pop(class)
-    if self.classes:getSize() == 0 then
+    ls.util.arrayRemove(self.classes, class, true)
+    if #self.classes == 0 then
         self.classes = nil
     end
 
     self:flushCache()
 end
 
----@type LinkedTable?
+---@type Node.Alias[]?
 M.aliases = nil
 
 ---@param alias Node.Alias
 ---@return Node.Type
 function M:addAlias(alias)
     if not self.aliases then
-        self.aliases = ls.tools.linkedTable.create()
+        self.aliases = {}
     end
-    self.aliases:pushTail(alias)
+    table.insert(self.aliases, alias)
 
     self:flushCache()
     alias:addRef(self)
@@ -108,8 +108,8 @@ function M:removeAlias(alias)
     if not self.aliases then
         return self
     end
-    self.aliases:pop(alias)
-    if self.aliases:getSize() == 0 then
+    ls.util.arrayRemove(self.aliases, alias, true)
+    if #self.aliases == 0 then
         self.aliases = nil
     end
 
@@ -131,7 +131,7 @@ function M:getProtos(protos, args)
 
     local nargs = args and #args or 0
     ---@param proto Node.Class | Node.Alias
-    for proto in protos:pairsFast() do
+    for _, proto in ipairs(protos) do
         proto:addRef(self)
         local nparams = proto.params and #proto.params or 0
         if nparams ~= nargs then
@@ -290,7 +290,7 @@ M.__getter.variableTable = function (self)
     local variableTables = {}
     for _, class in ipairs(self.protoClasses) do
         if class.variables then
-            for variable in class.variables:pairsFast() do
+            for _, variable in ipairs(class.variables) do
                 variable:addRef(self)
                 if variable.fields then
                     variableTables[#variableTables+1] = variable.fields

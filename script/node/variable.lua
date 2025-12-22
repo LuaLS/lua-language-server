@@ -45,7 +45,7 @@ function M:getLocation()
     return self.location
 end
 
----@type LinkedTable
+---@type Node[]?
 M.types = nil
 
 ---@param node Node
@@ -56,9 +56,9 @@ function M:addType(node)
         return self
     end
     if not self.types then
-        self.types = ls.tools.linkedTable.create()
+        self.types = {}
     end
-    self.types:pushTail(node)
+    table.insert(self.types, node)
     self:flushCache()
 
     return self
@@ -74,8 +74,8 @@ function M:removeType(node)
     if not self.types then
         return self
     end
-    self.types:pop(node)
-    if self.types:getSize() == 0 then
+    ls.util.arrayRemove(self.types, node, true)
+    if #self.types == 0 then
         self.types = nil
     end
     self:flushCache()
@@ -84,7 +84,7 @@ function M:removeType(node)
 end
 
 ---@package
----@type LinkedTable
+---@type Node.Field[]?
 M.assigns = nil
 
 ---@param field Node.Field
@@ -95,9 +95,9 @@ function M:addAssign(field)
         return self
     end
     if not self.assigns then
-        self.assigns = ls.tools.linkedTable.create()
+        self.assigns = {}
     end
-    self.assigns:pushTail(field)
+    table.insert(self.assigns, field)
     self.scope.rt.REF_POOL[self] = true
 
     self:flushCache()
@@ -115,9 +115,9 @@ function M:removeAssign(field)
     if not self.assigns then
         return self
     end
-    self.assigns:pop(field)
+    ls.util.arrayRemove(self.assigns, field, true)
 
-    if self.assigns:getSize() == 0 then
+    if #self.assigns == 0 then
         self.assigns = nil
 
         self.scope.rt.REF_POOL[self] = nil
@@ -152,10 +152,14 @@ function M:eachAssign()
     if not self.assigns then
         return function () end
     end
-    return self.assigns:pairsFast()
+    local i = 0
+    return function ()
+        i = i + 1
+        return self.assigns[i]
+    end
 end
 
----@type LinkedTable
+---@type Node.Class[]?
 M.classes = nil
 
 ---@param node Node.Class
@@ -166,9 +170,9 @@ function M:addClass(node)
         return self
     end
     if not self.classes then
-        self.classes = ls.tools.linkedTable.create()
+        self.classes = {}
     end
-    self.classes:pushTail(node)
+    table.insert(self.classes, node)
     self:flushCache()
 
     return self
@@ -184,8 +188,8 @@ function M:removeClass(node)
     if not self.classes then
         return self
     end
-    self.classes:pop(node)
-    if self.classes:getSize() == 0 then
+    ls.util.arrayRemove(self.classes, node, true)
+    if #self.classes == 0 then
         self.classes = nil
     end
     self:flushCache()
@@ -223,7 +227,7 @@ M.__getter.classValue = function (self)
         return false, true
     end
     local rt = self.scope.rt
-    local union = rt.union(ls.util.map(self.classes:toArray(), function (v)
+    local union = rt.union(ls.util.map(self.classes, function (v)
         ---@cast v Node.Class
         return v.masterType
     end))
@@ -245,7 +249,7 @@ M.__getter.typeValue = function (self)
         return false, true
     end
     local rt = self.scope.rt
-    local union = rt.union(self.types:toArray())
+    local union = rt.union(self.types)
     union:addRef(self)
     return union, true
 end
@@ -290,7 +294,7 @@ M.__getter.parentFieldValue = function (self)
     parent:addRef(self)
     if parent.assigns then
         local result
-        for assign in parent.assigns:pairsFast() do
+        for assign in parent:eachAssign() do
             ---@cast assign Node.Field
             if assign.value then
                 local r, e = assign.value:get(self.key)
@@ -319,7 +323,7 @@ M.__getter.fields = function (self)
     end
     local childs = {}
     if self.assigns then
-        for assign in self.assigns:pairsFast() do
+        for assign in self:eachAssign() do
             ---@cast assign Node.Field
             if assign.value and assign.value.kind == 'table' then
                 childs[#childs+1] = assign.value
@@ -447,7 +451,7 @@ function M:getExpect(key)
     end
     local rt = self.scope.rt
     if self.classes then
-        local expectValue = rt.union(ls.util.map(self.classes:toArray(), function (v)
+        local expectValue = rt.union(ls.util.map(self.classes, function (v)
             ---@cast v Node.Class
             return v.masterType.expectValue
         end))
@@ -609,7 +613,7 @@ M.__getter.allEquivalents = function (self)
         if not var.assigns then
             return
         end
-        for assign in var.assigns:pairsFast() do
+        for assign in var:eachAssign() do
             ---@cast assign Node.Field
             local value = assign.value
             if not value then
@@ -656,7 +660,7 @@ M.__getter.allEquivalents = function (self)
                     equivalent:addRef(self)
                 end
                 if equivalent.assigns then
-                    for assign in equivalent.assigns:pairsFast() do
+                    for assign in equivalent:eachAssign() do
                         ---@cast assign Node.Field
                         local value = assign.value
                         if value then
@@ -709,7 +713,7 @@ M.__getter.equivalentValue = function (self)
             end
             if equivalent.assigns then
                 equivalent:addRef(self)
-                for assign in equivalent.assigns:pairsFast() do
+                for assign in equivalent:eachAssign() do
                     ---@cast assign Node.Field
                     if assign.value then
                         results[#results+1] = assign.value
@@ -796,7 +800,7 @@ function M:getEquivalentLocations(onlySameVariable, onlySameKey)
             end
             locations[#locations+1] = equivalent:getLocation()
             if equivalent.assigns then
-                for assign in equivalent.assigns:pairsFast() do
+                for assign in equivalent:eachAssign() do
                     ---@cast assign Node.Field
                     locations[#locations+1] = assign.location
                 end

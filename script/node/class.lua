@@ -99,10 +99,10 @@ end
 ---@return Node.Class
 function M:addVariable(variable)
     if not self.variables then
-        self.variables = ls.tools.linkedTable.create()
+        self.variables = {}
     end
 
-    self.variables:pushTail(variable)
+    table.insert(self.variables, variable)
 
     self:flushCache()
 
@@ -110,7 +110,7 @@ function M:addVariable(variable)
 end
 
 --- 所有绑定的变量
----@type LinkedTable?
+---@type Node.Variable[]?
 M.variables = nil
 
 ---@param variable Node.Variable
@@ -119,8 +119,8 @@ function M:removeVariable(variable)
     if not self.variables then
         return self
     end
-    self.variables:pop(variable)
-    if self.variables:getSize() == 0 then
+    ls.util.arrayRemove(self.variables, variable, true)
+    if #self.variables == 0 then
         self.variables = nil
     end
 

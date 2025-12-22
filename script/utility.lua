@@ -971,10 +971,19 @@ function m.arrayInsert(array, value)
     end
 end
 
-function m.arrayRemove(array, value)
+---@generic T
+---@param array T[]
+---@param value T
+---@param noOrder? boolean
+function m.arrayRemove(array, value, noOrder)
     for i = 1, #array do
         if array[i] == value then
-            tableRemove(array, i)
+            if noOrder then
+                array[i] = array[#array]
+                array[#array] = nil
+            else
+                tableRemove(array, i)
+            end
             return
         end
     end

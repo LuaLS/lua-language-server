@@ -104,27 +104,37 @@ do
     collectgarbage()
     print('去除语法树后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
-    local c1 = os.clock()
     local count = 0
-    for _, uri in ipairs(result.uris) do
-        local doc = scope:getDocument(uri)
-        local vfile = scope.vm:getFile(uri)
-        ---@cast doc -?
-        ---@cast vfile -?
-        for _, nodes in pairs(doc.ast.nodesMap) do
-            for _, src in ipairs(nodes) do
-                vfile:getNode(src)
-                count = count + 1
+    ls.util.withDuration(function ()
+        for _, uri in ipairs(result.uris) do
+            local doc = scope:getDocument(uri)
+            local vfile = scope.vm:getFile(uri)
+            ---@cast doc -?
+            ---@cast vfile -?
+            for _, nodes in pairs(doc.ast.nodesMap) do
+                for _, src in ipairs(nodes) do
+                    vfile:getNode(src)
+                    count = count + 1
+                end
             end
         end
-    end
-    local c2 = os.clock()
-
-    local duration = c2 - c1
-    print('解析 {} 个token耗时: {%.2f} 秒' % { count, duration })
+    end, function (duration)
+        print('解析 {} 个token耗时: {%.2f} 秒' % { count, duration })
+    end)
 
     collectgarbage()
     print('全量解析后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
+
+    ls.util.withDuration(function ()
+        for _, uri in ipairs(result.uris) do
+            local vfile = scope.vm:getFile(uri)
+            if vfile then
+                vfile:remove()
+            end
+        end
+    end, function (duration)
+        print('释放所有文件耗时: {%.2f} 秒' % { duration })
+    end)
 
     testSyncTime(result.uris)
     testAsyncTime(result.uris)

@@ -36,8 +36,8 @@ DIAG_OVER_MAX_ARGS      =
 'Esta función espera un máximo de {:d} argumento(s), pero está recibiendo {:d}.'
 DIAG_MISS_ARGS          =
 'Esta función requiere {:d} argumento(s), pero está recibiendo {:d}.'
-DIAG_UNNECESSARY_ASSERT = -- TODO: need translate!
-'Unnecessary assert: this expression is always truthy.'
+DIAG_UNNECESSARY_ASSERT =
+'Aserción innecesaria: esta expresión siempre es verdadera.'
 DIAG_OVER_MAX_VALUES    =
 'Solo tiene {} variables, pero se están asignando {} valores.'
 DIAG_AMBIGUITY_1        =
@@ -45,11 +45,11 @@ DIAG_AMBIGUITY_1        =
 DIAG_LOWERCASE_GLOBAL   =
 'Variable global con inicial minúscula, ¿olvidó agregar `local` o está mal escrita?'
 
-ASSIGN_CONST_GLOBAL     = -- TODO: need translate!
-'Cannot assign to <const> global variable `{}`.'
+ASSIGN_CONST_GLOBAL     =
+'No se puede asignar a la variable global <const> `{}`.'
 
-VARIABLE_NOT_DECLARED = -- TODO: need translate!
-'Variable `{}` not declared (global declarations active).'
+VARIABLE_NOT_DECLARED =
+'Variable `{}` no declarada (declaraciones globales activas).'
 
 DIAG_EMPTY_BLOCK        =
 'Bloque vacío.'
@@ -384,7 +384,7 @@ HOVER_DOCUMENT_LUA53   =
 'http://www.lua.org/manual/5.3/manual.html#{}'
 HOVER_DOCUMENT_LUA54   =
 'http://www.lua.org/manual/5.4/manual.html#{}'
-HOVER_DOCUMENT_LUA55    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA55    =
 'https://www.lua.org/work/doc/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT  =
 'http://www.lua.org/manual/5.1/manual.html#{}'
@@ -396,7 +396,7 @@ HOVER_NATIVE_DOCUMENT_LUA53    =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54    =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA55     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA55     =
 'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT   =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
@@ -675,10 +675,10 @@ CLI_CHECK_PROGRESS=
 'Se encontraron {} problema(s) en {} archivo(s)'
 CLI_CHECK_RESULTS=
 'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
-CLI_CHECK_RESULTS_OUTPATH = -- TODO: need translate!
-'Diagnosis complete, {} problems found, see {}'
-CLI_CHECK_RESULTS_PRETTY = -- TODO: need translate!
-'Diagnosis complete, {} problems found'
+CLI_CHECK_RESULTS_OUTPATH =
+'Diagnóstico completado, se encontraron {} problema(s), vea {}'
+CLI_CHECK_RESULTS_PRETTY =
+'Diagnóstico completado, se encontraron {} problema(s)'
 CLI_CHECK_MULTIPLE_WORKERS=
 'Iniciando {} tarea(s) de trabajo, se ha deshabitado la salida de progreso. Esto podría tomar unos minutos.'
 CLI_DOC_INITING  =

@@ -6,8 +6,8 @@ config.addonManager.repositoryBranch =
 "指定插件管理器（Addon Manager）使用的git branch。"
 config.addonManager.repositoryPath =
 "指定插件管理器（Addon Manager）使用的git path。"
-config.addonRepositoryPath        = -- TODO: need translate!
-"Specifies the addon repository path (not related to the addon manager)."
+config.addonRepositoryPath        =
+"指定獨立的插件倉庫路徑（與插件管理器無關）。"
 config.runtime.version            =
 "Lua執行版本。"
 config.runtime.path               =
@@ -114,8 +114,8 @@ config.diagnostics.ignoredFiles.Opened   =
 "只有打開這些檔案時才會診斷。"
 config.diagnostics.ignoredFiles.Disable  =
 "不診斷這些檔案。"
-config.diagnostics.disableScheme  = -- TODO: need translate!
-'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
+config.diagnostics.disableScheme  =
+'對使用以下 scheme 的 Lua 檔案不進行診斷。'
 config.diagnostics.validScheme  =
 '對使用以下 scheme 的lua檔案啟用診斷。'
 config.diagnostics.unusedLocalExclude =
@@ -181,8 +181,8 @@ config.completion.showWord.Disable       =
 "不顯示上下文單詞。"
 config.completion.autoRequire            =
 "輸入內容看起來像檔名時，自動 `require` 此檔案。"
-config.completion.maxSuggestCount        = -- TODO: need translate!
-"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
+config.completion.maxSuggestCount        =
+"自動完成時最多分析的欄位數量。若物件欄位超過此上限，必須提供更精確的輸入才會顯示建議。"
 config.completion.showParams             =
 "在建議列表中顯示函式的參數資訊，函式擁有多個定義時會分開顯示。"
 config.completion.requireSeparator       =
@@ -284,10 +284,10 @@ config.format.defaultConfig              =
 ]]
 config.spell.dict                        =
 '拼寫檢查的自訂單詞。'
-config.nameStyle.config                  = -- TODO: need translate!
+config.nameStyle.config                  =
 [[
 設定檢查命名風格的組態。
-Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+閱讀 [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) 了解用法。
 ]]
 config.telemetry.enable                  =
 [[
@@ -325,22 +325,22 @@ config.type.checkTableShape              =
 [[
 對表的形狀進行嚴格檢查。
 ]]
-config.type.inferTableSize               = -- TODO: need translate!
-'Maximum number of table fields analyzed during type inference.'
+config.type.inferTableSize               =
+'在類型推斷時最多分析的表欄位數。'
 config.doc.privateName                   =
 '將特定名稱的欄位視為private，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 會是私有層級，只能在定義所在的類別內存取'
 config.doc.protectedName                 =
 '將特定名稱的欄位視為protected，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 會是保護層級，只能在定義所在的類別和其子類別內存取'
 config.doc.packageName                   =
 '將特定名稱的欄位視為package，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 只能在定義所在的檔案內存取'
-config.doc.regengine                     = -- TODO: need translate!
-'The regular expression engine used for matching documentation scope names.'
-config.doc.regengine.glob                = -- TODO: need translate!
-'The default lightweight pattern syntax.'
-config.doc.regengine.lua                 = -- TODO: need translate!
-'Full Lua-style regular expressions.'
-config.docScriptPath                     = -- TODO: need translate!
-'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine                     =
+'用於匹配文件作用域名稱的正則表達式引擎。'
+config.doc.regengine.glob                =
+'預設的輕量模式語法。'
+config.doc.regengine.lua                 =
+'完整的 Lua 風格正則表達式。'
+config.docScriptPath                     =
+'用於匹配文件作用域名稱的正則表達式引擎。'
 config.diagnostics['unused-local']          =
 '未使用的區域變數'
 config.diagnostics['unused-function']       =

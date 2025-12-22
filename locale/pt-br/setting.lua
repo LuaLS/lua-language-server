@@ -1,143 +1,143 @@
 ---@diagnostic disable: undefined-global
 
-config.addonManager.enable        = -- TODO: need translate!
-"Whether the addon manager is enabled or not."
-config.addonManager.repositoryBranch = -- TODO: need translate!
-"Specifies the git branch used by the addon manager."
-config.addonManager.repositoryPath = -- TODO: need translate!
-"Specifies the git path used by the addon manager."
-config.addonRepositoryPath        = -- TODO: need translate!
-"Specifies the addon repository path (not related to the addon manager)."
-config.runtime.version            = -- TODO: need translate!
-"Lua runtime version."
-config.runtime.path               = -- TODO: need translate!
+config.addonManager.enable        =
+"Habilita ou desabilita o gerenciador de add-ons."
+config.addonManager.repositoryBranch =
+"Define o branch Git usado pelo gerenciador de add-ons."
+config.addonManager.repositoryPath =
+"Define o caminho Git usado pelo gerenciador de add-ons."
+config.addonRepositoryPath        =
+"Define o caminho do repositório de add-ons (não relacionado ao gerenciador de add-ons)."
+config.runtime.version            =
+"Versão do runtime Lua."
+config.runtime.path               =
 [[
-When using `require`, how to find the file based on the input name.
-Setting this config to `?/init.lua` means that when you enter `require 'myfile'`, `${workspace}/myfile/init.lua` will be searched from the loaded files.
-if `runtime.pathStrict` is `false`, `${workspace}/**/myfile/init.lua` will also be searched.
-If you want to load files outside the workspace, you need to set `Lua.workspace.library` first.
+Ao usar `require`, define como encontrar o arquivo baseado no nome fornecido.
+Definir esta configuração como `?/init.lua` significa que ao executar `require 'myfile'`, será buscado `${workspace}/myfile/init.lua` nos arquivos carregados.
+Se `runtime.pathStrict` for `false`, `${workspace}/**/myfile/init.lua` também será buscado.
+Para carregar arquivos fora da workspace, primeiro configure `Lua.workspace.library`.
 ]]
-config.runtime.pathStrict         = -- TODO: need translate!
-'When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.'
-config.runtime.special            = -- TODO: need translate!
-[[The custom global variables are regarded as some special built-in variables, and the language server will provide special support
-The following example shows that 'include' is treated as' require '.
+config.runtime.pathStrict         =
+'Quando habilitado, `runtime.path` buscará apenas o primeiro nível de diretórios; veja a descrição de `runtime.path`.'
+config.runtime.special            =
+[[Variáveis globais personalizadas são tratadas como variáveis especiais internas, e o servidor fornecerá suporte especial.
+O exemplo a seguir mostra que 'include' é tratado como 'require'.
 ```json
 "Lua.runtime.special" : {
     "include" : "require"
 }
 ```
 ]]
-config.runtime.unicodeName        = -- TODO: need translate!
-"Allows Unicode characters in name."
-config.runtime.nonstandardSymbol  = -- TODO: need translate!
-"Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
-config.runtime.plugin             = -- TODO: need translate!
-"Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
-config.runtime.pluginArgs         = -- TODO: need translate!
-"Additional arguments for the plugin."
-config.runtime.fileEncoding       = -- TODO: need translate!
-"File encoding. The `ansi` option is only available under the `Windows` platform."
-config.runtime.builtin            = -- TODO: need translate!
+config.runtime.unicodeName        =
+"Permite caracteres Unicode em nomes."
+config.runtime.nonstandardSymbol  =
+"Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos."
+config.runtime.plugin             =
+"Caminho do plugin. Leia a [wiki](https://luals.github.io/wiki/plugins) para saber mais."
+config.runtime.pluginArgs         =
+"Argumentos adicionais para o plugin."
+config.runtime.fileEncoding       =
+"Codificação de arquivo. A opção `ansi` está disponível apenas na plataforma `Windows`."
+config.runtime.builtin            =
 [[
-Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
+Ajusta o estado de habilitação das bibliotecas internas. Você pode desabilitar (ou redefinir) bibliotecas inexistentes conforme o ambiente de execução real.
 
-* `default`: Indicates that the library will be enabled or disabled according to the runtime version
-* `enable`: always enable
-* `disable`: always disable
+* `default`: a biblioteca será habilitada ou desabilitada conforme a versão do runtime
+* `enable`: sempre habilitar
+* `disable`: sempre desabilitar
 ]]
-config.runtime.meta               = -- TODO: need translate!
-'Format of the directory name of the meta files.'
-config.diagnostics.enable         = -- TODO: need translate!
-"Enable diagnostics."
-config.diagnostics.disable        = -- TODO: need translate!
-"Disabled diagnostic (Use code in hover brackets)."
-config.diagnostics.globals        = -- TODO: need translate!
-"Defined global variables."
-config.diagnostics.globalsRegex   = -- TODO: need translate!
-"Find defined global variables using regex."
-config.diagnostics.severity       = -- TODO: need translate!
+config.runtime.meta               =
+'Formato do nome do diretório dos arquivos meta.'
+config.diagnostics.enable         =
+"Habilita diagnósticos."
+config.diagnostics.disable        =
+"Diagnósticos desabilitados (use o código nos colchetes do hover)."
+config.diagnostics.globals        =
+"Variáveis globais definidas."
+config.diagnostics.globalsRegex   =
+"Encontra variáveis globais definidas usando regex."
+config.diagnostics.severity       =
 [[
-Modify the diagnostic severity.
+Modifica a gravidade do diagnóstico.
 
-End with `!` means override the group setting `diagnostics.groupSeverity`.
+Terminar com `!` significa sobrescrever a configuração de grupo `diagnostics.groupSeverity`.
 ]]
-config.diagnostics.neededFileStatus = -- TODO: need translate!
+config.diagnostics.neededFileStatus =
 [[
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  diagnosticar apenas arquivos abertos
+* Any:     diagnosticar todos os arquivos
+* None:    desabilitar este diagnóstico
 
-End with `!` means override the group setting `diagnostics.groupFileStatus`.
+Terminar com `!` significa sobrescrever a configuração de grupo `diagnostics.groupFileStatus`.
 ]]
-config.diagnostics.groupSeverity  = -- TODO: need translate!
+config.diagnostics.groupSeverity  =
 [[
-Modify the diagnostic severity in a group.
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
-Other settings will override individual settings without end of `!`.
+Modifica a gravidade do diagnóstico em um grupo.
+`Fallback` significa que os diagnósticos deste grupo são controlados por `diagnostics.severity` separadamente.
+Outras configurações sobrescreverão configurações individuais sem terminar com `!`.
 ]]
-config.diagnostics.groupFileStatus = -- TODO: need translate!
+config.diagnostics.groupFileStatus =
 [[
-Modify the diagnostic needed file status in a group.
+Modifica o status de arquivo necessário para diagnóstico em um grupo.
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  diagnosticar apenas arquivos abertos
+* Any:     diagnosticar todos os arquivos
+* None:    desabilitar este diagnóstico
 
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
-Other settings will override individual settings without end of `!`.
+`Fallback` significa que os diagnósticos deste grupo são controlados por `diagnostics.neededFileStatus` separadamente.
+Outras configurações sobrescreverão configurações individuais sem terminar com `!`.
 ]]
-config.diagnostics.workspaceEvent = -- TODO: need translate!
-"Set the time to trigger workspace diagnostics."
-config.diagnostics.workspaceEvent.OnChange = -- TODO: need translate!
-"Trigger workspace diagnostics when the file is changed."
-config.diagnostics.workspaceEvent.OnSave = -- TODO: need translate!
-"Trigger workspace diagnostics when the file is saved."
-config.diagnostics.workspaceEvent.None = -- TODO: need translate!
-"Disable workspace diagnostics."
-config.diagnostics.workspaceDelay = -- TODO: need translate!
-"Latency (milliseconds) for workspace diagnostics."
-config.diagnostics.workspaceRate  = -- TODO: need translate!
-"Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
-config.diagnostics.libraryFiles   = -- TODO: need translate!
-"How to diagnose files loaded via `Lua.workspace.library`."
-config.diagnostics.libraryFiles.Enable   = -- TODO: need translate!
-"Always diagnose these files."
-config.diagnostics.libraryFiles.Opened   = -- TODO: need translate!
-"Only when these files are opened will it be diagnosed."
-config.diagnostics.libraryFiles.Disable  = -- TODO: need translate!
-"These files are not diagnosed."
-config.diagnostics.ignoredFiles   = -- TODO: need translate!
-"How to diagnose ignored files."
-config.diagnostics.ignoredFiles.Enable   = -- TODO: need translate!
-"Always diagnose these files."
-config.diagnostics.ignoredFiles.Opened   = -- TODO: need translate!
-"Only when these files are opened will it be diagnosed."
-config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
-"These files are not diagnosed."
-config.diagnostics.disableScheme  = -- TODO: need translate!
-'Do not diagnose Lua files that use the following scheme.'
-config.diagnostics.validScheme  = -- TODO: need translate!
-'Enable diagnostics for Lua files that use the following scheme.'
-config.diagnostics.unusedLocalExclude = -- TODO: need translate!
-'Do not diagnose `unused-local` when the variable name matches the following pattern.'
-config.diagnostics.validScheme  = -- TODO: need translate!
-'Enable diagnostics for Lua files that use the following scheme.'
-config.workspace.ignoreDir        = -- TODO: need translate!
-"Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
-config.workspace.ignoreSubmodules = -- TODO: need translate!
-"Ignore submodules."
-config.workspace.useGitIgnore     = -- TODO: need translate!
-"Ignore files list in `.gitignore` ."
-config.workspace.maxPreload       = -- TODO: need translate!
-"Max preloaded files."
-config.workspace.preloadFileSize  = -- TODO: need translate!
-"Skip files larger than this value (KB) when preloading."
-config.workspace.library          = -- TODO: need translate!
-"In addition to the current workspace, which directories will load files from. The files in these directories will be treated as externally provided code libraries, and some features (such as renaming fields) will not modify these files."
-config.workspace.checkThirdParty  = -- TODO: need translate!
+config.diagnostics.workspaceEvent =
+"Define quando acionar diagnósticos da workspace."
+config.diagnostics.workspaceEvent.OnChange =
+"Aciona diagnósticos da workspace quando o arquivo é modificado."
+config.diagnostics.workspaceEvent.OnSave =
+"Aciona diagnósticos da workspace quando o arquivo é salvo."
+config.diagnostics.workspaceEvent.None =
+"Desabilita diagnósticos da workspace."
+config.diagnostics.workspaceDelay =
+"Latência (milissegundos) para diagnósticos da workspace."
+config.diagnostics.workspaceRate  =
+"Taxa de execução dos diagnósticos da workspace (%). Diminuir este valor reduz o uso de CPU, mas também reduz a velocidade dos diagnósticos. O diagnóstico do arquivo que você está editando sempre é feito em velocidade total e não é afetado por esta configuração."
+config.diagnostics.libraryFiles   =
+"Como diagnosticar arquivos carregados via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   =
+"Sempre diagnosticar esses arquivos."
+config.diagnostics.libraryFiles.Opened   =
+"Diagnosticar esses arquivos apenas quando estiverem abertos."
+config.diagnostics.libraryFiles.Disable  =
+"Esses arquivos não são diagnosticados."
+config.diagnostics.ignoredFiles   =
+"Como diagnosticar arquivos ignorados."
+config.diagnostics.ignoredFiles.Enable   =
+"Sempre diagnosticar esses arquivos."
+config.diagnostics.ignoredFiles.Opened   =
+"Diagnosticar esses arquivos apenas quando estiverem abertos."
+config.diagnostics.ignoredFiles.Disable  =
+"Esses arquivos não são diagnosticados."
+config.diagnostics.disableScheme  =
+'Não diagnosticar arquivos Lua que usam os seguintes schemes.'
+config.diagnostics.validScheme  =
+'Habilita diagnósticos para arquivos Lua que usam os seguintes schemes.'
+config.diagnostics.unusedLocalExclude =
+'Não diagnosticar `unused-local` quando o nome da variável corresponder ao padrão a seguir.'
+config.diagnostics.validScheme  =
+'Habilita diagnósticos para arquivos Lua que usam os seguintes schemes.'
+config.workspace.ignoreDir        =
+"Arquivos e diretórios ignorados (usa sintaxe `.gitignore`)."-- .. example.ignoreDir,
+config.workspace.ignoreSubmodules =
+"Ignorar submódulos."
+config.workspace.useGitIgnore     =
+"Ignorar lista de arquivos em `.gitignore`."
+config.workspace.maxPreload       =
+"Número máximo de arquivos pré-carregados."
+config.workspace.preloadFileSize  =
+"Ignorar arquivos maiores que este valor (KB) ao pré-carregar."
+config.workspace.library          =
+"Além da workspace atual, de quais diretórios carregar arquivos. Os arquivos nesses diretórios serão tratados como bibliotecas de código externas, e alguns recursos (como renomear campos) não modificarão esses arquivos."
+config.workspace.checkThirdParty  =
 [[
-Automatic detection and adaptation of third-party libraries, currently supported libraries are:
+Detecção e adaptação automáticas de bibliotecas de terceiros; atualmente suportadas:
 
 * OpenResty
 * Cocos4.0
@@ -146,341 +146,340 @@ Automatic detection and adaptation of third-party libraries, currently supported
 * skynet
 * Jass
 ]]
-config.workspace.userThirdParty          = -- TODO: need translate!
-'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)'
-config.workspace.supportScheme           = -- TODO: need translate!
-'Provide language server for the Lua files of the following scheme.'
-config.completion.enable                 = -- TODO: need translate!
-'Enable completion.'
-config.completion.callSnippet            = -- TODO: need translate!
-'Shows function call snippets.'
-config.completion.callSnippet.Disable    = -- TODO: need translate!
-"Only shows `function name`."
-config.completion.callSnippet.Both       = -- TODO: need translate!
-"Shows `function name` and `call snippet`."
-config.completion.callSnippet.Replace    = -- TODO: need translate!
-"Only shows `call snippet.`"
-config.completion.keywordSnippet         = -- TODO: need translate!
-'Shows keyword syntax snippets.'
-config.completion.keywordSnippet.Disable = -- TODO: need translate!
-"Only shows `keyword`."
-config.completion.keywordSnippet.Both    = -- TODO: need translate!
-"Shows `keyword` and `syntax snippet`."
-config.completion.keywordSnippet.Replace = -- TODO: need translate!
-"Only shows `syntax snippet`."
-config.completion.displayContext         = -- TODO: need translate!
-"Previewing the relevant code snippet of the suggestion may help you understand the usage of the suggestion. The number set indicates the number of intercepted lines in the code fragment. If it is set to `0`, this feature can be disabled."
-config.completion.workspaceWord          = -- TODO: need translate!
-"Whether the displayed context word contains the content of other files in the workspace."
-config.completion.showWord               = -- TODO: need translate!
-"Show contextual words in suggestions."
-config.completion.showWord.Enable        = -- TODO: need translate!
-"Always show context words in suggestions."
-config.completion.showWord.Fallback      = -- TODO: need translate!
-"Contextual words are only displayed when suggestions based on semantics cannot be provided."
-config.completion.showWord.Disable       = -- TODO: need translate!
-"Do not display context words."
-config.completion.autoRequire            = -- TODO: need translate!
-"When the input looks like a file name, automatically `require` this file."
-config.completion.maxSuggestCount        = -- TODO: need translate!
-"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
-config.completion.showParams             = -- TODO: need translate!
-"Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
-config.completion.requireSeparator       = -- TODO: need translate!
-"The separator used when `require`."
-config.completion.postfix                = -- TODO: need translate!
-"The symbol used to trigger the postfix suggestion."
-config.color.mode                        = -- TODO: need translate!
-"Color mode."
-config.color.mode.Semantic               = -- TODO: need translate!
-"Semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect."
-config.color.mode.SemanticEnhanced       = -- TODO: need translate!
-"Enhanced semantic color. Like `Semantic`, but with additional analysis which might be more computationally expensive."
-config.color.mode.Grammar                = -- TODO: need translate!
-"Grammar color."
-config.semantic.enable                   = -- TODO: need translate!
-"Enable semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect."
-config.semantic.variable                 = -- TODO: need translate!
-"Semantic coloring of variables/fields/parameters."
-config.semantic.annotation               = -- TODO: need translate!
-"Semantic coloring of type annotations."
-config.semantic.keyword                  = -- TODO: need translate!
-"Semantic coloring of keywords/literals/operators. You only need to enable this feature if your editor cannot do syntax coloring."
-config.signatureHelp.enable              = -- TODO: need translate!
-"Enable signature help."
-config.hover.enable                      = -- TODO: need translate!
-"Enable hover."
-config.hover.viewString                  = -- TODO: need translate!
-"Hover to view the contents of a string (only if the literal contains an escape character)."
-config.hover.viewStringMax               = -- TODO: need translate!
-"The maximum length of a hover to view the contents of a string."
-config.hover.viewNumber                  = -- TODO: need translate!
-"Hover to view numeric content (only if literal is not decimal)."
-config.hover.fieldInfer                  = -- TODO: need translate!
-"When hovering to view a table, type infer will be performed for each field. When the accumulated time of type infer reaches the set value (MS), the type infer of subsequent fields will be skipped."
-config.hover.previewFields               = -- TODO: need translate!
-"When hovering to view a table, limits the maximum number of previews for fields."
-config.hover.enumsLimit                  = -- TODO: need translate!
-"When the value corresponds to multiple types, limit the number of types displaying."
-config.hover.expandAlias                 = -- TODO: need translate!
+config.workspace.userThirdParty          =
+'Adicione aqui caminhos de configuração de bibliotecas de terceiros privadas; consulte o [caminho de configuração](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd) embutido.'
+config.workspace.supportScheme           =
+'Fornece language server para arquivos Lua dos seguintes schemes.'
+config.completion.enable                 =
+'Habilita autocompletar.'
+config.completion.callSnippet            =
+'Mostra snippets de chamada de função.'
+config.completion.callSnippet.Disable    =
+"Mostra apenas o `nome da função`."
+config.completion.callSnippet.Both       =
+"Mostra o `nome da função` e o `trecho de chamada`."
+config.completion.callSnippet.Replace    =
+"Mostra apenas o `trecho de chamada`."
+config.completion.keywordSnippet         =
+'Mostra snippets de sintaxe de palavras-chave.'
+config.completion.keywordSnippet.Disable =
+"Mostra apenas a `palavra-chave`."
+config.completion.keywordSnippet.Both    =
+"Mostra a `palavra-chave` e o `trecho de sintaxe`."
+config.completion.keywordSnippet.Replace =
+"Mostra apenas o `trecho de sintaxe`."
+config.completion.displayContext         =
+"Pré-visualizar o trecho de código relevante da sugestão pode ajudar a entender seu uso. O número define quantas linhas são interceptadas no fragmento; definir como `0` desabilita este recurso."
+config.completion.workspaceWord          =
+"Define se as palavras de contexto exibidas incluem conteúdo de outros arquivos da workspace."
+config.completion.showWord               =
+"Mostrar palavras de contexto nas sugestões."
+config.completion.showWord.Enable        =
+"Sempre mostrar palavras de contexto nas sugestões."
+config.completion.showWord.Fallback      =
+"Mostrar palavras de contexto somente quando não houver sugestões baseadas em semântica."
+config.completion.showWord.Disable       =
+"Não mostrar palavras de contexto."
+config.completion.autoRequire            =
+"Quando a entrada se parece com um nome de arquivo, fazer `require` desse arquivo automaticamente."
+config.completion.maxSuggestCount        =
+"Número máximo de campos analisados para autocompletar. Se um objeto tiver mais campos que esse limite, serão necessárias entradas mais específicas para que as sugestões apareçam."
+config.completion.showParams             =
+"Mostrar parâmetros na lista de conclusão. Se a função tiver várias definições, elas serão exibidas separadamente."
+config.completion.requireSeparator       =
+"Separador usado em `require`."
+config.completion.postfix                =
+"Símbolo usado para acionar sugestões de pós-fixo."
+config.color.mode                        =
+"Modo de colorização."
+config.color.mode.Semantic               =
+"Colorização semântica. Pode ser necessário definir `editor.semanticHighlighting.enabled` como `true`."
+config.color.mode.SemanticEnhanced       =
+"Colorização semântica aprimorada; semelhante a `Semantic`, mas com análise extra (mais custosa computacionalmente)."
+config.color.mode.Grammar                =
+"Colorização sintática."
+config.semantic.enable                   =
+"Habilita colorização semântica. Pode ser necessário definir `editor.semanticHighlighting.enabled` como `true`."
+config.semantic.variable                 =
+"Colorização semântica de variáveis/campos/parâmetros."
+config.semantic.annotation               =
+"Colorização semântica de anotações de tipo."
+config.semantic.keyword                  =
+"Colorização semântica de palavras-chave/literais/operadores. Só habilite se seu editor não oferecer colorização sintática."
+config.signatureHelp.enable              =
+"Habilitar ajuda de assinatura."
+config.hover.enable                      =
+"Habilitar hover."
+config.hover.viewString                  =
+"No hover, mostrar o conteúdo da string (apenas se o literal tiver caracteres de escape)."
+config.hover.viewStringMax               =
+"Comprimento máximo da string exibida no hover."
+config.hover.viewNumber                  =
+"No hover, mostrar conteúdo numérico (apenas se o literal não for decimal)."
+config.hover.fieldInfer                  =
+"Ao inspecionar uma tabela no hover, inferir o tipo de cada campo; se o tempo acumulado atingir o limite (ms), os campos restantes serão ignorados."
+config.hover.previewFields               =
+"Ao inspecionar uma tabela, limita o número máximo de campos pré-visualizados."
+config.hover.enumsLimit                  =
+"Quando um valor corresponde a vários tipos, limita quantos tipos são exibidos."
+config.hover.expandAlias                 =
 [[
-Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+Definir se aliases devem ser expandidos. Por exemplo, `---@alias myType boolean|number` aparecerá como `boolean|number`; caso contrário aparecerá como `myType`.
 ]]
-config.develop.enable                    = -- TODO: need translate!
-'Developer mode. Do not enable, performance will be affected.'
-config.develop.debuggerPort              = -- TODO: need translate!
-'Listen port of debugger.'
-config.develop.debuggerWait              = -- TODO: need translate!
-'Suspend before debugger connects.'
-config.intelliSense.searchDepth          = -- TODO: need translate!
-'Set the search depth for IntelliSense. Increasing this value increases accuracy, but decreases performance. Different workspace have different tolerance for this setting. Please adjust it to the appropriate value.'
-config.intelliSense.fastGlobal           = -- TODO: need translate!
-'In the global variable completion, and view `_G` suspension prompt. This will slightly reduce the accuracy of type speculation, but it will have a significant performance improvement for projects that use a lot of global variables.'
-config.window.statusBar                  = -- TODO: need translate!
-'Show extension status in status bar.'
-config.window.progressBar                = -- TODO: need translate!
-'Show progress bar in status bar.'
-config.hint.enable                       = -- TODO: need translate!
-'Enable inlay hint.'
-config.hint.paramType                    = -- TODO: need translate!
-'Show type hints at the parameter of the function.'
-config.hint.setType                      = -- TODO: need translate!
-'Show hints of type at assignment operation.'
-config.hint.paramName                    = -- TODO: need translate!
-'Show hints of parameter name at the function call.'
-config.hint.paramName.All                = -- TODO: need translate!
-'All types of parameters are shown.'
-config.hint.paramName.Literal            = -- TODO: need translate!
-'Only literal type parameters are shown.'
-config.hint.paramName.Disable            = -- TODO: need translate!
-'Disable parameter hints.'
-config.hint.arrayIndex                   = -- TODO: need translate!
-'Show hints of array index when constructing a table.'
-config.hint.arrayIndex.Enable            = -- TODO: need translate!
-'Show hints in all tables.'
-config.hint.arrayIndex.Auto              = -- TODO: need translate!
-'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
-config.hint.arrayIndex.Disable           = -- TODO: need translate!
-'Disable hints of array index.'
-config.hint.await                        = -- TODO: need translate!
-'If the called function is marked `---@async`, prompt `await` at the call.'
-config.hint.awaitPropagate               = -- TODO: need translate!
-'Enable the propagation of `await`. When a function calls a function marked `---@async`,\z
-it will be automatically marked as `---@async`.'
-config.hint.semicolon                    = -- TODO: need translate!
-'If there is no semicolon at the end of the statement, display a virtual semicolon.'
-config.hint.semicolon.All                = -- TODO: need translate!
-'All statements display virtual semicolons.'
-config.hint.semicolon.SameLine            = -- TODO: need translate!
-'When two statements are on the same line, display a semicolon between them.'
-config.hint.semicolon.Disable            = -- TODO: need translate!
-'Disable virtual semicolons.'
-config.codeLens.enable                   = -- TODO: need translate!
-'Enable code lens.'
-config.format.enable                     = -- TODO: need translate!
-'Enable code formatter.'
-config.format.defaultConfig              = -- TODO: need translate!
+config.develop.enable                    =
+'Modo desenvolvedor. Não habilite; afeta o desempenho.'
+config.develop.debuggerPort              =
+'Porta de escuta do depurador.'
+config.develop.debuggerWait              =
+'Suspender antes de o depurador conectar.'
+config.intelliSense.searchDepth          =
+'Define a profundidade de busca do IntelliSense. Aumentar melhora a precisão, mas reduz o desempenho. Ajuste conforme a tolerância da sua workspace.'
+config.intelliSense.fastGlobal           =
+'Para completar globais e inspecionar `_G`, prioriza desempenho (ligeira perda de precisão de tipo); útil em projetos com muitas variáveis globais.'
+config.window.statusBar                  =
+'Mostrar status da extensão na barra de status.'
+config.window.progressBar                =
+'Mostrar barra de progresso na barra de status.'
+config.hint.enable                       =
+'Habilitar inlay hints.'
+config.hint.paramType                    =
+'Mostrar dicas de tipo nos parâmetros da função.'
+config.hint.setType                      =
+'Mostrar dicas de tipo em atribuições.'
+config.hint.paramName                    =
+'Mostrar dicas com o nome do parâmetro na chamada de função.'
+config.hint.paramName.All                =
+'Mostrar todos os tipos de parâmetros.'
+config.hint.paramName.Literal            =
+'Mostrar apenas parâmetros de tipo literal.'
+config.hint.paramName.Disable            =
+'Desativar dicas de nome de parâmetro.'
+config.hint.arrayIndex                   =
+'Mostrar dicas de índice de array ao construir uma tabela.'
+config.hint.arrayIndex.Enable            =
+'Mostrar dicas em todas as tabelas.'
+config.hint.arrayIndex.Auto              =
+'Mostrar dicas apenas quando a tabela tiver mais de 3 itens ou for uma tabela mista.'
+config.hint.arrayIndex.Disable           =
+'Desativar dicas de índice de array.'
+config.hint.await                        =
+'Se a função chamada estiver marcada com `---@async`, sugerir `await` na chamada.'
+config.hint.awaitPropagate               =
+'Habilita a propagação de `await`. Quando uma função chama outra marcada com `---@async`, ela será automaticamente marcada como `---@async`.'
+config.hint.semicolon                    =
+'Se não houver ponto e vírgula no fim da instrução, mostrar um ponto e vírgula virtual.'
+config.hint.semicolon.All                =
+'Todas as instruções exibem ponto e vírgula virtual.'
+config.hint.semicolon.SameLine            =
+'Quando duas instruções estiverem na mesma linha, mostrar um ponto e vírgula entre elas.'
+config.hint.semicolon.Disable            =
+'Desativar pontos e vírgulas virtuais.'
+config.codeLens.enable                   =
+'Habilitar code lens.'
+config.format.enable                     =
+'Habilitar formatador de código.'
+config.format.defaultConfig              =
 [[
-The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
-Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+Configuração de formatação padrão; tem prioridade menor que o arquivo `.editorconfig` da workspace.
+Consulte a [documentação do formatador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) para uso.
 ]]
-config.spell.dict                        = -- TODO: need translate!
-'Custom words for spell checking.'
-config.nameStyle.config                  = -- TODO: need translate!
+config.spell.dict                        =
+'Palavras personalizadas para verificação ortográfica.'
+config.nameStyle.config                  =
 [[
-Set name style config.
-Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+Configurações de estilo de nomes.
+Consulte a [documentação do formatador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) para uso.
 ]]
-config.telemetry.enable                  = -- TODO: need translate!
+config.telemetry.enable                  =
 [[
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://luals.github.io/privacy/#language-server).
+Habilita telemetria para enviar informações do editor e logs de erro pela rede. Leia nossa política de privacidade [aqui](https://luals.github.io/privacy/#language-server).
 ]]
-config.misc.parameters                   = -- TODO: need translate!
-'[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
-config.misc.executablePath               = -- TODO: need translate!
-'Specify the executable path in VSCode.'
-config.language.fixIndent                = -- TODO: need translate!
-'(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function."'
-config.language.completeAnnotation       = -- TODO: need translate!
-'(VSCode only) Automatically insert "---@ " after a line break following a annotation.'
-config.type.castNumberToInteger          = -- TODO: need translate!
-'Allowed to assign the `number` type to the `integer` type.'
-config.type.weakUnionCheck               = -- TODO: need translate!
+config.misc.parameters                   =
+'[Parâmetros de linha de comando](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) ao iniciar o serviço de linguagem no VSCode.'
+config.misc.executablePath               =
+'Especifica o caminho do executável no VSCode.'
+config.language.fixIndent                =
+'(Somente VSCode) Corrige indentação automática incorreta, como quebras de linha dentro de uma string contendo a palavra "function".'
+config.language.completeAnnotation       =
+'(Somente VSCode) Insere automaticamente "---@ " após uma quebra de linha seguinte a uma anotação.'
+config.type.castNumberToInteger          =
+'Permitir atribuir o tipo `number` ao tipo `integer`.'
+config.type.weakUnionCheck               =
 [[
-Once one subtype of a union type meets the condition, the union type also meets the condition.
+Quando um subtipo de uma união atende à condição, considera-se que a união inteira atende.
 
-When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+Quando esta opção for `false`, `number|boolean` não pode ser atribuído a `number`; com `true`, pode.
 ]]
-config.type.weakNilCheck                 = -- TODO: need translate!
+config.type.weakNilCheck                 =
 [[
-When checking the type of union type, ignore the `nil` in it.
+Ao verificar um tipo união, ignora o `nil` presente nele.
 
-When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+Quando esta opção for `false`, `number|nil` não pode ser atribuído a `number`; com `true`, pode.
 ]]
-config.type.inferParamType               = -- TODO: need translate!
+config.type.inferParamType               =
 [[
-When the parameter type is not annotated, the parameter type is inferred from the function's incoming parameters.
+Quando o parâmetro não tiver anotação, inferir o tipo a partir dos argumentos de chamada.
 
-When this setting is `false`, the type of the parameter is `any` when it is not annotated.
+Quando esta opção for `false`, o tipo do parâmetro será `any` se não houver anotação.
 ]]
-config.type.checkTableShape              = -- TODO: need translate!
+config.type.checkTableShape              =
 [[
-对表的形状进行严格检查。
+Verificação rigorosa do formato das tabelas.
 ]]
-config.type.inferTableSize               = -- TODO: need translate!
-'Maximum number of table fields analyzed during type inference.'
-config.doc.privateName                   = -- TODO: need translate!
-'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
-config.doc.protectedName                 = -- TODO: need translate!
-'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
-config.doc.packageName                   = -- TODO: need translate!
-'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
-config.doc.regengine                     = -- TODO: need translate!
-'The regular expression engine used for matching documentation scope names.'
-config.doc.regengine.glob                = -- TODO: need translate!
-'The default lightweight pattern syntax.'
-config.doc.regengine.lua                 = -- TODO: need translate!
-'Full Lua-style regular expressions.'
-config.docScriptPath                     = -- TODO: need translate!
-'The regular expression engine used for matching documentation scope names.'
-config.diagnostics['unused-local']          = -- TODO: need translate!
-'未使用的局部变量'
-config.diagnostics['unused-function']       = -- TODO: need translate!
-'未使用的函数'
-config.diagnostics['undefined-global']      = -- TODO: need translate!
-'未定义的全局变量'
-config.diagnostics['global-in-nil-env']     = -- TODO: need translate!
-'不能使用全局变量（ `_ENV` 被设置为了 `nil`）'
-config.diagnostics['unused-label']          = -- TODO: need translate!
-'未使用的标签'
-config.diagnostics['unused-vararg']         = -- TODO: need translate!
-'未使用的不定参数'
-config.diagnostics['trailing-space']        = -- TODO: need translate!
-'后置空格'
-config.diagnostics['redefined-local']       = -- TODO: need translate!
-'重复定义的局部变量'
-config.diagnostics['newline-call']          = -- TODO: need translate!
-'以 `(` 开始的新行，在语法上被解析为了上一行的函数调用'
-config.diagnostics['newfield-call']         = -- TODO: need translate!
-'在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作'
-config.diagnostics['redundant-parameter']   = -- TODO: need translate!
-'函数调用时，传入了多余的参数'
-config.diagnostics['ambiguity-1']           = -- TODO: need translate!
-'优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` '
-config.diagnostics['lowercase-global']      = -- TODO: need translate!
-'首字母小写的全局变量定义'
-config.diagnostics['undefined-env-child']   = -- TODO: need translate!
-'`_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中'
-config.diagnostics['duplicate-index']       = -- TODO: need translate!
-'在字面量表中重复定义了索引'
-config.diagnostics['empty-block']           = -- TODO: need translate!
-'空代码块'
-config.diagnostics['redundant-value']       = -- TODO: need translate!
-'赋值操作时，值的数量比被赋值的对象多'
-config.diagnostics['assign-type-mismatch']  = -- TODO: need translate!
-'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
-config.diagnostics['await-in-sync']         = -- TODO: need translate!
-'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
-config.diagnostics['cast-local-type']    = -- TODO: need translate!
-'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
-config.diagnostics['cast-type-mismatch']    = -- TODO: need translate!
-'Enable diagnostics for casts where the target type does not match the initial type.'
-config.diagnostics['circular-doc-class']    = -- TODO: need translate!
-'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
-config.diagnostics['close-non-object']      = -- TODO: need translate!
-'Enable diagnostics for attempts to close a variable with a non-object.'
-config.diagnostics['code-after-break']      = -- TODO: need translate!
-'Enable diagnostics for code placed after a break statement in a loop.'
-config.diagnostics['codestyle-check']       = -- TODO: need translate!
-'Enable diagnostics for incorrectly styled lines.'
-config.diagnostics['count-down-loop']       = -- TODO: need translate!
-'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
-config.diagnostics['deprecated']            = -- TODO: need translate!
-'Enable diagnostics to highlight deprecated API.'
-config.diagnostics['different-requires']    = -- TODO: need translate!
-'Enable diagnostics for files which are required by two different paths.'
-config.diagnostics['discard-returns']       = -- TODO: need translate!
-'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
-config.diagnostics['doc-field-no-class']    = -- TODO: need translate!
-'Enable diagnostics to highlight a field annotation without a defining class annotation.'
-config.diagnostics['duplicate-doc-alias']   = -- TODO: need translate!
-'Enable diagnostics for a duplicated alias annotation name.'
-config.diagnostics['duplicate-doc-field']   = -- TODO: need translate!
-'Enable diagnostics for a duplicated field annotation name.'
-config.diagnostics['duplicate-doc-param']   = -- TODO: need translate!
-'Enable diagnostics for a duplicated param annotation name.'
-config.diagnostics['duplicate-set-field']   = -- TODO: need translate!
-'Enable diagnostics for setting the same field in a class more than once.'
-config.diagnostics['incomplete-signature-doc'] = -- TODO: need translate!
-'Incomplete @param or @return annotations for functions.'
-config.diagnostics['invisible']             = -- TODO: need translate!
-'Enable diagnostics for accesses to fields which are invisible.'
-config.diagnostics['missing-global-doc']    = -- TODO: need translate!
-'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
-config.diagnostics['missing-local-export-doc'] = -- TODO: need translate!
-'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
-config.diagnostics['missing-parameter']     = -- TODO: need translate!
-'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
-config.diagnostics['missing-return']        = -- TODO: need translate!
-'Enable diagnostics for functions with return annotations which have no return statement.'
-config.diagnostics['missing-return-value']  = -- TODO: need translate!
-'Enable diagnostics for return statements without values although the containing function declares returns.'
-config.diagnostics['need-check-nil']        = -- TODO: need translate!
-'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
-config.diagnostics['unnecessary-assert']    = -- TODO: need translate!
-'Enable diagnostics for redundant assertions on truthy values.'
-config.diagnostics['no-unknown']            = -- TODO: need translate!
-'Enable diagnostics for cases in which the type cannot be inferred.'
-config.diagnostics['not-yieldable']         = -- TODO: need translate!
-'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
-config.diagnostics['param-type-mismatch']   = -- TODO: need translate!
-'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
-config.diagnostics['redundant-return']      = -- TODO: need translate!
-'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
-config.diagnostics['redundant-return-value']= -- TODO: need translate!
-'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
-config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
-'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
-config.diagnostics['spell-check']           = -- TODO: need translate!
-'Enable diagnostics for typos in strings.'
-config.diagnostics['name-style-check']      = -- TODO: need translate!
-'Enable diagnostics for name style.'
-config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
-'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
-config.diagnostics['undefined-doc-class']   = -- TODO: need translate!
-'Enable diagnostics for class annotations in which an undefined class is referenced.'
-config.diagnostics['undefined-doc-name']    = -- TODO: need translate!
-'Enable diagnostics for type annotations referencing an undefined type or alias.'
-config.diagnostics['undefined-doc-param']   = -- TODO: need translate!
-'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
-config.diagnostics['undefined-field']       = -- TODO: need translate!
-'Enable diagnostics for cases in which an undefined field of a variable is read.'
-config.diagnostics['unknown-cast-variable'] = -- TODO: need translate!
-'Enable diagnostics for casts of undefined variables.'
-config.diagnostics['unknown-diag-code']     = -- TODO: need translate!
-'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
-config.diagnostics['unknown-operator']      = -- TODO: need translate!
-'Enable diagnostics for unknown operators.'
-config.diagnostics['unreachable-code']      = -- TODO: need translate!
-'Enable diagnostics for unreachable code.'
-config.diagnostics['global-element']       = -- TODO: need translate!
-'Enable diagnostics to warn about global elements.'
-config.typeFormat.config                    = -- TODO: need translate!
-'Configures the formatting behavior while typing Lua code.'
-config.typeFormat.config.auto_complete_end  = -- TODO: need translate!
-'Controls if `end` is automatically completed at suitable positions.'
-config.typeFormat.config.auto_complete_table_sep = -- TODO: need translate!
-'Controls if a separator is automatically appended at the end of a table declaration.'
-config.typeFormat.config.format_line        = -- TODO: need translate!
-'Controls if a line is formatted at all.'
+config.type.inferTableSize               =
+'Número máximo de campos de tabela analisados durante a inferência de tipo.'
+config.doc.privateName                   =
+'Tratar nomes de campos específicos como privados; ex.: `m_*` significa que `XXX.m_id` e `XXX.m_type` são privados e só podem ser acessados na classe onde foram definidos.'
+config.doc.protectedName                 =
+'Tratar nomes de campos específicos como protegidos; ex.: `m_*` significa que `XXX.m_id` e `XXX.m_type` são protegidos e só podem ser acessados na classe onde foram definidos e em subclasses.'
+config.doc.packageName                   =
+'Tratar nomes de campos específicos como de pacote; ex.: `m_*` significa que `XXX.m_id` e `XXX.m_type` são de pacote e só podem ser acessados no arquivo onde foram definidos.'
+config.doc.regengine                     =
+'Mecanismo de expressão regular usado para corresponder nomes de escopo de documentação.'
+config.doc.regengine.glob                =
+'Sintaxe de padrão leve padrão.'
+config.doc.regengine.lua                 =
+'Expressões regulares completas no estilo Lua.'
+config.docScriptPath                     =
+'Mecanismo de expressão regular usado para corresponder nomes de escopo de documentação.'
+config.diagnostics['unused-local']          =
+'Variável local não utilizada'
+config.diagnostics['unused-function']       =
+'Função não utilizada'
+config.diagnostics['undefined-global']      =
+'Variável global não definida'
+config.diagnostics['global-in-nil-env']     =
+'Não é possível usar variáveis globais (`_ENV` foi definido como `nil`)'
+config.diagnostics['unused-label']          =
+'Rótulo não utilizado'
+config.diagnostics['unused-vararg']         =
+'Parâmetro vararg não utilizado'
+config.diagnostics['trailing-space']        =
+'Espaços à direita'
+config.diagnostics['redefined-local']       =
+'Variável local redefinida'
+config.diagnostics['newline-call']          =
+'Nova linha iniciando com `(` é analisada como chamada da linha anterior'
+config.diagnostics['newfield-call']         =
+'Em uma tabela literal, faltou um separador entre duas linhas; foi interpretado como uma operação de índice'
+config.diagnostics['redundant-parameter']   =
+'Chamada de função com parâmetros em excesso'
+config.diagnostics['ambiguity-1']           =
+'Ambiguidade de precedência, por exemplo `num or 0 + 1`; supõe-se que o esperado seja `(num or 0) + 1`'
+config.diagnostics['lowercase-global']      =
+'Definição de variável global com inicial minúscula'
+config.diagnostics['undefined-env-child']   =
+'`_ENV` foi definido como nova tabela literal, mas a variável global acessada não está nela'
+config.diagnostics['duplicate-index']       =
+'Índice duplicado em tabela literal'
+config.diagnostics['empty-block']           =
+'Bloco vazio'
+config.diagnostics['redundant-value']       =
+'Em uma atribuição, há mais valores que variáveis-alvo'
+config.diagnostics['assign-type-mismatch']  =
+'Habilita diagnóstico para atribuições em que o tipo do valor não corresponde ao tipo da variável alvo.'
+config.diagnostics['await-in-sync']         =
+'Habilita diagnóstico para chamadas de funções assíncronas dentro de uma função síncrona.'
+config.diagnostics['cast-local-type']    =
+'Habilita diagnóstico para coerções de variáveis locais em que o tipo alvo não corresponde ao tipo definido.'
+config.diagnostics['cast-type-mismatch']    =
+'Habilita diagnóstico para coerções em que o tipo alvo não corresponde ao tipo inicial.'
+config.diagnostics['circular-doc-class']    =
+'Habilita diagnóstico para classes que herdam entre si, formando relação circular.'
+config.diagnostics['close-non-object']      =
+'Habilita diagnóstico para tentativas de fechar uma variável que não é objeto.'
+config.diagnostics['code-after-break']      =
+'Habilita diagnóstico para código após um `break` em um loop.'
+config.diagnostics['codestyle-check']       =
+'Habilita diagnóstico para linhas que violam o estilo de código.'
+config.diagnostics['count-down-loop']       =
+'Habilita diagnóstico para laços `for` decrescentes que nunca atingem o limite porque são incrementados.'
+config.diagnostics['deprecated']            =
+'Habilita diagnóstico para APIs obsoletas.'
+config.diagnostics['different-requires']    =
+'Habilita diagnóstico para arquivos exigidos por dois caminhos diferentes.'
+config.diagnostics['discard-returns']       =
+'Habilita diagnóstico para chamadas de funções anotadas com `---@nodiscard` quando os retornos são ignorados.'
+config.diagnostics['doc-field-no-class']    =
+'Habilita diagnóstico para anotações de campo sem anotação de classe correspondente.'
+config.diagnostics['duplicate-doc-alias']   =
+'Habilita diagnóstico para nome de alias anotado duplicado.'
+config.diagnostics['duplicate-doc-field']   =
+'Habilita diagnóstico para nome de campo anotado duplicado.'
+config.diagnostics['duplicate-doc-param']   =
+'Habilita diagnóstico para nome de parâmetro anotado duplicado.'
+config.diagnostics['duplicate-set-field']   =
+'Habilita diagnóstico para definir o mesmo campo em uma classe mais de uma vez.'
+config.diagnostics['incomplete-signature-doc'] =
+'Anotações @param ou @return incompletas para funções.'
+config.diagnostics['invisible']             =
+'Habilita diagnóstico para acessos a campos invisíveis.'
+config.diagnostics['missing-global-doc']    =
+'Faltam anotações para globais! Funções globais devem ter comentário e anotações para todos os parâmetros e retornos.'
+config.diagnostics['missing-local-export-doc'] =
+'Faltam anotações para locais exportados! Funções locais exportadas devem ter comentário e anotações para todos os parâmetros e retornos.'
+config.diagnostics['missing-parameter']     =
+'Habilita diagnóstico para chamadas de função com menos argumentos que os parâmetros anotados.'
+config.diagnostics['missing-return']        =
+'Habilita diagnóstico para funções com anotação de retorno mas sem instrução return.'
+config.diagnostics['missing-return-value']  =
+'Habilita diagnóstico para retornos sem valores embora a função declare valores de retorno.'
+config.diagnostics['need-check-nil']        =
+'Habilita diagnóstico para uso de variável após ela receber `nil` ou valor opcional.'
+config.diagnostics['unnecessary-assert']    =
+'Habilita diagnóstico para asserts redundantes em valores verdadeiros.'
+config.diagnostics['no-unknown']            =
+'Habilita diagnóstico para casos em que o tipo não pode ser inferido.'
+config.diagnostics['not-yieldable']         =
+'Habilita diagnóstico para chamadas de `coroutine.yield()` quando não permitido.'
+config.diagnostics['param-type-mismatch']   =
+'Habilita diagnóstico para chamadas onde o tipo do parâmetro fornecido não corresponde à definição anotada.'
+config.diagnostics['redundant-return']      =
+'Habilita diagnóstico para retornos desnecessários porque a função já terminaria.'
+config.diagnostics['redundant-return-value']=
+'Habilita diagnóstico para retornos que entregam valor extra não especificado na anotação.'
+config.diagnostics['return-type-mismatch']  =
+'Habilita diagnóstico para retornos cujo tipo não corresponde ao tipo declarado.'
+config.diagnostics['spell-check']           =
+'Habilita diagnóstico para erros ortográficos em strings.'
+config.diagnostics['name-style-check']      =
+'Habilita diagnóstico para estilo de nomes.'
+config.diagnostics['unbalanced-assignments']=
+'Habilita diagnóstico em múltiplas atribuições se nem todas as variáveis recebem valor (ex.: `local x,y = 1`).'
+config.diagnostics['undefined-doc-class']   =
+'Habilita diagnóstico para anotações de classe que fazem referência a classe indefinida.'
+config.diagnostics['undefined-doc-name']    =
+'Habilita diagnóstico para anotações de tipo que referenciam tipo ou alias indefinido.'
+config.diagnostics['undefined-doc-param']   =
+'Habilita diagnóstico para anotações de parâmetro sem declaração correspondente na função.'
+config.diagnostics['undefined-field']       =
+'Habilita diagnóstico para leitura de campo indefinido de uma variável.'
+config.diagnostics['unknown-cast-variable'] =
+'Habilita diagnóstico para coerções de variáveis indefinidas.'
+config.diagnostics['unknown-diag-code']     =
+'Habilita diagnóstico quando um código de diagnóstico desconhecido é informado.'
+config.diagnostics['unknown-operator']      =
+'Habilita diagnóstico para operadores desconhecidos.'
+config.diagnostics['unreachable-code']      =
+'Habilita diagnóstico para código inalcançável.'
+config.diagnostics['global-element']       =
+'Habilita diagnóstico para avisar sobre elementos globais.'
+config.typeFormat.config                    =
+'Configura o comportamento de formatação enquanto digita código Lua.'
+config.typeFormat.config.auto_complete_end  =
+'Controla se `end` é completado automaticamente em posições adequadas.'
+config.typeFormat.config.auto_complete_table_sep =
+'Controla se um separador é adicionado automaticamente ao final de uma declaração de tabela.'
+config.typeFormat.config.format_line        =
+'Controla se uma linha deve ser formatada.'
 
-command.exportDocument = -- TODO: need translate!
-'Lua: Export Document ...'
-command.addon_manager.open = -- TODO: need translate!
-'Lua: Open Addon Manager ...'
-command.reloadFFIMeta = -- TODO: need translate!
-'Lua: Reload luajit ffi meta'
-command.startServer = -- TODO: need translate!
-'Lua: Restart Language Server'
-command.stopServer = -- TODO: need translate!
-'Lua: Stop Language Server'
+command.exportDocument =
+'Lua: Exportar Documento ...'
+command.addon_manager.open =
+'Lua: Abrir Gerenciador de Addon ...'
+command.reloadFFIMeta =
+'Lua: Recarregar metadados luajit ffi'
+command.startServer =
+'Lua: Reiniciar Language Server'
+command.stopServer =
+'Lua: Parar Language Server'

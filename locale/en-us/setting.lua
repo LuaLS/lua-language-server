@@ -115,8 +115,8 @@ config.diagnostics.ignoredFiles.Opened   =
 "Only when these files are opened will it be diagnosed."
 config.diagnostics.ignoredFiles.Disable  =
 "These files are not diagnosed."
-config.diagnostics.disableScheme  = -- TODO: need translate!
-'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
+config.diagnostics.disableScheme  =
+'Do not diagnose Lua files that use the following scheme.'
 config.diagnostics.validScheme  =
 'Enable diagnostics for Lua files that use the following scheme.'
 config.diagnostics.unusedLocalExclude =

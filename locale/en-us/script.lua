@@ -384,7 +384,7 @@ HOVER_DOCUMENT_LUA53    =
 'http://www.lua.org/manual/5.3/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
-HOVER_DOCUMENT_LUA55    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA55    =
 'https://www.lua.org/work/doc/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
@@ -396,7 +396,7 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA55     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA55     =
 'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
@@ -673,8 +673,8 @@ CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
 CLI_CHECK_PROGRESS =
 'Found {} problems in {} files'
-CLI_CHECK_RESULTS= -- TODO: need translate!
-'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
+CLI_CHECK_RESULTS =
+'Diagnosis complete, {} problems found, see {}'
 CLI_CHECK_RESULTS_OUTPATH =
 'Diagnosis complete, {} problems found, see {}'
 CLI_CHECK_RESULTS_PRETTY =

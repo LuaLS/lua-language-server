@@ -718,10 +718,10 @@ string.dump                 =
 '指定した関数をバイナリ形式（*バイナリコードブロック*）で表した文字列を返す。'
 string.find                 =
 '文字列の中から `pattern` に最初にマッチした部分を探す（§6.4.1 を参照）。マッチしたものが見つかった場合、マッチした部分の最初と最後のインデックスを返す。見つからなかった場合、`nil` を返す。'
-string.find['>5.2']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.find['=5.1']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.find['>5.2']         =
+'文字列中で `pattern`（§6.4.1 参照）に最初にマッチする部分を探します。'
+string.find['=5.1']         =
+'文字列中で `pattern`（§5.4.1 参照）に最初にマッチする部分を探します。'
 string.format               =
 '第一引数で指定されたフォーマットに沿って、可変数の引数を成形したものを返す。'
 string.gmatch               =
@@ -738,36 +738,34 @@ string.gmatch               =
 ]]
 string.gsub                 =
 '文字列 `s` の中の `pattern` にマッチした部分をすべて `repl` に置き換えた文字列を返す（§6.4.1 を参照）。`n` が指定された場合、最初にマッチした `n` 個の部分のみを置き換える。'
-string.gmatch['>5.2']       = -- TODO: need translate!
+string.gmatch['>5.2']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+呼び出されるたびに、文字列 `s` の中で `pattern`（§6.4.1 参照）に次にマッチするキャプチャを返すイテレータ関数を返します。
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+例として、次のループは文字列 `s` 内のすべての単語を走査し、1行ずつ出力します:
 ```lua
-    s =
-"hello world from Lua"
+    s = "hello world from Lua"
     for w in string.gmatch(s, "%a+") do
         print(w)
     end
 ```
 ]]
-string.gmatch['=5.1']       = -- TODO: need translate!
+string.gmatch['=5.1']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+呼び出されるたびに、文字列 `s` の中で `pattern`（§5.4.1 参照）に次にマッチするキャプチャを返すイテレータ関数を返します。
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+例として、次のループは文字列 `s` 内のすべての単語を走査し、1行ずつ出力します:
 ```lua
-    s =
-"hello world from Lua"
+    s = "hello world from Lua"
     for w in string.gmatch(s, "%a+") do
         print(w)
     end
 ```
 ]]
-string.gsub['>5.2']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
-string.gsub['=5.1']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['>5.2']         =
+'文字列 `s` の中で `pattern`（§6.4.1 参照）にマッチした部分をすべて（または `n` を指定した場合は先頭 `n` 件）`repl` で置き換えた文字列を返します。'
+string.gsub['=5.1']         =
+'文字列 `s` の中で `pattern`（§5.4.1 参照）にマッチした部分をすべて（または `n` を指定した場合は先頭 `n` 件）`repl` で置き換えた文字列を返します。'
 string.len                  =
 '文字列の長さを返す。'
 string.lower                =
@@ -778,14 +776,14 @@ string.pack                 =
 '第一引数で指定されたフォーマットに沿って、可変数の引数をバイナリ文字列にシリアライズしたものを返す（§6.4.2 を参照）。'
 string.packsize             =
 '指定されたフォーマットを用いて`string.pack`によって生成された文字列の長さを返す。フォーマット文字列には可変長オプション `s` または `z` を含めることはできない（§6.4.2 を参照）。'
-string.match['>5.2']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.match['=5.1']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
-string.pack['>5.2']         = -- TODO: need translate!
-'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
-string.packsize['>5.2']     = -- TODO: need translate!
-'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
+string.match['>5.2']        =
+'文字列中で `pattern`（§6.4.1 参照）に最初にマッチする部分を探します。'
+string.match['=5.1']        =
+'文字列中で `pattern`（§5.4.1 参照）に最初にマッチする部分を探します。'
+string.pack['>5.2']         =
+'フォーマット文字列 `fmt`（§6.4.2 参照）に従って値 `v1`, `v2` などをバイナリ文字列としてシリアライズして返します。'
+string.packsize['>5.2']     =
+'指定したフォーマット `fmt`（§6.4.2 参照）で `string.pack` が生成する文字列のサイズを返します。'
 string.rep['>5.2']          =
 '`n` 個の文字列 `s` を文字列 `sep` で区切って連結した文字列を返す。デフォルトの `sep` は空文字列。`n` が正数でない場合は空文字列を返す。'
 string.rep['<5.1']          =
@@ -843,18 +841,18 @@ table.foreachi              =
 ]]
 table.getn                  =
 'テーブルの長さを返す。`#list` と同等。'
-table.new                   = -- TODO: need translate!
-[[This creates a pre-sized table, just like the C API equivalent `lua_createtable()`. This is useful for big tables if the final table size is known and automatic table resizing is too expensive. `narray` parameter specifies the number of array-like items, and `nhash` parameter specifies the number of hash-like items. The function needs to be required before use.
+table.new                   =
+[[C API の `lua_createtable()` と同様に、事前サイズ指定のテーブルを作成します。最終サイズが分かっていて自動リサイズがコスト高な大きなテーブルに有効です。`narray` は配列部分の要素数ヒント、`nhash` はハッシュ部分の要素数ヒントです。使用前に require が必要です。
 ```lua
     require("table.new")
 ```
 ]]
-table.clear                 = -- TODO: need translate!
-[[This clears all keys and values from a table, but preserves the allocated array/hash sizes. This is useful when a table, which is linked from multiple places, needs to be cleared and/or when recycling a table for use by the same context. This avoids managing backlinks, saves an allocation and the overhead of incremental array/hash part growth. The function needs to be required before use.
+table.clear                 =
+[[テーブルの全キーと値を消去しますが、割り当て済みの配列/ハッシュ領域は保持します。複数箇所から参照されるテーブルをクリアする場合や、同じコンテキストで再利用する場合に有用で、バックリンク管理や再割り当て・漸増拡張のオーバーヘッドを避けられます。使用前に require が必要です。
 ```lua
     require("table.clear").
 ```
-Please note this function is meant for very specific situations. In most cases it's better to replace the (usually single) link with a new table and let the GC do its work.
+この関数はごく限られたケース向けです。多くの場合はリンク先を新しいテーブルに置き換え、GC に任せる方が適切です。
 ]]
 
 utf8                        =

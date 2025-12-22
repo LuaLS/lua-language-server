@@ -6,8 +6,8 @@ config.addonManager.repositoryBranch =
 "Especifica la rama de git usada por el manejador de extensiones."
 config.addonManager.repositoryPath =
 "Especifica la ruta git usada por el manejador de extensiones."
-config.addonRepositoryPath        = -- TODO: need translate!
-"Specifies the addon repository path (not related to the addon manager)."
+config.addonRepositoryPath        =
+"Especifica la ruta del repositorio de complementos (no relacionada con el gestor de complementos)."
 config.runtime.version            =
 "Versión de Lua que se ejecuta."
 config.runtime.path               =
@@ -118,12 +118,12 @@ config.diagnostics.ignoredFiles.Disable  =
 "Estos archivos no se diagnostican."
 config.diagnostics.disableScheme  =
 'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
-config.diagnostics.validScheme  = -- TODO: need translate!
-'Enable diagnostics for Lua files that use the following scheme.'
+config.diagnostics.validScheme  =
+'Habilita diagnósticos para archivos Lua que usan el siguiente esquema.'
 config.diagnostics.unusedLocalExclude =
 'Las variables que calcen con el siguiente patrón no se diagnostican con `unused-local`.'
-config.diagnostics.validScheme  = -- TODO: need translate!
-'Enable diagnostics for Lua files that use the following scheme.'
+config.diagnostics.validScheme  =
+'Habilita diagnósticos para archivos Lua que usan el siguiente esquema.'
 config.workspace.ignoreDir        =
 "Directorios y archivos ignorados (se usa la misma gramática que en `.gitignore`)"
 config.workspace.ignoreSubmodules =
@@ -183,8 +183,8 @@ config.completion.showWord.Disable       =
 "Sin presentar las palabras contextuales."
 config.completion.autoRequire            =
 "Agrega automáticamente el `require` correspondiente cuando la entrada se parece a un nombre de archivo."
-config.completion.maxSuggestCount        = -- TODO: need translate!
-"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
+config.completion.maxSuggestCount        =
+"Número máximo de campos a analizar para autocompletar. Cuando un objeto tiene más campos que este límite, las sugerencias requerirán una entrada más específica para aparecer."
 config.completion.showParams             =
 "Muestra los parámetros en la lista de completado. Cuando la función tiene múltiples definiciones, se mostrarán por separado."
 config.completion.requireSeparator       =
@@ -265,9 +265,9 @@ config.hint.arrayIndex.Disable           =
 'Deshabilita las pistas en de los índices de arreglos.'
 config.hint.await                        =
 'Si la función que se llama está marcada con `---@async`, pregunta por un `await` en la llamada.'
-config.hint.awaitPropagate               = -- TODO: need translate!
-'Enable the propagation of `await`. When a function calls a function marked `---@async`,\z
-it will be automatically marked as `---@async`.'
+config.hint.awaitPropagate               =
+'Habilita la propagación de `await`. Cuando una función llama a una función marcada con `---@async`,\z
+se marcará automáticamente como `---@async`.'
 config.hint.semicolon                    =
 'Si no hay punto y coma al final de la sentencia, despliega un punto y coma virtual.'
 config.hint.semicolon.All                =
@@ -331,22 +331,22 @@ config.type.checkTableShape              =
 [[
 Chequea estrictamente la forma de la tabla.
 ]]
-config.type.inferTableSize               = -- TODO: need translate!
-'Maximum number of table fields analyzed during type inference.'
+config.type.inferTableSize               =
+'Cantidad máxima de campos de tabla analizados durante la inferencia de tipos.'
 config.doc.privateName                   =
 'Trata los nombres específicos de campo como privados. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase.'
 config.doc.protectedName                 =
 'Trata los nombres específicos de campo como protegidos. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son privados, por lo que solo pueden ser accedidos donde se define la clase y sus subclases.'
 config.doc.packageName                   =
 'Trata los nombres específicos de campo como del paquete. Por ejemplo `m_*` significa `XXX.m_id` y `XXX.m_tipo` son de paquete, por lo que solo pueden ser accedidos en el archivo donde son definidos.'
-config.doc.regengine                     = -- TODO: need translate!
-'The regular expression engine used for matching documentation scope names.'
-config.doc.regengine.glob                = -- TODO: need translate!
-'The default lightweight pattern syntax.'
-config.doc.regengine.lua                 = -- TODO: need translate!
-'Full Lua-style regular expressions.'
-config.docScriptPath                     = -- TODO: need translate!
-'The regular expression engine used for matching documentation scope names.'
+config.doc.regengine                     =
+'Motor de expresiones regulares usado para coincidir nombres de ámbito de documentación.'
+config.doc.regengine.glob                =
+'Sintaxis de patrones ligera predeterminada.'
+config.doc.regengine.lua                 =
+'Expresiones regulares completas al estilo Lua.'
+config.docScriptPath                     =
+'Motor de expresiones regulares usado para coincidir nombres de ámbito de documentación.'
 config.diagnostics['unused-local']          =
 'Habilita el diagnóstico de variables local sin uso.'
 config.diagnostics['unused-function']       =
@@ -431,8 +431,8 @@ config.diagnostics['missing-return-value']  =
 'Habilita el diagnóstico para expresiones `return …` sin valores aunque la función que la contiene declare retornos.'
 config.diagnostics['need-check-nil']        =
 'Habilita el diagnóstico para usos de variables si `nil` o un valor opcional (potencialmente `nil`) haya sido asignado a la variable anteriormente.'
-config.diagnostics['unnecessary-assert']    = -- TODO: need translate!
-'Enable diagnostics for redundant assertions on truthy values.'
+config.diagnostics['unnecessary-assert']    =
+'Habilita diagnósticos para aserciones redundantes en valores verdaderos.'
 config.diagnostics['no-unknown']            =
 'Habilita el diagnóstico para los casos en que el tipo no puede ser inferido.'
 config.diagnostics['not-yieldable']         =

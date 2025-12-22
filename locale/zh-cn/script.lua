@@ -673,8 +673,8 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_PROGRESS =
 '检测到问题 {} 在文件 {} 中'
-CLI_CHECK_RESULTS= -- TODO: need translate!
-'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
+CLI_CHECK_RESULTS=
+'诊断完成，发现 {} 个问题，请查看 {}'
 CLI_CHECK_RESULTS_OUTPATH =
 '诊断完成，共有 {} 个问题，请查看 {}'
 CLI_CHECK_RESULTS_PRETTY =

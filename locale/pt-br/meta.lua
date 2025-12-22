@@ -724,10 +724,10 @@ string.dump                 =
 'Retorna uma string contendo uma representação binária (i.e., *binary chunk*) da função dada.'
 string.find                 =
 'Procura a primeira correspondencia de `pattern` (veja §6.4.1) na string.'
-string.find['>5.2']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.find['=5.1']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.find['>5.2']         =
+'Procura a primeira correspondência de `pattern` (veja §6.4.1) na string.'
+string.find['=5.1']         =
+'Procura a primeira correspondência de `pattern` (veja §5.4.1) na string.'
 string.format               =
 'Retorna uma versão formatada de seu número variável de argumentos após a descrição dada em seu primeiro argumento.'
 string.gmatch               =
@@ -745,11 +745,11 @@ Por exemplo, o loop a seguir irá iterar em todas as palavras da string *s*, imp
 ]]
 string.gsub                 =
 'Retorna uma cópia da *s* em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
-string.gmatch['>5.2']       = -- TODO: need translate!
+string.gmatch['>5.2']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+Retorna uma função iteradora que, a cada vez que é chamada, retorna as próximas capturas de `pattern` (veja §6.4.1) sobre a string s.
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+Por exemplo, o loop a seguir irá iterar em todas as palavras da string s, imprimindo cada palavra por linha:
 ```lua
     s =
 "hello world from Lua"
@@ -758,11 +758,11 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gmatch['=5.1']       = -- TODO: need translate!
+string.gmatch['=5.1']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+Retorna uma função iteradora que, a cada vez que é chamada, retorna as próximas capturas de `pattern` (veja §5.4.1) sobre a string s.
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+Por exemplo, o loop a seguir irá iterar em todas as palavras da string s, imprimindo cada palavra por linha:
 ```lua
     s =
 "hello world from Lua"
@@ -771,10 +771,10 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gsub['>5.2']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
-string.gsub['=5.1']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['>5.2']         =
+'Retorna uma cópia de s em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
+string.gsub['=5.1']         =
+'Retorna uma cópia de s em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §5.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
 string.len                  =
 'Retorna o comprimento da string.'
 string.lower                =
@@ -785,14 +785,14 @@ string.pack                 =
 'Retorna uma string binária contendo os valores `V1`, `v2`, etc. empacotados (isto é, serializado de forma binário) de acordo com o formato da string `fmt` fornecida (veja §6.4.2).'
 string.packsize             =
 'Retorna o tamanho de uma string resultante de `string.pack` com o formato da string `fmt` fornecida (veja §6.4.2).'
-string.match['>5.2']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.match['=5.1']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
-string.pack['>5.2']         = -- TODO: need translate!
-'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
-string.packsize['>5.2']     = -- TODO: need translate!
-'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
+string.match['>5.2']        =
+'Procura a primeira ocorrência do `pattern` (veja §6.4.1) na string.'
+string.match['=5.1']        =
+'Procura a primeira ocorrência do `pattern` (veja §5.4.1) na string.'
+string.pack['>5.2']         =
+'Retorna uma string binária contendo os valores `v1`, `v2`, etc. empacotados (isto é, serializados em formato binário) de acordo com a string de formato `fmt` (veja §6.4.2).'
+string.packsize['>5.2']     =
+'Retorna o tamanho de uma string resultante de `string.pack` com a string de formato `fmt` fornecida (veja §6.4.2).'
 string.rep['>5.2']          =
 'Retorna uma string que é a concatenação de `n` cópias da string `s` separadas pela string `sep`.'
 string.rep['<5.1']          =
@@ -839,24 +839,24 @@ Retorna os elementos da lista fornecida. Esta função é equivalente a
 ```
 Por padrão, `i` é `1` e `j` é `#list`.
 ]]
-table.foreach               = -- TODO: need translate!
-'Executes the given f over all elements of table. For each element, f is called with the index and respective value as arguments. If f returns a non-nil value, then the loop is broken, and this value is returned as the final value of foreach.'
-table.foreachi              = -- TODO: need translate!
-'Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.'
-table.getn                  = -- TODO: need translate!
-'Returns the number of elements in the table. This function is equivalent to `#list`.'
-table.new                   = -- TODO: need translate!
-[[This creates a pre-sized table, just like the C API equivalent `lua_createtable()`. This is useful for big tables if the final table size is known and automatic table resizing is too expensive. `narray` parameter specifies the number of array-like items, and `nhash` parameter specifies the number of hash-like items. The function needs to be required before use.
+table.foreach               =
+'Executa a função f fornecida sobre todos os elementos da tabela. Para cada elemento, f é chamada com o índice e o valor respectivo como argumentos. Se f retornar um valor não-nil, o loop é interrompido e esse valor é retornado como valor final de foreach.'
+table.foreachi              =
+'Executa a função f fornecida sobre os índices numéricos da tabela. Para cada índice, f é chamada com o índice e o valor respectivo como argumentos. Índices são visitados em ordem sequencial, de 1 a n, onde n é o tamanho da tabela. Se f retornar um valor não-nil, o loop é interrompido e esse valor é retornado como resultado de foreachi.'
+table.getn                  =
+'Retorna o número de elementos na tabela. Esta função é equivalente a `#list`.'
+table.new                   =
+[[Cria uma tabela pré-dimensionada, assim como o equivalente da C API `lua_createtable()`. É útil para tabelas grandes se o tamanho final for conhecido e o redimensionamento automático for muito custoso. O parâmetro `narray` especifica o número de itens tipo array, e o parâmetro `nhash` especifica o número de itens tipo hash. A função precisa ser requerida antes do uso.
 ```lua
 	require("table.new")
 ```
 ]]
-table.clear                 = -- TODO: need translate!
-[[This clears all keys and values from a table, but preserves the allocated array/hash sizes. This is useful when a table, which is linked from multiple places, needs to be cleared and/or when recycling a table for use by the same context. This avoids managing backlinks, saves an allocation and the overhead of incremental array/hash part growth. The function needs to be required before use.
+table.clear                 =
+[[Limpa todas as chaves e valores de uma tabela, mas preserva os tamanhos alocados das partes array/hash. É útil quando uma tabela, que está vinculada de vários lugares, precisa ser limpa e/ou quando se recicla uma tabela para uso pelo mesmo contexto. Evita gerenciar backlinks, economiza uma alocação e o custo de crescimento incremental das partes array/hash. A função precisa ser requerida antes do uso.
 ```lua
 	require("table.clear").
 ```
-Please note this function is meant for very specific situations. In most cases it's better to replace the (usually single) link with a new table and let the GC do its work.
+Observe que esta função é destinada a situações muito específicas. Na maioria dos casos, é melhor substituir o link (único geralmente) por uma nova tabela e deixar o GC fazer seu trabalho.
 ]]
 
 utf8                        =

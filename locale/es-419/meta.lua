@@ -723,10 +723,10 @@ string.dump                 =
 'Retorna un string que contiene una representación binaria de la función provista.'
 string.find                 =
 'Busca el primer calce del patrón `pattern` (véase §6.4.1) en el string.'
-string.find['>5.2']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.find['=5.1']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.find['>5.2']         =
+'Busca el primer calce del patrón `pattern` (véase §6.4.1) en el string.'
+string.find['=5.1']         =
+'Busca el primer calce del patrón `pattern` (véase §5.4.1) en el string.'
 string.format               =
 'Retorna una versión formateada de su argumentos (en número variable) siguiendo la descripción dada en su primer argumento.'
 string.gmatch               =
@@ -744,11 +744,11 @@ Por ejemplo, el bucle siguiente itera sobre todas las palabras del sstring s, im
 ]]
 string.gsub                 =
 'Retorna una copia de s en la cual todos (o los primeras `n`, si es provisto este argumento) ocurrencias del patrón `pattern` (vease §6.4.1) han sido reemplazadas por el string de reemplazo especificado por `repl`.'
-string.gmatch['>5.2']       = -- TODO: need translate!
+string.gmatch['>5.2']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+Retorna una función iteradora que, cada vez que es llamada, retorna las siguientes capturas del patrón `pattern` (véase §6.4.1) sobre el string s.
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+Por ejemplo, el bucle siguiente itera sobre todas las palabras del string s, imprimiendo una por línea:
 ```lua
     s =
 "hello world from Lua"
@@ -757,11 +757,11 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gmatch['=5.1']       = -- TODO: need translate!
+string.gmatch['=5.1']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+Retorna una función iteradora que, cada vez que es llamada, retorna las siguientes capturas del patrón `pattern` (véase §5.4.1) sobre el string s.
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+Por ejemplo, el bucle siguiente itera sobre todas las palabras del string s, imprimiendo una por línea:
 ```lua
     s =
 "hello world from Lua"
@@ -770,10 +770,10 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gsub['>5.2']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
-string.gsub['=5.1']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['>5.2']         =
+'Retorna una copia de s en la cual todas (o las primeras `n`, si se entrega) ocurrencias del patrón `pattern` (véase §6.4.1) han sido reemplazadas por un string de reemplazo especificado por `repl`.'
+string.gsub['=5.1']         =
+'Retorna una copia de s en la cual todas (o las primeras `n`, si se entrega) ocurrencias del patrón `pattern` (véase §5.4.1) han sido reemplazadas por un string de reemplazo especificado por `repl`.'
 string.len                  =
 'Retorna el largo.'
 string.lower                =
@@ -784,14 +784,14 @@ string.pack                 =
 'Retorna el string binario que contiene los valores `v1`, `v2`, etc. empacados (serializados en forma binaria) de acuerdo al string de formato `fmt` (véase §6.4.2) .'
 string.packsize             =
 'Retorna el largo del string que retorna `string.pack` con el formato `fmt` (véase §6.4.2) provisto.'
-string.match['>5.2']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.match['=5.1']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
-string.pack['>5.2']         = -- TODO: need translate!
-'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
-string.packsize['>5.2']     = -- TODO: need translate!
-'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
+string.match['>5.2']        =
+'Busca el primer calce del patrón `pattern` (véase §6.4.1) en el string.'
+string.match['=5.1']        =
+'Busca el primer calce del patrón `pattern` (véase §5.4.1) en el string.'
+string.pack['>5.2']         =
+'Retorna el string binario que contiene los valores `v1`, `v2`, etc. empacados (serializados en forma binaria) de acuerdo al string de formato `fmt` (véase §6.4.2).'
+string.packsize['>5.2']     =
+'Retorna el largo del string que retorna `string.pack` con el formato `fmt` (véase §6.4.2) provisto.'
 string.rep['>5.2']          =
 'Retorna el string que es la concatenación de `n` copias del string `s` separado por el string `sep`.'
 string.rep['<5.1']          =

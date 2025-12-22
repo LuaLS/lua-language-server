@@ -702,10 +702,10 @@ string.dump                 =
 '返回包含有以二进制方式表示的（一个 *二进制代码块* ）指定函数的字符串。'
 string.find                 =
 '查找第一个字符串中匹配到的 `pattern`（参见 §6.4.1）。'
-string.find['>5.2']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.find['=5.1']         = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.find['>5.2']         =
+'在字符串中查找与 `pattern`（参见 §6.4.1）匹配的第一个部分。'
+string.find['=5.1']         =
+'在字符串中查找与 `pattern`（参见 §5.4.1）匹配的第一个部分。'
 string.format               =
 '返回不定数量参数的格式化版本，格式化串为第一个参数。'
 string.gmatch               =
@@ -723,11 +723,11 @@ string.gmatch               =
 ]]
 string.gsub                 =
 '将字符串 s 中，所有的（或是在 n 给出时的前 n 个） pattern （参见 §6.4.1）都替换成 repl ，并返回其副本。'
-string.gmatch['>5.2']       = -- TODO: need translate!
+string.gmatch['>5.2']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+返回一个迭代器函数。每次调用都会在字符串 s 上继续按 `pattern`（参见 §6.4.1）匹配，并返回下一组捕获值。
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+例如，下面的循环会遍历字符串 s 中的所有单词，并逐行打印：
 ```lua
     s =
 "hello world from Lua"
@@ -736,11 +736,11 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gmatch['=5.1']       = -- TODO: need translate!
+string.gmatch['=5.1']       =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+返回一个迭代器函数。每次调用都会在字符串 s 上继续按 `pattern`（参见 §5.4.1）匹配，并返回下一组捕获值。
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+例如，下面的循环会遍历字符串 s 中的所有单词，并逐行打印：
 ```lua
     s =
 "hello world from Lua"
@@ -749,10 +749,10 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gsub['>5.2']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
-string.gsub['=5.1']         = -- TODO: need translate!
-'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['>5.2']         =
+'返回字符串 s 的副本，其中所有（或在给出 n 时的前 n 个）`pattern`（参见 §6.4.1）都被 `repl` 替换。'
+string.gsub['=5.1']         =
+'返回字符串 s 的副本，其中所有（或在给出 n 时的前 n 个）`pattern`（参见 §5.4.1）都被 `repl` 替换。'
 string.len                  =
 '返回其长度。'
 string.lower                =
@@ -763,14 +763,14 @@ string.pack                 =
 '返回一个打包了（即以二进制形式序列化） v1, v2 等值的二进制字符串。 字符串 fmt 为打包格式（参见 §6.4.2）。'
 string.packsize             =
 [[返回以指定格式用 $string.pack 打包的字符串的长度。 格式化字符串中不可以有变长选项 's' 或 'z' （参见 §6.4.2）。]]
-string.match['>5.2']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.match['=5.1']        = -- TODO: need translate!
-'Looks for the first match of `pattern` (see §5.4.1) in the string.'
-string.pack['>5.2']         = -- TODO: need translate!
-'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
-string.packsize['>5.2']     = -- TODO: need translate!
-'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
+string.match['>5.2']        =
+'在字符串中查找与 `pattern`（参见 §6.4.1）匹配的第一个部分。'
+string.match['=5.1']        =
+'在字符串中查找与 `pattern`（参见 §5.4.1）匹配的第一个部分。'
+string.pack['>5.2']         =
+'返回一个包含值 `v1`、`v2` 等，按照格式字符串 `fmt`（参见 §6.4.2）打包（即以二进制形式序列化）的二进制字符串。'
+string.packsize['>5.2']     =
+'返回使用指定格式字符串 `fmt`（参见 §6.4.2）调用 $string.pack 得到的字符串大小。'
 string.rep['>5.2']          =
 '返回 `n` 个字符串 `s` 以字符串 `sep` 为分割符连在一起的字符串。 默认的 `sep` 值为空字符串（即没有分割符）。 如果 `n` 不是正数则返回空串。'
 string.rep['<5.1']          =

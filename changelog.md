@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `CHG` Upgraded to Lua 5.5, memory usage has been reduced by ~10%
 
 ## 3.16.2
 `2025-12-18`

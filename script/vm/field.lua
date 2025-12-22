@@ -5,9 +5,9 @@ local guide     = require 'parser.guide'
 
 local searchByNodeSwitch = util.switch()
     : case 'global'
-    ---@param global vm.global
-    : call(function (suri, global, pushResult)
-        for _, set in ipairs(global:getSets(suri)) do
+    ---@param globalVar vm.global
+    : call(function (suri, globalVar, pushResult)
+        for _, set in ipairs(globalVar:getSets(suri)) do
             pushResult(set)
         end
     end)

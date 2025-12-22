@@ -18,11 +18,11 @@ local config = require 'config'
 ---@return parser.object[]
 function vm.getDocSets(suri, name)
     if name then
-        local global = vm.getGlobal('type', name)
-        if not global then
+        local globalVar = vm.getGlobal('type', name)
+        if not globalVar then
             return {}
         end
-        return global:getSets(suri)
+        return globalVar:getSets(suri)
     else
         return vm.getGlobalSets(suri, 'type')
     end
@@ -502,10 +502,10 @@ function vm.getCastTargetHead(doc)
         doc._castTargetHead = loc
         return loc
     end
-    local global = vm.getGlobal('variable', name)
-    if global then
-        doc._castTargetHead = global
-        return global
+    local globalVar = vm.getGlobal('variable', name)
+    if globalVar then
+        doc._castTargetHead = globalVar
+        return globalVar
     end
     return nil
 end

@@ -1607,15 +1607,7 @@ local function isKeyWord(word, nextToken)
     end
     if word == 'global' then
         if State.version == 'Lua 5.5' then
-            if not nextToken then
-                return true
-            end
-            if nextToken == '*'
-            or nextToken == '<'
-            or CharMapWord[ssub(nextToken, 1, 1)] then
-                return true
-            end
-            return false
+            return true
         end
         return false
     end
@@ -4377,8 +4369,16 @@ function parseAction()
         return parseLocal()
     end
 
-    if token == 'global' and isKeyWord('global', Tokens[Index + 3]) then
-        return parseGlobal()
+    if token == 'global' then
+        local nextToken = Tokens[Index + 3]
+        if isKeyWord('global', nextToken) then
+            if not nextToken
+            or nextToken == '*'
+            or nextToken == '<'
+            or CharMapWord[ssub(nextToken, 1, 1)] then
+                return parseGlobal()
+            end
+        end
     end
 
     if token == 'if'

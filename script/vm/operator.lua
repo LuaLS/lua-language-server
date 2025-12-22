@@ -102,7 +102,8 @@ function vm.runOperator(op, exp, value)
     local uri = guide.getUri(exp)
     local node = vm.compileNode(exp)
     local result
-    for c in node:eachObject() do
+    for cVal in node:eachObject() do
+        local c = cVal
         if c.type == 'string'
         or c.type == 'doc.type.string' then
             c = vm.declareGlobal('type', 'string')

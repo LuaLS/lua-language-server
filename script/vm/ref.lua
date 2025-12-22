@@ -71,7 +71,7 @@ local function searchWord(source, pushResult, defMap, fileNotify)
         return
     end
 
-    local global = vm.getGlobalNode(source)
+    local globalVar = vm.getGlobalNode(source)
 
     ---@param src parser.object
     local function checkDef(src)
@@ -97,8 +97,8 @@ local function searchWord(source, pushResult, defMap, fileNotify)
             return
         end
 
-        if global then
-            local globalName = global:asKeyName()
+        if globalVar then
+            local globalName = globalVar:asKeyName()
             ---@async
             guide.eachSourceTypes(state.ast, {'getglobal', 'setglobal', 'setfield', 'getfield', 'setmethod', 'getmethod', 'setindex', 'getindex', 'doc.type.name', 'doc.class.name', 'doc.alias.name', 'doc.extends.name'}, function (src)
                 local myGlobal = vm.getGlobalNode(src)

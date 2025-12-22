@@ -79,7 +79,8 @@ function mt:getRequireResultByPath(path)
     local strict      = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
     local libUri      = files.getLibraryUri(self.scp.uri, uri)
     local libraryPath = libUri and furi.decode(libUri)
-    for _, searcher in ipairs(searchers) do
+    for _, searcherVal in ipairs(searchers) do
+        local searcher = searcherVal
         local isAbsolute = searcher:match '^[/\\]'
                         or searcher:match '^%a+%:'
         searcher = files.normalize(searcher)

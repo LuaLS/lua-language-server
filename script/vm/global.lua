@@ -139,11 +139,11 @@ function mt:getParentBase(uri)
         return nil
     end
     local parentName = self.cate .. '|' .. parentID
-    local global = allGlobals[parentName]
-    if not global then
+    local globalVar = allGlobals[parentName]
+    if not globalVar then
         return nil
     end
-    local link = global.links[uri]
+    local link = globalVar.links[uri]
     if not link then
         return nil
     end
@@ -204,9 +204,9 @@ local compilerGlobalSwitch = util.switch()
         if not name then
             return
         end
-        local global = vm.declareGlobal('variable', name, uri)
-        global:addSet(uri, source)
-        source._globalNode = global
+        local globalVar = vm.declareGlobal('variable', name, uri)
+        globalVar:addSet(uri, source)
+        source._globalNode = globalVar
     end)
     : case 'getglobal'
     : call(function (source)
@@ -215,9 +215,9 @@ local compilerGlobalSwitch = util.switch()
         if not name then
             return
         end
-        local global = vm.declareGlobal('variable', name, uri)
-        global:addGet(uri, source)
-        source._globalNode = global
+        local globalVar = vm.declareGlobal('variable', name, uri)
+        globalVar:addGet(uri, source)
+        source._globalNode = globalVar
 
         local nxt = source.next
         if nxt then
@@ -248,9 +248,9 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local uri    = guide.getUri(source)
-        local global = vm.declareGlobal('variable', name, uri)
-        global:addSet(uri, source)
-        source._globalNode = global
+        local globalVar = vm.declareGlobal('variable', name, uri)
+        globalVar:addSet(uri, source)
+        source._globalNode = globalVar
     end)
     : case 'getfield'
     : case 'getmethod'
@@ -273,9 +273,9 @@ local compilerGlobalSwitch = util.switch()
             name = keyName
         end
         local uri    = guide.getUri(source)
-        local global = vm.declareGlobal('variable', name, uri)
-        global:addGet(uri, source)
-        source._globalNode = global
+        local globalVar = vm.declareGlobal('variable', name, uri)
+        globalVar:addGet(uri, source)
+        source._globalNode = globalVar
 
         local nxt = source.next
         if nxt then
@@ -295,14 +295,14 @@ local compilerGlobalSwitch = util.switch()
                 local name = guide.getKeyName(key)
                 if name then
                     local uri    = guide.getUri(source)
-                    local global = vm.declareGlobal('variable', name, uri)
+                    local globalVar = vm.declareGlobal('variable', name, uri)
                     if source.node.special == 'rawset' then
-                        global:addSet(uri, source)
+                        globalVar:addSet(uri, source)
                         source.value = source.args[3]
                     else
-                        global:addGet(uri, source)
+                        globalVar:addGet(uri, source)
                     end
-                    source._globalNode = global
+                    source._globalNode = globalVar
 
                     local nxt = source.next
                     if nxt then
@@ -471,12 +471,12 @@ function vm.getGlobalFields(cate, name)
     local key = cate .. '|' .. name
 
     local clock = os.clock()
-    for gid, global in pairs(allGlobals) do
+    for gid, globalVar in pairs(allGlobals) do
         if  gid ~= key
         and util.stringStartWith(gid, key)
         and gid:sub(#key + 1, #key + 1) == vm.ID_SPLITE
         and not gid:find(vm.ID_SPLITE, #key + 2) then
-            globals[#globals+1] = global
+            globals[#globals+1] = globalVar
         end
     end
     local cost = os.clock() - clock
@@ -493,10 +493,10 @@ function vm.getGlobals(cate)
     local globals = {}
 
     local clock = os.clock()
-    for gid, global in pairs(allGlobals) do
+    for gid, globalVar in pairs(allGlobals) do
         if  util.stringStartWith(gid, cate)
         and not gid:find(vm.ID_SPLITE) then
-            globals[#globals+1] = global
+            globals[#globals+1] = globalVar
         end
     end
     local cost = os.clock() - clock
@@ -515,11 +515,11 @@ end
 ---@return table<string, vm.global>
 function vm.getExportableGlobals()
     local exportableGlobals = {}
-    for key, global in pairs(allGlobals) do
+    for key, globalVar in pairs(allGlobals) do
         --If the source uri for the global matches the global variable METAPATH
         --then the global is a builtin Lua language feature and should not be exported
-        if global.uri and not string.find(global.uri, METAPATH, 1, true) then
-            exportableGlobals[key] = global
+        if globalVar.uri and not string.find(globalVar.uri, METAPATH, 1, true) then
+            exportableGlobals[key] = globalVar
         end
     end
     return exportableGlobals
@@ -531,8 +531,8 @@ end
 function vm.getGlobalSets(suri, cate)
     local globals = vm.getGlobals(cate)
     local result = {}
-    for _, global in ipairs(globals) do
-        local sets = global:getSets(suri)
+    for _, globalVar in ipairs(globals) do
+        local sets = globalVar:getSets(suri)
         for _, set in ipairs(sets) do
             result[#result+1] = set
         end
@@ -545,11 +545,11 @@ end
 ---@param name string
 ---@return boolean
 function vm.hasGlobalSets(suri, cate, name)
-    local global = vm.getGlobal(cate, name)
-    if not global then
+    local globalVar = vm.getGlobal(cate, name)
+    if not globalVar then
         return false
     end
-    local sets = global:getSets(suri)
+    local sets = globalVar:getSets(suri)
     if #sets == 0 then
         return false
     end
@@ -649,12 +649,12 @@ end
 ---@param source parser.object
 ---@return boolean
 function vm.compileByGlobal(source)
-    local global = vm.getGlobalNode(source)
-    if not global then
+    local globalVar = vm.getGlobalNode(source)
+    if not globalVar then
         return false
     end
-    vm.setNode(source, global)
-    if global.cate == 'variable' then
+    vm.setNode(source, globalVar)
+    if globalVar.cate == 'variable' then
         if guide.isAssign(source) then
             if vm.bindDocs(source) then
                 return true
@@ -689,8 +689,8 @@ function vm.getGlobalBase(source)
     if source._globalBase then
         return source._globalBase
     end
-    local global = vm.getGlobalNode(source)
-    if not global then
+    local globalVar = vm.getGlobalNode(source)
+    if not globalVar then
         return nil
     end
     ---@cast source parser.object
@@ -698,13 +698,13 @@ function vm.getGlobalBase(source)
     if not root._globalBaseMap then
         root._globalBaseMap = {}
     end
-    local name = global:asKeyName()
+    local name = globalVar:asKeyName()
     if not root._globalBaseMap[name] then
         ---@diagnostic disable-next-line: missing-fields
         root._globalBaseMap[name] = {
             type   = 'globalbase',
             parent = root,
-            global = global,
+            ['global'] = globalVar,
             start  = 0,
             finish = 0,
         }
@@ -742,10 +742,10 @@ local function dropUri(uri)
     local globalSub = globalSubs[uri]
     globalSubs[uri] = nil
     for key in pairs(globalSub) do
-        local global = allGlobals[key]
-        if global then
-            global:dropUri(uri)
-            if not global:isAlive() then
+        local globalVar = allGlobals[key]
+        if globalVar then
+            globalVar:dropUri(uri)
+            if not globalVar:isAlive() then
                 allGlobals[key] = nil
             end
         end

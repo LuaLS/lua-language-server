@@ -185,8 +185,9 @@ cpp.initial_processing = typed("FILE* -> LineList", function(fd)
     local state = "any"
     local output = {}
     local linenr = 0
-    for line in fd:lines() do
+    for lineVal in fd:lines() do
         linenr = linenr + 1
+        local line = lineVal
         local len = #line
         if line:find("\\", len, true) then
             -- If backslash-terminated, buffer it

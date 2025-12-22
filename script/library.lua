@@ -243,8 +243,8 @@ local function initBuiltIn(uri)
     end
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
-    for libName, status in pairs(define.BuiltIn) do
-        status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
+    for libName, builtinStatus in pairs(define.BuiltIn) do
+        local status = config.get(uri, 'Lua.runtime.builtin')[libName] or builtinStatus
         log.debug('Builtin status:', libName, status)
 
         ---@type fs.path
@@ -368,7 +368,8 @@ local function loadSingle3rdConfig(libraryDir)
         end
     end
     if cfg.files then
-        for i, filename in ipairs(cfg.files) do
+        for i, fname in ipairs(cfg.files) do
+            local filename = fname
             if plat.os == 'windows' then
                 filename = filename:gsub('/', '\\')
             else

@@ -23,14 +23,15 @@ local function loadLocaleFile(filePath)
     end
     local current
     local inLongString
-    for line, lineCount in util.eachLine(fileContent) do
+    for lineVal, lineCount in util.eachLine(fileContent) do
         if inLongString then
-            current.content[#current.content+1] = line
-            if isLongStringFinish(line, inLongString) then
+            current.content[#current.content+1] = lineVal
+            if isLongStringFinish(lineVal, inLongString) then
                 inLongString = nil
             end
             goto CONTINUE
         end
+        local line = lineVal
         local comment = line:match '%s*%-%- TODO.+$'
         if comment then
             line = line:sub(1, - #comment - 1)

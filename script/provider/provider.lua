@@ -61,10 +61,10 @@ function m.updateConfig(uri)
     end
 
     if client.getAbility('workspace.configuration') then
-        local global = cfgLoader.loadClientConfig()
+        local globalConfig = cfgLoader.loadClientConfig()
         log.info('Load config from client', 'fallback')
-        log.info(inspect(global))
-        config.update(scope.fallback, global)
+        log.info(inspect(globalConfig))
+        config.update(scope.fallback, globalConfig)
     end
 end
 

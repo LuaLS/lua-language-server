@@ -24,10 +24,10 @@ local Care = util.switch()
         local isLib = options.libGlobals[name]
         if isLib == nil then
             isLib = false
-            local global = vm.getGlobal('variable', name)
-            if global then
+            local globalVar = vm.getGlobal('variable', name)
+            if globalVar then
                 local uri = guide.getUri(source)
-                for _, set in ipairs(global:getSets(uri)) do
+                for _, set in ipairs(globalVar:getSets(uri)) do
                     if vm.isMetaFile(guide.getUri(set)) then
                         isLib = true
                         break
@@ -39,7 +39,7 @@ local Care = util.switch()
         local isFunc = vm.getInfer(source):hasFunction(guide.getUri(source))
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
-        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.global
+        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers['global']
 
         if source.declare then
             modifier = modifier | define.TokenModifiers.declaration

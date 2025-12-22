@@ -155,16 +155,16 @@ local function searchFieldByGlobalID(suri, source, key, pushResult)
             if type(key) ~= 'string' then
                 return
             end
-            local global = vm.getGlobal('variable', node.name, key)
-            if global then
-                for _, set in ipairs(global:getSets(suri)) do
+            local globalVar = vm.getGlobal('variable', node.name, key)
+            if globalVar then
+                for _, set in ipairs(globalVar:getSets(suri)) do
                     pushResult(set)
                 end
             end
         else
             local globals = vm.getGlobalFields('variable', node.name)
-            for _, global in ipairs(globals) do
-                for _, set in ipairs(global:getSets(suri)) do
+            for _, globalVar in ipairs(globals) do
+                for _, set in ipairs(globalVar:getSets(suri)) do
                     pushResult(set)
                 end
             end
@@ -353,11 +353,11 @@ local searchFieldSwitch = util.switch()
         if not source.node[1] then
             return
         end
-        local global = vm.getGlobal('type', source.node[1])
-        if not global then
+        local globalVar = vm.getGlobal('type', source.node[1])
+        if not globalVar then
             return
         end
-        vm.getClassFields(suri, global, key, pushResult)
+        vm.getClassFields(suri, globalVar, key, pushResult)
     end)
     : case 'global'
     : call(function (suri, node, key, pushResult)
@@ -366,16 +366,16 @@ local searchFieldSwitch = util.switch()
                 if type(key) ~= 'string' then
                     return
                 end
-                local global = vm.getGlobal('variable', node.name, key)
-                if global then
-                    for _, set in ipairs(global:getSets(suri)) do
+                local globalVar = vm.getGlobal('variable', node.name, key)
+                if globalVar then
+                    for _, set in ipairs(globalVar:getSets(suri)) do
                         pushResult(set)
                     end
                 end
             else
                 local globals = vm.getGlobalFields('variable', node.name)
-                for _, global in ipairs(globals) do
-                    for _, set in ipairs(global:getSets(suri)) do
+                for _, globalVar in ipairs(globals) do
+                    for _, set in ipairs(globalVar:getSets(suri)) do
                         pushResult(set)
                     end
                 end
@@ -589,9 +589,9 @@ function vm.getClassFields(suri, object, key, pushResult)
                     pushResult(set)
                 end
             elseif type(key) == 'string' then
-                local global = vm.getGlobal('variable', key)
-                if global then
-                    for _, set in ipairs(global:getSets(suri)) do
+                local globalVar = vm.getGlobal('variable', key)
+                if globalVar then
+                    for _, set in ipairs(globalVar:getSets(suri)) do
                         pushResult(set)
                     end
                 end
@@ -2077,11 +2077,11 @@ local compilerSwitch = util.switch()
         if not source.node[1] then
             return
         end
-        local global = vm.getGlobal('type', source.node[1])
-        if not global then
+        local globalVar = vm.getGlobal('type', source.node[1])
+        if not globalVar then
             return
         end
-        for _, set in ipairs(global:getSets(uri)) do
+        for _, set in ipairs(globalVar:getSets(uri)) do
             if set.type == 'doc.class' then
                 if set.extends then
                     for _, ext in ipairs(set.extends) do
@@ -2203,12 +2203,12 @@ local compilerSwitch = util.switch()
     : case 'globalbase'
     : call(function (source)
         ---@type vm.global
-        local global = source.global
+        local globalNode = source['global']
         local uri = guide.getUri(source)
         local scp = scope.getScope(uri)
-        vm.setNode(source, global)
-        if global.cate == 'variable' then
-            for luri, link in pairs(global.links) do
+        vm.setNode(source, globalNode)
+        if globalNode.cate == 'variable' then
+            for luri, link in pairs(globalNode.links) do
                 if not scp:isVisible(luri) then
                     goto continue
                 end
@@ -2226,8 +2226,8 @@ local compilerSwitch = util.switch()
                 ::continue::
             end
         end
-        if global.cate == 'type' then
-            for _, set in ipairs(global:getSets(uri)) do
+        if globalNode.cate == 'type' then
+            for _, set in ipairs(globalNode:getSets(uri)) do
                 if set.type == 'doc.class' then
                     if set.extends then
                         for _, ext in ipairs(set.extends) do

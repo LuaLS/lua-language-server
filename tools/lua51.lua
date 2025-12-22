@@ -63,7 +63,8 @@ end
 local function findTable(name)
     local pg = {}
     local current = lua51._G
-    for id in stringGmatch(name, '[^%.]+') do
+    for idVal in stringGmatch(name, '[^%.]+') do
+        local id = idVal
         id = stringMatch(id, '^%s*(.-)%s*$')
         pg[#pg+1] = id
         local field = rawget(current, id)

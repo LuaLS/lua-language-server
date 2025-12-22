@@ -148,12 +148,12 @@ end
 local function apply_check_level(uri, checkLevel)
     local config_disables = util.arrayToHash(config.get(uri, 'Lua.diagnostics.disable'))
     local config_severities = config.get(uri, 'Lua.diagnostics.severity')
-    for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
-        serverity = config_severities[name] or serverity
-        if serverity:sub(-1) == '!' then
-            serverity = serverity:sub(1, -2)
+    for name, defaultSeverity in pairs(define.DiagnosticDefaultSeverity) do
+        local severity = config_severities[name] or defaultSeverity
+        if severity:sub(-1) == '!' then
+            severity = severity:sub(1, -2)
         end
-        if define.DiagnosticSeverity[serverity] > checkLevel then
+        if define.DiagnosticSeverity[severity] > checkLevel then
             config_disables[name] = true
         end
     end

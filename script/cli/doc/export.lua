@@ -283,8 +283,8 @@ end
 ---@param callback fun(i, max)
 function export.makeDocs(globals, callback)
     local docs = {}
-    for i, global in ipairs(globals) do
-        table.insert(docs, export.documentObject(global))
+    for i, globalVar in ipairs(globals) do
+        table.insert(docs, export.documentObject(globalVar))
         callback(i, #globals)
     end
     docs[#docs+1] = export.getLualsConfig()

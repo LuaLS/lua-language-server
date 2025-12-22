@@ -138,9 +138,9 @@ function vm.getDefinedClass(suri, source)
             end
         end
     end
-    local global = vm.getGlobalNode(source)
-    if global then
-        for _, set in ipairs(global:getSets(suri)) do
+    local globalVar = vm.getGlobalNode(source)
+    if globalVar then
+        for _, set in ipairs(globalVar:getSets(suri)) do
             if set.bindDocs then
                 for _, doc in ipairs(set.bindDocs) do
                     if doc.type == 'doc.class' then

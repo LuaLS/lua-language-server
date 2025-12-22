@@ -175,7 +175,8 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+    for _, pathVal in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+        local path = pathVal
         if not addonRepositoryPathUpdated then
             addonRepositoryPathUpdated = true
             local addonRepositoryPath = config.get(scp.uri, 'Lua.addonRepositoryPath')
@@ -222,7 +223,8 @@ function m.getLibraryMatchers(scp)
     end
 
     local librarys = {}
-    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+    for _, pathVal in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+        local path = pathVal
         path = m.getAbsolutePath(scp.uri, path)
         if path then
             librarys[files.normalize(path)] = true

@@ -114,6 +114,10 @@ config.diagnostics.ignoredFiles.Opened   =
 "只有打開這些檔案時才會診斷。"
 config.diagnostics.ignoredFiles.Disable  =
 "不診斷這些檔案。"
+config.diagnostics.disableScheme  = -- TODO: need translate!
+'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
+config.diagnostics.validScheme  =
+'對使用以下 scheme 的lua檔案啟用診斷。'
 config.diagnostics.unusedLocalExclude =
 '如果變數名符合以下規則，則不對其進行 `unused-local` 診斷。'
 config.diagnostics.validScheme  =
@@ -177,6 +181,8 @@ config.completion.showWord.Disable       =
 "不顯示上下文單詞。"
 config.completion.autoRequire            =
 "輸入內容看起來像檔名時，自動 `require` 此檔案。"
+config.completion.maxSuggestCount        = -- TODO: need translate!
+"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
 config.completion.showParams             =
 "在建議列表中顯示函式的參數資訊，函式擁有多個定義時會分開顯示。"
 config.completion.requireSeparator       =

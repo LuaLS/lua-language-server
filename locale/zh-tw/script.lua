@@ -44,6 +44,13 @@ DIAG_AMBIGUITY_1        =
 '會優先運算 `{}` ，你可能需要加個括號。'
 DIAG_LOWERCASE_GLOBAL   =
 '首字母小寫的全域變數，你是否漏了 `local` 或是有拼寫錯誤？'
+
+ASSIGN_CONST_GLOBAL     = -- TODO: need translate!
+'Cannot assign to <const> global variable `{}`.'
+
+VARIABLE_NOT_DECLARED = -- TODO: need translate!
+'Variable `{}` not declared (global declarations active).'
+
 DIAG_EMPTY_BLOCK        =
 '空程式碼區塊'
 DIAG_DIAGNOSTICS        =
@@ -377,6 +384,8 @@ HOVER_DOCUMENT_LUA53    =
 'http://cloudwu.github.io/lua53doc/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
 'https://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUA55    = -- TODO: need translate!
+'https://www.lua.org/work/doc/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
@@ -387,6 +396,8 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["zh-cn/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA55     = -- TODO: need translate!
+'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
@@ -662,6 +673,8 @@ CLI_CHECK_SUCCESS =
 '診斷完成，沒有發現問題'
 CLI_CHECK_PROGRESS =
 '在檔案 {2} 中檢測到問題 {1}'
+CLI_CHECK_RESULTS= -- TODO: need translate!
+'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
 CLI_CHECK_RESULTS_OUTPATH =
 '診斷完成，共有 {} 個問題，請查看 {}'
 CLI_CHECK_RESULTS_PRETTY =

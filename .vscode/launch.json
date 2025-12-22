@@ -29,6 +29,7 @@
 			"address": "127.0.0.1:11422",
 			"outputCapture": [
 			],
+			"luaVersion": "lua54",
 			"sourceFormat": "string",
 			"sourceMaps": [
 				[
@@ -60,7 +61,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "lua-latest",
+			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -82,7 +83,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "lua-latest",
+			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -104,7 +105,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "lua-latest",
+			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -126,7 +127,7 @@
 				"--check",
 				"${workspaceRoot}",
 			],
-			"luaVersion": "lua-latest",
+			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -148,7 +149,7 @@
 				"--doc",
 				"${workspaceRoot}",
 			],
-			"luaVersion": "lua-latest",
+			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",

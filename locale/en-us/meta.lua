@@ -722,12 +722,29 @@ string.char                 =
 'Returns a string with length equal to the number of arguments, in which each character has the internal numeric code equal to its corresponding argument.'
 string.dump                 =
 'Returns a string containing a binary representation (a *binary chunk*) of the given function.'
+string.find                 = -- TODO: need translate!
+'查找第一个字符串中匹配到的 `pattern`（参见 §6.4.1）。'
 string.find['>5.2']         =
 'Looks for the first match of `pattern` (see §6.4.1) in the string.'
 string.find['=5.1']         =
 'Looks for the first match of `pattern` (see §5.4.1) in the string.'
 string.format               =
 'Returns a formatted version of its variable number of arguments following the description given in its first argument.'
+string.gmatch               = -- TODO: need translate!
+[[
+返回一个迭代器函数。 每次调用这个函数都会继续以 `pattern` （参见　§6.4.1） 对 s 做匹配，并返回所有捕获到的值。
+
+下面这个例子会循环迭代字符串 s 中所有的单词， 并逐行打印：
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub                 = -- TODO: need translate!
+'将字符串 s 中，所有的（或是在 n 给出时的前 n 个） pattern （参见 §6.4.1）都替换成 repl ，并返回其副本。'
 string.gmatch['>5.2']       =
 [[
 Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
@@ -762,6 +779,12 @@ string.len                  =
 'Returns its length.'
 string.lower                =
 'Returns a copy of this string with all uppercase letters changed to lowercase.'
+string.match                = -- TODO: need translate!
+'在字符串 s 中找到第一个能用 pattern （参见 §6.4.1）匹配到的部分。 如果能找到，match 返回其中的捕获物； 否则返回 nil 。'
+string.pack                 = -- TODO: need translate!
+'返回一个打包了（即以二进制形式序列化） v1, v2 等值的二进制字符串。 字符串 fmt 为打包格式（参见 §6.4.2）。'
+string.packsize             = -- TODO: need translate!
+[[返回以指定格式用 $string.pack 打包的字符串的长度。 格式化字符串中不可以有变长选项 's' 或 'z' （参见 §6.4.2）。]]
 string.match['>5.2']        =
 'Looks for the first match of `pattern` (see §6.4.1) in the string.'
 string.match['=5.1']        =

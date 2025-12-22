@@ -44,6 +44,13 @@ DIAG_AMBIGUITY_1        =
 'Calcule primeiro `{}`. Você pode precisar adicionar colchetes.'
 DIAG_LOWERCASE_GLOBAL   =
 'Variável global com inicial minúscula, você esqueceu o `local` ou digitou errado?'
+
+ASSIGN_CONST_GLOBAL     = -- TODO: need translate!
+'Cannot assign to <const> global variable `{}`.'
+
+VARIABLE_NOT_DECLARED = -- TODO: need translate!
+'Variable `{}` not declared (global declarations active).'
+
 DIAG_EMPTY_BLOCK        =
 'Bloco vazio.'
 DIAG_DIAGNOSTICS        =
@@ -377,6 +384,8 @@ HOVER_DOCUMENT_LUA53    =
 'http://www.lua.org/manual/5.3/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUA55    = -- TODO: need translate!
+'https://www.lua.org/work/doc/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
@@ -387,6 +396,8 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA55     = -- TODO: need translate!
+'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
@@ -662,6 +673,8 @@ CLI_CHECK_SUCCESS =
 'Diagnóstico completo, nenhum problema encontrado'
 CLI_CHECK_PROGRESS = -- TODO: need translate!
 'Found {} problems in {} files'
+CLI_CHECK_RESULTS= -- TODO: need translate!
+'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
 CLI_CHECK_RESULTS_OUTPATH =
 'Diagnóstico completo, {} problemas encontrados, veja {}'
 CLI_CHECK_RESULTS_PRETTY =

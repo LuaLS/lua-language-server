@@ -8,7 +8,6 @@ config.addonManager.repositoryPath =
 "Especifica la ruta git usada por el manejador de extensiones."
 config.addonRepositoryPath        = -- TODO: need translate!
 "Specifies the addon repository path (not related to the addon manager)."
-
 config.runtime.version            =
 "Versión de Lua que se ejecuta."
 config.runtime.path               =
@@ -119,8 +118,12 @@ config.diagnostics.ignoredFiles.Disable  =
 "Estos archivos no se diagnostican."
 config.diagnostics.disableScheme  =
 'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
+config.diagnostics.validScheme  = -- TODO: need translate!
+'Enable diagnostics for Lua files that use the following scheme.'
 config.diagnostics.unusedLocalExclude =
 'Las variables que calcen con el siguiente patrón no se diagnostican con `unused-local`.'
+config.diagnostics.validScheme  = -- TODO: need translate!
+'Enable diagnostics for Lua files that use the following scheme.'
 config.workspace.ignoreDir        =
 "Directorios y archivos ignorados (se usa la misma gramática que en `.gitignore`)"
 config.workspace.ignoreSubmodules =
@@ -180,6 +183,8 @@ config.completion.showWord.Disable       =
 "Sin presentar las palabras contextuales."
 config.completion.autoRequire            =
 "Agrega automáticamente el `require` correspondiente cuando la entrada se parece a un nombre de archivo."
+config.completion.maxSuggestCount        = -- TODO: need translate!
+"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
 config.completion.showParams             =
 "Muestra los parámetros en la lista de completado. Cuando la función tiene múltiples definiciones, se mostrarán por separado."
 config.completion.requireSeparator       =
@@ -260,6 +265,9 @@ config.hint.arrayIndex.Disable           =
 'Deshabilita las pistas en de los índices de arreglos.'
 config.hint.await                        =
 'Si la función que se llama está marcada con `---@async`, pregunta por un `await` en la llamada.'
+config.hint.awaitPropagate               = -- TODO: need translate!
+'Enable the propagation of `await`. When a function calls a function marked `---@async`,\z
+it will be automatically marked as `---@async`.'
 config.hint.semicolon                    =
 'Si no hay punto y coma al final de la sentencia, despliega un punto y coma virtual.'
 config.hint.semicolon.All                =
@@ -423,6 +431,8 @@ config.diagnostics['missing-return-value']  =
 'Habilita el diagnóstico para expresiones `return …` sin valores aunque la función que la contiene declare retornos.'
 config.diagnostics['need-check-nil']        =
 'Habilita el diagnóstico para usos de variables si `nil` o un valor opcional (potencialmente `nil`) haya sido asignado a la variable anteriormente.'
+config.diagnostics['unnecessary-assert']    = -- TODO: need translate!
+'Enable diagnostics for redundant assertions on truthy values.'
 config.diagnostics['no-unknown']            =
 'Habilita el diagnóstico para los casos en que el tipo no puede ser inferido.'
 config.diagnostics['not-yieldable']         =

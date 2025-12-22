@@ -172,6 +172,14 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
                 end
             else
                 data = localeMap['en-us'].map[key] or localeMap['zh-cn'].map[key]
+                if not data then
+                    for _, map in util.sortPairs(localeMap) do
+                        if map.map[key] then
+                            data = map.map[key]
+                            break
+                        end
+                    end
+                end
                 comment = ' -- TODO: need translate!'
             end
             lines[#lines+1] = key .. data.space .. '=' .. (comment or data.comment or '')

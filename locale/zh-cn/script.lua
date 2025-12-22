@@ -44,10 +44,13 @@ DIAG_AMBIGUITY_1        =
 '会优先运算 `{}`，你可能需要加个括号。'
 DIAG_LOWERCASE_GLOBAL   =
 '首字母小写的全局变量，你是否漏了 `local` 或是有拼写错误？'
+
 ASSIGN_CONST_GLOBAL     =
 '不能赋值给 <const> 全局变量 `{}`。'
+
 VARIABLE_NOT_DECLARED =
 '未声明的变量 `{}`（当前已使用 global 语法声明作用域）。'
+
 DIAG_EMPTY_BLOCK        =
 '空代码块'
 DIAG_DIAGNOSTICS        =
@@ -670,6 +673,8 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_PROGRESS =
 '检测到问题 {} 在文件 {} 中'
+CLI_CHECK_RESULTS= -- TODO: need translate!
+'Se completó el diagnóstico, se encontraron {} problema(s), vea {}'
 CLI_CHECK_RESULTS_OUTPATH =
 '诊断完成，共有 {} 个问题，请查看 {}'
 CLI_CHECK_RESULTS_PRETTY =

@@ -724,6 +724,10 @@ string.dump                 =
 'Retorna uma string contendo uma representação binária (i.e., *binary chunk*) da função dada.'
 string.find                 =
 'Procura a primeira correspondencia de `pattern` (veja §6.4.1) na string.'
+string.find['>5.2']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.find['=5.1']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
 string.format               =
 'Retorna uma versão formatada de seu número variável de argumentos após a descrição dada em seu primeiro argumento.'
 string.gmatch               =
@@ -741,6 +745,36 @@ Por exemplo, o loop a seguir irá iterar em todas as palavras da string *s*, imp
 ]]
 string.gsub                 =
 'Retorna uma cópia da *s* em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
+string.gmatch['>5.2']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gmatch['=5.1']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub['>5.2']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['=5.1']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
 string.len                  =
 'Retorna o comprimento da string.'
 string.lower                =
@@ -751,6 +785,14 @@ string.pack                 =
 'Retorna uma string binária contendo os valores `V1`, `v2`, etc. empacotados (isto é, serializado de forma binário) de acordo com o formato da string `fmt` fornecida (veja §6.4.2).'
 string.packsize             =
 'Retorna o tamanho de uma string resultante de `string.pack` com o formato da string `fmt` fornecida (veja §6.4.2).'
+string.match['>5.2']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.match['=5.1']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.pack['>5.2']         = -- TODO: need translate!
+'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
+string.packsize['>5.2']     = -- TODO: need translate!
+'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
 string.rep['>5.2']          =
 'Retorna uma string que é a concatenação de `n` cópias da string `s` separadas pela string `sep`.'
 string.rep['<5.1']          =

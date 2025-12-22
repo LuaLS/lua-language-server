@@ -117,8 +117,12 @@ config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
 "These files are not diagnosed."
 config.diagnostics.disableScheme  = -- TODO: need translate!
 'Do not diagnose Lua files that use the following scheme.'
+config.diagnostics.validScheme  = -- TODO: need translate!
+'Enable diagnostics for Lua files that use the following scheme.'
 config.diagnostics.unusedLocalExclude = -- TODO: need translate!
 'Do not diagnose `unused-local` when the variable name matches the following pattern.'
+config.diagnostics.validScheme  = -- TODO: need translate!
+'Enable diagnostics for Lua files that use the following scheme.'
 config.workspace.ignoreDir        = -- TODO: need translate!
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules = -- TODO: need translate!
@@ -178,6 +182,8 @@ config.completion.showWord.Disable       = -- TODO: need translate!
 "Do not display context words."
 config.completion.autoRequire            = -- TODO: need translate!
 "When the input looks like a file name, automatically `require` this file."
+config.completion.maxSuggestCount        = -- TODO: need translate!
+"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
 config.completion.showParams             = -- TODO: need translate!
 "Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
 config.completion.requireSeparator       = -- TODO: need translate!

@@ -1,4 +1,4 @@
-﻿---@diagnostic disable: undefined-global, lowercase-global
+---@diagnostic disable: undefined-global, lowercase-global
 
 arg                 =
 '独立版Lua的启动参数。'
@@ -702,6 +702,10 @@ string.dump                 =
 '返回包含有以二进制方式表示的（一个 *二进制代码块* ）指定函数的字符串。'
 string.find                 =
 '查找第一个字符串中匹配到的 `pattern`（参见 §6.4.1）。'
+string.find['>5.2']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.find['=5.1']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
 string.format               =
 '返回不定数量参数的格式化版本，格式化串为第一个参数。'
 string.gmatch               =
@@ -719,6 +723,36 @@ string.gmatch               =
 ]]
 string.gsub                 =
 '将字符串 s 中，所有的（或是在 n 给出时的前 n 个） pattern （参见 §6.4.1）都替换成 repl ，并返回其副本。'
+string.gmatch['>5.2']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gmatch['=5.1']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub['>5.2']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['=5.1']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
 string.len                  =
 '返回其长度。'
 string.lower                =
@@ -729,6 +763,14 @@ string.pack                 =
 '返回一个打包了（即以二进制形式序列化） v1, v2 等值的二进制字符串。 字符串 fmt 为打包格式（参见 §6.4.2）。'
 string.packsize             =
 [[返回以指定格式用 $string.pack 打包的字符串的长度。 格式化字符串中不可以有变长选项 's' 或 'z' （参见 §6.4.2）。]]
+string.match['>5.2']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.match['=5.1']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.pack['>5.2']         = -- TODO: need translate!
+'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
+string.packsize['>5.2']     = -- TODO: need translate!
+'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
 string.rep['>5.2']          =
 '返回 `n` 个字符串 `s` 以字符串 `sep` 为分割符连在一起的字符串。 默认的 `sep` 值为空字符串（即没有分割符）。 如果 `n` 不是正数则返回空串。'
 string.rep['<5.1']          =

@@ -115,10 +115,14 @@ config.diagnostics.ignoredFiles.Opened   =
 "Only when these files are opened will it be diagnosed."
 config.diagnostics.ignoredFiles.Disable  =
 "These files are not diagnosed."
+config.diagnostics.disableScheme  = -- TODO: need translate!
+'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
 config.diagnostics.validScheme  =
 'Enable diagnostics for Lua files that use the following scheme.'
 config.diagnostics.unusedLocalExclude =
 'Do not diagnose `unused-local` when the variable name matches the following pattern.'
+config.diagnostics.validScheme  =
+'Enable diagnostics for Lua files that use the following scheme.'
 config.workspace.ignoreDir        =
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules =

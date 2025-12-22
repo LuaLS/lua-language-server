@@ -707,6 +707,10 @@ string.dump                 =
 '回傳包含有以二進制方式表示的（一個 *二進制程式碼區塊* ）指定函式的字串。'
 string.find                 =
 '尋找第一個字串中配對到的 `pattern`（參見 §6.4.1）。'
+string.find['>5.2']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.find['=5.1']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
 string.format               =
 '回傳不定數量引數的格式化版本，格式化字串為第一個引數。'
 string.gmatch               =
@@ -724,6 +728,36 @@ string.gmatch               =
 ]]
 string.gsub                 =
 '將字串 s 中，所有的（或是有提供 n 時的前 n 個） `pattern` （參見 §6.4.1）都替換成 `repl` ，並回傳其副本。'
+string.gmatch['>5.2']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gmatch['=5.1']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub['>5.2']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['=5.1']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
 string.len                  =
 '回傳其長度。'
 string.lower                =
@@ -734,6 +768,14 @@ string.pack                 =
 '回傳一個壓縮了（即以二進制形式序列化） v1, v2 等值的二進制字串。字串 `fmt` 為壓縮格式（參見 §6.4.2）。'
 string.packsize             =
 [[回傳以指定格式用 $string.pack 壓縮的字串的長度。格式化字串中不可以有變長選項 's' 或 'z' （參見 §6.4.2）。]]
+string.match['>5.2']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.match['=5.1']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.pack['>5.2']         = -- TODO: need translate!
+'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
+string.packsize['>5.2']     = -- TODO: need translate!
+'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
 string.rep['>5.2']          =
 '回傳 `n` 個由字串 `s` 以字串 `sep` 為分割符連在一起的字串。預設的 `sep` 值為空字串（即沒有分割符）。如果 `n` 不是正數則回傳空字串。'
 string.rep['<5.1']          =

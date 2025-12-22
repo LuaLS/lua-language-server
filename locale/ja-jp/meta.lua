@@ -718,6 +718,10 @@ string.dump                 =
 '指定した関数をバイナリ形式（*バイナリコードブロック*）で表した文字列を返す。'
 string.find                 =
 '文字列の中から `pattern` に最初にマッチした部分を探す（§6.4.1 を参照）。マッチしたものが見つかった場合、マッチした部分の最初と最後のインデックスを返す。見つからなかった場合、`nil` を返す。'
+string.find['>5.2']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.find['=5.1']         = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
 string.format               =
 '第一引数で指定されたフォーマットに沿って、可変数の引数を成形したものを返す。'
 string.gmatch               =
@@ -734,6 +738,36 @@ string.gmatch               =
 ]]
 string.gsub                 =
 '文字列 `s` の中の `pattern` にマッチした部分をすべて `repl` に置き換えた文字列を返す（§6.4.1 を参照）。`n` が指定された場合、最初にマッチした `n` 個の部分のみを置き換える。'
+string.gmatch['>5.2']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gmatch['=5.1']       = -- TODO: need translate!
+[[
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §5.4.1) over the string s.
+
+As an example, the following loop will iterate over all the words from string s, printing one per line:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub['>5.2']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
+string.gsub['=5.1']         = -- TODO: need translate!
+'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §5.4.1) have been replaced by a replacement string specified by `repl`.'
 string.len                  =
 '文字列の長さを返す。'
 string.lower                =
@@ -744,6 +778,14 @@ string.pack                 =
 '第一引数で指定されたフォーマットに沿って、可変数の引数をバイナリ文字列にシリアライズしたものを返す（§6.4.2 を参照）。'
 string.packsize             =
 '指定されたフォーマットを用いて`string.pack`によって生成された文字列の長さを返す。フォーマット文字列には可変長オプション `s` または `z` を含めることはできない（§6.4.2 を参照）。'
+string.match['>5.2']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §6.4.1) in the string.'
+string.match['=5.1']        = -- TODO: need translate!
+'Looks for the first match of `pattern` (see §5.4.1) in the string.'
+string.pack['>5.2']         = -- TODO: need translate!
+'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
+string.packsize['>5.2']     = -- TODO: need translate!
+'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
 string.rep['>5.2']          =
 '`n` 個の文字列 `s` を文字列 `sep` で区切って連結した文字列を返す。デフォルトの `sep` は空文字列。`n` が正数でない場合は空文字列を返す。'
 string.rep['<5.1']          =

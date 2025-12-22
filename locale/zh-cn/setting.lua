@@ -114,10 +114,14 @@ config.diagnostics.ignoredFiles.Opened   =
 "只有打开这些文件时才会诊断。"
 config.diagnostics.ignoredFiles.Disable  =
 "不诊断这些文件。"
+config.diagnostics.disableScheme  = -- TODO: need translate!
+'Los archivos de Lua que siguen el siguiente esquema no se diagnostican.'
 config.diagnostics.validScheme  =
 '对使用以下 scheme 的lua文件启用诊断。'
 config.diagnostics.unusedLocalExclude =
 '如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。'
+config.diagnostics.validScheme  =
+'对使用以下 scheme 的lua文件启用诊断。'
 config.workspace.ignoreDir        =
 "忽略的文件与目录（使用 `.gitignore` 语法）。"
 config.workspace.ignoreSubmodules =
@@ -177,6 +181,8 @@ config.completion.showWord.Disable       =
 "不显示上下文单词。"
 config.completion.autoRequire            =
 "输入内容看起来是个文件名时，自动 `require` 此文件。"
+config.completion.maxSuggestCount        = -- TODO: need translate!
+"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
 config.completion.showParams             =
 "在建议列表中显示函数的参数信息，函数拥有多个定义时会分开显示。"
 config.completion.requireSeparator       =

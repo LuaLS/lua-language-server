@@ -1,4 +1,6 @@
---collectgarbage('generational', 10, 50)
+collectgarbage('generational')
+collectgarbage('param', 'minormul', 10)
+collectgarbage('param', 'minormajor', 50)
 
 ---@class never
 ---@field never never

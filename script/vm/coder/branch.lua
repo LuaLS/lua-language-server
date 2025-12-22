@@ -35,6 +35,10 @@ function C:checkCondition(exp)
             self:tryEqual(exp.exp1:trim(), exp.exp2:trim())
             self:tryEqual(exp.exp2:trim(), exp.exp1:trim())
         end
+        if exp.op == '~=' and exp.exp1 and exp.exp2 then
+            self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), true)
+            self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), true)
+        end
     end
 
     return false
@@ -42,8 +46,9 @@ end
 
 ---@param exp? LuaParser.Node.Base
 ---@param method string
+---@param otherSide? boolean
 ---@return boolean
-function C:narrow(exp, method)
+function C:narrow(exp, method, otherSide)
     if not exp then
         return false
     end
@@ -56,10 +61,11 @@ function C:narrow(exp, method)
 
     -- truly
     local value = self.branch.coder:getCustomKey('narrow|{}|{}' % { self.index, exp.uniqueKey })
-    self.branch.coder:addLine('{narrow} = rt.narrow({value}):{method}' % {
+    self.branch.coder:addLine('{narrow} = rt.narrow({value}):{method}{otherSide}' % {
         narrow = value,
         value  = self:getValueBeforeNarrow(var.name),
         method = method,
+        otherSide = otherSide and ':otherSide()' or '',
     })
     local shadow = self.branch.coder:getCustomKey('shadow|{}|{}' % { self.index, exp.uniqueKey })
     self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
@@ -94,11 +100,12 @@ end
 ---@package
 ---@param exp LuaParser.Node.Base
 ---@param other LuaParser.Node.Base
-function C:tryEqual(exp, other)
+---@param otherSide? boolean
+function C:tryEqual(exp, other, otherSide)
     -- 收窄整个变量的类型
     self:narrow(exp, 'equalValue({other})' % {
         other = self.branch.coder:getKey(other),
-    })
+    }, otherSide)
 
     -- 根据字段值来收窄类型
     if exp.kind == 'field' then
@@ -108,7 +115,7 @@ function C:tryEqual(exp, other)
             self:narrow(exp.last, 'matchField({key}, {other})' % {
                 key   = fieldCode,
                 other = self.branch.coder:getKey(other),
-            })
+            }, otherSide)
         end
     end
 end

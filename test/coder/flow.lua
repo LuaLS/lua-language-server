@@ -235,3 +235,59 @@ do
     assert(X2:view() == 'B')
     assert(XX:view() == 'A | B')
 end
+
+do
+    TEST_INDEX [[
+    ---@type 1 | 2 | 3 | 4
+    local x
+    X0 = x --> 1 | 2 | 3 | 4
+
+    if (1 ~= x) then
+        X1 = x --> 2 | 3 | 4
+    elseif (2 ~= x) then
+        X2 = x --> 1
+    else
+        X3 = x --> never
+    end
+
+    XX = x --> 1 | 2 | 3 | 4
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == '1 | 2 | 3 | 4')
+    assert(X1:view() == '2 | 3 | 4')
+    assert(X2:view() == '1')
+    assert(X3:view() == 'never')
+    assert(XX:view() == '1 | 2 | 3 | 4')
+end
+
+do
+    TEST_INDEX [[
+    ---@type { a: 1 } | { a: 2 }
+    local x
+    X0 = x --> { a: 1 } | { a: 2 }
+
+    if x.a ~= 1 then
+        X1 = x --> { a: 2 }
+    else
+        X2 = x --> { a: 1 }
+    end
+
+    XX = x --> { a: 1 } | { a: 2 }
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == '{ a: 1 } | { a: 2 }')
+    assert(X1:view() == '{ a: 2 }')
+    assert(X2:view() == '{ a: 1 }')
+    assert(XX:view() == '{ a: 1 } | { a: 2 }')
+end

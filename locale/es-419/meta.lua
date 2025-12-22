@@ -6,66 +6,103 @@ arg                 =
 assert              =
 'Alsa un error si el valor de sus argumentos es falso. (ej: `nil` ó `falso`); de lo contrario, retorna todos sus argumentos. En caso de error, `message` es el mensaje de error; cuando se omite, el valor predeterminado es `"assertion failed!"`'
 
-cgopt.collect       =
-'Realiza un ciclo completo de recolección de basura.'
-cgopt.stop          =
-'Detiene la ejecución automática.'
-cgopt.restart       =
-'Reinicia la ejecución automática.'
-cgopt.count         =
-'Retorna el total de memoria en Kbytes.'
-cgopt.step          =
+collectgarbage51    =
 [[
-Realiza un paso de recolección de basura. Esta opción puede seguirse por un entero `size`.
-Si `size` es un n positivo, el recolector actúa como si se hubieran asignado n nuevos bytes; si `size` es cero, realiza un paso básico.
-En modo incremental, un paso básico corresponde al tamaño de paso actual; en modo generacional, un paso básico realiza una recolección menor completa,
-o un paso incremental si el recolector ha agendado uno.
-En modo incremental, la función retorna `true` si el paso terminó un ciclo de recolección; en modo generacional, retorna `true` si el paso terminó una recolección mayor.
-]]
-cgopt.setpause      =
-'Establece la pausa.'
-cgopt.setstepmul    =
-'Establece el multiplicador para el paso de recolección de basura.'
-cgopt.incremental   =
-'Cambia el modo del recolector a incremental y retorna el modo anterior (sea `"generational"` o `"incremental"`).'
-cgopt.generational  =
-'Cambia el modo del recolector a generacional y retorna el modo anterior (sea `"generational"` o `"incremental"`).'
-cgopt.param         =
-[[
-Cambia y/o recupera los valores de un parámetro del recolector. Esta opción debe ir seguida de uno o dos argumentos adicionales:
-el nombre del parámetro (una cadena) y un nuevo valor opcional (un entero en el rango [0,100000]).
-La llamada siempre retorna el valor anterior del parámetro; si no se da un nuevo valor, el valor se mantiene sin cambios.
-Lua almacena estos valores en un formato comprimido, por lo que el valor retornado como anterior puede no ser exactamente el último valor establecido.
+Esta función es una interfaz genérica para el recolector de basura. Realiza diferentes funciones según su primer argumento, opt:
+
+* `"collect"`: realiza un ciclo completo de recolección de basura. Esta es la opción predeterminada.
+* `"stop"`: detiene el recolector de basura.
+* `"restart"`: reinicia el recolector de basura.
+* `"count"`: retorna la memoria total en uso por Lua (en Kbytes).
+* `"step"`: realiza un paso de recolección de basura. El "tamaño" del paso es controlado por arg (valores más grandes significan más pasos) de una manera no especificada. Si desea controlar el tamaño del paso, debe ajustar experimentalmente el valor de arg. Retorna true si el paso terminó un ciclo de recolección.
+* `"setpause"`: establece arg como el nuevo valor para la pausa del recolector (ver §2.10). Retorna el valor anterior de pausa.
+* `"setstepmul"`: establece arg como el nuevo valor para el multiplicador de paso del recolector (ver §2.10). Retorna el valor anterior del multiplicador de paso.
 ]]
 
-gcparam.minormul    =
-'El multiplicador menor.'
-gcparam.majorminor  =
-'El multiplicador mayor-menor.'
-gcparam.minormajor  =
-'El multiplicador menor-mayor.'
-gcparam.pause       =
-'La pausa del recolector de basura.'
-gcparam.stepmul     =
-'El multiplicador de paso.'
-gcparam.stepsize    =
-'El tamaño del paso.'
-
-cgopt.isrunning     =
-'Retorna si el recolector está corriendo.'
-
-collectgarbage      =
+collectgarbage52    =
 [[
-Interfaz genérica al recolector de basura. Según el primer argumento `opt`, realiza:
-• `"collect"`: Realiza un ciclo completo de recolección de basura (opción predeterminada).
-• `"stop"`: Detiene la ejecución automática; el recolector corre sólo cuando se invoca explícitamente, hasta `"restart"`.
-• `"restart"`: Reinicia la ejecución automática.
-• `"count"`: Retorna la memoria total usada por Lua en Kbytes (fraccionario; multiplique por 1024 para bytes).
-• `"step"`: Realiza un paso de recolección; entero opcional `size` controla el comportamiento y el retorno (vea `cgopt.step`).
-• `"isrunning"`: Retorna si el recolector está corriendo (es decir, no detenido).
-• `"incremental"`: Cambia el modo a incremental y retorna el modo anterior.
-• `"generational"`: Cambia el modo a generacional y retorna el modo anterior.
-• `"param"`: Cambia/lee parámetros del recolector (vea `gcparam.*`), siempre retorna el valor anterior.
+Esta función es una interfaz genérica para el recolector de basura. Realiza diferentes funciones según su primer argumento, opt:
+
+* `"collect"`: realiza un ciclo completo de recolección de basura. Esta es la opción predeterminada.
+* `"stop"`: detiene la ejecución automática del recolector de basura. El recolector solo se ejecutará cuando se invoque explícitamente, hasta una llamada para reiniciarlo.
+* `"restart"`: reinicia la ejecución automática del recolector de basura.
+* `"count"`: retorna la memoria total en uso por Lua (en Kbytes) y un segundo valor con la memoria total en bytes módulo 1024. El primer valor tiene una parte fraccionaria, por lo que la siguiente igualdad siempre es verdadera:
+    ```lua
+     k, b = collectgarbage("count")
+     assert(k*1024 == math.floor(k)*1024 + b)
+     ```
+    (El segundo resultado es útil cuando Lua se compila con un tipo no flotante para números.)
+* `"step"`: realiza un paso de recolección de basura. El "tamaño" del paso es controlado por arg (valores más grandes significan más pasos) de una manera no especificada. Si desea controlar el tamaño del paso, debe ajustar experimentalmente el valor de arg. Retorna true si el paso terminó un ciclo de recolección.
+* `"setpause"`: establece arg como el nuevo valor para la pausa del recolector (ver §2.5). Retorna el valor anterior de pausa.
+* `"setstepmul"`: establece arg como el nuevo valor para el multiplicador de paso del recolector (ver §2.5). Retorna el valor anterior del multiplicador de paso.
+* `"isrunning"`: retorna un booleano que indica si el recolector está en ejecución (es decir, no detenido).
+* `"generational"`: cambia el recolector al modo generacional. Esta es una característica experimental (ver §2.5).
+* `"incremental"`: cambia el recolector al modo incremental. Este es el modo predeterminado.
+]]
+
+collectgarbage53    =
+[[
+Esta función es una interfaz genérica para el recolector de basura. Realiza diferentes funciones según su primer argumento, opt:
+
+* `"collect"`: realiza un ciclo completo de recolección de basura. Esta es la opción predeterminada.
+* `"stop"`: detiene la ejecución automática del recolector de basura. El recolector solo se ejecutará cuando se invoque explícitamente, hasta una llamada para reiniciarlo.
+* `"restart"`: reinicia la ejecución automática del recolector de basura.
+* `"count"`: retorna la memoria total en uso por Lua en Kbytes. El valor tiene una parte fraccionaria, por lo que multiplicado por 1024 da el número exacto de bytes en uso por Lua (excepto por desbordamientos).
+* `"step"`: realiza un paso de recolección de basura. El "tamaño" del paso es controlado por arg. Con un valor cero, el recolector realizará un paso básico (indivisible). Para valores distintos de cero, el recolector se comportará como si esa cantidad de memoria (en KBytes) hubiera sido asignada por Lua. Retorna true si el paso terminó un ciclo de recolección.
+* `"setpause"`: establece arg como el nuevo valor para la pausa del recolector (ver §2.5). Retorna el valor anterior de pausa.
+* `"setstepmul"`: establece arg como el nuevo valor para el multiplicador de paso del recolector (ver §2.5). Retorna el valor anterior del multiplicador de paso.
+* "isrunning"`: retorna un booleano que indica si el recolector está en ejecución (es decir, no detenido).
+]]
+
+collectgarbage54    =
+[[
+Esta función es una interfaz genérica para el recolector de basura. Realiza diferentes funciones según su primer argumento, opt:
+
+* `"collect"`: Realiza un ciclo completo de recolección de basura. Esta es la opción predeterminada.
+* `"stop"`: Detiene la ejecución automática del recolector de basura. El recolector solo se ejecutará cuando se invoque explícitamente, hasta una llamada para reiniciarlo.
+* `"restart"`: Reinicia la ejecución automática del recolector de basura.
+* `"count"`: Retorna la memoria total en uso por Lua en Kbytes. El valor tiene una parte fraccionaria, por lo que multiplicado por 1024 da el número exacto de bytes en uso por Lua.
+* `"step"`: Realiza un paso de recolección de basura. El "tamaño" del paso es controlado por arg. Con un valor cero, el recolector realizará un paso básico (indivisible). Para valores distintos de cero, el recolector se comportará como si esa cantidad de memoria (en Kbytes) hubiera sido asignada por Lua. Retorna true si el paso terminó un ciclo de recolección.
+* `"isrunning"`: Retorna un booleano que indica si el recolector está en ejecución (es decir, no detenido).
+* `"incremental"`: Cambia el modo del recolector a incremental. Esta opción puede ir seguida de tres números: la pausa del recolector de basura, el multiplicador de paso y el tamaño del paso (ver §2.5.1). Un cero significa no cambiar ese valor.
+* `"generational"`: Cambia el modo del recolector a generacional. Esta opción puede ir seguida de dos números: el multiplicador menor del recolector de basura y el multiplicador mayor (ver §2.5.2). Un cero significa no cambiar ese valor.
+Vea §2.5 para más detalles sobre la recolección de basura y algunas de estas opciones.
+
+Esta función no debe ser llamada por un finalizador.
+]]
+
+collectgarbage55    =
+[[
+Esta función es una interfaz genérica para el recolector de basura. Realiza diferentes funciones según su primer argumento, opt:
+
+* `"collect"`: Realiza un ciclo completo de recolección de basura. Esta es la opción predeterminada.
+* `"stop"`: Detiene la ejecución automática del recolector de basura. El recolector solo se ejecutará cuando se invoque explícitamente, hasta una llamada para reiniciarlo.
+* `"restart"`: Reinicia la ejecución automática del recolector de basura.
+* `"count"`: Retorna la memoria total en uso por Lua en Kbytes. El valor tiene una parte fraccionaria, por lo que multiplicado por 1024 da el número exacto de bytes en uso por Lua.
+* `"step"`: Realiza un paso de recolección de basura. Esta opción puede ir seguida de un argumento adicional, un entero con el tamaño del paso.
+
+    Si el tamaño es un n positivo, el recolector actúa como si se hubieran asignado n nuevos bytes. Si el tamaño es cero, el recolector realiza un paso básico. En modo incremental, un paso básico corresponde al tamaño de paso actual. En modo generacional, un paso básico realiza una recolección menor completa o un paso incremental, si el recolector ha programado uno.
+
+    En modo incremental, la función retorna true si el paso terminó un ciclo de recolección. En modo generacional, la función retorna true si el paso terminó una recolección mayor.
+
+* `"isrunning"`: Retorna un booleano que indica si el recolector está en ejecución (es decir, no detenido).
+* `"incremental"`: Cambia el modo del recolector a incremental y retorna el modo anterior.
+* `"generational"`: Cambia el modo del recolector a generacional y retorna el modo anterior.
+* `"param"`: Cambia y/o recupera los valores de un parámetro del recolector. Esta opción debe ir seguida de uno o dos argumentos adicionales: El nombre del parámetro que se cambia o recupera (una cadena) y un nuevo valor opcional para ese parámetro, un entero en el rango [0,100000]. El primer argumento debe tener uno de los siguientes valores:
+    * `"minormul"`: El multiplicador menor.
+    * `"majorminor"`: El multiplicador mayor-menor.
+    * `"minormajor"`: El multiplicador menor-mayor.
+    * `"pause"`: La pausa del recolector de basura.
+    * `"stepmul"`: El multiplicador de paso.
+    * `"stepsize"`: El tamaño del paso.
+
+    La llamada siempre retorna el valor anterior del parámetro. Si la llamada no proporciona un nuevo valor, el valor permanece sin cambios.
+
+    Lua almacena estos valores en un formato comprimido, por lo que el valor retornado como valor anterior puede no ser exactamente el último valor establecido.
+
+Vea §2.5 para más detalles sobre la recolección de basura y algunas de estas opciones.
+
+Esta función no debe ser llamada por un finalizador.
 ]]
 
 dofile              =

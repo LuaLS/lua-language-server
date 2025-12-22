@@ -6,66 +6,103 @@ arg                 =
 assert              =
 'Emite um erro se o valor de seu argumento v for falso (i.e., `nil` ou `false`); caso contrário, devolve todos os seus argumentos. Em caso de erro, `message` é o objeto de erro que, quando ausente, por padrão é `"assertion failed!"`'
 
-cgopt.collect       =
-'Realiza um ciclo completo de coleta de lixo (i.e., garbage-collection cycle).'
-cgopt.stop          =
-'Interrompe a execução automática.'
-cgopt.restart       =
-'Reinicia a execução automática.'
-cgopt.count         =
-'Retorna, em Kbytes, a quantidade total de memória utilizada pela linguagem Lua.'
-cgopt.step          =
+collectgarbage51    =
 [[
-Executa um passo do coletor de lixo. Esta opção pode ser seguida por um inteiro `size`.
-Se `size` for um n positivo, o coletor age como se n novos bytes tivessem sido alocados; se `size` for zero, o coletor executa um passo básico.
-No modo incremental, um passo básico corresponde ao tamanho de passo atual; no modo geracional, um passo básico executa uma coleta menor completa,
-ou um passo incremental, se o coletor tiver agendado um.
-No modo incremental, a função retorna `true` se o passo terminou um ciclo de coleta; no modo geracional, retorna `true` se o passo terminou uma coleta maior.
-]]
-cgopt.setpause      =
-'Estabelece pausa. Defina via `arg` o intervalo de pausa do coletor de lixo (i.e., garbage-collection).'
-cgopt.setstepmul    =
-'Estabelece um multiplicador para etapa de coleta de lixo (i.e., garbage-collection). Defina via `arg` o valor multiplicador.'
-cgopt.incremental   =
-'Altera o modo do coletor para incremental e retorna o modo anterior (ou `"generational"` ou `"incremental"`).'
-cgopt.generational  =
-'Altera o modo do coletor para geracional e retorna o modo anterior (ou `"generational"` ou `"incremental"`).'
-cgopt.param         =
-[[
-Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras:
-o nome do parâmetro (uma string) e um novo valor opcional (um inteiro no intervalo [0,100000]).
-A chamada sempre retorna o valor anterior do parâmetro; se nenhum novo valor for dado, o valor permanece inalterado.
-O Lua armazena esses valores em um formato compactado, portanto o valor retornado como anterior pode não ser exatamente o último valor definido.
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: para o coletor de lixo.
+* `"restart"`: reinicia o coletor de lixo.
+* `"count"`: retorna a memória total em uso pelo Lua (em Kbytes).
+* `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg (valores maiores significam mais etapas) de uma maneira não especificada. Se você quiser controlar o tamanho da etapa, deve ajustar experimentalmente o valor de arg. Retorna true se a etapa terminou um ciclo de coleta.
+* `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.10). Retorna o valor anterior da pausa.
+* `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.10). Retorna o valor anterior do multiplicador de etapa.
 ]]
 
-gcparam.minormul    =
-'O multiplicador menor.'
-gcparam.majorminor  =
-'O multiplicador maior-menor.'
-gcparam.minormajor  =
-'O multiplicador menor-maior.'
-gcparam.pause       =
-'A pausa do coletor de lixo.'
-gcparam.stepmul     =
-'O multiplicador de passo.'
-gcparam.stepsize    =
-'O tamanho do passo.'
-
-cgopt.isrunning     =
-'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
-
-collectgarbage      =
+collectgarbage52    =
 [[
-Interface genérica para o coletor de lixo. De acordo com o primeiro argumento `opt`, executa:
-• `"collect"`: Executa um ciclo completo de coleta de lixo (opção padrão).
-• `"stop"`: Para a execução automática; o coletor só roda quando invocado explicitamente, até `"restart"`.
-• `"restart"`: Reinicia a execução automática.
-• `"count"`: Retorna a memória total usada pelo Lua em Kbytes (fracionário; multiplique por 1024 para bytes).
-• `"step"`: Executa um passo de coleta; inteiro opcional `size` controla comportamento e retorno (veja `cgopt.step`).
-• `"isrunning"`: Retorna se o coletor está rodando (ou seja, não parado).
-• `"incremental"`: Altera para modo incremental e retorna o modo anterior.
-• `"generational"`: Altera para modo geracional e retorna o modo anterior.
-• `"param"`: Altera/lê parâmetros do coletor (veja `gcparam.*`), sempre retorna o valor anterior.
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: reinicia a execução automática do coletor de lixo.
+* `"count"`: retorna a memória total em uso pelo Lua (em Kbytes) e um segundo valor com a memória total em bytes módulo 1024. O primeiro valor tem uma parte fracionária, então a seguinte igualdade é sempre verdadeira:
+    ```lua
+     k, b = collectgarbage("count")
+     assert(k*1024 == math.floor(k)*1024 + b)
+     ```
+    (O segundo resultado é útil quando Lua é compilado com um tipo não flutuante para números.)
+* `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg (valores maiores significam mais etapas) de uma maneira não especificada. Se você quiser controlar o tamanho da etapa, deve ajustar experimentalmente o valor de arg. Retorna true se a etapa terminou um ciclo de coleta.
+* `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.5). Retorna o valor anterior da pausa.
+* `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.5). Retorna o valor anterior do multiplicador de etapa.
+* `"isrunning"`: retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"generational"`: muda o coletor para o modo geracional. Este é um recurso experimental (ver §2.5).
+* `"incremental"`: muda o coletor para o modo incremental. Este é o modo padrão.
+]]
+
+collectgarbage53    =
+[[
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: reinicia a execução automática do coletor de lixo.
+* `"count"`: retorna a memória total em uso pelo Lua em Kbytes. O valor tem uma parte fracionária, de modo que multiplicado por 1024 fornece o número exato de bytes em uso pelo Lua (exceto por estouros).
+* `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg. Com um valor zero, o coletor executará uma etapa básica (indivisível). Para valores diferentes de zero, o coletor se comportará como se essa quantidade de memória (em KBytes) tivesse sido alocada pelo Lua. Retorna true se a etapa terminou um ciclo de coleta.
+* `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.5). Retorna o valor anterior da pausa.
+* `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.5). Retorna o valor anterior do multiplicador de etapa.
+* "isrunning"`: retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+]]
+
+collectgarbage54    =
+[[
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: Executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: Para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: Reinicia a execução automática do coletor de lixo.
+* `"count"`: Retorna a memória total em uso pelo Lua em Kbytes. O valor tem uma parte fracionária, de modo que multiplicado por 1024 fornece o número exato de bytes em uso pelo Lua.
+* `"step"`: Executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg. Com um valor zero, o coletor executará uma etapa básica (indivisível). Para valores diferentes de zero, o coletor se comportará como se essa quantidade de memória (em Kbytes) tivesse sido alocada pelo Lua. Retorna true se a etapa terminou um ciclo de coleta.
+* `"isrunning"`: Retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"incremental"`: Muda o modo do coletor para incremental. Esta opção pode ser seguida por três números: a pausa do coletor de lixo, o multiplicador de etapa e o tamanho da etapa (ver §2.5.1). Um zero significa não alterar esse valor.
+* `"generational"`: Muda o modo do coletor para geracional. Esta opção pode ser seguida por dois números: o multiplicador menor do coletor de lixo e o multiplicador maior (ver §2.5.2). Um zero significa não alterar esse valor.
+Veja §2.5 para mais detalhes sobre coleta de lixo e algumas dessas opções.
+
+Esta função não deve ser chamada por um finalizador.
+]]
+
+collectgarbage55    =
+[[
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: Executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: Para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: Reinicia a execução automática do coletor de lixo.
+* `"count"`: Retorna a memória total em uso pelo Lua em Kbytes. O valor tem uma parte fracionária, de modo que multiplicado por 1024 fornece o número exato de bytes em uso pelo Lua.
+* `"step"`: Executa uma etapa de coleta de lixo. Esta opção pode ser seguida por um argumento extra, um inteiro com o tamanho da etapa.
+
+    Se o tamanho for um n positivo, o coletor age como se n novos bytes tivessem sido alocados. Se o tamanho for zero, o coletor executa uma etapa básica. No modo incremental, uma etapa básica corresponde ao tamanho de etapa atual. No modo geracional, uma etapa básica executa uma coleta menor completa ou uma etapa incremental, se o coletor tiver agendado uma.
+
+    No modo incremental, a função retorna true se a etapa terminou um ciclo de coleta. No modo geracional, a função retorna true se a etapa terminou uma coleta maior.
+
+* `"isrunning"`: Retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"incremental"`: Muda o modo do coletor para incremental e retorna o modo anterior.
+* `"generational"`: Muda o modo do coletor para geracional e retorna o modo anterior.
+* `"param"`: Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras: O nome do parâmetro sendo alterado ou recuperado (uma string) e um novo valor opcional para esse parâmetro, um inteiro no intervalo [0,100000]. O primeiro argumento deve ter um dos seguintes valores:
+    * `"minormul"`: O multiplicador menor.
+    * `"majorminor"`: O multiplicador maior-menor.
+    * `"minormajor"`: O multiplicador menor-maior.
+    * `"pause"`: A pausa do coletor de lixo.
+    * `"stepmul"`: O multiplicador de etapa.
+    * `"stepsize"`: O tamanho da etapa.
+
+    A chamada sempre retorna o valor anterior do parâmetro. Se a chamada não fornecer um novo valor, o valor permanece inalterado.
+
+    Lua armazena esses valores em um formato compactado, então, o valor retornado como o valor anterior pode não ser exatamente o último valor definido.
+
+Veja §2.5 para mais detalhes sobre coleta de lixo e algumas dessas opções.
+
+Esta função não deve ser chamada por um finalizador.
 ]]
 
 dofile              =

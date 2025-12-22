@@ -178,28 +178,60 @@ do
     assert(XX:view() == '1 | 2 | 3 | 4')
 end
 
--- do
---     TEST_INDEX [[
---     ---@type { a: 1 } | { a: 2 }
---     local x
---     X0 = x --> { a: 1 } | { a: 2 }
+do
+    TEST_INDEX [[
+    ---@type { a: 1 } | { a: 2 }
+    local x
+    X0 = x --> { a: 1 } | { a: 2 }
 
---     if x.a == 1 then
---         X1 = x --> { a: 1 }
---     else
---         X2 = x --> { a: 2 }
---     end
+    if x.a == 1 then
+        X1 = x --> { a: 1 }
+    else
+        X2 = x --> { a: 2 }
+    end
 
---     XX = x --> { a: 1 } | { a: 2 }
---     ]]
+    XX = x --> { a: 1 } | { a: 2 }
+    ]]
 
---     local X0 = rt:globalGet('X0')
---     local X1 = rt:globalGet('X1')
---     local X2 = rt:globalGet('X2')
---     local XX = rt:globalGet('XX')
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
 
---     assert(X0:view() == '{ a: 1 } | { a: 2 }')
---     assert(X1:view() == '{ a: 1 }')
---     assert(X2:view() == '{ a: 2 }')
---     assert(XX:view() == '{ a: 1 } | { a: 2 }')
--- end
+    assert(X0:view() == '{ a: 1 } | { a: 2 }')
+    assert(X1:view() == '{ a: 1 }')
+    assert(X2:view() == '{ a: 2 }')
+    assert(XX:view() == '{ a: 1 } | { a: 2 }')
+end
+
+do
+    TEST_INDEX [[
+    ---@class A
+    ---@field a integer
+
+    ---@class B
+    ---@field b integer
+    
+    ---@type A | B
+    local x
+    X0 = x --> A | B
+
+    if x.a then
+        X1 = x --> A
+    else
+        X2 = x --> B
+    end
+
+    XX = x --> A | B
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == 'A | B')
+    assert(X1:view() == 'A')
+    assert(X2:view() == 'B')
+    assert(XX:view() == 'A | B')
+end

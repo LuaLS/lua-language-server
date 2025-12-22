@@ -32,18 +32,21 @@ function C:checkCondition(exp)
     if exp.kind == 'binary' then
         ---@cast exp LuaParser.Node.Binary
         if exp.op == '==' and exp.exp1 and exp.exp2 then
-            return self:tryEqual(exp.exp1:trim(), exp.exp2:trim())
-                or self:tryEqual(exp.exp2:trim(), exp.exp1:trim())
+            self:tryEqual(exp.exp1:trim(), exp.exp2:trim())
+            self:tryEqual(exp.exp2:trim(), exp.exp1:trim())
         end
     end
 
     return false
 end
 
----@param exp LuaParser.Node.Base
+---@param exp? LuaParser.Node.Base
 ---@param method string
 ---@return boolean
 function C:narrow(exp, method)
+    if not exp then
+        return false
+    end
     local var = self.branch.flow:getVar(exp)
 
     if not var then
@@ -73,19 +76,41 @@ end
 
 ---@package
 ---@param exp LuaParser.Node.Base
----@return boolean
 function C:tryTruly(exp)
-    return self:narrow(exp, 'truly()')
+    self:narrow(exp, 'truly()')
+
+    -- 根据字段来收窄类型
+    if exp.kind == 'field' then
+        ---@cast exp LuaParser.Node.Field
+        local fieldCode = self.branch.coder:makeFieldCode(exp.key)
+        if fieldCode then
+            self:narrow(exp.last, 'matchField({key}, rt.TRULY)' % {
+                key   = fieldCode,
+            })
+        end
+    end
 end
 
 ---@package
 ---@param exp LuaParser.Node.Base
 ---@param other LuaParser.Node.Base
----@return boolean
 function C:tryEqual(exp, other)
-    return self:narrow(exp, 'equalValue({other})' % {
+    -- 收窄整个变量的类型
+    self:narrow(exp, 'equalValue({other})' % {
         other = self.branch.coder:getKey(other),
     })
+
+    -- 根据字段值来收窄类型
+    if exp.kind == 'field' then
+        ---@cast exp LuaParser.Node.Field
+        local fieldCode = self.branch.coder:makeFieldCode(exp.key)
+        if fieldCode then
+            self:narrow(exp.last, 'matchField({key}, {other})' % {
+                key   = fieldCode,
+                other = self.branch.coder:getKey(other),
+            })
+        end
+    end
 end
 
 ---@param name string

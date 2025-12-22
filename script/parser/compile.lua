@@ -1607,7 +1607,15 @@ local function isKeyWord(word, nextToken)
     end
     if word == 'global' then
         if State.version == 'Lua 5.5' then
-            return true
+            if not nextToken then
+                return true
+            end
+            if nextToken == '*'
+            or nextToken == '<'
+            or CharMapWord[ssub(nextToken, 1, 1)] then
+                return true
+            end
+            return false
         end
         return false
     end

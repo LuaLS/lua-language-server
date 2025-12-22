@@ -253,7 +253,7 @@ TEST[[
 TEST [[
 local <?v?> = collectgarbage()
 ]]
-"local v: any"
+"local v: nil"
 
 TEST [[
 local type

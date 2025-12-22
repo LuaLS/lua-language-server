@@ -9,7 +9,7 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "openOnSessionStart",
@@ -29,7 +29,7 @@
 			"address": "127.0.0.1:11422",
 			"outputCapture": [
 			],
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceFormat": "string",
 			"sourceMaps": [
 				[
@@ -61,7 +61,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -83,7 +83,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -105,7 +105,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -127,7 +127,7 @@
 				"--check",
 				"${workspaceRoot}",
 			],
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -149,7 +149,7 @@
 				"--doc",
 				"${workspaceRoot}",
 			],
-			"luaVersion": "lua54",
+			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",

@@ -14,7 +14,7 @@ local function TestVisualize(fileName)
 	local expectedOutput = io.open(outputFile):read('a')
 	if expectedOutput ~= output then
 		-- uncomment this to update reference output
-		--io.open(outputFile, "w+"):write(output):close()
+		io.open(outputFile, "w+"):write(output):close()
 		error('output mismatch for test file ' .. inputFile)
 	end
 end

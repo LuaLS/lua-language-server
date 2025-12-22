@@ -2,11 +2,11 @@ digraph AST {
 	node [shape = rect]
 	"main:0:170009" [
 		label="main\l\l"
-		tooltip="start: 0\nfinish: 170009\nstate: <table>\nlocals: <table>\nbstart: 0\nbfinish: 170009\n1: <node setglobal>\n2: <node setglobal>\n3: <node setglobal>\n4: <node setglobal>\n5: <node setglobal>\n6: <node setglobal>\n7: <node setglobal>\n8: <node setglobal>\n9: <node setglobal>\n10: <node setglobal>\n11: <node setglobal>\n12: <node setglobal>\n13: <node setglobal>\n14: <node setglobal>\n15: <node setglobal>\n15..17: (...)\n"
+		tooltip="start: 0\nfinish: 170009\nbfinish: 170009\nbstart: 0\nlocals: <table>\nstate: <table>\n1: <node setglobal>\n2: <node setglobal>\n3: <node setglobal>\n4: <node setglobal>\n5: <node setglobal>\n6: <node setglobal>\n7: <node setglobal>\n8: <node setglobal>\n9: <node setglobal>\n10: <node setglobal>\n11: <node setglobal>\n12: <node setglobal>\n13: <node setglobal>\n14: <node setglobal>\n15: <node setglobal>\n15..17: (...)\n"
 	]
 	"setglobal:0:1" [
 		label="setglobal\ls\l"
-		tooltip="start: 0\nfinish: 1\nnode: <node local>\nrange: 101\nvalue: <node string>\neffect: 101\n1: s\n"
+		tooltip="start: 0\nfinish: 1\neffect: 101\nnode: <node local>\nrange: 101\nvalue: <node string>\n1: s\n"
 	]
 	"main:0:170009" -> "setglobal:0:1"
 	"string:4:101" [
@@ -16,7 +16,7 @@ digraph AST {
 	"setglobal:0:1" -> "string:4:101"
 	"setglobal:10000:10001" [
 		label="setglobal\ls\l"
-		tooltip="start: 10000\nfinish: 10001\nnode: <node local>\nrange: 10031\nvalue: <node string>\neffect: 10031\n1: s\n"
+		tooltip="start: 10000\nfinish: 10001\neffect: 10031\nnode: <node local>\nrange: 10031\nvalue: <node string>\n1: s\n"
 	]
 	"main:0:170009" -> "setglobal:10000:10001"
 	"string:10004:10031" [
@@ -26,7 +26,7 @@ digraph AST {
 	"setglobal:10000:10001" -> "string:10004:10031"
 	"setglobal:20000:20001" [
 		label="setglobal\lx\l"
-		tooltip="start: 20000\nfinish: 20001\nnode: <node local>\nrange: 20009\nvalue: <node binary>\neffect: 20009\n1: x\n"
+		tooltip="start: 20000\nfinish: 20001\neffect: 20009\nnode: <node local>\nrange: 20009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:20000:20001"
 	"binary:20004:20009" [
@@ -46,7 +46,7 @@ digraph AST {
 	"binary:20004:20009" -> "integer:20008:20009"
 	"setglobal:30000:30001" [
 		label="setglobal\lx\l"
-		tooltip="start: 30000\nfinish: 30001\nnode: <node local>\nrange: 30009\nvalue: <node binary>\neffect: 30009\n1: x\n"
+		tooltip="start: 30000\nfinish: 30001\neffect: 30009\nnode: <node local>\nrange: 30009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:30000:30001"
 	"binary:30004:30009" [
@@ -66,7 +66,7 @@ digraph AST {
 	"binary:30004:30009" -> "integer:30008:30009"
 	"setglobal:40000:40001" [
 		label="setglobal\lx\l"
-		tooltip="start: 40000\nfinish: 40001\nnode: <node local>\nrange: 40009\nvalue: <node binary>\neffect: 40009\n1: x\n"
+		tooltip="start: 40000\nfinish: 40001\neffect: 40009\nnode: <node local>\nrange: 40009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:40000:40001"
 	"binary:40004:40009" [
@@ -86,7 +86,7 @@ digraph AST {
 	"binary:40004:40009" -> "integer:40008:40009"
 	"setglobal:50000:50001" [
 		label="setglobal\lx\l"
-		tooltip="start: 50000\nfinish: 50001\nnode: <node local>\nrange: 50009\nvalue: <node binary>\neffect: 50009\n1: x\n"
+		tooltip="start: 50000\nfinish: 50001\neffect: 50009\nnode: <node local>\nrange: 50009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:50000:50001"
 	"binary:50004:50009" [
@@ -106,7 +106,7 @@ digraph AST {
 	"binary:50004:50009" -> "integer:50008:50009"
 	"setglobal:60000:60001" [
 		label="setglobal\lx\l"
-		tooltip="start: 60000\nfinish: 60001\nnode: <node local>\nrange: 60009\nvalue: <node binary>\neffect: 60009\n1: x\n"
+		tooltip="start: 60000\nfinish: 60001\neffect: 60009\nnode: <node local>\nrange: 60009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:60000:60001"
 	"binary:60004:60009" [
@@ -126,7 +126,7 @@ digraph AST {
 	"binary:60004:60009" -> "integer:60008:60009"
 	"setglobal:70000:70001" [
 		label="setglobal\lx\l"
-		tooltip="start: 70000\nfinish: 70001\nnode: <node local>\nrange: 70009\nvalue: <node binary>\neffect: 70009\n1: x\n"
+		tooltip="start: 70000\nfinish: 70001\neffect: 70009\nnode: <node local>\nrange: 70009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:70000:70001"
 	"binary:70004:70009" [
@@ -146,7 +146,7 @@ digraph AST {
 	"binary:70004:70009" -> "integer:70008:70009"
 	"setglobal:80000:80001" [
 		label="setglobal\lx\l"
-		tooltip="start: 80000\nfinish: 80001\nnode: <node local>\nrange: 80009\nvalue: <node binary>\neffect: 80009\n1: x\n"
+		tooltip="start: 80000\nfinish: 80001\neffect: 80009\nnode: <node local>\nrange: 80009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:80000:80001"
 	"binary:80004:80009" [
@@ -166,7 +166,7 @@ digraph AST {
 	"binary:80004:80009" -> "integer:80008:80009"
 	"setglobal:90000:90001" [
 		label="setglobal\lx\l"
-		tooltip="start: 90000\nfinish: 90001\nnode: <node local>\nrange: 90009\nvalue: <node binary>\neffect: 90009\n1: x\n"
+		tooltip="start: 90000\nfinish: 90001\neffect: 90009\nnode: <node local>\nrange: 90009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:90000:90001"
 	"binary:90004:90009" [
@@ -186,7 +186,7 @@ digraph AST {
 	"binary:90004:90009" -> "integer:90008:90009"
 	"setglobal:100000:100001" [
 		label="setglobal\lx\l"
-		tooltip="start: 100000\nfinish: 100001\nnode: <node local>\nrange: 100009\nvalue: <node binary>\neffect: 100009\n1: x\n"
+		tooltip="start: 100000\nfinish: 100001\neffect: 100009\nnode: <node local>\nrange: 100009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:100000:100001"
 	"binary:100004:100009" [
@@ -206,7 +206,7 @@ digraph AST {
 	"binary:100004:100009" -> "integer:100008:100009"
 	"setglobal:110000:110001" [
 		label="setglobal\lx\l"
-		tooltip="start: 110000\nfinish: 110001\nnode: <node local>\nrange: 110009\nvalue: <node binary>\neffect: 110009\n1: x\n"
+		tooltip="start: 110000\nfinish: 110001\neffect: 110009\nnode: <node local>\nrange: 110009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:110000:110001"
 	"binary:110004:110009" [
@@ -226,7 +226,7 @@ digraph AST {
 	"binary:110004:110009" -> "integer:110008:110009"
 	"setglobal:120000:120001" [
 		label="setglobal\lx\l"
-		tooltip="start: 120000\nfinish: 120001\nnode: <node local>\nrange: 120009\nvalue: <node binary>\neffect: 120009\n1: x\n"
+		tooltip="start: 120000\nfinish: 120001\neffect: 120009\nnode: <node local>\nrange: 120009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:120000:120001"
 	"binary:120004:120009" [
@@ -246,7 +246,7 @@ digraph AST {
 	"binary:120004:120009" -> "integer:120008:120009"
 	"setglobal:130000:130001" [
 		label="setglobal\lx\l"
-		tooltip="start: 130000\nfinish: 130001\nnode: <node local>\nrange: 130009\nvalue: <node binary>\neffect: 130009\n1: x\n"
+		tooltip="start: 130000\nfinish: 130001\neffect: 130009\nnode: <node local>\nrange: 130009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:130000:130001"
 	"binary:130004:130009" [
@@ -266,7 +266,7 @@ digraph AST {
 	"binary:130004:130009" -> "integer:130008:130009"
 	"setglobal:140000:140001" [
 		label="setglobal\lx\l"
-		tooltip="start: 140000\nfinish: 140001\nnode: <node local>\nrange: 140009\nvalue: <node binary>\neffect: 140009\n1: x\n"
+		tooltip="start: 140000\nfinish: 140001\neffect: 140009\nnode: <node local>\nrange: 140009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:140000:140001"
 	"binary:140004:140009" [
@@ -286,7 +286,7 @@ digraph AST {
 	"binary:140004:140009" -> "integer:140008:140009"
 	"setglobal:160000:160001" [
 		label="setglobal\lx\l"
-		tooltip="start: 160000\nfinish: 160001\nnode: <node local>\nrange: 160009\nvalue: <node binary>\neffect: 160009\n1: x\n"
+		tooltip="start: 160000\nfinish: 160001\neffect: 160009\nnode: <node local>\nrange: 160009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:160000:160001"
 	"binary:160004:160009" [
@@ -306,7 +306,7 @@ digraph AST {
 	"binary:160004:160009" -> "integer:160008:160009"
 	"setglobal:170000:170001" [
 		label="setglobal\lx\l"
-		tooltip="start: 170000\nfinish: 170001\nnode: <node local>\nrange: 170009\nvalue: <node binary>\neffect: 170009\n1: x\n"
+		tooltip="start: 170000\nfinish: 170001\neffect: 170009\nnode: <node local>\nrange: 170009\nvalue: <node binary>\n1: x\n"
 	]
 	"main:0:170009" -> "setglobal:170000:170001"
 	"binary:170004:170009" [

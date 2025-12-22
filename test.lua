@@ -21,7 +21,9 @@ if arg then
    end
 end
 
-collectgarbage 'generational'
+--collectgarbage 'generational'
+collectgarbage('param', 'minormul', 10)
+collectgarbage('param', 'minormajor', 50)
 
 ---@diagnostic disable-next-line: duplicate-set-field
 io.write = function () end

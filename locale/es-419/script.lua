@@ -385,7 +385,7 @@ HOVER_DOCUMENT_LUA53   =
 HOVER_DOCUMENT_LUA54   =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUA55    =
-'https://www.lua.org/work/doc/manual.html#{}'
+'https://www.lua.org/manual/5.5/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT  =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51    =

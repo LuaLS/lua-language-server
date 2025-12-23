@@ -25,19 +25,28 @@ end
 
 ---@package
 ---@param exp LuaParser.Node.Base
+---@param otherSide? boolean
 ---@return boolean
-function C:checkCondition(exp)
-    self:tryTruly(exp)
+function C:checkCondition(exp, otherSide)
+    self:tryTruly(exp, otherSide)
 
     if exp.kind == 'binary' then
         ---@cast exp LuaParser.Node.Binary
         if exp.op == '==' and exp.exp1 and exp.exp2 then
-            self:tryEqual(exp.exp1:trim(), exp.exp2:trim())
-            self:tryEqual(exp.exp2:trim(), exp.exp1:trim())
+            self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), otherSide)
+            self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), otherSide)
         end
         if exp.op == '~=' and exp.exp1 and exp.exp2 then
-            self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), true)
-            self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), true)
+            self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), not otherSide)
+            self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), not otherSide)
+        end
+    end
+
+    if exp.kind == 'unary' then
+        ---@cast exp LuaParser.Node.Unary
+        if exp.op == 'not' and exp.exp then
+            local innerExp = exp.exp:trim()
+            self:checkCondition(innerExp, not otherSide)
         end
     end
 
@@ -82,8 +91,9 @@ end
 
 ---@package
 ---@param exp LuaParser.Node.Base
-function C:tryTruly(exp)
-    self:narrow(exp, 'truly()')
+---@param otherSide? boolean
+function C:tryTruly(exp, otherSide)
+    self:narrow(exp, 'truly()', otherSide)
 
     -- 根据字段来收窄类型
     if exp.kind == 'field' then
@@ -92,7 +102,7 @@ function C:tryTruly(exp)
         if fieldCode then
             self:narrow(exp.last, 'matchField({key}, rt.TRULY)' % {
                 key   = fieldCode,
-            })
+            }, otherSide)
         end
     end
 end

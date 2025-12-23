@@ -428,6 +428,9 @@ end
 ---@return Node
 ---@return boolean exists
 function M:get(key)
+    if self:getCurrentValue() then
+        return self:getCurrentValue():get(key)
+    end
     if self.masterVariable then
         return self.masterVariable:get(key)
     end

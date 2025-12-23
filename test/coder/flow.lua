@@ -291,3 +291,29 @@ do
     assert(X2:view() == '{ a: 1 }')
     assert(XX:view() == '{ a: 1 } | { a: 2 }')
 end
+
+do
+    TEST_INDEX [[
+    ---@type integer?
+    local x
+    X0 = x --> integer | nil
+
+    if not x then
+        X1 = x --> nil
+    else
+        X2 = x --> integer
+    end
+
+    X3 = x --> integer | nil
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+
+    assert(X0:view() == 'integer | nil')
+    assert(X1:view() == 'nil')
+    assert(X2:view() == 'integer')
+    assert(X3:view() == 'integer | nil')
+end

@@ -6,7 +6,7 @@ local C = Class 'Coder.Branch.Child'
 
 ---@param branch Coder.Branch
 ---@param index integer
----@param callback fun()
+---@param callback? fun()
 function C:__init(branch, index, callback)
     self.branch = branch
     self.index = index
@@ -32,21 +32,39 @@ function C:checkCondition(exp, otherSide)
 
     if exp.kind == 'binary' then
         ---@cast exp LuaParser.Node.Binary
-        if exp.op == '==' and exp.exp1 and exp.exp2 then
-            self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), otherSide)
-            self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), otherSide)
-        end
-        if exp.op == '~=' and exp.exp1 and exp.exp2 then
-            self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), not otherSide)
-            self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), not otherSide)
+        if exp.exp1 and exp.exp2 then
+            if exp.op == '==' then
+                self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), otherSide)
+                self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), otherSide)
+            end
+            if exp.op == '~=' then
+                self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), not otherSide)
+                self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), not otherSide)
+            end
+            if exp.op == 'and' then
+                local branch = self.branch.flow:getBranch(exp)
+                if branch then
+                    local lastChild = branch.childs[#branch.childs]
+                    for name in pairs(branch.cares) do
+                        self.branch:careVar(name, self:getVarKeyBeforeNarrow(name))
+                        self.narrowReasons[name]     = lastChild.narrowReasons[name]
+                        self.varKeyAfterNarrow[name] = lastChild:getVarKeyAfterNarrow(name)
+                        self.valueAfterNarrow[name]  = lastChild:getValueAfterNarrow(name)
+                        self.otherSideVarKeyAfterNarrow[name] = lastChild:getOtherSideVarKeyAfterNarrow(name)
+                        self.otherSideValueAfterNarrow[name]  = lastChild:getOtherSideValueAfterNarrow(name)
+                    end
+                end
+            end
         end
     end
 
     if exp.kind == 'unary' then
         ---@cast exp LuaParser.Node.Unary
-        if exp.op == 'not' and exp.exp then
-            local innerExp = exp.exp:trim()
-            self:checkCondition(innerExp, not otherSide)
+        if exp.exp then
+            if exp.op == 'not' then
+                local innerExp = exp.exp:trim()
+                self:checkCondition(innerExp, not otherSide)
+            end
         end
     end
 
@@ -69,14 +87,22 @@ function C:narrow(exp, method, otherSide)
     self.branch:careVar(var.name, var.currentKey)
 
     -- truly
-    local value = self.branch.coder:getCustomKey('narrow|{}|{}' % { self.index, exp.uniqueKey })
+    local value = self.branch.coder:getCustomKey('narrow|{mode}|{index}|{uniqueKey}' % {
+        mode = self.branch.mode,
+        index = self.index,
+        uniqueKey = exp.uniqueKey,
+    })
     self.branch.coder:addLine('{narrow} = rt.narrow({value}):{method}{otherSide}' % {
         narrow = value,
         value  = self:getValueBeforeNarrow(var.name),
         method = method,
         otherSide = otherSide and ':otherSide()' or '',
     })
-    local shadow = self.branch.coder:getCustomKey('shadow|{}|{}' % { self.index, exp.uniqueKey })
+    local shadow = self.branch.coder:getCustomKey('shadow|{mode}|{index}|{uniqueKey}' % {
+        mode = self.branch.mode,
+        index = self.index,
+        uniqueKey = exp.uniqueKey,
+    })
     self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
         shadow = shadow,
         var    = self:getVarKeyBeforeNarrow(var.name),
@@ -135,7 +161,12 @@ end
 function C:getVarKeyBeforeNarrow(name)
     local lastChild = self.branch.childs[self.index - 1]
     if lastChild then
-        return lastChild:getOtherSideVarKeyAfterNarrow(name)
+        if self.branch.mode == 'if' then
+            return lastChild:getOtherSideVarKeyAfterNarrow(name)
+        end
+        if self.branch.mode == 'and' then
+            return lastChild:getVarKeyAfterNarrow(name)
+        end
     end
     local currentVar = self.branch.flow:getVarByName(name)
     assert(currentVar)
@@ -147,7 +178,12 @@ end
 function C:getValueBeforeNarrow(name)
     local lastChild = self.branch.childs[self.index - 1]
     if lastChild then
-        return lastChild:getOtherSideValueAfterNarrow(name)
+        if self.branch.mode == 'if' then
+            return lastChild:getOtherSideValueAfterNarrow(name)
+        end
+        if self.branch.mode == 'and' then
+            return lastChild:getValueAfterNarrow(name)
+        end
     end
     local currentVar = self.branch.flow:getVarByName(name)
     assert(currentVar)
@@ -163,11 +199,32 @@ function C:getOtherSideValueAfterNarrow(name)
             return self:getValueBeforeNarrow(name)
         end
         local value = self.valueAfterNarrow[name]
-        local otherSide = self.branch.coder:getCustomKey('narrow-os|{}|{}' % { self.index, reason.uniqueKey })
-        self.branch.coder:addLine('{other} = {value}:otherSide()' % {
-            other = otherSide,
-            value = value,
+        local otherSide = self.branch.coder:getCustomKey('narrow-os|{mode}|{index}|{uniqueKey}' % {
+            mode = self.branch.mode,
+            index = self.index,
+            uniqueKey = reason.uniqueKey,
         })
+        if self.branch.mode == 'if' then
+            self.branch.coder:addLine('{other} = {value}:otherSide()' % {
+                other = otherSide,
+                value = value,
+            })
+        end
+        if self.branch.mode == 'and' then
+            if self.index == 1 then
+                self.branch.coder:addLine('{other} = {value}:otherSide()' % {
+                    other = otherSide,
+                    value = value,
+                })
+            end
+            if self.index == 2 then
+                self.branch.coder:addLine('{other} = {value}:otherSide() | {lastValue}' % {
+                    other = otherSide,
+                    value = value,
+                    lastValue = self.branch.childs[1]:getOtherSideValueAfterNarrow(name),
+                })
+            end
+        end
         self.otherSideValueAfterNarrow[name] = otherSide
     end
     return self.otherSideValueAfterNarrow[name]
@@ -182,7 +239,11 @@ function C:getOtherSideVarKeyAfterNarrow(name)
             return self:getVarKeyBeforeNarrow(name)
         end
         local value = self:getOtherSideValueAfterNarrow(name)
-        local shadow = self.branch.coder:getCustomKey('shadow-os|{}|{}' % { self.index, reason.uniqueKey })
+        local shadow = self.branch.coder:getCustomKey('shadow-os|{mode}|{index}|{uniqueKey}' % {
+            mode = self.branch.mode,
+            index = self.index,
+            uniqueKey = reason.uniqueKey,
+        })
         self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
             shadow = shadow,
             var    = self:getVarKeyBeforeNarrow(name),
@@ -191,6 +252,13 @@ function C:getOtherSideVarKeyAfterNarrow(name)
         self.otherSideVarKeyAfterNarrow[name] = shadow
     end
     return self.otherSideVarKeyAfterNarrow[name]
+end
+
+---@param name string
+---@return string
+function C:getValueAfterNarrow(name)
+    return self.valueAfterNarrow[name]
+        or self:getValueBeforeNarrow(name)
 end
 
 ---@param name string
@@ -222,9 +290,11 @@ end
 
 ---@param flow Coder.Flow
 ---@param node LuaParser.Node.Base
-function M:__init(flow, node)
+---@param mode 'if' | 'and' | 'or'
+function M:__init(flow, node, mode)
     self.flow = flow
     self.node = node
+    self.mode = mode
     self.coder = self.flow.coder
     --- 保存关心的变量及其初始key
     ---@type table<string, string>
@@ -239,7 +309,8 @@ function M:__close()
 end
 
 ---@param condition? LuaParser.Node.Exp
----@param callback fun()
+---@param callback? fun()
+---@return Coder.Branch
 function M:addChild(condition, callback)
     local exp = condition and condition:trim()
 
@@ -250,6 +321,8 @@ function M:addChild(condition, callback)
         self.coder:compile(exp)
         child:checkCondition(exp)
     end
+
+    return self
 end
 
 ---@package
@@ -262,18 +335,21 @@ function M:careVar(name, varKey)
     self.cares[name] = varKey
 end
 
+---@return Coder.Branch
 function M:finish()
     if self.finished then
-        return
+        return self
     end
     self.finished = true
 
     local function runCallbacks()
         for _, child in ipairs(self.childs) do
-            local newStack = self.flow:pushStack()
-            child:preprocessStack(newStack)
-            child.callback()
-            self.flow:popStack()
+            if child.callback then
+                local newStack = self.flow:pushStack()
+                child:preprocessStack(newStack)
+                child.callback()
+                self.flow:popStack()
+            end
         end
     end
 
@@ -299,12 +375,20 @@ function M:finish()
             for i, child in ipairs(self.childs) do
                 unions[i] = child:getVarKeyAfterCallback(name)
             end
-            local valueKey = self.coder:getCustomKey('value-apply|{}|{}' % { name, self.node.uniqueKey })
+            local valueKey = self.coder:getCustomKey('value-apply|{mode}|{name}|{uniqueKey}' % {
+                mode = self.mode,
+                name = name,
+                uniqueKey = self.node.uniqueKey,
+            })
             self.coder:addLine('{value} = rt.union { {unions} }' % {
                 value  = valueKey,
                 unions = table.concat(unions, ', '),
             })
-            local shadowKey = self.coder:getCustomKey('shadow-apply|{}|{}' % { name, self.node.uniqueKey })
+            local shadowKey = self.coder:getCustomKey('shadow-apply|{mode}|{name}|{uniqueKey}' % {
+                mode = self.mode,
+                name = name,
+                uniqueKey = self.node.uniqueKey,
+            })
             self.coder:addLine('{shadow} = {var}:shadow({value})' % {
                 shadow = shadowKey,
                 var    = self.cares[name],
@@ -314,9 +398,13 @@ function M:finish()
         end
     end
 
-    runCallbacks()
+    if self.mode == 'if' then
+        runCallbacks()
 
-    local changedVars = collectChangedVars()
+        local changedVars = collectChangedVars()
 
-    applyChangedVars(changedVars)
+        applyChangedVars(changedVars)
+    end
+
+    return self
 end

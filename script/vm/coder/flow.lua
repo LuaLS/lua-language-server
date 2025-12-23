@@ -129,6 +129,8 @@ function M:__init(coder)
     self.coder = coder
     ---@type Coder.Flow.Stack[]
     self.stacks = {}
+    ---@type table<LuaParser.Node.Base, Coder.Branch>
+    self.nodeBranches = {}
 
     self:pushStack()
 end
@@ -214,8 +216,16 @@ function M:setVarKey(source, key)
 end
 
 ---@param node LuaParser.Node.Base
+---@param mode 'if' | 'and' | 'or'
 ---@return Coder.Branch
-function M:createBranch(node)
-    local branch = New 'Coder.Branch' (self, node)
+function M:createBranch(node, mode)
+    local branch = New 'Coder.Branch' (self, node, mode)
+    self.nodeBranches[node] = branch
     return branch
+end
+
+---@param node LuaParser.Node.Base
+---@return Coder.Branch?
+function M:getBranch(node)
+    return self.nodeBranches[node]
 end

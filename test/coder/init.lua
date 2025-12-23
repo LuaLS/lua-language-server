@@ -12,8 +12,12 @@ function TEST_INDEX(code)
     TEST_CODER = vfile.coder
 end
 
+print('[coder] 测试中...')
+
 require 'test.coder.meta'
 require 'test.coder.common'
 require 'test.coder.metatable'
 require 'test.coder.block'
 require 'test.coder.flow'
+
+print('[coder] 测试完毕')

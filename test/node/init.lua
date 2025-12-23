@@ -1,3 +1,5 @@
+print('[node] 测试中...')
+
 require 'test.node.view'
 require 'test.node.get'
 require 'test.node.cast_base'
@@ -20,3 +22,5 @@ require 'test.node.flush'
 require 'test.node.variable'
 
 require 'test.node.flow'
+
+print('[node] 测试完毕')

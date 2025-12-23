@@ -40,7 +40,7 @@ end)
 
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
-    local branch <close> = coder.flow:createBranch(source)
+    local branch <close> = coder.flow:createBranch(source, 'if')
     for _, child in ipairs(source.childs) do
         branch:addChild(child.condition, function ()
             coder:withIndentation(function ()

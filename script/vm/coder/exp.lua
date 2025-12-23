@@ -163,6 +163,12 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
             : addChild(source.exp2)
         return
     end
+    if source.op == 'or' and source.exp1 and source.exp2 then
+        local branch <close> = coder.flow:createBranch(source, 'or')
+            : addChild(source.exp1)
+            : addChild(source.exp2)
+        return
+    end
 
     local op = bopMap[source.op]
     if source.exp1 then

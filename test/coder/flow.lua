@@ -343,3 +343,29 @@ do
     assert(X2:view() == '{ a: 1, b: 1 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
     assert(XX:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
 end
+
+do
+    TEST_INDEX [[
+    ---@type { a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }
+    local x
+    X0 = x --> { a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }
+
+    if x.a == 1 or x.b == 2 then
+        X1 = x --> { a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 2 }
+    else
+        X2 = x --> { a: 2, b: 1 }
+    end
+
+    XX = x --> { a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
+    assert(X1:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 2 }')
+    assert(X2:view() == '{ a: 2, b: 1 }')
+    assert(XX:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
+end

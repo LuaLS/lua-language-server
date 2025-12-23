@@ -156,27 +156,36 @@ local bopMap = {
 ls.vm.registerCoderProvider('binary', function (coder, source)
     ---@cast source LuaParser.Node.Binary
 
-
     if source.op == 'and' and source.exp1 and source.exp2 then
         local branch <close> = coder.flow:createBranch(source, 'and')
             : addChild(source.exp1)
             : addChild(source.exp2)
+
+        coder:addLine('{key} = {value}' % {
+            key   = coder:getKey(source),
+            value = branch:getValue(),
+        })
         return
     end
     if source.op == 'or' and source.exp1 and source.exp2 then
         local branch <close> = coder.flow:createBranch(source, 'or')
             : addChild(source.exp1)
             : addChild(source.exp2)
+
+        coder:addLine('{key} = {value}' % {
+            key   = coder:getKey(source),
+            value = branch:getValue(),
+        })
         return
     end
 
-    local op = bopMap[source.op]
     if source.exp1 then
         coder:compile(source.exp1)
     end
     if source.exp2 then
         coder:compile(source.exp2)
     end
+    local op = bopMap[source.op]
     if not op or not source.exp1 or not source.exp2 then
         coder:addUnknown(source)
         return

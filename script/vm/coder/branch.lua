@@ -2,6 +2,7 @@
 local M = Class 'Coder.Branch'
 
 ---@class Coder.Branch.Child
+---@field exp? LuaParser.Node.Base
 local C = Class 'Coder.Branch.Child'
 
 ---@param branch Coder.Branch
@@ -42,7 +43,10 @@ function C:checkCondition(exp, otherSide)
                 self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), not otherSide)
             end
             if exp.op == 'and' then
-                self:tryAnd(exp, otherSide)
+                self:tryAndOr(exp, otherSide)
+            end
+            if exp.op == 'or' then
+                self:tryAndOr(exp, otherSide)
             end
         end
     end
@@ -63,7 +67,7 @@ end
 ---@package
 ---@param exp LuaParser.Node.Base
 ---@param otherSide? boolean
-function C:tryAnd(exp, otherSide)
+function C:tryAndOr(exp, otherSide)
     local branch = self.branch.flow:getBranch(exp)
     if not branch then
         return
@@ -308,6 +312,10 @@ function M:__init(flow, node, mode)
     self.childs = {}
 
     ---@type table<string, string>
+    self.varKeyAfterNarrow = {}
+    ---@type table<string, string>
+    self.valueAfterNarrow = {}
+    ---@type table<string, string>
     self.otherSideValueAfterNarrow = {}
     ---@type table<string, string>
     self.otherSideVarKeyAfterNarrow = {}
@@ -327,6 +335,7 @@ function M:addChild(condition, callback)
     self.childs[#self.childs+1] = child
 
     if exp then
+        child.exp = exp
         self.coder:compile(exp)
         child:checkCondition(exp)
     end
@@ -361,7 +370,33 @@ function M:getValueAfterNarrow(name)
     if not child then
         return nil
     end
-    return child:getValueAfterNarrow(name)
+    if self.mode == 'if' or self.mode == 'and' then
+        return child:getValueAfterNarrow(name)
+    end
+    if self.mode == 'or' then
+        if not self.valueAfterNarrow[name] then
+            local reason = self.childs[1].narrowReasons[name]
+                        or self.childs[2].narrowReasons[name]
+            if not reason then
+                return self.childs[1]:getValueBeforeNarrow(name)
+            end
+            local value1 = self.childs[1]:getValueAfterNarrow(name)
+            local value2 = self.childs[2]:getValueAfterNarrow(name)
+            local value = self.coder:getCustomKey('narrow|{mode}|{index}|{name}|{uniqueKey}' % {
+                mode = self.mode,
+                index = '*',
+                name  = name,
+                uniqueKey = self.node.uniqueKey,
+            })
+            self.coder:addLine('{value} = {value1} | {value2}' % {
+                value  = value,
+                value1 = value1,
+                value2 = value2,
+            })
+            self.valueAfterNarrow[name] = value
+        end
+        return self.valueAfterNarrow[name]
+    end
 end
 
 ---@param name string
@@ -371,7 +406,32 @@ function M:getVarKeyAfterNarrow(name)
     if not child then
         return nil
     end
-    return child:getVarKeyAfterNarrow(name)
+    if self.mode == 'if' or self.mode == 'and' then
+        return child:getVarKeyAfterNarrow(name)
+    end
+    if self.mode == 'or' then
+        if not self.varKeyAfterNarrow[name] then
+            local reason = self.childs[1].narrowReasons[name]
+                        or self.childs[2].narrowReasons[name]
+            if not reason then
+                return self.childs[1]:getVarKeyBeforeNarrow(name)
+            end
+            local value = self:getValueAfterNarrow(name)
+            local shadow = self.coder:getCustomKey('shadow|{mode}|{index}|{name}|{uniqueKey}' % {
+                mode = self.mode,
+                index = '*',
+                name  = name,
+                uniqueKey = self.node.uniqueKey,
+            })
+            self.coder:addLine('{shadow} = {var}:shadow({value})' % {
+                shadow = shadow,
+                var    = self.childs[1]:getVarKeyBeforeNarrow(name),
+                value  = value,
+            })
+            self.varKeyAfterNarrow[name] = shadow
+        end
+        return self.varKeyAfterNarrow[name]
+    end
 end
 
 ---@param name string
@@ -393,10 +453,11 @@ function M:getOtherSideValueAfterNarrow(name)
             end
             local value1 = self.childs[1]:getOtherSideValueAfterNarrow(name)
             local value2 = self.childs[2]:getOtherSideValueAfterNarrow(name)
-            local otherSide = self.coder:getCustomKey('narrow-os|{mode}|{index}|{uniqueKey}' % {
+            local otherSide = self.coder:getCustomKey('narrow-os|{mode}|{index}|{name}|{uniqueKey}' % {
                 mode = self.mode,
                 index = '*',
-                uniqueKey = reason.uniqueKey,
+                name  = name,
+                uniqueKey = self.node.uniqueKey,
             })
             self.coder:addLine('{other} = {value2} | {value1}' % {
                 other = otherSide,
@@ -407,6 +468,18 @@ function M:getOtherSideValueAfterNarrow(name)
         end
         return self.otherSideValueAfterNarrow[name]
     end
+end
+
+---@return string
+function M:getValue()
+    local child = self.childs[#self.childs]
+    if not child then
+        return 'rt.UNKNOWN'
+    end
+    if not child.exp then
+        return 'rt.UNKNOWN'
+    end
+    return self.coder:getKey(child.exp)
 end
 
 ---@param name string
@@ -427,10 +500,11 @@ function M:getOtherSideVarKeyAfterNarrow(name)
                 return self.childs[1]:getVarKeyBeforeNarrow(name)
             end
             local value = self:getOtherSideValueAfterNarrow(name)
-            local shadow = self.coder:getCustomKey('shadow-os|{mode}|{index}|{uniqueKey}' % {
+            local shadow = self.coder:getCustomKey('shadow-os|{mode}|{index}|{name}|{uniqueKey}' % {
                 mode = self.mode,
                 index = '*',
-                uniqueKey = reason.uniqueKey,
+                name  = name,
+                uniqueKey = self.node.uniqueKey,
             })
             self.coder:addLine('{shadow} = {var}:shadow({value})' % {
                 shadow = shadow,

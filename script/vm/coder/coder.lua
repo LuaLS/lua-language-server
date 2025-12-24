@@ -234,6 +234,16 @@ function M:run(vfile)
     end
 
     LAST_CODE = self.code
+    if ls.args.SAVE_CODER then
+        local path = vfile.scope:getRelativePath(vfile.uri)
+        if path then
+            local uri = ls.uri.encode(ls.env.LOG_PATH / 'coder' / vfile.scope.name / path)
+            ---@async
+            ls.await.call(function ()
+                ls.afs.write(uri, self.code)
+            end)
+        end
+    end
 end
 
 ---@param delta integer

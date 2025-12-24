@@ -55,7 +55,9 @@ end
 ---@param content string
 ---@return boolean
 function ls.fs.write(uri, content)
-    return ls.util.saveFile(ls.uri.decode(uri), content)
+    local path = ls.uri.decode(uri)
+    fs.create_directories(fs.path(path):parent_path())
+    return ls.util.saveFile(path, content)
 end
 
 ---@param uri Uri

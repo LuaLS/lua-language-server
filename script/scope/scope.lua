@@ -96,6 +96,15 @@ function M:testUri(uri)
 end
 
 ---@param uri Uri
+---@return string?
+function M:getRelativePath(uri)
+    if not self.uri then
+        return nil
+    end
+    return ls.uri.relativePath(uri, self.uri)
+end
+
+---@param uri Uri
 ---@return Document?
 function M:getDocument(uri)
     local file = ls.file.get(uri)

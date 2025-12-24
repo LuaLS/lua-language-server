@@ -35,10 +35,12 @@ function C:checkCondition(exp, otherSide)
         ---@cast exp LuaParser.Node.Binary
         if exp.exp1 and exp.exp2 then
             if exp.op == '==' then
+                self.branch.coder:addLine('-- try `==`')
                 self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), otherSide)
                 self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), otherSide)
             end
             if exp.op == '~=' then
+                self.branch.coder:addLine('-- try `~=`')
                 self:tryEqual(exp.exp1:trim(), exp.exp2:trim(), not otherSide)
                 self:tryEqual(exp.exp2:trim(), exp.exp1:trim(), not otherSide)
             end
@@ -105,7 +107,11 @@ function C:narrow(exp, method, otherSide)
     end
     self.branch:careVar(var.name, var.currentKey)
 
-    -- truly
+    self.branch.coder:addLine('-- Narrow variable `{name}` by `{method}`' % {
+        name   = var.name,
+        method = method,
+    })
+
     local value = self.branch.coder:getCustomKey('narrow|{mode}|{index}|{uniqueKey}' % {
         mode = self.branch.mode,
         index = self.index,
@@ -321,6 +327,10 @@ function M:__init(flow, node, mode)
     self.otherSideValueAfterNarrow = {}
     ---@type table<string, string>
     self.otherSideVarKeyAfterNarrow = {}
+
+    if mode == 'and' or mode == 'or' then
+        self.coder:addLine('-- try `' .. mode .. '`')
+    end
 end
 
 function M:__close()

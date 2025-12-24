@@ -93,8 +93,18 @@ do
         end
     end)
 
+    local size = 0
+    for _, uri in ipairs(result.uris) do
+        local doc = scope:getDocument(uri)
+        if doc then
+            size = size + doc.file:getText():len() / 1024 / 1024
+        end
+    end
+    print('文件数量为： {}，总大小为： {%.2f} MB' % { #result.uris, size })
+
     collectgarbage()
-    print('索引后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
+    local mem = collectgarbage 'count' / 1024
+    print('索引后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
 
     for _, uri in ipairs(scope.uris) do
         local document = scope:getDocument(uri)
@@ -102,7 +112,8 @@ do
     end
 
     collectgarbage()
-    print('去除语法树后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
+    mem = collectgarbage 'count' / 1024
+    print('去除语法树后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
 
     local count = 0
     ls.util.withDuration(function ()
@@ -119,11 +130,12 @@ do
             end
         end
     end, function (duration)
-        print('解析 {} 个token耗时: {%.2f} 秒' % { count, duration })
+        print('解析 {} 个token耗时: {%.2f} 秒 ({%.2f}K/秒)' % { count, duration, count / duration / 1000})
     end)
 
     collectgarbage()
-    print('全量解析后的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
+    mem = collectgarbage 'count' / 1024
+    print('全量解析后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
 
     ls.util.withDuration(function ()
         for _, uri in ipairs(result.uris) do

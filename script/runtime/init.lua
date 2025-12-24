@@ -1,4 +1,3 @@
-
 local argparser = require 'runtime.argparser'
 local version   = require 'runtime.version'
 local platform  = require 'bee.platform'
@@ -27,8 +26,6 @@ ls.args = {
     LOGLEVEL = 'debug',
     -- 全局配置文件的路径
     CONFIGPATH = '',
-    -- 在日志中记录RPC信息
-    RPCLOG = false,
     -- 使用socket来连接客户端，指定端口号
     SOCKET = 0,
     -- 强制接受工作区。默认情况下会拒绝根目录与Home目录作为工作区

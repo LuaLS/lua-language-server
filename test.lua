@@ -49,7 +49,6 @@ log = New 'Log' {
 }
 
 
-test.catch = require 'test.catch'
 
 test.rootPath = ls.env.ROOT_PATH .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
@@ -58,6 +57,9 @@ test.scope    = ls.scope.create('test', test.rootUri)
 
 ---@async
 ls.await.call(function ()
+    -- 加载一些工具
+    require 'test.include'
+    test.catch = require 'test.catch'
     local suc, err = pcall(function ()
         print('开始测试')
         dofile 'test/tools/init.lua'

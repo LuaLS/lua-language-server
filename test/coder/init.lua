@@ -4,6 +4,7 @@ TEST_CODER = nil
 ---@param code string
 function TEST_INDEX(code)
     test.scope.rt:reset()
+    local _ <close> = test.checkInclude(code)
     local vm = ls.vm.create(test.scope)
     local vfile = vm:createFile('test.lua')
     ls.file.setServerText('test.lua', code)

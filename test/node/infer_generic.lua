@@ -530,3 +530,26 @@ do
     assert(results[C]:view() == '4 | 5')
     assert(results[D]:view() == '"d" | "e"')
 end
+
+do
+    rt:reset()
+
+    --[[
+        fun<T>(x: T, y: T) @ fun(x: number, y: string)
+        T -> number
+    ]]
+
+    local T = rt.generic 'T'
+    local f = rt.func()
+        : addTypeParam(T)
+        : addParamDef('x', T)
+        : addParamDef('y', T)
+
+    local target = rt.func()
+        : addParamDef('x', rt.NUMBER)
+        : addParamDef('y', rt.STRING)
+
+    local results = {}
+    f:inferGeneric(target, results)
+    assert(results[T]:view() == 'number')
+end

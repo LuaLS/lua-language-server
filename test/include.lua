@@ -15,6 +15,11 @@ test.includeCodes['binary'] = [[
 ---@alias op.add<A: integer, B: integer> integer
 ]]
 
+test.includeCodes['type'] = [[
+
+]]
+
+--- 使用 `--!include setmetatable` 在测试中包含预定义代码片段。
 ---@param script string
 ---@return function?
 function test.checkInclude(script)

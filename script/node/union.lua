@@ -74,13 +74,13 @@ M.__getter.values = function (self)
             end
             return
         end
+        if nv.typeName == 'never' then
+            return
+        end
         values[#values+1] = nv
     end
     for _, v in ipairs(self.rawNodes) do
         v:addRef(self)
-        if v.typeName == 'never' then
-            goto continue
-        end
         insertValue(v)
         ::continue::
     end

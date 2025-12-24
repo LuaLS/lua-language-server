@@ -312,6 +312,8 @@ function M:__init(flow, node, mode)
     self.childs = {}
 
     ---@type table<string, string>
+    self.varKeyBeforeNarrow = {}
+    ---@type table<string, string>
     self.varKeyAfterNarrow = {}
     ---@type table<string, string>
     self.valueAfterNarrow = {}
@@ -335,6 +337,13 @@ function M:addChild(condition, callback)
     self.childs[#self.childs+1] = child
 
     if exp then
+        local lastChild = self.childs[#self.childs - 1]
+        if lastChild then
+            for name, varKey in pairs(lastChild.varKeyAfterNarrow) do
+                self.varKeyBeforeNarrow[name] = self:getVarKeyBeforeNarrow(name)
+                self.flow:setVarKeyByName(name, varKey)
+            end
+        end
         child.exp = exp
         self.coder:compile(exp)
         child:checkCondition(exp)
@@ -397,6 +406,11 @@ function M:getValueAfterNarrow(name)
         end
         return self.valueAfterNarrow[name]
     end
+end
+
+function M:getVarKeyBeforeNarrow(name)
+    return self.varKeyBeforeNarrow[name]
+        or self.flow:getVarKeyByName(name)
 end
 
 ---@param name string
@@ -571,6 +585,8 @@ function M:finish()
     local function collectChangedVars()
         ---@type table<string, boolean>
         local changed = {}
+        ---@type table<string, boolean>
+        local unchanged = {}
         for name in ls.util.sortPairs(self.cares) do
             for _, child in ipairs(self.childs) do
                 local before = child:getVarKeyAfterNarrow(name)
@@ -579,8 +595,11 @@ function M:finish()
                     changed[name] = true
                 end
             end
+            if not changed[name] then
+                unchanged[name] = true
+            end
         end
-        return changed
+        return changed, unchanged
     end
 
     ---@param changed table<string, boolean>
@@ -613,12 +632,23 @@ function M:finish()
         end
     end
 
+    ---@param unchanged table<string, any>
+    local function resetUnchangedVars(unchanged)
+        for name in pairs(unchanged) do
+            local varKey = self:getVarKeyBeforeNarrow(name)
+            if varKey then
+                self.flow:setVarKeyByName(name, varKey)
+            end
+        end
+    end
+
     if self.mode == 'if' then
         runCallbacks()
-
-        local changedVars = collectChangedVars()
-
+        local changedVars, unchangedVars = collectChangedVars()
+        resetUnchangedVars(unchangedVars)
         applyChangedVars(changedVars)
+    else
+        resetUnchangedVars(self.cares)
     end
 
     return self

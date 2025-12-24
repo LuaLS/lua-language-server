@@ -67,6 +67,12 @@ do
 end
 
 do
+    local a = rt.union { rt.value(1), rt.value(2), rt.NEVER }
+
+    assert(a:view() == '1 | 2')
+end
+
+do
     local a = rt.value(1) | rt.value(2)
 
     assert(a:view() == '1 | 2')

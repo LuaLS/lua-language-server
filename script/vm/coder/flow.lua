@@ -203,6 +203,16 @@ function M:getVarKey(source)
     return var.currentKey
 end
 
+---@param name string
+---@return string?
+function M:getVarKeyByName(name)
+    local var = self:getVarByName(name)
+    if var then
+        return var.currentKey
+    end
+    return nil
+end
+
 ---@param source LuaParser.Node.AssignAble
 ---@param key string
 ---@return boolean

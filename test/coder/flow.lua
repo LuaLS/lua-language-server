@@ -369,3 +369,84 @@ do
     assert(X2:view() == '{ a: 2, b: 1 }')
     assert(XX:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
 end
+
+do
+    TEST_INDEX [[
+    X = true and 1
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == '1')
+end
+
+do
+    TEST_INDEX [[
+    X = false and 2
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == 'false')
+end
+
+do
+    TEST_INDEX [[
+    X = true and 1
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == '1')
+end
+
+do
+    TEST_INDEX [[
+    ---@type boolean
+    local t
+
+    X = t and 3
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == '3 | false')
+end
+
+do
+    TEST_INDEX [[
+    X = true or 1
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == 'true')
+end
+
+do
+    TEST_INDEX [[
+    X = false or 2
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == '2')
+end
+
+do
+    TEST_INDEX [[
+    ---@type boolean
+    local t
+
+    X = t or 3
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == '3 | true')
+end
+
+do
+    TEST_INDEX [[
+    ---@type string?
+    local s
+
+    X = s and s or 1
+    ]]
+
+    local X = rt:globalGet('X')
+    assert(X:view() == '1 | string')
+end

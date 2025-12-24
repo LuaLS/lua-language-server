@@ -13,6 +13,9 @@ function M:__init(scope, nodes)
     self.scope = scope
     ---@package
     self.rawNodes = nodes or {}
+    for _, v in ipairs(self.rawNodes) do
+        assert(type(v) == 'table')
+    end
 end
 
 ---@param other Node

@@ -74,7 +74,7 @@ do
     local x = rt.variable 'x'
     x:addType(rt.INTEGER | rt.NIL)
 
-    local xNarrow = rt.narrow(x):truly()
+    local xNarrow = rt.narrow(x):matchTruly()
 
     local x1 = x:shadow(xNarrow)
 
@@ -107,7 +107,7 @@ do
     local x = rt.variable 'x'
     x:addType(rt.INTEGER | rt.NIL)
 
-    local xNarrow = rt.narrow(x):truly()
+    local xNarrow = rt.narrow(x):matchTruly()
 
     local x1 = x:shadow(xNarrow)
 

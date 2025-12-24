@@ -274,6 +274,14 @@ function M:fillAPIs()
         return New 'Node.Narrow' (scope, node)
     end
 
+    ---@param cond Node
+    ---@param thenNode Node
+    ---@param elseNode Node
+    ---@return Node.Ternary
+    function self.ternary(cond, thenNode, elseNode)
+        return New 'Node.Ternary' (scope, cond, thenNode, elseNode)
+    end
+
     ---@param childs Node.Table[]
     ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table

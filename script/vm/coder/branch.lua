@@ -138,7 +138,7 @@ end
 ---@param exp LuaParser.Node.Base
 ---@param otherSide? boolean
 function C:tryTruly(exp, otherSide)
-    self:narrow(exp, 'truly()', otherSide)
+    self:narrow(exp, 'matchTruly()', otherSide)
 
     -- 根据字段来收窄类型
     if exp.kind == 'field' then
@@ -472,14 +472,47 @@ end
 
 ---@return string
 function M:getValue()
-    local child = self.childs[#self.childs]
-    if not child then
-        return 'rt.UNKNOWN'
+    if self.mode == 'and' then
+        local child1 = self.childs[1]
+        local child2 = self.childs[2]
+        local value1 =  child1 and child1.exp
+                    and self.coder:getKey(child1.exp)
+                    or  'rt.UNKNOWN'
+        local value2 =  child2 and child2.exp
+                    and self.coder:getKey(child2.exp)
+                    or  'rt.UNKNOWN'
+        local value = self.coder:getCustomKey('value|{mode}|{uniqueKey}' % {
+            mode = self.mode,
+            uniqueKey = self.node.uniqueKey,
+        })
+        self.coder:addLine('{value} = rt.ternary({value1}, {value2}, rt.narrow({value1}):matchFalsy())' % {
+            value = value,
+            value1 = value1,
+            value2 = value2,
+        })
+        return value
     end
-    if not child.exp then
-        return 'rt.UNKNOWN'
+    if self.mode == 'or' then
+        local child1 = self.childs[1]
+        local child2 = self.childs[2]
+        local value1 =  child1 and child1.exp
+                    and self.coder:getKey(child1.exp)
+                    or  'rt.UNKNOWN'
+        local value2 =  child2 and child2.exp
+                    and self.coder:getKey(child2.exp)
+                    or  'rt.UNKNOWN'
+        local value = self.coder:getCustomKey('value|{mode}|{uniqueKey}' % {
+            mode = self.mode,
+            uniqueKey = self.node.uniqueKey,
+        })
+        self.coder:addLine('{value} = rt.ternary({value1}, rt.narrow({value1}):matchTruly(), {value2})' % {
+            value = value,
+            value1 = value1,
+            value2 = value2,
+        })
+        return value
     end
-    return self.coder:getKey(child.exp)
+    return 'rt.UNKNOWN'
 end
 
 ---@param name string

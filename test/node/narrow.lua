@@ -96,3 +96,28 @@ do
 
     assert(b:view() == '1 | 2')
 end
+
+do
+    rt:reset()
+
+    local a = rt.ternary(
+        rt.value(true),
+        rt.value(1),
+        rt.value(2)
+    )
+    assert(a:view() == '1')
+
+    local b = rt.ternary(
+        rt.value(false),
+        rt.value(1),
+        rt.value(2)
+    )
+    assert(b:view() == '2')
+
+    local c = rt.ternary(
+        rt.BOOLEAN,
+        rt.value(1),
+        rt.value(2)
+    )
+    assert(c:view() == '1 | 2')
+end

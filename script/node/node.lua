@@ -36,6 +36,7 @@ ls.node.kind = {
     ['field']        = 1 << 20,
     ['paramof']      = 1 << 21,
     ['narrow']       = 1 << 22,
+    ['ternary']      = 1 << 23,
 }
 
 ---@class Node.Location

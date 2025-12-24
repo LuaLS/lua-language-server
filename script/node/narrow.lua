@@ -14,8 +14,14 @@ function M:__init(scope, node)
     self.node  = node
 end
 
-function M:truly()
+function M:matchTruly()
     self.narrowType = 'truly'
+    return self
+end
+
+function M:matchFalsy()
+    self.narrowType = 'truly'
+    self.isOtherSide = true
     return self
 end
 

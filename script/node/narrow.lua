@@ -1,6 +1,6 @@
 ---@class Node.Narrow: Node
 ---@field node Node
----@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal'
+---@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal' | 'param'
 ---@field nvalue? Node
 ---@field field? Node.Key
 local M = ls.node.register 'Node.Narrow'
@@ -48,6 +48,18 @@ end
 function M:equalValue(value)
     self.narrowType = 'equal'
     self.nvalue = value
+    return self
+end
+
+---@param f Node
+---@param index integer
+---@param ret Node
+---@return self
+function M:matchParam(f, index, ret)
+    self.narrowType = 'param'
+    self.calledFunc = f
+    self.paramIndex = index
+    self.callRet = ret
     return self
 end
 
@@ -110,6 +122,10 @@ M.__getter.value = function (self)
             local _, otherSide = value:narrowEqual(self.nvalue)
             return otherSide, true
         end
+        if narrowType == 'param' then
+            local _, otherSide = self:narrowParam()
+            return otherSide, true
+        end
         return rt.NEVER, true
     else
         if narrowType == 'truly' then
@@ -124,6 +140,9 @@ M.__getter.value = function (self)
         if narrowType == 'equal' then
             return value:narrowEqual(self.nvalue), true
         end
+        if narrowType == 'param' then
+            return self:narrowParam(), true
+        end
         return value, true
     end
 end
@@ -134,6 +153,45 @@ function M:otherSide()
     new.narrowType = self.narrowType
     new.field = self.field
     new.nvalue = self.nvalue
+    new.calledFunc = self.calledFunc
+    new.paramIndex = self.paramIndex
+    new.callRet = self.callRet
     new.isOtherSide = not self.isOtherSide
     return new
+end
+
+---@return Node
+---@return Node
+function M:narrowParam()
+    self.calledFunc:addRef(self)
+    self.callRet:addRef(self)
+    ---@type Node.Function[]
+    local defs = {}
+
+    self.calledFunc:each('function', function (f)
+        ---@cast f Node.Function
+        defs[#defs+1] = f
+    end)
+
+    local matches = {}
+    local notMatches = {}
+    for _, def in ipairs(defs) do
+        if def:getReturn(1):canCast(self.callRet) then
+            matches[#matches+1] = def
+        else
+            notMatches[#notMatches+1] = def
+        end
+    end
+
+    local function makeParam(funcs)
+        local result = {}
+
+        for _, f in ipairs(funcs) do
+            result[#result+1] = f:getParam(self.paramIndex)
+        end
+
+        return self.scope.rt.union(result)
+    end
+
+    return makeParam(matches), makeParam(notMatches)
 end

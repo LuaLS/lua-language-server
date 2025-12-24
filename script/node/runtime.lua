@@ -313,29 +313,32 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.UNKNOWN = self.type 'unknown'
         : setConfig('onCanCast', function (_, other)
-            if other.value ~= self.NIL then
-                return true
-            end
+            local hasNil
+            other:each('type', function (node)
+                if node.typeName == 'nil' then
+                    hasNil = true
+                end
+            end)
+            return not hasNil
         end)
         : setConfig('onCanBeCast', function (_, other)
-            if other.value ~= self.NIL then
-                return true
-            end
+            local hasNil
+            other:each('type', function (node)
+                if node.typeName == 'nil' then
+                    hasNil = true
+                end
+            end)
+            return not hasNil
         end)
     self.TRULY = self.type 'truly'
         : setConfig('onCanCast', function (_, other)
-            if  other.value ~= self.NIL
-            and other.value ~= self.FALSE then
-                return true
-            end
+            return not other:canCast(self.FALSY)
         end)
         : setConfig('onCanBeCast', function (_, other)
-            if  other.value ~= self.NIL
-            and other.value ~= self.FALSE then
-                return true
-            end
+            return not other:canCast(self.FALSY)
         end)
         : setConfig('basicType', true)
+    self.FALSY = self.FALSE | self.NIL
     self.NIL = self.type 'nil'
         : setConfig('basicType', true)
     self.NUMBER = self.type 'number'
@@ -360,7 +363,7 @@ function M:fillPresets()
 
     self.ANY:addClass(anykv)
     self.ANY.truly = self.TRULY
-    self.ANY.falsy = self.FALSE | self.type 'nil'
+    self.ANY.falsy = self.FALSY
 
 
     self.UNKNOWN:addClass(anykv)

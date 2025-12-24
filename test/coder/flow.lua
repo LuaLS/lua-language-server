@@ -450,3 +450,91 @@ do
     local X = rt:globalGet('X')
     assert(X:view() == '1 | string')
 end
+
+do
+    TEST_INDEX [[
+    ---@type 1 | 2
+    local x
+    X0 = x --> 1 | 2
+
+    ---@type (fun(x: 1): true) | (fun(x: 2): false)
+    local f
+
+    if f(x) then
+        X1 = x --> 1
+    else
+        X2 = x --> 2
+    end
+
+    XX = x --> 1 | 2
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == '1 | 2')
+    assert(X1:view() == '1')
+    assert(X2:view() == '2')
+    assert(XX:view() == '1 | 2')
+end
+
+do
+    TEST_INDEX [[
+    ---@type 1 | 2
+    local x
+    X0 = x --> 1 | 2
+
+    ---@type (fun(x: 1): true) | (fun(x: 2): false)
+    local f
+
+    if f(x) == false then
+        X1 = x --> 2
+    else
+        X2 = x --> 1
+    end
+
+    XX = x --> 1 | 2
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == '1 | 2')
+    assert(X1:view() == '2')
+    assert(X2:view() == '1')
+    assert(XX:view() == '1 | 2')
+end
+
+-- do
+--     local _ <close> = TEST_INDEX [[
+--     --!include type
+
+--     local x
+--     X0 = x --> unknown
+--     if type(x) == 'string then
+--         X1 = x --> 'string'
+--     elseif type(x) == 'number' then
+--         X2 = x --> 'number'
+--     else
+--         X3 = x --> unknown
+--     end
+
+--     XX = x --> unknown
+--     ]]
+
+--     local X0 = rt:globalGet('X0')
+--     local X1 = rt:globalGet('X1')
+--     local X2 = rt:globalGet('X2')
+--     local X3 = rt:globalGet('X3')
+--     local XX = rt:globalGet('XX')
+
+--     assert(X0:view() == 'unknown')
+--     assert(X1:view() == 'string')
+--     assert(X2:view() == 'number')
+--     assert(X3:view() == 'unknown')
+--     assert(XX:view() == 'unknown')
+-- end

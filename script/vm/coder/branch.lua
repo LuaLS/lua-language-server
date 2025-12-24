@@ -156,6 +156,17 @@ function C:tryTruly(exp, otherSide)
             }, otherSide)
         end
     end
+
+    -- 根据函数调用的返回值来收窄类型
+    if exp.kind == 'call' then
+        ---@cast exp LuaParser.Node.Call
+        for i, arg in ipairs(exp.args) do
+            self:narrow(arg, 'matchParam({func}, {index}, "match", rt.TRULY)' % {
+                func  = self.branch.coder:getKey(exp.node),
+                index = i,
+            }, otherSide)
+        end
+    end
 end
 
 ---@package
@@ -175,6 +186,18 @@ function C:tryEqual(exp, other, otherSide)
         if fieldCode then
             self:narrow(exp.last, 'matchField({key}, {other})' % {
                 key   = fieldCode,
+                other = self.branch.coder:getKey(other),
+            }, otherSide)
+        end
+    end
+
+    -- 根据函数调用的返回值来收窄类型
+    if exp.kind == 'call' then
+        ---@cast exp LuaParser.Node.Call
+        for i, arg in ipairs(exp.args) do
+            self:narrow(arg, 'matchParam({func}, {index}, "equal", {other})' % {
+                func  = self.branch.coder:getKey(exp.node),
+                index = i,
                 other = self.branch.coder:getKey(other),
             }, otherSide)
         end

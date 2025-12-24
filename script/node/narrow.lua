@@ -3,9 +3,12 @@
 ---@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal' | 'param'
 ---@field nvalue? Node
 ---@field field? Node.Key
+---@field callParams? Node.Narrow.CallParams
 local M = ls.node.register 'Node.Narrow'
 
 M.kind = 'narrow'
+
+---@alias Node.Narrow.CallParams [Node, integer, 'equal' | 'match', Node]
 
 ---@param scope Scope
 ---@param node Node
@@ -53,13 +56,12 @@ end
 
 ---@param f Node
 ---@param index integer
+---@param mode 'equal' | 'match'
 ---@param ret Node
 ---@return self
-function M:matchParam(f, index, ret)
+function M:matchParam(f, index, mode, ret)
     self.narrowType = 'param'
-    self.calledFunc = f
-    self.paramIndex = index
-    self.callRet = ret
+    self.callParams = { f, index, mode, ret }
     return self
 end
 
@@ -153,9 +155,7 @@ function M:otherSide()
     new.narrowType = self.narrowType
     new.field = self.field
     new.nvalue = self.nvalue
-    new.calledFunc = self.calledFunc
-    new.paramIndex = self.paramIndex
-    new.callRet = self.callRet
+    new.callParams = self.callParams
     new.isOtherSide = not self.isOtherSide
     return new
 end
@@ -163,20 +163,31 @@ end
 ---@return Node
 ---@return Node
 function M:narrowParam()
-    self.calledFunc:addRef(self)
-    self.callRet:addRef(self)
+    local func, index, mode, ret = table.unpack(self.callParams)
+    func:addRef(self)
+    ret:addRef(self)
     ---@type Node.Function[]
     local defs = {}
 
-    self.calledFunc:each('function', function (f)
+    func:each('function', function (f)
         ---@cast f Node.Function
         defs[#defs+1] = f
     end)
 
+    local rt = self.scope.rt
+
     local matches = {}
     local notMatches = {}
     for _, def in ipairs(defs) do
-        if def:getReturn(1):canCast(self.callRet) then
+        local res
+        local ret1 = def:getReturn(1) or rt.NIL
+        if mode == 'match' then
+            res = ret1:canCast(ret)
+        end
+        if mode == 'equal' then
+            res = ret1:narrowEqual(ret) ~= rt.NEVER
+        end
+        if res then
             matches[#matches+1] = def
         else
             notMatches[#notMatches+1] = def
@@ -187,7 +198,7 @@ function M:narrowParam()
         local result = {}
 
         for _, f in ipairs(funcs) do
-            result[#result+1] = f:getParam(self.paramIndex)
+            result[#result+1] = f:getParam(index)
         end
 
         return self.scope.rt.union(result)

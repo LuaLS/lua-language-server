@@ -16,7 +16,15 @@ test.includeCodes['binary'] = [[
 ]]
 
 test.includeCodes['type'] = [[
-
+---@overload fun(x: nil): 'nil'
+---@overload fun(x: boolean): 'boolean'
+---@overload fun(x: number): 'number'
+---@overload fun(x: string): 'string'
+---@overload fun(x: table): 'table'
+---@overload fun(x: function): 'function'
+---@overload fun(x: thread): 'thread'
+---@overload fun(x: userdata): 'userdata'
+function type(...) end
 ]]
 
 --- 使用 `--!include setmetatable` 在测试中包含预定义代码片段。

@@ -10,10 +10,6 @@ ls.vm.registerCoderProvider('var', function (coder, source)
     if source.value then
         coder.flow:setVarKey(source, coder:getKey(source))
     end
-    coder:addLine('{variable} = {key}' % {
-        variable = coder:getVariableKey(source),
-        key      = coder:getKey(source),
-    })
 end)
 
 ls.vm.registerCoderProvider('field', function (coder, source)
@@ -39,10 +35,6 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             varKey = varKey,
             shadow = source.value and ':shadow()' or '',
         })
-        coder:addLine('{variable} = {var}' % {
-            variable = coder:getVariableKey(source),
-            var      = coder:getKey(source),
-        })
         if source.value then
             coder.flow:setVarKey(source, coder:getKey(source))
         end
@@ -52,10 +44,6 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             var   = coder:getKey(source),
             value = coder:makeVarKey(source),
         })
-        coder:addLine('{variable} = {var}' % {
-            variable = coder:getVariableKey(source),
-            var      = coder:getKey(source),
-        })
     end
 
     if source.subtype ~= 'index' then
@@ -63,10 +51,6 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         coder:addLine('{r2} = {r1}' % {
             r1 = coder:getKey(source),
             r2 = coder:getKey(source.key),
-        })
-        coder:addLine('{v2} = {v1}' % {
-            v1 = coder:getVariableKey(source),
-            v2 = coder:getVariableKey(source.key),
         })
     end
 end)
@@ -81,10 +65,6 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
-    coder:addLine('{variable} = {key}' % {
-        variable = coder:getVariableKey(source),
-        key      = coder:getKey(source),
-    })
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -96,10 +76,6 @@ ls.vm.registerCoderProvider('param', function (coder, source)
     coder:addLine('{varKey}:setLocation {location}' % {
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
-    })
-    coder:addLine('{variable} = {key}' % {
-        variable = coder:getVariableKey(source),
-        key      = coder:getKey(source),
     })
 
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)

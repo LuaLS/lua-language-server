@@ -218,16 +218,13 @@ function M:run(vfile)
     self.rt = vfile.scope.rt
     self.vfile = vfile
     local map = {}
-    local var = {}
     self.map = makeRegistry(map)
-    self.var = makeRegistry(var)
     vfile.scope.rt:lockCache()
     local suc = xpcall(function (...)
         self.disposer = self.func(self, vfile)
     end, log.error)
     vfile.scope.rt:unlockCache()
     self.map = map
-    self.var = var
     -- self:simplifyMap()
     if not suc then
         ls.util.saveFile(ls.env.LOG_PATH / 'last_failed_coder.log', self.code)
@@ -410,13 +407,6 @@ end
 ---@return string
 function M:getKey(source)
     return string.format('r[%q]', source.uniqueKey)
-end
-
---- 形如 `v["uniqueKey"]`，导出的变量
----@param source LuaParser.Node.Base
----@return string
-function M:getVariableKey(source)
-    return string.format('v[%q]', source.uniqueKey)
 end
 
 ---@param key string

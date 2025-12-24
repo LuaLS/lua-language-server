@@ -163,7 +163,7 @@ function M:getVariable(source)
         return nil
     end
     local key = source.uniqueKey
-    local node = self.coder.var[key]
+    local node = self.coder.map[key]
     if not node then
         return nil
     end

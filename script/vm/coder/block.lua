@@ -19,10 +19,6 @@ ls.vm.registerCoderProvider('main', function (coder, source)
         coder:addLine('{key} = rt.VAR_G' % {
             key = coder:getKey(env),
         })
-        coder:addLine('{var} = {key}' % {
-            var = coder:getVariableKey(env),
-            key = coder:getKey(env),
-        })
         coder:addLine('')
     end
 

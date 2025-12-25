@@ -516,9 +516,11 @@ do
     local x
     X0 = x --> any
     if type(x) == 'string' then
-        X1 = x --> 'string'
+        X1 = x --> string
     elseif type(x) == 'number' then
-        X2 = x --> 'number'
+        X2 = x --> number
+    else
+        X3 = x --> boolean | table | userdata | function | thread | nil
     end
 
     XX = x --> any
@@ -527,11 +529,13 @@ do
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
     assert(X0:view() == 'any')
     assert(X1:view() == 'string')
     assert(X2:view() == 'number')
+    assert(X3:view() == 'boolean | table | userdata | function | thread | nil')
     assert(XX:view() == 'any')
 end
 

@@ -149,5 +149,14 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             coder:compileAssign(source.name, 1, coder:getKey(source))
         end
 
+        -- 一个潜规则：
+        -- 如果函数有overload注解，但没有任何 param 与 return 注解，
+        -- 那么这个函数本身就不算一个原型。
+        if overloads and not returns and not coder:findNearedCats(source, 'catstateparam') then
+            coder:addLine('{key}:setDummy()' % {
+                key = funcKey,
+            })
+        end
+
     end, source)
 end)

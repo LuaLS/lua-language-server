@@ -171,6 +171,9 @@ function M:narrowParam()
 
     func:each('function', function (f)
         ---@cast f Node.Function
+        if f:isDummy() then
+            return
+        end
         defs[#defs+1] = f
     end)
 
@@ -201,9 +204,16 @@ function M:narrowParam()
 
         for _, f in ipairs(funcs) do
             local v = f:getParam(index)
-            if v and self.node:canCast(v) then
-                result[#result+1] = v
+            if not v then
+                goto continue
             end
+            if self.node:finalValue() == rt.ANY then
+                result[#result+1] = v
+            else
+                local res = self.node:narrow(v)
+                result[#result+1] = res
+            end
+            ::continue::
         end
 
         return self.scope.rt.union(result)

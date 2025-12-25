@@ -502,8 +502,16 @@ function M:onCanCast(other)
 end
 
 function M:narrowEqual(other)
+    local rt = self.scope.rt
     if self == other then
-        return self, self.scope.rt.NEVER
+        return self, rt.NEVER
+    end
+
+    if self == rt.ANY then
+        return other, self
+    end
+    if self == rt.UNKNOWN and other ~= rt.NIL then
+        return other, self
     end
 
     local l = self:findValue(ls.node.kind['value'] | ls.node.kind['union'])
@@ -511,7 +519,7 @@ function M:narrowEqual(other)
         return l:narrowEqual(other)
     end
 
-    return self.scope.rt.NEVER, self
+    return rt.NEVER, self
 end
 
 ---@param key Node.Key

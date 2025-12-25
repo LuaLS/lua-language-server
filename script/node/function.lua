@@ -46,6 +46,17 @@ function M:setLocation(location)
     return self
 end
 
+---@return Node.Function
+function M:setDummy()
+    self.dummy = true
+    return self
+end
+
+---@return boolean
+function M:isDummy()
+    return self.dummy == true
+end
+
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)

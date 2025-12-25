@@ -121,3 +121,11 @@ do
     )
     assert(c:view() == '1 | 2')
 end
+
+do
+    rt:reset()
+
+    local a = rt.ANY:narrowEqual(rt.value(1))
+
+    assert(a:view() == '1')
+end

@@ -503,14 +503,36 @@ end
 
 function M:narrowEqual(other)
     local rt = self.scope.rt
+    other = other:finalValue()
     if self == other then
         return self, rt.NEVER
     end
 
     if self == rt.ANY then
+        if other == rt.NIL then
+            return rt.NIL, rt.UNKNOWN
+        end
+        if other == rt.UNKNOWN then
+            return rt.UNKNOWN, rt.NIL
+        end
+        if other == rt.TRULY then
+            return rt.TRULY, rt.FALSY
+        end
+        if other == rt.FALSY then
+            return rt.FALSY, rt.TRULY
+        end
         return other, self
     end
-    if self == rt.UNKNOWN and other ~= rt.NIL then
+    if self == rt.UNKNOWN then
+        if other == rt.NIL then
+            return rt.NEVER, self
+        end
+        if other == rt.TRULY then
+            return self, rt.FALSE
+        end
+        if other == rt.FALSY then
+            return rt.FALSE, self
+        end
         return other, self
     end
 

@@ -632,6 +632,31 @@ end
 
 do
     TEST_INDEX [[
+    local x
+    X = x --> any
+    
+    if x == nil then
+        X1 = x --> nil
+    else
+        X2 = x --> unknown
+    end
+
+    XX = x --> any
+    ]]
+
+    local X = rt:globalGet('X')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X:view() == 'any')
+    assert(X1:view() == 'nil')
+    assert(X2:view() == 'unknown')
+    assert(XX:view() == 'any')
+end
+
+do
+    TEST_INDEX [[
     ---@type fun<T>(x: T): T
     local f
 

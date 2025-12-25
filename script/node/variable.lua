@@ -464,7 +464,7 @@ function M:getExpect(key)
         local expectValue = self.value
         return expectValue:get(key)
     end
-    return rt.UNKNOWN, false
+    return rt.ANY, false
 end
 
 ---@param key Node.Key
@@ -581,11 +581,11 @@ M.value = nil
 ---@return true
 M.__getter.value = function (self)
     local rt = self.scope.rt
-    self.value = rt.UNKNOWN
+    self.value = rt.ANY
     return self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
-        or rt.UNKNOWN
+        or rt.ANY
         , true
 end
 

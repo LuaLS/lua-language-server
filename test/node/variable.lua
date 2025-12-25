@@ -5,19 +5,19 @@ do
     local var = rt.variable('x')
 
     assert(var:viewAsVariable() == 'x')
-    assert(var.value:view() == 'unknown')
+    assert(var.value:view() == 'any')
     assert(var.fields == false)
 
     local child1 = rt.variable(1, var)
 
     assert(child1:viewAsVariable() == 'x[1]')
-    assert(var.value:view() == 'unknown')
+    assert(var.value:view() == 'any')
     assert(var.fields == false)
 
     local child2 = rt.variable('y', child1)
 
     assert(child2:viewAsVariable() == 'x[1].y')
-    assert(var.value:view() == 'unknown')
+    assert(var.value:view() == 'any')
     assert(var.fields == false)
 end
 

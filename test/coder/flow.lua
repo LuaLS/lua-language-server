@@ -514,25 +514,23 @@ do
     --!include type
 
     local x
-    X0 = x --> unknown
+    X0 = x --> any
     if type(x) == 'string' then
         X1 = x --> 'string'
     elseif type(x) == 'number' then
         X2 = x --> 'number'
     end
 
-    XX = x --> unknown
+    XX = x --> any
     ]]
 
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
-    local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'unknown')
+    assert(X0:view() == 'any')
     assert(X1:view() == 'string')
     assert(X2:view() == 'number')
-    assert(X3:view() == 'unknown')
-    assert(XX:view() == 'unknown')
+    assert(XX:view() == 'any')
 end

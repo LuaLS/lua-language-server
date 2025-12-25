@@ -20,10 +20,10 @@ do
 end
 
 do
-    assert(Never >> Any == false)
-    assert(Never >> Nil == false)
-    assert(Never >> Never == false)
-    assert(Never >> Unknown == false)
+    assert(Never >> Any == true)
+    assert(Never >> Nil == true)
+    assert(Never >> Never == true)
+    assert(Never >> Unknown == true)
 end
 
 do
@@ -41,7 +41,7 @@ do
 
     assert(Any     >> rt.value(1) == true)
     assert(Nil     >> rt.value(1) == false)
-    assert(Never   >> rt.value(1) == false)
+    assert(Never   >> rt.value(1) == true)
     assert(Unknown >> rt.value(1) == true)
 end
 

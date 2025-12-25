@@ -534,3 +534,34 @@ do
     assert(X2:view() == 'number')
     assert(XX:view() == 'any')
 end
+
+do
+    local _ <close> = TEST_INDEX [[
+    --!include type
+
+    ---@type string | number | boolean
+    local x
+    X0 = x --> string | number | boolean
+    if type(x) == 'string' then
+        X1 = x --> string
+    elseif type(x) == 'number' then
+        X2 = x --> number
+    else
+        X3 = x --> boolean
+    end
+
+    XX = x --> string | number | boolean
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == 'string | number | boolean')
+    assert(X1:view() == 'string')
+    assert(X2:view() == 'number')
+    assert(X3:view() == 'boolean')
+    assert(XX:view() == 'string | number | boolean')
+end

@@ -303,9 +303,15 @@ function M:fillPresets()
 
     self.NEVER = self.type 'never'
         : setConfig('basicType', true)
-    self.ANY = self.type 'any'
         : setConfig('onCanCast', function (_, other)
             return true
+        end)
+        : setConfig('onCanBeCast', function (_, other)
+            return other.typeName == 'never'
+        end)
+    self.ANY = self.type 'any'
+        : setConfig('onCanCast', function (_, other)
+            return other.typeName ~= 'never'
         end)
         : setConfig('onCanBeCast', function (_, other)
             return true

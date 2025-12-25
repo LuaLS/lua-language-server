@@ -442,9 +442,6 @@ end
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
-    if other.typeName == 'never' then
-        return false
-    end
     if self._onCanBeCast then
         ---@cast other Node.Type
         local res = self._onCanBeCast(self, other)
@@ -469,9 +466,6 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    if other.typeName == 'never' then
-        return false
-    end
     if self._onCanCast then
         local res = self._onCanCast(self, other)
         if res then

@@ -194,11 +194,16 @@ function M:narrowParam()
         end
     end
 
+    ---@param funcs Node.Function[]
+    ---@return Node
     local function makeParam(funcs)
         local result = {}
 
         for _, f in ipairs(funcs) do
-            result[#result+1] = f:getParam(index)
+            local v = f:getParam(index)
+            if v and self.node:canCast(v) then
+                result[#result+1] = v
+            end
         end
 
         return self.scope.rt.union(result)

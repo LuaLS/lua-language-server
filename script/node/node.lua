@@ -187,7 +187,10 @@ function M:refreshCastCache()
     self._castCache = nil
 end
 
----是否能转换为另一个节点(双向检查)
+---自己是否是对方的子类型？
+---* 对于基础值来说，自己能否转换为对方
+---* 对于表类型来说，自己是否包含对方的所有字段
+---* 对于类型来说，自己是否是对方的子类型（或退化为表的情况）
 ---@param other string | number | boolean | Node
 ---@return boolean
 function M:canCast(other)

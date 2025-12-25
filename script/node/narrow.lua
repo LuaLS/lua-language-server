@@ -59,7 +59,7 @@ end
 ---@param mode 'equal' | 'match'
 ---@param ret Node
 ---@return self
-function M:matchParam(f, index, mode, ret)
+function M:asParam(f, index, mode, ret)
     self.narrowType = 'param'
     self.callParams = { f, index, mode, ret }
     return self
@@ -314,12 +314,32 @@ function M:narrowParamByParam()
     ---@param param Node
     ---@param def Node.Function
     local function checkDef(node, param, def)
+        if node == rt.BOOLEAN then
+            checkDef(rt.TRUE, param, def)
+            checkDef(rt.FALSE, param, def)
+            return
+        end
+        local genericMap
+        if param.hasGeneric then
+            genericMap = {}
+            param:inferGeneric(node, genericMap)
+            param = param:resolveGeneric(genericMap)
+            if param.hasGeneric then
+                return
+            end
+        end
         if not node:canCast(param) then
             return
         end
         all:pushTail(param)
         local res
         local ret1 = def:getReturn(1) or rt.NIL
+        if ret1.hasGeneric then
+            ret1 = ret1:resolveGeneric(genericMap or {})
+            if ret1.hasGeneric then
+                return
+            end
+        end
         if mode == 'match' then
             res = ret1:canCast(ret)
         end

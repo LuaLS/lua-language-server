@@ -161,7 +161,7 @@ function C:tryTruly(exp, otherSide)
     if exp.kind == 'call' then
         ---@cast exp LuaParser.Node.Call
         for i, arg in ipairs(exp.args) do
-            self:narrow(arg, 'matchParam({func}, {index}, "match", rt.TRULY)' % {
+            self:narrow(arg, 'asParam({func}, {index}, "match", rt.TRULY)' % {
                 func  = self.branch.coder:getKey(exp.node),
                 index = i,
             }, otherSide)
@@ -195,7 +195,7 @@ function C:tryEqual(exp, other, otherSide)
     if exp.kind == 'call' then
         ---@cast exp LuaParser.Node.Call
         for i, arg in ipairs(exp.args) do
-            self:narrow(arg, 'matchParam({func}, {index}, "equal", {other})' % {
+            self:narrow(arg, 'asParam({func}, {index}, "equal", {other})' % {
                 func  = self.branch.coder:getKey(exp.node),
                 index = i,
                 other = self.branch.coder:getKey(other),

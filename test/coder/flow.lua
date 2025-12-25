@@ -569,3 +569,125 @@ do
     assert(X3:view() == 'boolean')
     assert(XX:view() == 'string | number | boolean')
 end
+
+do
+    TEST_INDEX [[
+    ---@type fun<T>(x: T): T
+    local f
+
+    local x
+    X = x --> any
+    
+    if f(x) == 1 then
+        X1 = x --> 1
+    elseif f(x) == 2 then
+        X2 = x --> 2
+    else
+        X3 = x --> any
+    end
+
+    XX = x --> any
+    ]]
+
+    local X = rt:globalGet('X')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
+
+    assert(X:view() == 'any')
+    assert(X1:view() == '1')
+    assert(X2:view() == '2')
+    assert(X3:view() == 'any')
+    assert(XX:view() == 'any')
+end
+
+do
+    TEST_INDEX [[
+    ---@type fun<T>(x: T): T
+    local f
+
+    local x
+    X = x --> any
+    
+    if f(x) then
+        X1 = x --> truly
+    else
+        X2 = x --> false | nil
+    end
+
+    XX = x --> any
+    ]]
+
+    local X = rt:globalGet('X')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X:view() == 'any')
+    assert(X1:view() == 'truly')
+    assert(X2:view() == 'false | nil')
+    assert(XX:view() == 'any')
+end
+
+do
+    TEST_INDEX [[
+    ---@type fun<T>(x: T): T
+    local f
+
+    ---@type 1 | 2 | 3 | 4
+    local x
+    X = x --> 1 | 2 | 3 | 4
+    
+    if f(x) == 1 then
+        X1 = x --> 1
+    elseif f(x) == 2 then
+        X2 = x --> 2
+    else
+        X3 = x --> 3 | 4
+    end
+
+    XX = x --> 1 | 2 | 3 | 4
+    ]]
+
+    local X = rt:globalGet('X')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
+
+    assert(X:view() == '1 | 2 | 3 | 4')
+    assert(X1:view() == '1')
+    assert(X2:view() == '2')
+    assert(X3:view() == '3 | 4')
+    assert(XX:view() == '1 | 2 | 3 | 4')
+end
+
+do
+    TEST_INDEX [[
+    ---@type fun<T>(x: T): T
+    local f
+
+    ---@type boolean
+    local x
+    X = x --> boolean
+    
+    if f(x) then
+        X1 = x --> true
+    else
+        X2 = x --> false
+    end
+
+    XX = x --> boolean
+    ]]
+
+    local X = rt:globalGet('X')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X:view() == 'boolean')
+    assert(X1:view() == 'true')
+    assert(X2:view() == 'false')
+    assert(XX:view() == 'boolean')
+end

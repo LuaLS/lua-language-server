@@ -338,10 +338,10 @@ function M:fillPresets()
         end)
     self.TRULY = self.type 'truly'
         : setConfig('onCanCast', function (_, other)
-            return not other:canCast(self.FALSY)
+            return other.truly ~= self.NEVER
         end)
         : setConfig('onCanBeCast', function (_, other)
-            return not other:canCast(self.FALSY)
+            return other.truly ~= self.NEVER
         end)
         : setConfig('basicType', true)
     self.FALSY = self.FALSE | self.NIL

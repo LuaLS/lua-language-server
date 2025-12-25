@@ -266,7 +266,7 @@ do
     local f = rt.variable 'f'
     f:addType(f1 | f2)
 
-    local xNarrow = rt.narrow(x):matchParam(f, 1, 'match', rt.TRULY)
+    local xNarrow = rt.narrow(x):asParam(f, 1, 'match', rt.TRULY)
 
     local x1 = x:shadow(xNarrow)
 
@@ -313,7 +313,7 @@ do
     local f = rt.variable 'f'
     f:addType(f1 | f2)
 
-    local xNarrow = rt.narrow(x):matchParam(f, 1, 'equal', rt.FALSE)
+    local xNarrow = rt.narrow(x):asParam(f, 1, 'equal', rt.FALSE)
 
     local x1 = x:shadow(xNarrow)
 
@@ -357,10 +357,10 @@ do
     f:addType(fType)
     local x = rt.variable 'x'
 
-    local xNarrow1 = rt.narrow(x):matchParam(f, 1, 'equal', rt.value(1))
+    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'equal', rt.value(1))
     local x1 = x:shadow(xNarrow1)
 
-    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):matchParam(f, 1, 'equal', rt.value(2))
+    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):asParam(f, 1, 'equal', rt.value(2))
     local x2 = x:shadow(xNarrow2)
 
     local x3 = x:shadow(xNarrow2:otherSide())
@@ -382,7 +382,7 @@ do
     if f(x) then
         X1 = x --> truly
     else
-        X2 = x --> falsy
+        X2 = x --> false | nil
     end
 
     XX = x --> any
@@ -399,7 +399,7 @@ do
     f:addType(fType)
     local x = rt.variable 'x'
 
-    local xNarrow1 = rt.narrow(x):matchParam(f, 1, 'match', rt.TRULY)
+    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'match', rt.TRULY)
     local x1 = x:shadow(xNarrow1)
 
     local x2 = x:shadow(xNarrow1:otherSide())
@@ -407,4 +407,91 @@ do
     assert(x:view() == 'any')
     assert(x1:view() == 'truly')
     assert(x2:view() == 'false | nil')
+end
+
+do
+    --[[
+    ---@type fun<T>(x: T): T
+    local f
+
+    ---@type 1 | 2 | 3 | 4
+    local x
+    X = x --> 1 | 2 | 3 | 4
+    
+    if f(x) == 1 then
+        X1 = x --> 1
+    elseif f(x) == 2 then
+        X2 = x --> 2
+    else
+        X3 = x --> 3 | 4
+    end
+
+    XX = x --> 1 | 2 | 3 | 4
+    ]]
+
+    rt:reset()
+
+    local T = rt.generic 'T'
+    local f = rt.variable 'f'
+    local fType = rt.func()
+        : addParamDef('x', T)
+        : addReturnDef(nil, T)
+
+    f:addType(fType)
+    local x = rt.variable 'x'
+    x:addType(rt.value(1) | rt.value(2) | rt.value(3) | rt.value(4))
+
+    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'equal', rt.value(1))
+    local x1 = x:shadow(xNarrow1)
+
+    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):asParam(f, 1, 'equal', rt.value(2))
+    local x2 = x:shadow(xNarrow2)
+
+    local x3 = x:shadow(xNarrow2:otherSide())
+
+    assert(x:view() == '1 | 2 | 3 | 4')
+    assert(x1:view() == '1')
+    assert(x2:view() == '2')
+    assert(x3:view() == '3 | 4')
+end
+
+do
+    --[[
+    ---@type fun<T>(x: T): T
+    local f
+
+    ---@type boolean
+    local x
+    X = x --> boolean
+    
+    if f(x) then
+        X1 = x --> true
+    else
+        X2 = x --> false
+    end
+
+    XX = x --> boolean
+    ]]
+
+    rt:reset()
+
+    local T = rt.generic 'T'
+    local f = rt.variable 'f'
+    local fType = rt.func()
+        : addParamDef('x', T)
+        : addReturnDef(nil, T)
+
+    f:addType(fType)
+    local x = rt.variable 'x'
+    x:addType(rt.BOOLEAN)
+
+    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'match', rt.TRULY)
+    local x1 = x:shadow(xNarrow1)
+
+    local x2 = x:shadow(xNarrow1:otherSide())
+
+
+    assert(x:view() == 'boolean')
+    assert(x1:view() == 'true')
+    assert(x2:view() == 'false')
 end

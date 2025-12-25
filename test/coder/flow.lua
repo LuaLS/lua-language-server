@@ -535,7 +535,7 @@ do
     assert(X0:view() == 'any')
     assert(X1:view() == 'string')
     assert(X2:view() == 'number')
-    assert(X3:view() == 'boolean | table | userdata | function | thread | nil')
+    assert(X3:view() == 'boolean | table | function | thread | userdata | nil')
     assert(XX:view() == 'any')
 end
 

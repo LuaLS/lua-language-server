@@ -163,6 +163,19 @@ end
 ---@return Node
 ---@return Node
 function M:narrowParam()
+    local rt = self.scope.rt
+    local nodeValue = self.node:finalValue()
+    if nodeValue == rt.ANY or nodeValue == rt.UNKNOWN then
+        return self:narrowParamByRet()
+    end
+    return self:narrowParamByParam()
+end
+
+---@private
+---@return Node
+---@return Node
+function M:narrowParamByRet()
+    local rt = self.scope.rt
     local func, index, mode, ret = table.unpack(self.callParams)
     func:addRef(self)
     ret:addRef(self)
@@ -177,10 +190,10 @@ function M:narrowParam()
         defs[#defs+1] = f
     end)
 
-    local rt = self.scope.rt
-
     local matches = {}
     local notMatches = {}
+
+    -- 参数为any或unknown时，只能根据返回值来匹配原型
     for _, def in ipairs(defs) do
         local res
         local ret1 = def:getReturn(1) or rt.NIL
@@ -197,6 +210,8 @@ function M:narrowParam()
         end
     end
 
+    local nodeValue = self.node:finalValue()
+
     ---@param funcs Node.Function[]
     ---@return Node
     local function makeParam(funcs)
@@ -207,8 +222,10 @@ function M:narrowParam()
             if not v then
                 goto continue
             end
-            if self.node:finalValue() == rt.ANY then
+            if nodeValue == rt.ANY then
                 result[#result+1] = v
+            elseif nodeValue == rt.UNKNOWN then
+                result[#result+1] = v.truly
             else
                 local res = self.node:narrow(v)
                 result[#result+1] = res
@@ -220,4 +237,73 @@ function M:narrowParam()
     end
 
     return makeParam(matches), makeParam(notMatches)
+end
+
+---@private
+---@return Node
+---@return Node
+function M:narrowParamByParam()
+    local rt = self.scope.rt
+    local func, index, mode, ret = table.unpack(self.callParams)
+    func:addRef(self)
+    ret:addRef(self)
+    ---@type Node.Function[]
+    local defs = {}
+
+    func:each('function', function (f)
+        ---@cast f Node.Function
+        if f:isDummy() then
+            return
+        end
+        defs[#defs+1] = f
+    end)
+
+    local nodeValue = self.node:finalValue()
+
+    local passed = ls.tools.linkedTable.create()
+    local all = ls.tools.linkedTable.create()
+
+    ---@param node Node
+    ---@param param Node
+    ---@param def Node.Function
+    local function checkDef(node, param, def)
+        if not node:canCast(param) then
+            return
+        end
+        all:pushTail(param)
+        local res
+        local ret1 = def:getReturn(1) or rt.NIL
+        if mode == 'match' then
+            res = ret1:canCast(ret)
+        end
+        if mode == 'equal' then
+            res = ret1:narrowEqual(ret) ~= rt.NEVER
+        end
+        if res then
+            passed:pushTail(param)
+        end
+    end
+
+    -- 直接代入原型来匹配
+    for _, def in ipairs(defs) do
+        local param = def:getParam(index)
+        if not param then
+            goto continue
+        end
+        if nodeValue.kind == 'union' then
+            ---@cast nodeValue Node.Union
+            for _, nv in ipairs(nodeValue.values) do
+                checkDef(nv, param, def)
+            end
+        else
+            checkDef(nodeValue, param, def)
+        end
+        ::continue::
+    end
+
+    local passedNodes = passed:toArray()
+    local allNodes = all:toArray()
+    local notPassedNodes = ls.util.arrayDiff(allNodes, passedNodes)
+
+    return rt.union(passedNodes), rt.union(notPassedNodes)
 end

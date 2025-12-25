@@ -691,3 +691,32 @@ do
     assert(X2:view() == 'false')
     assert(XX:view() == 'boolean')
 end
+
+do
+    TEST_INDEX [[
+    ---@type fun<T>(x: T): T
+    local f
+
+    ---@type { a: 1 } | { a: 2 }
+    local x
+    X = x --> { a: 1 } | { a: 2 }
+    
+    if f(x.a) == 1 then
+        X1 = x --> { a: 1 }
+    else
+        X2 = x --> { a: 2 }
+    end
+
+    XX = x --> { a: 1 } | { a: 2 }
+    ]]
+
+    local X = rt:globalGet('X')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+
+    assert(X:view() == '{ a: 1 } | { a: 2 }')
+    assert(X1:view() == '{ a: 1 }')
+    assert(X2:view() == '{ a: 2 }')
+    assert(XX:view() == '{ a: 1 } | { a: 2 }')
+end

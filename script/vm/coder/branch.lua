@@ -137,6 +137,17 @@ function C:narrow(exp, method, otherSide)
     self.valueAfterNarrow[var.name]  = value
     self.narrowReasons[var.name] = exp
 
+    if exp.kind == 'field' then
+        ---@cast exp LuaParser.Node.Field
+        local fieldCode = self.branch.coder:makeFieldCode(exp.key)
+        if fieldCode then
+            self:narrow(exp.last, 'matchField({key}, {value})' % {
+                key   = fieldCode,
+                value = value,
+            }, otherSide)
+        end
+    end
+
     return true
 end
 
@@ -145,17 +156,6 @@ end
 ---@param otherSide? boolean
 function C:tryTruly(exp, otherSide)
     self:narrow(exp, 'matchTruly()', otherSide)
-
-    -- 根据字段来收窄类型
-    if exp.kind == 'field' then
-        ---@cast exp LuaParser.Node.Field
-        local fieldCode = self.branch.coder:makeFieldCode(exp.key)
-        if fieldCode then
-            self:narrow(exp.last, 'matchField({key}, rt.TRULY)' % {
-                key   = fieldCode,
-            }, otherSide)
-        end
-    end
 
     -- 根据函数调用的返回值来收窄类型
     if exp.kind == 'call' then
@@ -178,18 +178,6 @@ function C:tryEqual(exp, other, otherSide)
     self:narrow(exp, 'equalValue({other})' % {
         other = self.branch.coder:getKey(other),
     }, otherSide)
-
-    -- 根据字段值来收窄类型
-    if exp.kind == 'field' then
-        ---@cast exp LuaParser.Node.Field
-        local fieldCode = self.branch.coder:makeFieldCode(exp.key)
-        if fieldCode then
-            self:narrow(exp.last, 'matchField({key}, {other})' % {
-                key   = fieldCode,
-                other = self.branch.coder:getKey(other),
-            }, otherSide)
-        end
-    end
 
     -- 根据函数调用的返回值来收窄类型
     if exp.kind == 'call' then

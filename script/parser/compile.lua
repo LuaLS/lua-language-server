@@ -4098,9 +4098,9 @@ local function parseFor()
             for i = 1, #list do
                 local obj = list[i]
                 ---@cast obj parser.object
-                -- In Lua 5.5, for loop variables are treated as constants
+                -- In Lua 5.5, for first loop variable is treated as constant
                 local attrs
-                if State.version == 'Lua 5.5' then
+                if i == 1 and State.version == 'Lua 5.5' then
                     attrs = {
                         type = 'localattrs',
                         start = obj.start,

@@ -5,7 +5,7 @@
 
 ## 3.16.4
 * `FIX` (VSCode) Broken `view document`
-
+* `FIX` `for .. in` should only treat the first variable as const
 
 ## 3.16.3
 `2025-12-23`

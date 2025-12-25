@@ -120,8 +120,6 @@ config.diagnostics.validScheme  =
 '对使用以下 scheme 的lua文件启用诊断。'
 config.diagnostics.unusedLocalExclude =
 '如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。'
-config.diagnostics.validScheme  =
-'对使用以下 scheme 的lua文件启用诊断。'
 config.workspace.ignoreDir        =
 "忽略的文件与目录（使用 `.gitignore` 语法）。"
 config.workspace.ignoreSubmodules =

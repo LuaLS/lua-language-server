@@ -860,3 +860,5 @@ utf8.len                    =
 '返回字符串 `s` 中 从位置 `i` 到 `j` 间 （包括两端） UTF-8 字符的个数。'
 utf8.offset                 =
 '返回编码在 `s` 中的第 `n` 个字符的开始位置（按字节数） （从位置 `i` 处开始统计）。'
+utf8.offset[55]             = -- TODO: need translate!
+'Returns the position of the n-th character of s (counting from byte position i) as two integers: The index (in bytes) where its encoding starts and the index (in bytes) where it ends.'

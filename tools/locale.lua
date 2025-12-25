@@ -120,6 +120,7 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
     local lastKey
     local blocks = {}
     local currentBlock = {}
+    local usedKeys = {}
     blocks[#blocks+1] = currentBlock
     for _, key in ipairs(allKeys) do
         if needSplit(key, lastKey) then
@@ -127,7 +128,10 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
             blocks[#blocks+1] = currentBlock
         end
         lastKey = key
-        currentBlock[#currentBlock+1] = key
+        if not usedKeys[key] then
+            currentBlock[#currentBlock+1] = key
+            usedKeys[key] = true
+        end
     end
 
     if fileName == 'meta' then

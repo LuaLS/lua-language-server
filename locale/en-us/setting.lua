@@ -121,8 +121,6 @@ config.diagnostics.validScheme  =
 'Enable diagnostics for Lua files that use the following scheme.'
 config.diagnostics.unusedLocalExclude =
 'Do not diagnose `unused-local` when the variable name matches the following pattern.'
-config.diagnostics.validScheme  =
-'Enable diagnostics for Lua files that use the following scheme.'
 config.workspace.ignoreDir        =
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules =

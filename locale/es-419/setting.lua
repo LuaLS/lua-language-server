@@ -122,8 +122,6 @@ config.diagnostics.validScheme  =
 'Habilita diagnósticos para archivos Lua que usan el siguiente esquema.'
 config.diagnostics.unusedLocalExclude =
 'Las variables que calcen con el siguiente patrón no se diagnostican con `unused-local`.'
-config.diagnostics.validScheme  =
-'Habilita diagnósticos para archivos Lua que usan el siguiente esquema.'
 config.workspace.ignoreDir        =
 "Directorios y archivos ignorados (se usa la misma gramática que en `.gitignore`)"
 config.workspace.ignoreSubmodules =

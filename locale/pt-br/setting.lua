@@ -121,8 +121,6 @@ config.diagnostics.validScheme  =
 'Habilita diagnósticos para arquivos Lua que usam os seguintes schemes.'
 config.diagnostics.unusedLocalExclude =
 'Não diagnosticar `unused-local` quando o nome da variável corresponder ao padrão a seguir.'
-config.diagnostics.validScheme  =
-'Habilita diagnósticos para arquivos Lua que usam os seguintes schemes.'
 config.workspace.ignoreDir        =
 "Arquivos e diretórios ignorados (usa sintaxe `.gitignore`)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules =

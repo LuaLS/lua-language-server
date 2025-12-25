@@ -6,82 +6,129 @@ config.addonManager.repositoryBranch =
 "アドオンマネージャーが使用するgitブランチを指定します。"
 config.addonManager.repositoryPath =
 "アドオンマネージャーが使用するgitパスを指定します。"
-config.develop.enable                    =
-'開発者モード。パフォーマンスに影響するため有効にしないでください。'
-config.develop.debuggerPort              =
-'デバッガーの待ち受けポート。'
-config.develop.debuggerWait              =
-'デバッガー接続前に停止します。'
-config.intelliSense.searchDepth          =
-'IntelliSenseの検索深度を設定します。この値を上げると精度が上がりますが、パフォーマンスが低下します。ワークスペースごとに適切な値を調整してください。'
-config.intelliSense.fastGlobal           =
-'グローバル変数補完および `_G` ホバー表示を高速化します。型推論の精度がわずかに低下しますが、多数のグローバルを使うプロジェクトでは大きく改善します。'
-config.window.statusBar                  =
-'ステータスバーに拡張機能のステータスを表示します。'
-config.window.progressBar                =
-'ステータスバーに進行状況バーを表示します。'
-config.hint.enable                       =
-'インレイヒントを有効にします。'
-config.hint.paramType                    =
-'関数のパラメータに型ヒントを表示します。'
-config.hint.setType                      =
-'代入操作で型ヒントを表示します。'
-config.hint.paramName                    =
-'関数呼び出し時にパラメータ名のヒントを表示します。'
-config.hint.paramName.All                =
-'すべての型のパラメータを表示します。'
-config.hint.paramName.Literal            =
-'リテラル型のパラメータのみを表示します。'
-config.hint.paramName.Disable            =
-'パラメータヒントを無効にします。'
-config.hint.arrayIndex                   =
-'テーブル構築時に配列インデックスのヒントを表示します。'
-config.hint.arrayIndex.Enable            =
-'すべてのテーブルでヒントを表示します。'
-config.hint.arrayIndex.Auto              =
-'テーブルが3要素を超える、または混在テーブルの場合のみヒントを表示します。'
-config.hint.arrayIndex.Disable           =
-'配列インデックスのヒントを無効にします。'
-config.hint.await                        =
-'呼び出す関数に `---@async` が付いている場合、呼び出し箇所で `await` を提案します。'
-config.hint.awaitPropagate               =
-'`await` の伝播を有効にします。`---@async` が付いた関数を呼び出す関数は、自動的に `---@async` とマークされます。'
-config.hint.semicolon                    =
-'文末にセミコロンがない場合に仮想セミコロンを表示します。'
-config.hint.semicolon.All                =
-'すべての文で仮想セミコロンを表示します。'
-config.hint.semicolon.SameLine           =
-'同じ行に2つの文がある場合、その間にセミコロンを表示します。'
-config.hint.semicolon.Disable            =
-'仮想セミコロンを無効にします。'
-config.codeLens.enable                   =
-'コードレンズを有効にします。'
-config.format.enable                     =
-'コードフォーマッタを有効にします。'
-config.format.defaultConfig              =
+config.addonRepositoryPath        = -- TODO: need translate!
+"Specifies the addon repository path (not related to the addon manager)."
+config.runtime.version            = -- TODO: need translate!
+"Lua runtime version."
+config.runtime.path               = -- TODO: need translate!
 [[
-デフォルトのフォーマット設定。ワークスペース内の`.editorconfig`ファイルより優先度が低くなります。
-[formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) を参照してください。
+When using `require`, how to find the file based on the input name.
+Setting this config to `?/init.lua` means that when you enter `require 'myfile'`, `${workspace}/myfile/init.lua` will be searched from the loaded files.
+if `runtime.pathStrict` is `false`, `${workspace}/**/myfile/init.lua` will also be searched.
+If you want to load files outside the workspace, you need to set `Lua.workspace.library` first.
 ]]
-config.spell.dict                        =
-'スペルチェック用のカスタム単語。'
-config.nameStyle.config                  =
+config.runtime.pathStrict         = -- TODO: need translate!
+'When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.'
+config.runtime.special            = -- TODO: need translate!
+[[The custom global variables are regarded as some special built-in variables, and the language server will provide special support
+The following example shows that 'include' is treated as' require '.
+```json
+"Lua.runtime.special" : {
+    "include" : "require"
+}
+```
+]]
+config.runtime.unicodeName        = -- TODO: need translate!
+"Allows Unicode characters in name."
+config.runtime.nonstandardSymbol  = -- TODO: need translate!
+"Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
+config.runtime.plugin             = -- TODO: need translate!
+"Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
+config.runtime.fileEncoding       = -- TODO: need translate!
+"File encoding. The `ansi` option is only available under the `Windows` platform."
+config.runtime.builtin            = -- TODO: need translate!
 [[
-命名スタイル設定。
-[formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) を参照してください。
+Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
+
+* `default`: Indicates that the library will be enabled or disabled according to the runtime version
+* `enable`: always enable
+* `disable`: always disable
 ]]
-config.telemetry.enable                  =
+config.runtime.meta               = -- TODO: need translate!
+'Format of the directory name of the meta files.'
+config.diagnostics.enable         = -- TODO: need translate!
+"Enable diagnostics."
+config.diagnostics.disable        = -- TODO: need translate!
+"Disabled diagnostic (Use code in hover brackets)."
+config.diagnostics.globals        = -- TODO: need translate!
+"Defined global variables."
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
+config.diagnostics.severity       = -- TODO: need translate!
 [[
-テレメトリを有効にし、エディタ情報とエラーログをネットワーク経由で送信します。プライバシーポリシーは[こちら](https://luals.github.io/privacy/#language-server)。
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
 ]]
-config.misc.parameters                   =
-'VSCode で言語サーバーを起動するときの[コマンドライン引数](https://github.com/LuaLS/lua-telemetry-server/tree/master/method)。'
-config.misc.executablePath               =
-'VSCodeでの実行可能ファイルのパスを指定します。'
-config.language.fixIndent                =
-'(VSCodeのみ) 誤った自動インデントを修正します。例えば、"function" を含む文字列内で改行したときの不正なインデントなど。'
-config.language.completeAnnotation       =
-'(VSCodeのみ) 注釈行の改行後に自動で "---@ " を挿入します。'
+config.diagnostics.neededFileStatus = -- TODO: need translate!
+[[
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
+]]
+config.diagnostics.groupSeverity  = -- TODO: need translate!
+[[
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus = -- TODO: need translate!
+[[
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.workspaceEvent = -- TODO: need translate!
+"Set the time to trigger workspace diagnostics."
+config.diagnostics.workspaceEvent.OnChange = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is changed."
+config.diagnostics.workspaceEvent.OnSave = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is saved."
+config.diagnostics.workspaceEvent.None = -- TODO: need translate!
+"Disable workspace diagnostics."
+config.diagnostics.workspaceDelay = -- TODO: need translate!
+"Latency (milliseconds) for workspace diagnostics."
+config.diagnostics.workspaceRate  = -- TODO: need translate!
+"Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
+config.diagnostics.libraryFiles   = -- TODO: need translate!
+"How to diagnose files loaded via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   = -- TODO: need translate!
+"Always diagnose these files."
+config.diagnostics.libraryFiles.Opened   = -- TODO: need translate!
+"Only when these files are opened will it be diagnosed."
+config.diagnostics.libraryFiles.Disable  = -- TODO: need translate!
+"These files are not diagnosed."
+config.diagnostics.ignoredFiles   = -- TODO: need translate!
+"How to diagnose ignored files."
+config.diagnostics.ignoredFiles.Enable   = -- TODO: need translate!
+"Always diagnose these files."
+config.diagnostics.ignoredFiles.Opened   = -- TODO: need translate!
+"Only when these files are opened will it be diagnosed."
+config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
+"These files are not diagnosed."
+config.diagnostics.disableScheme  = -- TODO: need translate!
+'Do not diagnose Lua files that use the following scheme.'
+config.diagnostics.validScheme  = -- TODO: need translate!
+'Enable diagnostics for Lua files that use the following scheme.'
+config.diagnostics.unusedLocalExclude = -- TODO: need translate!
+'Do not diagnose `unused-local` when the variable name matches the following pattern.'
+config.workspace.ignoreDir        = -- TODO: need translate!
+"Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
+config.workspace.ignoreSubmodules = -- TODO: need translate!
+"Ignore submodules."
+config.workspace.useGitIgnore     = -- TODO: need translate!
+"Ignore files list in `.gitignore` ."
+config.workspace.maxPreload       = -- TODO: need translate!
+"Max preloaded files."
 config.workspace.preloadFileSize  =
 "プリロード時にこの値（KB）より大きいファイルをスキップします。"
 config.workspace.library          =
@@ -177,6 +224,82 @@ config.hover.expandAlias                 =
 [[
 エイリアスを展開するかどうか。たとえば、`---@alias myType boolean|number`を展開すると`boolean|number`として表示され、そうでない場合は`myType`として表示されます。
 ]]
+config.develop.enable                    =
+'開発者モード。パフォーマンスに影響するため有効にしないでください。'
+config.develop.debuggerPort              =
+'デバッガーの待ち受けポート。'
+config.develop.debuggerWait              =
+'デバッガー接続前に停止します。'
+config.intelliSense.searchDepth          =
+'IntelliSenseの検索深度を設定します。この値を上げると精度が上がりますが、パフォーマンスが低下します。ワークスペースごとに適切な値を調整してください。'
+config.intelliSense.fastGlobal           =
+'グローバル変数補完および `_G` ホバー表示を高速化します。型推論の精度がわずかに低下しますが、多数のグローバルを使うプロジェクトでは大きく改善します。'
+config.window.statusBar                  =
+'ステータスバーに拡張機能のステータスを表示します。'
+config.window.progressBar                =
+'ステータスバーに進行状況バーを表示します。'
+config.hint.enable                       =
+'インレイヒントを有効にします。'
+config.hint.paramType                    =
+'関数のパラメータに型ヒントを表示します。'
+config.hint.setType                      =
+'代入操作で型ヒントを表示します。'
+config.hint.paramName                    =
+'関数呼び出し時にパラメータ名のヒントを表示します。'
+config.hint.paramName.All                =
+'すべての型のパラメータを表示します。'
+config.hint.paramName.Literal            =
+'リテラル型のパラメータのみを表示します。'
+config.hint.paramName.Disable            =
+'パラメータヒントを無効にします。'
+config.hint.arrayIndex                   =
+'テーブル構築時に配列インデックスのヒントを表示します。'
+config.hint.arrayIndex.Enable            =
+'すべてのテーブルでヒントを表示します。'
+config.hint.arrayIndex.Auto              =
+'テーブルが3要素を超える、または混在テーブルの場合のみヒントを表示します。'
+config.hint.arrayIndex.Disable           =
+'配列インデックスのヒントを無効にします。'
+config.hint.await                        =
+'呼び出す関数に `---@async` が付いている場合、呼び出し箇所で `await` を提案します。'
+config.hint.awaitPropagate               =
+'`await` の伝播を有効にします。`---@async` が付いた関数を呼び出す関数は、自動的に `---@async` とマークされます。'
+config.hint.semicolon                    =
+'文末にセミコロンがない場合に仮想セミコロンを表示します。'
+config.hint.semicolon.All                =
+'すべての文で仮想セミコロンを表示します。'
+config.hint.semicolon.SameLine           =
+'同じ行に2つの文がある場合、その間にセミコロンを表示します。'
+config.hint.semicolon.Disable            =
+'仮想セミコロンを無効にします。'
+config.codeLens.enable                   =
+'コードレンズを有効にします。'
+config.format.enable                     =
+'コードフォーマッタを有効にします。'
+config.format.defaultConfig              =
+[[
+デフォルトのフォーマット設定。ワークスペース内の`.editorconfig`ファイルより優先度が低くなります。
+[formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) を参照してください。
+]]
+config.spell.dict                        =
+'スペルチェック用のカスタム単語。'
+config.nameStyle.config                  =
+[[
+命名スタイル設定。
+[formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) を参照してください。
+]]
+config.telemetry.enable                  =
+[[
+テレメトリを有効にし、エディタ情報とエラーログをネットワーク経由で送信します。プライバシーポリシーは[こちら](https://luals.github.io/privacy/#language-server)。
+]]
+config.misc.parameters                   =
+'VSCode で言語サーバーを起動するときの[コマンドライン引数](https://github.com/LuaLS/lua-telemetry-server/tree/master/method)。'
+config.misc.executablePath               =
+'VSCodeでの実行可能ファイルのパスを指定します。'
+config.language.fixIndent                =
+'(VSCodeのみ) 誤った自動インデントを修正します。例えば、"function" を含む文字列内で改行したときの不正なインデントなど。'
+config.language.completeAnnotation       =
+'(VSCodeのみ) 注釈行の改行後に自動で "---@ " を挿入します。'
 config.type.castNumberToInteger          =
 '`number` 型を `integer` 型に代入することを許可します。'
 config.type.weakUnionCheck               =

@@ -67,6 +67,7 @@ function utf8.len(s, i, j) end
 function utf8.len(s, i, j, lax) end
 ---#end
 
+---#if VERSION <= 5.4 then
 ---#DES 'utf8.offset'
 ---@param s string
 ---@param n integer
@@ -74,5 +75,17 @@ function utf8.len(s, i, j, lax) end
 ---@return integer p
 ---@nodiscard
 function utf8.offset(s, n, i) end
+---#end
+
+---#if VERSION >= 5.5 then
+---#DES 'utf8.offset.55'
+---@param s string
+---@param n integer
+---@param i? integer
+---@return integer ps
+---@return integer pe
+---@nodiscard
+function utf8.offset(s, n, i) end
+---#end
 
 return utf8

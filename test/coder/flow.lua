@@ -509,32 +509,30 @@ do
     assert(XX:view() == '1 | 2')
 end
 
--- do
---     local _ <close> = TEST_INDEX [[
---     --!include type
+do
+    local _ <close> = TEST_INDEX [[
+    --!include type
 
---     local x
---     X0 = x --> unknown
---     if type(x) == 'string then
---         X1 = x --> 'string'
---     elseif type(x) == 'number' then
---         X2 = x --> 'number'
---     else
---         X3 = x --> unknown
---     end
+    local x
+    X0 = x --> unknown
+    if type(x) == 'string' then
+        X1 = x --> 'string'
+    elseif type(x) == 'number' then
+        X2 = x --> 'number'
+    end
 
---     XX = x --> unknown
---     ]]
+    XX = x --> unknown
+    ]]
 
---     local X0 = rt:globalGet('X0')
---     local X1 = rt:globalGet('X1')
---     local X2 = rt:globalGet('X2')
---     local X3 = rt:globalGet('X3')
---     local XX = rt:globalGet('XX')
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
 
---     assert(X0:view() == 'unknown')
---     assert(X1:view() == 'string')
---     assert(X2:view() == 'number')
---     assert(X3:view() == 'unknown')
---     assert(XX:view() == 'unknown')
--- end
+    assert(X0:view() == 'unknown')
+    assert(X1:view() == 'string')
+    assert(X2:view() == 'number')
+    assert(X3:view() == 'unknown')
+    assert(XX:view() == 'unknown')
+end

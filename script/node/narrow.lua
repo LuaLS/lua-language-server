@@ -192,24 +192,52 @@ function M:narrowParamByRet()
 
     local matches = {}
     local notMatches = {}
+    local genericMaps = {}
+
+    local inferAsFalsy
 
     -- 参数为any或unknown时，只能根据返回值来匹配原型
-    for _, def in ipairs(defs) do
+    for i, def in ipairs(defs) do
         local res
         local ret1 = def:getReturn(1) or rt.NIL
         if mode == 'match' then
-            res = ret1:canCast(ret)
+            if ret1.hasGeneric then
+                if ret ~= rt.TRULY then
+                    -- 无法处理泛型返回值，直接跳过这个原型
+                    goto continue
+                end
+                -- 直接视为 等于 truly
+                mode = 'equal'
+                -- 将 else 一方视为 falsy
+                inferAsFalsy = true
+            else
+                res = ret1:canCast(ret)
+            end
         end
         if mode == 'equal' then
-            res = ret1:narrowEqual(ret) ~= rt.NEVER
+            if ret1.hasGeneric then
+                local map = {}
+                ret1:inferGeneric(ret, map)
+                local newRet1 = ret1:resolveGeneric(map)
+                if newRet1.hasGeneric then
+                    -- 无法解决泛型，直接跳过这个原型
+                    goto continue
+                end
+                genericMaps[i] = map
+                res = true
+            else
+                res = ret1:narrowEqual(ret) ~= rt.NEVER
+            end
         end
         if res then
             matches[#matches+1] = def
         else
             notMatches[#notMatches+1] = def
         end
+        ::continue::
     end
 
+    -- 在这个分支里一定是 any 或 unknown
     local nodeValue = self.node:finalValue()
 
     ---@param funcs Node.Function[]
@@ -217,10 +245,20 @@ function M:narrowParamByRet()
     local function makeParam(funcs)
         local result = {}
 
-        for _, f in ipairs(funcs) do
+        for i, f in ipairs(funcs) do
             local v = f:getParam(index)
             if not v then
                 goto continue
+            end
+            if v.hasGeneric then
+                local map = genericMaps[i]
+                if not map then
+                    goto continue
+                end
+                v = v:resolveGeneric(map)
+                if v.hasGeneric then
+                    goto continue
+                end
             end
             if nodeValue == rt.ANY then
                 result[#result+1] = v
@@ -236,7 +274,16 @@ function M:narrowParamByRet()
         return self.scope.rt.union(result)
     end
 
-    return makeParam(matches), makeParam(notMatches)
+    local trueValue  = makeParam(matches)
+    local falseValue = makeParam(notMatches)
+    if falseValue == rt.NEVER then
+        if inferAsFalsy then
+            falseValue = nodeValue.falsy
+        else
+            falseValue = nodeValue
+        end
+    end
+    return trueValue, falseValue
 end
 
 ---@private

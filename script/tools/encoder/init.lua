@@ -61,7 +61,7 @@ function M.offset(encoding, s, n, i)
         return #os + i
     end
     if encoding == 'utf-8' then
-        return utf8.offset(s, n, i)
+        return (utf8.offset(s, n, i))
     end
     log.error('Unsupport offset encoding:', encoding)
     return n + i - 1

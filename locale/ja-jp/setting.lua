@@ -6,129 +6,129 @@ config.addonManager.repositoryBranch =
 "アドオンマネージャーが使用するgitブランチを指定します。"
 config.addonManager.repositoryPath =
 "アドオンマネージャーが使用するgitパスを指定します。"
-config.addonRepositoryPath        = -- TODO: need translate!
-"Specifies the addon repository path (not related to the addon manager)."
-config.runtime.version            = -- TODO: need translate!
-"Lua runtime version."
-config.runtime.path               = -- TODO: need translate!
+config.addonRepositoryPath        =
+"アドオンのリポジトリパスを指定します（アドオンマネージャーとは無関係です）。"
+config.runtime.version            =
+"Lua のランタイムバージョン。"
+config.runtime.path               =
 [[
-When using `require`, how to find the file based on the input name.
-Setting this config to `?/init.lua` means that when you enter `require 'myfile'`, `${workspace}/myfile/init.lua` will be searched from the loaded files.
-if `runtime.pathStrict` is `false`, `${workspace}/**/myfile/init.lua` will also be searched.
-If you want to load files outside the workspace, you need to set `Lua.workspace.library` first.
+`require` を使用する際、入力名に基づいてファイルを探す方法。
+この設定を `?/init.lua` にすると、`require 'myfile'` と入力したとき、読み込まれたファイルから `${workspace}/myfile/init.lua` が検索されます。
+`runtime.pathStrict` が `false` の場合、`${workspace}/**/myfile/init.lua` も検索対象になります。
+ワークスペース外のファイルを読み込みたい場合は、先に `Lua.workspace.library` を設定する必要があります。
 ]]
-config.runtime.pathStrict         = -- TODO: need translate!
-'When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.'
-config.runtime.special            = -- TODO: need translate!
-[[The custom global variables are regarded as some special built-in variables, and the language server will provide special support
-The following example shows that 'include' is treated as' require '.
+config.runtime.pathStrict         =
+'有効にすると、`runtime.path` は最上位のディレクトリ階層のみを検索します。詳細は `runtime.path` の説明を参照してください。'
+config.runtime.special            =
+[[カスタムのグローバル変数を一部の特別な組み込み変数として扱い、言語サーバーが特別なサポートを提供します。
+以下の例では、`include` を `require` として扱います。
 ```json
 "Lua.runtime.special" : {
     "include" : "require"
 }
 ```
 ]]
-config.runtime.unicodeName        = -- TODO: need translate!
-"Allows Unicode characters in name."
-config.runtime.nonstandardSymbol  = -- TODO: need translate!
-"Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
-config.runtime.plugin             = -- TODO: need translate!
-"Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
-config.runtime.pluginArgs         = -- TODO: need translate!
-"Additional arguments for the plugin."
-config.runtime.fileEncoding       = -- TODO: need translate!
-"File encoding. The `ansi` option is only available under the `Windows` platform."
-config.runtime.builtin            = -- TODO: need translate!
+config.runtime.unicodeName        =
+"名前に Unicode 文字を使用できるようにします。"
+config.runtime.nonstandardSymbol  =
+"非標準の記号をサポートします。ランタイム環境がこれらの記号をサポートしていることを確認してください。"
+config.runtime.plugin             =
+"プラグインのパス。詳細は [wiki](https://luals.github.io/wiki/plugins) を参照してください。"
+config.runtime.pluginArgs         =
+"プラグインに渡す追加引数。"
+config.runtime.fileEncoding       =
+"ファイルのエンコーディング。`ansi` オプションは `Windows` プラットフォームでのみ利用可能です。"
+config.runtime.builtin            =
 [[
-Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
+組み込みライブラリの有効状態を調整します。実際のランタイム環境に応じて、存在しないライブラリを無効化（または再定義）できます。
 
-* `default`: Indicates that the library will be enabled or disabled according to the runtime version
-* `enable`: always enable
-* `disable`: always disable
+* `default`: ランタイムバージョンに応じてライブラリを有効／無効にします
+* `enable`: 常に有効
+* `disable`: 常に無効
 ]]
-config.runtime.meta               = -- TODO: need translate!
-'Format of the directory name of the meta files.'
-config.diagnostics.enable         = -- TODO: need translate!
-"Enable diagnostics."
-config.diagnostics.disable        = -- TODO: need translate!
-"Disabled diagnostic (Use code in hover brackets)."
-config.diagnostics.globals        = -- TODO: need translate!
-"Defined global variables."
-config.diagnostics.globalsRegex   = -- TODO: need translate!
-"Find defined global variables using regex."
-config.diagnostics.severity       = -- TODO: need translate!
+config.runtime.meta               =
+'メタファイルのディレクトリ名の形式。'
+config.diagnostics.enable         =
+"診断を有効にします。"
+config.diagnostics.disable        =
+"無効化する診断（ホバーの括弧内に表示されるコードを使用）。"
+config.diagnostics.globals        =
+"定義済みのグローバル変数。"
+config.diagnostics.globalsRegex   =
+"正規表現で定義済みのグローバル変数を検索します。"
+config.diagnostics.severity       =
 [[
-Modify the diagnostic severity.
+診断の重大度を変更します。
 
-End with `!` means override the group setting `diagnostics.groupSeverity`.
+末尾に `!` を付けると、グループ設定 `diagnostics.groupSeverity` を上書きします。
 ]]
-config.diagnostics.neededFileStatus = -- TODO: need translate!
+config.diagnostics.neededFileStatus =
 [[
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened: 開いているファイルのみを診断
+* Any:    すべてのファイルを診断
+* None:   この診断を無効化
 
-End with `!` means override the group setting `diagnostics.groupFileStatus`.
+末尾に `!` を付けると、グループ設定 `diagnostics.groupFileStatus` を上書きします。
 ]]
-config.diagnostics.groupSeverity  = -- TODO: need translate!
+config.diagnostics.groupSeverity  =
 [[
-Modify the diagnostic severity in a group.
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
-Other settings will override individual settings without end of `!`.
+グループ内の診断の重大度を変更します。
+`Fallback` は、このグループ内の診断が個別に `diagnostics.severity` によって制御されることを意味します。
+その他の設定は、末尾に `!` が付いていない個別の設定を上書きします。
 ]]
-config.diagnostics.groupFileStatus = -- TODO: need translate!
+config.diagnostics.groupFileStatus =
 [[
-Modify the diagnostic needed file status in a group.
+グループ内の診断対象ファイル状態を変更します。
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened: 開いているファイルのみを診断
+* Any:    すべてのファイルを診断
+* None:   この診断を無効化
 
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
-Other settings will override individual settings without end of `!`.
+`Fallback` は、このグループ内の診断が個別に `diagnostics.neededFileStatus` によって制御されることを意味します。
+その他の設定は、末尾に `!` が付いていない個別の設定を上書きします。
 ]]
-config.diagnostics.workspaceEvent = -- TODO: need translate!
-"Set the time to trigger workspace diagnostics."
-config.diagnostics.workspaceEvent.OnChange = -- TODO: need translate!
-"Trigger workspace diagnostics when the file is changed."
-config.diagnostics.workspaceEvent.OnSave = -- TODO: need translate!
-"Trigger workspace diagnostics when the file is saved."
-config.diagnostics.workspaceEvent.None = -- TODO: need translate!
-"Disable workspace diagnostics."
-config.diagnostics.workspaceDelay = -- TODO: need translate!
-"Latency (milliseconds) for workspace diagnostics."
-config.diagnostics.workspaceRate  = -- TODO: need translate!
-"Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
-config.diagnostics.libraryFiles   = -- TODO: need translate!
-"How to diagnose files loaded via `Lua.workspace.library`."
-config.diagnostics.libraryFiles.Enable   = -- TODO: need translate!
-"Always diagnose these files."
-config.diagnostics.libraryFiles.Opened   = -- TODO: need translate!
-"Only when these files are opened will it be diagnosed."
-config.diagnostics.libraryFiles.Disable  = -- TODO: need translate!
-"These files are not diagnosed."
-config.diagnostics.ignoredFiles   = -- TODO: need translate!
-"How to diagnose ignored files."
-config.diagnostics.ignoredFiles.Enable   = -- TODO: need translate!
-"Always diagnose these files."
-config.diagnostics.ignoredFiles.Opened   = -- TODO: need translate!
-"Only when these files are opened will it be diagnosed."
-config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
-"These files are not diagnosed."
-config.diagnostics.disableScheme  = -- TODO: need translate!
-'Do not diagnose Lua files that use the following scheme.'
-config.diagnostics.validScheme  = -- TODO: need translate!
-'Enable diagnostics for Lua files that use the following scheme.'
-config.diagnostics.unusedLocalExclude = -- TODO: need translate!
-'Do not diagnose `unused-local` when the variable name matches the following pattern.'
-config.workspace.ignoreDir        = -- TODO: need translate!
-"Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
-config.workspace.ignoreSubmodules = -- TODO: need translate!
-"Ignore submodules."
-config.workspace.useGitIgnore     = -- TODO: need translate!
-"Ignore files list in `.gitignore` ."
-config.workspace.maxPreload       = -- TODO: need translate!
-"Max preloaded files."
+config.diagnostics.workspaceEvent =
+"ワークスペース診断をトリガーするタイミングを設定します。"
+config.diagnostics.workspaceEvent.OnChange =
+"ファイルが変更されたときにワークスペース診断をトリガーします。"
+config.diagnostics.workspaceEvent.OnSave =
+"ファイルが保存されたときにワークスペース診断をトリガーします。"
+config.diagnostics.workspaceEvent.None =
+"ワークスペース診断を無効にします。"
+config.diagnostics.workspaceDelay =
+"ワークスペース診断の待ち時間（ミリ秒）。"
+config.diagnostics.workspaceRate  =
+"ワークスペース診断の実行レート（％）。この値を下げると CPU 使用率は低下しますが、ワークスペース診断の速度も低下します。現在編集中のファイルの診断は常に全速で行われ、この設定の影響を受けません。"
+config.diagnostics.libraryFiles   =
+"`Lua.workspace.library` 経由で読み込まれたファイルをどのように診断するか。"
+config.diagnostics.libraryFiles.Enable   =
+"常にこれらのファイルを診断します。"
+config.diagnostics.libraryFiles.Opened   =
+"これらのファイルが開かれているときのみ診断します。"
+config.diagnostics.libraryFiles.Disable  =
+"これらのファイルは診断しません。"
+config.diagnostics.ignoredFiles   =
+"無視されているファイルをどのように診断するか。"
+config.diagnostics.ignoredFiles.Enable   =
+"常にこれらのファイルを診断します。"
+config.diagnostics.ignoredFiles.Opened   =
+"これらのファイルが開かれているときのみ診断します。"
+config.diagnostics.ignoredFiles.Disable  =
+"これらのファイルは診断しません。"
+config.diagnostics.disableScheme  =
+'次のスキームを使用する Lua ファイルは診断しません。'
+config.diagnostics.validScheme  =
+'次のスキームを使用する Lua ファイルの診断を有効にします。'
+config.diagnostics.unusedLocalExclude =
+'変数名が次のパターンに一致する場合、`unused-local` を診断しません。'
+config.workspace.ignoreDir        =
+"無視するファイルとディレクトリ（`.gitignore` の構文を使用）。"-- .. example.ignoreDir,
+config.workspace.ignoreSubmodules =
+"サブモジュールを無視します。"
+config.workspace.useGitIgnore     =
+"`.gitignore` に記載されたファイルを無視します。"
+config.workspace.maxPreload       =
+"プリロードする最大ファイル数。"
 config.workspace.preloadFileSize  =
 "プリロード時にこの値（KB）より大きいファイルをスキップします。"
 config.workspace.library          =

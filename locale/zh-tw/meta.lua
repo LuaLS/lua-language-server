@@ -864,5 +864,5 @@ utf8.len                    =
 '回傳字串 `s` 中 從位置 `i` 到 `j` 間 （包括兩端） UTF-8 字元的個數。'
 utf8.offset                 =
 '回傳編碼在 `s` 中的第 `n` 個字元的開始位置（按位元組數）（從位置 `i` 處開始統計）。'
-utf8.offset[55]             = -- TODO: need translate!
-'Returns the position of the n-th character of s (counting from byte position i) as two integers: The index (in bytes) where its encoding starts and the index (in bytes) where it ends.'
+utf8.offset[55]             =
+'以兩個整數回傳字串 `s` 中第 `n` 個字元的位置（從位元組位置 `i` 開始計數）：其編碼開始的位元組索引與結束的位元組索引。'

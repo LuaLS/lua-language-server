@@ -26,6 +26,7 @@ function M:__init(scope, v, quo)
 end
 
 function M:onCanCast(other)
+    other = other:finalValue()
     if other.kind == 'value' then
         ---@cast other Node.Value
         return self.literal == other.literal

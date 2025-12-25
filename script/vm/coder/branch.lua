@@ -144,7 +144,7 @@ function C:narrow(exp, method, otherSide)
             self:narrow(exp.last, 'matchField({key}, {value})' % {
                 key   = fieldCode,
                 value = value,
-            }, otherSide)
+            })
         end
     end
 

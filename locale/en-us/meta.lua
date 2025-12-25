@@ -881,5 +881,5 @@ utf8.len                    =
 'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
 utf8.offset                 =
 'Returns the position (in bytes) where the encoding of the `n`-th character of `s` (counting from position `i`) starts.'
-utf8.offset[55]             =
+utf8.offset['55']             =
 'Returns the position of the n-th character of s (counting from byte position i) as two integers: The index (in bytes) where its encoding starts and the index (in bytes) where it ends.'

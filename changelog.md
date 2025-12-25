@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.16.4
+`2025-12-25`
 * `FIX` (VSCode) Broken `view document`
 * `FIX` `for .. in` should only treat the first variable as const
 

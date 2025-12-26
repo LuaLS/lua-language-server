@@ -101,6 +101,7 @@ ls.vm.registerCoderProvider('call', function (coder, source)
     ---@cast source LuaParser.Node.Call
 
     coder:compile(source.node)
+    local func = coder:getKey(source.node)
     local args = {}
     for i, arg in ipairs(source.args) do
         coder:compile(arg)
@@ -108,16 +109,35 @@ ls.vm.registerCoderProvider('call', function (coder, source)
         if arg.kind == 'table' then
             coder:addLine('{key}:setExpectParent(rt.paramOf({func}, {index}))' % {
                 key   = coder:getKey(arg),
-                func  = coder:getKey(source.node),
+                func  = func,
                 index = i,
             })
         end
     end
     coder:addLine('{key} = rt.fcall({func}, { {args} })' % {
         key   = coder:getKey(source),
-        func  = coder:getKey(source.node),
+        func  = func,
         args  = table.concat(args, ', '),
     })
+
+    -- 记录 link 信息，用于远程收窄变量类型
+    local returns = {}
+    local parent = source.parent
+    if parent and parent.kind == 'select' then
+        local assign = parent.parent
+        if assign and assign.kind == 'localdef' then
+            ls.util.arrayMerge(returns, assign.vars)
+        end
+        if assign and assign.kind == 'assign' then
+            ls.util.arrayMerge(returns, assign.exps)
+        end
+    end
+
+    coder.flow:addLinks {
+        func = source.node,
+        args = source.args,
+        rets = returns,
+    }
 end)
 
 ls.vm.registerCoderProvider('paren', function (coder, source)

@@ -20,7 +20,7 @@ function C:__init(branch, index, callback)
     self.otherSideValueAfterNarrow = {}
     ---@type table<string, string>
     self.otherSideVarKeyAfterNarrow = {}
-    ---@type table<string, LuaParser.Node.Base>
+    ---@type table<string, string>
     self.narrowReasons = {}
 end
 
@@ -92,11 +92,57 @@ function C:tryAndOr(exp, otherSide)
     end
 end
 
+---@param name string
+---@param reason string
+---@param method string
+---@param otherSide? boolean
+---@return string?
+function C:narrowByName(name, reason, method, otherSide)
+    local var = self.branch.flow:getVarByName(name)
+    if not var then
+        return nil
+    end
+    self.branch:careVar(name, var.currentKey)
+
+    self.branch.coder:addLine('-- Narrow variable `{name}` by `{method}`' % {
+        name   = name,
+        method = ls.util.firstLine(method),
+    })
+
+    local value = self.branch.coder:getCustomKey('narrow|{mode}|{index}|{reason}' % {
+        mode = self.branch.mode,
+        index = self.index,
+        reason = reason,
+    })
+    self.branch.coder:addLine('{narrow} = rt.narrow({value}):{method}{otherSide}' % {
+        narrow = value,
+        value  = self:getValueBeforeNarrow(name),
+        method = method,
+        otherSide = otherSide and ':otherSide()' or '',
+    })
+    local shadow = self.branch.coder:getCustomKey('shadow|{mode}|{index}|{reason}' % {
+        mode = self.branch.mode,
+        index = self.index,
+        reason = reason,
+    })
+    self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
+        shadow = shadow,
+        var    = self:getVarKeyBeforeNarrow(name),
+        value  = value,
+    })
+    self.varKeyAfterNarrow[name] = shadow
+    self.valueAfterNarrow[name]  = value
+    self.narrowReasons[name] = reason
+
+    return value
+end
+
 ---@param exp? LuaParser.Node.Base
+---@param reason string
 ---@param method string
 ---@param otherSide? boolean
 ---@return boolean
-function C:narrow(exp, method, otherSide)
+function C:narrow(exp, reason, method, otherSide)
     if not exp then
         return false
     end
@@ -105,43 +151,14 @@ function C:narrow(exp, method, otherSide)
     if not var then
         return false
     end
-    self.branch:careVar(var.name, var.currentKey)
 
-    self.branch.coder:addLine('-- Narrow variable `{name}` by `{method}`' % {
-        name   = var.name,
-        method = ls.util.firstLine(method),
-    })
-
-    local value = self.branch.coder:getCustomKey('narrow|{mode}|{index}|{uniqueKey}' % {
-        mode = self.branch.mode,
-        index = self.index,
-        uniqueKey = exp.uniqueKey,
-    })
-    self.branch.coder:addLine('{narrow} = rt.narrow({value}):{method}{otherSide}' % {
-        narrow = value,
-        value  = self:getValueBeforeNarrow(var.name),
-        method = method,
-        otherSide = otherSide and ':otherSide()' or '',
-    })
-    local shadow = self.branch.coder:getCustomKey('shadow|{mode}|{index}|{uniqueKey}' % {
-        mode = self.branch.mode,
-        index = self.index,
-        uniqueKey = exp.uniqueKey,
-    })
-    self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
-        shadow = shadow,
-        var    = self:getVarKeyBeforeNarrow(var.name),
-        value  = value,
-    })
-    self.varKeyAfterNarrow[var.name] = shadow
-    self.valueAfterNarrow[var.name]  = value
-    self.narrowReasons[var.name] = exp
+    local value = self:narrowByName(var.name, reason, method, otherSide)
 
     if exp.kind == 'field' then
         ---@cast exp LuaParser.Node.Field
         local fieldCode = self.branch.coder:makeFieldCode(exp.key)
         if fieldCode then
-            self:narrow(exp.last, 'matchField({key}, {value})' % {
+            self:narrow(exp.last, exp.last.uniqueKey, 'matchField({key}, {value})' % {
                 key   = fieldCode,
                 value = value,
             })
@@ -151,17 +168,7 @@ function C:narrow(exp, method, otherSide)
     return true
 end
 
----@package
----@param exp LuaParser.Node.Base
----@param otherSide? boolean
-function C:tryTruly(exp, otherSide)
-    self:narrow(exp, 'matchTruly()', otherSide)
-
-    -- 根据函数调用的返回值来收窄类型
-    if exp.kind == 'call' then
-        ---@cast exp LuaParser.Node.Call
-        for i, arg in ipairs(exp.args) do
-            self:narrow(arg, [[
+local narrowByCallCode = [[
 asCall {
     func        = {func},
     myType      = {myType%q},
@@ -170,15 +177,69 @@ asCall {
     targetType  = {targetType%q},
     targetIndex = {targetIndex},
     targetValue = {targetValue},
-}]]         % {
-                func        = self.branch.coder:getKey(exp.node),
-                myType      = 'param',
-                myIndex     = i,
-                mode        = 'match',
-                targetType  = 'return',
-                targetIndex = 1,
-                targetValue = 'rt.TRULY',
-            }, otherSide)
+}]]
+
+---@param func LuaParser.Node.Base
+---@param reason string
+---@param args LuaParser.Node.Base[]
+---@param returns LuaParser.Node.Base[]
+---@param mode 'match' | 'equal'
+---@param targetType 'param' | 'return'
+---@param targetIndex integer
+---@param targetValue string
+---@param otherSide? boolean
+function C:narrowByCall(func, reason, args, returns, mode, targetType, targetIndex, targetValue, otherSide)
+    for i, arg in ipairs(args) do
+        if targetType == 'param' and i == targetIndex then
+            -- 跳过自己
+            goto continue
+        end
+        self:narrow(arg, '{}|call-{}-{}' % { reason, 'param', i }, narrowByCallCode % {
+            func        = self.branch.coder:getKey(func),
+            myType      = 'param',
+            myIndex     = i,
+            mode        = mode,
+            targetType  = targetType,
+            targetIndex = targetIndex,
+            targetValue = targetValue,
+        }, otherSide)
+        ::continue::
+    end
+    for i, ret in ipairs(returns) do
+        if targetType == 'return' and i == targetIndex then
+            -- 跳过自己
+            goto continue
+        end
+        self:narrow(ret, '{}|call-{}-{}' % { reason, 'return', i }, narrowByCallCode % {
+            func        = self.branch.coder:getKey(func),
+            myType      = 'return',
+            myIndex     = i,
+            mode        = mode,
+            targetType  = targetType,
+            targetIndex = targetIndex,
+            targetValue = targetValue,
+        }, otherSide)
+        ::continue::
+    end
+end
+
+---@package
+---@param exp LuaParser.Node.Base
+---@param otherSide? boolean
+function C:tryTruly(exp, otherSide)
+    self:narrow(exp, exp.uniqueKey, 'matchTruly()', otherSide)
+
+    -- 根据函数调用的返回值来收窄类型
+    if exp.kind == 'call' then
+        ---@cast exp LuaParser.Node.Call
+        self:narrowByCall(exp.node, exp.uniqueKey, exp.args, {}, 'match', 'return', 1, 'rt.TRULY', otherSide)
+    end
+
+    local links = self.branch.flow:getLinks(exp)
+    if links then
+        for i, link in ipairs(links) do
+            local targetMode, targetIndex = self:findTargetModeAndIndex(link, exp)
+            self:narrowByCall(link.func, '{}|link-{}' % { exp.uniqueKey, i }, link.args, link.rets, 'match', targetMode, targetIndex, 'rt.TRULY', otherSide)
         end
     end
 end
@@ -188,35 +249,44 @@ end
 ---@param other LuaParser.Node.Base
 ---@param otherSide? boolean
 function C:tryEqual(exp, other, otherSide)
+    local targetValue = self.branch.coder:getKey(other)
     -- 收窄整个变量的类型
-    self:narrow(exp, 'equalValue({other})' % {
-        other = self.branch.coder:getKey(other),
+    self:narrow(exp, exp.uniqueKey, 'equalValue({other})' % {
+        other = targetValue,
     }, otherSide)
 
     -- 根据函数调用的返回值来收窄类型
     if exp.kind == 'call' then
         ---@cast exp LuaParser.Node.Call
-        for i, arg in ipairs(exp.args) do
-            self:narrow(arg, [[
-asCall {
-    func        = {func},
-    myType      = {myType%q},
-    myIndex     = {myIndex},
-    mode        = {mode%q},
-    targetType  = {targetType%q},
-    targetIndex = {targetIndex},
-    targetValue = {targetValue},
-}]]         % {
-                func        = self.branch.coder:getKey(exp.node),
-                myType      = 'param',
-                myIndex     = i,
-                mode        = 'equal',
-                targetType  = 'return',
-                targetIndex = 1,
-                targetValue = self.branch.coder:getKey(other),
-            }, otherSide)
+        self:narrowByCall(exp.node, exp.uniqueKey, exp.args, {}, 'equal', 'return', 1, targetValue, otherSide)
+    end
+
+    local links = self.branch.flow:getLinks(exp)
+    if links then
+        for i, link in ipairs(links) do
+            local targetMode, targetIndex = self:findTargetModeAndIndex(link, exp)
+            self:narrowByCall(link.func, '{}|link-{}' % { exp.uniqueKey, i }, link.args, link.rets, 'equal', targetMode, targetIndex, targetValue, otherSide)
         end
     end
+end
+
+---@param link Coder.Variable.Link
+---@param exp LuaParser.Node.Base
+---@return string
+---@return integer
+function C:findTargetModeAndIndex(link, exp)
+    local myName = self.branch.flow:getVarName(exp)
+    for i, arg in ipairs(link.args) do
+        if self.branch.flow:getVarName(arg) == myName then
+            return 'param', i
+        end
+    end
+    for i, ret in ipairs(link.rets) do
+        if self.branch.flow:getVarName(ret) == myName then
+            return 'return', i
+        end
+    end
+    error('Cannot find exp in link')
 end
 
 ---@param name string
@@ -268,10 +338,10 @@ function C:getOtherSideValueAfterNarrow(name)
             return self:getValueBeforeNarrow(name)
         end
         local value = self.valueAfterNarrow[name]
-        local otherSide = self.branch.coder:getCustomKey('narrow-os|{mode}|{index}|{uniqueKey}' % {
+        local otherSide = self.branch.coder:getCustomKey('narrow-os|{mode}|{index}|{reason}' % {
             mode = self.branch.mode,
             index = self.index,
-            uniqueKey = reason.uniqueKey,
+            reason = reason,
         })
         self.branch.coder:addLine('{other} = {value}:otherSide()' % {
             other = otherSide,
@@ -291,10 +361,10 @@ function C:getOtherSideVarKeyAfterNarrow(name)
             return self:getVarKeyBeforeNarrow(name)
         end
         local value = self:getOtherSideValueAfterNarrow(name)
-        local shadow = self.branch.coder:getCustomKey('shadow-os|{mode}|{index}|{uniqueKey}' % {
+        local shadow = self.branch.coder:getCustomKey('shadow-os|{mode}|{index}|{reason}' % {
             mode = self.branch.mode,
             index = self.index,
-            uniqueKey = reason.uniqueKey,
+            reason = reason,
         })
         self.branch.coder:addLine('{shadow} = {var}:shadow({value})' % {
             shadow = shadow,
@@ -411,7 +481,7 @@ function M:careVar(name, varKey)
 end
 
 ---@param name string
----@return LuaParser.Node.Base?
+---@return string?
 function M:getNarrowReasons(name)
     local child = self.childs[#self.childs]
     if not child then

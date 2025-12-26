@@ -805,3 +805,67 @@ do
     assert(X3:view() == 'any')
     assert(XX:view() == 'any')
 end
+
+do
+    local _ <close> = TEST_INDEX [[
+    --!include type3
+
+    local x
+    X0 = x --> any
+
+    local tp, _ = type(x)
+    if tp == 'string' then
+        X1 = x --> string
+    elseif tp == 'number' then
+        X2 = x --> number
+    else
+        X3 = x --> any
+    end
+
+    XX = x --> any
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == 'any')
+    assert(X1:view() == 'string')
+    assert(X2:view() == 'number')
+    assert(X3:view() == 'any')
+    assert(XX:view() == 'any')
+end
+
+do
+    local _ <close> = TEST_INDEX [[
+    --!include type3
+
+    local x
+    X0 = x --> any
+
+    local tp, _ = type(x)
+    if tp == 'string' then
+        X1 = x --> string
+    elseif tp == 'number' then
+        X2 = x --> number
+    else
+        X3 = x --> any
+    end
+
+    XX = x --> any
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local XX = rt:globalGet('XX')
+
+    assert(X0:view() == 'any')
+    assert(X1:view() == 'string')
+    assert(X2:view() == 'number')
+    assert(X3:view() == 'any')
+    assert(XX:view() == 'any')
+end

@@ -68,6 +68,11 @@ end
 --- 当前变量使用的key，key一定代表一个 Node.Variable
 ---@field currentKey string
 
+---@class Coder.Variable.Link
+---@field func LuaParser.Node.Base
+---@field args LuaParser.Node.Base[]
+---@field rets LuaParser.Node.Base[]
+
 ---@class Coder.Flow.Stack
 local S = Class 'Coder.Flow.Stack'
 
@@ -131,6 +136,9 @@ function M:__init(coder)
     self.stacks = {}
     ---@type table<LuaParser.Node.Base, Coder.Branch>
     self.nodeBranches = {}
+    --- 当前变量通过函数调用和其它变量的关联信息，用于远程收窄关联变量的类型
+    ---@type table<string, Coder.Variable.Link[]>
+    self.links = {}
 
     self:pushStack()
 end
@@ -194,6 +202,59 @@ function M:setVarKeyByName(name, varKey)
 end
 
 ---@param source LuaParser.Node.AssignAble
+---@param key string
+---@return boolean
+function M:setVarKey(source, key)
+    local name = getName(source)
+    if not name then
+        return false
+    end
+    self:setVarKeyByName(name, key)
+    return true
+end
+
+---@param source LuaParser.Node.Base
+---@return string?
+function M:getVarName(source)
+    return getName(source)
+end
+
+---@param source LuaParser.Node.Base
+---@param link Coder.Variable.Link
+function M:addLink(source, link)
+    local name = getName(source)
+    if not name then
+        return
+    end
+    local links = self.links[name]
+    if not links then
+        links = {}
+        self.links[name] = links
+    end
+    links[#links+1] = link
+end
+
+---@param link Coder.Variable.Link
+function M:addLinks(link)
+    for _, arg in ipairs(link.args) do
+        self:addLink(arg, link)
+    end
+    for _, ret in ipairs(link.rets) do
+        self:addLink(ret, link)
+    end
+end
+
+---@param source LuaParser.Node.Base
+---@return Coder.Variable.Link[]?
+function M:getLinks(source)
+    local name = getName(source)
+    if not name then
+        return nil
+    end
+    return self.links[name]
+end
+
+---@param source LuaParser.Node.AssignAble
 ---@return string?
 function M:getVarKey(source)
     local var = self:getVar(source, true)
@@ -211,18 +272,6 @@ function M:getVarKeyByName(name)
         return var.currentKey
     end
     return nil
-end
-
----@param source LuaParser.Node.AssignAble
----@param key string
----@return boolean
-function M:setVarKey(source, key)
-    local var = self:getVar(source, true)
-    if not var then
-        return false
-    end
-    var.currentKey = key
-    return true
 end
 
 ---@param node LuaParser.Node.Base

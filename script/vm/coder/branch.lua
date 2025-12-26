@@ -109,7 +109,7 @@ function C:narrow(exp, method, otherSide)
 
     self.branch.coder:addLine('-- Narrow variable `{name}` by `{method}`' % {
         name   = var.name,
-        method = method,
+        method = ls.util.firstLine(method),
     })
 
     local value = self.branch.coder:getCustomKey('narrow|{mode}|{index}|{uniqueKey}' % {
@@ -161,9 +161,23 @@ function C:tryTruly(exp, otherSide)
     if exp.kind == 'call' then
         ---@cast exp LuaParser.Node.Call
         for i, arg in ipairs(exp.args) do
-            self:narrow(arg, 'asParam({func}, {index}, "match", rt.TRULY)' % {
-                func  = self.branch.coder:getKey(exp.node),
-                index = i,
+            self:narrow(arg, [[
+asCall {
+    func        = {func},
+    myType      = {myType%q},
+    myIndex     = {myIndex},
+    mode        = {mode%q},
+    targetType  = {targetType%q},
+    targetIndex = {targetIndex},
+    targetValue = {targetValue},
+}]]         % {
+                func        = self.branch.coder:getKey(exp.node),
+                myType      = 'param',
+                myIndex     = i,
+                mode        = 'match',
+                targetType  = 'return',
+                targetIndex = 1,
+                targetValue = 'rt.TRULY',
             }, otherSide)
         end
     end
@@ -183,10 +197,23 @@ function C:tryEqual(exp, other, otherSide)
     if exp.kind == 'call' then
         ---@cast exp LuaParser.Node.Call
         for i, arg in ipairs(exp.args) do
-            self:narrow(arg, 'asParam({func}, {index}, "equal", {other})' % {
-                func  = self.branch.coder:getKey(exp.node),
-                index = i,
-                other = self.branch.coder:getKey(other),
+            self:narrow(arg, [[
+asCall {
+    func        = {func},
+    myType      = {myType%q},
+    myIndex     = {myIndex},
+    mode        = {mode%q},
+    targetType  = {targetType%q},
+    targetIndex = {targetIndex},
+    targetValue = {targetValue},
+}]]         % {
+                func        = self.branch.coder:getKey(exp.node),
+                myType      = 'param',
+                myIndex     = i,
+                mode        = 'equal',
+                targetType  = 'return',
+                targetIndex = 1,
+                targetValue = self.branch.coder:getKey(other),
             }, otherSide)
         end
     end

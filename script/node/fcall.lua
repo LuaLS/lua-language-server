@@ -122,7 +122,9 @@ end
 
 function M:onView(viewer, options)
     return '{}({})' % {
-        viewer:view(self.head),
+        viewer:view(self.head, {
+            needParentheses = true,
+        }),
         table.concat(ls.util.map(self.args, function (arg)
             return viewer:view(arg)
         end), ', '),

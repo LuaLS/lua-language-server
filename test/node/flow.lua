@@ -266,7 +266,15 @@ do
     local f = rt.variable 'f'
     f:addType(f1 | f2)
 
-    local xNarrow = rt.narrow(x):asParam(f, 1, 'match', rt.TRULY)
+    local xNarrow = rt.narrow(x):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'match',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(true),
+    }
 
     local x1 = x:shadow(xNarrow)
 
@@ -313,7 +321,15 @@ do
     local f = rt.variable 'f'
     f:addType(f1 | f2)
 
-    local xNarrow = rt.narrow(x):asParam(f, 1, 'equal', rt.FALSE)
+    local xNarrow = rt.narrow(x):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'equal',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(false),
+    }
 
     local x1 = x:shadow(xNarrow)
 
@@ -357,10 +373,26 @@ do
     f:addType(fType)
     local x = rt.variable 'x'
 
-    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'equal', rt.value(1))
+    local xNarrow1 = rt.narrow(x):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'equal',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(1),
+    }
     local x1 = x:shadow(xNarrow1)
 
-    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):asParam(f, 1, 'equal', rt.value(2))
+    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'equal',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(2),
+    }
     local x2 = x:shadow(xNarrow2)
 
     local x3 = x:shadow(xNarrow2:otherSide())
@@ -399,7 +431,15 @@ do
     f:addType(fType)
     local x = rt.variable 'x'
 
-    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'match', rt.TRULY)
+    local xNarrow1 = rt.narrow(x):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'match',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.TRULY,
+    }
     local x1 = x:shadow(xNarrow1)
 
     local x2 = x:shadow(xNarrow1:otherSide())
@@ -441,10 +481,26 @@ do
     local x = rt.variable 'x'
     x:addType(rt.value(1) | rt.value(2) | rt.value(3) | rt.value(4))
 
-    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'equal', rt.value(1))
+    local xNarrow1 = rt.narrow(x):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'equal',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(1),
+    }
     local x1 = x:shadow(xNarrow1)
 
-    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):asParam(f, 1, 'equal', rt.value(2))
+    local xNarrow2 = rt.narrow(xNarrow1:otherSide()):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'equal',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(2),
+    }
     local x2 = x:shadow(xNarrow2)
 
     local x3 = x:shadow(xNarrow2:otherSide())
@@ -485,7 +541,15 @@ do
     local x = rt.variable 'x'
     x:addType(rt.BOOLEAN)
 
-    local xNarrow1 = rt.narrow(x):asParam(f, 1, 'match', rt.TRULY)
+    local xNarrow1 = rt.narrow(x):asCall {
+        func = f,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'match',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value(true),
+    }
     local x1 = x:shadow(xNarrow1)
 
     local x2 = x:shadow(xNarrow1:otherSide())
@@ -494,4 +558,66 @@ do
     assert(x:view() == 'boolean')
     assert(x1:view() == 'true')
     assert(x2:view() == 'false')
+end
+
+do
+    --[[
+    ---@overload fun(x: string): 'string'
+    ---@overload fun(x: number): 'number'
+    function type(...) end
+
+    local x
+    local tp = type(x)
+
+    X0 = x --> any
+    TP = tp --> 'string' | 'number'
+
+    if tp == 'string' then
+        X1 = x --> string
+    else
+        X2 = x --> number
+    end
+
+    XX = x --> any
+    ]]
+
+    rt:reset()
+
+    local f1 = rt.func()
+        : addParamDef('x', rt.STRING)
+        : addReturnDef(nil, rt.value('string'))
+    local f2 = rt.func()
+        : addParamDef('x', rt.NUMBER)
+        : addReturnDef(nil, rt.value('number'))
+
+    local typeFunc = f1 | f2
+
+    local x = rt.variable 'x'
+    assert(x:view() == 'any')
+
+    local tp = rt.variable 'tp'
+    local fcall = rt.fcall(typeFunc, { x })
+    tp:setCurrentValue(rt.select(fcall, 1))
+    assert(tp:view() == '"string" | "number"')
+
+    local tpNarrow = rt.narrow(tp):equalValue(rt.value('string'))
+    assert(tpNarrow:view() == '"string"')
+    local xNarrow = rt.narrow(x):asCall {
+        func = typeFunc,
+        myType = 'param',
+        myIndex = 1,
+        mode = 'equal',
+        targetType = 'return',
+        targetIndex = 1,
+        targetValue = rt.value('string'),
+    }
+
+    local x1 = x:shadow(xNarrow)
+    assert(x1:view() == 'string')
+
+    local x2 = x:shadow(xNarrow:otherSide())
+    assert(x2:view() == 'number')
+
+    local x3 = x:shadow(x)
+    assert(x3:view() == 'any')
 end

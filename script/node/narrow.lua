@@ -1,6 +1,6 @@
 ---@class Node.Narrow: Node
 ---@field node Node
----@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal' | 'param'
+---@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal' | 'call'
 ---@field nvalue? Node
 ---@field field? Node.Key
 ---@field callParams? Node.Narrow.CallParams
@@ -8,7 +8,15 @@ local M = ls.node.register 'Node.Narrow'
 
 M.kind = 'narrow'
 
----@alias Node.Narrow.CallParams [Node, integer, 'equal' | 'match', Node]
+---@alias Node.Narrow.CallParams {
+--- func: Node,
+--- myType: 'param' | 'return',
+--- myIndex: integer,
+--- mode: 'match' | 'equal',
+--- targetType: 'param' | 'return',
+--- targetIndex: integer,
+--- targetValue: Node,
+---}
 
 ---@param scope Scope
 ---@param node Node
@@ -54,14 +62,11 @@ function M:equalValue(value)
     return self
 end
 
----@param f Node
----@param index integer
----@param mode 'equal' | 'match'
----@param ret Node
+---@param params Node.Narrow.CallParams
 ---@return self
-function M:asParam(f, index, mode, ret)
-    self.narrowType = 'param'
-    self.callParams = { f, index, mode, ret }
+function M:asCall(params)
+    self.narrowType = 'call'
+    self.callParams = params
     return self
 end
 
@@ -124,8 +129,8 @@ M.__getter.value = function (self)
             local _, otherSide = value:narrowEqual(self.nvalue)
             return otherSide, true
         end
-        if narrowType == 'param' then
-            local _, otherSide = self:narrowParam()
+        if narrowType == 'call' then
+            local _, otherSide = self:narrowCall()
             return otherSide, true
         end
         return rt.NEVER, true
@@ -142,8 +147,8 @@ M.__getter.value = function (self)
         if narrowType == 'equal' then
             return value:narrowEqual(self.nvalue), true
         end
-        if narrowType == 'param' then
-            return self:narrowParam(), true
+        if narrowType == 'call' then
+            return self:narrowCall(), true
         end
         return value, true
     end
@@ -162,23 +167,30 @@ end
 
 ---@return Node
 ---@return Node
-function M:narrowParam()
+function M:narrowCall()
     local rt = self.scope.rt
     local nodeValue = self.node:finalValue()
     if nodeValue == rt.ANY or nodeValue == rt.UNKNOWN then
-        return self:narrowParamByRet()
+        return self:narrowCallByTarget()
     end
-    return self:narrowParamByParam()
+    return self:narrowCallByTryAll()
 end
 
+---当自己的类型为 any 或 unknown 时，需要根据目标类型来反推自己的类型
 ---@private
 ---@return Node
 ---@return Node
-function M:narrowParamByRet()
+function M:narrowCallByTarget()
     local rt = self.scope.rt
-    local func, index, mode, ret = table.unpack(self.callParams)
+    local func        = self.callParams.func
+    local myType      = self.callParams.myType
+    local myIndex     = self.callParams.myIndex
+    local mode        = self.callParams.mode
+    local targetType  = self.callParams.targetType
+    local targetIndex = self.callParams.targetIndex
+    local targetValue = self.callParams.targetValue
     func:addRef(self)
-    ret:addRef(self)
+    targetValue:addRef(self)
     ---@type Node.Function[]
     local defs = {}
 
@@ -199,10 +211,15 @@ function M:narrowParamByRet()
     -- 参数为any或unknown时，只能根据返回值来匹配原型
     for i, def in ipairs(defs) do
         local res
-        local ret1 = def:getReturn(1) or rt.NIL
+        local target
+        if targetType == 'param' then
+            target = def:getParam(targetIndex) or rt.NIL
+        else
+            target = def:getReturn(targetIndex) or rt.NIL
+        end
         if mode == 'match' then
-            if ret1.hasGeneric then
-                if ret ~= rt.TRULY then
+            if target.hasGeneric then
+                if targetValue ~= rt.TRULY then
                     -- 无法处理泛型返回值，直接跳过这个原型
                     goto continue
                 end
@@ -211,14 +228,14 @@ function M:narrowParamByRet()
                 -- 将 else 一方视为 falsy
                 inferAsFalsy = true
             else
-                res = ret1:canCast(ret)
+                res = target:canCast(targetValue)
             end
         end
         if mode == 'equal' then
-            if ret1.hasGeneric then
+            if target.hasGeneric then
                 local map = {}
-                ret1:inferGeneric(ret, map)
-                local newRet1 = ret1:resolveGeneric(map)
+                target:inferGeneric(targetValue, map)
+                local newRet1 = target:resolveGeneric(map)
                 if newRet1.hasGeneric then
                     -- 无法解决泛型，直接跳过这个原型
                     goto continue
@@ -226,7 +243,7 @@ function M:narrowParamByRet()
                 genericMaps[i] = map
                 res = true
             else
-                res = ret1:narrowEqual(ret) ~= rt.NEVER
+                res = target:narrowEqual(targetValue) ~= rt.NEVER
             end
         end
         if res then
@@ -246,7 +263,12 @@ function M:narrowParamByRet()
         local result = {}
 
         for i, f in ipairs(funcs) do
-            local v = f:getParam(index)
+            local v
+            if myType == 'param' then
+                v = f:getParam(myIndex)
+            else
+                v = f:getReturn(myIndex)
+            end
             if not v then
                 goto continue
             end
@@ -286,14 +308,21 @@ function M:narrowParamByRet()
     return trueValue, falseValue
 end
 
+---已知类型为具体类型时，可以直接代入所有的情况一个一个的测试
 ---@private
 ---@return Node
 ---@return Node
-function M:narrowParamByParam()
+function M:narrowCallByTryAll()
     local rt = self.scope.rt
-    local func, index, mode, ret = table.unpack(self.callParams)
+    local func        = self.callParams.func
+    local myType      = self.callParams.myType
+    local myIndex     = self.callParams.myIndex
+    local mode        = self.callParams.mode
+    local targetType  = self.callParams.targetType
+    local targetIndex = self.callParams.targetIndex
+    local targetValue = self.callParams.targetValue
     func:addRef(self)
-    ret:addRef(self)
+    targetValue:addRef(self)
     ---@type Node.Function[]
     local defs = {}
 
@@ -333,18 +362,23 @@ function M:narrowParamByParam()
         end
         all:pushTail(param)
         local res
-        local ret1 = def:getReturn(1) or rt.NIL
-        if ret1.hasGeneric then
-            ret1 = ret1:resolveGeneric(genericMap or {})
-            if ret1.hasGeneric then
+        local target
+        if targetType == 'param' then
+            target = def:getParam(targetIndex) or rt.NIL
+        else
+            target = def:getReturn(targetIndex) or rt.NIL
+        end
+        if target.hasGeneric then
+            target = target:resolveGeneric(genericMap or {})
+            if target.hasGeneric then
                 return
             end
         end
         if mode == 'match' then
-            res = ret1:canCast(ret)
+            res = target:canCast(targetValue)
         end
         if mode == 'equal' then
-            res = ret1:narrowEqual(ret) ~= rt.NEVER
+            res = target:narrowEqual(targetValue) ~= rt.NEVER
         end
         if res then
             passed:pushTail(param)
@@ -353,7 +387,12 @@ function M:narrowParamByParam()
 
     -- 直接代入原型来匹配
     for _, def in ipairs(defs) do
-        local param = def:getParam(index)
+        local param
+        if myType == 'param' then
+            param = def:getParam(myIndex)
+        else
+            param = def:getReturn(myIndex)
+        end
         if not param then
             goto continue
         end

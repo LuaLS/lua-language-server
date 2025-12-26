@@ -746,6 +746,12 @@ function m.trim(str, mode)
     return (str:match '^%s*(.-)%s*$')
 end
 
+---@param str string
+---@return string
+function m.firstLine(str)
+    return str:match('([^\r\n]*)')
+end
+
 ---@param path string
 ---@param env? { [string]: string }
 ---@return string
@@ -1264,8 +1270,11 @@ function m.enableFormatString()
             else
                 value = args[k]
             end
-            if value == nil and k:find('{', 1, true) then
-                return '{' .. k % args .. '}'
+            if value == nil then
+                local inside = key:sub(2, -2)
+                if inside:find('{', 1, true) then
+                    return '{' .. inside % args .. '}'
+                end
             end
             if fmt then
                 value = stringFormat(fmt, value)

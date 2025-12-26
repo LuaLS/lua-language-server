@@ -27,6 +27,44 @@ test.includeCodes['type'] = [[
 function type(...) end
 ]]
 
+test.includeCodes['type2'] = [[
+---@alias TypeViewMap {
+---    [nil]: 'nil',
+---    [boolean]: 'boolean',
+---    [number]: 'number',
+---    [string]: 'string',
+---    [table]: 'table',
+---    [function]: 'function',
+---    [thread]: 'thread',
+---    [userdata]: 'userdata',
+---}
+
+---@generic T
+---@param obj T
+---@return TypeViewMap[T]
+function type(obj) end
+]]
+
+test.includeCodes['type3'] = [[
+---@alias TypeViewMap {
+---    [nil]: 'nil',
+---    [boolean]: 'boolean',
+---    [number]: 'number',
+---    [string]: 'string',
+---    [table]: 'table',
+---    [function]: 'function',
+---    [thread]: 'thread',
+---    [userdata]: 'userdata',
+---}
+
+---@alias TypeView<T> TypeViewMap[T]
+
+---@generic T
+---@param obj T
+---@return TypeView<T>
+function type(obj) end
+]]
+
 --- 使用 `--!include setmetatable` 在测试中包含预定义代码片段。
 ---@param script string
 ---@return function?

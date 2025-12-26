@@ -553,3 +553,43 @@ do
     f:inferGeneric(target, results)
     assert(results[T]:view() == 'number')
 end
+
+do
+    rt:reset()
+
+    --[[
+    ---@alias A { x: 1, y: 2 }
+
+    A[T] @ 2 --> T = 'y'
+    ]]
+
+    local t = rt.table {
+        x = rt.value(1),
+        y = rt.value(2),
+    }
+
+    local T = rt.generic 'T'
+    local indexType = rt.index(t, T)
+
+    local results = {}
+    indexType:inferGeneric(rt.value(2), results)
+
+    assert(results[T]:view() == '"y"')
+end
+
+do
+    rt:reset()
+
+    local T = rt.generic 'T'
+    local call = rt.call('ABC', { T })
+
+    local K = rt.generic 'K'
+    local ABC = rt.alias 'ABC'
+        : addTypeParam(K)
+        : setValue(K)
+
+    local results = {}
+    call:inferGeneric(rt.value(1), results)
+
+    assert(results[T]:view() == '1')
+end

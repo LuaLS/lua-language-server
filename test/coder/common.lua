@@ -279,7 +279,8 @@ do
 
     assert(rt.type('C'):view() == 'C')
     assert(rt.type('C').value:view() == 'B<number>')
-    assert(rt.type('C').value.value:view() == '[number, 2]')
+    assert(rt.type('C').value.value:view() == 'A<number, 2>')
+    assert(rt.type('C').value.value.value:view() == '[number, 2]')
 end
 
 do

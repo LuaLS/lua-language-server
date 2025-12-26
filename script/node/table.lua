@@ -617,6 +617,7 @@ function M:onView(viewer, options)
                 end
             end
         end
+
         ---@type Node.Key
         local k = rt.luaKey(key)
         local value = self.valueMap[k]

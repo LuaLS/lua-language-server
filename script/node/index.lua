@@ -63,6 +63,11 @@ function M:resolveGeneric(map)
     return self.scope.rt.index(head, index)
 end
 
+function M:inferGeneric(other, result)
+    local key = self.head:keyOf(other)
+    self.index:inferGeneric(key, result)
+end
+
 function M:onView(viewer, options)
     if self.head.kind == 'generic' then
         return '{}[{}]' % {

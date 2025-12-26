@@ -124,7 +124,10 @@ do
             ---@cast vfile -?
             for _, nodes in pairs(doc.ast.nodesMap) do
                 for _, src in ipairs(nodes) do
-                    vfile:getNode(src)
+                    local node = vfile:getNode(src)
+                    if node then
+                        local _ = node.value
+                    end
                     count = count + 1
                 end
             end

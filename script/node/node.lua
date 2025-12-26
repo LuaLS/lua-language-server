@@ -231,9 +231,14 @@ end
 
 ---@return Node
 function M:finalValue()
+    local visited = {}
     local value = self
     while value ~= value.value do
         value = value.value
+        if visited[value] then
+            break
+        end
+        visited[value] = true
     end
     return value
 end
@@ -241,6 +246,7 @@ end
 ---@param kinds integer
 ---@return Node?
 function M:findValue(kinds)
+    local visited = {}
     local value = self
     for _ = 1, 1000 do
         if (kinds & ls.node.kind[value.kind]) ~= 0 then
@@ -250,6 +256,10 @@ function M:findValue(kinds)
             return nil
         end
         value = value.value
+        if visited[value] then
+            return nil
+        end
+        visited[value] = true
     end
     return nil
 end

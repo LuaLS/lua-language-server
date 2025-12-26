@@ -21,6 +21,11 @@ local function writeLog(name, timeStamp, level, sourceStr, message)
         name,
         message,
     }
+    if level == 'error' or level == 'fatal' then
+        if ls.server then
+            ls.server.client:logMessage('Error', message)
+        end
+    end
     return log:write(fullMessage)
 end
 

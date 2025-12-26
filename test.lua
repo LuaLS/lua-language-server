@@ -22,34 +22,6 @@ require 'vm'
 require 'file'
 require 'feature'
 
-local function writeLog(name, timeStamp, level, sourceStr, message)
-    local fullMessage = '[{}][{:5s}][{}]<{}>: {}\n' % {
-        timeStamp,
-        level,
-        sourceStr,
-        name,
-        message,
-    }
-    if level == 'error' or level == 'fatal' then
-        if ls.server then
-            ls.server.client:logMessage('Error', message)
-        end
-    end
-    return log:write(fullMessage)
-end
-
----@class Log
-log = New 'Log' {
-    level = 'verb',
-    print = function (timeStamp, level, sourceStr, message)
-        writeLog('master', timeStamp, level, sourceStr, message)
-        return true
-    end,
-    path = ls.uri.decode(ls.env.LOG_URI) .. '/test.log',
-}
-
-
-
 test.rootPath = ls.env.ROOT_PATH .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')

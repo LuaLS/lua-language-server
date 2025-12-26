@@ -194,7 +194,7 @@ function C:narrowByCall(func, reason, args, returns, mode, targetType, targetInd
             -- 跳过自己
             goto continue
         end
-        self:narrow(arg, '{}|call-{}-{}' % { reason, 'param', i }, narrowByCallCode % {
+        self:narrow(arg, '{}|{}-{}' % { reason, 'param', i }, narrowByCallCode % {
             func        = self.branch.coder:getKey(func),
             myType      = 'param',
             myIndex     = i,
@@ -210,7 +210,7 @@ function C:narrowByCall(func, reason, args, returns, mode, targetType, targetInd
             -- 跳过自己
             goto continue
         end
-        self:narrow(ret, '{}|call-{}-{}' % { reason, 'return', i }, narrowByCallCode % {
+        self:narrow(ret, '{}|{}-{}' % { reason, 'return', i }, narrowByCallCode % {
             func        = self.branch.coder:getKey(func),
             myType      = 'return',
             myIndex     = i,

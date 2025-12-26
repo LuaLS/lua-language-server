@@ -869,3 +869,45 @@ do
     assert(X3:view() == 'any')
     assert(XX:view() == 'any')
 end
+
+do
+    TEST_INDEX [[
+    ---@overload fun(): true
+    ---@overload fun(): false, string
+    local function f() end
+
+    local ok, err = f()
+    X0 = ok --> true | false
+    Y0 = err --> string | nil
+
+    if ok then
+        X1 = ok --> true
+        Y1 = err --> nil
+    else
+        X2 = ok --> false
+        Y2 = err --> string
+    end
+
+    XX = ok --> true | false
+    YY = err --> string | nil
+    ]]
+
+    local X0 = rt:globalGet('X0')
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local XX = rt:globalGet('XX')
+    local Y0 = rt:globalGet('Y0')
+    local Y1 = rt:globalGet('Y1')
+    local Y2 = rt:globalGet('Y2')
+    local YY = rt:globalGet('YY')
+
+    assert(X0:view() == 'true | false')
+    assert(X1:view() == 'true')
+    assert(X2:view() == 'false')
+    assert(XX:view() == 'true | false')
+
+    assert(Y0:view() == 'string | nil')
+    assert(Y1:view() == 'nil')
+    assert(Y2:view() == 'string')
+    assert(YY:view() == 'string | nil')
+end

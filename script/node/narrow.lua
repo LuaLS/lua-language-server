@@ -391,7 +391,7 @@ function M:narrowCallByTryAll()
         if myType == 'param' then
             param = def:getParam(myIndex)
         else
-            param = def:getReturn(myIndex)
+            param = def:getReturn(myIndex) or rt.NIL
         end
         if not param then
             goto continue

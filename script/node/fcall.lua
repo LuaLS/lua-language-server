@@ -65,7 +65,9 @@ M.__getter.returns = function (self)
 
     self.head:each('function', function (f)
         ---@cast f Node.Function
-        defs[#defs+1] = f
+        if not f:isDummy() then
+            defs[#defs+1] = f
+        end
     end)
 
     if #defs > 1 then
@@ -101,18 +103,21 @@ M.__getter.returns = function (self)
     local matches = rt:getBestMatchs(allParams, #self.args)
     for _, match in ipairs(matches) do
         local f = defs[match]
-        f = f:resolveGeneric(f:makeGenericMap(self.args))
         local min, max = f:getReturnCount()
-        for i = 1, min do
-            returns[i] = returns[i] | f:getReturn(i)
-        end
-        if not allMin or allMin > min then
+        if not allMin or allMin < min then
             allMin = min
         end
         if not max then
             allMax = false
         elseif allMax and allMax < max then
             allMax = max
+        end
+    end
+    for _, match in ipairs(matches) do
+        local f = defs[match]
+        f = f:resolveGeneric(f:makeGenericMap(self.args))
+        for i = 1, allMin do
+            returns[i] = returns[i] | (f:getReturn(i) or rt.NIL)
         end
     end
 

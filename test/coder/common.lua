@@ -372,3 +372,15 @@ do
         a[nil] = 10
     ]]
 end
+
+do
+    TEST_INDEX [[
+    ---@alias f fun<T>(a: T): T[]
+
+    ---@alias r f(number) --> number[]
+    ]]
+
+    assert(rt.type('r'):view() == 'r')
+    assert(rt.type('r').value:view() == 'f(number)')
+    assert(rt.type('r').value.value:view() == 'number[]')
+end

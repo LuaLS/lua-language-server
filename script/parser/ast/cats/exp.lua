@@ -13,6 +13,7 @@
 ---| LuaParser.Node.CatInteger
 ---| LuaParser.Node.CatString
 ---| LuaParser.Node.CatTuple
+---| LuaParser.Node.CatFCall
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatExp
@@ -54,6 +55,15 @@ local CatCall = Class('LuaParser.Node.CatCall', 'LuaParser.Node.Base')
 
 CatCall.kind = 'catcall'
 
+---@class LuaParser.Node.CatFCall: LuaParser.Node.Base
+---@field head LuaParser.Node.CatExp
+---@field args LuaParser.Node.CatExp[]
+---@field symbolPos1 integer # 左括号的位置
+---@field symbolPos2? integer # 右括号的位置
+local CatFCall = Class('LuaParser.Node.CatFCall', 'LuaParser.Node.Base')
+
+CatFCall.kind = 'catfcall'
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
@@ -93,6 +103,7 @@ function Ast:parseCatTerm(required)
         local chain = self:parseCatArray(current)
                 or    self:parseCatIndex(current)
                 or    self:parseCatCall(current)
+                or    self:parseCatFCall(current)
 
         if chain then
             current = chain
@@ -226,4 +237,35 @@ function Ast:parseCatCall(head)
     end
 
     return call
+end
+
+---@private
+---@param head LuaParser.Node.CatExp
+---@return LuaParser.Node.CatFCall?
+function Ast:parseCatFCall(head)
+    local pos1 = self.lexer:consume '('
+    if not pos1 then
+        return nil
+    end
+    local fcall = self:createNode('LuaParser.Node.CatFCall', {
+        start = head.start,
+        head  = head,
+        symbolPos1 = pos1,
+    })
+    head.parent = fcall
+
+    self:skipSpace()
+    local args = self:parseCatTypeList(true)
+    fcall.args = args
+
+    for i = 1, #args do
+        local arg = args[i]
+        arg.parent = fcall
+    end
+
+    self:skipSpace()
+    fcall.symbolPos2 = self:assertSymbol ')'
+    fcall.finish = self:getLastPos()
+
+    return fcall
 end

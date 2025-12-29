@@ -192,7 +192,7 @@ end
 
 function M:moveTo(pos)
     local curPos = self.poses[self.ci]
-    if curPos == pos then
+    if not curPos or curPos == pos then
         return
     end
     if curPos < pos then

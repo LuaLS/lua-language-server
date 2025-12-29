@@ -508,3 +508,19 @@ ls.vm.registerCoderProvider('catparen', function (coder, source)
         value = coder:getKey(source.value),
     })
 end)
+
+ls.vm.registerCoderProvider('catfcall', function (coder, source)
+    ---@cast source LuaParser.Node.CatFCall
+
+    coder:compile(source.head)
+    local args = {}
+    for i, arg in ipairs(source.args) do
+        coder:compile(arg)
+        args[i] = coder:getKey(arg)
+    end
+    coder:addLine('{key} = rt.fcall({head}, { {args} })' % {
+        key   = coder:getKey(source),
+        head  = coder:getKey(source.head),
+        args  = table.concat(args, ', '),
+    })
+end)

@@ -75,7 +75,7 @@ function M:findSources(offset, accepts)
     local sources = {}
 
     for kind, nodes in pairs(ast.nodesMap) do
-        if kind == 'error' then
+        if kind == 'error' or kind == 'comment' then
             goto continue
         end
         for _, node in ipairs(nodes) do

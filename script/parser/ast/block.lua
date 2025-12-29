@@ -9,6 +9,7 @@
 ---@field localMap table<string, LuaParser.Node.Local>
 ---@field labelMap table<string, LuaParser.Node.Label>
 ---@field genericMap table<string, LuaParser.Node.CatGeneric>
+---@field delayComments LuaParser.Node.Comment[]
 local Block = Class('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.kind = 'block'
@@ -96,6 +97,10 @@ Block.__getter.referBlock = function (self)
     return self, true
 end
 
+Block.__getter.delayComments = function (self)
+    return {}, true
+end
+
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
@@ -153,6 +158,7 @@ function Ast:blockParseChilds(block)
             end
             lastState = state
             self:skipSpace(false)
+            self:parseDelayedComments(block)
         else
             if block.isMain then
                 self.lexer:next()
@@ -162,8 +168,28 @@ function Ast:blockParseChilds(block)
             end
         end
     end
+    self:parseDelayedComments(block)
     self:mergeStatesAndCats(block)
 end
+
+
+---@private
+---@param block LuaParser.Node.Block
+function Ast:parseDelayedComments(block)
+    local comments = block.delayComments
+    if #comments == 0 then
+        return
+    end
+    block.delayComments = nil
+    local ci = self.lexer.ci
+    for _, comment in ipairs(comments) do
+        self.lexer:moveTo(comment.start)
+        local _  = self:parseCat()
+                or self:parseCatBlock()
+    end
+    self.lexer.ci = ci
+end
+
 
 ---@private
 ---@param block LuaParser.Node.Block

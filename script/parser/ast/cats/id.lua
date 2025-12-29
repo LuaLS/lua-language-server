@@ -32,7 +32,8 @@ function Ast:parseCatID(asExp)
     ---@cast id string
 
     local var
-    if asExp and self.code:sub(pos, pos) == '$' then
+    if asExp and id:sub(1, 1) == '$' then
+        self.lexer:moveTo(pos + 1) -- skip '$'
         var = self:parseTermInCat()
     end
 

@@ -40,7 +40,7 @@ Lexer.Symbol = l.P'=='
             +  l.P'/='
             -- end non-standard
             -- singles
-            +  l.S'+-*/!#%^&()={}[]|\\\'":;<>,.?~`'
+            +  l.S'+-*/!#%^&()={}[]|\\\'":;<>,.?~`$'
 
 ---@param code string
 ---@return Lexer.Result
@@ -192,10 +192,10 @@ end
 
 function M:moveTo(pos)
     local curPos = self.poses[self.ci]
-    if not curPos or curPos == pos then
+    if curPos == pos then
         return
     end
-    if curPos < pos then
+    if curPos and curPos < pos then
         self:fastForward(pos)
     else
         self:rewind(pos)

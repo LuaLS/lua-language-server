@@ -115,17 +115,6 @@ Ast:registerCatParser('cast', {
 })
 
 ---@private
----@return boolean
-function Ast:skipCat()
-    local cat = self:parseCat()
-            or  self:parseCatBlock()
-    if not cat then
-        return false
-    end
-    return true
-end
-
----@private
 ---@return LuaParser.Node.Cat?
 function Ast:parseCat()
     local token, _, pos = self.lexer:peek()

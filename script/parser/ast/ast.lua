@@ -155,6 +155,7 @@ function M:skipComment(inExp)
     local comment = self:parseComment(inExp)
     if comment then
         self.comments[#self.comments+1] = comment
+        table.insert(self.curBlock.delayComments, comment)
         return true
     end
     return false
@@ -184,7 +185,6 @@ function M:skipSpace(inExp)
         self.lastRightCI = self.lexer.ci
     end
     repeat until not self:skipNL()
-            and  not self:skipCat()
             and  not self:skipComment(inExp)
             and  not self:skipUnknown()
     ---@private

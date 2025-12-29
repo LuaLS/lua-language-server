@@ -67,7 +67,7 @@ do
     local a = rt.type 'A'
 
     assert(a.truly:view() == 'A')
-    assert(a.falsy:view() == 'never')
+    assert(a.falsy:view() == 'A')
 end
 
 do

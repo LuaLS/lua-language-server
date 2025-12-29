@@ -524,3 +524,18 @@ ls.vm.registerCoderProvider('catfcall', function (coder, source)
         args  = table.concat(args, ', '),
     })
 end)
+
+ls.vm.registerCoderProvider('catternary', function (coder, source)
+    ---@cast source LuaParser.Node.CatTernary
+
+    coder:compile(source.cond)
+    coder:compile(source.thenExp)
+    coder:compile(source.elseExp)
+
+    coder:addLine('{key} = rt.ternary({cond}, {thenExp}, {elseExp})' % {
+        key     = coder:getKey(source),
+        cond    = coder:getKey(source.cond),
+        thenExp = coder:getKey(source.thenExp),
+        elseExp = coder:getKey(source.elseExp),
+    })
+end)

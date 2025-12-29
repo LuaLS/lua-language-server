@@ -25,6 +25,10 @@ function M:__del()
     self.masterType:removeAlias(self)
 end
 
+function M:__close()
+    self:dispose()
+end
+
 function M:dispose()
     Delete(self)
 end

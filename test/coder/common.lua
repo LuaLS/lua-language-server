@@ -384,3 +384,22 @@ do
     assert(rt.type('r').value:view() == 'f(number)')
     assert(rt.type('r').value.value:view() == 'number[]')
 end
+
+do
+    TEST_INDEX [[
+    ---@alias r X ? 1 : 2
+    ]]
+
+    assert(rt.type('r'):view() == 'r')
+    assert(rt.type('r').value:view() == '1 | 2')
+
+    do
+        local trueNode <close> = rt.alias('X', nil, rt.TRUE)
+        assert(rt.type('r').value.value:view() == '1')
+    end
+
+    do
+        local falseNode <close> = rt.alias('X', nil, rt.FALSE)
+        assert(rt.type('r').value.value:view() == '2')
+    end
+end

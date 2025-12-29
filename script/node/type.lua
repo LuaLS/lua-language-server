@@ -413,7 +413,10 @@ M.__getter.falsy = function (self)
             return falsy, true
         end
     end
-    return self.scope.rt.NEVER, true
+    if self:isClassLike() then
+        return self.scope.rt.NEVER, true
+    end
+    return self, true
 end
 
 ---@type fun(self: Node.Type, other: Node): boolean?

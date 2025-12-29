@@ -56,11 +56,12 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param last LuaParser.Node.Term
+---@param onlyDot? boolean
 ---@return LuaParser.Node.Field?
-function Ast:parseField(last)
+function Ast:parseField(last, onlyDot)
     local token, _, pos = self.lexer:peek()
     if token == '.'
-    or token == ':' then
+    or (token == ':' and not onlyDot) then
         self.lexer:next()
         self:skipSpace()
         local key = self:parseID('LuaParser.Node.FieldID', true)
@@ -80,7 +81,7 @@ function Ast:parseField(last)
         end
         return nil
     end
-    if token == '[' then
+    if token == '[' and not onlyDot then
         local nextChar = self.code:sub(pos + 2, pos + 2)
         if nextChar == '['
         or nextChar == '=' then

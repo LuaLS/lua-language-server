@@ -4,6 +4,7 @@
 ---@field asCode? boolean # 作为自动完成使用的代码。废弃特性
 ---@field generic? LuaParser.Node.CatGeneric
 ---@field genericTemplate? table<string, LuaParser.Node.CatGeneric?>
+---@field var? LuaParser.Node.Term
 local CatID = Class('LuaParser.Node.CatID', 'LuaParser.Node.Base')
 
 CatID.kind = 'catid'
@@ -20,7 +21,7 @@ function Ast:parseCatID(asExp)
         return nil
     end
 
-    local id = self.code:match('^[%a\x80-\xff_%`][%w\x80-\xff_%.%*%-%`]*', pos + 1)
+    local id = self.code:match('^$?[%a\x80-\xff_%`][%w\x80-\xff_%.%*%-%`]*', pos + 1)
     if not id then
         if self.code:sub(pos + 1, pos + 3) == '...' then
             id = '...'
@@ -29,6 +30,11 @@ function Ast:parseCatID(asExp)
         end
     end
     ---@cast id string
+
+    local var
+    if asExp and self.code:sub(pos, pos) == '$' then
+        var = self:parseTermInCat()
+    end
 
     local finish = pos + #id
     self.lexer:moveTo(finish)
@@ -40,6 +46,10 @@ function Ast:parseCatID(asExp)
     })
 
     local block = self.curBlock
+    if var then
+        var.parent = res
+        res.var = var
+    end
 
     if id:sub(1, 1) == '`' and id:sub(-1) == '`' then
         local generic = block and block.genericMap[id:sub(2, -2)]

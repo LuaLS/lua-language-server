@@ -182,6 +182,32 @@ function Ast:parseTerm()
 end
 
 ---@private
+---@return LuaParser.Node.Term?
+function Ast:parseTermInCat()
+    local head = self:parseVar()
+
+    if not head then
+        return nil
+    end
+
+    ---@type LuaParser.Node.Term
+    local current = head
+
+    while true do
+        self:skipSpace(true)
+
+        local chain = self:parseField(current, true)
+        if chain then
+            current = chain
+        else
+            break
+        end
+    end
+
+    return current
+end
+
+---@private
 ---@return LuaParser.Node.Paren?
 function Ast:parseParen()
     local pos = self.lexer:consume '('

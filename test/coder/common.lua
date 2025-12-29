@@ -403,3 +403,14 @@ do
         assert(rt.type('r').value.value:view() == '2')
     end
 end
+
+do
+    TEST_INDEX [[
+    local t = { x = 1, y = 2 }
+
+    ---@alias t [ $t['x'], $t['y'] ] --> [1, 2]
+    ]]
+
+    assert(rt.type('t'):view() == 't')
+    assert(rt.type('t').value:view() == '[1, 2]')
+end

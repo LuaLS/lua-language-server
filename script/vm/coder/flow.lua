@@ -257,7 +257,7 @@ function M:getLinks(source)
     return self.links[name]
 end
 
----@param source LuaParser.Node.AssignAble
+---@param source LuaParser.Node.Base
 ---@return string?
 function M:getVarKey(source)
     local var = self:getVar(source, true)

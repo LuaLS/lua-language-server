@@ -136,15 +136,24 @@ ls.vm.registerCoderProvider('catid', function (coder, source)
             })
         end
     else
-        if source.optional then
-            coder:addLine('{id} = rt.type {name%q} | rt.NIL' % {
-                id = coder:getKey(source),
+        local value
+        if source.var then
+            coder:compile(source.var)
+            value = coder.flow:getVarKey(source.var)
+        else
+            value = 'rt.type {name%q}' % {
                 name = source.id,
+            }
+        end
+        if source.optional then
+            coder:addLine('{id} = {value} | rt.NIL' % {
+                id    = coder:getKey(source),
+                value = value,
             })
         else
-            coder:addLine('{id} = rt.type {name%q}' % {
-                id = coder:getKey(source),
-                name = source.id,
+            coder:addLine('{id} = {value}' % {
+                id    = coder:getKey(source),
+                value = value,
             })
         end
     end

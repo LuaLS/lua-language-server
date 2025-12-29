@@ -13,6 +13,7 @@ CatSeeName.kind = 'catseename'
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
+---@private
 function Ast:parseCatStateSee()
     local _, _, pos = self.lexer:peek()
     if not pos then

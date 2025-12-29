@@ -39,6 +39,7 @@ function Ast:parseCatStateCast()
     return state
 end
 
+---@private
 function Ast:parseCatStateCastItem()
     local start = self:getLastPos()
     local op = self.lexer:consume('+') and '+'

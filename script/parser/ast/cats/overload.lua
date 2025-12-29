@@ -7,6 +7,7 @@ CatStateOverload.kind = 'catstateoverload'
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
+---@private
 function Ast:parseCatStateOverload()
     local value = self:parseCatExp(true)
     if not value then

@@ -35,6 +35,9 @@ local function getName(var)
             return nil
         end
         local key = var.key
+        if not key then
+            return nil
+        end
         if var.subtype == 'field' or var.subtype == 'method' then
             ---@cast key LuaParser.Node.FieldID
             return '{}.{}' % { lastName, key.id }

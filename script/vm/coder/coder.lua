@@ -63,11 +63,22 @@ end
 ---@async
 ---@param file File
 function M:makeFromFile(file)
-    self.code = assert(self.coderMaster:awaitRequest('makeCode', {
+    local code = self.coderMaster:awaitRequest('makeCode', {
         text = file:getText(),
         source = file.uri,
-    }))
-    self.func = assert(load(self.code, self.code, 't', self.env))
+    })
+    if not code then
+        log.error('Failed to make coder from file: ' .. file.uri)
+
+        return
+    end
+    local func = load(code, code, 't', self.env)
+    if not func then
+        log.error('Failed to load coder function from file: ' .. file.uri)
+        return
+    end
+    self.code = code
+    self.func = func
 end
 
 ---@param code string
@@ -382,9 +393,12 @@ function M:makeLocationCode(source)
     )
 end
 
----@param source LuaParser.Node.FieldID | LuaParser.Node.Exp | LuaParser.Node.TableFieldID
+---@param source? LuaParser.Node.FieldID | LuaParser.Node.Exp | LuaParser.Node.TableFieldID
 ---@return string?
 function M:makeFieldCode(source)
+    if not source then
+        return nil
+    end
     if source.kind == 'fieldid' then
         ---@cast source LuaParser.Node.FieldID
         return string.format('%q', source.id)

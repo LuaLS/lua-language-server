@@ -24,7 +24,9 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         coder:compile(last)
     end
     if source.subtype == 'index' then
-        coder:compile(source.key)
+        if source.key then
+            coder:compile(source.key)
+        end
     end
 
     local varKey = coder.flow:getVarKey(source)
@@ -48,10 +50,12 @@ ls.vm.registerCoderProvider('field', function (coder, source)
 
     if source.subtype ~= 'index' then
         -- 字段的id即为整个字段
-        coder:addLine('{r2} = {r1}' % {
-            r1 = coder:getKey(source),
-            r2 = coder:getKey(source.key),
-        })
+        if source.key then
+            coder:addLine('{r2} = {r1}' % {
+                r1 = coder:getKey(source),
+                r2 = coder:getKey(source.key),
+            })
+        end
     end
 end)
 

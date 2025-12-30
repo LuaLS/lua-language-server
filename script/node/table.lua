@@ -559,7 +559,7 @@ function M:onView(viewer, options)
     local visited = viewer.visited
 
     if visited[self] > 1
-    or viewer.skipLevel >= 10 then
+    or viewer.skipLevel > 10 then
         return '{ ... }'
     end
     if self.locations then
@@ -600,9 +600,13 @@ function M:onView(viewer, options)
 
     for _, key in ipairs(self.keys) do
         local field = self.fieldMap[key]
+        local isOptional
         if #field == 0 then
             if field.hideInView then
                 goto continue
+            end
+            if field.optional then
+                isOptional = true
             end
             if checkSkip(field) then
                 goto continue
@@ -611,6 +615,9 @@ function M:onView(viewer, options)
             for _, f in ipairs(field) do
                 if f.hideInView then
                     goto continue
+                end
+                if f.optional then
+                    isOptional = true
                 end
                 if checkSkip(f) then
                     goto continue
@@ -621,8 +628,9 @@ function M:onView(viewer, options)
         ---@type Node.Key
         local k = rt.luaKey(key)
         local value = self.valueMap[k]
-        fields[#fields+1] = string.format('%s: %s'
+        fields[#fields+1] = string.format('%s%s: %s'
             , viewer:viewAsKey(key)
+            , isOptional and '?' or ''
             , viewer:view(value)
         )
         ::continue::

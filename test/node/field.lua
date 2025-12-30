@@ -241,3 +241,13 @@ do
 
     assert(index:view() == '<T>["xyz"]')
 end
+
+do
+    local t = rt.table()
+        : addField(rt.field('x', rt.value 'x', true))
+        : addField(rt.field('y', rt.value 'y', true))
+
+    assert(t:view() == '{ x?: "x" | nil, y?: "y" | nil }')
+    assert(t:get('x'):view() == '"x" | nil')
+    assert(t:get('y'):view() == '"y" | nil')
+end

@@ -256,9 +256,10 @@ function M:fillAPIs()
 
     ---@param key Node.Key
     ---@param value? Node
+    ---@param optional? boolean
     ---@return Node.Field
-    function self.field(key, value)
-        return New 'Node.Field' (scope, key, value)
+    function self.field(key, value, optional)
+        return New 'Node.Field' (scope, key, value, optional)
     end
 
     ---@param func Node

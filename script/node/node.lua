@@ -180,6 +180,19 @@ function M:keyOf(value)
     return self.value:keyOf(value)
 end
 
+---@type Node.Value[]
+M.keys = nil
+
+---@param self Node.Tuple
+---@return Node.Value[]
+---@return true
+M.__getter.keys = function (self)
+    if self.value == self then
+        return {}, true
+    end
+    return self.value.keys, true
+end
+
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'
 
 function M:refreshCastCache()
@@ -188,7 +201,7 @@ function M:refreshCastCache()
 end
 
 ---自己是否是对方的子类型？
----* 对于基础值来说，自己能否转换为对方
+---* 对于基础值来说，自己是否是更具体的类型
 ---* 对于表类型来说，自己是否包含对方的所有字段
 ---* 对于类型来说，自己是否是对方的子类型（或退化为表的情况）
 ---@param other string | number | boolean | Node
@@ -403,6 +416,19 @@ function M:each(kind, callback, visited)
         return
     end
     self.value:each(kind, callback, visited)
+end
+
+---@param callback fun(node: Node): Node
+---@param visited? table<Node, boolean>
+---@return Node
+function M:convert(callback, visited)
+    visited = ls.util.visited(self, visited)
+    if not visited then
+        return self
+    end
+    local v = self:findValue(ls.node.kind['union'] | ls.node.kind['intersection'])
+           or self
+    return v:convert(callback, visited)
 end
 
 ---@param viewer Node.Viewer

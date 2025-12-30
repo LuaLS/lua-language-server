@@ -6,7 +6,8 @@ M.kind = 'field'
 ---@param scope Scope
 ---@param key Node.Key
 ---@param value? Node
-function M:__init(scope, key, value)
+---@param optional? boolean
+function M:__init(scope, key, value, optional)
     self.scope = scope
     if type(key) ~= 'table' then
         ---@cast key -Node
@@ -16,6 +17,11 @@ function M:__init(scope, key, value)
     self.key = key
     ---@type Node
     self.value = value or scope.rt.UNKNOWN
+    ---@type boolean?
+    self.optional = optional
+    if optional then
+        self.value = self.value | scope.rt.NIL
+    end
 end
 
 ---@param location Node.Location

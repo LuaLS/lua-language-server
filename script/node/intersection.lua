@@ -269,6 +269,18 @@ function M:each(kind, callback, visited)
     end
 end
 
+function M:convert(callback, visited)
+    visited = ls.util.visited(self, visited)
+    if not visited then
+        return self
+    end
+    local newValues = {}
+    for _, v in ipairs(self.values) do
+        newValues[#newValues+1] = v:convert(callback, visited)
+    end
+    return self.scope.rt.intersection(newValues)
+end
+
 function M:onView(viewer, options)
     local values = self.values
     if #values == 0 then

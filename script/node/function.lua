@@ -359,7 +359,7 @@ function M:onView(viewer, options)
             , v.key
             , v.optional and '?' or ''
             , viewer:view(v.value, {
-                skipLevel = 10,
+                skipLevel = 9,
             })
         )
     end

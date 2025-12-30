@@ -23,4 +23,6 @@ require 'test.node.variable'
 
 require 'test.node.flow'
 
+require 'test.node.custom'
+
 print('[node] 测试完毕')

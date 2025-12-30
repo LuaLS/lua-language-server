@@ -56,13 +56,33 @@ function M:setValue(value)
     return self
 end
 
+---@param callback fun(self: Node.Alias, args: Node[]): Node
+---@return Node.Alias
+function M:setCustomValue(callback)
+    self.customValue = callback
+    return self
+end
+
+---@param args Node[]
+---@return Node
+function M:call(args)
+    if self.customValue then
+        local value = self.customValue(self, args)
+        value:addRef(self)
+        return value
+    end
+    if not self.params then
+        return self.value
+    end
+    return self.value:resolveGeneric(self:makeGenericMap(args))
+end
+
 M.__getter.value = function (self)
     if self.extendsValue then
         self.extendsValue:addRef(self)
         return self.extendsValue, true
-    else
-        return self.scope.rt.UNKNOWN, true
     end
+    return self.scope.rt.UNKNOWN, true
 end
 
 ---@type Node.Location?

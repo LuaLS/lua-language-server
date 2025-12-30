@@ -194,9 +194,7 @@ M.__getter.value = function (self)
         local aliases = {}
         ---@param alias Node.Alias
         for _, alias in ipairs(self.protoAliases) do
-            if alias.value then
-                aliases[#aliases+1] = alias.value:resolveGeneric(alias:makeGenericMap(self.args))
-            end
+            aliases[#aliases+1] = alias:call(self.args)
         end
         local union = self.scope.rt.union(aliases)
         return union, true

@@ -330,9 +330,7 @@ M.__getter.extendsValue = function (self)
         local aliases = {}
         ---@param alias Node.Alias
         for _, alias in ipairs(self.protoAliases) do
-            if alias.value then
-                aliases[#aliases+1] = alias.value
-            end
+            aliases[#aliases+1] = alias:call({})
         end
         local union = self.scope.rt.union(aliases)
         return union, true

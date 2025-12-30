@@ -27,6 +27,7 @@ function Ast:parseCatGeneric()
         id = id,
         start = id.start,
     })
+    id.parent = generic
 
     self:skipSpace()
     generic.symbolPos = self.lexer:consume ':'

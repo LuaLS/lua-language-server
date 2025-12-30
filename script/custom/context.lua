@@ -7,17 +7,21 @@ local masterMap = ls.util.weakKTable()
 ---如果传入的参数数量不足，那么不足的部分会被填充为 `never` 。
 ---其他索引返回 `nil`。
 ---如果不是类型调用，则此字段为 `nil` 。
+---在 `onValue` 的回调中可以保证此字段存在且被填充。
 ---@field args? Node[] | table<string, Node>
----@field table fun(): Node.Table
+---@field table fun(fields?: table<Node.Key, Node>): Node.Table
 ---@field field fun(name: Node.Key, value: Node, optional: boolean): Node.Field
+---@field type fun(name: string): Node.Type
+---@field value fun(val: string | number | boolean): Node.Value
 
 ---@class Custom.Context.Master
 local M = Class 'Custom.Context.Master'
 
----@param rt Node.Runtime
+---@param node Node
 ---@param data? table
-function M:__init(rt, data)
-    self.rt = rt
+function M:__init(node, data)
+    self.node = node
+    self.rt = node.scope.rt
     self.context = self:makeDefaultContext(data or {})
     masterMap[self.context] = self
 end
@@ -30,6 +34,13 @@ function M:makeDefaultContext(data)
 
     data.table = rt.table
     data.field = rt.field
+    data.value = rt.value
+
+    data.type = function (name)
+        local t = rt.type(name)
+        t:addRef(self.node)
+        return t
+    end
 
     return data
 end
@@ -53,10 +64,10 @@ function M:call(func, extraArgs)
     return self.rt.NEVER
 end
 
----@param rt Node.Runtime
+---@param node Node
 ---@param data? table
 ---@return Custom.Context.Master
-function ls.custom.contextMaster(rt, data)
-    local master = New 'Custom.Context.Master' (rt, data)
+function ls.custom.contextMaster(node, data)
+    local master = New 'Custom.Context.Master' (node, data)
     return master
 end

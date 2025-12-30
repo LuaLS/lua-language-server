@@ -8,7 +8,7 @@ function M:__init(rt, name)
     self.name  = name
 
     self.alias = rt.alias(name)
-    self.master = ls.custom.contextMaster(rt)
+    self.master = ls.custom.contextMaster(self.alias)
 end
 
 ---@param name string
@@ -22,14 +22,16 @@ end
 ---@param callback fun(c: Custom.Context): Node
 function M:onValue(callback)
     self.alias:setCustomValue(function (_, args)
-        local cargs = {}
-        for i, param in ipairs(self.alias.params) do
-            cargs[i] = args[i] or self.rt.NEVER
-            cargs[param.name] = cargs[i]
+        local data = {}
+        if self.alias.params then
+            local cargs = {}
+            for i, param in ipairs(self.alias.params) do
+                cargs[i] = args[i] or self.rt.NEVER
+                cargs[param.name] = cargs[i]
+            end
+            data.args = cargs
         end
-        local node = self.master:call(callback, {
-            args = cargs,
-        })
+        local node = self.master:call(callback, data)
         return node
     end)
 end

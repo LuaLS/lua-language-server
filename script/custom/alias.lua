@@ -8,12 +8,15 @@ function M:__init(rt, name)
     self.name  = name
 
     self.alias = rt.alias(name)
+    self.master = ls.custom.contextMaster(rt)
 end
 
 ---@param name string
+---@return Custom.Alias
 function M:param(name)
     local p = self.rt.generic(name)
     self.alias:addTypeParam(p)
+    return self
 end
 
 ---@param callback fun(c: Custom.Context): Node
@@ -24,10 +27,9 @@ function M:onValue(callback)
             cargs[i] = args[i] or self.rt.NEVER
             cargs[param.name] = cargs[i]
         end
-        local master = ls.custom.contextMaster(self.rt, {
-            args = args,
+        local node = self.master:call(callback, {
+            args = cargs,
         })
-        local node = master:call(callback)
         return node
     end)
 end

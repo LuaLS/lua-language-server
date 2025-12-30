@@ -44,7 +44,20 @@ do
     do
         local _ENV = playground.env
 
-        
+        _ENV.alias('Options')
+            : param('T')
+            : onValue(function (c)
+                local v = c.args[1]
+                if #v.keys == 0 then
+                    return v
+                end
+                local t = c.table()
+                for _, key in ipairs(v.keys) do
+                    t = t:addField(c.field(key, v:get(key), true))
+                end
+
+                return t
+            end)
     end
 
     local t1 = rt.table {

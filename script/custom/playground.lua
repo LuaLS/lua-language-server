@@ -11,11 +11,7 @@ function M:__init(scope)
 
     self.env = sb.env
 
-    self:fillAPIs(self.env)
-end
-
-function M:fillAPIs(env)
-    function env.alias(...)
+    function self.env.alias(...)
         return ls.custom.alias(self.scope.rt, ...)
     end
 end

@@ -3,6 +3,7 @@ require 'config'
 require 'filesystem'
 require 'node'
 require 'vm'
+require 'custom'
 require 'file'
 require 'feature'
 

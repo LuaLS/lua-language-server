@@ -421,14 +421,16 @@ end
 ---@param callback fun(node: Node): Node
 ---@param visited? table<Node, boolean>
 ---@return Node
-function M:convert(callback, visited)
+function M:every(callback, visited)
     visited = ls.util.visited(self, visited)
     if not visited then
         return self
     end
     local v = self:findValue(ls.node.kind['union'] | ls.node.kind['intersection'])
-           or self
-    return v:convert(callback, visited)
+    if v then
+        return v:every(callback, visited)
+    end
+    return callback(self)
 end
 
 ---@param viewer Node.Viewer

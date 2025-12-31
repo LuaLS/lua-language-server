@@ -249,14 +249,14 @@ function M:each(kind, callback, visited)
     end
 end
 
-function M:convert(callback, visited)
+function M:every(callback, visited)
     visited = ls.util.visited(self, visited)
     if not visited then
         return self
     end
     local newValues = {}
     for _, v in ipairs(self.values) do
-        newValues[#newValues+1] = v:convert(callback, visited)
+        newValues[#newValues+1] = v:every(callback, visited)
     end
     return self.scope.rt.union(newValues)
 end

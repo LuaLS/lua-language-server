@@ -1,4 +1,5 @@
-local master = ls.async.create('afs', 2, 'filesystem.async-worker', true)
+local reader = ls.async.create('afs-reader', 1, 'filesystem.async-worker', true)
+local writer = ls.async.create('afs-writer', 1, 'filesystem.async-worker', true)
 
 ---@class AsyncFileSystem: FileSystem
 ls.afs = Class('AsyncFileSystem', 'FileSystem')
@@ -9,28 +10,28 @@ ls.afs.mode = 'async'
 ---@param uri Uri
 ---@return Uri[]?
 function ls.afs.getChilds(uri)
-    return master:awaitRequest('getChilds', { uri })
+    return reader:awaitRequest('getChilds', { uri })
 end
 
 ---@async
 ---@param uri Uri
 ---@return 'file'|'directory'|'symlink'|nil
 function ls.afs.getTypeWithSymlink(uri)
-    return master:awaitRequest('getTypeWithSymlink', { uri })
+    return reader:awaitRequest('getTypeWithSymlink', { uri })
 end
 
 ---@async
 ---@param uri Uri
 ---@return 'file'|'directory'|nil
 function ls.afs.getType(uri)
-    return master:awaitRequest('getType', { uri })
+    return reader:awaitRequest('getType', { uri })
 end
 
 ---@async
 ---@param uri Uri
 ---@return string?
 function ls.afs.read(uri)
-    return master:awaitRequest('read', { uri })
+    return reader:awaitRequest('read', { uri })
 end
 
 ---@async
@@ -38,12 +39,12 @@ end
 ---@param content string
 ---@return boolean
 function ls.afs.write(uri, content)
-    return master:awaitRequest('write', { uri, content })
+    return writer:awaitRequest('write', { uri, content })
 end
 
 ---@async
 ---@param uri Uri
 ---@return boolean
 function ls.afs.remove(uri)
-    return master:awaitRequest('remove', { uri })
+    return writer:awaitRequest('remove', { uri })
 end

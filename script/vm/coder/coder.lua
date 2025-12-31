@@ -33,6 +33,7 @@ function M:makeFromAst(ast)
     self.flow = New 'Coder.Flow' (self)
 
     self:addLine('-- Middle Code: ' .. ast.source)
+    self:addLine 'global <const> *'
     self:addLine 'local coder, vfile = ...'
     self:addLine 'local rt  = vfile.scope.rt'
     self:addLine 'local uri = vfile.uri'
@@ -218,6 +219,9 @@ end
 
 ---@param vfile VM.Vfile
 function M:run(vfile)
+    if not self.func then
+        return
+    end
     self.rt = vfile.scope.rt
     self.vfile = vfile
     local map = {}

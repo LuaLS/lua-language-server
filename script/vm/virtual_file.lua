@@ -150,7 +150,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Node?
 function M:getNode(source)
-    if not self.coder then
+    if not self.coder or not self.coder.map then
         return nil
     end
     local key = source.uniqueKey
@@ -167,7 +167,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Node.Variable?
 function M:getVariable(source)
-    if not self.coder then
+    if not self.coder or not self.coder.map then
         return nil
     end
     local key = source.uniqueKey

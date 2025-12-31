@@ -26,7 +26,7 @@ end
 ---@param document Document
 ---@return Coder
 function M:makeCoder(document)
-    local coder = self.coder or ls.vm.createCoder()
+    local coder = ls.vm.createCoder()
     coder:makeFromAst(document.ast)
     return coder
 end
@@ -35,7 +35,7 @@ end
 ---@param document Document
 ---@return Coder
 function M:awaitMakeCoder(document)
-    local coder = self.coder or ls.vm.createCoder()
+    local coder = ls.vm.createCoder()
     coder:makeFromFile(document.file)
     return coder
 end
@@ -52,7 +52,11 @@ function M:index()
     end
 
     ls.util.withDuration(function ()
-        self.coder = self:makeCoder(document)
+        local coder = self:makeCoder(document)
+        if self.coder then
+            self.coder:dispose()
+        end
+        self.coder = coder
     end, function (duration)
         if duration > 0.1 then
             log.warn('Index {} took {%.2f} seconds.' % { self.uri, duration })
@@ -115,7 +119,11 @@ function M:awaitIndex()
 
     ---@async
     ls.util.withDuration(function ()
-        self.coder = self:awaitMakeCoder(document)
+        local coder = self:awaitMakeCoder(document)
+        if self.coder then
+            self.coder:dispose()
+        end
+        self.coder = coder
     end, function (duration)
         if duration > 0.1 then
             log.warn('Index (async) {} took {%.3f} seconds.' % { self.uri, duration })

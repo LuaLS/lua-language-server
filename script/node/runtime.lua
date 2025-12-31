@@ -12,6 +12,10 @@ function M:__init(scope)
     self:fillAPIs()
 end
 
+function M:playground()
+    return ls.custom.playground(self.scope)
+end
+
 ---@private
 function M:createPools()
     local scope = self.scope
@@ -299,10 +303,6 @@ end
 
 ---@private
 function M:fillPresets()
-    if self.playground then
-        self.playground:dispose()
-    end
-    self.playground = ls.custom.playground(self.scope)
     self.TRUE  = self.value(true)
     self.FALSE = self.value(false)
 

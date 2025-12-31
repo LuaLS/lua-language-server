@@ -1,5 +1,7 @@
----@class Coder
+---@class Coder: GCHost
 local M = Class 'Coder'
+
+Extends(M, 'GCHost')
 
 if ls.threadName == 'master' then
     M.coderMaster = ls.async.create('coder', 8, 'vm.coder.coder-worker', true)
@@ -19,7 +21,6 @@ function M:__init()
 end
 
 function M:__del()
-    self:dispose()
 end
 
 ---@param ast LuaParser.Ast
@@ -36,19 +37,18 @@ function M:makeFromAst(ast)
     self:addLine 'local rt  = vfile.scope.rt'
     self:addLine 'local uri = vfile.uri'
     self:addLine 'local r   = coder.map'
-    self:addLine 'local v   = coder.var'
     self:addLine ''
 
     self:compile(ast.main)
 
     self:addLine ''
-    self:addLine 'return function ()'
+    self:addLine 'coder:bindGC(function ()'
     self:addIndentation(1)
     for i = #self.disposers, 1, -1 do
         self:addLine(self.disposers[i])
     end
     self:addIndentation(-1)
-    self:addLine 'end'
+    self:addLine 'end)'
 
     -- self:simplifyCode()
 
@@ -194,14 +194,7 @@ end
 M.disposer = nil
 
 function M:dispose()
-    if self.disposer then
-        self.rt:lockCache()
-        xpcall(function ()
-            self.disposer()
-        end, log.error)
-        self.rt:unlockCache()
-        self.disposer = nil
-    end
+    Delete(self)
 end
 
 local function makeRegistry(t)
@@ -225,7 +218,6 @@ end
 
 ---@param vfile VM.Vfile
 function M:run(vfile)
-    self:dispose()
     self.rt = vfile.scope.rt
     self.vfile = vfile
     local map = {}

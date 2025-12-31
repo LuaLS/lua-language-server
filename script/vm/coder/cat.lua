@@ -558,6 +558,7 @@ ls.vm.registerCoderProvider('catblock', function (coder, source)
         coder:addLine('-- Error loading cat block: {err}' % { err = err })
         return
     end
-    coder:addLine('local _ENV = rt.playground.env\n')
+    coder:addLine('local playground = coder:bindGC(rt:playground())')
+    coder:addLine('local _ENV = playground.env')
     coder:addLine(source.code)
 end)

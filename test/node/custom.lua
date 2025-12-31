@@ -33,11 +33,19 @@ do
         [ 'y' ] = rt.value '20',
     }
 
-    assert(t1:view() == '{ x: "10", y: "20" }')
+    assert(t1:view() == [[
+{
+    x: "10",
+    y: "20",
+}]])
 
     local t2 = rt.call('Options', { t1 })
 
-    assert(t2:view() == '{ x?: "10" | nil, y?: "20" | nil }')
+    assert(t2:view() == [[
+{
+    x?: "10" | nil,
+    y?: "20" | nil,
+}]])
 end
 
 do
@@ -67,11 +75,19 @@ do
         [ 'y' ] = rt.value '20',
     }
 
-    assert(t1:view() == '{ x: "10", y: "20" }')
+    assert(t1:view() == [[
+{
+    x: "10",
+    y: "20",
+}]])
 
     local t2 = rt.call('Options', { t1 })
 
-    assert(t2:view() == '{ x?: "10" | nil, y?: "20" | nil }')
+    assert(t2:view() == [[
+{
+    x?: "10" | nil,
+    y?: "20" | nil,
+}]])
 end
 
 do
@@ -100,16 +116,34 @@ do
         : addField(rt.field('x', rt.value '10'))
         : addField(rt.field('y', rt.value '20'))
 
-    assert(rt.type 'XXX'.value:view() == '{ x: "10", y: "20" }')
+    assert(rt.type 'XXX'.value:view() == [[
+{
+    x: "10",
+    y: "20",
+}]])
 
     local t2 = rt.call('Options', { rt.type 'XXX' })
 
-    assert(t2:view() == '{ x?: "10" | nil, y?: "20" | nil }')
+    assert(t2:view() == [[
+{
+    x?: "10" | nil,
+    y?: "20" | nil,
+}]])
 
     c:addField(rt.field('z', rt.value '30'))
 
-    assert(rt.type 'XXX'.value:view() == '{ x: "10", y: "20", z: "30" }')
-    assert(t2.value:view() == '{ x?: "10" | nil, y?: "20" | nil, z?: "30" | nil }')
+    assert(rt.type 'XXX'.value:view() == [[
+{
+    x: "10",
+    y: "20",
+    z: "30",
+}]])
+    assert(t2.value:view() == [[
+{
+    x?: "10" | nil,
+    y?: "20" | nil,
+    z?: "30" | nil,
+}]])
 end
 
 do

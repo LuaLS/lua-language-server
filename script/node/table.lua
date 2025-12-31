@@ -644,5 +644,9 @@ function M:onView(viewer, options)
         return '{}'
     end
 
-    return '{ ' .. table.concat(fields, ', ') .. ' }'
+    if #fields == 1 then
+        return '{ ' .. fields[1] .. ' }'
+    end
+
+    return '{\n    ' .. table.concat(fields, ',\n    ') .. ',\n}'
 end

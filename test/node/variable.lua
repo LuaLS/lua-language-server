@@ -55,18 +55,43 @@ do
     assert(a.value:view() == '{ n: number }')
 
     var:addField(rt.field(rt.value 'self', a))
-    assert(var.value:view() == '{ n: number, self: A }')
-    assert(a.value:view() == '{ n: number, self: A }')
+    assert(var.value:view() == [[
+{
+    n: number,
+    self: A,
+}]])
+    assert(a.value:view() == [[
+{
+    n: number,
+    self: A,
+}]])
 
     var:addClass(ca)
     assert(var.value:view() == 'A')
-    assert(var.fields:view() == '{ n: number, self: A }')
-    assert(a.value:view() == '{ n: number, self: A }')
+    assert(var.fields:view() == [[
+{
+    n: number,
+    self: A,
+}]])
+    assert(a.value:view() == [[
+{
+    n: number,
+    self: A,
+}]])
 
     ca:addField(rt.field(rt.value 's', rt.type 'string'))
     assert(var.value:view() == 'A')
-    assert(var.fields:view() == '{ n: number, self: A }')
-    assert(a.value:view() == '{ n: number, s: string, self: A }')
+    assert(var.fields:view() == [[
+{
+    n: number,
+    self: A,
+}]])
+    assert(a.value:view() == [[
+{
+    n: number,
+    s: string,
+    self: A,
+}]])
 end
 
 do
@@ -91,9 +116,18 @@ do
     m:addField(rt.field(rt.value '__index', m))
     m:addField(rt.field(rt.value 'y', rt.value 'abc'))
 
-    assert(a.value:view() == '{ x: number, y: "abc", __index: A }')
+    assert(a.value:view() == [[
+{
+    x: number,
+    y: "abc",
+    __index: A,
+}]])
     assert(m.value:view() == 'A')
-    assert(m.fields:view() == '{ y: "abc", __index: A }')
+    assert(m.fields:view() == [[
+{
+    y: "abc",
+    __index: A,
+}]])
 end
 
 do
@@ -159,8 +193,16 @@ do
     a:addField(dy, {'b', 'c', 'd'})
     assert(d:viewAsVariable() == 'a.b.c.d')
     assert(d.value:view() == 'A')
-    assert(d.fields:view() == '{ x: 1, y: 2 }')
-    assert(A.value:view() == '{ x: 1, y: 2 }')
+    assert(d.fields:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
+    assert(A.value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 
     a:removeField(dx, {'b', 'c', 'd'})
     assert(d:viewAsVariable() == 'a.b.c.d')

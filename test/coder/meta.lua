@@ -8,7 +8,12 @@ do
         ---@field z number
     ]]
 
-    assert(rt.type('A').value:view() == '{ x: number, y: number, z: number }')
+    assert(rt.type('A').value:view() == [[
+{
+    x: number,
+    y: number,
+    z: number,
+}]])
 end
 
 do
@@ -20,7 +25,11 @@ do
         A.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 end
 
 do
@@ -32,7 +41,11 @@ do
         A.B.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 end
 
 do
@@ -44,7 +57,11 @@ do
         A.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 end
 
 do
@@ -58,7 +75,11 @@ do
         A.B.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == '{ x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 end
 
 do

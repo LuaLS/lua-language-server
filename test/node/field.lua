@@ -116,7 +116,11 @@ do
     assert(u:view() == '{ x: "x" } & { y: "y" }')
     assert(u.kind == 'intersection')
     ---@cast u Node.Intersection
-    assert(u.value:view() == '{ x: "x", y: "y" }')
+    assert(u.value:view() == [[
+{
+    x: "x",
+    y: "y",
+}]])
     assert(u:get('x'):view() == '"x"')
     assert(u:get('y'):view() == '"y"')
 end
@@ -131,10 +135,17 @@ do
 
     local u = a & b
 
-    assert(u:view() == '{ x: "x" } & { x: "y", y: "y" }')
+    assert(u:view() == [[
+{ x: "x" } & {
+    x: "y",
+    y: "y",
+}]])
     assert(u.kind == 'intersection')
     ---@cast u Node.Intersection
-    assert(u.value:view() == '{ x: never, y: "y" }')
+    assert(u.value:view() == [[{
+    x: never,
+    y: "y",
+}]])
     assert(u:get('x'):view() == 'never')
     assert(u:get('y'):view() == '"y"')
 end
@@ -247,7 +258,11 @@ do
         : addField(rt.field('x', rt.value 'x', true))
         : addField(rt.field('y', rt.value 'y', true))
 
-    assert(t:view() == '{ x?: "x" | nil, y?: "y" | nil }')
+    assert(t:view() == [[
+{
+    x?: "x" | nil,
+    y?: "y" | nil,
+}]])
     assert(t:get('x'):view() == '"x" | nil')
     assert(t:get('y'):view() == '"y" | nil')
 end

@@ -12,7 +12,11 @@ do
     assert(t:view() == '{ x: number }')
 
     t:addField(field2)
-    assert(t:view() == '{ x: number, y: string }')
+    assert(t:view() == [[
+{
+    x: number,
+    y: string,
+}]])
 
     t:removeField(field1)
     assert(t:view() == '{ y: string }')
@@ -70,7 +74,11 @@ do
     assert(an:get('y'):view() == 'nil')
 
     ca:addField(rt.field('y', rt.STRING))
-    assert(an.value:view() == '{ x: number, y: string }')
+    assert(an.value:view() == [[
+{
+    x: number,
+    y: string,
+}]])
     assert(an:get('y'):view() == 'string')
 end
 
@@ -84,13 +92,30 @@ do
     local sec = t1 & t2
 
     assert(sec:view() == '{ x: 1 } & { y: 2 }')
-    assert(sec.value:view() == '{ x: 1, y: 2 }')
+    assert(sec.value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 
     t1:addField(rt.field('xx', rt.value(11)))
     t2:addField(rt.field('yy', rt.value(22)))
 
-    assert(sec:view() == '{ x: 1, xx: 11 } & { y: 2, yy: 22 }')
-    assert(sec.value:view() == '{ x: 1, xx: 11, y: 2, yy: 22 }')
+    assert(sec:view() == [[
+{
+    x: 1,
+    xx: 11,
+} & {
+    y: 2,
+    yy: 22,
+}]])
+    assert(sec.value:view() == [[
+{
+    x: 1,
+    xx: 11,
+    y: 2,
+    yy: 22,
+}]])
 end
 
 do

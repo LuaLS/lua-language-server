@@ -135,7 +135,14 @@ do
     t:addField(rt.field(rt.value(2),   rt.value('y')))
     t:addField(rt.field(rt.value(3),   rt.value('z')))
 
-    assert(t:view() == [[{ [1]: "x", [2]: "y", [3]: "z", x: 1, y: 2, z: 3 }]])
+    assert(t:view() == [[{
+    [1]: "x",
+    [2]: "y",
+    [3]: "z",
+    x: 1,
+    y: 2,
+    z: 3,
+}]])
 end
 
 do
@@ -144,7 +151,14 @@ do
         x = 1, y = 2, z = 3,
     }
 
-    assert(t:view() == [[{ [1]: "x", [2]: "y", [3]: "z", x: 1, y: 2, z: 3 }]])
+    assert(t:view() == [[{
+    [1]: "x",
+    [2]: "y",
+    [3]: "z",
+    x: 1,
+    y: 2,
+    z: 3,
+}]])
 end
 
 do

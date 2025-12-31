@@ -243,7 +243,11 @@ do
         ))
 
     local map2 = map:call { rt.STRING, rt.INTEGER }
-    assert(map2.value:view() == '{ get: fun(key: string):integer, set: fun(key: string, value: integer) }')
+    assert(map2.value:view() == [[
+{
+    get: fun(key: string):integer,
+    set: fun(key: string, value: integer),
+}]])
     assert(map2:get('set'):view() == 'fun(key: string, value: integer)')
     assert(map2.value:get('set'):view() == 'fun(key: string, value: integer)')
 end

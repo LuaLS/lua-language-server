@@ -23,7 +23,11 @@ do
         : addField(rt.field(rt.value 'y', rt.value 'y'))
 
     assert(a:view() == 'A')
-    assert(a.value:view() == '{ x: "x", y: "y" }')
+    assert(a.value:view() == [[
+{
+    x: "x",
+    y: "y",
+}]])
 end
 
 do
@@ -55,7 +59,12 @@ do
     rt.class('A', nil, { b, c, d })
 
     assert(a:view() == 'A')
-    assert(a.value:view() == '{ x: "x", y: "y", z: "z" }')
+    assert(a.value:view() == [[
+{
+    x: "x",
+    y: "y",
+    z: "z",
+}]])
 end
 
 do
@@ -95,7 +104,13 @@ do
         : addField(rt.field(rt.value 'z', rt.value 'z'))
 
     assert(a:view() == 'A')
-    assert(a.value:view() == '{ w: "1", x: "2", y: "3", z: "z" }')
+    assert(a.value:view() == [[
+{
+    w: "1",
+    x: "2",
+    y: "3",
+    z: "z",
+}]])
 end
 
 do
@@ -186,8 +201,16 @@ do
 
 
     assert(a:view() == 'A')
-    assert(a.value:view() == '{ x: 1, y: 2 }')
+    assert(a.value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 
     assert(b:view() == 'B')
-    assert(b.value:view() == '{ x: 1, y: 2 }')
+    assert(b.value:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
 end

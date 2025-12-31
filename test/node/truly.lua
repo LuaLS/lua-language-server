@@ -45,8 +45,16 @@ do
         : addField(rt.field('x', rt.value(1)))
         : addField(rt.field('y', rt.value(2)))
 
-    assert(u:view() == '{ x: 1, y: 2 }')
-    assert(u.truly:view() == '{ x: 1, y: 2 }')
+    assert(u:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
+    assert(u.truly:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
     assert(u.falsy:view() == 'never')
 end
 
@@ -58,7 +66,11 @@ do
 
     local u = a & b
     assert(u:view() == '{ x: 1 } & { y: 2 }')
-    assert(u.truly:view() == '{ x: 1, y: 2 }')
+    assert(u.truly:view() == [[
+{
+    x: 1,
+    y: 2,
+}]])
     assert(u.falsy:view() == 'never')
 end
 

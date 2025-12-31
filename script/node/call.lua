@@ -233,6 +233,11 @@ function M:resolveGeneric(map)
 end
 
 function M:onView(viewer, options)
+    if self.head:isAliasLike() and self.value ~= self then
+        return viewer:view(self.value, {
+            skipLevel = 0,
+        })
+    end
     return '{}<{}>' % {
         self.head.typeName,
         table.concat(ls.util.map(self.args, function (arg)

@@ -11,6 +11,18 @@ function M:__init(rt, name)
     self.master = ls.custom.contextMaster(self.alias)
 end
 
+function M:__del()
+    self.alias:dispose()
+end
+
+function M:__close()
+    self:dispose()
+end
+
+function M:dispose()
+    Delete(self)
+end
+
 ---@param name string
 ---@return Custom.Alias
 function M:param(name)

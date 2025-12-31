@@ -299,6 +299,7 @@ end
 
 ---@private
 function M:fillPresets()
+    self.playground = ls.custom.playground(self.scope)
     self.TRUE  = self.value(true)
     self.FALSE = self.value(false)
 

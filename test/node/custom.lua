@@ -37,8 +37,7 @@ do
 
     local t2 = rt.call('Options', { t1 })
 
-    assert(t2:view() == 'Options<{ x: "10", y: "20" }>')
-    assert(t2.value:view() == '{ x?: "10" | nil, y?: "20" | nil }')
+    assert(t2:view() == '{ x?: "10" | nil, y?: "20" | nil }')
 end
 
 do
@@ -72,8 +71,7 @@ do
 
     local t2 = rt.call('Options', { t1 })
 
-    assert(t2:view() == 'Options<{ x: "10", y: "20" }>')
-    assert(t2.value:view() == '{ x?: "10" | nil, y?: "20" | nil }')
+    assert(t2:view() == '{ x?: "10" | nil, y?: "20" | nil }')
 end
 
 do
@@ -106,8 +104,7 @@ do
 
     local t2 = rt.call('Options', { rt.type 'XXX' })
 
-    assert(t2:view() == 'Options<XXX>')
-    assert(t2.value:view() == '{ x?: "10" | nil, y?: "20" | nil }')
+    assert(t2:view() == '{ x?: "10" | nil, y?: "20" | nil }')
 
     c:addField(rt.field('z', rt.value '30'))
 
@@ -148,4 +145,27 @@ do
     end
 
     assert(t.value:view() == 'never')
+end
+
+do
+    rt:reset()
+
+    assert(rt.type('Test'):view() == 'Test')
+    assert(rt.type('Test').value:view() == 'Test')
+
+    local playground = ls.custom.playground(test.scope)
+    do
+        local _ENV = playground.env
+
+        _ENV.alias('Test')
+            : onValue(function (c)
+                return c.value(1)
+            end)
+    end
+
+    assert(rt.type('Test').value:view() == '1')
+
+    playground:dispose()
+
+    assert(rt.type('Test').value:view() == 'Test')
 end

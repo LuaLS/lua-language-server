@@ -28,5 +28,6 @@ require 'test.coder.common'
 require 'test.coder.metatable'
 require 'test.coder.block'
 require 'test.coder.flow'
+require 'test.coder.custom'
 
 print('[coder] 测试完毕')

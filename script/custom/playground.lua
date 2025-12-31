@@ -1,19 +1,35 @@
 local sandbox = require 'tools.sandbox'
 
----@class Custom.Playground
+local SharedEnv
+local function sharedEnv()
+    if not SharedEnv then
+        local sb = sandbox('playground')
+        sb.env.require = nil
+        SharedEnv = sb.env
+    end
+    return SharedEnv
+end
+
+---@class Custom.Playground: GCHost
 local M = Class 'Custom.Playground'
+
+Extends(M, 'GCHost')
 
 ---@param scope Scope
 function M:__init(scope)
     self.scope = scope
-    local sb = sandbox('playground')
-    sb.env.require = nil
 
-    self.env = sb.env
+    self.env = sharedEnv()
 
     function self.env.alias(...)
-        return ls.custom.alias(self.scope.rt, ...)
+        local alias = ls.custom.alias(self.scope.rt, ...)
+        self:bindGC(alias)
+        return alias
     end
+end
+
+function M:dispose()
+    Delete(self)
 end
 
 ---@param scope Scope

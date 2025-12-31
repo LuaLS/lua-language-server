@@ -13,6 +13,7 @@ local masterMap = ls.util.weakKTable()
 ---@field field fun(name: Node.Key, value: Node, optional: boolean): Node.Field
 ---@field type fun(name: string): Node.Type
 ---@field value fun(val: string | number | boolean): Node.Value
+---@field array fun(value: Node): Node.Array
 
 ---@class Custom.Context.Master
 local M = Class 'Custom.Context.Master'
@@ -35,6 +36,7 @@ function M:makeDefaultContext(data)
     data.table = rt.table
     data.field = rt.field
     data.value = rt.value
+    data.array = rt.array
 
     data.type = function (name)
         local t = rt.type(name)

@@ -94,9 +94,7 @@ do
     assert(aliasValue.value:view() == '<K> | <V> | boolean')
 
     local call = alias:call { rt.NUMBER, rt.STRING }
-    assert(call:view() == 'Alias<number, string>')
-
-    assert(call.value:view() == 'number | string | boolean')
+    assert(call:view() == 'number | string | boolean')
 end
 
 do
@@ -121,14 +119,12 @@ do
     assert(alias.value:view() == '{ [any]: any }')
 
     local alias1 = alias:call { rt.STRING }
-    assert(alias1:view() == 'Alias<string>')
-    assert(alias1.value:view() == '{ [string]: boolean }')
+    assert(alias1:view() == '{ [string]: boolean }')
     assert(alias1:get(1):view() == 'nil')
     assert(alias1:get('x'):view() == 'boolean')
 
     local alias2 = alias:call { rt.STRING, rt.INTEGER }
-    assert(alias2:view() == 'Alias<string, integer>')
-    assert(alias2.value:view() == '{ [string]: integer }')
+    assert(alias2:view() == '{ [string]: integer }')
     assert(alias2:get(1):view() == 'nil')
     assert(alias2:get('x'):view() == 'integer')
 end
@@ -154,14 +150,13 @@ do
     assert(aliasValue:view() == 'unknown | unknown[]')
 
     local alias1 = alias:call { rt.value 'X', rt.ANY }
-    assert(alias1:view() == 'Alias<"X", any>')
-    assert(alias1.value:view() == 'unknown | X[]')
+    assert(alias1:view() == 'unknown | X[]')
 
     local alias2 = alias:call { rt.value 'X', rt.value 'Y' }
-    assert(alias2.value:view() == 'xyzX.Y.xyz | X[]')
+    assert(alias2:view() == 'xyzX.Y.xyz | X[]')
 
     local alias3 = alias:call { rt.value 'X1' | rt.value 'X2', rt.value 'Y1' | rt.value 'Y2' }
-    assert(alias3.value:view() == 'xyzX1.Y1.xyz | xyzX1.Y2.xyz | xyzX2.Y1.xyz | xyzX2.Y2.xyz | (X1 | X2)[]')
+    assert(alias3:view() == 'xyzX1.Y1.xyz | xyzX1.Y2.xyz | xyzX2.Y1.xyz | xyzX2.Y2.xyz | (X1 | X2)[]')
 end
 
 do
@@ -174,8 +169,7 @@ do
     rt.alias('Alias', { A }, rt.oddTemplate { 'abc', A })
 
     local alias1 = alias:call { rt.value 'X' }
-    assert(alias1:view() == 'Alias<"X">')
-    assert(alias1.value:view() == '"X"')
+    assert(alias1:view() == '"X"')
 end
 
 do

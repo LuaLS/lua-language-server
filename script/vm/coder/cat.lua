@@ -548,3 +548,16 @@ ls.vm.registerCoderProvider('catternary', function (coder, source)
         elseExp = coder:getKey(source.elseExp),
     })
 end)
+
+ls.vm.registerCoderProvider('catblock', function (coder, source)
+    ---@cast source LuaParser.Node.CatBlock
+
+    coder:addLine('-- Cat Block --')
+    local f, err = load(source.code, source.code, 't')
+    if not f then
+        coder:addLine('-- Error loading cat block: {err}' % { err = err })
+        return
+    end
+    coder:addLine('local _ENV = rt.playground.env\n')
+    coder:addLine(source.code)
+end)

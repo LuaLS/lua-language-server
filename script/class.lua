@@ -37,9 +37,12 @@ M._errorHandler = error
 ---@field package initCalls?   false|fun(...)[]
 local Config = {}
 
----@param name string
+---@param name string | table
 ---@return Class.Config
 function M.getConfig(name)
+    if type(name) == 'table' then
+        name = name.__name
+    end
     if not M._classConfig[name] then
         M._classConfig[name] = setmetatable({
             name         = name,
@@ -264,7 +267,7 @@ end
 
 ---@generic Class: string
 ---@generic Extends: string
----@param name `Class`
+---@param name `Class` | table
 ---@param extendsName `Extends`
 ---@param init? fun(self: Class, super: Extends, ...)
 function M.extends(name, extendsName, init)

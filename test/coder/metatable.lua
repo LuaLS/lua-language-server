@@ -6,8 +6,7 @@ do
 ---@alias A f<number>
     ]]
 
-    assert(rt.type('A').value:view() == 'f<number>')
-    assert(rt.type('A').value.value:view() == 'number[]')
+    assert(rt.type('A').value:view() == 'number[]')
 end
 
 do
@@ -17,8 +16,7 @@ do
     ]]
 
     assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == 'f<{ __index: 1 }>')
-    assert(rt.type('A').value.value:view() == '1')
+    assert(rt.type('A').value:view() == '1')
 end
 
 do

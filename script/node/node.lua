@@ -306,6 +306,7 @@ M.truly = nil
 ---@return Node
 ---@return true
 M.__getter.truly = function (self)
+    self.truly = self
     if self.value == self then
         return self, true
     end
@@ -319,6 +320,7 @@ M.falsy = nil
 ---@return Node
 ---@return true
 M.__getter.falsy = function (self)
+    self.falsy = self
     if self.value == self then
         return self.scope.rt.NEVER, true
     end

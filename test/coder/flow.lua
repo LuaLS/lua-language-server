@@ -338,10 +338,50 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
-    assert(X1:view() == '{ a: 1, b: 2 }')
-    assert(X2:view() == '{ a: 1, b: 1 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
-    assert(XX:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
+    assert(X0:view() == [[
+{
+    a: 1,
+    b: 1,
+} | {
+    a: 1,
+    b: 2,
+} | {
+    a: 2,
+    b: 1,
+} | {
+    a: 2,
+    b: 2,
+}]])
+    assert(X1:view() == [[
+{
+    a: 1,
+    b: 2,
+}]])
+    assert(X2:view() == [[
+{
+    a: 1,
+    b: 1,
+} | {
+    a: 2,
+    b: 1,
+} | {
+    a: 2,
+    b: 2,
+}]])
+    assert(XX:view() == [[
+{
+    a: 1,
+    b: 1,
+} | {
+    a: 1,
+    b: 2,
+} | {
+    a: 2,
+    b: 1,
+} | {
+    a: 2,
+    b: 2,
+}]])
 end
 
 do
@@ -362,12 +402,20 @@ do
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
-    local XX = rt:globalGet('XX')
-
-    assert(X0:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
-    assert(X1:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 2 }')
-    assert(X2:view() == '{ a: 2, b: 1 }')
-    assert(XX:view() == '{ a: 1, b: 1 } | { a: 1, b: 2 } | { a: 2, b: 1 } | { a: 2, b: 2 }')
+    assert(X0:view() == [[
+{
+    a: 1,
+    b: 1,
+} | {
+    a: 1,
+    b: 2,
+} | {
+    a: 2,
+    b: 1,
+} | {
+    a: 2,
+    b: 2,
+}]])
 end
 
 do

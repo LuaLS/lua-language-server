@@ -128,7 +128,12 @@ do
     ]]
 
     assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '{ x: number, y: string, [number]: boolean }')
+    assert(rt.type('A').value:view() == [[
+{
+    x: number,
+    y: string,
+    [number]: boolean,
+}]])
 end
 
 do
@@ -174,7 +179,14 @@ do
     ]]
 
     assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '{ [1]: 5, [10]: 4, abc: 3, x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    [1]: 5,
+    [10]: 4,
+    abc: 3,
+    x: 1,
+    y: 2,
+}]])
 end
 
 do
@@ -216,7 +228,12 @@ do
     SELF:addField(rt.field('y', rt.value(2)))
 
     assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    init: fun(self: A),
+    x: 1,
+    y: 2,
+}]])
 end
 
 do
@@ -231,7 +248,12 @@ do
     ]]
 
     assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '{ init: fun(self: A), x: 1, y: 2 }')
+    assert(rt.type('A').value:view() == [[
+{
+    init: fun(self: A),
+    x: 1,
+    y: 2,
+}]])
 end
 
 do
@@ -293,7 +315,11 @@ do
 
     assert(rt.type('C'):view() == 'C')
     assert(rt.type('C').value:view() == 'B<number>')
-    assert(rt.type('C').value.value:view() == '{ data: [number, 2], extra: number[] }')
+    assert(rt.type('C').value.value:view() == [[
+{
+    data: [number, 2],
+    extra: number[],
+}]])
 end
 
 do

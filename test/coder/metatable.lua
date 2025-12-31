@@ -152,7 +152,11 @@ do
 
     local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
-    assert(R:view() == '{ x: 1, __index: { ... } }')
+    assert(R:view() == [[
+{
+    x: 1,
+    __index: { ... },
+}]])
 
     local V = R:get 'x'
     assert(V:view() == '1')
@@ -335,7 +339,11 @@ mt.xxx = 1
 MT = mt
     ]]
 
-    assert(rt:globalGet('MT'):view() == '{ xxx: 1, __index: { ... } }')
+    assert(rt:globalGet('MT'):view() == [[
+{
+    xxx: 1,
+    __index: { ... },
+}]])
 end
 
 do
@@ -355,6 +363,10 @@ obj = setmetatable({}, mt)
 value = obj.xxx
     ]]
 
-    assert(rt:globalGet('obj'):view() == '{ xxx: 1, __index: { ... } }')
+    assert(rt:globalGet('obj'):view() == [[
+{
+    xxx: 1,
+    __index: { ... },
+}]])
     assert(rt:globalGet('value'):view() == '1')
 end

@@ -30,11 +30,9 @@ local M = Class 'LuaParser.Ast'
 
 ---@alias LuaParser.Status
 ---| 'Lua' # Lua代码
----| 'ShortCats' # 单行的注解
----| 'LongCats' # 多行的注解
+---| 'Cats' # 一行行的注解（可以换行）
 ---| 'InLineCats' # 内联的注解
----| 'ShortLua' # 单行注解内的Lua代码
----| 'LongLua' # 多行注释内的Lua代码
+---| 'LuaInCats' # 通过 --[[@@@ ]] 包裹的 Lua 代码
 
 ---@param code string # lua代码
 ---@param source? string # 来源
@@ -118,10 +116,9 @@ end
 function M:skipNL()
     local status = self.status
     if status == 'Lua'
-    or status == 'LongCats'
-    or status == 'LongLua' then
+    or status == 'LuaInCats' then
         return self.lexer:consumeType 'NL' ~= nil
-    elseif status == 'ShortCats' then
+    elseif status == 'Cats' then
         local _, tp = self.lexer:peek()
         if tp ~= 'NL' then
             return false

@@ -62,6 +62,7 @@ local Ast = Class 'LuaParser.Ast'
 ---| LuaParser.Node.Function
 ---| LuaParser.Node.Cat
 ---| LuaParser.Node.FuncName
+---| LuaParser.Node.CatBlock
 
 ---@private
 Ast.stateParserMap = {}

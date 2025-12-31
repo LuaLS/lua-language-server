@@ -467,3 +467,32 @@ TEST [[
         }
     }
 }
+
+TEST [=[
+local x
+
+--[[@@@
+print(x)
+]]
+]=]
+{
+    childs = {
+        [1] = {
+            kind = 'localdef'
+        },
+        [2] = {
+            kind = 'catblock',
+            childs = {
+                [1] = {
+                    kind = 'call',
+                    args = {
+                        [1] = {
+                            kind = 'var',
+                            id   = 'x',
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

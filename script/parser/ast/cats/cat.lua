@@ -20,6 +20,7 @@ require 'parser.ast.cats.return'
 require 'parser.ast.cats.overload'
 require 'parser.ast.cats.see'
 require 'parser.ast.cats.cast'
+require 'parser.ast.cats.block'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string
@@ -131,9 +132,9 @@ function Ast:parseCat()
 
     ---@type LuaParser.Status
     local oldStatus = self.status
-    if oldStatus == 'Lua' then
-        self.status = 'ShortCats'
-    elseif oldStatus == 'LongCats' then
+    if oldStatus == 'Lua'
+    or oldStatus == 'LuaInCats' then
+        self.status = 'Cats'
     else
         return nil
     end
@@ -186,8 +187,56 @@ function Ast:parseCat()
 end
 
 ---@private
+---@return LuaParser.Node.CatBlock?
 function Ast:parseCatBlock()
-    
+    local oldStatus = self.status
+    if oldStatus ~= 'Lua' then
+        return nil
+    end
+    local token, _, pos = self.lexer:peek()
+    ---@cast pos -?
+    if token ~= '--' then
+        return nil
+    end
+    ---@cast pos -?
+    local finishQuo
+    local startPos
+    if token == '--' then
+        local quo, s = self.code:match('^(%[=*%[)@@@()', pos + 3)
+        if not quo then
+            return nil
+        end
+        finishQuo = quo:gsub('%[', ']')
+        startPos = s
+    else
+        return nil
+    end
+
+    local offset = self.code:find(finishQuo, pos + 3, true)
+    if not offset then
+        self:throwMissSymbol(#self.code, finishQuo)
+        self.lexer:moveTo(#self.code)
+        return nil
+    end
+
+    self.status = 'LuaInCats'
+    self.lexer:moveTo(startPos)
+    local block = self:parseCatBlockInRange(startPos, offset - 1)
+    self.status = oldStatus
+    local finish = offset + #finishQuo
+    self.lexer:moveTo(finish)
+
+    local curBlock = self.curBlock
+    if curBlock then
+        local cats = curBlock.cats
+        if not cats then
+            cats = {}
+            curBlock.cats = cats
+        end
+        cats[#cats+1] = block
+    end
+
+    return block
 end
 
 ---@private

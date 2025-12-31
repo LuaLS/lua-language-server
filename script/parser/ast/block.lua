@@ -3,7 +3,7 @@
 ---@field childs LuaParser.Node.State[]
 ---@field locals LuaParser.Node.Local[]
 ---@field labels LuaParser.Node.Label[]
----@field cats? LuaParser.Node.Cat[]
+---@field cats? (LuaParser.Node.Cat|LuaParser.Node.CatBlock)[]
 ---@field generics LuaParser.Node.CatGeneric[]
 ---@field isMain boolean
 ---@field localMap table<string, LuaParser.Node.Local>
@@ -111,6 +111,7 @@ local FinishMap = {
     ['until']  = true,
     ['}']      = true,
     [')']      = true,
+    [']']      = true,
 }
 
 ---@private

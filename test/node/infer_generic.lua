@@ -5,7 +5,7 @@ do
     local map = {}
     T:inferGeneric(rt.NUMBER, map)
 
-    assert(map[T] == rt.NUMBER)
+    lt.assertEquals(map[T], rt.NUMBER)
 end
 
 do
@@ -19,7 +19,7 @@ do
     local arrayNumber = rt.array(rt.NUMBER)
     arrayT:inferGeneric(arrayNumber, map)
 
-    assert(map[T] == rt.NUMBER)
+    lt.assertEquals(map[T], rt.NUMBER)
 end
 
 do
@@ -33,7 +33,7 @@ do
     local table = rt.table()
     arrayT:inferGeneric(table, map)
 
-    assert(map[T] == nil)
+    lt.assertEquals(map[T], nil)
 end
 
 do
@@ -49,7 +49,7 @@ do
     }
     arrayT:inferGeneric(table, map)
 
-    assert(map[T]:view() == 'string')
+    lt.assertEquals(map[T]:view(), 'string')
 end
 
 do
@@ -65,7 +65,7 @@ do
     }
     arrayT:inferGeneric(table, map)
 
-    assert(map[T] == rt.STRING)
+    lt.assertEquals(map[T], rt.STRING)
 end
 
 do
@@ -82,7 +82,7 @@ do
     }
     arrayT:inferGeneric(table, map)
 
-    assert(map[T]:view() == 'number | string')
+    lt.assertEquals(map[T]:view(), 'number | string')
 end
 
 do
@@ -101,8 +101,8 @@ do
     }
     tupleT1T2:inferGeneric(tuple, map)
 
-    assert(map[T1] == rt.NUMBER)
-    assert(map[T2] == rt.STRING)
+    lt.assertEquals(map[T1], rt.NUMBER)
+    lt.assertEquals(map[T2], rt.STRING)
 end
 
 do
@@ -118,8 +118,8 @@ do
     local target = rt.array(rt.NUMBER)
     tupleT1T2:inferGeneric(target, map)
 
-    assert(map[T1] == rt.NUMBER)
-    assert(map[T2] == rt.NUMBER)
+    lt.assertEquals(map[T1], rt.NUMBER)
+    lt.assertEquals(map[T2], rt.NUMBER)
 end
 
 do
@@ -138,8 +138,8 @@ do
     }
     tupleT1T2:inferGeneric(target, map)
 
-    assert(map[T1]:view() == 'number')
-    assert(map[T2]:view() == 'string')
+    lt.assertEquals(map[T1]:view(), 'number')
+    lt.assertEquals(map[T2]:view(), 'string')
 end
 
 do
@@ -159,8 +159,8 @@ do
     }
     tableKV:inferGeneric(target, map)
 
-    assert(map[K]:view() == 'number')
-    assert(map[V]:view() == 'string')
+    lt.assertEquals(map[K]:view(), 'number')
+    lt.assertEquals(map[V]:view(), 'string')
 end
 
 do
@@ -178,8 +178,8 @@ do
     local target = rt.array(rt.STRING)
     tableKV:inferGeneric(target, map)
 
-    assert(map[K] == rt.INTEGER)
-    assert(map[V] == rt.STRING)
+    lt.assertEquals(map[K], rt.INTEGER)
+    lt.assertEquals(map[V], rt.STRING)
 end
 
 do
@@ -200,8 +200,8 @@ do
     }
     tableKV:inferGeneric(target, map)
 
-    assert(map[K]:view() == '1 | 2')
-    assert(map[V]:view() == 'string | boolean')
+    lt.assertEquals(map[K]:view(), '1 | 2')
+    lt.assertEquals(map[V]:view(), 'string | boolean')
 end
 
 do
@@ -223,8 +223,8 @@ do
     }
     tableKV:inferGeneric(target, map)
 
-    assert(map[T1]:view() == 'number')
-    assert(map[T2]:view() == 'string')
+    lt.assertEquals(map[T1]:view(), 'number')
+    lt.assertEquals(map[T2]:view(), 'string')
 end
 
 do
@@ -240,8 +240,8 @@ do
     local target = rt.tuple { rt.NUMBER, rt.STRING }
     tupleG:inferGeneric(target, map)
 
-    assert(map[T1]:view() == 'number')
-    assert(map[T2]:view() == 'string')
+    lt.assertEquals(map[T1]:view(), 'number')
+    lt.assertEquals(map[T2]:view(), 'string')
 end
 
 do
@@ -257,8 +257,8 @@ do
     local target = rt.array(rt.STRING)
     tupleG:inferGeneric(target, map)
 
-    assert(map[T1]:view() == 'string')
-    assert(map[T2]:view() == 'string')
+    lt.assertEquals(map[T1]:view(), 'string')
+    lt.assertEquals(map[T2]:view(), 'string')
 end
 
 do
@@ -277,8 +277,8 @@ do
     }
     tupleG:inferGeneric(target, map)
 
-    assert(map[T1]:view() == 'string')
-    assert(map[T2]:view() == 'boolean')
+    lt.assertEquals(map[T1]:view(), 'string')
+    lt.assertEquals(map[T2]:view(), 'boolean')
 end
 
 do
@@ -304,8 +304,8 @@ do
     map:call { T1, T2 } :inferGeneric(rt.table {
         [rt.NUMBER] = rt.STRING
     }, result)
-    assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'string')
+    lt.assertEquals(result[T1]:view(), 'number')
+    lt.assertEquals(result[T2]:view(), 'string')
 end
 
 do
@@ -326,8 +326,8 @@ do
     local result = {}
     funG:inferGeneric(target, result)
 
-    assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'string')
+    lt.assertEquals(result[T1]:view(), 'number')
+    lt.assertEquals(result[T2]:view(), 'string')
 end
 
 do
@@ -348,8 +348,8 @@ do
     local result = {}
     funG:inferGeneric(target, result)
 
-    assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'string | nil')
+    lt.assertEquals(result[T1]:view(), 'number')
+    lt.assertEquals(result[T2]:view(), 'string | nil')
 end
 
 do
@@ -371,8 +371,8 @@ do
     local result = {}
     funG:inferGeneric(target, result)
 
-    assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'boolean | string | nil')
+    lt.assertEquals(result[T1]:view(), 'number')
+    lt.assertEquals(result[T2]:view(), 'boolean | string | nil')
 end
 
 do
@@ -386,7 +386,7 @@ do
     local result = {}
     u:inferGeneric(rt.NUMBER, result)
 
-    assert(result[T]:view() == 'number')
+    lt.assertEquals(result[T]:view(), 'number')
 end
 
 do
@@ -400,7 +400,7 @@ do
     local result = {}
     i:inferGeneric(rt.NUMBER, result)
 
-    assert(result[T]:view() == 'number')
+    lt.assertEquals(result[T]:view(), 'number')
 end
 
 do
@@ -423,8 +423,8 @@ do
     local result = {}
     funG:inferGeneric(target, result)
 
-    assert(result[T1]:view() == 'number')
-    assert(result[T2]:view() == 'unknown')
+    lt.assertEquals(result[T1]:view(), 'number')
+    lt.assertEquals(result[T2]:view(), 'unknown')
 end
 
 do
@@ -438,8 +438,8 @@ do
     local results = {}
     template:inferGeneric(rt.value 'X', results)
 
-    assert(results[T].kind == 'type')
-    assert(results[T]:view() == 'abc.X')
+    lt.assertEquals(results[T].kind, 'type')
+    lt.assertEquals(results[T]:view(), 'abc.X')
 end
 
 do
@@ -458,8 +458,8 @@ do
         y = rt.value(1),
     }, results)
 
-    assert(results[A]:view() == '"y"')
-    assert(results[B]:view() == '"x"')
+    lt.assertEquals(results[A]:view(), '"y"')
+    lt.assertEquals(results[B]:view(), '"x"')
 end
 
 do
@@ -478,8 +478,8 @@ do
         [2] = rt.value 'y',
     }, results)
 
-    assert(results[A]:view() == '"x"')
-    assert(results[B]:view() == '"y"')
+    lt.assertEquals(results[A]:view(), '"x"')
+    lt.assertEquals(results[B]:view(), '"y"')
 end
 
 do
@@ -498,8 +498,8 @@ do
         [2] = rt.value 'y',
     }, results)
 
-    assert(results[A]:view() == '"x"')
-    assert(results[B]:view() == '2')
+    lt.assertEquals(results[A]:view(), '"x"')
+    lt.assertEquals(results[B]:view(), '2')
 end
 
 do
@@ -525,10 +525,10 @@ do
         [5] = rt.value 'e',
     }, results)
 
-    assert(results[A]:view() == '2')
-    assert(results[B]:view() == '"c"')
-    assert(results[C]:view() == '4 | 5')
-    assert(results[D]:view() == '"d" | "e"')
+    lt.assertEquals(results[A]:view(), '2')
+    lt.assertEquals(results[B]:view(), '"c"')
+    lt.assertEquals(results[C]:view(), '4 | 5')
+    lt.assertEquals(results[D]:view(), '"d" | "e"')
 end
 
 do
@@ -551,7 +551,7 @@ do
 
     local results = {}
     f:inferGeneric(target, results)
-    assert(results[T]:view() == 'number')
+    lt.assertEquals(results[T]:view(), 'number')
 end
 
 do
@@ -574,7 +574,7 @@ do
     local results = {}
     indexType:inferGeneric(rt.value(2), results)
 
-    assert(results[T]:view() == '"y"')
+    lt.assertEquals(results[T]:view(), '"y"')
 end
 
 do
@@ -591,5 +591,5 @@ do
     local results = {}
     call:inferGeneric(rt.value(1), results)
 
-    assert(results[T]:view() == '1')
+    lt.assertEquals(results[T]:view(), '1')
 end

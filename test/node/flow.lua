@@ -22,10 +22,10 @@ do
     local V = rt.variable 'V'
     V:addAssign(rt.field('V', x2))
 
-    assert(x:view() == '10')
-    assert(x2:view() == '5')
-    assert(W:view() == '10')
-    assert(V:view() == '5')
+    lt.assertEquals(x:view(), '10')
+    lt.assertEquals(x2:view(), '5')
+    lt.assertEquals(W:view(), '10')
+    lt.assertEquals(V:view(), '5')
 end
 
 do
@@ -50,10 +50,10 @@ do
     local V = rt.variable 'V'
     V:addAssign(rt.field('V', x2))
 
-    assert(x:view() == '5 | 10')
-    assert(x1:view() == '10')
-    assert(x2:view() == '5')
-    assert(V:view() == '5')
+    lt.assertEquals(x:view(), '5 | 10')
+    lt.assertEquals(x1:view(), '10')
+    lt.assertEquals(x2:view(), '5')
+    lt.assertEquals(V:view(), '5')
 end
 
 do
@@ -82,10 +82,10 @@ do
 
     local x3 = x:shadow(x)
 
-    assert(x:view() == 'integer | nil')
-    assert(x1:view() == 'integer')
-    assert(x2:view() == 'nil')
-    assert(x3:view() == 'integer | nil')
+    lt.assertEquals(x:view(), 'integer | nil')
+    lt.assertEquals(x1:view(), 'integer')
+    lt.assertEquals(x2:view(), 'nil')
+    lt.assertEquals(x3:view(), 'integer | nil')
 end
 
 do
@@ -118,11 +118,11 @@ do
 
     local x3 = x:shadow(x1 | x21)
 
-    assert(x:view() == 'integer | nil')
-    assert(x1:view() == 'integer')
-    assert(x2:view() == 'nil')
-    assert(x21:view() == '"string"')
-    assert(x3:view() == '"string" | integer')
+    lt.assertEquals(x:view(), 'integer | nil')
+    lt.assertEquals(x1:view(), 'integer')
+    lt.assertEquals(x2:view(), 'nil')
+    lt.assertEquals(x21:view(), '"string"')
+    lt.assertEquals(x3:view(), '"string" | integer')
 end
 
 do
@@ -153,10 +153,10 @@ do
 
     local x3 = x:shadow(v2:otherSide())
 
-    assert(x:view() == '1 | 2 | 3 | 4')
-    assert(x1:view() == '1')
-    assert(x2:view() == '2')
-    assert(x3:view() == '3 | 4')
+    lt.assertEquals(x:view(), '1 | 2 | 3 | 4')
+    lt.assertEquals(x1:view(), '1')
+    lt.assertEquals(x2:view(), '2')
+    lt.assertEquals(x3:view(), '3 | 4')
 end
 
 do
@@ -185,10 +185,10 @@ do
 
     local x3 = x:shadow(x)
 
-    assert(x:view() == '{ a: 1 } | { a: 2 }')
-    assert(x1:view() == '{ a: 1 }')
-    assert(x2:view() == '{ a: 2 }')
-    assert(x3:view() == '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(x:view(), '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(x1:view(), '{ a: 1 }')
+    lt.assertEquals(x2:view(), '{ a: 2 }')
+    lt.assertEquals(x3:view(), '{ a: 1 } | { a: 2 }')
 end
 
 do
@@ -208,7 +208,7 @@ do
     local x2 = x:shadow(rt.value(20))
     x2:addAssign(rt.field('x', rt.value(20)))
 
-    assert(y:view() == '10')
+    lt.assertEquals(y:view(), '10')
 end
 
 do
@@ -230,7 +230,7 @@ do
     W:setCurrentValue(x2)
     W:addAssign(rt.field('W', x2))
 
-    assert(W:view() == 'op.add<0, 1>')
+    lt.assertEquals(W:view(), 'op.add<0, 1>')
 end
 
 do
@@ -282,10 +282,10 @@ do
 
     local x3 = x:shadow(x)
 
-    assert(x:view() == '1 | 2')
-    assert(x1:view() == '1')
-    assert(x2:view() == '2')
-    assert(x3:view() == '1 | 2')
+    lt.assertEquals(x:view(), '1 | 2')
+    lt.assertEquals(x1:view(), '1')
+    lt.assertEquals(x2:view(), '2')
+    lt.assertEquals(x3:view(), '1 | 2')
 end
 
 do
@@ -337,10 +337,10 @@ do
 
     local x3 = x:shadow(x)
 
-    assert(x:view() == '1 | 2')
-    assert(x1:view() == '2')
-    assert(x2:view() == '1')
-    assert(x3:view() == '1 | 2')
+    lt.assertEquals(x:view(), '1 | 2')
+    lt.assertEquals(x1:view(), '2')
+    lt.assertEquals(x2:view(), '1')
+    lt.assertEquals(x3:view(), '1 | 2')
 end
 
 do
@@ -397,10 +397,10 @@ do
 
     local x3 = x:shadow(xNarrow2:otherSide())
 
-    assert(x:view() == 'any')
-    assert(x1:view() == '1')
-    assert(x2:view() == '2')
-    assert(x3:view() == 'any')
+    lt.assertEquals(x:view(), 'any')
+    lt.assertEquals(x1:view(), '1')
+    lt.assertEquals(x2:view(), '2')
+    lt.assertEquals(x3:view(), 'any')
 end
 
 do
@@ -444,9 +444,9 @@ do
 
     local x2 = x:shadow(xNarrow1:otherSide())
 
-    assert(x:view() == 'any')
-    assert(x1:view() == 'truly')
-    assert(x2:view() == 'false | nil')
+    lt.assertEquals(x:view(), 'any')
+    lt.assertEquals(x1:view(), 'truly')
+    lt.assertEquals(x2:view(), 'false | nil')
 end
 
 do
@@ -505,10 +505,10 @@ do
 
     local x3 = x:shadow(xNarrow2:otherSide())
 
-    assert(x:view() == '1 | 2 | 3 | 4')
-    assert(x1:view() == '1')
-    assert(x2:view() == '2')
-    assert(x3:view() == '3 | 4')
+    lt.assertEquals(x:view(), '1 | 2 | 3 | 4')
+    lt.assertEquals(x1:view(), '1')
+    lt.assertEquals(x2:view(), '2')
+    lt.assertEquals(x3:view(), '3 | 4')
 end
 
 do
@@ -555,9 +555,9 @@ do
     local x2 = x:shadow(xNarrow1:otherSide())
 
 
-    assert(x:view() == 'boolean')
-    assert(x1:view() == 'true')
-    assert(x2:view() == 'false')
+    lt.assertEquals(x:view(), 'boolean')
+    lt.assertEquals(x1:view(), 'true')
+    lt.assertEquals(x2:view(), 'false')
 end
 
 do
@@ -593,15 +593,15 @@ do
     local typeFunc = f1 | f2
 
     local x = rt.variable 'x'
-    assert(x:view() == 'any')
+    lt.assertEquals(x:view(), 'any')
 
     local tp = rt.variable 'tp'
     local fcall = rt.fcall(typeFunc, { x })
     tp:setCurrentValue(rt.select(fcall, 1))
-    assert(tp:view() == '"string" | "number"')
+    lt.assertEquals(tp:view(), '"string" | "number"')
 
     local tpNarrow = rt.narrow(tp):equalValue(rt.value('string'))
-    assert(tpNarrow:view() == '"string"')
+    lt.assertEquals(tpNarrow:view(), '"string"')
     local xNarrow = rt.narrow(x):asCall {
         func = typeFunc,
         myType = 'param',
@@ -613,11 +613,11 @@ do
     }
 
     local x1 = x:shadow(xNarrow)
-    assert(x1:view() == 'string')
+    lt.assertEquals(x1:view(), 'string')
 
     local x2 = x:shadow(xNarrow:otherSide())
-    assert(x2:view() == 'number')
+    lt.assertEquals(x2:view(), 'number')
 
     local x3 = x:shadow(x)
-    assert(x3:view() == 'any')
+    lt.assertEquals(x3:view(), 'any')
 end

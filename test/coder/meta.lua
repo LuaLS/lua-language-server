@@ -8,7 +8,7 @@ do
         ---@field z number
     ]]
 
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     x: number,
     y: number,
@@ -25,7 +25,7 @@ do
         A.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     x: 1,
     y: 2,
@@ -41,7 +41,7 @@ do
         A.B.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     x: 1,
     y: 2,
@@ -57,7 +57,7 @@ do
         A.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     x: 1,
     y: 2,
@@ -75,7 +75,7 @@ do
         A.B.y = 2
     ]]
 
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     x: 1,
     y: 2,
@@ -88,7 +88,7 @@ do
         end
     ]]
 
-    assert(rt:globalGet('type').value:view() == 'fun(o: any)')
+    lt.assertEquals(rt:globalGet('type').value:view(), 'fun(o: any)')
 end
 
 do
@@ -99,5 +99,5 @@ do
         end
     ]]
 
-    assert(rt:globalGet('type').value:view() == 'fun(o: table):string')
+    lt.assertEquals(rt:globalGet('type').value:view(), 'fun(o: table):string')
 end

@@ -13,7 +13,7 @@ do
 
     local fcall = rt.fcall(f, { rt.value(1) })
     local r = fcall.value
-    assert(r:view() == 'boolean')
+    lt.assertEquals(r:view(), 'boolean')
 end
 
 do
@@ -35,9 +35,9 @@ do
 
     local fcall = rt.fcall(f, { rt.NUMBER, rt.STRING })
     local r = fcall.value
-    assert(r:view() == 'number[]')
-    assert(fcall.returns:select(1):view() == 'number[]')
-    assert(fcall.returns:select(2):view() == 'string[]')
+    lt.assertEquals(r:view(), 'number[]')
+    lt.assertEquals(fcall.returns:select(1):view(), 'number[]')
+    lt.assertEquals(fcall.returns:select(2):view(), 'string[]')
 end
 
 do
@@ -68,9 +68,9 @@ do
     local r2 = rt.fcall(rt.type 'F', { rt.value(123) } )
     local r3 = rt.fcall(rt.type 'F', { rt.value('hello') } )
 
-    assert(r1.value:view() == '1')
-    assert(r2.value:view() == '2')
-    assert(r3.value:view() == '3')
+    lt.assertEquals(r1.value:view(), '1')
+    lt.assertEquals(r2.value:view(), '2')
+    lt.assertEquals(r3.value:view(), '3')
 end
 
 do
@@ -87,7 +87,7 @@ do
 
     local fcall = rt.fcall(f, {})
     local r = fcall.value
-    assert(r:view() == '1')
+    lt.assertEquals(r:view(), '1')
 end
 
 do
@@ -106,9 +106,9 @@ do
 
     local fcall = rt.fcall(f, {})
     local r1 = fcall:select(1)
-    assert(r1:view() == '1 | 3')
+    lt.assertEquals(r1:view(), '1 | 3')
     local r2 = fcall:select(2)
-    assert(r2:view() == '2 | 4')
+    lt.assertEquals(r2:view(), '2 | 4')
 end
 
 do -- 方案1
@@ -144,11 +144,11 @@ do -- 方案1
         }
     )
 
-    assert(rt.fcall(f, { rt.value(123) }):simplify():view() == '"number"')
-    assert(rt.fcall(f, { rt.value('hello') }):simplify():view() == '"string"')
-    assert(rt.fcall(f, { rt.value(true) }):simplify():view() == '"boolean"')
-    assert(rt.fcall(f, { rt.table {} }):simplify():view() == '"table"')
-    assert(rt.fcall(f, { rt.variable 'X' }):simplify():view() == '"number" | "string" | "boolean" | "table"')
+    lt.assertEquals(rt.fcall(f, { rt.value(123) }):simplify():view(), '"number"')
+    lt.assertEquals(rt.fcall(f, { rt.value('hello') }):simplify():view(), '"string"')
+    lt.assertEquals(rt.fcall(f, { rt.value(true) }):simplify():view(), '"boolean"')
+    lt.assertEquals(rt.fcall(f, { rt.table {} }):simplify():view(), '"table"')
+    lt.assertEquals(rt.fcall(f, { rt.variable 'X' }):simplify():view(), '"number" | "string" | "boolean" | "table"')
 end
 
 do -- 方案2
@@ -187,11 +187,11 @@ do -- 方案2
         : addParamDef('x', T)
         : addReturnDef(nil, rt.index(rt.type 'TypeViewMap', T))
 
-    assert(rt.fcall(f, { rt.value(123) }):simplify():view() == '"number"')
-    assert(rt.fcall(f, { rt.value('hello') }):simplify():view() == '"string"')
-    assert(rt.fcall(f, { rt.value(true) }):simplify():view() == '"boolean"')
-    assert(rt.fcall(f, { rt.table {} }):simplify():view() == '"table"')
-    assert(rt.fcall(f, { rt.variable 'X' }):simplify():view() == '"number" | "string" | "boolean" | "table"')
+    lt.assertEquals(rt.fcall(f, { rt.value(123) }):simplify():view(), '"number"')
+    lt.assertEquals(rt.fcall(f, { rt.value('hello') }):simplify():view(), '"string"')
+    lt.assertEquals(rt.fcall(f, { rt.value(true) }):simplify():view(), '"boolean"')
+    lt.assertEquals(rt.fcall(f, { rt.table {} }):simplify():view(), '"table"')
+    lt.assertEquals(rt.fcall(f, { rt.variable 'X' }):simplify():view(), '"number" | "string" | "boolean" | "table"')
 end
 
 do -- 方案3
@@ -232,9 +232,9 @@ do -- 方案3
         : addParamDef('x', T2)
         : addReturnDef(nil, rt.call('TypeView', { T2 }))
 
-    assert(rt.fcall(f, { rt.value(123) }):simplify():view() == '"number"')
-    assert(rt.fcall(f, { rt.value('hello') }):simplify():view() == '"string"')
-    assert(rt.fcall(f, { rt.value(true) }):simplify():view() == '"boolean"')
-    assert(rt.fcall(f, { rt.table {} }):simplify():view() == '"table"')
-    assert(rt.fcall(f, { rt.variable 'X' }):simplify():view() == '"number" | "string" | "boolean" | "table"')
+    lt.assertEquals(rt.fcall(f, { rt.value(123) }):simplify():view(), '"number"')
+    lt.assertEquals(rt.fcall(f, { rt.value('hello') }):simplify():view(), '"string"')
+    lt.assertEquals(rt.fcall(f, { rt.value(true) }):simplify():view(), '"boolean"')
+    lt.assertEquals(rt.fcall(f, { rt.table {} }):simplify():view(), '"table"')
+    lt.assertEquals(rt.fcall(f, { rt.variable 'X' }):simplify():view(), '"number" | "string" | "boolean" | "table"')
 end

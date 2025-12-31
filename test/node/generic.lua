@@ -4,24 +4,24 @@ do
     local K = rt.generic('K')
     local V = rt.generic('V')
 
-    assert(K:view() == '<K>')
-    assert(V:view() == '<V>')
+    lt.assertEquals(K:view(), '<K>')
+    lt.assertEquals(V:view(), '<V>')
 
     local table = rt.table { [K] = V }
 
-    assert(table:view() == '{ [<K>]: <V> }')
+    lt.assertEquals(table:view(), '{ [<K>]: <V> }')
 
     local t1 = table:resolveGeneric {}
-    assert(t1:view() == '{ [<K>]: <V> }')
+    lt.assertEquals(t1:view(), '{ [<K>]: <V> }')
 
     local t2 = table:resolveGeneric { [K] = rt.INTEGER }
-    assert(t2:view() == '{ [integer]: <V> }')
+    lt.assertEquals(t2:view(), '{ [integer]: <V> }')
 
     local t3 = table:resolveGeneric { [V] = rt.BOOLEAN }
-    assert(t3:view() == '{ [<K>]: boolean }')
+    lt.assertEquals(t3:view(), '{ [<K>]: boolean }')
 
     local t4 = table:resolveGeneric { [K] = rt.STRING, [V] = rt.NUMBER }
-    assert(t4:view() == '{ [string]: number }')
+    lt.assertEquals(t4:view(), '{ [string]: number }')
 end
 
 do
@@ -37,43 +37,43 @@ do
     local union = N | U
     local intersection = N & U
 
-    assert(N:view() == '<N>')
-    assert(U:view() == '<U>')
+    lt.assertEquals(N:view(), '<N>')
+    lt.assertEquals(U:view(), '<U>')
 
-    assert(array:view() == '<N>[]')
+    lt.assertEquals(array:view(), '<N>[]')
 
-    assert(tuple:view() == '[<N>, <U>]')
+    lt.assertEquals(tuple:view(), '[<N>, <U>]')
 
-    assert(table:view() == '{ [<N>]: <U> }')
+    lt.assertEquals(table:view(), '{ [<N>]: <U> }')
 
-    assert(func:view() == 'fun(a: <N>, ...: <U>):[<N>, <U>]')
+    lt.assertEquals(func:view(), 'fun(a: <N>, ...: <U>):[<N>, <U>]')
     func:addTypeParam(N)
     func:addTypeParam(U)
-    assert(func:view() == 'fun<N:number, U>(a: <N>, ...: <U>):[<N>, <U>]')
+    lt.assertEquals(func:view(), 'fun<N:number, U>(a: <N>, ...: <U>):[<N>, <U>]')
 
-    assert(union:view() == '<N> | <U>')
+    lt.assertEquals(union:view(), '<N> | <U>')
 
-    assert(intersection:view() == '<N> & <U>')
+    lt.assertEquals(intersection:view(), '<N> & <U>')
 
     local resolve = { [N] = rt.INTEGER }
 
     local newArray = array:resolveGeneric(resolve)
-    assert(newArray:view() == 'integer[]')
+    lt.assertEquals(newArray:view(), 'integer[]')
 
     local newTuple = tuple:resolveGeneric(resolve)
-    assert(newTuple:view() == '[integer, <U>]')
+    lt.assertEquals(newTuple:view(), '[integer, <U>]')
 
     local newTable = table:resolveGeneric(resolve)
-    assert(newTable:view() == '{ [integer]: <U> }')
+    lt.assertEquals(newTable:view(), '{ [integer]: <U> }')
 
     local newFunc = func:resolveGeneric(resolve)
-    assert(newFunc:view() == 'fun<integer, U>(a: integer, ...: <U>):[integer, <U>]')
+    lt.assertEquals(newFunc:view(), 'fun<integer, U>(a: integer, ...: <U>):[integer, <U>]')
 
     local newUnion = union:resolveGeneric(resolve)
-    assert(newUnion:view() == 'integer | <U>')
+    lt.assertEquals(newUnion:view(), 'integer | <U>')
 
     local newIntersection = intersection:resolveGeneric(resolve)
-    assert(newIntersection:view() == 'integer & <U>')
+    lt.assertEquals(newIntersection:view(), 'integer & <U>')
 end
 
 do
@@ -90,11 +90,11 @@ do
 
     rt.alias('Alias', { K, V }, aliasValue)
 
-    assert(alias:view() == 'Alias')
-    assert(aliasValue.value:view() == '<K> | <V> | boolean')
+    lt.assertEquals(alias:view(), 'Alias')
+    lt.assertEquals(aliasValue.value:view(), '<K> | <V> | boolean')
 
     local call = alias:call { rt.NUMBER, rt.STRING }
-    assert(call:view() == 'number | string | boolean')
+    lt.assertEquals(call:view(), 'number | string | boolean')
 end
 
 do
@@ -115,18 +115,18 @@ do
     rt.alias('Alias', { T }, rt.table { [T] = rt.BOOLEAN })
     rt.alias('Alias', { K, V }, rt.table { [K] = V })
 
-    assert(alias:view() == 'Alias')
-    assert(alias.value:view() == '{ [any]: any }')
+    lt.assertEquals(alias:view(), 'Alias')
+    lt.assertEquals(alias.value:view(), '{ [any]: any }')
 
     local alias1 = alias:call { rt.STRING }
-    assert(alias1:view() == '{ [string]: boolean }')
-    assert(alias1:get(1):view() == 'nil')
-    assert(alias1:get('x'):view() == 'boolean')
+    lt.assertEquals(alias1:view(), '{ [string]: boolean }')
+    lt.assertEquals(alias1:get(1):view(), 'nil')
+    lt.assertEquals(alias1:get('x'):view(), 'boolean')
 
     local alias2 = alias:call { rt.STRING, rt.INTEGER }
-    assert(alias2:view() == '{ [string]: integer }')
-    assert(alias2:get(1):view() == 'nil')
-    assert(alias2:get('x'):view() == 'integer')
+    lt.assertEquals(alias2:view(), '{ [string]: integer }')
+    lt.assertEquals(alias2:get(1):view(), 'nil')
+    lt.assertEquals(alias2:get('x'):view(), 'integer')
 end
 
 do
@@ -147,16 +147,16 @@ do
         ),
     }
     rt.alias('Alias', { A, B }, aliasValue)
-    assert(aliasValue:view() == 'unknown | unknown[]')
+    lt.assertEquals(aliasValue:view(), 'unknown | unknown[]')
 
     local alias1 = alias:call { rt.value 'X', rt.ANY }
-    assert(alias1:view() == 'unknown | X[]')
+    lt.assertEquals(alias1:view(), 'unknown | X[]')
 
     local alias2 = alias:call { rt.value 'X', rt.value 'Y' }
-    assert(alias2:view() == 'xyzX.Y.xyz | X[]')
+    lt.assertEquals(alias2:view(), 'xyzX.Y.xyz | X[]')
 
     local alias3 = alias:call { rt.value 'X1' | rt.value 'X2', rt.value 'Y1' | rt.value 'Y2' }
-    assert(alias3:view() == 'xyzX1.Y1.xyz | xyzX1.Y2.xyz | xyzX2.Y1.xyz | xyzX2.Y2.xyz | (X1 | X2)[]')
+    lt.assertEquals(alias3:view(), 'xyzX1.Y1.xyz | xyzX1.Y2.xyz | xyzX2.Y1.xyz | xyzX2.Y2.xyz | (X1 | X2)[]')
 end
 
 do
@@ -169,7 +169,7 @@ do
     rt.alias('Alias', { A }, rt.oddTemplate { 'abc', A })
 
     local alias1 = alias:call { rt.value 'X' }
-    assert(alias1:view() == '"X"')
+    lt.assertEquals(alias1:view(), '"X"')
 end
 
 do
@@ -187,14 +187,14 @@ do
     rt.class('Map', { K, V })
         : addField(rt.field(K, V))
 
-    assert(map:view() == 'Map')
-    assert(map.value:view() == '{}')
+    lt.assertEquals(map:view(), 'Map')
+    lt.assertEquals(map.value:view(), '{}')
 
     local map2 = map:call { rt.STRING, rt.INTEGER }
-    assert(map2:view() == 'Map<string, integer>')
-    assert(map2.value:view() == '{ [string]: integer }')
-    assert(map2:get(1):view() == 'nil')
-    assert(map2:get('x'):view() == 'integer')
+    lt.assertEquals(map2:view(), 'Map<string, integer>')
+    lt.assertEquals(map2.value:view(), '{ [string]: integer }')
+    lt.assertEquals(map2:get(1):view(), 'nil')
+    lt.assertEquals(map2:get('x'):view(), 'integer')
 end
 
 do
@@ -213,10 +213,10 @@ do
     })
 
     local map2 = map:call { rt.STRING, rt.INTEGER }
-    assert(map2:view() == 'Map<string, integer>')
-    assert(map2.value:view() == '{ [string]: integer }')
-    assert(map2:get(1):view() == 'nil')
-    assert(map2:get('x'):view() == 'integer')
+    lt.assertEquals(map2:view(), 'Map<string, integer>')
+    lt.assertEquals(map2.value:view(), '{ [string]: integer }')
+    lt.assertEquals(map2:get(1):view(), 'nil')
+    lt.assertEquals(map2:get('x'):view(), 'integer')
 end
 
 do
@@ -243,13 +243,13 @@ do
         ))
 
     local map2 = map:call { rt.STRING, rt.INTEGER }
-    assert(map2.value:view() == [[
+    lt.assertEquals(map2.value:view(), [[
 {
     get: fun(key: string):integer,
     set: fun(key: string, value: integer),
 }]])
-    assert(map2:get('set'):view() == 'fun(key: string, value: integer)')
-    assert(map2.value:get('set'):view() == 'fun(key: string, value: integer)')
+    lt.assertEquals(map2:get('set'):view(), 'fun(key: string, value: integer)')
+    lt.assertEquals(map2.value:get('set'):view(), 'fun(key: string, value: integer)')
 end
 
 do
@@ -271,15 +271,15 @@ do
             ))
 
     local map1 = map:call { rt.STRING }
-    assert(map1.value:view() == '{ set: fun<V>(key: string, value: <V>) }')
-    assert(map1:get('set'):view() == 'fun<V>(key: string, value: <V>)')
-    assert(map1.value:get('set'):view() == 'fun<V>(key: string, value: <V>)')
+    lt.assertEquals(map1.value:view(), '{ set: fun<V>(key: string, value: <V>) }')
+    lt.assertEquals(map1:get('set'):view(), 'fun<V>(key: string, value: <V>)')
+    lt.assertEquals(map1.value:get('set'):view(), 'fun<V>(key: string, value: <V>)')
 
     local func = map1:get('set')
     ---@cast func Node.Function
-    assert(func:view() == 'fun<V>(key: string, value: <V>)')
+    lt.assertEquals(func:view(), 'fun<V>(key: string, value: <V>)')
     local rfunc = func:resolveGeneric { [V] = rt.INTEGER }
-    assert(rfunc:view() == 'fun<integer>(key: string, value: integer)')
+    lt.assertEquals(rfunc:view(), 'fun<integer>(key: string, value: integer)')
 end
 
 do
@@ -306,9 +306,9 @@ do
     rt.class('Unit')
         : addField(rt.field('childs', map:call { rt.INTEGER, unit }))
 
-    assert(unit.value:view() == '{ childs: Map<integer, Unit> }')
-    assert(unit:get('childs'):view() == 'Map<integer, Unit>')
-    assert(unit:get('childs'):finalValue():view() == '{ set: fun(key: integer, value: Unit) }')
+    lt.assertEquals(unit.value:view(), '{ childs: Map<integer, Unit> }')
+    lt.assertEquals(unit:get('childs'):view(), 'Map<integer, Unit>')
+    lt.assertEquals(unit:get('childs'):finalValue():view(), '{ set: fun(key: integer, value: Unit) }')
 end
 
 do
@@ -337,11 +337,11 @@ do
         :addField(rt.field('childs', map:call { T, rt.STRING }))
 
     local unit2 = unit:call { rt.NUMBER }
-    assert(unit2.value:view() == '{ childs: Map<number, string> }')
-    assert(unit2.value:get('childs'):view() == 'Map<number, string>')
-    assert(unit2.value:get('childs'):finalValue():view() == '{ set: fun(key: number, value: string) }')
-    assert(unit2:get('childs'):view() == 'Map<number, string>')
-    assert(unit2:get('childs'):finalValue():view() == '{ set: fun(key: number, value: string) }')
+    lt.assertEquals(unit2.value:view(), '{ childs: Map<number, string> }')
+    lt.assertEquals(unit2.value:get('childs'):view(), 'Map<number, string>')
+    lt.assertEquals(unit2.value:get('childs'):finalValue():view(), '{ set: fun(key: number, value: string) }')
+    lt.assertEquals(unit2:get('childs'):view(), 'Map<number, string>')
+    lt.assertEquals(unit2:get('childs'):finalValue():view(), '{ set: fun(key: number, value: string) }')
 end
 
 do
@@ -366,7 +366,7 @@ do
     local omap = rt.type 'OrderMap'
     rt.class('OrderMap', nil, { map:call { rt.NUMBER, rt.STRING } })
 
-    assert(omap:get('set'):view() == 'fun(key: number, value: string)')
+    lt.assertEquals(omap:get('set'):view(), 'fun(key: number, value: string)')
 end
 
 do
@@ -395,5 +395,5 @@ do
 
     local omap2 = omap:call { rt.INTEGER, rt.STRING }
 
-    assert(omap2:get('set'):view() == 'fun(key: integer, value: string)')
+    lt.assertEquals(omap2:get('set'):view(), 'fun(key: integer, value: string)')
 end

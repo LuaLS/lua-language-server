@@ -8,7 +8,7 @@ do
     local u = rt.type 'A' | rt.type 'B' | rt.type 'C'
     local r = u:narrow(rt.type 'B')
 
-    assert(r:view() == 'B')
+    lt.assertEquals(r:view(), 'B')
 end
 
 do
@@ -20,7 +20,7 @@ do
     local u = rt.type 'A' | rt.type 'B' | rt.type 'C'
     local r = u:narrow(rt.type 'B')
 
-    assert(r:view() == 'A | B')
+    lt.assertEquals(r:view(), 'A | B')
 end
 
 do
@@ -29,9 +29,9 @@ do
     local r2 = u:narrow(rt.STRING)
     local r3 = u:narrow(rt.BOOLEAN)
 
-    assert(r1:view() == '1')
-    assert(r2:view() == '"x"')
-    assert(r3:view() == 'true')
+    lt.assertEquals(r1:view(), '1')
+    lt.assertEquals(r2:view(), '"x"')
+    lt.assertEquals(r3:view(), 'true')
 end
 
 do
@@ -56,12 +56,12 @@ do
     local r5 = t:narrowByField('y', 2)
     local r6 = t:narrowByField('z', 3)
 
-    assert(r1:view() == '{ x: 1 }')
-    assert(r2:view() == '{ y: 2 }')
-    assert(r3:view() == '{ z: 3 }')
-    assert(r4:view() == '{ x: 1 }')
-    assert(r5:view() == '{ y: 2 }')
-    assert(r6:view() == '{ z: 3 }')
+    lt.assertEquals(r1:view(), '{ x: 1 }')
+    lt.assertEquals(r2:view(), '{ y: 2 }')
+    lt.assertEquals(r3:view(), '{ z: 3 }')
+    lt.assertEquals(r4:view(), '{ x: 1 }')
+    lt.assertEquals(r5:view(), '{ y: 2 }')
+    lt.assertEquals(r6:view(), '{ z: 3 }')
 end
 
 do
@@ -74,7 +74,7 @@ do
         : addParamDef('x', rt.NUMBER)
     )
 
-    assert(r:view() == 'fun(x: number)')
+    lt.assertEquals(r:view(), 'fun(x: number)')
 end
 
 do
@@ -84,7 +84,7 @@ do
 
     local b = rt.type('A').truly
 
-    assert(b:view() == 'A')
+    lt.assertEquals(b:view(), 'A')
 end
 
 do
@@ -94,7 +94,7 @@ do
 
     local b = rt.type('A').truly
 
-    assert(b:view() == '1 | 2')
+    lt.assertEquals(b:view(), '1 | 2')
 end
 
 do
@@ -105,21 +105,21 @@ do
         rt.value(1),
         rt.value(2)
     )
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 
     local b = rt.ternary(
         rt.value(false),
         rt.value(1),
         rt.value(2)
     )
-    assert(b:view() == '2')
+    lt.assertEquals(b:view(), '2')
 
     local c = rt.ternary(
         rt.BOOLEAN,
         rt.value(1),
         rt.value(2)
     )
-    assert(c:view() == '1 | 2')
+    lt.assertEquals(c:view(), '1 | 2')
 end
 
 do
@@ -127,5 +127,5 @@ do
 
     local a = rt.ANY:narrowEqual(rt.value(1))
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end

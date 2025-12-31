@@ -10,8 +10,8 @@ do
 
     local X = rt:globalGet('X')
     local X2 = rt:globalGet('X2')
-    assert(X:view() == '10')
-    assert(X2:view() == '5')
+    lt.assertEquals(X:view(), '10')
+    lt.assertEquals(X2:view(), '5')
 end
 
 do
@@ -27,9 +27,9 @@ do
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
-    assert(X0:view() == '5 | 10')
-    assert(X1:view() == '10')
-    assert(X2:view() == '5')
+    lt.assertEquals(X0:view(), '5 | 10')
+    lt.assertEquals(X1:view(), '10')
+    lt.assertEquals(X2:view(), '5')
 end
 
 do
@@ -45,12 +45,12 @@ do
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
-    assert(X0:view() == '1')
-    assert(X1:view() == '2')
-    assert(X2:view() == '3')
+    lt.assertEquals(X0:view(), '1')
+    lt.assertEquals(X1:view(), '2')
+    lt.assertEquals(X2:view(), '3')
 
     local abc = rt:globalGet('a', 'b', 'c')
-    assert(abc:view() == '1 | 2 | 3')
+    lt.assertEquals(abc:view(), '1 | 2 | 3')
 end
 
 do
@@ -62,7 +62,7 @@ do
     ]]
 
     local W = rt:globalGet('W')
-    assert(W:view() == 'op.add<0, 1>')
+    lt.assertEquals(W:view(), 'op.add<0, 1>')
 end
 
 do
@@ -85,10 +85,10 @@ do
     local X2 = rt:globalGet('X2')
     local X3 = rt:globalGet('X3')
 
-    assert(X0:view() == 'integer | nil')
-    assert(X1:view() == 'integer')
-    assert(X2:view() == 'nil')
-    assert(X3:view() == 'integer | nil')
+    lt.assertEquals(X0:view(), 'integer | nil')
+    lt.assertEquals(X1:view(), 'integer')
+    lt.assertEquals(X2:view(), 'nil')
+    lt.assertEquals(X3:view(), 'integer | nil')
 end
 
 do
@@ -112,10 +112,10 @@ do
     local X2 = rt:globalGet('X2')
     local X3 = rt:globalGet('X3')
 
-    assert(X0:view() == 'integer | nil')
-    assert(X1:view() == 'integer')
-    assert(X2:view() == 'nil')
-    assert(X3:view() == '"string" | integer')
+    lt.assertEquals(X0:view(), 'integer | nil')
+    lt.assertEquals(X1:view(), 'integer')
+    lt.assertEquals(X2:view(), 'nil')
+    lt.assertEquals(X3:view(), '"string" | integer')
 end
 
 do
@@ -141,11 +141,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '1 | 2 | 3 | 4')
-    assert(X1:view() == '1')
-    assert(X2:view() == '2')
-    assert(X3:view() == '3 | 4')
-    assert(XX:view() == '1 | 2 | 3 | 4')
+    lt.assertEquals(X0:view(), '1 | 2 | 3 | 4')
+    lt.assertEquals(X1:view(), '1')
+    lt.assertEquals(X2:view(), '2')
+    lt.assertEquals(X3:view(), '3 | 4')
+    lt.assertEquals(XX:view(), '1 | 2 | 3 | 4')
 end
 
 do
@@ -171,11 +171,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '1 | 2 | 3 | 4')
-    assert(X1:view() == '1')
-    assert(X2:view() == '2')
-    assert(X3:view() == '3 | 4')
-    assert(XX:view() == '1 | 2 | 3 | 4')
+    lt.assertEquals(X0:view(), '1 | 2 | 3 | 4')
+    lt.assertEquals(X1:view(), '1')
+    lt.assertEquals(X2:view(), '2')
+    lt.assertEquals(X3:view(), '3 | 4')
+    lt.assertEquals(XX:view(), '1 | 2 | 3 | 4')
 end
 
 do
@@ -198,10 +198,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '{ a: 1 } | { a: 2 }')
-    assert(X1:view() == '{ a: 1 }')
-    assert(X2:view() == '{ a: 2 }')
-    assert(XX:view() == '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(X0:view(), '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(X1:view(), '{ a: 1 }')
+    lt.assertEquals(X2:view(), '{ a: 2 }')
+    lt.assertEquals(XX:view(), '{ a: 1 } | { a: 2 }')
 end
 
 do
@@ -230,10 +230,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'A | B')
-    assert(X1:view() == 'A')
-    assert(X2:view() == 'B')
-    assert(XX:view() == 'A | B')
+    lt.assertEquals(X0:view(), 'A | B')
+    lt.assertEquals(X1:view(), 'A')
+    lt.assertEquals(X2:view(), 'B')
+    lt.assertEquals(XX:view(), 'A | B')
 end
 
 do
@@ -259,11 +259,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '1 | 2 | 3 | 4')
-    assert(X1:view() == '2 | 3 | 4')
-    assert(X2:view() == '1')
-    assert(X3:view() == 'never')
-    assert(XX:view() == '1 | 2 | 3 | 4')
+    lt.assertEquals(X0:view(), '1 | 2 | 3 | 4')
+    lt.assertEquals(X1:view(), '2 | 3 | 4')
+    lt.assertEquals(X2:view(), '1')
+    lt.assertEquals(X3:view(), 'never')
+    lt.assertEquals(XX:view(), '1 | 2 | 3 | 4')
 end
 
 do
@@ -286,10 +286,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '{ a: 1 } | { a: 2 }')
-    assert(X1:view() == '{ a: 2 }')
-    assert(X2:view() == '{ a: 1 }')
-    assert(XX:view() == '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(X0:view(), '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(X1:view(), '{ a: 2 }')
+    lt.assertEquals(X2:view(), '{ a: 1 }')
+    lt.assertEquals(XX:view(), '{ a: 1 } | { a: 2 }')
 end
 
 do
@@ -312,10 +312,10 @@ do
     local X2 = rt:globalGet('X2')
     local X3 = rt:globalGet('X3')
 
-    assert(X0:view() == 'integer | nil')
-    assert(X1:view() == 'nil')
-    assert(X2:view() == 'integer')
-    assert(X3:view() == 'integer | nil')
+    lt.assertEquals(X0:view(), 'integer | nil')
+    lt.assertEquals(X1:view(), 'nil')
+    lt.assertEquals(X2:view(), 'integer')
+    lt.assertEquals(X3:view(), 'integer | nil')
 end
 
 do
@@ -338,7 +338,7 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == [[
+    lt.assertEquals(X0:view(), [[
 {
     a: 1,
     b: 1,
@@ -352,12 +352,12 @@ do
     a: 2,
     b: 2,
 }]])
-    assert(X1:view() == [[
+    lt.assertEquals(X1:view(), [[
 {
     a: 1,
     b: 2,
 }]])
-    assert(X2:view() == [[
+    lt.assertEquals(X2:view(), [[
 {
     a: 1,
     b: 1,
@@ -368,7 +368,7 @@ do
     a: 2,
     b: 2,
 }]])
-    assert(XX:view() == [[
+    lt.assertEquals(XX:view(), [[
 {
     a: 1,
     b: 1,
@@ -402,7 +402,7 @@ do
     local X0 = rt:globalGet('X0')
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
-    assert(X0:view() == [[
+    lt.assertEquals(X0:view(), [[
 {
     a: 1,
     b: 1,
@@ -424,7 +424,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '1')
+    lt.assertEquals(X:view(), '1')
 end
 
 do
@@ -433,7 +433,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == 'false')
+    lt.assertEquals(X:view(), 'false')
 end
 
 do
@@ -442,7 +442,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '1')
+    lt.assertEquals(X:view(), '1')
 end
 
 do
@@ -454,7 +454,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '3 | false')
+    lt.assertEquals(X:view(), '3 | false')
 end
 
 do
@@ -463,7 +463,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == 'true')
+    lt.assertEquals(X:view(), 'true')
 end
 
 do
@@ -472,7 +472,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '2')
+    lt.assertEquals(X:view(), '2')
 end
 
 do
@@ -484,7 +484,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '3 | true')
+    lt.assertEquals(X:view(), '3 | true')
 end
 
 do
@@ -496,7 +496,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '1 | string')
+    lt.assertEquals(X:view(), '1 | string')
 end
 
 do
@@ -522,10 +522,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '1 | 2')
-    assert(X1:view() == '1')
-    assert(X2:view() == '2')
-    assert(XX:view() == '1 | 2')
+    lt.assertEquals(X0:view(), '1 | 2')
+    lt.assertEquals(X1:view(), '1')
+    lt.assertEquals(X2:view(), '2')
+    lt.assertEquals(XX:view(), '1 | 2')
 end
 
 do
@@ -551,10 +551,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == '1 | 2')
-    assert(X1:view() == '2')
-    assert(X2:view() == '1')
-    assert(XX:view() == '1 | 2')
+    lt.assertEquals(X0:view(), '1 | 2')
+    lt.assertEquals(X1:view(), '2')
+    lt.assertEquals(X2:view(), '1')
+    lt.assertEquals(XX:view(), '1 | 2')
 end
 
 do
@@ -580,11 +580,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'any')
-    assert(X1:view() == 'string')
-    assert(X2:view() == 'number')
-    assert(X3:view() == 'boolean | table | function | thread | userdata | nil')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X0:view(), 'any')
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'number')
+    lt.assertEquals(X3:view(), 'boolean | table | function | thread | userdata | nil')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -611,11 +611,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'string | number | boolean')
-    assert(X1:view() == 'string')
-    assert(X2:view() == 'number')
-    assert(X3:view() == 'boolean')
-    assert(XX:view() == 'string | number | boolean')
+    lt.assertEquals(X0:view(), 'string | number | boolean')
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'number')
+    lt.assertEquals(X3:view(), 'boolean')
+    lt.assertEquals(XX:view(), 'string | number | boolean')
 end
 
 do
@@ -643,11 +643,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X:view() == 'any')
-    assert(X1:view() == '1')
-    assert(X2:view() == '2')
-    assert(X3:view() == 'any')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X:view(), 'any')
+    lt.assertEquals(X1:view(), '1')
+    lt.assertEquals(X2:view(), '2')
+    lt.assertEquals(X3:view(), 'any')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -672,10 +672,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X:view() == 'any')
-    assert(X1:view() == 'truly')
-    assert(X2:view() == 'false | nil')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X:view(), 'any')
+    lt.assertEquals(X1:view(), 'truly')
+    lt.assertEquals(X2:view(), 'false | nil')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -697,10 +697,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X:view() == 'any')
-    assert(X1:view() == 'nil')
-    assert(X2:view() == 'unknown')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X:view(), 'any')
+    lt.assertEquals(X1:view(), 'nil')
+    lt.assertEquals(X2:view(), 'unknown')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -729,11 +729,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X:view() == '1 | 2 | 3 | 4')
-    assert(X1:view() == '1')
-    assert(X2:view() == '2')
-    assert(X3:view() == '3 | 4')
-    assert(XX:view() == '1 | 2 | 3 | 4')
+    lt.assertEquals(X:view(), '1 | 2 | 3 | 4')
+    lt.assertEquals(X1:view(), '1')
+    lt.assertEquals(X2:view(), '2')
+    lt.assertEquals(X3:view(), '3 | 4')
+    lt.assertEquals(XX:view(), '1 | 2 | 3 | 4')
 end
 
 do
@@ -759,10 +759,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X:view() == 'boolean')
-    assert(X1:view() == 'true')
-    assert(X2:view() == 'false')
-    assert(XX:view() == 'boolean')
+    lt.assertEquals(X:view(), 'boolean')
+    lt.assertEquals(X1:view(), 'true')
+    lt.assertEquals(X2:view(), 'false')
+    lt.assertEquals(XX:view(), 'boolean')
 end
 
 do
@@ -788,10 +788,10 @@ do
     local X2 = rt:globalGet('X2')
     local XX = rt:globalGet('XX')
 
-    assert(X:view() == '{ a: 1 } | { a: 2 }')
-    assert(X1:view() == '{ a: 1 }')
-    assert(X2:view() == '{ a: 2 }')
-    assert(XX:view() == '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(X:view(), '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(X1:view(), '{ a: 1 }')
+    lt.assertEquals(X2:view(), '{ a: 2 }')
+    lt.assertEquals(XX:view(), '{ a: 1 } | { a: 2 }')
 end
 
 do
@@ -817,11 +817,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'any')
-    assert(X1:view() == 'string')
-    assert(X2:view() == 'number')
-    assert(X3:view() == 'any')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X0:view(), 'any')
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'number')
+    lt.assertEquals(X3:view(), 'any')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -847,11 +847,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'any')
-    assert(X1:view() == 'string')
-    assert(X2:view() == 'number')
-    assert(X3:view() == 'any')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X0:view(), 'any')
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'number')
+    lt.assertEquals(X3:view(), 'any')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -879,11 +879,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'any')
-    assert(X1:view() == 'string')
-    assert(X2:view() == 'number')
-    assert(X3:view() == 'any')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X0:view(), 'any')
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'number')
+    lt.assertEquals(X3:view(), 'any')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -911,11 +911,11 @@ do
     local X3 = rt:globalGet('X3')
     local XX = rt:globalGet('XX')
 
-    assert(X0:view() == 'any')
-    assert(X1:view() == 'string')
-    assert(X2:view() == 'number')
-    assert(X3:view() == 'any')
-    assert(XX:view() == 'any')
+    lt.assertEquals(X0:view(), 'any')
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'number')
+    lt.assertEquals(X3:view(), 'any')
+    lt.assertEquals(XX:view(), 'any')
 end
 
 do
@@ -949,13 +949,13 @@ do
     local Y2 = rt:globalGet('Y2')
     local YY = rt:globalGet('YY')
 
-    assert(X0:view() == 'true | false')
-    assert(X1:view() == 'true')
-    assert(X2:view() == 'false')
-    assert(XX:view() == 'true | false')
+    lt.assertEquals(X0:view(), 'true | false')
+    lt.assertEquals(X1:view(), 'true')
+    lt.assertEquals(X2:view(), 'false')
+    lt.assertEquals(XX:view(), 'true | false')
 
-    assert(Y0:view() == 'string | nil')
-    assert(Y1:view() == 'nil')
-    assert(Y2:view() == 'string')
-    assert(YY:view() == 'string | nil')
+    lt.assertEquals(Y0:view(), 'string | nil')
+    lt.assertEquals(Y1:view(), 'nil')
+    lt.assertEquals(Y2:view(), 'string')
+    lt.assertEquals(YY:view(), 'string | nil')
 end

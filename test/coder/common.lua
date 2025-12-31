@@ -6,9 +6,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    assert(g:get('A'):view() == '1')
-    assert(rt:globalGet('A'):viewAsVariable() == 'A')
-    assert(rt:globalGet('A').value:view() == '1')
+    lt.assertEquals(g:get('A'):view(), '1')
+    lt.assertEquals(rt:globalGet('A'):viewAsVariable(), 'A')
+    lt.assertEquals(rt:globalGet('A').value:view(), '1')
 end
 
 do
@@ -17,9 +17,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    assert(g:get('A'):view() == '{ B: { C: 1 } }')
-    assert(rt:globalGet('A', 'B', 'C'):viewAsVariable() == 'A.B.C')
-    assert(rt:globalGet('A', 'B', 'C').value:view() == '1')
+    lt.assertEquals(g:get('A'):view(), '{ B: { C: 1 } }')
+    lt.assertEquals(rt:globalGet('A', 'B', 'C'):viewAsVariable(), 'A.B.C')
+    lt.assertEquals(rt:globalGet('A', 'B', 'C').value:view(), '1')
 end
 
 do
@@ -28,9 +28,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    assert(g:get('A'):view() == '{ [1]: { C: 1 } }')
-    assert(rt:globalGet('A', 1, 'C'):viewAsVariable() == 'A[1].C')
-    assert(rt:globalGet('A', 1, 'C').value:view() == '1')
+    lt.assertEquals(g:get('A'):view(), '{ [1]: { C: 1 } }')
+    lt.assertEquals(rt:globalGet('A', 1, 'C'):viewAsVariable(), 'A[1].C')
+    lt.assertEquals(rt:globalGet('A', 1, 'C').value:view(), '1')
 end
 
 do
@@ -39,9 +39,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
-    assert(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable() == 'A[unknown].C')
-    assert(rt:globalGet('A', rt.UNKNOWN, 'C').value:view() == '1')
+    lt.assertEquals(g:get('A'):view(), '{ [unknown]: { C: 1 } }')
+    lt.assertEquals(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable(), 'A[unknown].C')
+    lt.assertEquals(rt:globalGet('A', rt.UNKNOWN, 'C').value:view(), '1')
 end
 
 do
@@ -50,9 +50,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    assert(g:get('A'):view() == '{ [unknown]: { C: 1 } }')
-    assert(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable() == 'A[unknown].C')
-    assert(rt:globalGet('A', rt.UNKNOWN, 'C').value:view() == '1')
+    lt.assertEquals(g:get('A'):view(), '{ [unknown]: { C: 1 } }')
+    lt.assertEquals(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable(), 'A[unknown].C')
+    lt.assertEquals(rt:globalGet('A', rt.UNKNOWN, 'C').value:view(), '1')
 end
 
 do
@@ -68,9 +68,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    assert(g:get('A'):view() == '1')
-    assert(rt:globalGet('A'):viewAsVariable() == 'A')
-    assert(rt:globalGet('A').value:view() == '1')
+    lt.assertEquals(g:get('A'):view(), '1')
+    lt.assertEquals(rt:globalGet('A'):viewAsVariable(), 'A')
+    lt.assertEquals(rt:globalGet('A').value:view(), '1')
 end
 
 do
@@ -78,8 +78,8 @@ do
         ---@alias A 1
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '1')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), '1')
 end
 
 do
@@ -87,8 +87,8 @@ do
         ---@alias A number?
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == 'number | nil')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), 'number | nil')
 end
 
 do
@@ -96,8 +96,8 @@ do
         ---@alias A 1 | 2 | 3
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '1 | 2 | 3')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), '1 | 2 | 3')
 end
 
 do
@@ -105,8 +105,8 @@ do
         ---@alias A B & C & D
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == 'B & C & D')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), 'B & C & D')
 end
 
 do
@@ -114,8 +114,8 @@ do
         ---@alias A number[]
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == 'number[]')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), 'number[]')
 end
 
 do
@@ -127,8 +127,8 @@ do
         ---}
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     x: number,
     y: string,
@@ -141,8 +141,8 @@ do
         ---@alias A [1, 2, 3]
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '[1, 2, 3]')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), '[1, 2, 3]')
 end
 
 do
@@ -150,8 +150,8 @@ do
         ---@alias A table<number, boolean>
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == 'table<number, boolean>')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), 'table<number, boolean>')
 end
 
 do
@@ -162,8 +162,8 @@ do
         ---, ...: T1
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
 end
 
 do
@@ -178,8 +178,8 @@ do
         }
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     [1]: 5,
     [10]: 4,
@@ -195,7 +195,7 @@ do
         B = {}
     ]]
 
-    assert(rt:globalGet('B').value:view() == 'A')
+    lt.assertEquals(rt:globalGet('B').value:view(), 'A')
 end
 
 do
@@ -227,8 +227,8 @@ do
 
     SELF:addField(rt.field('y', rt.value(2)))
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     init: fun(self: A),
     x: 1,
@@ -247,8 +247,8 @@ do
         end
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == [[
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), [[
 {
     init: fun(self: A),
     x: 1,
@@ -262,8 +262,8 @@ do
         ---@alias B A['x']
     ]]
 
-    assert(rt.type('B'):view() == 'B')
-    assert(rt.type('B').value:view() == '1')
+    lt.assertEquals(rt.type('B'):view(), 'B')
+    lt.assertEquals(rt.type('B').value:view(), '1')
 end
 
 do
@@ -272,8 +272,8 @@ do
         ---@alias B A<number>
     ]]
 
-    assert(rt.type('B'):view() == 'B')
-    assert(rt.type('B').value:view() == 'number[]')
+    lt.assertEquals(rt.type('B'):view(), 'B')
+    lt.assertEquals(rt.type('B').value:view(), 'number[]')
 end
 
 do
@@ -284,9 +284,9 @@ do
         ---@alias B A<number>
     ]]
 
-    assert(rt.type('B'):view() == 'B')
-    assert(rt.type('B').value:view() == 'A<number>')
-    assert(rt.type('B').value.value:view() == '{ data: number[] }')
+    lt.assertEquals(rt.type('B'):view(), 'B')
+    lt.assertEquals(rt.type('B').value:view(), 'A<number>')
+    lt.assertEquals(rt.type('B').value.value:view(), '{ data: number[] }')
 end
 
 do
@@ -298,8 +298,8 @@ do
         ---@alias C B<number>
     ]]
 
-    assert(rt.type('C'):view() == 'C')
-    assert(rt.type('C').value:view() == '[number, 2]')
+    lt.assertEquals(rt.type('C'):view(), 'C')
+    lt.assertEquals(rt.type('C').value:view(), '[number, 2]')
 end
 
 do
@@ -313,9 +313,9 @@ do
         ---@alias C B<number>
     ]]
 
-    assert(rt.type('C'):view() == 'C')
-    assert(rt.type('C').value:view() == 'B<number>')
-    assert(rt.type('C').value.value:view() == [[
+    lt.assertEquals(rt.type('C'):view(), 'C')
+    lt.assertEquals(rt.type('C').value:view(), 'B<number>')
+    lt.assertEquals(rt.type('C').value.value:view(), [[
 {
     data: [number, 2],
     extra: number[],
@@ -330,7 +330,7 @@ do
         X = t
     ]]
 
-    assert(rt:globalGet('X'):view() == '{ insert: 1 }')
+    lt.assertEquals(rt:globalGet('X'):view(), '{ insert: 1 }')
 end
 
 do
@@ -341,7 +341,7 @@ do
         X = t.insert
     ]]
 
-    assert(rt:globalGet('X'):view() == '1')
+    lt.assertEquals(rt:globalGet('X'):view(), '1')
 end
 
 do
@@ -354,7 +354,7 @@ do
         X = t.l.insert
     ]]
 
-    assert(rt:globalGet('X'):view() == '1')
+    lt.assertEquals(rt:globalGet('X'):view(), '1')
 end
 
 do
@@ -369,7 +369,7 @@ do
         V = n.x
     ]]
 
-    assert(rt:globalGet('V'):view() == '1')
+    lt.assertEquals(rt:globalGet('V'):view(), '1')
 end
 
 do
@@ -403,9 +403,9 @@ do
     ---@alias r f(number) --> number[]
     ]]
 
-    assert(rt.type('r'):view() == 'r')
-    assert(rt.type('r').value:view() == 'f(number)')
-    assert(rt.type('r').value.value:view() == 'number[]')
+    lt.assertEquals(rt.type('r'):view(), 'r')
+    lt.assertEquals(rt.type('r').value:view(), 'f(number)')
+    lt.assertEquals(rt.type('r').value.value:view(), 'number[]')
 end
 
 do
@@ -413,17 +413,17 @@ do
     ---@alias r X ? 1 : 2
     ]]
 
-    assert(rt.type('r'):view() == 'r')
-    assert(rt.type('r').value:view() == '1 | 2')
+    lt.assertEquals(rt.type('r'):view(), 'r')
+    lt.assertEquals(rt.type('r').value:view(), '1 | 2')
 
     do
         local trueNode <close> = rt.alias('X', nil, rt.TRUE)
-        assert(rt.type('r').value.value:view() == '1')
+        lt.assertEquals(rt.type('r').value.value:view(), '1')
     end
 
     do
         local falseNode <close> = rt.alias('X', nil, rt.FALSE)
-        assert(rt.type('r').value.value:view() == '2')
+        lt.assertEquals(rt.type('r').value.value:view(), '2')
     end
 end
 
@@ -434,6 +434,6 @@ do
     ---@alias t [ $t['x'], $t['y'] ] --> [1, 2]
     ]]
 
-    assert(rt.type('t'):view() == 't')
-    assert(rt.type('t').value:view() == '[1, 2]')
+    lt.assertEquals(rt.type('t'):view(), 't')
+    lt.assertEquals(rt.type('t').value:view(), '[1, 2]')
 end

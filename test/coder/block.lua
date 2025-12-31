@@ -8,7 +8,7 @@ do
     ]]
 
     local X = rt:globalGet('X')
-    assert(X:view() == '1')
+    lt.assertEquals(X:view(), '1')
 end
 
 do
@@ -26,9 +26,9 @@ do
     local Y = rt:globalGet('Y')
     local Z = rt:globalGet('Z')
 
-    assert(X:view() == '1')
-    assert(Y:view() == '2')
-    assert(Z:view() == '3')
+    lt.assertEquals(X:view(), '1')
+    lt.assertEquals(Y:view(), '2')
+    lt.assertEquals(Z:view(), '3')
 end
 
 do
@@ -38,7 +38,7 @@ do
     ]]
 
     local F = rt:globalGet('F')
-    assert(F:view() == 'fun(a: any, b: any)')
+    lt.assertEquals(F:view(), 'fun(a: any, b: any)')
 end
 
 do
@@ -49,7 +49,7 @@ do
     ]]
 
     local F = rt:globalGet('F')
-    assert(F:view() == 'fun(a: any, b: any)')
+    lt.assertEquals(F:view(), 'fun(a: any, b: any)')
 end
 
 do
@@ -60,7 +60,7 @@ do
     ]]
 
     local F = rt:globalGet('F')
-    assert(F:view() == 'fun(a: any, b: any):1')
+    lt.assertEquals(F:view(), 'fun(a: any, b: any):1')
 end
 
 do
@@ -71,7 +71,7 @@ do
     ]]
 
     local F = rt:globalGet('F')
-    assert(F:view() == 'fun(a: any, b: any):(1, 2)')
+    lt.assertEquals(F:view(), 'fun(a: any, b: any):(1, 2)')
 end
 
 do
@@ -83,7 +83,7 @@ do
     ]]
 
     local F = rt:globalGet('F')
-    assert(F:view() == 'fun(a: any, b: any):(1 | 3, 2 | 4)')
+    lt.assertEquals(F:view(), 'fun(a: any, b: any):(1 | 3, 2 | 4)')
 end
 
 do
@@ -99,8 +99,8 @@ do
 
     local X = rt:globalGet('X')
     local Y = rt:globalGet('Y')
-    assert(X:view() == '1')
-    assert(Y:view() == '2')
+    lt.assertEquals(X:view(), '1')
+    lt.assertEquals(Y:view(), '2')
 end
 
 do
@@ -119,6 +119,6 @@ do
 
     local X = rt:globalGet('X')
     local Y = rt:globalGet('Y')
-    assert(X:view() == '1')
-    assert(Y:view() == '2')
+    lt.assertEquals(X:view(), '1')
+    lt.assertEquals(Y:view(), '2')
 end

@@ -3,127 +3,127 @@ local rt = test.scope.rt
 do
     local a = rt.type('number')
 
-    assert(a:view() == 'number')
+    lt.assertEquals(a:view(), 'number')
 end
 
 do
     local a = rt.type('nil')
 
-    assert(a:view() == 'nil')
+    lt.assertEquals(a:view(), 'nil')
 end
 
 do
     local a = rt.value(1)
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.value(1.2345)
 
-    assert(a:view() == '1.2345')
+    lt.assertEquals(a:view(), '1.2345')
 end
 
 do
     local a = rt.value(true)
 
-    assert(a:view() == 'true')
+    lt.assertEquals(a:view(), 'true')
 end
 
 do
     local a = rt.value(false)
 
-    assert(a:view() == 'false')
+    lt.assertEquals(a:view(), 'false')
 end
 
 do
     local a = rt.value('abc', '"')
 
-    assert(a:view() == '"abc"')
+    lt.assertEquals(a:view(), '"abc"')
 end
 
 do
     local a = rt.value('abc', "'")
 
-    assert(a:view() == "'abc'")
+    lt.assertEquals(a:view(), "'abc'")
 end
 
 do
     local a = rt.value('abc', "[[")
 
-    assert(a:view() == "[[abc]]")
+    lt.assertEquals(a:view(), "[[abc]]")
 end
 
 do
     local a = rt.type('number') | rt.type('string')
 
-    assert(a:view() == 'number | string')
+    lt.assertEquals(a:view(), 'number | string')
 end
 
 do
     local a = rt.union { rt.value(1), rt.value(2) }
 
-    assert(a:view() == '1 | 2')
+    lt.assertEquals(a:view(), '1 | 2')
 end
 
 do
     local a = rt.union { rt.value(1), rt.value(2), rt.NEVER }
 
-    assert(a:view() == '1 | 2')
+    lt.assertEquals(a:view(), '1 | 2')
 end
 
 do
     local a = rt.value(1) | rt.value(2)
 
-    assert(a:view() == '1 | 2')
+    lt.assertEquals(a:view(), '1 | 2')
 end
 
 do
     local a = rt.value(1) | rt.value(2) | rt.value(3)
 
-    assert(a:view() == '1 | 2 | 3')
+    lt.assertEquals(a:view(), '1 | 2 | 3')
 end
 
 do
     local a = (rt.value(1) | rt.value(2)) | (rt.value(1) | rt.value(3))
 
-    assert(a:view() == '1 | 2 | 3')
+    lt.assertEquals(a:view(), '1 | 2 | 3')
 end
 
 do
     local a = rt.NEVER | rt.value(1)
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.value(1) | rt.NEVER
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.value(1) | nil
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = nil | rt.value(1)
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.VAR_G
 
-    assert(a:view() == '_G')
+    lt.assertEquals(a:view(), '_G')
 end
 
 do
     local a = rt.value(1) | rt.VAR_G
 
-    assert(a:view() == '1 | _G')
+    lt.assertEquals(a:view(), '1 | _G')
 end
 
 do
@@ -135,7 +135,7 @@ do
     t:addField(rt.field(rt.value(2),   rt.value('y')))
     t:addField(rt.field(rt.value(3),   rt.value('z')))
 
-    assert(t:view() == [[{
+    lt.assertEquals(t:view(), [[{
     [1]: "x",
     [2]: "y",
     [3]: "z",
@@ -151,7 +151,7 @@ do
         x = 1, y = 2, z = 3,
     }
 
-    assert(t:view() == [[{
+    lt.assertEquals(t:view(), [[{
     [1]: "x",
     [2]: "y",
     [3]: "z",
@@ -164,7 +164,7 @@ end
 do
     local t = rt.tuple({rt.value(1), rt.value(2), rt.value(3)})
 
-    assert(t:view() == '[1, 2, 3]')
+    lt.assertEquals(t:view(), '[1, 2, 3]')
 end
 
 do
@@ -173,13 +173,13 @@ do
         : insert(rt.value(2))
         : insert(rt.value(3))
 
-    assert(t:view() == '[1, 2, 3]')
+    lt.assertEquals(t:view(), '[1, 2, 3]')
 end
 
 do
     local a = rt.array(rt.type('number'))
 
-    assert(a:view() == 'number[]')
+    lt.assertEquals(a:view(), 'number[]')
 end
 
 do
@@ -189,5 +189,5 @@ do
         : addReturnDef('suc', rt.value(true))
         : addReturnDef(nil, rt.value(false))
 
-    assert(func:view() == 'fun(a: 1, b: 2):((suc: true), false)')
+    lt.assertEquals(func:view(), 'fun(a: 1, b: 2):((suc: true), false)')
 end

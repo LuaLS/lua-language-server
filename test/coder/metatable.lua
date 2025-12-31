@@ -6,7 +6,7 @@ do
 ---@alias A f<number>
     ]]
 
-    assert(rt.type('A').value:view() == 'number[]')
+    lt.assertEquals(rt.type('A').value:view(), 'number[]')
 end
 
 do
@@ -15,8 +15,8 @@ do
 ---@alias A f<{ __index: 1 }>
     ]]
 
-    assert(rt.type('A'):view() == 'A')
-    assert(rt.type('A').value:view() == '1')
+    lt.assertEquals(rt.type('A'):view(), 'A')
+    lt.assertEquals(rt.type('A').value:view(), '1')
 end
 
 do
@@ -40,10 +40,10 @@ do
     V:addField(rt.field('x', V))
 
     local r = A:get 'x'
-    assert(r:view() == 'A')
+    lt.assertEquals(r:view(), 'A')
 
     local I = rt.index(A, rt.value 'x')
-    assert(I:view() == 'A')
+    lt.assertEquals(I:view(), 'A')
 end
 
 do
@@ -61,7 +61,7 @@ do
     V:addField(rt.field('x', rt.value(1)))
 
     local r = V:get 'x'
-    assert(r:view() == '1')
+    lt.assertEquals(r:view(), '1')
 end
 
 do
@@ -88,7 +88,7 @@ do
     local FCALL = rt.fcall(F, { TABLE })
     local R = FCALL.value
 
-    assert(R:view() == '1')
+    lt.assertEquals(R:view(), '1')
 end
 
 do
@@ -119,7 +119,7 @@ do
     local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
 
-    assert(R:view() == '1')
+    lt.assertEquals(R:view(), '1')
 end
 
 do
@@ -152,14 +152,14 @@ do
 
     local FCALL = rt.fcall(F, { MT })
     local R = FCALL.value
-    assert(R:view() == [[
+    lt.assertEquals(R:view(), [[
 {
     x: 1,
     __index: { ... },
 }]])
 
     local V = R:get 'x'
-    assert(V:view() == '1')
+    lt.assertEquals(V:view(), '1')
 end
 
 do
@@ -179,8 +179,8 @@ do
     local FCALL = rt.fcall(F, {})
     local R1 = FCALL.returns:select(1)
     local R2 = FCALL.returns:select(2)
-    assert(R1:view() == 'boolean')
-    assert(R2:view() == 'number')
+    lt.assertEquals(R1:view(), 'boolean')
+    lt.assertEquals(R2:view(), 'number')
 end
 
 do
@@ -193,8 +193,8 @@ R1, R2 = F()
 
     local R1 = rt:globalGet('R1')
     local R2 = rt:globalGet('R2')
-    assert(R1.value:view() == 'boolean')
-    assert(R2.value:view() == 'number')
+    lt.assertEquals(R1.value:view(), 'boolean')
+    lt.assertEquals(R2.value:view(), 'number')
 end
 
 do
@@ -206,7 +206,7 @@ R = F(1)
     ]]
 
     local R = rt:globalGet('R')
-    assert(R.value:view() == '1[]')
+    lt.assertEquals(R.value:view(), '1[]')
 end
 
 do
@@ -218,9 +218,9 @@ R = F()
     ]]
 
     local F = rt:globalGet('F')
-    assert(F.value:view() == 'fun():number')
+    lt.assertEquals(F.value:view(), 'fun():number')
     local R = rt:globalGet('R')
-    assert(R.value:view() == 'number')
+    lt.assertEquals(R.value:view(), 'number')
 end
 
 do
@@ -234,9 +234,9 @@ R = F(1)
     ]]
 
     local F = rt:globalGet('F')
-    assert(F.value:view() == 'fun<T>(x: <T>):<T>[]')
+    lt.assertEquals(F.value:view(), 'fun<T>(x: <T>):<T>[]')
     local R = rt:globalGet('R')
-    assert(R.value:view() == '1[]')
+    lt.assertEquals(R.value:view(), '1[]')
 end
 
 do
@@ -258,8 +258,8 @@ do
     MT:addField(rt.field('__index', MT))
 
     local R = rt.index(MT, rt.value '__index')
-    assert(R:view() == 'A')
-    assert(R:finalValue():view() == '{ __index: A }')
+    lt.assertEquals(R:view(), 'A')
+    lt.assertEquals(R:finalValue():view(), '{ __index: A }')
 end
 
 do
@@ -277,8 +277,8 @@ mt.__index = mt
 obj = setmetatable({}, mt)
     ]]
 
-    assert(rt:globalGet('obj'):view() == 'A')
-    assert(rt:globalGet('obj'):finalValue():view() == '{ __index: A }')
+    lt.assertEquals(rt:globalGet('obj'):view(), 'A')
+    lt.assertEquals(rt:globalGet('obj'):finalValue():view(), '{ __index: A }')
 end
 
 do -- 变量作为参数时要转换为类型
@@ -296,7 +296,7 @@ do -- 变量作为参数时要转换为类型
 
     local FCALL = rt.fcall(FUNC, { A })
     local R = FCALL.value
-    assert(R:view() == '{ x: 1 }')
+    lt.assertEquals(R:view(), '{ x: 1 }')
 end
 
 do
@@ -313,9 +313,9 @@ do
         x = rt.NUMBER,
     })
 
-    assert(T:view() == '{ x: number }')
+    lt.assertEquals(T:view(), '{ x: number }')
     local X = T:getChild('x')
-    assert(X:view() == 'number')
+    lt.assertEquals(X:view(), 'number')
 end
 
 do
@@ -326,7 +326,7 @@ do
     B = t.x
     ]]
 
-    assert(rt:globalGet('B').value:view() == 'number')
+    lt.assertEquals(rt:globalGet('B').value:view(), 'number')
 end
 
 do
@@ -339,7 +339,7 @@ mt.xxx = 1
 MT = mt
     ]]
 
-    assert(rt:globalGet('MT'):view() == [[
+    lt.assertEquals(rt:globalGet('MT'):view(), [[
 {
     xxx: 1,
     __index: { ... },
@@ -363,10 +363,10 @@ obj = setmetatable({}, mt)
 value = obj.xxx
     ]]
 
-    assert(rt:globalGet('obj'):view() == [[
+    lt.assertEquals(rt:globalGet('obj'):view(), [[
 {
     xxx: 1,
     __index: { ... },
 }]])
-    assert(rt:globalGet('value'):view() == '1')
+    lt.assertEquals(rt:globalGet('value'):view(), '1')
 end

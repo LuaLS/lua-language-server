@@ -13,7 +13,7 @@ alias 'Test'
 
     local v = rt.call('Test', { rt.value(10) })
 
-    assert(v:view() == '10[]')
+    lt.assertEquals(v:view(), '10[]')
 end
 
 do
@@ -29,7 +29,7 @@ alias 'Test'
 
     local v = rt.call('Test', { rt.value(10) | rt.value(20) })
 
-    assert(v:view() == '(10 | 20)[]')
+    lt.assertEquals(v:view(), '(10 | 20)[]')
 end
 
 do
@@ -47,5 +47,5 @@ alias 'Test'
 
     local v = rt.call('Test', { rt.value(10) | rt.value(20) })
 
-    assert(v:view() == '10[] | 20[]')
+    lt.assertEquals(v:view(), '10[] | 20[]')
 end

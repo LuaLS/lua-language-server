@@ -48,10 +48,10 @@ do
     local r5 = rt.call('A', { rt.value 'x', rt.value(true) })
     local r6 = rt.type('A')
 
-    assert(r1.value:view() == '6')
-    assert(r2.value:view() == '5')
-    assert(r3.value:view() == '3')
-    assert(r4.value:view() == '4')
-    assert(r5.value:view() == '2')
-    assert(r6.value:view() == '1')
+    lt.assertEquals(r1.value:view(), '6')
+    lt.assertEquals(r2.value:view(), '5')
+    lt.assertEquals(r3.value:view(), '3')
+    lt.assertEquals(r4.value:view(), '4')
+    lt.assertEquals(r5.value:view(), '2')
+    lt.assertEquals(r6.value:view(), '1')
 end

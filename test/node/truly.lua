@@ -1,43 +1,43 @@
 local rt = test.scope.rt
 
 do
-    assert(rt.ANY.truly:view() == 'truly')
-    assert(rt.ANY.falsy:view() == 'false | nil')
+    lt.assertEquals(rt.ANY.truly:view(), 'truly')
+    lt.assertEquals(rt.ANY.falsy:view(), 'false | nil')
 
-    assert(rt.UNKNOWN.truly:view() == 'truly')
-    assert(rt.UNKNOWN.falsy:view() == 'false')
+    lt.assertEquals(rt.UNKNOWN.truly:view(), 'truly')
+    lt.assertEquals(rt.UNKNOWN.falsy:view(), 'false')
 
-    assert(rt.TRULY.truly:view() == 'truly')
-    assert(rt.TRULY.falsy:view() == 'never')
+    lt.assertEquals(rt.TRULY.truly:view(), 'truly')
+    lt.assertEquals(rt.TRULY.falsy:view(), 'never')
 
-    assert(rt.NIL.truly:view() == 'never')
-    assert(rt.NIL.falsy:view() == 'nil')
+    lt.assertEquals(rt.NIL.truly:view(), 'never')
+    lt.assertEquals(rt.NIL.falsy:view(), 'nil')
 
-    assert(rt.BOOLEAN.truly:view() == 'true')
-    assert(rt.BOOLEAN.falsy:view() == 'false')
+    lt.assertEquals(rt.BOOLEAN.truly:view(), 'true')
+    lt.assertEquals(rt.BOOLEAN.falsy:view(), 'false')
 
-    assert(rt.TRUE.truly:view() == 'true')
-    assert(rt.TRUE.falsy:view() == 'never')
+    lt.assertEquals(rt.TRUE.truly:view(), 'true')
+    lt.assertEquals(rt.TRUE.falsy:view(), 'never')
 
-    assert(rt.FALSE.truly:view() == 'never')
-    assert(rt.FALSE.falsy:view() == 'false')
+    lt.assertEquals(rt.FALSE.truly:view(), 'never')
+    lt.assertEquals(rt.FALSE.falsy:view(), 'false')
 
-    assert(rt.TABLE.truly:view() == 'table')
-    assert(rt.TABLE.falsy:view() == 'never')
+    lt.assertEquals(rt.TABLE.truly:view(), 'table')
+    lt.assertEquals(rt.TABLE.falsy:view(), 'never')
 
-    assert(rt.value(0).truly:view() == '0')
-    assert(rt.value(0).falsy:view() == 'never')
+    lt.assertEquals(rt.value(0).truly:view(), '0')
+    lt.assertEquals(rt.value(0).falsy:view(), 'never')
 
-    assert(rt.value(1).truly:view() == '1')
-    assert(rt.value(1).falsy:view() == 'never')
+    lt.assertEquals(rt.value(1).truly:view(), '1')
+    lt.assertEquals(rt.value(1).falsy:view(), 'never')
 end
 
 do
     local u = rt.value(0) | rt.value(1) | rt.value(true) | rt.value(false) | rt.NIL
 
-    assert(u:view() == '0 | 1 | true | false | nil')
-    assert(u.truly:view() == '0 | 1 | true')
-    assert(u.falsy:view() == 'false | nil')
+    lt.assertEquals(u:view(), '0 | 1 | true | false | nil')
+    lt.assertEquals(u.truly:view(), '0 | 1 | true')
+    lt.assertEquals(u.falsy:view(), 'false | nil')
 end
 
 do
@@ -45,17 +45,17 @@ do
         : addField(rt.field('x', rt.value(1)))
         : addField(rt.field('y', rt.value(2)))
 
-    assert(u:view() == [[
+    lt.assertEquals(u:view(), [[
 {
     x: 1,
     y: 2,
 }]])
-    assert(u.truly:view() == [[
+    lt.assertEquals(u.truly:view(), [[
 {
     x: 1,
     y: 2,
 }]])
-    assert(u.falsy:view() == 'never')
+    lt.assertEquals(u.falsy:view(), 'never')
 end
 
 do
@@ -65,21 +65,21 @@ do
         : addField(rt.field('y', rt.value(2)))
 
     local u = a & b
-    assert(u:view() == '{ x: 1 } & { y: 2 }')
-    assert(u.truly:view() == [[
+    lt.assertEquals(u:view(), '{ x: 1 } & { y: 2 }')
+    lt.assertEquals(u.truly:view(), [[
 {
     x: 1,
     y: 2,
 }]])
-    assert(u.falsy:view() == 'never')
+    lt.assertEquals(u.falsy:view(), 'never')
 end
 
 do
     rt.TYPE_POOL['A'] = nil
     local a = rt.type 'A'
 
-    assert(a.truly:view() == 'A')
-    assert(a.falsy:view() == 'A')
+    lt.assertEquals(a.truly:view(), 'A')
+    lt.assertEquals(a.falsy:view(), 'A')
 end
 
 do
@@ -89,8 +89,8 @@ do
     rt.class('A')
         : addField(rt.field('x', rt.value(1)))
 
-    assert(a.truly:view() == 'A')
-    assert(a.falsy:view() == 'never')
+    lt.assertEquals(a.truly:view(), 'A')
+    lt.assertEquals(a.falsy:view(), 'never')
 end
 
 do
@@ -102,7 +102,7 @@ do
     rt.alias('A', nil, rt.value(true))
     rt.alias('A', nil, rt.value(false))
 
-    assert(a:view() == 'A')
-    assert(a.truly:view() == '1 | 2 | true')
-    assert(a.falsy:view() == 'false')
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.truly:view(), '1 | 2 | true')
+    lt.assertEquals(a.falsy:view(), 'false')
 end

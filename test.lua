@@ -33,6 +33,8 @@ ls.await.call(function ()
     -- 加载一些工具
     require 'test.include'
     test.catch = require 'test.catch'
+    ---@diagnostic disable-next-line
+    lt = require 'test.ltest'
     local suc, err = pcall(function ()
         print('开始测试')
         dofile 'test/tools/init.lua'

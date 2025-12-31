@@ -3,55 +3,55 @@ local rt = test.scope.rt
 do
     local a = rt.NIL & rt.value(1)
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.value(1) & rt.value(2)
 
-    assert(a:view() == 'never')
+    lt.assertEquals(a:view(), 'never')
 end
 
 do
     local a = rt.value(1) & rt.type('number')
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.type('number') & rt.value(1)
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.type('number') & rt.value(1)
 
-    assert(a:view() == '1')
+    lt.assertEquals(a:view(), '1')
 end
 
 do
     local a = rt.type('number') & rt.type('string')
 
-    assert(a:view() == 'never')
+    lt.assertEquals(a:view(), 'never')
 end
 
 do
     local a = rt.type('number') & rt.type('number')
 
-    assert(a:view() == 'number')
+    lt.assertEquals(a:view(), 'number')
 end
 
 do
     local a = rt.type('number') & rt.type('number') & rt.type('string')
 
-    assert(a:view() == 'never')
+    lt.assertEquals(a:view(), 'never')
 end
 
 do
     local a = rt.type('table') & rt.VAR_G
 
-    assert(a:view() == 'table & _G')
+    lt.assertEquals(a:view(), 'table & _G')
 end
 
 do
@@ -59,7 +59,7 @@ do
     rt.TYPE_POOL['B'] = nil
     local a = rt.type('A') & rt.type('B')
 
-    assert(a:view() == 'A & B')
+    lt.assertEquals(a:view(), 'A & B')
 end
 
 do
@@ -68,7 +68,7 @@ do
     rt.TYPE_POOL['C'] = nil
     local a = rt.type('A') & rt.type('B') & rt.type('C')
 
-    assert(a:view() == 'A & B & C')
+    lt.assertEquals(a:view(), 'A & B & C')
 end
 
 do
@@ -78,7 +78,7 @@ do
         : addField(rt.field(rt.value 'y', rt.value 'y'))
     local c = a & b
 
-    assert(c:view() == '{ x: "x" } & { y: "y" }')
+    lt.assertEquals(c:view(), '{ x: "x" } & { y: "y" }')
 end
 
 do
@@ -87,7 +87,7 @@ do
     rt.TYPE_POOL['C'] = nil
     local a = rt.type('A') & rt.type('B') & rt.type('C') & rt.type('A')
 
-    assert(a:view() == 'A & B & C')
+    lt.assertEquals(a:view(), 'A & B & C')
 end
 
 do
@@ -97,7 +97,7 @@ do
     rt.TYPE_POOL['D'] = nil
     local a = rt.type('A') & (rt.type('B') | rt.type('C')) & rt.type('D')
 
-    assert(a:view() == '(A & B & D) | (A & C & D)')
+    lt.assertEquals(a:view(), '(A & B & D) | (A & C & D)')
 end
 
 do
@@ -106,17 +106,17 @@ do
     rt.TYPE_POOL['C'] = nil
     local a = rt.type('A') & (rt.type('B') | rt.type('C')) & rt.type('A')
 
-    assert(a:view() == '(A & B) | (A & C)')
+    lt.assertEquals(a:view(), '(A & B) | (A & C)')
 end
 
 do
     local a = rt.table() & rt.NIL
 
-    assert(a:view() == '{}')
+    lt.assertEquals(a:view(), '{}')
 end
 
 do
     local a = rt.table() & rt.func()
 
-    assert(a:view() == '{} & fun()')
+    lt.assertEquals(a:view(), '{} & fun()')
 end

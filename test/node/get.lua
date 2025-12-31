@@ -6,11 +6,11 @@ do
         [2] = rt.value(200),
     }
 
-    assert(t:get(1):view() == '100')
-    assert(t:get(2):view() == '200')
-    assert(t:get(3):view() == 'nil')
-    assert(t:get(rt.INTEGER):view() == '100 | 200')
-    assert(t:get(rt.NUMBER):view() == '100 | 200')
+    lt.assertEquals(t:get(1):view(), '100')
+    lt.assertEquals(t:get(2):view(), '200')
+    lt.assertEquals(t:get(3):view(), 'nil')
+    lt.assertEquals(t:get(rt.INTEGER):view(), '100 | 200')
+    lt.assertEquals(t:get(rt.NUMBER):view(), '100 | 200')
 end
 
 do
@@ -18,10 +18,10 @@ do
         [rt.INTEGER] = rt.TRUE,
     }
 
-    assert(t:get(1):view() == 'true')
-    assert(t:get(2):view() == 'true')
-    assert(t:get(rt.INTEGER):view() == 'true')
-    assert(t:get(rt.NUMBER):view() == 'true')
+    lt.assertEquals(t:get(1):view(), 'true')
+    lt.assertEquals(t:get(2):view(), 'true')
+    lt.assertEquals(t:get(rt.INTEGER):view(), 'true')
+    lt.assertEquals(t:get(rt.NUMBER):view(), 'true')
 end
 
 do
@@ -29,10 +29,10 @@ do
         [rt.NUMBER] = rt.TRUE,
     }
 
-    assert(t:get(1):view() == 'true')
-    assert(t:get(2):view() == 'true')
-    assert(t:get(rt.INTEGER):view() == 'true')
-    assert(t:get(rt.NUMBER):view() == 'true')
+    lt.assertEquals(t:get(1):view(), 'true')
+    lt.assertEquals(t:get(2):view(), 'true')
+    lt.assertEquals(t:get(rt.INTEGER):view(), 'true')
+    lt.assertEquals(t:get(rt.NUMBER):view(), 'true')
 end
 
 do
@@ -45,5 +45,5 @@ do
 
     t:setExpectParent(rt.type 'A')
 
-    assert(t:get('x'):view() == 'number')
+    lt.assertEquals(t:get('x'):view(), 'number')
 end

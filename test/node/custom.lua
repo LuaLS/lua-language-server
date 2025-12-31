@@ -7,8 +7,8 @@ do
             return rt.value 'custom X'
         end)
 
-    assert(rt.type('X'):view() == 'X')
-    assert(rt.type('X').value:view() == '"custom X"')
+    lt.assertEquals(rt.type('X'):view(), 'X')
+    lt.assertEquals(rt.type('X').value:view(), '"custom X"')
 end
 
 do
@@ -33,7 +33,7 @@ do
         [ 'y' ] = rt.value '20',
     }
 
-    assert(t1:view() == [[
+    lt.assertEquals(t1:view(), [[
 {
     x: "10",
     y: "20",
@@ -41,7 +41,7 @@ do
 
     local t2 = rt.call('Options', { t1 })
 
-    assert(t2:view() == [[
+    lt.assertEquals(t2:view(), [[
 {
     x?: "10" | nil,
     y?: "20" | nil,
@@ -75,7 +75,7 @@ do
         [ 'y' ] = rt.value '20',
     }
 
-    assert(t1:view() == [[
+    lt.assertEquals(t1:view(), [[
 {
     x: "10",
     y: "20",
@@ -83,7 +83,7 @@ do
 
     local t2 = rt.call('Options', { t1 })
 
-    assert(t2:view() == [[
+    lt.assertEquals(t2:view(), [[
 {
     x?: "10" | nil,
     y?: "20" | nil,
@@ -116,7 +116,7 @@ do
         : addField(rt.field('x', rt.value '10'))
         : addField(rt.field('y', rt.value '20'))
 
-    assert(rt.type 'XXX'.value:view() == [[
+    lt.assertEquals(rt.type 'XXX'.value:view(), [[
 {
     x: "10",
     y: "20",
@@ -124,7 +124,7 @@ do
 
     local t2 = rt.call('Options', { rt.type 'XXX' })
 
-    assert(t2:view() == [[
+    lt.assertEquals(t2:view(), [[
 {
     x?: "10" | nil,
     y?: "20" | nil,
@@ -132,13 +132,13 @@ do
 
     c:addField(rt.field('z', rt.value '30'))
 
-    assert(rt.type 'XXX'.value:view() == [[
+    lt.assertEquals(rt.type 'XXX'.value:view(), [[
 {
     x: "10",
     y: "20",
     z: "30",
 }]])
-    assert(t2.value:view() == [[
+    lt.assertEquals(t2.value:view(), [[
 {
     x?: "10" | nil,
     y?: "20" | nil,
@@ -161,31 +161,31 @@ do
 
     local t = rt.type 'Test'
 
-    assert(t:view() == 'Test')
-    assert(t.value:view() == 'never')
+    lt.assertEquals(t:view(), 'Test')
+    lt.assertEquals(t.value:view(), 'never')
 
     do
         local _ <close> = rt.alias('XXX', nil, rt.table {
             x = rt.value(123),
         })
-        assert(t.value:view() == '123')
+        lt.assertEquals(t.value:view(), '123')
     end
 
     do
         local _ <close> = rt.alias('XXX', nil, rt.table {
             x = rt.value(345),
         })
-        assert(t.value:view() == '345')
+        lt.assertEquals(t.value:view(), '345')
     end
 
-    assert(t.value:view() == 'never')
+    lt.assertEquals(t.value:view(), 'never')
 end
 
 do
     rt:reset()
 
-    assert(rt.type('Test'):view() == 'Test')
-    assert(rt.type('Test').value:view() == 'Test')
+    lt.assertEquals(rt.type('Test'):view(), 'Test')
+    lt.assertEquals(rt.type('Test').value:view(), 'Test')
 
     local playground = ls.custom.playground(test.scope)
     do
@@ -197,9 +197,9 @@ do
             end)
     end
 
-    assert(rt.type('Test').value:view() == '1')
+    lt.assertEquals(rt.type('Test').value:view(), '1')
 
     playground:dispose()
 
-    assert(rt.type('Test').value:view() == 'Test')
+    lt.assertEquals(rt.type('Test').value:view(), 'Test')
 end

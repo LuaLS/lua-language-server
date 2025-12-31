@@ -4,21 +4,21 @@ do
     rt:reset()
     local var = rt.variable('x')
 
-    assert(var:viewAsVariable() == 'x')
-    assert(var.value:view() == 'any')
-    assert(var.fields == false)
+    lt.assertEquals(var:viewAsVariable(), 'x')
+    lt.assertEquals(var.value:view(), 'any')
+    lt.assertEquals(var.fields, false)
 
     local child1 = rt.variable(1, var)
 
-    assert(child1:viewAsVariable() == 'x[1]')
-    assert(var.value:view() == 'any')
-    assert(var.fields == false)
+    lt.assertEquals(child1:viewAsVariable(), 'x[1]')
+    lt.assertEquals(var.value:view(), 'any')
+    lt.assertEquals(var.fields, false)
 
     local child2 = rt.variable('y', child1)
 
-    assert(child2:viewAsVariable() == 'x[1].y')
-    assert(var.value:view() == 'any')
-    assert(var.fields == false)
+    lt.assertEquals(child2:viewAsVariable(), 'x[1].y')
+    lt.assertEquals(var.value:view(), 'any')
+    lt.assertEquals(var.fields, false)
 end
 
 do
@@ -26,13 +26,13 @@ do
     local var = rt.variable('x')
 
     var:addType(rt.type 'number')
-    assert(var.value:view() == 'number')
+    lt.assertEquals(var.value:view(), 'number')
 
     var:addType(rt.type 'string')
-    assert(var.value:view() == 'number | string')
+    lt.assertEquals(var.value:view(), 'number | string')
 
     var:addClass(rt.class 'A')
-    assert(var.value:view() == 'A')
+    lt.assertEquals(var.value:view(), 'A')
 end
 
 do
@@ -41,52 +41,52 @@ do
 
     var:addField(rt.field(rt.value 'n', rt.type 'number'))
 
-    assert(var:viewAsVariable() == 'x')
-    assert(var.value:view() == '{ n: number }')
-    assert(var.fields:view() == '{ n: number }')
+    lt.assertEquals(var:viewAsVariable(), 'x')
+    lt.assertEquals(var.value:view(), '{ n: number }')
+    lt.assertEquals(var.fields:view(), '{ n: number }')
 
     local a = rt.type 'A'
 
-    assert(a.value:view() == 'A')
+    lt.assertEquals(a.value:view(), 'A')
 
     local ca = rt.class 'A'
     a:addClass(ca)
     ca:addVariable(var)
-    assert(a.value:view() == '{ n: number }')
+    lt.assertEquals(a.value:view(), '{ n: number }')
 
     var:addField(rt.field(rt.value 'self', a))
-    assert(var.value:view() == [[
+    lt.assertEquals(var.value:view(), [[
 {
     n: number,
     self: A,
 }]])
-    assert(a.value:view() == [[
+    lt.assertEquals(a.value:view(), [[
 {
     n: number,
     self: A,
 }]])
 
     var:addClass(ca)
-    assert(var.value:view() == 'A')
-    assert(var.fields:view() == [[
+    lt.assertEquals(var.value:view(), 'A')
+    lt.assertEquals(var.fields:view(), [[
 {
     n: number,
     self: A,
 }]])
-    assert(a.value:view() == [[
+    lt.assertEquals(a.value:view(), [[
 {
     n: number,
     self: A,
 }]])
 
     ca:addField(rt.field(rt.value 's', rt.type 'string'))
-    assert(var.value:view() == 'A')
-    assert(var.fields:view() == [[
+    lt.assertEquals(var.value:view(), 'A')
+    lt.assertEquals(var.fields:view(), [[
 {
     n: number,
     self: A,
 }]])
-    assert(a.value:view() == [[
+    lt.assertEquals(a.value:view(), [[
 {
     n: number,
     s: string,
@@ -116,14 +116,14 @@ do
     m:addField(rt.field(rt.value '__index', m))
     m:addField(rt.field(rt.value 'y', rt.value 'abc'))
 
-    assert(a.value:view() == [[
+    lt.assertEquals(a.value:view(), [[
 {
     x: number,
     y: "abc",
     __index: A,
 }]])
-    assert(m.value:view() == 'A')
-    assert(m.fields:view() == [[
+    lt.assertEquals(m.value:view(), 'A')
+    lt.assertEquals(m.fields:view(), [[
 {
     y: "abc",
     __index: A,
@@ -138,23 +138,23 @@ do
 
     local a = rt.variable 'a'
     a:addField(rt.field(rt.value 'd', rt.value(1)), {'b', 'c'})
-    assert(a:viewAsVariable() == 'a')
-    assert(a:view() == '{ b: { c: { d: 1 } } }')
+    lt.assertEquals(a:viewAsVariable(), 'a')
+    lt.assertEquals(a:view(), '{ b: { c: { d: 1 } } }')
 
     local b = a:getChild('b')
     assert(b)
-    assert(b:viewAsVariable() == 'a.b')
-    assert(b:view() == '{ c: { d: 1 } }')
+    lt.assertEquals(b:viewAsVariable(), 'a.b')
+    lt.assertEquals(b:view(), '{ c: { d: 1 } }')
 
     local c = a:getChild('b', 'c')
     assert(c)
-    assert(c:viewAsVariable() == 'a.b.c')
-    assert(c:view() == '{ d: 1 }')
+    lt.assertEquals(c:viewAsVariable(), 'a.b.c')
+    lt.assertEquals(c:view(), '{ d: 1 }')
 
     local d = a:getChild('b', 'c', 'd')
     assert(d)
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d:view() == '1')
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d:view(), '1')
 end
 
 do
@@ -169,52 +169,52 @@ do
 
     local a = rt.variable 'a'
     local d = a:addField(rt.field(rt.value 'd', rt.table()), {'b', 'c'})
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d.value:view() == '{}')
-    assert(d.fields:view() == '{}')
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d.value:view(), '{}')
+    lt.assertEquals(d.fields:view(), '{}')
 
     local A = rt.type 'A'
     local CA = rt.class 'A'
     CA:addVariable(d)
     d:addClass(CA)
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d.value:view() == 'A')
-    assert(d.fields:view() == '{}')
-    assert(A.value:view() == '{}')
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d.value:view(), 'A')
+    lt.assertEquals(d.fields:view(), '{}')
+    lt.assertEquals(A.value:view(), '{}')
 
     local dx = rt.field(rt.value 'x', rt.value(1))
     d:addField(dx)
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d.value:view() == 'A')
-    assert(d.fields:view() == '{ x: 1 }')
-    assert(A.value:view() == '{ x: 1 }')
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d.value:view(), 'A')
+    lt.assertEquals(d.fields:view(), '{ x: 1 }')
+    lt.assertEquals(A.value:view(), '{ x: 1 }')
 
     local dy = rt.field(rt.value 'y', rt.value(2))
     a:addField(dy, {'b', 'c', 'd'})
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d.value:view() == 'A')
-    assert(d.fields:view() == [[
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d.value:view(), 'A')
+    lt.assertEquals(d.fields:view(), [[
 {
     x: 1,
     y: 2,
 }]])
-    assert(A.value:view() == [[
+    lt.assertEquals(A.value:view(), [[
 {
     x: 1,
     y: 2,
 }]])
 
     a:removeField(dx, {'b', 'c', 'd'})
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d.value:view() == 'A')
-    assert(d.fields:view() == '{ y: 2 }')
-    assert(A.value:view() == '{ y: 2 }')
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d.value:view(), 'A')
+    lt.assertEquals(d.fields:view(), '{ y: 2 }')
+    lt.assertEquals(A.value:view(), '{ y: 2 }')
 
     d:removeField(dy)
-    assert(d:viewAsVariable() == 'a.b.c.d')
-    assert(d.value:view() == 'A')
-    assert(d.fields:view() == '{}')
-    assert(A.value:view() == '{}')
+    lt.assertEquals(d:viewAsVariable(), 'a.b.c.d')
+    lt.assertEquals(d.value:view(), 'A')
+    lt.assertEquals(d.fields:view(), '{}')
+    lt.assertEquals(A.value:view(), '{}')
 end
 
 do
@@ -231,11 +231,11 @@ do
     local T = rt.variable 't'
     T:addAssign(rt.field(rt.value 't', X))
 
-    assert(T.fields == false)
-    assert(T:view() == '{ a: 1 }')
+    lt.assertEquals(T.fields, false)
+    lt.assertEquals(T:view(), '{ a: 1 }')
 
     local TA = T:getChild 'a'
-    assert(TA:view() == '1')
+    lt.assertEquals(TA:view(), '1')
 end
 
 do
@@ -252,11 +252,11 @@ do
     local T = rt.variable 't'
     T:addAssign(rt.field(rt.value 't', X))
 
-    assert(T.fields == false)
-    assert(T:view() == '{ a: { b: 1 } }')
+    lt.assertEquals(T.fields, false)
+    lt.assertEquals(T:view(), '{ a: { b: 1 } }')
 
     local TA = T:getChild('a', 'b')
-    assert(TA:view() == '1')
+    lt.assertEquals(TA:view(), '1')
 end
 
 do
@@ -273,11 +273,11 @@ do
     local T = rt.variable 't'
     T:addAssign(rt.field(rt.value 't', X:getChild 'a'))
 
-    assert(T.fields == false)
-    assert(T:view() == '{ b: 1 }')
+    lt.assertEquals(T.fields, false)
+    lt.assertEquals(T:view(), '{ b: 1 }')
 
     local TA = T:getChild('b')
-    assert(TA:view() == '1')
+    lt.assertEquals(TA:view(), '1')
 end
 
 do
@@ -296,8 +296,8 @@ do
     Z:addAssign(rt.field(rt.value 'z', Y))
     local A = Z:getChild 'a'
 
-    assert(Z:view() == '{ a: 1 }')
-    assert(#A:getEquivalentLocations() == 1)
+    lt.assertEquals(Z:view(), '{ a: 1 }')
+    lt.assertEquals(#A:getEquivalentLocations(), 1)
 end
 
 do
@@ -316,5 +316,5 @@ do
 
     X:addField(rt.field(rt.value 'z', rt.value(1)), { 'y' })
 
-    assert(X:view() == '{ y: { z: 1 } }')
+    lt.assertEquals(X:view(), '{ y: { z: 1 } }')
 end

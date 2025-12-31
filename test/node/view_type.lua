@@ -5,8 +5,8 @@ do
 
     local a = rt.type('A')
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == 'A')
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), 'A')
 end
 
 do
@@ -22,8 +22,8 @@ do
         : addField(rt.field(rt.value 'x', rt.value 'x'))
         : addField(rt.field(rt.value 'y', rt.value 'y'))
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == [[
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), [[
 {
     x: "x",
     y: "y",
@@ -58,8 +58,8 @@ do
 
     rt.class('A', nil, { b, c, d })
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == [[
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), [[
 {
     x: "x",
     y: "y",
@@ -103,8 +103,8 @@ do
     rt.class('D')
         : addField(rt.field(rt.value 'z', rt.value 'z'))
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == [[
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), [[
 {
     w: "1",
     x: "2",
@@ -126,8 +126,8 @@ do
     rt.alias('A', nil, rt.value(2))
     rt.alias('A', nil, rt.value(3))
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == '1 | 2 | 3')
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), '1 | 2 | 3')
 end
 
 do
@@ -161,8 +161,8 @@ do
     rt.alias('D', nil, rt.value(3))
     rt.alias('D', nil, rt.value(4))
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == 'B | C | D')
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), 'B | C | D')
 end
 
 do
@@ -176,8 +176,8 @@ do
         [rt.STRING] = rt.BOOLEAN,
     }})
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == '{ [string]: boolean }')
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), '{ [string]: boolean }')
 end
 
 do
@@ -200,15 +200,15 @@ do
         : addField(rt.field(rt.value('y'), rt.value(2)))
 
 
-    assert(a:view() == 'A')
-    assert(a.value:view() == [[
+    lt.assertEquals(a:view(), 'A')
+    lt.assertEquals(a.value:view(), [[
 {
     x: 1,
     y: 2,
 }]])
 
-    assert(b:view() == 'B')
-    assert(b.value:view() == [[
+    lt.assertEquals(b:view(), 'B')
+    lt.assertEquals(b.value:view(), [[
 {
     x: 1,
     y: 2,

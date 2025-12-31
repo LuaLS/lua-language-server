@@ -6,8 +6,8 @@ do
     local a = rt.type 'A'
     local b = rt.type 'B'
 
-    assert(a >> b == false)
-    assert(b >> a == false)
+    lt.assertEquals(a >> b, false)
+    lt.assertEquals(b >> a, false)
 end
 
 do
@@ -16,8 +16,8 @@ do
     local a = rt.NIL
     local b = rt.ANY
 
-    assert(a >> b == true)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, true)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -28,8 +28,8 @@ do
 
     rt.class('B', nil, { a })
 
-    assert(a >> b == false)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, false)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -43,8 +43,8 @@ do
     local d = rt.type 'D'
     rt.class('D', nil, { c })
 
-    assert(a >> d == false)
-    assert(d >> a == true)
+    lt.assertEquals(a >> d, false)
+    lt.assertEquals(d >> a, true)
 end
 
 do
@@ -55,8 +55,8 @@ do
     local b = rt.type 'B'
     rt.alias('A', nil, rt.type 'A')
 
-    assert(a >> b == false)
-    assert(b >> a == false)
+    lt.assertEquals(a >> b, false)
+    lt.assertEquals(b >> a, false)
 end
 
 do
@@ -74,19 +74,19 @@ do
     local tc = rt.table()
         : addField(rt.field('z', rt.value 'z'))
 
-    assert(a >> ta == true)
-    assert(a >> tb == true)
-    assert(a >> tc == false)
+    lt.assertEquals(a >> ta, true)
+    lt.assertEquals(a >> tb, true)
+    lt.assertEquals(a >> tc, false)
 
-    assert(ta >> a == false)
-    assert(tb >> a == false)
-    assert(tc >> a == false)
+    lt.assertEquals(ta >> a, false)
+    lt.assertEquals(tb >> a, false)
+    lt.assertEquals(tc >> a, false)
 
-    assert(a >> (ta & tb) == true)
-    assert((ta & tb) >> a == true)
+    lt.assertEquals(a >> (ta & tb), true)
+    lt.assertEquals((ta & tb) >> a, true)
 
-    assert(a >> (ta & tb & tc) == false)
-    assert((ta & tb & tc) >> a == true)
+    lt.assertEquals(a >> (ta & tb & tc), false)
+    lt.assertEquals((ta & tb & tc) >> a, true)
 end
 
 do
@@ -99,8 +99,8 @@ do
     rt.alias('B', nil, rt.value(2))
     rt.alias('B', nil, rt.value(3))
 
-    assert(a >> b == true)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, true)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -112,8 +112,8 @@ do
     rt.alias('B', nil, rt.value(1))
     rt.alias('B', nil, rt.value(2))
 
-    assert(a >> b == false)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, false)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -131,8 +131,8 @@ do
         : addField(rt.field('z', rt.value 'z'))
     )
 
-    assert(a >> b == false)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, false)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -148,8 +148,8 @@ do
         : addField(rt.field('x', rt.value 'x'))
         : addField(rt.field('y', rt.value 'y'))
 
-    assert(a >> b == true)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, true)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -168,8 +168,8 @@ do
         : addField(rt.field('y', rt.value 'y'))
 
 
-    assert(a >> b == true)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, true)
+    lt.assertEquals(b >> a, true)
 end
 
 do
@@ -188,8 +188,8 @@ do
         : addField(rt.field('x', rt.value 'x'))
         : addField(rt.field('y', rt.value 'y'))
 
-    assert(a >> b == true)
-    assert(b >> a == false)
+    lt.assertEquals(a >> b, true)
+    lt.assertEquals(b >> a, false)
 end
 
 do
@@ -210,6 +210,6 @@ do
         : addField(rt.field('x', rt.value 'x'))
         : addField(rt.field('y', rt.value 'y'))
 
-    assert(a >> b == true)
-    assert(b >> a == true)
+    lt.assertEquals(a >> b, true)
+    lt.assertEquals(b >> a, true)
 end

@@ -75,7 +75,11 @@ do
     collectgarbage()
     print('加载项目前的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
-    local result = scope:load(function (event, status, uri)
+    local result = scope:load({
+        ignores = {
+            'log',
+        }
+    }, function (event, status, uri)
         if event == 'found' then
             print('已发现 {found} 个文件' % status)
         end

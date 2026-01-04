@@ -47,18 +47,18 @@ function Ast:parseMain()
         parent = main,
     })
     self:initLocal(vararg)
-    if self.envMode == '_ENV' then
-        local env = self:createNode('LuaParser.Node.Local', {
-            start  = 0,
-            finish = 0,
-            dummy  = true,
-            id     = '_ENV',
-            parent = main,
-        })
-        self:initLocal(env)
-        -- 虽然 _ENV 是上值，但是不计入200个的数量限制
-        self.localCount = 0
-    end
+    local env = self:createNode('LuaParser.Node.Local', {
+        start  = 0,
+        finish = 0,
+        dummy  = true,
+        -- 为了简化实现，Lua 5.1 也通过类似 _ENV 的方式实现环境。
+        -- Lua 5.1 中使用 `@fenv` 作为环境变量名，这样用户无法正常访问到。
+        id     = self.envMode,
+        parent = main,
+    })
+    self:initLocal(env)
+    -- 虽然 _ENV 是上值，但是不计入200个的数量限制
+    self.localCount = 0
 
     self:skipSpace(false)
     self:blockParseChilds(main)

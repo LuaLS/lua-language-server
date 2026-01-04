@@ -36,11 +36,12 @@ function M:__close()
     self:remove()
 end
 
-function M:start()
+---@param options Scope.Load.Options
+function M:start(options)
     -- TODO: 需要先读配置文件
     ---@async
     ls.await.call(function ()
-        self:load(function (event, status, uri)
+        self:load(options, function (event, status, uri)
             if event == 'start' then
                 log.info('[Scope] Start loading: {}' % { self.name })
                 return
@@ -127,7 +128,9 @@ end
 ---@param uri Uri
 ---@return boolean
 function M:isIgnored(uri)
-    self:initGlob()
+    if not self.glob then
+        return false
+    end
     return self.glob:check(uri)
 end
 

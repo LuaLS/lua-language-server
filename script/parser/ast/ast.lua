@@ -23,7 +23,7 @@ require 'parser.ast.main'
 require 'parser.ast.cats.cat'
 
 ---@class LuaParser.Ast
----@field envMode 'fenv' | '_ENV'
+---@field envMode '@fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = Class 'LuaParser.Ast'
@@ -98,14 +98,14 @@ function M:__init(code, source, options)
     end
 
     if envMode == '_ENV'
-    or envMode == 'fenv' then
-        ---@cast envMode '_ENV' | 'fenv'
+    or envMode == '@fenv' then
+        ---@cast envMode '_ENV' | '@fenv'
         self.envMode = envMode
     else
         if self.versionNum >= 52 then
             self.envMode = '_ENV'
         else
-            self.envMode = 'fenv'
+            self.envMode = '@fenv'
         end
     end
 end

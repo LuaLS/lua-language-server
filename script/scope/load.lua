@@ -1,11 +1,12 @@
 ---@class Scope
 local M = Class 'Scope'
 
-function M:initGlob()
+---@param options Scope.Load.Options
+function M:initGlob(options)
     if self.glob then
         return
     end
-    self.glob = ls.glob.gitignore()
+    self.glob = ls.glob.gitignore(options.ignores)
     self.glob:setOption('root', self.uri)
     self.glob:setOption('ignoreCase', true)
     self.glob:setInterface('type', function (uri)
@@ -76,11 +77,15 @@ end
 ---@field indexed integer
 ---@field uris Uri[]
 
+---@class Scope.Load.Options
+---@field ignores? string[]
+
 ---@async
+---@param options Scope.Load.Options
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
 ---@return Scope.Load.Status
-function M:load(callback)
-    self:initGlob()
+function M:load(options, callback)
+    self:initGlob(options)
 
     ---@type Uri[]
     self.uris = {}

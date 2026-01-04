@@ -467,6 +467,9 @@ function M:status(paths)
         end
     end
 
+    local patterns = self.patternMap[''] or {}
+    statusWithPatterns(patterns, 1)
+
     if self.options.asGitIgnore then
         for i = 1, #paths do
             local base = table.concat(paths, '/', 1, i - 1)
@@ -494,9 +497,6 @@ function M:status(paths)
                 statusWithPatterns(patterns, i)
             end
         end
-    else
-        local patterns = self.patternMap[''] or {}
-        statusWithPatterns(patterns, 1)
     end
 
     return status
@@ -645,12 +645,12 @@ local function createGlob(pattern, options, interface)
     return glob
 end
 
----@param pattern? string|string[]
+---@param ignores? string|string[]
 ---@param options? Glob.Options
 ---@param interface? Glob.Interface
 ---@return Glob
-local function createGitIgnore(pattern, options, interface)
-    local glob = createGlob(pattern, options, interface)
+local function createGitIgnore(ignores, options, interface)
+    local glob = createGlob(ignores, options, interface)
     glob:setOption('asGitIgnore', true)
     return glob
 end

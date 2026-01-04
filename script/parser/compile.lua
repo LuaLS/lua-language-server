@@ -23,7 +23,7 @@ local LuaParser = Class 'LuaParser'
 ---@field jit? boolean # 是否为LuaJIT，默认为 false
 ---@field nonestandardSymbols? LuaParser.NonestandardSymbol[] # 支持的非标准符号
 ---@field unicodeName? boolean # 是否支持Unicode标识符，默认为 false
----@field envMode? 'auto' | '_ENV' | 'fenv' # 环境模式，默认为 'auto'，会根据版本自动选择
+---@field envMode? 'auto' | '_ENV' | '@fenv' # 环境模式，默认为 'auto'，会根据版本自动选择
 
 -- 编译lua代码
 ---@param code string # lua代码

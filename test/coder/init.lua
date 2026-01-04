@@ -1,4 +1,4 @@
----@type string?
+---@type Coder?
 TEST_CODER = nil
 
 ---@param code string
@@ -29,5 +29,6 @@ require 'test.coder.metatable'
 require 'test.coder.block'
 require 'test.coder.flow'
 require 'test.coder.custom'
+require 'test.coder.find-local'
 
 print('[coder] 测试完毕')

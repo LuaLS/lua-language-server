@@ -1,6 +1,6 @@
 ls.vm.registerCoderProvider('var', function (coder, source)
     ---@cast source LuaParser.Node.Var
-    local value = coder.flow:getVarKey(source)
+    local value = coder.flow:getOrCreateVarKey(source)
     assert(value, 'Variable key not found for var')
     coder:addLine('{key} = {value}{shadow}' % {
         key = coder:getKey(source),
@@ -8,7 +8,7 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         shadow = source.value and ':shadow()' or '',
     })
     if source.value then
-        coder.flow:setVarKey(source, coder:getKey(source))
+        coder.flow:createVar(source)
     end
 end)
 
@@ -29,7 +29,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         end
     end
 
-    local varKey = coder.flow:getVarKey(source)
+    local varKey = coder.flow:getOrCreateVarKey(source)
 
     if varKey then
         coder:addLine('{var} = {varKey}{shadow}' % {
@@ -38,7 +38,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             shadow = source.value and ':shadow()' or '',
         })
         if source.value then
-            coder.flow:setVarKey(source, coder:getKey(source))
+            coder.flow:createVar(source)
         end
     else
         -- 无法追踪变量，如 t[func()] , t:func().xxx 之类的
@@ -69,6 +69,7 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
+    coder.flow:createVar(source)
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -81,6 +82,7 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
+    coder.flow:createVar(source)
 
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 

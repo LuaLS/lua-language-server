@@ -17,7 +17,9 @@ M.func = nil
 M.providers = {}
 
 function M:__init()
-    self.env   = _G
+    self.env = _G
+    ---@type table<string, { key: string, offset: integer }[]>
+    self.variableMap = {}
 end
 
 function M:__del()
@@ -215,6 +217,15 @@ local function makeRegistry(t)
             t[k] = v
         end,
     })
+end
+
+function M:saveVariable(name, key, offset)
+    local infos = self.variableMap[name]
+    if not infos then
+        infos = {}
+        self.variableMap[name] = infos
+    end
+    infos[#infos+1] = { key = key, offset = offset }
 end
 
 ---@param vfile VM.Vfile

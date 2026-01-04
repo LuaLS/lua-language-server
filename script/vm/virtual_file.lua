@@ -11,6 +11,9 @@ M.indexingVersion = nil
 --- 即将要编译的最新版本
 ---@type integer
 M.nextVersion = -1
+--- 当前使用的 Document
+---@type Document?
+M.document = nil
 
 ---@param scope Scope
 ---@param uri Uri
@@ -145,6 +148,7 @@ function M:awaitIndex()
 
     self.indexingVersion = nil
     self.version = version
+    self.document = document
 end
 
 ---@param source LuaParser.Node.Base

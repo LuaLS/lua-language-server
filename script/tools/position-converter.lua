@@ -8,6 +8,7 @@ local setmetatable = setmetatable
 local M = {}
 M.__index = M
 
+---@package
 ---@param text string
 function M:parse(text)
     self._text = text

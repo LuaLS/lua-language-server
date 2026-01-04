@@ -87,38 +87,54 @@ function S:__init(coder)
 end
 
 ---@param source LuaParser.Node.Base
----@param create? boolean
 ---@return Coder.Variable?
-function S:getVar(source, create)
+function S:getVar(source)
     local name = getName(source)
     if not name then
         return nil
     end
-    return self:getVarByName(name, create and self.coder:makeVarKey(source) or nil)
+    return self:getVarByName(name)
+end
+
+---@param source LuaParser.Node.Base
+---@return Coder.Variable?
+function S:getOrCreateVar(source)
+    local name = getName(source)
+    if not name then
+        return nil
+    end
+    return self:getOrCreateVarByName(name, self.coder:makeVarKey(source), source.effectStart)
 end
 
 ---@param name string
----@param createKey? string
 ---@return Coder.Variable?
-function S:getVarByName(name, createKey)
+function S:getVarByName(name)
+    local var = self.variables[name]
+    return var
+end
+
+---@param name string
+---@param key string
+---@param offset integer
+---@return Coder.Variable
+function S:getOrCreateVarByName(name, key, offset)
     local var = self.variables[name]
     if not var then
-        if not createKey then
-            return nil
-        end
         var = {
             name = name,
-            currentKey = createKey,
+            currentKey = key,
         }
         self.variables[name] = var
+        self.coder:saveVariable(name, key, offset or 0)
     end
     return var
 end
 
 ---@param name string
 ---@param key string
+---@param offset integer
 ---@return Coder.Variable
-function S:setVarKeyByName(name, key)
+function S:setVarKeyByName(name, key, offset)
     local var = self.variables[name]
     if not var then
         var = {
@@ -129,6 +145,7 @@ function S:setVarKeyByName(name, key)
     else
         var.currentKey = key
     end
+    self.coder:saveVariable(name, key, offset)
     return var
 end
 
@@ -164,29 +181,29 @@ function M:currentStack()
 end
 
 ---@param source LuaParser.Node.Base
----@param create? boolean
 ---@return Coder.Variable?
-function M:getVar(source, create)
+function M:getVar(source)
     local name = getName(source)
     if not name then
         return nil
     end
-    if create then
-        local stack = self:currentStack()
-        return stack:getVarByName(name, self.coder:makeVarKey(source))
-    else
-        return self:getVarByName(name)
+    return self:getVarByName(name)
+end
+
+---@param source LuaParser.Node.Base
+---@return Coder.Variable?
+function M:getOrCreateVar(source)
+    local name = getName(source)
+    if not name then
+        return nil
     end
+    local stack = self:currentStack()
+    return stack:getOrCreateVarByName(name, self.coder:makeVarKey(source), source.effectStart)
 end
 
 ---@param name string
----@param createKey? string
 ---@return Coder.Variable?
-function M:getVarByName(name, createKey)
-    if createKey then
-        local stack = self:currentStack()
-        return stack:getVarByName(name, createKey)
-    end
+function M:getVarByName(name)
     for i = #self.stacks, 1, -1 do
         local stack = self.stacks[i]
         local var = stack.variables[name]
@@ -198,21 +215,30 @@ function M:getVarByName(name, createKey)
 end
 
 ---@param name string
----@param varKey string
-function M:setVarKeyByName(name, varKey)
+---@param key string
+---@param offset integer
+---@return Coder.Variable?
+function M:getOrCreateVarByName(name, key, offset)
     local stack = self:currentStack()
-    stack:setVarKeyByName(name, varKey)
+    return stack:getOrCreateVarByName(name, key, offset)
+end
+
+---@param name string
+---@param varKey string
+---@param offset integer
+function M:setVarKeyByName(name, varKey, offset)
+    local stack = self:currentStack()
+    stack:setVarKeyByName(name, varKey, offset)
 end
 
 ---@param source LuaParser.Node.AssignAble
----@param key string
 ---@return boolean
-function M:setVarKey(source, key)
+function M:createVar(source)
     local name = getName(source)
     if not name then
         return false
     end
-    self:setVarKeyByName(name, key)
+    self:setVarKeyByName(name, self.coder:getKey(source), source.effectStart)
     return true
 end
 
@@ -259,8 +285,8 @@ end
 
 ---@param source LuaParser.Node.Base
 ---@return string?
-function M:getVarKey(source)
-    local var = self:getVar(source, true)
+function M:getOrCreateVarKey(source)
+    local var = self:getOrCreateVar(source)
     if not var then
         return nil
     end

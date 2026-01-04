@@ -3,6 +3,7 @@
 ---@field ast LuaParser.Ast
 ---@field start integer # 开始位置（偏移）
 ---@field finish integer # 结束位置（偏移）
+---@field effectStart integer # 有效开始位置（偏移）
 ---@field left integer # 开始位置（行号与列号合并，仅用于测试）
 ---@field right integer # 结束位置（行号与列号合并，仅用于测试）
 ---@field where string # 位置描述（仅用于测试）
@@ -176,6 +177,12 @@ Base.__getter.finishCol = function (self)
 end
 
 ---@param self LuaParser.Node.Base
+---@return integer
+Base.__getter.effectStart = function (self)
+    return self.finish
+end
+
+---@param self LuaParser.Node.Base
 ---@return string
 Base.__getter.where = function (self)
     return string.format('%s:(%s:%s-%s:%s) %s'
@@ -198,10 +205,18 @@ end
 ---@return string
 ---@return true
 Base.__getter.uniqueKey = function (self)
+    local id = self.kind
+    if self.kind == 'local' then
+        ---@cast self LuaParser.Node.Local
+        id = id .. ':' .. self.id
+    elseif self.kind == 'var' then
+        ---@cast self LuaParser.Node.Var
+        id = id .. ':' .. self.id
+    end
     if self.dummy then
-        return string.format('dummy|%s@%d:%d-%d:%d', self.kind, self.startRow + 1, self.startCol + 1, self.finishRow + 1, self.finishCol), true
+        return string.format('dummy|%s@%d:%d-%d:%d', id, self.startRow + 1, self.startCol + 1, self.finishRow + 1, self.finishCol), true
     else
-        return string.format('%s@%d:%d-%d:%d', self.kind, self.startRow + 1, self.startCol + 1, self.finishRow + 1, self.finishCol), true
+        return string.format('%s@%d:%d-%d:%d', id, self.startRow + 1, self.startCol + 1, self.finishRow + 1, self.finishCol), true
     end
 end
 

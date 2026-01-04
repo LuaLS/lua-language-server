@@ -139,7 +139,7 @@ ls.vm.registerCoderProvider('catid', function (coder, source)
         local value
         if source.var then
             coder:compile(source.var)
-            value = coder.flow:getVarKey(source.var)
+            value = coder.flow:getOrCreateVarKey(source.var)
         else
             value = 'rt.type {name%q}' % {
                 name = source.id,

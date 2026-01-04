@@ -178,8 +178,8 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
 
     if source.op == 'and' and source.exp1 and source.exp2 then
         local branch <close> = coder.flow:createBranch(source, 'and')
-            : addChild(source.exp1)
-            : addChild(source.exp2)
+            : addChild(source.start, source.exp1)
+            : addChild(source.symbolPos, source.exp2)
 
         coder:addLine('{key} = {value}' % {
             key   = coder:getKey(source),
@@ -189,8 +189,8 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
     end
     if source.op == 'or' and source.exp1 and source.exp2 then
         local branch <close> = coder.flow:createBranch(source, 'or')
-            : addChild(source.exp1)
-            : addChild(source.exp2)
+            : addChild(source.start, source.exp1)
+            : addChild(source.symbolPos, source.exp2)
 
         coder:addLine('{key} = {value}' % {
             key   = coder:getKey(source),

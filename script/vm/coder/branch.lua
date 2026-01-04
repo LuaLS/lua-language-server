@@ -7,10 +7,12 @@ local C = Class 'Coder.Branch.Child'
 
 ---@param branch Coder.Branch
 ---@param index integer
+---@param effectPos integer
 ---@param callback? fun()
-function C:__init(branch, index, callback)
+function C:__init(branch, index, effectPos, callback)
     self.branch = branch
     self.index = index
+    self.effectPos = effectPos
     self.callback = callback
     ---@type table<string, string>
     self.varKeyAfterNarrow = {}
@@ -406,7 +408,7 @@ function C:preprocessStack(stack)
 
     for name in ls.util.sortPairs(self.branch.cares) do
         local varKey = self:getVarKeyAfterNarrow(name)
-        stack:setVarKeyByName(name, varKey)
+        stack:setVarKeyByName(name, varKey, self.effectPos)
     end
 end
 
@@ -445,13 +447,14 @@ function M:__close()
     self:finish()
 end
 
+---@param effectPos integer
 ---@param condition? LuaParser.Node.Exp
 ---@param callback? fun()
 ---@return Coder.Branch
-function M:addChild(condition, callback)
+function M:addChild(effectPos, condition, callback)
     local exp = condition and condition:trim()
 
-    local child = New 'Coder.Branch.Child' (self, #self.childs + 1, callback)
+    local child = New 'Coder.Branch.Child' (self, #self.childs + 1, effectPos, callback)
     self.childs[#self.childs+1] = child
 
     if exp then
@@ -459,7 +462,7 @@ function M:addChild(condition, callback)
         if lastChild then
             for name, varKey in pairs(lastChild.varKeyAfterNarrow) do
                 self.varKeyBeforeNarrow[name] = self:getVarKeyBeforeNarrow(name)
-                self.flow:setVarKeyByName(name, varKey)
+                self.flow:setVarKeyByName(name, varKey, exp.start)
             end
         end
         child.exp = exp
@@ -746,7 +749,7 @@ function M:finish()
                 var    = self.cares[name],
                 value  = valueKey,
             })
-            self.flow:setVarKeyByName(name, shadowKey)
+            self.flow:setVarKeyByName(name, shadowKey, self.node.finish)
         end
     end
 
@@ -755,7 +758,7 @@ function M:finish()
         for name in pairs(unchanged) do
             local varKey = self:getVarKeyBeforeNarrow(name)
             if varKey then
-                self.flow:setVarKeyByName(name, varKey)
+                self.flow:setVarKeyByName(name, varKey, self.node.finish)
             end
         end
     end

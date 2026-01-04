@@ -121,21 +121,21 @@ function S:createVar(source)
 end
 
 ---@param name string
----@param key string
+---@param varKey string
 ---@param offset integer
 ---@return Coder.Variable
-function S:setVarKeyByName(name, key, offset)
+function S:setVarKeyByName(name, varKey, offset)
     local var = self.variables[name]
     if not var then
         var = {
             name = name,
-            currentKey = key,
+            currentKey = varKey,
         }
         self.variables[name] = var
     else
-        var.currentKey = key
+        var.currentKey = varKey
     end
-    self.coder:saveVariable(name, key, offset)
+    self.coder:saveVariable(name, varKey, offset)
     return var
 end
 
@@ -213,8 +213,16 @@ function M:setVarKeyByName(name, varKey, offset)
 end
 
 ---@param source LuaParser.Node.AssignAble
----@return boolean
+---@return Coder.Variable?
 function M:createVar(source)
+    local stack = self:currentStack()
+    local var = stack:createVar(source)
+    return var
+end
+
+---@param source LuaParser.Node.AssignAble
+---@return boolean
+function M:setVarKey(source)
     local name = getName(source)
     if not name then
         return false

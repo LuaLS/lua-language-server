@@ -8,7 +8,7 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         shadow = source.value and ':shadow()' or '',
     })
     if source.value then
-        coder.flow:createVar(source)
+        coder.flow:setVarKey(source)
     end
 end)
 
@@ -38,7 +38,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             shadow = source.value and ':shadow()' or '',
         })
         if source.value then
-            coder.flow:createVar(source)
+            coder.flow:setVarKey(source)
         end
     else
         -- 无法追踪变量，如 t[func()] , t:func().xxx 之类的

@@ -219,13 +219,16 @@ local function makeRegistry(t)
     })
 end
 
-function M:saveVariable(name, key, offset)
+---@param name string
+---@param varKey string
+---@param offset integer
+function M:saveVariable(name, varKey, offset)
     local infos = self.variableMap[name]
     if not infos then
         infos = {}
         self.variableMap[name] = infos
     end
-    infos[#infos+1] = { key = key, offset = offset }
+    infos[#infos+1] = { key = varKey, offset = offset }
 end
 
 ---@param vfile VM.Vfile

@@ -53,7 +53,7 @@ function M:makeFromAst(ast)
 
     -- self:simplifyCode()
 
-    self.code = table.concat(self.buf)
+    self.code = table.concat(self.buf):gsub('[ ]+([\r\n])', '%1')
     self.compiled = nil
     self.blockStack = nil
     self.flow = nil
@@ -92,7 +92,7 @@ function M:addLine(code)
     if self.indentation > 0 then
         local indentation = string.rep('    ', self.indentation)
         buf[#buf+1] = indentation
-        buf[#buf+1] = code:gsub('\n', '\n' .. indentation):gsub('%s+$', '')
+        buf[#buf+1] = code:gsub('\n', '\n' .. indentation)
     else
         buf[#buf+1] = code
     end

@@ -494,6 +494,14 @@ function M:makeVarKey(source)
             field = fieldCode,
         }
     end
+    if source.kind == 'local' then
+        ---@cast source LuaParser.Node.Local
+        return self:getKey(source) or error('Cannot make var key')
+    end
+    if source.kind == 'param' then
+        ---@cast source LuaParser.Node.Param
+        return self:getKey(source) or error('Cannot make var key')
+    end
     error('Cannot make var key for kind ' .. tostring(source.kind))
 end
 

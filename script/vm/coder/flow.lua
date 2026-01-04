@@ -96,16 +96,6 @@ function S:getVar(source)
     return self:getVarByName(name)
 end
 
----@param source LuaParser.Node.Base
----@return Coder.Variable?
-function S:getOrCreateVar(source)
-    local name = getName(source)
-    if not name then
-        return nil
-    end
-    return self:getOrCreateVarByName(name, self.coder:makeVarKey(source), source.effectStart)
-end
-
 ---@param name string
 ---@return Coder.Variable?
 function S:getVarByName(name)
@@ -113,20 +103,20 @@ function S:getVarByName(name)
     return var
 end
 
----@param name string
----@param key string
----@param offset integer
----@return Coder.Variable
-function S:getOrCreateVarByName(name, key, offset)
-    local var = self.variables[name]
-    if not var then
-        var = {
-            name = name,
-            currentKey = key,
-        }
-        self.variables[name] = var
-        self.coder:saveVariable(name, key, offset or 0)
+---@param source LuaParser.Node.Base
+---@return Coder.Variable?
+function S:createVar(source)
+    local name = getName(source)
+    if not name then
+        return nil
     end
+    local key = self.coder:makeVarKey(source)
+    local var = {
+        name = name,
+        currentKey = key,
+    }
+    self.variables[name] = var
+    self.coder:saveVariable(name, key, source.effectStart)
     return var
 end
 
@@ -193,12 +183,12 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Coder.Variable?
 function M:getOrCreateVar(source)
-    local name = getName(source)
-    if not name then
-        return nil
+    local var = self:getVar(source)
+    if var then
+        return var
     end
     local stack = self:currentStack()
-    return stack:getOrCreateVarByName(name, self.coder:makeVarKey(source), source.effectStart)
+    return stack:createVar(source)
 end
 
 ---@param name string
@@ -212,15 +202,6 @@ function M:getVarByName(name)
         end
     end
     return nil
-end
-
----@param name string
----@param key string
----@param offset integer
----@return Coder.Variable?
-function M:getOrCreateVarByName(name, key, offset)
-    local stack = self:currentStack()
-    return stack:getOrCreateVarByName(name, key, offset)
 end
 
 ---@param name string
@@ -287,6 +268,16 @@ end
 ---@return string?
 function M:getOrCreateVarKey(source)
     local var = self:getOrCreateVar(source)
+    if not var then
+        return nil
+    end
+    return var.currentKey
+end
+
+---@param source LuaParser.Node.Base
+---@return string?
+function M:getVarKey(source)
+    local var = self:getVar(source)
     if not var then
         return nil
     end

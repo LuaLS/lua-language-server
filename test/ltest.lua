@@ -991,6 +991,9 @@ local function equals_table(actual, expected, recursions)
 end
 
 function equals_value(actual, expected, recursions)
+    if actual == expected then
+        return true
+    end
     if type(actual) ~= type(expected) then
         return false
     end

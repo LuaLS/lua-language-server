@@ -3455,7 +3455,6 @@ local function parseGlobal()
     if attrs then
         glob.attrs = attrs
         attrs.parent = glob
-        glob.start = globalPos
         for i = 1, #attrs do
             if attrs[i][1] == 'close' then
                 pushError {
@@ -3465,8 +3464,6 @@ local function parseGlobal()
                 }
             end
         end
-    else
-        glob.start = name.start
     end
 
     -- attributes after name

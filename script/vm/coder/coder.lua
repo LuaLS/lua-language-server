@@ -1,3 +1,5 @@
+local parser = require 'parser'
+
 ---@class Coder: GCHost
 local M = Class 'Coder'
 
@@ -20,6 +22,8 @@ function M:__init()
     self.env = _G
     ---@type table<string, { key: string, offset: integer }[]>
     self.variableMap = {}
+    ---@type table<LuaParser.Node.Base, string>
+    self.sourceVarNameMap = {}
 end
 
 function M:__del()
@@ -506,6 +510,83 @@ function M:makeVarKey(source)
         return self:getKey(source) or error('Cannot make var key')
     end
     error('Cannot make var key for kind ' .. tostring(source.kind))
+end
+
+---@param var LuaParser.Node.Base
+---@return string?
+function M:getVarName(var)
+    local lastName = self.sourceVarNameMap[var]
+    if lastName then
+        return lastName
+    end
+    local name = self:makeVarName(var)
+    if name then
+        self.sourceVarNameMap[var] = name
+    end
+    return name
+end
+
+---@private
+---@param var LuaParser.Node.Base
+---@return string?
+function M:makeVarName(var)
+    if var.kind == 'local' or var.kind == 'param' then
+        ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
+        return '{}@{}:{}' % {
+            var.id,
+            var.startRow + 1,
+            var.startCol + 1,
+        }
+    end
+    if var.kind == 'var' then
+        ---@cast var LuaParser.Node.Var
+        if var.loc then
+            return self:getVarName(var.loc)
+        end
+        if var.env then
+            local envName = self:getVarName(var.env)
+            if not envName then
+                return nil
+            end
+            return '{}.{}' % { envName, var.id }
+        end
+        return '_G.{}' % { var.id }
+    end
+    if var.kind == 'field' then
+        ---@cast var LuaParser.Node.Field
+        local lastName = self:getVarName(var.last)
+        if not lastName then
+            return nil
+        end
+        local key = var.key
+        if not key then
+            return nil
+        end
+        if var.subtype == 'field' or var.subtype == 'method' then
+            ---@cast key LuaParser.Node.FieldID
+            return '{}.{}' % { lastName, key.id }
+        end
+        if var.subtype == 'index' then
+            ---@cast key LuaParser.Node.Exp
+            if key.isLiteral then
+                ---@cast key LuaParser.Node.Literal
+                local value = key.value
+                if type(value) == 'string' then
+                    if parser.isName(value) then
+                        return '{}.{}' % { lastName, value }
+                    else
+                        return '{}[{%q}]' % { lastName, value }
+                    end
+                else
+                    return '{}[{}]' % { lastName, tostring(value) }
+                end
+            else
+                return '{}[{}]' % { lastName, 'unknown' }
+            end
+            return nil
+        end
+    end
+    return nil
 end
 
 ---@return Coder

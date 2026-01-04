@@ -1,69 +1,5 @@
-local parser = require 'parser'
-
 ---@class Coder.Flow
 local M = Class 'Coder.Flow'
-
----@param var LuaParser.Node.Base
----@return string?
-local function getName(var)
-    if var.kind == 'local' or var.kind == 'param' then
-        ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
-        return '{}@{}:{}' % {
-            var.id,
-            var.startRow + 1,
-            var.startCol + 1,
-        }
-    end
-    if var.kind == 'var' then
-        ---@cast var LuaParser.Node.Var
-        if var.loc then
-            return getName(var.loc)
-        end
-        if var.env then
-            local envName = getName(var.env)
-            if not envName then
-                return nil
-            end
-            return '{}.{}' % { envName, var.id }
-        end
-        return '_G.{}' % { var.id }
-    end
-    if var.kind == 'field' then
-        ---@cast var LuaParser.Node.Field
-        local lastName = getName(var.last)
-        if not lastName then
-            return nil
-        end
-        local key = var.key
-        if not key then
-            return nil
-        end
-        if var.subtype == 'field' or var.subtype == 'method' then
-            ---@cast key LuaParser.Node.FieldID
-            return '{}.{}' % { lastName, key.id }
-        end
-        if var.subtype == 'index' then
-            ---@cast key LuaParser.Node.Exp
-            if key.isLiteral then
-                ---@cast key LuaParser.Node.Literal
-                local value = key.value
-                if type(value) == 'string' then
-                    if parser.isName(value) then
-                        return '{}.{}' % { lastName, value }
-                    else
-                        return '{}[{%q}]' % { lastName, value }
-                    end
-                else
-                    return '{}[{}]' % { lastName, tostring(value) }
-                end
-            else
-                return '{}[{}]' % { lastName, 'unknown' }
-            end
-            return nil
-        end
-    end
-    return nil
-end
 
 
 ---@class Coder.Variable
@@ -89,7 +25,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Coder.Variable?
 function S:getVar(source)
-    local name = getName(source)
+    local name = self.coder:getVarName(source)
     if not name then
         return nil
     end
@@ -106,7 +42,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Coder.Variable?
 function S:createVar(source)
-    local name = getName(source)
+    local name = self.coder:getVarName(source)
     if not name then
         return nil
     end
@@ -173,7 +109,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Coder.Variable?
 function M:getVar(source)
-    local name = getName(source)
+    local name = self.coder:getVarName(source)
     if not name then
         return nil
     end
@@ -224,7 +160,7 @@ end
 ---@param varKey string
 ---@return boolean
 function M:setVarKey(source, varKey)
-    local name = getName(source)
+    local name = self.coder:getVarName(source)
     if not name then
         return false
     end
@@ -233,15 +169,9 @@ function M:setVarKey(source, varKey)
 end
 
 ---@param source LuaParser.Node.Base
----@return string?
-function M:getVarName(source)
-    return getName(source)
-end
-
----@param source LuaParser.Node.Base
 ---@param link Coder.Variable.Link
 function M:addLink(source, link)
-    local name = getName(source)
+    local name = self.coder:getVarName(source)
     if not name then
         return
     end
@@ -266,7 +196,7 @@ end
 ---@param source LuaParser.Node.Base
 ---@return Coder.Variable.Link[]?
 function M:getLinks(source)
-    local name = getName(source)
+    local name = self.coder:getVarName(source)
     if not name then
         return nil
     end

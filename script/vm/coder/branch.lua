@@ -277,14 +277,14 @@ end
 ---@return string
 ---@return integer
 function C:findTargetModeAndIndex(link, exp)
-    local myName = self.branch.flow:getVarName(exp)
+    local myName = self.branch.coder:getVarName(exp)
     for i, arg in ipairs(link.args) do
-        if self.branch.flow:getVarName(arg) == myName then
+        if self.branch.coder:getVarName(arg) == myName then
             return 'param', i
         end
     end
     for i, ret in ipairs(link.rets) do
-        if self.branch.flow:getVarName(ret) == myName then
+        if self.branch.coder:getVarName(ret) == myName then
             return 'return', i
         end
     end

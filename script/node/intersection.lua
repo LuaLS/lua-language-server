@@ -276,7 +276,7 @@ function M:every(callback, visited)
     end
     local newValues = {}
     for _, v in ipairs(self.values) do
-        newValues[#newValues+1] = v:every(callback, visited)
+        newValues[#newValues+1] = callback(v)
     end
     return self.scope.rt.intersection(newValues)
 end

@@ -4,7 +4,6 @@ local util    = require 'utility'
 local furi    = require 'file-uri'
 local ws      = require 'workspace'
 local files   = require 'files'
-local scope   = require 'workspace.scope'
 
 local rootPath = LOGPATH .. '/relative-library'
 local rootUri  = furi.encode(rootPath)
@@ -18,10 +17,10 @@ end
 lclient():start(function (client)
     client:registerFakers()
 
-    client:register('workspace/configuration', function (params)
+    client:register('workspace/configuration', function ()
         return {
             ['workspace.library'] = {
-                rootPath .. '/lib',
+                './lib',
             }
         }
     end)

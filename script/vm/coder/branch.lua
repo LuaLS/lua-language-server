@@ -158,7 +158,7 @@ function C:narrow(exp, reason, method, otherSide)
         ---@cast exp LuaParser.Node.Field
         local fieldCode = self.branch.coder:makeFieldCode(exp.key)
         if fieldCode then
-            self:narrow(exp.last, exp.last.uniqueKey, 'matchField({key}, {value})' % {
+            self:narrow(exp.last, exp.last.uniqueKey .. '|' .. reason, 'matchField({key}, {value})' % {
                 key   = fieldCode,
                 value = value,
             })

@@ -977,3 +977,17 @@ do
     lt.assertEquals(rt.type('X1').value:view(), '1')
     lt.assertEquals(rt.type('X2').value:view(), '2')
 end
+
+do
+    TEST_INDEX [[
+    local x
+
+    local a, b = call(x.t)
+
+    if a then
+    end
+
+    if b then
+    end
+    ]]
+end

@@ -221,13 +221,14 @@ function M:createVar(source)
 end
 
 ---@param source LuaParser.Node.AssignAble
+---@param varKey string
 ---@return boolean
-function M:setVarKey(source)
+function M:setVarKey(source, varKey)
     local name = getName(source)
     if not name then
         return false
     end
-    self:setVarKeyByName(name, self.coder:getKey(source), source.effectStart)
+    self:setVarKeyByName(name, varKey, source.effectStart)
     return true
 end
 

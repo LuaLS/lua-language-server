@@ -19,8 +19,10 @@ lclient():start(function (client)
 
     client:register('workspace/configuration', function ()
         return {
-            ['workspace.library'] = {
-                './lib',
+            {
+                ['workspace.library'] = {
+                    './lib',
+                }
             }
         }
     end)

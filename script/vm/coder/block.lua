@@ -14,16 +14,20 @@ end
 ls.vm.registerCoderProvider('main', function (coder, source)
     ---@cast source LuaParser.Node.Main
 
-    local env = source.localMap['_ENV']
-    if env then
-        coder:addLine('{key} = rt.VAR_G' % {
-            key = coder:getKey(env),
-        })
-        coder:addLine('')
-    end
+    local env = source.ast:findLocal(source.ast.envMode, 0)
+    assert(env)
+    coder:addLine('{key} = rt.VAR_G' % {
+        key = coder:getKey(env),
+    })
+    coder:addLine('')
 
-    local varargs = source.localMap['...']
-    coder:compile(varargs)
+    coder.flow:setVarKey(env, coder:getKey(env))
+
+    local varargs = source.ast:findLocal('...', 0)
+
+    if varargs then
+        coder:compile(varargs)
+    end
 
     parseBlock(coder, source)
 end)

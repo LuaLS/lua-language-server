@@ -31,8 +31,8 @@ function Ast:parseVar()
     if loc then
         var.loc = loc
         loc.refs[#loc.refs+1] = var
-    elseif self.envMode == '_ENV' then
-        local env = self:getLocal('_ENV')
+    else
+        local env = self:getLocal(self.envMode)
         if env then
             var.env = env
             env.envRefs[#env.envRefs+1] = var

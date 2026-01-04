@@ -11,6 +11,8 @@ LocalDef.kind = 'localdef'
 ---@field id string
 ---@field parent LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
 ---@field index integer
+---@field effectStart integer
+---@field effectFinish integer
 ---@field value? LuaParser.Node.Exp
 ---@field refs? LuaParser.Node.Var[]
 ---@field gets? LuaParser.Node.Var[]
@@ -63,6 +65,24 @@ end
 -- _ENV的隐式引用
 Local.__getter.envRefs = function ()
     return {}, true
+end
+
+---@param self LuaParser.Node.Local
+---@return integer
+---@return boolean
+Local.__getter.effectStart = function (self)
+    return self.finish + 1, true
+end
+
+---@param self LuaParser.Node.Local
+---@return integer
+---@return boolean
+Local.__getter.effectFinish = function (self)
+    local block = self.parentBlock
+    if not block then
+        return #self.ast.code + 1, true
+    end
+    return block.finish, true
 end
 
 ---@class LuaParser.Node.Attr: LuaParser.Node.Base
@@ -148,7 +168,13 @@ function Ast:initLocal(loc)
 
     block.locals[#block.locals+1] = loc
 
+    loc.effectStart = self:getLastPos()
+
     local name = loc.id
+    local lastLoc = rawget(block.localMap, name)
+    if lastLoc then
+        lastLoc.effectFinish = loc.effectStart
+    end
     block.localMap[name] = loc
 
     if name ~= '...' then
@@ -275,4 +301,37 @@ function Ast:checkAssignConst()
             end
         end
     end
+end
+
+---@param name string
+---@param pos integer
+---@return LuaParser.Node.Local?
+function Ast:findLocal(name, pos)
+    local block = self:getRecentBlock(pos)
+    if not block then
+        return nil
+    end
+    local loc = block.localMap[name]
+    do -- first try
+        if not loc then
+            return nil
+        end
+        if loc.effectStart <= pos and pos <= loc.effectFinish then
+            return loc
+        end
+    end
+    do -- search all locals
+        block = loc.parentBlock
+        while block do
+            for _, localVar in ipairs(block.locals) do
+                if  localVar.id == name
+                and localVar.effectStart <= pos
+                and localVar.effectFinish >= pos then
+                    return localVar
+                end
+            end
+            block = block.parentBlock
+        end
+    end
+    return nil
 end

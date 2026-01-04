@@ -959,3 +959,21 @@ do
     lt.assertEquals(Y2:view(), 'string')
     lt.assertEquals(YY:view(), 'string | nil')
 end
+
+do
+    TEST_INDEX [[
+    x = 1
+
+    X1 = x
+    ---@alias X1 $X1
+
+    local _ENV = { x = 2 }
+    
+    X2 = x
+
+    ---@alias X2 $X2
+    ]]
+
+    lt.assertEquals(rt.type('X1').value:view(), '1')
+    lt.assertEquals(rt.type('X2').value:view(), '2')
+end

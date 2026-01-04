@@ -196,6 +196,9 @@ function M:getLastPos()
     if ci == self.lastSpaceCI then
         ci = self.lastRightCI
     end
+    if ci == 1 then
+        return 0
+    end
     local token = self.lexer.tokens[ci - 1]
     local pos   = self.lexer.poses[ci - 1]
     return pos + #token

@@ -52,7 +52,6 @@ function S:createVar(source)
         currentKey = key,
     }
     self.variables[name] = var
-    self.coder:saveVariable(name, key, source.effectStart)
     return var
 end
 

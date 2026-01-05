@@ -57,6 +57,9 @@ function M:makeFromAst(ast)
     self:addIndentation(-1)
     self:addLine 'end)'
 
+    self:addLine ''
+    self:addLine('coder.variableMap = ' .. ls.util.dump(self.variableMap))
+
     -- self:simplifyCode()
 
     self.code = table.concat(self.buf):gsub('[ ]+([\r\n])', '%1')
@@ -232,7 +235,7 @@ function M:saveVariable(name, varKey, offset)
         infos = {}
         self.variableMap[name] = infos
     end
-    infos[#infos+1] = { key = varKey, offset = offset }
+    infos[#infos+1] = { key = varKey:sub(4, -3), offset = offset }
 end
 
 ---@param vfile VM.Vfile

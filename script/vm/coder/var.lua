@@ -70,6 +70,7 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         location = coder:makeLocationCode(source),
     })
     coder.flow:createVar(source)
+    coder.flow:setVarKey(source, coder:getKey(source))
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -83,6 +84,7 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         location = coder:makeLocationCode(source),
     })
     coder.flow:createVar(source)
+    coder.flow:setVarKey(source, coder:getKey(source))
 
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 

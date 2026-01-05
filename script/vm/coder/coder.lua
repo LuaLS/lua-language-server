@@ -60,6 +60,8 @@ function M:makeFromAst(ast)
     self:addLine ''
     self:addLine('coder.variableMap = ' .. ls.util.dump(self.variableMap))
 
+    self:makeVisibleInfo()
+
     -- self:simplifyCode()
 
     self.code = table.concat(self.buf):gsub('[ ]+([\r\n])', '%1')
@@ -590,6 +592,10 @@ function M:makeVarName(var)
         end
     end
     return nil
+end
+
+function M:makeVisibleInfo()
+    
 end
 
 ---@return Coder

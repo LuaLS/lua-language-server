@@ -644,11 +644,7 @@ M.__getter.allEquivalents = function (self)
             return
         end
         value:addRef(self)
-        if #child > 0 then
-            ls.util.arrayMerge(results, child)
-        else
-            results[#results+1] = child
-        end
+        results[#results+1] = child
     end
 
     local parent = self.parent

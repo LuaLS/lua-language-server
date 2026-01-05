@@ -66,11 +66,11 @@ function M:addLocation(location)
     self.locations[#self.locations+1] = location
 end
 
----@type table<Node, Node.Field|Node.Field[]>
+---@type table<Node, Node.Field>
 M.fieldMap = nil
 
 ---@param self Node.Table
----@return table<Node, Node.Field|Node.Field[]>
+---@return table<Node, Node.Field>
 ---@return true
 M.__getter.fieldMap = function (self)
     local fieldMap = {}
@@ -182,11 +182,7 @@ M.__getter.valueMap = function (self)
     local rt = self.scope.rt
     local valueMap = {}
     for k, field in pairs(self.fieldMap) do
-        if #field > 0 then
-            ls.util.arrayMerge(valueMap[rt.luaKey(k)], field)
-        else
-            valueMap[rt.luaKey(k)] = field
-        end
+        valueMap[rt.luaKey(k)] = field
     end
     return valueMap, true
 end
@@ -601,28 +597,14 @@ function M:onView(viewer, options)
     for _, key in ipairs(self.keys) do
         local field = self.fieldMap[key]
         local isOptional
-        if #field == 0 then
-            if field.hideInView then
-                goto continue
-            end
-            if field.optional then
-                isOptional = true
-            end
-            if checkSkip(field) then
-                goto continue
-            end
-        else
-            for _, f in ipairs(field) do
-                if f.hideInView then
-                    goto continue
-                end
-                if f.optional then
-                    isOptional = true
-                end
-                if checkSkip(f) then
-                    goto continue
-                end
-            end
+        if field.hideInView then
+            goto continue
+        end
+        if field.optional then
+            isOptional = true
+        end
+        if checkSkip(field) then
+            goto continue
         end
 
         ---@type Node.Key

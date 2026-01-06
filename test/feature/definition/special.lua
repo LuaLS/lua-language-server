@@ -1,9 +1,9 @@
-TEST [[
+TEST_DEF [[
 _ENV.<!x!> = 1
 print(<?x?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 _G.<!x!> = 1
 print(<?x?>)
 ]]
@@ -13,7 +13,7 @@ print(<?x?>)
 -- print(<?x?>)
 -- ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic T, MT
 ---@param t T
 ---@param mt MT
@@ -29,7 +29,7 @@ obj = setmetatable({}, mt)
 value = obj.<?xxx?>
 ]]
 
-TEST [[
+TEST_DEF [[
 --!include setmetatable
 local mt
 mt.__index = mt
@@ -40,7 +40,7 @@ local obj = setmetatable({}, mt)
 obj:<?method1?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 --!include setmetatable
 local mt
 function mt:<!method1!>()
@@ -111,7 +111,7 @@ obj:<?method1?>()
 --obj:x()
 --]]
 
-TEST [[
+TEST_DEF [[
 --!include setmetatable
 local sm = setmetatable
 local mt
@@ -123,7 +123,7 @@ local obj = sm({}, mt)
 obj:<?method1?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 --!include setmetatable
 local mt = {}
 function mt:<!x!>()
@@ -137,7 +137,7 @@ mt:<?x?>()
 ]]
 
 -- TODO 通过代码执行顺序来判断?
-TEST [[
+TEST_DEF [[
 --!include setmetatable
 local mt = {}
 function mt:<!x!>()
@@ -150,7 +150,7 @@ end
 obj:<?x?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 local mt = {}
 
 mt.<!xx!> = 1

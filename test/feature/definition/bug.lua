@@ -1,4 +1,4 @@
-TEST [[
+TEST_DEF [[
 local <!x!>
 function _(x)
 end
@@ -7,14 +7,14 @@ function _()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 function _(<!x!>)
     do return end
     <?x?>()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 local <!a!>
 function a:b()
     a:b()
@@ -30,28 +30,28 @@ end
 --end
 --]]
 
-TEST [[
+TEST_DEF [[
 local <!a!>
 (<?a?> / b)()
 ]]
 
-TEST [[
+TEST_DEF [[
 local <!args!>
 io.load(root / <?args?>.source / 'API' / path)
 ]]
 
-TEST [[
+TEST_DEF [[
 obj[#<?obj?>+1] = {}
 ]]
 
-TEST [[
+TEST_DEF [[
 self = {
     <!results!> = {}
 }
 self[self.<?results?>] = lbl
 ]]
 
-TEST [[
+TEST_DEF [[
 self = {
     results = {
         <!labels!> = {},
@@ -60,19 +60,19 @@ self = {
 self[self.results.<?labels?>] = lbl
 ]]
 
-TEST [[
+TEST_DEF [[
 self.results = {
     <!labels!> = {},
 }
 self[self.results.<?labels?>] = lbl
 ]]
 
-TEST [[
+TEST_DEF [[
 self.results.<!labels!> = {}
 self[self.results.<?labels?>] = lbl
 ]]
 
-TEST [[
+TEST_DEF [[
 local mt = {}
 function mt:<!x!>()
 end
@@ -80,7 +80,7 @@ mt:x()
 mt:<?x?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 local function func(<!a!>)
     x = {
         xx(),
@@ -89,7 +89,7 @@ local function func(<!a!>)
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 local <!x!>
 local t = {
     ...,
@@ -97,18 +97,18 @@ local t = {
 }
 ]]
 
-TEST [[
+TEST_DEF [[
 local a
 local <!b!>
 return f(), <?b?>
 ]]
 
-TEST [[
+TEST_DEF [[
 local a = os.clock()
 local <?<!b!>?> = os.clock()
 ]]
 
-TEST [[
+TEST_DEF [[
 local mt = {}
 
 function mt:<!add!>(a, b)
@@ -122,7 +122,7 @@ local t = init()
 t:<?add?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 --!include setmetatable
 local mt = {}
 mt.__index = mt
@@ -138,7 +138,7 @@ local t = init()
 t:<?add?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 local t = {}
 t.f1 = 1
 t.<!f2!> = t.f1
@@ -146,7 +146,7 @@ t.<!f2!> = t.f1
 print(t.<?f2?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 local t = {}
 t.f1 = 1
 t.<!f2!> = t.f1
@@ -155,7 +155,7 @@ t.f1 = t.f2
 print(t.<?f2?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type string
 string.xx = ''
 string.xx:<?format?>()
@@ -178,7 +178,7 @@ string.xx:<?format?>()
 --v.<?bar1?>
 --]]
 
-TEST [[
+TEST_DEF [[
 local A, B
 
 function A:get1()
@@ -238,12 +238,12 @@ local <!b!> = B:get()
 print(<?b?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 g[a.b.c] = 1
 print(g.<?x?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 local function f()
     return ''
 end
@@ -251,7 +251,7 @@ end
 local <?<!s!>?> = ''
 ]]
 
-TEST [[
+TEST_DEF [[
 local t, a
 local <!v!> = t[a]
 

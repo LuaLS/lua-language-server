@@ -1,16 +1,16 @@
-TEST [[
+TEST_DEF [[
 <!x!> = 1
 <?x?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 do
     <!global!> = 1
 end
 <?global?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 <!x!> = 1
 do
     local x = 1
@@ -18,7 +18,7 @@ end
 <?x?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 x = 1
 do
     local <!x!> = 1
@@ -29,7 +29,7 @@ do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 <!x!> = 1
 if y then
     <!x!> = 2

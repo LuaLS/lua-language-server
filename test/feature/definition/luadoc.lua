@@ -1,30 +1,30 @@
 local config = test.scope.config
 config:set(test.fileUri, 'Lua.type.castNumberToInteger', false)
-TEST [[
+TEST_DEF [[
 ---@class <!A!>
 ---@class B : <?A?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class <!A!>
 ---@type B|<?A?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Class
 local <?<!t!>?>
 ---@type Class
 local x
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Class
 local t
 ---@type Class
 local <?<!x!>?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local mt = {}
 function mt:<!cast!>()
@@ -35,7 +35,7 @@ local obj
 obj:<?cast?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 ---@field x number
 
@@ -48,7 +48,7 @@ local t
 t.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 ---@field <!x!> number
 
@@ -60,7 +60,7 @@ local t
 t.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local A
 
@@ -77,7 +77,7 @@ local t
 local <!<?v?>!> = t.x
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local A
 
@@ -92,7 +92,7 @@ local t
 local <!<?v?>!> = t.x
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type A
 local obj
 obj:<?func?>()
@@ -103,7 +103,7 @@ function mt:<!func!>()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type A
 local obj
 obj:<?func?>()
@@ -114,51 +114,51 @@ function mt:<!func!>()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@alias <!B!> A
 ---@type <?B?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class <!Class!>
 ---@param a <?Class?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type <!fun():void!>
 local <?<!f!>?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@param f <!fun():void!>
 function t(<?<!f!>?>) end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@vararg <!fun():void!>
 function f(<?...?>) end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@param ... <!fun():void!>
 function f(<?...?>) end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@alias A <!fun()!>
 
 ---@type A
 local <!<?x?>!>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A: <!{}!>
 
 ---@type A
 local <!<?x?>!>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@overload <!fun(y: boolean)!>
 ---@param x number
 ---@param y boolean
@@ -168,7 +168,7 @@ function <!f!>(x, y, z) end
 print(<?f?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 local function f()
     local x
     return x
@@ -181,7 +181,7 @@ local mt
 local <?<!x!>?> = f()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Class
 ---@field <!name!> string
 ---@field id integer
@@ -189,13 +189,13 @@ local mt = {}
 mt.<?name?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@alias <!A!> string
 
 ---@type <?A?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class X
 ---@field <!a!> string
 
@@ -206,7 +206,7 @@ local y
 y.<?a?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class <!A!>
 local mt
 
@@ -216,7 +216,7 @@ end
 ---@see <?A?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local mt
 
@@ -226,14 +226,14 @@ end
 ---@see <?A.f?>
 ]]
 
-TEST [[
+TEST_DEF [[
 AAA = {}
 AAA.<!BBB!> = 1
 
 ---@see <?AAA.BBB?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class AAAA
 ---@field a AAAA
 AAAA = {};
@@ -245,14 +245,14 @@ end
 AAAA.a.<?SSDF?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@return <!fun()!>
 local function f() end
 
 local <?<!r!>?> = f()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic T
 ---@param p T
 ---@return T
@@ -262,7 +262,7 @@ local k = <!function () end!>
 local <?<!r!>?> = f(k)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -276,7 +276,7 @@ local v1 = Generic(Foo)
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:bar1() end
@@ -290,7 +290,7 @@ local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:bar1() end
@@ -304,7 +304,7 @@ local v1 = Generic(Foo)
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -318,7 +318,7 @@ local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class n.Foo
 local Foo = {}
 function Foo:bar1() end
@@ -332,7 +332,7 @@ local v1 = Generic(Foo)
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class n.Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -346,7 +346,7 @@ local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo*
 local Foo = {}
 function Foo:bar1() end
@@ -360,7 +360,7 @@ local v1 = Generic(Foo)
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo*
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -374,7 +374,7 @@ local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class n.Foo.2
 local Foo = {}
 function Foo:bar1() end
@@ -388,7 +388,7 @@ local v1 = Generic(Foo)
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class n.Foo.2
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -402,7 +402,7 @@ local v1 = Generic("Foo")
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class n-Foo-2
 local Foo = {}
 function Foo:bar1() end
@@ -416,7 +416,7 @@ local v1 = Generic({Foo})
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class n-Foo-2
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -430,7 +430,7 @@ local v1 = Generic({"Foo"})
 print(v1.<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local t
 
@@ -443,7 +443,7 @@ local c = b[1]
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local t
 
@@ -456,7 +456,7 @@ local c = b[1]
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -466,7 +466,7 @@ local v1
 print(v1[1].<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -495,14 +495,14 @@ print(v1[1].<?bar1?>)
 --print(v1.<?bar1?>)
 --]]
 
-TEST [[
+TEST_DEF [[
 ---@type fun():<!fun()!>
 local f
 
 local <?<!f2!>?> = f()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic T
 ---@type fun(x: T):T
 local f
@@ -510,7 +510,7 @@ local f
 local <?<!v2!>?> = f(<!function () end!>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic T
 ---@param x T
 ---@return fun():T
@@ -520,7 +520,7 @@ local v1 = f(<!function () end!>)
 local <?<!v2!>?> = v1()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic T
 ---@type fun(x: T):fun():T
 local f
@@ -529,7 +529,7 @@ local v1 = f(<!function () end!>)
 local <?<!v2!>?> = v1()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@return fun(x: V):V
 local function f(x) end
@@ -538,7 +538,7 @@ local v1 = f()
 local <?<!v2!>?> = v1(<!function () end!>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@param x V[]
 ---@return V
@@ -555,7 +555,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@param x { [number]: V }
 ---@return V
@@ -572,7 +572,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@param x { [number]: V }
 ---@return V
@@ -589,7 +589,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@param x { [integer]: V }
 ---@return V
@@ -606,7 +606,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@param x { [number]: V }
 ---@return V
@@ -623,7 +623,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic K
 ---@param x { [K]: number }
 ---@return K
@@ -640,7 +640,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic K
 ---@param x { [K]: A }
 ---@return K
@@ -657,7 +657,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic K
 ---@param x { [K]: number }
 ---@return K
@@ -674,7 +674,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic K
 ---@param x { [K]: integer }
 ---@return K
@@ -691,7 +691,7 @@ local c = f(b)
 c.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V
 ---@return fun(t: V[]):V
 local function f() end
@@ -704,7 +704,7 @@ local f2 = f()
 local <?<!c!>?> = f2(b)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic T, V
 ---@param t T
 ---@return fun(t: V[]):V
@@ -724,7 +724,7 @@ local d = f2(c)
 d.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@generic V, T
 ---@param t T
 ---@return fun(t: V): V
@@ -736,7 +736,7 @@ for <!v!> in iterator(<!function () end!>) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@alias C <!fun()!>
 
 ---@type C[]
@@ -753,7 +753,7 @@ for <!v!> in iterator(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class TT<V>: { <!x!>: V }
 
 ---@type TT<A>
@@ -764,7 +764,7 @@ local t
 print(t.<?x?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@alias TT<V> { <!x!>: V }
 
 ---@type TT<A>
@@ -775,7 +775,7 @@ local t
 print(t.<?x?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class TT<V>: { [number]: V }
 
 ---@type TT<<!{}!>>
@@ -792,7 +792,7 @@ for <!v!> in iterator(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class TT<K, V>: { [K]: V }
 
 ---@type TT<number, <!{}!>>
@@ -809,7 +809,7 @@ for <!v!> in iterator(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -829,7 +829,7 @@ for i, v in ipairs(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -849,7 +849,7 @@ for i, v in ipairs(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -870,7 +870,7 @@ for k, v in pairs(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -891,7 +891,7 @@ for k, v in pairs(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -911,7 +911,7 @@ for i, v in ipairs(v1) do
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end
@@ -921,7 +921,7 @@ local v1
 print(v1[1][1].<?bar1?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class X
 
 ---@class Y
@@ -934,14 +934,14 @@ local z
 z.<?a?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type { <!x!>: number, y: number }
 local t
 
 print(t.<?x?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 ---@field [<!1!>]? <!{}!>
 local t
@@ -949,14 +949,14 @@ local t
 local <!<?v?>!> = t[1]
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type { [<!1!>]?: <!{}!> }
 local t
 
 local <!<?v?>!> = t[1]
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 ---@field [<!'xx'!>]? <!{}!>
 local t
@@ -964,14 +964,14 @@ local t
 print(t.<?xx?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type { [<!'xx'!>]?: boolean }
 local t
 
 print(t.<?xx?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local <!t!>
 
@@ -981,7 +981,7 @@ end
 <?t?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local t = {
     <!x!> = nil,
@@ -992,7 +992,7 @@ local f
 f.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 G = {
     <!x!> = nil,
@@ -1003,13 +1003,13 @@ local f
 f.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class <!XXX!><K, V>: {}
 
 ---@type <?XXX?><>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class <!YYY!>
 
 ---@type XXX<<?YYY?>>
@@ -1029,7 +1029,7 @@ TEST [[
 -- end
 -- ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 ---@field <!x!> number
 
@@ -1039,7 +1039,7 @@ local t = {
 }
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 ---@field <!x!> number
 
@@ -1051,7 +1051,7 @@ f {
 }
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class A
 local a
 a.__index = a
@@ -1061,7 +1061,7 @@ local b
 b.<!<?__index?>!> = b
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class myClass
 local myClass = { nested = {} }
 
@@ -1073,7 +1073,7 @@ local class
 class.nested.<?fn?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@class myClass
 local myClass = { has = { nested = {} } }
 
@@ -1085,7 +1085,7 @@ local class
 class.has.nested.<?fn?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@type table<string, integer>
 local x = {
     <!a!> = 1,
@@ -1098,13 +1098,13 @@ print(x.<?a?>)
 
 config:set(test.fileUri, 'Lua.type.castNumberToInteger', true)
 
-TEST [[
+TEST_DEF [[
 ---@class <!A!>
 
 ---@class <!<?A?>!>
 ]]
 
-TEST [[
+TEST_DEF [[
 ---@alias <!A!> number
 
 ---@alias <!<?A?>!> number

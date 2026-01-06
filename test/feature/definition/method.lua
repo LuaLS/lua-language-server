@@ -1,4 +1,4 @@
-TEST [[
+TEST_DEF [[
 function mt:<!a!>()
 end
 function mt:b()
@@ -6,7 +6,7 @@ function mt:b()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 function mt:<!m1!>()
 end
 function mt:m2()
@@ -14,7 +14,7 @@ function mt:m2()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 function mt:m3()
     mt:<?m4?>()
 end
@@ -22,7 +22,7 @@ function mt:<!m4!>()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 function mt:m3()
     self:<?m4?>()
 end
@@ -30,7 +30,7 @@ function mt:<!m4!>()
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 local mt
 
 function mt:f()
@@ -40,7 +40,7 @@ end
 mt.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 function G:f()
     self.<!x!> = 1
 end
@@ -48,7 +48,7 @@ end
 G.<?x?>
 ]]
 
-TEST [[
+TEST_DEF [[
 function G.H:f()
     self.<!x!> = 1
 end

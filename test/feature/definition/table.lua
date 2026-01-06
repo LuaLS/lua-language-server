@@ -1,33 +1,33 @@
-TEST [[
+TEST_DEF [[
 local <!t!>
 a = {
     <?t?>
 }
 ]]
 
-TEST [[
+TEST_DEF [[
 local t
 t.<!x!> = 1
 t.<?x?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 t.<!x!> = 1
 t.<?x?>()
 ]]
 
-TEST [[
+TEST_DEF [[
 local <!t!>
 t.x = 1
 <?t?>.x = 1
 ]]
 
-TEST [[
+TEST_DEF [[
 t.<!x!> = 1
 t.<?x?>.y = 1
 ]]
 
-TEST [[
+TEST_DEF [[
 local t
 t.<!x!> = 1
 t.<?x?>()
@@ -45,65 +45,65 @@ t.<?x?>()
 --t[<?true?>]()
 --]]
 
-TEST [[
+TEST_DEF [[
 local t
 t[<!"method"!>] = 1
 t[<?"method"?>]()
 ]]
 
-TEST [[
+TEST_DEF [[
 local t
 t[<!"longString"!>] = 1
 t[ <?[==[longString]==]?> ]()
 ]]
 
-TEST [[
+TEST_DEF [[
 local t
 t.<!x!> = 1
 t[<?'x'?>]()
 ]]
 
-TEST [[
+TEST_DEF [[
 local t
 t.<!a!> = 1
 t.<?a?>.b()
 ]]
 
-TEST [[
+TEST_DEF [[
 local t
 local <!x!>
 t[<?x?>]()
 ]]
 
-TEST[[
+TEST_DEF[[
 local <!t!>
 local _ = {
     _ = <?t?>
 }
 ]]
 
-TEST[[
+TEST_DEF[[
 local <!t!>
 t {
     _ = <?t?>.x
 }
 ]]
 
-TEST[[
+TEST_DEF[[
 local t = {
     <!insert!> = 1,
 }
 t.<?insert?>()
 ]]
 
-TEST[[
+TEST_DEF[[
 local t = {
     [<!'insert'!>] = 1,
 }
 t.<?insert?>()
 ]]
 
-TEST[[
+TEST_DEF[[
 local t;t = {
     <!insert!> = 1,
 }
@@ -117,7 +117,7 @@ t.<?insert?>()
 --y.<?insert?>()
 --]]
 
-TEST[[
+TEST_DEF[[
 local t = {
     <!insert!> = 1,
 }
@@ -128,14 +128,14 @@ t.<?insert?>()
 ]]
 
 
-TEST [[
+TEST_DEF [[
 local x
 x.y.<!z!> = 1
 print(x.y.<?z?>)
 ]]
 
 
-TEST [[
+TEST_DEF [[
 local x
 x.y = {
     <!z!> = 1
@@ -143,7 +143,7 @@ x.y = {
 print(x.y.<?z?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 local x = {
     y = {
         <!z!> = 1
@@ -152,7 +152,7 @@ local x = {
 print(x.y.<?z?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 local function f()
     local t = {
         <!x!> = 1,
@@ -169,7 +169,7 @@ t.<?x?>
 --print(t[<?1?>])
 --]]
 
-TEST [[
+TEST_DEF [[
 local t = {
     <?x?> = 1,
 }

@@ -1,17 +1,17 @@
-TEST [[
+TEST_DEF [[
 X.<!y!> = 1
 
 print(X.<?y?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 local x = {}
 x.<!y!> = 1
 
 print(x.<?y?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 X.<!y!> = 1
 
 local t = X
@@ -19,7 +19,7 @@ local t = X
 print(t.<?y?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 X.x.<!y!> = 1
 
 local t = X.x
@@ -27,7 +27,7 @@ local t = X.x
 print(t.<?y?>)
 ]]
 
-TEST [[
+TEST_DEF [[
 X.x.<!y!> = 1
 
 local t = X

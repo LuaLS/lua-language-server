@@ -1,28 +1,28 @@
-TEST [[
+TEST_DEF [[
 ::<!LABEL!>::
 goto <?LABEL?>
 ]]
 
-TEST [[
+TEST_DEF [[
 goto <?LABEL?>
 ::<!LABEL!>::
 ]]
 
-TEST [[
+TEST_DEF [[
 ::LABEL::
 function _()
     goto <?LABEL?>
 end
 ]]
 
-TEST [[
+TEST_DEF [[
 do
     goto <?LABEL?>
 end
 ::<!LABEL!>::
 ]]
 
-TEST [[
+TEST_DEF [[
 ::LABEL::
 goto <?LABEL?>
 ::<!LABEL!>::

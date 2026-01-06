@@ -36,10 +36,12 @@ function Ast:parseRepeat()
             repeatNode.condition = condition
             condition.parent = repeatNode
         end
+
+        repeatNode.finish = self:getLastPos()
+    else
+        repeatNode.finish = self:getBlockEndPos()
     end
     self:blockFinish(repeatNode)
-
-    repeatNode.finish = self:getLastPos()
 
     return repeatNode
 end

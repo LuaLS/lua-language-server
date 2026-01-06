@@ -45,7 +45,11 @@ function Ast:parseWhile()
     local symbolPos2 = self:assertSymbolEnd(pos, pos + #'while')
     whileNode.symbolPos2 = symbolPos2
 
-    whileNode.finish = self:getLastPos()
+    if symbolPos2 then
+        whileNode.finish = self:getLastPos()
+    else
+        whileNode.finish = self:getBlockEndPos()
+    end
 
     return whileNode
 end

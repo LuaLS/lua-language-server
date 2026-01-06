@@ -204,6 +204,18 @@ function M:getLastPos()
     return pos + #token
 end
 
+--- 获取到下个有效词之前的位置
+---@private
+---@return integer
+function M:getBlockEndPos()
+    local ci = self.lexer.ci
+    local pos = self.lexer.poses[ci]
+    if not pos then
+        return #self.code
+    end
+    return pos
+end
+
 -- 创建一个节点
 ---@private
 ---@generic T: string

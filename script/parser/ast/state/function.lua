@@ -128,7 +128,12 @@ function Ast:parseFunction(isLocal)
     local symbolPos3 = self:assertSymbolEnd(pos, pos + #'function')
 
     func.symbolPos3 = symbolPos3
-    func.finish     = self:getLastPos()
+
+    if symbolPos3 then
+        func.finish = self:getLastPos()
+    else
+        func.finish = self:getBlockEndPos()
+    end
 
     return func
 end

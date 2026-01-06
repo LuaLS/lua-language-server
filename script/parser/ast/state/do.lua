@@ -28,7 +28,11 @@ function Ast:parseDo()
     self:skipSpace()
     doNode.symbolPos = self:assertSymbol 'end'
 
-    doNode.finish = self:getLastPos()
+    if doNode.symbolPos then
+        doNode.finish = self:getLastPos()
+    else
+        doNode.finish = self:getBlockEndPos()
+    end
 
     return doNode
 end

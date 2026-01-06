@@ -100,10 +100,13 @@ function Ast:parseFor()
     end
 
     self:skipSpace()
-    local symbolPos3 = self:assertSymbolEnd(pos, pos + #'for')
-    forNode.symbolPos3 = symbolPos3
+    forNode.symbolPos3 = self:assertSymbolEnd(pos, pos + #'for')
 
-    forNode.finish = self:getLastPos()
+    if forNode.symbolPos3 then
+        forNode.finish = self:getLastPos()
+    else
+        forNode.finish = self:getBlockEndPos()
+    end
 
     return forNode
 end

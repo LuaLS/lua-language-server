@@ -16,13 +16,11 @@ ls.vm.registerCoderProvider('main', function (coder, source)
 
     local env = source.ast:findLocal(source.ast.envMode, 0)
     assert(env)
-    coder:addLine('{key} = rt.VAR_G' % {
-        key = coder:getKey(env),
+    coder:compile(env)
+    coder:addLine('{varKey}:setMasterVariable(rt.VAR_G)' % {
+        varKey = coder:getKey(env),
     })
     coder:addLine('')
-
-    coder.flow:createVar(env)
-    coder.flow:setVarKey(env, coder:getKey(env))
 
     local varargs = source.ast:findLocal('...', 0)
 

@@ -1173,6 +1173,9 @@ local sbyteMap = {
 ---@param b string
 ---@return boolean
 function m.stringLess(a, b)
+    if a == b then
+        return false
+    end
     for i = 1, #a do
         if i > #b then
             return false

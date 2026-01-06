@@ -1,6 +1,7 @@
 
 ---@class LuaParser.Node.If: LuaParser.Node.Block
 ---@field childs LuaParser.Node.IfChild[]
+---@field symbolPos? integer # end 的位置
 local If = Class('LuaParser.Node.If', 'LuaParser.Node.Block')
 
 If.kind = 'if'
@@ -49,9 +50,12 @@ function Ast:parseIf()
     end
 
     self:skipSpace()
-    self:assertSymbolEnd(pos, pos + #'if')
-
-    ifNode.finish = self:getLastPos()
+    ifNode.symbolPos = self:assertSymbolEnd(pos, pos + #'if')
+    if ifNode.symbolPos then
+        ifNode.finish = self:getLastPos()
+    else
+        ifNode.finish = self:getBlockEndPos()
+    end
 
     return ifNode
 end
@@ -88,7 +92,7 @@ function Ast:parseIfChildIf()
     self:blockStart(node)
     self:blockParseChilds(node)
     self:blockFinish(node)
-    node.finish = self:getLastPos()
+    node.finish = self:getBlockEndPos()
 
     return node
 end
@@ -117,7 +121,7 @@ function Ast:parseIfChildElseIf()
     self:blockStart(node)
     self:blockParseChilds(node)
     self:blockFinish(node)
-    node.finish = self:getLastPos()
+    node.finish = self:getBlockEndPos()
 
     return node
 end
@@ -141,7 +145,7 @@ function Ast:parseIfChildElse()
     self:blockParseChilds(node)
     self:blockFinish(node)
 
-    node.finish = self:getLastPos()
+    node.finish = self:getBlockEndPos()
 
     return node
 end

@@ -630,10 +630,10 @@ function M:makeVisibleInfo(ast)
         result[id] = ls.util.mergeLayers(list)
     end
 
-    self.visibleVariables = result
+    self.variables = result
 
 
-    self:addLine('coder.visibleVariables = {')
+    self:addLine('coder.variables = {')
     self:addIndentation(1)
     for id, list in ls.util.sortPairs(result) do
         if parser.isName(id) then
@@ -659,7 +659,7 @@ function M:findVariable(name, offset)
     if not self.map then
         return nil
     end
-    local varList = self.visibleVariables[name]
+    local varList = self.variables[name]
     if not varList then
         return nil
     end
@@ -673,6 +673,31 @@ function M:findVariable(name, offset)
         end
     end
     return nil
+end
+
+---@param offset integer
+---@return Node.Variable[]
+function M:findVisibleVariables(offset)
+    if not self.map then
+        return {}
+    end
+
+    ---@type Node.Variable[]
+    local result = {}
+    for name, varList in pairs(self.variables) do
+        for i = 1, #varList do
+            local info = varList[i]
+            local s = info[1]
+            local e = info[2]
+            if offset >= s and offset <= e then
+                local varKey = info[3]
+                result[#result+1] = self.map[varKey]
+                break
+            end
+        end
+    end
+
+    return result
 end
 
 ---@return Coder

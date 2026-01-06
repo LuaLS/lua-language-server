@@ -3,7 +3,7 @@ ls.feature.helper = {}
 
 ---@param results Location[]
 ---@return Location[]
-function ls.feature.helper.organizeResults(results)
+function ls.feature.helper.organizeResultsByRange(results)
     table.sort(results, function (a, b)
         return a.range[1] < b.range[1]
     end)
@@ -39,4 +39,29 @@ function ls.feature.helper.convertLocation(loc, source)
         location.originRange = { source.start, source.finish }
     end
     return location
+end
+
+---@return PriorityQueue
+---@return fun(param: any): any[]
+function ls.feature.helper.providers()
+    local providers = ls.tools.pqueue.create()
+
+    return providers, function (param)
+        local results = {}
+        local skipPriorty = -1
+        for provider, priority in providers:pairs() do
+            if priority <= skipPriorty then
+                break
+            end
+            xpcall(provider, log.error, param, function (loc)
+                results[#results+1] = loc
+            end, function (p)
+                p = p or priority
+                if skipPriorty < p then
+                    skipPriorty = p
+                end
+            end)
+        end
+        return results
+    end
 end

@@ -1,4 +1,4 @@
-local providers = ls.tools.pqueue.create()
+local providers, runner = ls.feature.helper.providers()
 
 ---@class Feature.Definition.Param
 ---@field uri Uri
@@ -15,9 +15,6 @@ function ls.feature.definition(uri, offset)
         return {}
     end
 
-    local results = {}
-    local skipPriorty = -1
-
     local param = {
         uri     = uri,
         offset  = offset,
@@ -25,21 +22,9 @@ function ls.feature.definition(uri, offset)
         sources = sources,
     }
 
-    for provider, priority in providers:pairs() do
-        if priority <= skipPriorty then
-            break
-        end
-        xpcall(provider, log.error, param, function (loc)
-            results[#results+1] = loc
-        end, function (p)
-            p = p or priority
-            if skipPriorty < p then
-                skipPriorty = p
-            end
-        end)
-    end
+    local results = runner(param)
 
-    return ls.feature.helper.organizeResults(results)
+    return ls.feature.helper.organizeResultsByRange(results)
 end
 
 ---@param callback fun(param: Feature.Definition.Param, push: fun(loc: Location), skip: fun(priority?: integer))

@@ -31,7 +31,7 @@ function ls.feature.implementation(uri, offset)
         xpcall(provider, log.error, param, push)
     end
 
-    return ls.feature.helper.organizeResults(results)
+    return ls.feature.helper.organizeResultsByRange(results)
 end
 
 ---@param callback fun(param: Feature.Implementation.Param, push: fun(loc: Location))

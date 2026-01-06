@@ -8,3 +8,4 @@ require 'feature.helper'
 
 require 'feature.definition'
 require 'feature.implementation'
+require 'feature.completion'

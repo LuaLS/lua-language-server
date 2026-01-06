@@ -21,6 +21,7 @@ require 'language-server.capability.document-synchronization.did-close-text-docu
 
 require 'language-server.capability.language-features.go-to-definition'
 require 'language-server.capability.language-features.hover'
+require 'language-server.capability.language-features.completion'
 
 local server = require 'language-server.language-server'
 

@@ -34,7 +34,7 @@ end
 ---@param offset integer # 字节位置
 ---@param encoding? Encoder.Encoding
 ---@return integer row # 第一行是0
----@return integer col # 第一列是0，根据编码的字符位置
+---@return integer col # 第一列是0，根据编码的光标位置
 function M:offsetToPosition(offset, encoding)
     local lineStarts = self._lineStarts
 
@@ -89,7 +89,7 @@ end
 
 --- 将行列（0-based）转换为偏移位置（0-based）
 ---@param row integer # 第一行是0
----@param col integer # 第一列是0，根据编码的字符位置
+---@param col integer # 第一列是0，根据编码的光标位置
 ---@param encoding? Encoder.Encoding
 ---@return integer offset # 字节位置
 function M:positionToOffset(row, col, encoding)

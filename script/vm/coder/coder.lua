@@ -624,7 +624,7 @@ function M:makeVisibleInfo(ast)
 
     for id, list in pairs(vars) do
         table.sort(list, function (a, b)
-            return a[2] < b[2]
+            return a[1] < b[1]
         end)
 
         result[id] = ls.util.mergeLayers(list)
@@ -650,6 +650,29 @@ function M:makeVisibleInfo(ast)
     end
     self:addIndentation(-1)
     self:addLine('}')
+end
+
+---@param name string
+---@param offset integer
+---@return Node.Variable?
+function M:findVariable(name, offset)
+    if not self.map then
+        return nil
+    end
+    local varList = self.visibleVariables[name]
+    if not varList then
+        return nil
+    end
+    for i = 1, #varList do
+        local info = varList[i]
+        local s = info[1]
+        local e = info[2]
+        if offset >= s and offset <= e then
+            local varKey = info[3]
+            return self.map[varKey]
+        end
+    end
+    return nil
 end
 
 ---@return Coder

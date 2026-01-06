@@ -79,6 +79,7 @@ function M:index()
     end)
 
     self.version = version
+    self.document = document
 end
 
 ---@async
@@ -183,6 +184,16 @@ function M:getVariable(source)
         return node
     end
     return nil
+end
+
+---@param name string
+---@param offset integer
+---@return Node.Variable?
+function M:findVariable(name, offset)
+    if not self.coder then
+        return nil
+    end
+    return self.coder:findVariable(name, offset)
 end
 
 function M:remove()

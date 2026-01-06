@@ -31,6 +31,7 @@ ls.tools = {
     pathTable     = require 'tools.path-table',
     caselessTable = require 'tools.caseless-table',
     pqueue        = require 'tools.priority-queue',
+    activePool    = require 'tools.active-pool',
 }
 ls.uri           = require 'tools.uri'
 ls.timer         = require 'tools.timer'

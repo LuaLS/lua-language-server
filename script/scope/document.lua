@@ -8,6 +8,19 @@ local M = Class 'Document'
 Extends('Document', 'GCHost')
 
 M.version = 0
+M.astPool = ls.tools.activePool.create {
+    { 1,   10 * 60 * 1000 },
+    { 3,   60 * 1000 },
+    { 5,   30 * 1000 },
+    { 100, 10 * 1000 },
+}
+
+ls.timer.loop(5, function ()
+    ---@param obj Document
+    M.astPool:update(5 * 1000, function (obj)
+        obj.ast = nil
+    end)
+end)
 
 ---@param file File
 function M:__init(file)
@@ -40,6 +53,7 @@ M.__getter.ast = function (self)
     if not suc then
         return false, true
     end
+    M.astPool:push(self, ls.timer.clock())
     return ast, true
 end
 

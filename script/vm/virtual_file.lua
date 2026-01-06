@@ -196,6 +196,15 @@ function M:findVariable(name, offset)
     return self.coder:findVariable(name, offset)
 end
 
+---@param offset integer
+---@return Node.Variable[]
+function M:findVisibleVariables(offset)
+    if not self.coder then
+        return {}
+    end
+    return self.coder:findVisibleVariables(offset)
+end
+
 function M:remove()
     Delete(self)
 end

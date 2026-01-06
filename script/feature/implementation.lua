@@ -1,4 +1,4 @@
-local providers = {}
+local providers, runner = ls.feature.helper.providers()
 
 ---@class Feature.Implementation.Param
 ---@field uri Uri
@@ -15,11 +15,6 @@ function ls.feature.implementation(uri, offset)
         return {}
     end
 
-    local results = {}
-    local function push(loc)
-        results[#results+1] = loc
-    end
-
     local param = {
         uri     = uri,
         offset  = offset,
@@ -27,9 +22,7 @@ function ls.feature.implementation(uri, offset)
         sources = sources,
     }
 
-    for _, provider in ipairs(providers) do
-        xpcall(provider, log.error, param, push)
-    end
+    local results = runner(param)
 
     return ls.feature.helper.organizeResultsByRange(results)
 end

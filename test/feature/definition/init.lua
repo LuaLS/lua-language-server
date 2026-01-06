@@ -16,16 +16,14 @@ end
 
 ---@param script string
 function TEST_DEF(script)
-    test.scope.rt:reset()
-    local _ <close> = test.checkInclude(script)
-    local newScript, catched = test.catch(script, '!?')
+    local ranges, catched = TEST_FRAME(script, function (catched)
+        local results = ls.feature.definition(test.fileUri, catched['?'][1][1])
 
-    local file <close>  = ls.file.setServerText(test.fileUri, newScript)
-    local vfile <close> = test.scope.vm:indexFile(test.fileUri)
+        local ranges = ls.util.map(results, function (v, k)
+            return v.range
+        end)
 
-    local results = ls.feature.definition(test.fileUri, catched['?'][1][1])
-    local ranges = ls.util.map(results, function (v, k)
-        return v.range
+        return ranges
     end)
     assert(founded(catched['!'], ranges))
 end

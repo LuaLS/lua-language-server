@@ -22,6 +22,7 @@ ls.vm.registerCoderProvider('main', function (coder, source)
     coder:addLine('')
 
     coder.flow:createVar(env)
+    coder.flow:setVarKey(env, coder:getKey(env))
 
     local varargs = source.ast:findLocal('...', 0)
 

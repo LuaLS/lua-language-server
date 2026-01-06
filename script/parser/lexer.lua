@@ -284,7 +284,7 @@ end
 ---@param str string
 ---@return boolean
 function API.isWord(str)
-    return Lexer.Word:match(str) == #str
+    return Lexer.Word:match(str) == #str + 1
 end
 
 return API

@@ -58,9 +58,7 @@ function M:makeFromAst(ast)
     self:addLine 'end)'
 
     self:addLine ''
-    self:addLine('coder.variableMap = ' .. ls.util.dump(self.variableMap))
-
-    self:makeVisibleInfo()
+    self:makeVisibleInfo(ast)
 
     -- self:simplifyCode()
 
@@ -594,8 +592,64 @@ function M:makeVarName(var)
     return nil
 end
 
-function M:makeVisibleInfo()
-    
+---@param ast LuaParser.Ast
+function M:makeVisibleInfo(ast)
+    ---@type table<string, [string, integer, integer][]>
+    local vars = {}
+
+    ---@param nodes LuaParser.Node.Local[]
+    local function check(nodes)
+        for _, node in ipairs(nodes) do
+            local id = node.id
+            if not vars[id] then
+                vars[id] = {}
+            end
+            local name = self:getVarName(node)
+            assert(name)
+            local variableInfo = self.variableMap[name]
+            for _, info in ipairs(variableInfo) do
+                table.insert(vars[id], {
+                    info.offset,
+                    node.parentBlock.finish,
+                    info.key,
+                })
+            end
+        end
+    end
+
+    check(ast.nodesMap['local'])
+    check(ast.nodesMap['param'])
+
+    local result = {}
+
+    for id, list in pairs(vars) do
+        table.sort(list, function (a, b)
+            return a[2] < b[2]
+        end)
+
+        result[id] = ls.util.mergeLayers(list)
+    end
+
+    self.visibleVariables = result
+
+
+    self:addLine('coder.visibleVariables = {')
+    self:addIndentation(1)
+    for id, list in ls.util.sortPairs(result) do
+        if parser.isName(id) then
+            self:addLine('{id} = {' % { id = id })
+        else
+            self:addLine('[{id%q}] = {' % { id = id })
+        end
+        self:addIndentation(1)
+        for _, info in ipairs(list) do
+            self:addLine('{ {}, {}, {%q} },' % info)
+        end
+        self:addIndentation(-1)
+        self:addLine('},')
+    end
+    self:addIndentation(-1)
+    self:addLine('}')
 end
 
 ---@return Coder

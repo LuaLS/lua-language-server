@@ -16,12 +16,12 @@ function Ast:parseCatBlockInRange(start, finish)
         finish = finish,
     })
 
-    self:skipSpace()
-    self:blockStart(block)
-    self:blockParseChilds(block)
-    self:blockFinish(block)
+    -- self:skipSpace()
+    -- self:blockStart(block)
+    -- self:blockParseChilds(block)
+    -- self:blockFinish(block)
 
-    self:skipSpace()
+    -- self:skipSpace()
 
     return block
 end

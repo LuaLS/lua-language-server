@@ -1,4 +1,5 @@
 local parser = require 'parser'
+local lexer = require 'parser.lexer'
 
 ---@param uris Uri[]
 local function testSyncTime(uris)
@@ -62,6 +63,54 @@ local function testAsyncTime(uris)
     end
     print('=== 异步解析 ===')
     print('总大小为: {%.2f} MB，索引总时间为: {%.2f} 秒，速度： {%.2f} MB/s' % {
+        totalSize,
+        duration,
+        totalSize / duration,
+    })
+end
+
+local function testLexerTime(uris)
+    local c1 = os.clock()
+    local refs = {}
+    for _, uri in ipairs(uris) do
+        local file = ls.file.get(uri) --[[@as File]]
+        refs[#refs+1] = lexer.new():parse(assert(file:getText()))
+    end
+    local c2 = os.clock()
+    local duration = c2 - c1
+
+    assert(#refs == #uris)
+
+    local totalSize = 0
+    for _, uri in ipairs(uris) do
+        totalSize = totalSize + ls.file.get(uri):getText():len() / 1024 / 1024
+    end
+    print('=== 词法解析 ===')
+    print('总大小为: {%.2f} MB，解析总时间为: {%.2f} 秒，速度： {%.2f} MB/s' % {
+        totalSize,
+        duration,
+        totalSize / duration,
+    })
+end
+
+local function testParserTime(uris)
+    local c1 = os.clock()
+    local refs = {}
+    for _, uri in ipairs(uris) do
+        local file = ls.file.get(uri) --[[@as File]]
+        refs[#refs+1] = parser.compile(assert(file:getText()), uri)
+    end
+    local c2 = os.clock()
+    local duration = c2 - c1
+
+    assert(#refs == #uris)
+
+    local totalSize = 0
+    for _, uri in ipairs(uris) do
+        totalSize = totalSize + ls.file.get(uri):getText():len() / 1024 / 1024
+    end
+    print('=== 语法解析 ===')
+    print('总大小为: {%.2f} MB，解析总时间为: {%.2f} 秒，速度： {%.2f} MB/s' % {
         totalSize,
         duration,
         totalSize / duration,
@@ -157,4 +206,6 @@ do
 
     testSyncTime(result.uris)
     testAsyncTime(result.uris)
+    testLexerTime(result.uris)
+    testParserTime(result.uris)
 end

@@ -17,7 +17,7 @@ M.astPool = ls.tools.activePool.create {
 
 ls.timer.loop(5, function ()
     ---@param obj Document
-    M.astPool:update(5 * 1000, function (obj)
+    M.astPool:update(ls.timer.clock(), function (obj)
         obj.ast = nil
     end)
 end)

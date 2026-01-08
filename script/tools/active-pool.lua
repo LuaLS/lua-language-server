@@ -1,4 +1,4 @@
-local lk = ls.tools.linkedTable
+local lk = require 'tools.linked-table'
 
 ---@class ActivePool
 local M = {}

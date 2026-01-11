@@ -1542,6 +1542,10 @@ local function compileLocal(source)
 end
 
 ---@param source parser.object
+---Resolves generic type names from a class's generic parameters
+---@param uri uri
+---@param classGlobal vm.global
+---@param typeName string
 ---@param mfunc  parser.object
 ---@param index  integer
 ---@param args   parser.object[]
@@ -1557,6 +1561,62 @@ local function bindReturnOfFunction(source, mfunc, index, args)
             break
         end
     end
+
+    -- Handle method calls on generic class instances
+    -- When calling b:getValue() where b is Box<string>, resolve T to string
+    local call = source.parent
+    if call and call.type == 'call' then
+        local callNode = call.node
+        if callNode and (callNode.type == 'getmethod' or callNode.type == 'getfield') then
+            local receiver = callNode.node
+            if receiver then
+                local receiverNode = vm.compileNode(receiver)
+                for rn in receiverNode:eachObject() do
+                    if rn.type == 'doc.type.sign' and rn.signs and rn.node then
+                        local classGlobal = vm.getGlobal('type', rn.node[1])
+                        if classGlobal then
+                            -- Build a map of class generic param names to their concrete types
+                            local genericMap = {}
+                            for _, set in ipairs(classGlobal:getSets(guide.getUri(source))) do
+                                if set.type == 'doc.class' and set.signs then
+                                    for i, signName in ipairs(set.signs) do
+                                        if signName[1] and rn.signs[i] then
+                                            genericMap[signName[1]] = vm.compileNode(rn.signs[i])
+                                        end
+                                    end
+                                    break
+                                end
+                            end
+
+                            if next(genericMap) then
+                                -- Check the return node for global type references that match generic params
+                                local newReturnNode = vm.createNode()
+                                local hasReplacement = false
+                                for retNode in returnNode:eachObject() do
+                                    if retNode.type == 'global' and retNode.cate == 'type' then
+                                        local resolvedNode = genericMap[retNode.name]
+                                        if resolvedNode then
+                                            newReturnNode:merge(resolvedNode)
+                                            hasReplacement = true
+                                        else
+                                            newReturnNode:merge(retNode)
+                                        end
+                                    else
+                                        newReturnNode:merge(retNode)
+                                    end
+                                end
+                                if hasReplacement then
+                                    returnNode = newReturnNode
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     if returnNode then
         for rnode in returnNode:eachObject() do
             -- TODO: narrow type
@@ -2154,6 +2214,9 @@ local compilerSwitch = util.switch()
                         if ext.type == 'doc.type.table' then
                             if vm.getGeneric(ext) then
                                 local resolved = vm.getGeneric(ext):resolve(uri, source.signs)
+                                for obj in resolved:eachObject() do
+                                    obj.hideView = true
+                                end
                                 vm.setNode(source, resolved)
                             end
                         end

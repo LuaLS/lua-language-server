@@ -4955,3 +4955,59 @@ TEST 'string' [[
 local c
 local <?k?> = c.key
 ]]
+
+TEST 'string' [[
+---@class Box<T>
+---@field value T
+local Box = {}
+
+---@return T
+function Box:getValue()
+    return self.value
+end
+
+---@type Box<string>
+local b
+
+local <?v?> = b:getValue()
+]]
+
+TEST 'integer' [[
+---@class Wrapper<V>
+---@field item V
+local Wrapper = {}
+
+---@return V
+function Wrapper:unwrap()
+    return self.item
+end
+
+---@type Wrapper<integer>
+local w
+
+local <?result?> = w:unwrap()
+]]
+
+-- Issue #1856: Generic class display format
+-- Current behavior shows list<<T>>|{...} - the <<T>> indicates an unresolved generic
+-- The resolved table type is also shown
+TEST 'list<<T>>|{ [integer]: string }' [[
+---@class list<T>: {[integer]:T}
+
+---@generic T
+---@param class `T`
+---@return list<T>
+local function new_list(class)
+    return {}
+end
+
+local <?strings?> = new_list('string')
+]]
+
+-- Issue #1853: Recursive expansion on hover of generic type
+-- Self-referential generic classes should not expand infinitely
+TEST 'store<string>' [[
+---@class store<T>: {set:fun(self:store<T>, key:integer, value:T), get:fun(self:store<T>, key:integer):T}
+
+local <?string_store?> ---@type store<string>
+]]

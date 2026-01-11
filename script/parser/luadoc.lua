@@ -1030,6 +1030,12 @@ local docSwitch = util.switch()
                 }
                 return result
             end
+            if extend.type == 'doc.extends.name' then
+                local signResult = parseTypeUnitSign(result, extend)
+                if signResult then
+                    extend = signResult
+                end
+            end
             result.extends[#result.extends+1] = extend
             result.finish = getFinish()
             if not checkToken('symbol', ',', 1) then
@@ -1850,7 +1856,8 @@ local function bindGeneric(binded)
         or doc.type == 'doc.return'
         or doc.type == 'doc.type'
         or doc.type == 'doc.class'
-        or doc.type == 'doc.alias' then
+        or doc.type == 'doc.alias'
+        or doc.type == 'doc.field' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then

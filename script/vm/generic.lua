@@ -173,3 +173,10 @@ function vm.createGeneric(proto, sign)
     }, mt)
     return generic
 end
+
+---@param source    vm.object?
+---@param resolved? table<string, vm.node>
+---@return vm.object?
+function vm.cloneObject(source, resolved)
+    return cloneObject(source, resolved)
+end

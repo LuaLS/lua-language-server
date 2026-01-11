@@ -234,6 +234,56 @@ local function searchLiteralFieldFromTable(source, key, callback)
     end
 end
 
+---@param uri uri
+---@param classGlobal vm.global
+---@param field parser.object
+---@param signs parser.object[]
+---@return parser.object?
+local function resolveGenericField(uri, classGlobal, field, signs)
+    if field.type ~= 'doc.field' then
+        return nil
+    end
+    if not field.extends then
+        return nil
+    end
+    local hasGeneric = false
+    guide.eachSourceType(field.extends, 'doc.generic.name', function ()
+        hasGeneric = true
+    end)
+    if not hasGeneric then
+        return nil
+    end
+    for _, set in ipairs(classGlobal:getSets(uri)) do
+        if set.type == 'doc.class' and set.signs then
+            local resolved = {}
+            for i, signName in ipairs(set.signs) do
+                local signType = signs[i]
+                if signType and signName[1] then
+                    local signNode = vm.compileNode(signType)
+                    resolved[signName[1]] = signNode
+                end
+            end
+            if next(resolved) then
+                local newExtends = vm.cloneObject(field.extends, resolved)
+                if newExtends then
+                    return {
+                        type    = field.type,
+                        start   = field.start,
+                        finish  = field.finish,
+                        parent  = field.parent,
+                        field   = field.field,
+                        extends = newExtends,
+                        visible = field.visible,
+                        optional = field.optional,
+                    }
+                end
+            end
+            break
+        end
+    end
+    return nil
+end
+
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (_suri, source, key, pushResult)
@@ -357,7 +407,16 @@ local searchFieldSwitch = util.switch()
         if not globalVar then
             return
         end
-        vm.getClassFields(suri, globalVar, key, pushResult)
+        vm.getClassFields(suri, globalVar, key, function (field, isMark)
+            if source.signs then
+                local newField = resolveGenericField(suri, globalVar, field, source.signs)
+                if newField then
+                    pushResult(newField, isMark)
+                    return
+                end
+            end
+            pushResult(field, isMark)
+        end)
     end)
     : case 'global'
     : call(function (suri, node, key, pushResult)
@@ -565,7 +624,6 @@ function vm.getClassFields(suri, object, key, pushResult)
 
         for _, set in ipairs(sets) do
             if set.type == 'doc.class' then
-                -- look into extends(if field not found)
                 if not searchedFields[key] and set.extends then
                     for _, extend in ipairs(set.extends) do
                         if extend.type == 'doc.extends.name' then
@@ -573,6 +631,14 @@ function vm.getClassFields(suri, object, key, pushResult)
                             if extendType then
                                 searchClass(extendType, searchedFields)
                             end
+                        elseif extend.type == 'doc.type.sign' then
+                            searchFieldSwitch(extend.type, suri, extend, key, function (field, isMark)
+                                local fieldKey = guide.getKeyName(field)
+                                if fieldKey and not searchedFields[fieldKey] then
+                                    hasFounded[fieldKey] = true
+                                    pushResult(field, isMark)
+                                end
+                            end)
                         end
                     end
                 end

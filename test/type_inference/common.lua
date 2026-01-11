@@ -4909,3 +4909,49 @@ function f(...args)
     print(<?args?>)
 end
 ]]
+
+TEST 'integer' [[
+---@class Foo<T>
+---@field a T
+
+---@class Bar: Foo<integer>
+
+---@type Bar
+local x
+local <?what?> = x.a
+]]
+
+TEST 'string' [[
+---@class GenericBase<T>
+---@field value T
+
+---@class StringHolder: GenericBase<string>
+
+---@type StringHolder
+local holder
+local <?v?> = holder.value
+]]
+
+TEST 'boolean' [[
+---@class Container<K, V>
+---@field key K
+---@field val V
+
+---@class BoolContainer: Container<string, boolean>
+
+---@type BoolContainer
+local c
+local <?b?> = c.val
+]]
+
+TEST 'string' [[
+---@class Container<K, V>
+---@field key K
+---@field val V
+
+---@class BoolContainer: Container<string, boolean>
+
+---@type BoolContainer
+local c
+local <?k?> = c.key
+]]

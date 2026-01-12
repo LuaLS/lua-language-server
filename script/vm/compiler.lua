@@ -1542,10 +1542,6 @@ local function compileLocal(source)
 end
 
 ---@param source parser.object
----Resolves generic type names from a class's generic parameters
----@param uri uri
----@param classGlobal vm.global
----@param typeName string
 ---@param mfunc  parser.object
 ---@param index  integer
 ---@param args   parser.object[]
@@ -1572,7 +1568,7 @@ local function bindReturnOfFunction(source, mfunc, index, args)
             if receiver then
                 local receiverNode = vm.compileNode(receiver)
                 for rn in receiverNode:eachObject() do
-                    if rn.type == 'doc.type.sign' and rn.signs and rn.node then
+                    if rn.type == 'doc.type.sign' and rn.signs and rn.node and rn.node[1] then
                         local classGlobal = vm.getGlobal('type', rn.node[1])
                         if classGlobal then
                             -- Build a map of class generic param names to their concrete types

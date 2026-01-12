@@ -7,6 +7,9 @@ function M:__init(scope)
     self.rt    = scope.rt
     ---@type table<Uri, VM.Vfile>
     self.vfiles = ls.fs.newMap()
+    ---@type VM.Vfile[]
+    self.indexingFiles = {}
+    self.onDidIndex = ls.sevent.create()
 end
 
 ---@param uri Uri

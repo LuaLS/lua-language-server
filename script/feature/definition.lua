@@ -6,10 +6,12 @@ local providers, runner = ls.feature.helper.providers()
 ---@field scope Scope
 ---@field sources? LuaParser.Node.Base[]
 
+---@async
 ---@param uri Uri
 ---@param offset integer
 ---@return Location[]
 function ls.feature.definition(uri, offset)
+    ls.scope.waitIndexing(uri)
     local sources, scope = ls.scope.findSources(uri, offset)
     if not sources or #sources == 0 then
         return {}

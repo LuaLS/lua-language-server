@@ -1,3 +1,5 @@
+---@diagnostic disable: await-in-sync
+
 local function founded(targets, results)
     if #targets ~= #results then
         return false

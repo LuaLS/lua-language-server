@@ -19,6 +19,17 @@ function M:on(callback)
     end
 end
 
+---@param callback fun(...)
+---@return function unsubscribe
+function M:once(callback)
+    local unsubscribe
+    unsubscribe = self:on(function (...)
+        unsubscribe()
+        callback(...)
+    end)
+    return unsubscribe
+end
+
 function M:fire(...)
     for _, callback in ipairs(self.events) do
         xpcall(callback, log.error, ...)

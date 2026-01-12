@@ -20,6 +20,7 @@ M.document = nil
 function M:__init(scope, uri)
     self.scope = scope
     self.uri = uri
+    self.onDidIndex = ls.sevent.create()
 end
 
 function M:__close()
@@ -80,6 +81,9 @@ function M:index()
 
     self.version = version
     self.document = document
+
+    self.onDidIndex:fire(self)
+    self.scope.vm.onDidIndex:fire(self)
 end
 
 ---@async
@@ -95,9 +99,9 @@ function M:awaitIndex()
             return
         end
         -- 等待上个编译任务完成
-        while indexingVersion == self.indexingVersion do
-            ls.await.sleep(0.01)
-        end
+        ls.await.yield(function (resume)
+            self.onDidIndex:once(resume)
+        end)
         return
     end
 
@@ -120,6 +124,7 @@ function M:awaitIndex()
     end
 
     self.indexingVersion = version
+    table.insert(self.scope.vm.indexingFiles, self)
 
     ---@async
     ls.util.withDuration(function ()
@@ -150,6 +155,10 @@ function M:awaitIndex()
     self.indexingVersion = nil
     self.version = version
     self.document = document
+
+    ls.util.arrayRemove(self.scope.vm.indexingFiles, self, true)
+    self.onDidIndex:fire(self)
+    self.scope.vm.onDidIndex:fire(self)
 end
 
 ---@param source LuaParser.Node.Base

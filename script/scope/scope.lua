@@ -179,6 +179,35 @@ function ls.scope.find(uri)
 end
 
 ---@param uri Uri
+---@return VM.Vfile?
+function ls.scope.findVfile(uri)
+    local scope = ls.scope.find(uri)
+    if not scope then
+        return nil
+    end
+    return scope.vm:getFile(uri)
+end
+
+---@async
+---@param uri Uri
+function ls.scope.waitIndexing(uri)
+    local scope = ls.scope.find(uri)
+    if not scope then
+        return
+    end
+    if #scope.vm.indexingFiles == 0 then
+        return
+    end
+    ls.await.yield(function (resume)
+        scope.vm.onDidIndex:on(function ()
+            if #scope.vm.indexingFiles == 0 then
+                resume()
+            end
+        end)
+    end)
+end
+
+---@param uri Uri
 ---@return Document?
 ---@return Scope?
 function ls.scope.findDocument(uri)

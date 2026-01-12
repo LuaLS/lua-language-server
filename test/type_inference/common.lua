@@ -5046,3 +5046,126 @@ local f
 
 local <?wrapped?> = f:wrap()
 ]]
+
+-- Issue #723: Generics in @overload
+-- @generic should work with @overload annotations
+TEST 'string' [[
+---@generic T
+---@param x T
+---@return T
+---@overload fun(x: T): T
+local function identity(x)
+    return x
+end
+
+local <?result?> = identity("hello")
+]]
+
+-- Issue #723: Multiple generics in @overload
+TEST 'integer' [[
+---@generic K, V
+---@param k K
+---@param v V
+---@return V
+---@overload fun(k: K, v: V): V
+local function getValue(k, v)
+    return v
+end
+
+local <?result?> = getValue("key", 42)
+]]
+
+-- Issue #1170: Generics in function type format (fun<T>)
+TEST 'string' [[
+---@type fun<T>(x: T): T
+local identity
+
+local <?result?> = identity("hello")
+]]
+
+-- Issue #1170: Multiple generics in function type
+TEST 'boolean' [[
+---@type fun<K, V>(k: K, v: V): V
+local getSecond
+
+local <?result?> = getSecond("key", true)
+]]
+
+-- Issue #1170: Generic function in @field
+TEST 'integer' [[
+---@class Mapper
+---@field transform fun<T, U>(input: T, fn: fun(x: T): U): U
+
+---@type Mapper
+local m
+
+local <?result?> = m.transform("hello", function(x) return #x end)
+]]
+
+-- Issue #1532: Promise-like method chaining
+-- Method returning self-type should preserve generic param through chain
+TEST 'string' [[
+---@class Promise<T>
+---@field value T
+local Promise = {}
+
+---@return Promise<T>
+function Promise:next(fn)
+    return self
+end
+
+---@return T
+function Promise:await()
+    return self.value
+end
+
+---@type Promise<string>
+local p
+
+local <?result?> = p:next(function() end):await()
+]]
+
+-- Issue #1532: Multiple chained methods
+TEST 'number' [[
+---@class Chain<V>
+local Chain = {}
+
+---@return Chain<V>
+function Chain:map(fn)
+    return self
+end
+
+---@return Chain<V>
+function Chain:filter(fn)
+    return self
+end
+
+---@return V
+function Chain:first()
+    return nil
+end
+
+---@type Chain<number>
+local c
+
+local <?result?> = c:map(function() end):filter(function() end):first()
+]]
+
+-- Issue #1000: Generic self parameter should resolve to concrete type
+-- When @generic T and @param self T, calling on List<number> should return List<number>
+TEST 'List<number>' [[
+---@class List<V>
+local List = {}
+
+---@generic T
+---@param self T
+---@return T
+function List:identity()
+    return self
+end
+
+---@type List<number>
+local mylist
+
+local <?result?> = mylist:identity()
+]]

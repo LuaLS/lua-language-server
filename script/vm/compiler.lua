@@ -1550,18 +1550,120 @@ local function bindReturnOfFunction(source, mfunc, index, args)
     if not returnObject then
         return
     end
+
+    local resolveArgs = args
+    if source.func and source.func.type == 'getmethod' then
+        local receiver = source.func.node
+        if receiver then
+            resolveArgs = { receiver }
+            if args then
+                for i = 2, #args do
+                    resolveArgs[#resolveArgs + 1] = args[i]
+                end
+            end
+        end
+    end
+
     local returnNode = vm.compileNode(returnObject)
+
+    local selfGenericResolved = nil
+    if source.func and source.func.type == 'getmethod' and mfunc.type == 'function' and mfunc.bindDocs then
+        local receiver = source.func.node
+        if receiver then
+            local receiverNode = vm.compileNode(receiver)
+            local selfGenericName = nil
+            for _, doc in ipairs(mfunc.bindDocs) do
+                if doc.type == 'doc.param' and doc.param and doc.param[1] == 'self' then
+                    if doc.extends then
+                        for _, typeUnit in ipairs(doc.extends.types or {}) do
+                            if typeUnit.type == 'doc.generic.name' then
+                                selfGenericName = typeUnit[1]
+                                break
+                            end
+                        end
+                    end
+                    break
+                end
+            end
+            if selfGenericName then
+                local filteredNode = vm.createNode()
+                for item in receiverNode:eachObject() do
+                    if item.type == 'doc.type.sign'
+                    or (item.type == 'global' and item.cate == 'type')
+                    or item.type == 'doc.type.table'
+                    or item.type == 'doc.type.array' then
+                        filteredNode:merge(item)
+                    end
+                end
+                if not filteredNode:isEmpty() then
+                    selfGenericResolved = { [selfGenericName] = filteredNode }
+                else
+                    selfGenericResolved = { [selfGenericName] = receiverNode }
+                end
+            end
+        end
+    end
+
     for rnode in returnNode:eachObject() do
         if rnode.type == 'generic' then
-            returnNode = rnode:resolve(guide.getUri(source), args)
+            if selfGenericResolved and rnode.sign then
+                local resolved = rnode.sign:resolve(guide.getUri(source), resolveArgs) or {}
+                for k, v in pairs(selfGenericResolved) do
+                    resolved[k] = v
+                end
+                local protoNode = vm.compileNode(rnode.proto)
+                local result = vm.createNode()
+                for nd in protoNode:eachObject() do
+                    if nd.type == 'global' or nd.type == 'variable' then
+                        result:merge(nd)
+                    else
+                        local clonedObject = vm.cloneObject(nd, resolved)
+                        if clonedObject then
+                            result:merge(vm.compileNode(clonedObject))
+                        end
+                    end
+                end
+                if protoNode:isOptional() then
+                    result:addOptional()
+                end
+                returnNode = result
+            else
+                returnNode = rnode:resolve(guide.getUri(source), resolveArgs)
+            end
             break
         end
     end
 
-    -- Handle method calls on generic class instances
-    -- When calling b:getValue() where b is Box<string>, resolve T to string
+    if mfunc.type == 'function' then
+        local hasUnresolvedGeneric = false
+        for rnode in returnNode:eachObject() do
+            if rnode.type == 'doc.generic.name' and not rnode._resolved then
+                hasUnresolvedGeneric = true
+                break
+            end
+        end
+        if hasUnresolvedGeneric then
+            local sign = vm.getSign(mfunc)
+            if sign and resolveArgs and #resolveArgs > 0 then
+                local resolved = sign:resolve(guide.getUri(source), resolveArgs)
+                if resolved and next(resolved) then
+                    local newReturnNode = vm.createNode()
+                    for rnode in returnNode:eachObject() do
+                        local cloned = vm.cloneObject(rnode, resolved)
+                        if cloned then
+                            newReturnNode:merge(vm.compileNode(cloned))
+                        else
+                            newReturnNode:merge(rnode)
+                        end
+                    end
+                    returnNode = newReturnNode
+                end
+            end
+        end
+    end
+
     local call = source.parent
-    if call and call.type == 'call' then
+    if not selfGenericResolved and call and call.type == 'call' then
         local callNode = call.node
         if callNode and (callNode.type == 'getmethod' or callNode.type == 'getfield') then
             local receiver = callNode.node
@@ -1571,7 +1673,6 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                     if rn.type == 'doc.type.sign' and rn.signs and rn.node and rn.node[1] then
                         local classGlobal = vm.getGlobal('type', rn.node[1])
                         if classGlobal then
-                            -- Build a map of class generic param names to their concrete types
                             local genericMap = {}
                             for _, set in ipairs(classGlobal:getSets(guide.getUri(source))) do
                                 if set.type == 'doc.class' and set.signs then
@@ -1616,7 +1717,6 @@ local function bindReturnOfFunction(source, mfunc, index, args)
 
     if returnNode then
         for rnode in returnNode:eachObject() do
-            -- TODO: narrow type
             if rnode.type ~= 'doc.generic.name' then
                 vm.setNode(source, rnode)
             end
@@ -2191,7 +2291,11 @@ local compilerSwitch = util.switch()
     end)
     : case 'doc.generic.name'
     : call(function (source)
-        vm.setNode(source, source)
+        if source._resolved then
+            vm.setNode(source, source._resolved)
+        else
+            vm.setNode(source, source)
+        end
     end)
     : case 'doc.type.sign'
     : call(function (source)

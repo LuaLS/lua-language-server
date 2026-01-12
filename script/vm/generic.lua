@@ -34,6 +34,21 @@ local function cloneObject(source, resolved)
         end
         return newName
     end
+    if source.type == 'doc.type.name' then
+        local key = source[1]
+        if resolved[key] then
+            local newName = {
+                type   = 'doc.generic.name',
+                start  = source.start,
+                finish = source.finish,
+                parent = source.parent,
+                [1]    = source[1],
+            }
+            vm.setNode(newName, resolved[key], true)
+            newName._resolved = resolved[key]
+            return newName
+        end
+    end
     if source.type == 'doc.type' then
         local newType = {
             type     = source.type,
@@ -112,6 +127,36 @@ local function cloneObject(source, resolved)
             newDocFunc.returns[i] = cloneObject(ret, resolved)
         end
         return newDocFunc
+    end
+    if source.type == 'doc.type.sign' and source.signs then
+        local needsClone = false
+        for _, sign in ipairs(source.signs) do
+            if sign.type == 'doc.type' then
+                for _, tp in ipairs(sign.types) do
+                    if tp.type == 'doc.type.name' and resolved[tp[1]] then
+                        needsClone = true
+                        break
+                    end
+                end
+            elseif sign.type == 'doc.type.name' and resolved[sign[1]] then
+                needsClone = true
+            end
+            if needsClone then break end
+        end
+        if needsClone then
+            local newSign = {
+                type   = source.type,
+                start  = source.start,
+                finish = source.finish,
+                parent = source.parent,
+                node   = source.node,
+                signs  = {},
+            }
+            for i, sign in ipairs(source.signs) do
+                newSign.signs[i] = cloneObject(sign, resolved)
+            end
+            return newSign
+        end
     end
     return source
 end

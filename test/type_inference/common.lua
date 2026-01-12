@@ -5011,3 +5011,38 @@ TEST 'store<string>' [[
 
 local <?string_store?> ---@type store<string>
 ]]
+
+-- Test composite return types with generics (T[] should resolve to string[])
+TEST 'string[]' [[
+---@class Container<T>
+local Container = {}
+
+---@return T[]
+function Container:getAll()
+    return {}
+end
+
+---@type Container<string>
+local c
+
+local <?items?> = c:getAll()
+]]
+
+-- Test nested generic return types (Wrapper<T> should resolve to Wrapper<string>)
+TEST 'Wrapper<string>' [[
+---@class Wrapper<V>
+---@field value V
+
+---@class Factory<T>
+local Factory = {}
+
+---@return Wrapper<T>
+function Factory:wrap()
+    return {}
+end
+
+---@type Factory<string>
+local f
+
+local <?wrapped?> = f:wrap()
+]]

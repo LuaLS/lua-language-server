@@ -1584,25 +1584,26 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                                 end
                             end
 
-                            if next(genericMap) then
-                                -- Check the return node for global type references that match generic params
-                                local newReturnNode = vm.createNode()
-                                local hasReplacement = false
-                                for retNode in returnNode:eachObject() do
-                                    if retNode.type == 'global' and retNode.cate == 'type' then
-                                        local resolvedNode = genericMap[retNode.name]
-                                        if resolvedNode then
-                                            newReturnNode:merge(resolvedNode)
-                                            hasReplacement = true
-                                        else
-                                            newReturnNode:merge(retNode)
+                            if next(genericMap) and mfunc.bindDocs then
+                                for _, doc in ipairs(mfunc.bindDocs) do
+                                    if doc.type == 'doc.return' then
+                                        for _, rtn in ipairs(doc.returns) do
+                                            if rtn.returnIndex == index then
+                                                local newRtn = vm.cloneObject(rtn, genericMap)
+                                                if newRtn then
+                                                    returnNode = vm.compileNode(newRtn)
+                                                    for rnode in returnNode:eachObject() do
+                                                        if rnode.type == 'generic' then
+                                                            returnNode = rnode:resolve(guide.getUri(source), args)
+                                                            break
+                                                        end
+                                                    end
+                                                end
+                                                break
+                                            end
                                         end
-                                    else
-                                        newReturnNode:merge(retNode)
+                                        break
                                     end
-                                end
-                                if hasReplacement then
-                                    returnNode = newReturnNode
                                 end
                             end
                             break

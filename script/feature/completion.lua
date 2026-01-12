@@ -4,12 +4,13 @@ local providers, runner = ls.feature.helper.providers()
 ---@field uri Uri
 ---@field offset integer
 ---@field scope Scope
+---@field sources LuaParser.Node.Base[]
 
 ---@param uri Uri
 ---@param offset integer
 ---@return LSP.CompletionItem[]
 function ls.feature.completion(uri, offset)
-    local scope = ls.scope.find(uri)
+    local sources, scope = ls.scope.findSources(uri, offset)
     if not scope then
         return {}
     end
@@ -18,6 +19,7 @@ function ls.feature.completion(uri, offset)
         uri     = uri,
         offset  = offset,
         scope   = scope,
+        sources = sources,
     }
 
     local results = runner(param)

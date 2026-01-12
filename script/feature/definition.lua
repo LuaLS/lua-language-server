@@ -4,7 +4,7 @@ local providers, runner = ls.feature.helper.providers()
 ---@field uri Uri
 ---@field offset integer
 ---@field scope Scope
----@field sources? LuaParser.Node.Base[]
+---@field sources LuaParser.Node.Base[]
 
 ---@async
 ---@param uri Uri

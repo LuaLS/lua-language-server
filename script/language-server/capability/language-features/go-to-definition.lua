@@ -2,6 +2,7 @@ ls.capability.registerCapability.definitionProvider = {
     workDoneProgress = true,
 }
 
+---@async
 ls.capability.register('textDocument/definition', function (server, params, task)
     ---@cast params LSP.DefinitionParams
 

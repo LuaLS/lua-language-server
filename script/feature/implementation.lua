@@ -4,12 +4,14 @@ local providers, runner = ls.feature.helper.providers()
 ---@field uri Uri
 ---@field offset integer
 ---@field scope Scope
----@field sources? LuaParser.Node.Base[]
+---@field sources LuaParser.Node.Base[]
 
+---@async
 ---@param uri Uri
 ---@param offset integer
 ---@return Location[]
 function ls.feature.implementation(uri, offset)
+    ls.scope.waitIndexing(uri)
     local sources, scope = ls.scope.findSources(uri, offset)
     if not sources or #sources == 0 then
         return {}
@@ -27,15 +29,17 @@ function ls.feature.implementation(uri, offset)
     return ls.feature.helper.organizeResultsByRange(results)
 end
 
----@param callback fun(param: Feature.Implementation.Param, push: fun(loc: Location))
+---@param callback async fun(param: Feature.Implementation.Param, push: fun(loc: Location), skip: fun(priority?: integer))
+---@param priority integer? # 优先级
 ---@return fun() disposable
-function ls.feature.provider.implementation(callback)
-    table.insert(providers, callback)
+function ls.feature.provider.implementation(callback, priority)
+    providers:insert(callback, priority)
     return function ()
-        ls.util.arrayRemove(providers, callback)
+        providers:remove(callback)
     end
 end
 
+---@async
 -- 局部变量的实现位置
 ls.feature.provider.implementation(function (param, push)
     local first = param.sources[1]

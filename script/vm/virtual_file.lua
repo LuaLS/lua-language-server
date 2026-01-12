@@ -113,10 +113,9 @@ function M:awaitIndex()
             self.nextVersion = version
         end
         -- 等待前一个编译完成再编译新的，防抖
-        local indexingVersion = self.indexingVersion
-        while indexingVersion == self.indexingVersion do
-            ls.await.sleep(0.01)
-        end
+        ls.await.yield(function (resume)
+            self.onDidIndex:once(resume)
+        end)
         if self.nextVersion ~= version then
             -- 有更新的版本，跳过
             return

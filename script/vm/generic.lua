@@ -121,10 +121,10 @@ local function cloneObject(source, resolved)
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(source.returns) do
-            local newObj  = cloneObject(ret, resolved)
+            local newObj = cloneObject(ret, resolved)
             newObj.parent   = newDocFunc
             newObj.optional = ret.optional
-            newDocFunc.returns[i] = cloneObject(ret, resolved)
+            newDocFunc.returns[i] = newObj
         end
         return newDocFunc
     end

@@ -234,54 +234,105 @@ local function searchLiteralFieldFromTable(source, key, callback)
     end
 end
 
+---@param obj parser.object
+---@return boolean
+local function containsGenericName(obj)
+    if not obj then
+        return false
+    end
+    if obj.type == 'doc.generic.name' then
+        return true
+    end
+    if obj.type == 'doc.type' and obj.types then
+        for _, t in ipairs(obj.types) do
+            if containsGenericName(t) then
+                return true
+            end
+        end
+    elseif obj.type == 'doc.type.array' then
+        return containsGenericName(obj.node)
+    elseif obj.type == 'doc.type.table' and obj.fields then
+        for _, field in ipairs(obj.fields) do
+            if containsGenericName(field.name) or containsGenericName(field.extends) then
+                return true
+            end
+        end
+    elseif obj.type == 'doc.type.sign' then
+        if obj.signs then
+            for _, s in ipairs(obj.signs) do
+                if containsGenericName(s) then
+                    return true
+                end
+            end
+        end
+    elseif obj.type == 'doc.type.function' then
+        for _, arg in ipairs(obj.args or {}) do
+            if containsGenericName(arg.extends) then
+                return true
+            end
+        end
+        for _, ret in ipairs(obj.returns or {}) do
+            if containsGenericName(ret) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 ---@param uri uri
 ---@param classGlobal vm.global
----@param field parser.object
 ---@param signs parser.object[]
----@return parser.object?
-local function resolveGenericField(uri, classGlobal, field, signs)
-    if field.type ~= 'doc.field' then
-        return nil
-    end
-    if not field.extends then
-        return nil
-    end
-    local hasGeneric = false
-    guide.eachSourceType(field.extends, 'doc.generic.name', function ()
-        hasGeneric = true
-    end)
-    if not hasGeneric then
-        return nil
-    end
+---@return table<string, vm.node>?
+local function getClassGenericMap(uri, classGlobal, signs)
     for _, set in ipairs(classGlobal:getSets(uri)) do
         if set.type == 'doc.class' and set.signs then
             local resolved = {}
             for i, signName in ipairs(set.signs) do
                 local signType = signs[i]
                 if signType and signName[1] then
-                    local signNode = vm.compileNode(signType)
-                    resolved[signName[1]] = signNode
+                    resolved[signName[1]] = vm.compileNode(signType)
                 end
             end
             if next(resolved) then
-                local newExtends = vm.cloneObject(field.extends, resolved)
-                if newExtends then
-                    return {
-                        type    = field.type,
-                        start   = field.start,
-                        finish  = field.finish,
-                        parent  = field.parent,
-                        field   = field.field,
-                        extends = newExtends,
-                        visible = field.visible,
-                        optional = field.optional,
-                    }
-                end
+                return resolved
             end
             break
         end
     end
     return nil
+end
+
+---@param uri uri
+---@param classGlobal vm.global
+---@param field parser.object
+---@param signs parser.object[]
+---@return parser.object?
+local function resolveGenericField(uri, classGlobal, field, signs)
+    if field.type ~= 'doc.field' or not field.extends then
+        return nil
+    end
+    if not containsGenericName(field.extends) then
+        return nil
+    end
+    local resolved = getClassGenericMap(uri, classGlobal, signs)
+    if not resolved then
+        return nil
+    end
+    local newExtends = vm.cloneObject(field.extends, resolved)
+    if not newExtends then
+        return nil
+    end
+    return {
+        type     = field.type,
+        start    = field.start,
+        finish   = field.finish,
+        parent   = field.parent,
+        field    = field.field,
+        extends  = newExtends,
+        visible  = field.visible,
+        optional = field.optional,
+    }
 end
 
 local searchFieldSwitch = util.switch()
@@ -1673,19 +1724,8 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                     if rn.type == 'doc.type.sign' and rn.signs and rn.node and rn.node[1] then
                         local classGlobal = vm.getGlobal('type', rn.node[1])
                         if classGlobal then
-                            local genericMap = {}
-                            for _, set in ipairs(classGlobal:getSets(guide.getUri(source))) do
-                                if set.type == 'doc.class' and set.signs then
-                                    for i, signName in ipairs(set.signs) do
-                                        if signName[1] and rn.signs[i] then
-                                            genericMap[signName[1]] = vm.compileNode(rn.signs[i])
-                                        end
-                                    end
-                                    break
-                                end
-                            end
-
-                            if next(genericMap) and mfunc.bindDocs then
+                            local genericMap = getClassGenericMap(guide.getUri(source), classGlobal, rn.signs)
+                            if genericMap and mfunc.bindDocs then
                                 for _, doc in ipairs(mfunc.bindDocs) do
                                     if doc.type == 'doc.return' then
                                         for _, rtn in ipairs(doc.returns) do

@@ -305,7 +305,7 @@ end
 
 ---@param uri uri
 ---@param classGlobal vm.global
----@param field parser.object
+---@param field parser.object | vm.generic
 ---@param signs parser.object[]
 ---@return parser.object?
 local function resolveGenericField(uri, classGlobal, field, signs)
@@ -1688,7 +1688,7 @@ local function bindReturnOfFunction(source, mfunc, index, args)
     if mfunc.type == 'function' then
         local hasUnresolvedGeneric = false
         for rnode in returnNode:eachObject() do
-            if rnode.type == 'doc.generic.name' and not rnode._resolved then
+            if vm.isGenericUnsolved(rnode) then
                 hasUnresolvedGeneric = true
                 break
             end

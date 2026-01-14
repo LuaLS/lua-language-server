@@ -12,7 +12,7 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param source    vm.object?
+---@param source    table?
 ---@param resolved? table<string, vm.node>
 ---@return vm.object?
 local function cloneObject(source, resolved)
@@ -196,6 +196,14 @@ function vm.getGenericResolved(source)
     return source._resolved
 end
 
+---@param source table
+function vm.isGenericUnsolved(source)
+    if source.type == 'doc.generic.name' and not source._resolved then
+        return true
+    end
+    return false
+end
+
 ---@param source parser.object
 ---@param generic vm.generic
 function vm.setGeneric(source, generic)
@@ -219,7 +227,7 @@ function vm.createGeneric(proto, sign)
     return generic
 end
 
----@param source    vm.object?
+---@param source    table?
 ---@param resolved? table<string, vm.node>
 ---@return vm.object?
 function vm.cloneObject(source, resolved)

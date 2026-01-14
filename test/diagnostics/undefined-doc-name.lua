@@ -17,3 +17,42 @@ TEST [[
 TEST [[
 ---@alias B <!AAA!>
 ]]
+
+-- Generic class methods should not warn about class generic params
+TEST [[
+---@class Container<T>
+local Container = {}
+
+---@return T[]
+function Container:getAll()
+    return {}
+end
+]]
+
+-- Inline class fields with generics should not warn
+TEST [[
+---@class Box<T>
+---@field value T
+]]
+
+-- Multiple generic params should all be recognized
+TEST [[
+---@class Map<K, V>
+local Map = {}
+
+---@param key K
+---@return V
+function Map:get(key)
+end
+]]
+
+-- Undefined types SHOULD still warn (control case)
+TEST [[
+---@class Container<T>
+local Container = {}
+
+---@return <!UndefinedType!>
+function Container:getBad()
+    return {}
+end
+]]

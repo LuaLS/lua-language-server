@@ -1,4 +1,5 @@
-local providers, runner = ls.feature.helper.providers()
+---@type Feature.Provider<Feature.Completion.Param>
+local providers = ls.feature.helper.providers()
 
 ---@class Feature.Completion.Param
 ---@field uri Uri
@@ -22,20 +23,20 @@ function ls.feature.completion(uri, offset)
         sources = sources,
     }
 
-    local results = runner(param)
+    local results = providers.runner(param)
 
     return results
 end
 
----@param callback fun(param: Feature.Completion.Param, push: fun(item: LSP.CompletionItem), skip: fun(priority?: integer))
+---@param callback fun(param: Feature.Completion.Param, action: Feature.ProviderActions<LSP.CompletionItem>)
 ---@param priority integer? # 优先级
 ---@return fun() disposable
 function ls.feature.provider.completion(callback, priority)
-    providers:insert(callback, priority)
+    providers.queue:insert(callback, priority)
     return function ()
-        providers:remove(callback)
+        providers.queue:remove(callback)
     end
 end
 
-ls.feature.provider.completion(function (param, push, skip)
+ls.feature.provider.completion(function (param, action)
 end)

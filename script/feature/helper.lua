@@ -41,27 +41,40 @@ function ls.feature.helper.convertLocation(loc, source)
     return location
 end
 
----@return PriorityQueue
----@return fun(param: any): any[]
-function ls.feature.helper.providers()
-    local providers = ls.tools.pqueue.create()
+---@class Feature.Provider<P>
+---@field queue PriorityQueue
+---@field runner fun(param: P): any[]
 
-    return providers, function (param)
-        local results = {}
-        local skipPriorty = -1
-        for provider, priority in providers:pairs() do
-            if priority <= skipPriorty then
-                break
-            end
-            xpcall(provider, log.error, param, function (loc)
-                results[#results+1] = loc
-            end, function (p)
-                p = p or priority
-                if skipPriorty < p then
-                    skipPriorty = p
+---@class Feature.ProviderActions<R>
+---@field push fun(item: R)
+---@field skip fun(priority?: integer)
+
+---@return Feature.ProviderActions<any>
+function ls.feature.helper.providers()
+    local queue = ls.tools.pqueue.create()
+
+    return {
+        queue = queue,
+        runner = function (param)
+            local results = {}
+            local skipPriorty = -1
+            for provider, priority in queue:pairs() do
+                if priority <= skipPriorty then
+                    break
                 end
-            end)
-        end
-        return results
-    end
+                xpcall(provider, log.error, param, {
+                    push = function (loc)
+                        results[#results+1] = loc
+                    end,
+                    skip = function (p)
+                        p = p or priority
+                        if skipPriorty < p then
+                            skipPriorty = p
+                        end
+                    end
+                })
+            end
+            return results
+        end,
+    }
 end

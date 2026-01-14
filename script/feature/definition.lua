@@ -1,4 +1,5 @@
-local providers, runner = ls.feature.helper.providers()
+---@type Feature.Provider<Feature.Definition.Param>
+local providers = ls.feature.helper.providers()
 
 ---@class Feature.Definition.Param
 ---@field uri Uri
@@ -24,23 +25,23 @@ function ls.feature.definition(uri, offset)
         sources = sources,
     }
 
-    local results = runner(param)
+    local results = providers.runner(param)
 
     return ls.feature.helper.organizeResultsByRange(results)
 end
 
----@param callback fun(param: Feature.Definition.Param, push: fun(loc: Location), skip: fun(priority?: integer))
+---@param callback fun(param: Feature.Definition.Param, action: Feature.ProviderActions<Location>)
 ---@param priority integer? # 优先级
 ---@return fun() disposable
 function ls.feature.provider.definition(callback, priority)
-    providers:insert(callback, priority)
+    providers.queue:insert(callback, priority)
     return function ()
-        providers:remove(callback)
+        providers.queue:remove(callback)
     end
 end
 
 -- 函数或表的位置
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, action)
     local first = param.sources[1]
     local node = param.scope.vm:getNode(first)
     if not node then
@@ -49,28 +50,28 @@ ls.feature.provider.definition(function (param, push)
     ---@param func Node.Function
     node:each('function', function (func)
         if func.location then
-            push(ls.feature.helper.convertLocation(func.location, first))
+            action.push(ls.feature.helper.convertLocation(func.location, first))
         end
     end)
     ---@param table Node.Table
     node:each('table', function (table)
         if table.locations then
             for _, location in ipairs(table.locations) do
-                push(ls.feature.helper.convertLocation(location, first))
+                action.push(ls.feature.helper.convertLocation(location, first))
             end
         end
     end)
 end)
 
 -- 变量的定义位置
-ls.feature.provider.definition(function (param, push, skip)
+ls.feature.provider.definition(function (param, action)
     local var = param.sources[1]
     if  var.kind ~= 'var'
     and var.kind ~= 'local'
     and var.kind ~= 'param' then
         return
     end
-    skip()
+    action.skip()
     local variable = param.scope.vm:getVariable(var)
     if not variable then
         return
@@ -83,7 +84,7 @@ ls.feature.provider.definition(function (param, push, skip)
     -- 在声明处查询定义，则查询所有等价定义的赋值位置
     if var.kind == 'local' or var.kind == 'param' then
         for _, location in ipairs(variable:getEquivalentLocations(true)) do
-            push(ls.feature.helper.convertLocation(location, var))
+            action.push(ls.feature.helper.convertLocation(location, var))
         end
         return
     end
@@ -96,7 +97,7 @@ ls.feature.provider.definition(function (param, push, skip)
         -- 如果是局部变量，则只查询声明位置
         local location = variable:getLocation()
         if location then
-            push(ls.feature.helper.convertLocation(location, var))
+            action.push(ls.feature.helper.convertLocation(location, var))
             return
         end
 
@@ -104,7 +105,7 @@ ls.feature.provider.definition(function (param, push, skip)
         for assign in variable:eachAssign() do
             local location = assign.location
             if location then
-                push(ls.feature.helper.convertLocation(location, var))
+                action.push(ls.feature.helper.convertLocation(location, var))
             end
         end
     end
@@ -131,7 +132,7 @@ ls.feature.provider.definition(function (param, push, skip)
 end)
 
 -- 字段的赋值位置
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, action)
     local first = param.sources[1]
     local field = param.sources[2]
     if not field or field.kind ~= 'field' then
@@ -151,12 +152,12 @@ ls.feature.provider.definition(function (param, push)
     -- 有个特殊规则，等价位置必须是 field ，且 field 名称要相同
 
     for _, location in ipairs(variable:getEquivalentLocations(false, true)) do
-        push(ls.feature.helper.convertLocation(location, field))
+        action.push(ls.feature.helper.convertLocation(location, field))
     end
 end)
 
 -- 表中字段的定义位置
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, action)
     local first = param.sources[1]
     if first.kind ~= 'tablefieldid' then
         return
@@ -168,25 +169,25 @@ ls.feature.provider.definition(function (param, push)
     ---@param field Node.Field
     node:each('field', function (field)
         if field.location and field.value ~= first then
-            push(ls.feature.helper.convertLocation(field.location, first))
+            action.push(ls.feature.helper.convertLocation(field.location, first))
         end
     end)
 end)
 
 -- 标签
-ls.feature.provider.definition(function (param, push, skip)
+ls.feature.provider.definition(function (param, action)
     local source = param.sources[2]
     if not source or source.kind ~= 'goto' then
         return
     end
-    skip()
+    action.skip()
     ---@cast source LuaParser.Node.Goto
     local label = source.label
     if not label then
         return
     end
 
-    push {
+    action.push {
         uri = label.ast.source,
         range = { label.name.start, label.name.finish },
         originRange = { source.name.start, source.name.finish },
@@ -216,7 +217,7 @@ local function findDefinitionOfType(node, push, source)
 end
 
 -- LuaCats 的类
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, action)
     local source = param.sources[1]
     if not source or source.kind ~= 'catid' then
         return
@@ -226,11 +227,11 @@ ls.feature.provider.definition(function (param, push)
     local node = param.scope.rt.type(source.id)
 
     ---@cast node Node.Type
-    findDefinitionOfType(node, push)
+    findDefinitionOfType(node, action.push)
 end)
 
 -- see 跳转，这个以后挪到文件符号功能里
-ls.feature.provider.definition(function (param, push)
+ls.feature.provider.definition(function (param, action)
     local source = param.sources[1]
     if not source or source.kind ~= 'catseename' then
         return
@@ -239,12 +240,11 @@ ls.feature.provider.definition(function (param, push)
     ---@cast source LuaParser.Node.CatSeeName
     local names = ls.util.split(source.id, '.')
 
-    findDefinitionOfType(rt.type(source.id), push, source)
-
+    findDefinitionOfType(rt.type(source.id), action.push, source)
     local varFields = rt:findGlobalVariableFields(table.unpack(names))
     for _, field in ipairs(varFields) do
         if field.location then
-            push(ls.feature.helper.convertLocation(field.location, source))
+            action.push(ls.feature.helper.convertLocation(field.location, source))
         end
     end
 
@@ -253,7 +253,7 @@ ls.feature.provider.definition(function (param, push)
         local fields = rt:findFields(t, names[i])
         for _, field in ipairs(fields) do
             if field.location then
-                push(ls.feature.helper.convertLocation(field.location, source))
+                action.push(ls.feature.helper.convertLocation(field.location, source))
             end
         end
     end

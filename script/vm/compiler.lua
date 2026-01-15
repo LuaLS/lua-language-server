@@ -280,11 +280,12 @@ local function containsGenericName(obj)
     return false
 end
 
+---Builds a map from generic parameter names to their concrete types
 ---@param uri uri
 ---@param classGlobal vm.global
 ---@param signs parser.object[]
 ---@return table<string, vm.node>?
-local function getClassGenericMap(uri, classGlobal, signs)
+function vm.getClassGenericMap(uri, classGlobal, signs)
     for _, set in ipairs(classGlobal:getSets(uri)) do
         if set.type == 'doc.class' and set.signs then
             local resolved = {}
@@ -315,7 +316,7 @@ local function resolveGenericField(uri, classGlobal, field, signs)
     if not containsGenericName(field.extends) then
         return nil
     end
-    local resolved = getClassGenericMap(uri, classGlobal, signs)
+    local resolved = vm.getClassGenericMap(uri, classGlobal, signs)
     if not resolved then
         return nil
     end
@@ -1724,7 +1725,7 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                     if rn.type == 'doc.type.sign' and rn.signs and rn.node and rn.node[1] then
                         local classGlobal = vm.getGlobal('type', rn.node[1])
                         if classGlobal then
-                            local genericMap = getClassGenericMap(guide.getUri(source), classGlobal, rn.signs)
+                            local genericMap = vm.getClassGenericMap(guide.getUri(source), classGlobal, rn.signs)
                             if genericMap and mfunc.bindDocs then
                                 for _, doc in ipairs(mfunc.bindDocs) do
                                     if doc.type == 'doc.return' then

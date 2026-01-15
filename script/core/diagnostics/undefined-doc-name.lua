@@ -54,18 +54,22 @@ local function isClassGenericParam(source, name, uri)
     end
 
     -- Check if bound to a method on a generic class
-    -- First, find the function from any doc in the bindGroup
+    -- Find the function from any doc in the bindGroup
     local func = nil
     if bindGroup then
         for _, other in ipairs(bindGroup) do
             local bindSource = other.bindSource
             if bindSource then
                 if bindSource.type == 'function' then
+                    -- doc.return binds directly to function
                     func = bindSource
                     break
-                elseif bindSource.parent and bindSource.parent.type == 'function' then
-                    func = bindSource.parent
-                    break
+                else
+                    -- doc.param binds to local param, find containing function
+                    func = guide.getParentFunction(bindSource)
+                    if func then
+                        break
+                    end
                 end
             end
         end

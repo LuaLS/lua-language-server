@@ -46,6 +46,15 @@ function Map:get(key)
 end
 ]]
 
+-- Variable name different from class name
+TEST [[
+---@class Pool<T>
+local M = {}
+
+---@param item T
+function M:push(item) end
+]]
+
 -- Undefined types SHOULD still warn (control case)
 TEST [[
 ---@class Container<T>

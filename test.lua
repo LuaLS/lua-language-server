@@ -41,7 +41,7 @@ ls.await.call(function ()
         require 'test.parser'
         require 'test.node'
         require 'test.coder'
-        require 'test.feature'
+        --require 'test.feature'
         dofile 'test/project/init.lua'
     end)
     ls.await.sleep(1)

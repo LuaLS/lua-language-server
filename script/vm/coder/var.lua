@@ -1,15 +1,9 @@
 ls.vm.registerCoderProvider('var', function (coder, source)
     ---@cast source LuaParser.Node.Var
-    local value = coder.flow:getOrCreateVarKey(source)
-    assert(value, 'Variable key not found for var')
-    coder:addLine('{key} = {value}{shadow}' % {
+    coder:addLine('{key} = {value}' % {
         key = coder:getKey(source),
-        value = value,
-        shadow = source.value and ':shadow()' or '',
+        value = coder:makeVarKey(source),
     })
-    if source.value then
-        coder.flow:setVarKey(source, coder:getKey(source))
-    end
 end)
 
 ls.vm.registerCoderProvider('field', function (coder, source)
@@ -29,24 +23,10 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         end
     end
 
-    local varKey = coder.flow:getOrCreateVarKey(source)
-
-    if varKey then
-        coder:addLine('{var} = {varKey}{shadow}' % {
-            var    = coder:getKey(source),
-            varKey = varKey,
-            shadow = source.value and ':shadow()' or '',
-        })
-        if source.value then
-            coder.flow:setVarKey(source, coder:getKey(source))
-        end
-    else
-        -- 无法追踪变量，如 t[func()] , t:func().xxx 之类的
-        coder:addLine('{var} = {value}' % {
-            var   = coder:getKey(source),
-            value = coder:makeVarKey(source),
-        })
-    end
+    coder:addLine('{var} = {value}' % {
+        var   = coder:getKey(source),
+        value = coder:makeVarKey(source),
+    })
 
     if source.subtype ~= 'index' then
         -- 字段的id即为整个字段
@@ -69,8 +49,6 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
-    coder.flow:createVar(source)
-    coder.flow:setVarKey(source, coder:getKey(source))
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -83,8 +61,6 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
-    coder.flow:createVar(source)
-    coder.flow:setVarKey(source, coder:getKey(source))
 
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 

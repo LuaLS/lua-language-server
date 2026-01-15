@@ -91,10 +91,10 @@ function M:compileAssign(var, index, valueKey, isTable)
     end
 
     if not isTable then
-        self:addLine('{varKey}:setCurrentValue({valueKey})' % {
-            varKey   = self:getKey(var),
-            valueKey = catKey or valueKey,
-        })
+        -- self:addLine('{varKey}:setCurrentValue({valueKey})' % {
+        --     varKey   = self:getKey(var),
+        --     valueKey = catKey or valueKey,
+        -- })
     end
 end
 

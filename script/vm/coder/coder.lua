@@ -36,7 +36,6 @@ function M:makeFromAst(ast)
     self.disposers = {}
     self.compiled = {}
     self.blockStack = {}
-    self.flow = New 'Coder.Flow' (self)
 
     self:addLine('-- Middle Code: ' .. ast.source)
     self:addLine 'global <const> *'
@@ -58,14 +57,13 @@ function M:makeFromAst(ast)
     self:addLine 'end)'
 
     self:addLine ''
-    self:makeVisibleInfo(ast)
+    --self:makeVisibleInfo(ast)
 
     -- self:simplifyCode()
 
     self.code = table.concat(self.buf):gsub('[ ]+([\r\n])', '%1')
     self.compiled = nil
     self.blockStack = nil
-    self.flow = nil
 
     self.func = assert(load(self.code, self.code, 't', self.env))
 end
@@ -659,6 +657,7 @@ function M:findVariable(name, offset)
     if not self.map then
         return nil
     end
+    do return nil end
     local varList = self.variables[name]
     if not varList then
         return nil

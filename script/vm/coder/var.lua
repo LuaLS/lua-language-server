@@ -1,6 +1,6 @@
 ls.vm.registerCoderProvider('var', function (coder, source)
     ---@cast source LuaParser.Node.Var
-    coder:addLine('{key} = {value}' % {
+    coder:addLine('{key} = {value}:shadow()' % {
         key = coder:getKey(source),
         value = coder:makeVarKey(source),
     })
@@ -23,7 +23,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         end
     end
 
-    coder:addLine('{var} = {value}' % {
+    coder:addLine('{var} = {value}:shadow()' % {
         var   = coder:getKey(source),
         value = coder:makeVarKey(source),
     })

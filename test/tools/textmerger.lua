@@ -244,11 +244,11 @@ end
 local c1 = os.clock()
 local t1 = tm.create(text):applyChanges(changes):getText()
 local c2 = os.clock()
-print('text-merger Large test time:', c2 - c1)
+print('text-merger Large test time: {%.3f} secs' % { c2 - c1 })
 
 -- local c3 = os.clock()
 -- local t2 = tm2(text, nil, changes)
 -- local c4 = os.clock()
--- print('text-merger2 Large test time:', c4 - c3)
+-- print('text-merger2 Large test time: {%.3f} secs' % { c4 - c3 })
 
 -- assert(t1 == t2)

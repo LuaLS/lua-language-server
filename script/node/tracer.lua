@@ -63,6 +63,9 @@ function W:traceBlock(block)
             self:traceRef(v)
             goto continue
         end
+        if tag == 'if' then
+            self:traceIf(v)
+        end
         ::continue::
     end
 end
@@ -77,4 +80,14 @@ function W:traceRef(ref)
     local id, alias = ref[2], ref[3]
     self.aliasID[alias] = id
     self.map[alias]:setCurrentValue(self.idValue[id])
+end
+
+function W:traceIf(ifNode)
+    for i = 2, #ifNode do
+        self:traceIfChild(ifNode[i])
+    end
+end
+
+function W:traceIfChild(block)
+    
 end

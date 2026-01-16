@@ -7,7 +7,7 @@ local M = ls.node.register 'Node.Table'
 
 M.kind = 'table'
 
----@type LinkedTable?
+---@type LinkedTable<Node.Field>?
 M.fields = nil
 
 ---@param scope Scope

@@ -336,7 +336,9 @@ function M:narrowCallByTryAll()
 
     local nodeValue = self.node:finalValue()
 
+    ---@type LinkedTable<Node>
     local passed = ls.tools.linkedTable.create()
+    ---@type LinkedTable<Node>
     local all = ls.tools.linkedTable.create()
 
     ---@param node Node

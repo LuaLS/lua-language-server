@@ -12,7 +12,9 @@ function M:__init(name, num, entry, useDebugger)
     self.num     = num
     self.entry   = entry
     self.workers = {}
+    ---@type LinkedTable<Async.Worker>
     self.idles   = ls.tools.linkedTable.create()
+    ---@type LinkedTable<any>
     self.queue   = ls.tools.linkedTable.create()
     self.useDebugger = useDebugger
 
@@ -26,7 +28,6 @@ end
 ---@private
 function M:pickJob()
     local job    = self.queue:getHead()
-    ---@type Async.Worker
     local worker = self.idles:getHead()
     if not job or not worker then
         return

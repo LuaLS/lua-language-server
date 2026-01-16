@@ -22,6 +22,7 @@ require 'test.node.flush'
 require 'test.node.variable'
 
 require 'test.node.flow'
+require 'test.node.tracer'
 
 require 'test.node.custom'
 

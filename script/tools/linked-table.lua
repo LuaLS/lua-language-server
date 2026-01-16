@@ -1,4 +1,4 @@
----@class LinkedTable
+---@class LinkedTable<T>
 ---@field package _left  table
 ---@field package _right table
 local M = {}
@@ -10,13 +10,13 @@ M._size = 0
 local HEAD = {'<HEAD>'}
 local TAIL = {'<TAIL>'}
 
----@param node any
+---@param node T?
 ---@return boolean
 function M:has(node)
     return self._left[node] ~= nil
 end
 
----@param node any
+---@param node T?
 ---@return boolean
 function M:isValidNode(node)
     if node == nil
@@ -27,8 +27,8 @@ function M:isValidNode(node)
     return true
 end
 
----@param node any
----@param afterWho any
+---@param node T
+---@param afterWho T
 ---@return boolean
 function M:pushAfter(node, afterWho)
     if not self:isValidNode(node) then
@@ -50,8 +50,8 @@ function M:pushAfter(node, afterWho)
     return true
 end
 
----@param node any
----@param beforeWho any
+---@param node T
+---@param beforeWho T
 ---@return boolean
 function M:pushBefore(node, beforeWho)
     if node == nil then
@@ -64,12 +64,13 @@ function M:pushBefore(node, beforeWho)
     return self:pushAfter(node, left)
 end
 
----@param node any
+---@param node T?
 ---@return boolean
 function M:pop(node)
     if not self:isValidNode(node) then
         return false
     end
+    ---@cast node -?
     local left = self._left[node]
     if not left then
         return false
@@ -85,20 +86,20 @@ function M:pop(node)
     return true
 end
 
----@param node any
+---@param node T
 ---@return boolean
 function M:pushHead(node)
     return self:pushAfter(node, HEAD)
 end
 
----@param node any
+---@param node T
 ---@return boolean
 function M:pushTail(node)
     return self:pushBefore(node, TAIL)
 end
 
----@param node any
----@return any
+---@param node T
+---@return T?
 function M:getAfter(node)
     if node == nil then
         node = HEAD
@@ -110,13 +111,13 @@ function M:getAfter(node)
     return right
 end
 
----@return any
+---@return T?
 function M:getHead()
     return self:getAfter(HEAD)
 end
 
----@param node any
----@return any
+---@param node T
+---@return T?
 function M:getBefore(node)
     if node == nil then
         node = TAIL
@@ -128,7 +129,7 @@ function M:getBefore(node)
     return left
 end
 
----@return any
+---@return T?
 function M:getTail()
     return self:getBefore(TAIL)
 end
@@ -143,8 +144,8 @@ function M:popTail()
     return self:pop(self:getTail())
 end
 
----@param old any
----@param new any
+---@param old T
+---@param new T
 ---@return boolean
 function M:replace(old, new)
     if not self:isValidNode(old)
@@ -194,11 +195,11 @@ local function pairsRightNode(lt, current)
 end
 
 --遍历链表，速度较快，但不支持改变当前节点
----@param start any
+---@param start? T
 ---@param revert? boolean
----@return fun():any
+---@return fun():T?
 ---@return LinkedTable
----@return any
+---@return T?
 function M:pairsFast(start, revert)
     if revert then
         if start ~= nil then
@@ -216,9 +217,9 @@ end
 --遍历链表，遍历到当前节点时已经确定下一个节点，
 --因此改变当前节点（如删除当前节点）
 --不会影响下一个要遍历的节点
----@param start any
+---@param start? T
 ---@param revert? boolean
----@return fun():any
+---@return fun():T?
 function M:pairs(start, revert)
     if revert then
         if start == nil then
@@ -252,6 +253,9 @@ end
 --遍历节点，遍历开始前会先复制一份链表，
 --因此遍历过程中改变链表不会影响遍历结果，
 --但速度较慢
+---@param start? T
+---@param revert? boolean
+---@return fun():T?
 function M:pairsSafe(start, revert)
     local nodes = {}
     for node in self:pairsFast(start, revert) do
@@ -264,7 +268,7 @@ function M:pairsSafe(start, revert)
     end
 end
 
----@param start any
+---@param start? T
 ---@param revert? boolean
 ---@return string
 function M:dump(start, revert)
@@ -282,9 +286,9 @@ function M:reset()
     self._size = 0
 end
 
----@param start any
+---@param start? T
 ---@param revert? boolean
----@return any[]
+---@return T[]
 function M:toArray(start, revert)
     local nodes = {}
     for node in self:pairsFast(start, revert) do

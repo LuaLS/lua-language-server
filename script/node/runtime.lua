@@ -287,6 +287,12 @@ function M:fillAPIs()
         return New 'Node.Ternary' (scope, cond, thenNode, elseNode)
     end
 
+    ---@param map table<string, Node>
+    ---@return Node.Tracer
+    function self.tracer(map)
+        return New 'Node.Tracer' (scope, map)
+    end
+
     ---@param childs Node.Table[]
     ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table

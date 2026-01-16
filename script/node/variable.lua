@@ -573,6 +573,14 @@ function M:getCurrentValue()
     return node
 end
 
+---@type Node.Tracer?
+M.tracer = nil
+
+---@param tracer Node.Tracer
+function M:setTracer(tracer)
+    self.tracer = tracer
+end
+
 ---@type Node
 M.value = nil
 
@@ -582,6 +590,9 @@ M.value = nil
 M.__getter.value = function (self)
     local rt = self.scope.rt
     self.value = rt.ANY
+    if self.tracer then
+        self.tracer:trace()
+    end
     return self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()

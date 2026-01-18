@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` convert all keys to string before using
 
 ## 3.16.4
 `2025-12-25`

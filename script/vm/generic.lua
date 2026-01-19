@@ -12,7 +12,7 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param source    vm.object?
+---@param source    table?
 ---@param resolved? table<string, vm.node>
 ---@return vm.object?
 local function cloneObject(source, resolved)
@@ -33,6 +33,21 @@ local function cloneObject(source, resolved)
             newName._resolved = resolved[key]
         end
         return newName
+    end
+    if source.type == 'doc.type.name' then
+        local key = source[1]
+        if resolved[key] then
+            local newName = {
+                type   = 'doc.generic.name',
+                start  = source.start,
+                finish = source.finish,
+                parent = source.parent,
+                [1]    = source[1],
+            }
+            vm.setNode(newName, resolved[key], true)
+            newName._resolved = resolved[key]
+            return newName
+        end
     end
     if source.type == 'doc.type' then
         local newType = {
@@ -106,12 +121,42 @@ local function cloneObject(source, resolved)
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(source.returns) do
-            local newObj  = cloneObject(ret, resolved)
+            local newObj = cloneObject(ret, resolved)
             newObj.parent   = newDocFunc
             newObj.optional = ret.optional
-            newDocFunc.returns[i] = cloneObject(ret, resolved)
+            newDocFunc.returns[i] = newObj
         end
         return newDocFunc
+    end
+    if source.type == 'doc.type.sign' and source.signs then
+        local needsClone = false
+        for _, sign in ipairs(source.signs) do
+            if sign.type == 'doc.type' then
+                for _, tp in ipairs(sign.types) do
+                    if tp.type == 'doc.type.name' and resolved[tp[1]] then
+                        needsClone = true
+                        break
+                    end
+                end
+            elseif sign.type == 'doc.type.name' and resolved[sign[1]] then
+                needsClone = true
+            end
+            if needsClone then break end
+        end
+        if needsClone then
+            local newSign = {
+                type   = source.type,
+                start  = source.start,
+                finish = source.finish,
+                parent = source.parent,
+                node   = source.node,
+                signs  = {},
+            }
+            for i, sign in ipairs(source.signs) do
+                newSign.signs[i] = cloneObject(sign, resolved)
+            end
+            return newSign
+        end
     end
     return source
 end
@@ -151,6 +196,14 @@ function vm.getGenericResolved(source)
     return source._resolved
 end
 
+---@param source table
+function vm.isGenericUnsolved(source)
+    if source.type == 'doc.generic.name' and not source._resolved then
+        return true
+    end
+    return false
+end
+
 ---@param source parser.object
 ---@param generic vm.generic
 function vm.setGeneric(source, generic)
@@ -172,4 +225,11 @@ function vm.createGeneric(proto, sign)
         proto = proto,
     }, mt)
     return generic
+end
+
+---@param source    table?
+---@param resolved? table<string, vm.node>
+---@return vm.object?
+function vm.cloneObject(source, resolved)
+    return cloneObject(source, resolved)
 end

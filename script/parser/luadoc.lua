@@ -523,6 +523,8 @@ local function  parseTypeUnitFunction(parent)
         args    = {},
         returns = {},
     }
+    -- Parse optional generic params: fun<T, V>(...)
+    typeUnit.signs = parseSigns(typeUnit)
     if not nextSymbolOrError('(') then
         return nil
     end
@@ -617,6 +619,51 @@ local function  parseTypeUnitFunction(parent)
         end
     end
     typeUnit.finish = getFinish()
+    -- Bind local generics from fun<T, V> to type names within this function
+    if typeUnit.signs then
+        local generics = {}
+        for _, sign in ipairs(typeUnit.signs) do
+            generics[sign[1]] = sign
+        end
+        local function bindTypeNames(obj)
+            if not obj then return end
+            if obj.type == 'doc.type.name' and generics[obj[1]] then
+                obj.type = 'doc.generic.name'
+                obj.generic = generics[obj[1]]
+            elseif obj.type == 'doc.type' and obj.types then
+                for _, t in ipairs(obj.types) do
+                    bindTypeNames(t)
+                end
+            elseif obj.type == 'doc.type.array' then
+                bindTypeNames(obj.node)
+            elseif obj.type == 'doc.type.table' and obj.fields then
+                for _, field in ipairs(obj.fields) do
+                    bindTypeNames(field.name)
+                    bindTypeNames(field.extends)
+                end
+            elseif obj.type == 'doc.type.sign' then
+                bindTypeNames(obj.node)
+                if obj.signs then
+                    for _, s in ipairs(obj.signs) do
+                        bindTypeNames(s)
+                    end
+                end
+            elseif obj.type == 'doc.type.function' then
+                for _, arg in ipairs(obj.args) do
+                    bindTypeNames(arg.extends)
+                end
+                for _, ret in ipairs(obj.returns) do
+                    bindTypeNames(ret)
+                end
+            end
+        end
+        for _, arg in ipairs(typeUnit.args) do
+            bindTypeNames(arg.extends)
+        end
+        for _, ret in ipairs(typeUnit.returns) do
+            bindTypeNames(ret)
+        end
+    end
     return typeUnit
 end
 
@@ -1029,6 +1076,12 @@ local docSwitch = util.switch()
                     finish = getFinish(),
                 }
                 return result
+            end
+            if extend.type == 'doc.extends.name' then
+                local signResult = parseTypeUnitSign(result, extend)
+                if signResult then
+                    extend = signResult
+                end
             end
             result.extends[#result.extends+1] = extend
             result.finish = getFinish()
@@ -1850,7 +1903,9 @@ local function bindGeneric(binded)
         or doc.type == 'doc.return'
         or doc.type == 'doc.type'
         or doc.type == 'doc.class'
-        or doc.type == 'doc.alias' then
+        or doc.type == 'doc.alias'
+        or doc.type == 'doc.field'
+        or doc.type == 'doc.overload' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then

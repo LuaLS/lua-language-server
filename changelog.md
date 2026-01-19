@@ -3,6 +3,12 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` convert all keys to string before using
+* `FIX` Generic class inheritance with type arguments now works correctly (e.g., `class Bar: Foo<integer>`) [#1929](https://github.com/LuaLS/lua-language-server/issues/1929)
+* `FIX` Method return types on generic classes now resolve correctly (e.g., `Box<string>:getValue()` returns `string`) [#1863](https://github.com/LuaLS/lua-language-server/issues/1863)
+* `FIX` Self-referential generic classes no longer cause infinite expansion in hover display [#1853](https://github.com/LuaLS/lua-language-server/issues/1853)
+* `FIX` Generic type parameters now work in `@overload` annotations [#723](https://github.com/LuaLS/lua-language-server/issues/723)
+* `NEW` Support `fun<T>` syntax for inline generic function types in `@field` and `@type` annotations [#1170](https://github.com/LuaLS/lua-language-server/issues/1170)
+* `FIX` Methods with `@generic T` and `@param self T` now correctly resolve return type to the receiver's concrete type (e.g., `List<number>:identity()` returns `List<number>`) [#1000](https://github.com/LuaLS/lua-language-server/issues/1000)
 
 ## 3.16.4
 `2025-12-25`

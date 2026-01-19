@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.17.0
+`2026-01-19`
 * `NEW` Support `fun<T>` syntax for inline generic function types in `@field` and `@type` annotations [#1170](https://github.com/LuaLS/lua-language-server/issues/1170)
 * `FIX` Generic class inheritance with type arguments now works correctly (e.g., `class Bar: Foo<integer>`) [#1929](https://github.com/LuaLS/lua-language-server/issues/1929)
 * `FIX` Method return types on generic classes now resolve correctly (e.g., `Box<string>:getValue()` returns `string`) [#1863](https://github.com/LuaLS/lua-language-server/issues/1863)

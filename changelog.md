@@ -8,6 +8,7 @@
 * `FIX` Self-referential generic classes no longer cause infinite expansion in hover display [#1853](https://github.com/LuaLS/lua-language-server/issues/1853)
 * `FIX` Generic type parameters now work in `@overload` annotations [#723](https://github.com/LuaLS/lua-language-server/issues/723)
 * `FIX` Methods with `@generic T` and `@param self T` now correctly resolve return type to the receiver's concrete type (e.g., `List<number>:identity()` returns `List<number>`) [#1000](https://github.com/LuaLS/lua-language-server/issues/1000)
+* `FIX` Fixed a CPU scheduling bug that prevented the full utilization of high-performance CPUs.
 * `FIX` convert all keys to string in `--check`
 
 ## 3.16.4

@@ -235,16 +235,12 @@ function m.recieve(block)
         selector:wait(-1)
         -- 遍历公共组
         for _, brave in ipairs(m.publicBraves) do
-            if m.reciveFromPad(brave) then
-                return
-            end
+            m.reciveFromPad(brave)
         end
         -- 遍历所有专用组
         for _, braveList in pairs(m.privateBraves) do
             for _, brave in ipairs(braveList) do
-                if m.reciveFromPad(brave) then
-                    return
-                end
+                m.reciveFromPad(brave)
             end
         end
     else

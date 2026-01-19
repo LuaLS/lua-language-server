@@ -168,13 +168,7 @@ function m.eventLoop()
         end
     end
 
-    local lastNetUpdateTime = 0
     local function doSomething()
-        local now = time.monotonic()
-        if now - lastNetUpdateTime >= 100 then
-            net.update()
-            lastNetUpdateTime = now
-        end
         timer.update()
         pub.step(false)
         if await.step() then
@@ -185,17 +179,24 @@ function m.eventLoop()
     end
 
     local function sleep()
-        idle()
-        for _ = 1, 10 do
-            net.update(100)
-            if doSomething() then
-                return
+        while true do
+            idle()
+            for _ = 1, 10 do
+                net.update(100)
+                if doSomething() then
+                    return
+                end
             end
+            pub.step(true)
         end
-        pub.step(true)
     end
 
     while true do
+        net.update()
+        local clock = os.clock()
+        while os.clock() - clock < 0.1 do
+            doSomething()
+        end
         if doSomething() then
             goto CONTINUE
         end

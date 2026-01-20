@@ -126,36 +126,42 @@ end
 ---@return Node
 ---@return true
 M.__getter.truly = function (self)
+    local rt = self.scope.rt
     local result = {}
     local changed = false
     for _, v in ipairs(self.values) do
-        result[#result+1] = v.truly
         if v ~= v.truly then
             changed = true
+        end
+        if v.truly ~= rt.NEVER then
+            result[#result+1] = v.truly
         end
     end
     if not changed then
         return self, true
     end
-    return self.scope.rt.union(result), true
+    return rt.union(result), true
 end
 
 ---@param self Node.Union
 ---@return Node
 ---@return true
 M.__getter.falsy = function (self)
+    local rt = self.scope.rt
     local result = {}
     local changed = false
     for _, v in ipairs(self.values) do
-        result[#result+1] = v.falsy
-        if v ~= v.truly then
+        if v ~= v.falsy then
             changed = true
+        end
+        if v.falsy ~= rt.NEVER then
+            result[#result+1] = v.falsy
         end
     end
     if not changed then
         return self, true
     end
-    return self.scope.rt.union(result), true
+    return rt.union(result), true
 end
 
 function M:narrow(other)

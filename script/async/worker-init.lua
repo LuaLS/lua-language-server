@@ -1,8 +1,8 @@
-local channel = require 'bee.channel'
-local time    = require 'bee.time'
-local thread  = require 'bee.thread'
-
 return function (options)
+    local channel = require 'bee.channel'
+    local time    = require 'bee.time'
+    local thread  = require 'bee.thread'
+    local epoll   = require 'bee.epoll'
 
     require 'luals'
 
@@ -44,8 +44,6 @@ return function (options)
         end
     end, log.warn)
 
-    local channel = require 'bee.channel'
-    local epoll   = require 'bee.epoll'
     local requestChannel  = channel.query(options.name .. '-request')
     local responseChannel = channel.query(options.name .. '-response')
 

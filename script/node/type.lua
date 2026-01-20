@@ -403,6 +403,9 @@ end
 ---@return Node
 ---@return true
 M.__getter.falsy = function (self)
+    if self.isBasicType then
+        return self.scope.rt.NEVER, true
+    end
     if self:isAliasLike() then
         local falsy = self.value.falsy
         if falsy == self.value then

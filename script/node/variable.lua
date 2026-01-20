@@ -577,8 +577,10 @@ end
 M.tracer = nil
 
 ---@param tracer Node.Tracer
+---@return Node.Variable
 function M:setTracer(tracer)
     self.tracer = tracer
+    return self
 end
 
 ---@type Node

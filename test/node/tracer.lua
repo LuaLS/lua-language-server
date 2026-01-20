@@ -32,13 +32,17 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', {
-                { 'ref', 'x', 'x1' },
-            } },
+            { 'condition', { 'ref', 'x', 'x1' } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
         } },
         { 'ref', 'x', 'x4' },
     }
+
+    assert(r['x0']:view() == 'string | nil')
+    assert(r['x1']:view() == 'string | nil')
+    assert(r['x2']:view() == 'string')
+    assert(r['x3']:view() == 'nil')
+    assert(r['x4']:view() == 'string | nil')
 end

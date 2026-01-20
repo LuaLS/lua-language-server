@@ -193,8 +193,9 @@ function m.eventLoop()
 
     while true do
         net.update()
-        local clock = os.clock()
-        while os.clock() - clock < 0.1 do
+        log.debug('net update')
+        local clock = time.monotonic()
+        while time.monotonic() - clock < 100 do
             doSomething()
         end
         if doSomething() then

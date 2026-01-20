@@ -3,6 +3,10 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 
+## 3.17.1
+`2026-01-20`
+* `FIX` Fixed a CPU usage issue again
+
 ## 3.17.0
 `2026-01-19`
 * `NEW` Support `fun<T>` syntax for inline generic function types in `@field` and `@type` annotations [#1170](https://github.com/LuaLS/lua-language-server/issues/1170)

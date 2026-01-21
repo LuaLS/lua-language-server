@@ -217,9 +217,31 @@ function m.getLibraryMatchers(scp)
             pattern[#pattern+1] = path
         end
     end
+    local libPatterns = {}
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
         log.debug('Ignore directory:', path)
-        pattern[#pattern+1] = path
+        -- check for library specific ignoreDir
+        local isLibPattern = false
+        local nPath = files.normalize(path)
+        for _, libPath in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+            -- check if ignoreDir path is relative to libPath
+            local nLibPath = m.getAbsolutePath(scp.uri, libPath)
+            if nLibPath then
+                local relativeToLibPath = fs.relative(fs.path(nPath), fs.path(nLibPath)):string()
+                if relativeToLibPath ~= ''  -- will be empty string on windows if drive letter is different
+                and relativeToLibPath:sub(1, 2) ~= '..' -- a valid subpath of libPath should not starts with `..`
+                then
+                    isLibPattern = true
+                    -- add leading `/` to convert subpath to absolute gitignore pattern path
+                    local subPattern = '/' .. relativeToLibPath
+                    libPatterns[nLibPath] = libPatterns[nLibPath] or {}
+                    table.insert(libPatterns[nLibPath], subPattern)
+                end
+            end
+        end
+        if not isLibPattern then
+            pattern[#pattern+1] = path
+        end
     end
 
     local librarys = {}
@@ -241,8 +263,16 @@ function m.getLibraryMatchers(scp)
     local matchers = {}
     for path in pairs(librarys) do
         if fs.exists(fs.path(path)) then
+            local patterns = libPatterns[path]
+            if patterns then
+                -- append default pattern
+                util.arrayMerge(patterns, pattern)
+            else
+                -- use default pattern
+                patterns = pattern
+            end
             local nPath = fs.absolute(fs.path(path)):string()
-            local matcher = glob.gitignore(pattern, {
+            local matcher = glob.gitignore(patterns, {
                 root       = path,
                 ignoreCase = platform.os == 'windows',
             }, globInteferFace)

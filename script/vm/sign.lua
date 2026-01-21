@@ -58,9 +58,29 @@ function mt:resolve(uri, args)
             if object.literal then
                 -- 'number' -> `T`
                 for n in node:eachObject() do
+                    local typeName = nil
+                    local typeUri = nil
                     if n.type == 'string' then
+                        typeName = n[1]
+                        typeUri = guide.getUri(n)
+                    elseif n.type == "global" and n.cate == "type" then
+                        typeName = n:getName()
+                    elseif (n.type == "function" or n.type == "doc.type.function")
+                        and #n.returns > 0 then
                         ---@cast n parser.object
-                        local type = vm.declareGlobal('type', object.pattern and object.pattern:format(n[1]) or n[1], guide.getUri(n))
+                        local fret = vm.getReturnOfFunction(n, 1)
+                        if fret then
+                            local compiled = vm.compileNode(fret)
+                            local r1 = compiled and compiled[1]
+                            if r1 and r1.cate == "type" then
+                                typeName = r1:getName()
+                            end
+						end
+                    end
+                    if typeName ~= nil then
+                        ---@cast n parser.object
+                        local type = vm.declareGlobal('type',
+                            object.pattern and object.pattern:format(typeName) or typeName, typeUri)
                         resolved[key] = vm.createNode(type, resolved[key])
                     end
                 end

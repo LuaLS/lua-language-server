@@ -5,9 +5,11 @@ M.kind = 'tracer'
 
 ---@param scope Scope
 ---@param map table<string, Node>
-function M:__init(scope, map)
+---@param parentMap table<string, [string, string]>
+function M:__init(scope, map, parentMap)
     self.scope = scope
     self.map = map
+    self.parentMap = parentMap
 end
 
 ---@param self Node.Tracer
@@ -26,7 +28,7 @@ end
 M.walker = nil
 
 M.__getter.walker = function (self)
-    return New 'Node.Tracer.Walker' (self.scope, self.map), true
+    return New 'Node.Tracer.Walker' (self.scope, self.map, self.parentMap), true
 end
 
 function M:trace()
@@ -38,9 +40,11 @@ local W = Class 'Node.Tracer.Walker'
 
 ---@param scope Scope
 ---@param map table<string, Node.Variable>
-function W:__init(scope, map)
+---@param parentMap table<string, [string, string]>
+function W:__init(scope, map, parentMap)
     self.scope = scope
     self.map   = map
+    self.parentMap = parentMap
 end
 
 function W:start(block)
@@ -69,6 +73,8 @@ function W:currentStack()
     return self.stacks[#self.stacks]
 end
 
+---@param id string
+---@return Node?
 function W:getValue(id)
     for i = #self.stacks, 1, -1 do
         local stack = self.stacks[i]
@@ -77,6 +83,7 @@ function W:getValue(id)
             return value
         end
     end
+    return nil
 end
 
 function W:setValue(id, value)
@@ -100,6 +107,11 @@ function W:traceBlock(block, start)
         end
         if tag == 'if' then
             self:traceIf(v)
+            goto continue
+        end
+        if tag == 'condition' then
+            self:traceCondition(v)
+            goto continue
         end
         ::continue::
     end
@@ -113,17 +125,21 @@ function W:traceVar(var)
 end
 
 ---@param ref ['ref', string, string]
----@return Node
+---@return Node?
 function W:traceRef(ref)
     local id, alias = ref[2], ref[3]
     self.aliasID[alias] = id
     local value = self:getValue(id)
+               or self.map[alias].value
+    if not value then
+        return nil
+    end
     self.map[alias]:setCurrentValue(value)
     return value
 end
 
 ---@param data ['value', string]
----@return Node
+---@return Node?
 function W:traceValue(data)
     local id = data[2]
     return self.map[id]
@@ -144,31 +160,40 @@ function W:traceIfChild(block, lastStack)
     if lastStack then
         stack.current = lastStack.otherSide
     end
-    local condition = block[1]
-    if condition[1] == 'condition' then
-        self:traceCondition(condition[2])
-        self:traceBlock(block, 2)
-    else
-        self:traceBlock(block)
-    end
+    self:traceBlock(block)
     self:popStack()
     return stack
 end
 
 function W:traceCondition(condition)
-    local kind = condition[1]
+    local exp = condition[2]
+    local kind = exp[1]
     if kind == 'ref' then
-        self:traceTruly(condition)
+        self:traceTruly(exp)
     elseif kind == 'equal' then
-        self:traceEqual(condition[2], condition[3])
-        self:traceEqual(condition[3], condition[2])
+        self:traceEqual(exp[2], exp[3])
+        self:traceEqual(exp[3], exp[2])
     end
 end
 
 function W:traceTruly(exp)
-    if exp[1] == 'ref' then
-        local value = self:traceRef(exp)
-        self:setNarrowResult(exp[2], value.truly, value.falsy)
+    if exp[1] ~= 'ref' then
+        return
+    end
+    local id = exp[2]
+    local value = self:traceRef(exp)
+    if not value then
+        return
+    end
+    self:setNarrowResult(id, value.truly, value.falsy)
+
+    local pdata = self.parentMap[id]
+    if pdata then
+        local pvalue = self:getValue(pdata[1])
+        if pvalue then
+            local narrowed, otherSide = pvalue:narrowByField(pdata[2], self.scope.rt.TRULY)
+            self:setNarrowResult(pdata[1], narrowed, otherSide)
+        end
     end
 end
 
@@ -176,9 +201,25 @@ function W:traceEqual(left, right)
     if left[1] ~= 'ref' then
         return
     end
-    local var = self:traceRef(left)
-    local value = self.map[right[2]]
-    self:setNarrowResult(left[2], var:narrowEqual(value))
+    local lvalue = self:traceRef(left)
+    if not lvalue then
+        return
+    end
+    local rvalue = self:traceValue(right)
+    if not rvalue then
+        return
+    end
+    local id = left[2]
+    self:setNarrowResult(id, lvalue:narrowEqual(rvalue))
+
+    local pdata = self.parentMap[id]
+    if pdata then
+        local pvalue = self:getValue(pdata[1])
+        if pvalue then
+            local narrowed, otherSide = pvalue:narrowByField(pdata[2], rvalue)
+            self:setNarrowResult(pdata[1], narrowed, otherSide)
+        end
+    end
 end
 
 function W:setNarrowResult(id, result, otherSide)

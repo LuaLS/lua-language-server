@@ -288,9 +288,10 @@ function M:fillAPIs()
     end
 
     ---@param map table<string, Node>
+    ---@param parentMap table<string, [string, string]>
     ---@return Node.Tracer
-    function self.tracer(map)
-        return New 'Node.Tracer' (scope, map)
+    function self.tracer(map, parentMap)
+        return New 'Node.Tracer' (scope, map, parentMap)
     end
 
     ---@param childs Node.Table[]

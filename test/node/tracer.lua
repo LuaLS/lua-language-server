@@ -15,7 +15,7 @@ do
     rt:reset()
     local r = {}
 
-    local tracer = rt.tracer(r)
+    local tracer = rt.tracer(r, {})
 
     r['x0'] = rt.variable 'x'
     r['x0']:addType(rt.STRING | rt.NIL)
@@ -62,7 +62,7 @@ do
     rt:reset()
     local r = {}
 
-    local tracer = rt.tracer(r)
+    local tracer = rt.tracer(r, {})
 
     r['x0'] = rt.variable 'x'
     r['x0']:addType(rt.value(1) | rt.value(2))
@@ -111,7 +111,7 @@ do
     rt:reset()
     local r = {}
 
-    local tracer = rt.tracer(r)
+    local tracer = rt.tracer(r, {})
 
     r['x0'] = rt.variable 'x'
     r['x0']:addType(rt.value(1) | rt.value(2))
@@ -143,4 +143,121 @@ do
     assert(r['x2']:view() == '1')
     assert(r['x3']:view() == '2')
     assert(r['x4']:view() == '1 | 2')
+end
+
+do
+    --[[
+    ---@type { a: 1 } | { b: 2 }
+    local x
+    if x.a then
+        x
+    else
+        x
+    end
+    x
+    ]]
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local tracer = rt.tracer(r, p)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.table {
+        a = rt.value(1)
+    } | rt.table {
+        b = rt.value(2)
+    })
+
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x.a1'] = r['x0']:getChild('a')
+    r['x.a1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+
+    p['x.a'] = { 'x', 'a' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'ref', 'x', 'x1' },
+            { 'condition', { 'ref', 'x.a', 'x.a1' } },
+            { 'ref', 'x', 'x2' }
+        }, {
+            { 'ref', 'x', 'x3' }
+        } },
+        { 'ref', 'x', 'x4' },
+    }
+
+    assert(r['x0']:view() == '{ a: 1 } | { b: 2 }')
+    assert(r['x1']:view() == '{ a: 1 } | { b: 2 }')
+    assert(r['x2']:view() == '{ a: 1 }')
+    assert(r['x3']:view() == '{ b: 2 }')
+    assert(r['x4']:view() == '{ a: 1 } | { b: 2 }')
+end
+
+do
+    --[[
+    ---@type { a: 1 } | { a: 2 }
+    local x
+    if x.a == 1 then
+        x
+    else
+        x
+    end
+    x
+    ]]
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local tracer = rt.tracer(r, p)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.table {
+        a = rt.value(1)
+    } | rt.table {
+        a = rt.value(2)
+    })
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x.a1'] = r['x0']:getChild('a')
+    r['x.a1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+
+    r['value'] = rt.value(1)
+
+    p['x.a'] = { 'x', 'a' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'ref', 'x', 'x1' },
+            { 'condition', { 'equal', { 'ref', 'x.a', 'x.a1' }, { 'value', 'value' } } },
+            { 'ref', 'x', 'x2' }
+        }, {
+            { 'ref', 'x', 'x3' }
+        } },
+        { 'ref', 'x', 'x4' },
+    }
+
+    assert(r['x0']:view() == '{ a: 1 } | { a: 2 }')
+    assert(r['x1']:view() == '{ a: 1 } | { a: 2 }')
+    assert(r['x2']:view() == '{ a: 1 }')
+    assert(r['x3']:view() == '{ a: 2 }')
+    assert(r['x4']:view() == '{ a: 1 } | { a: 2 }')
 end

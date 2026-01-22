@@ -122,6 +122,13 @@ function W:traceRef(ref)
     return value
 end
 
+---@param data ['value', string]
+---@return Node
+function W:traceValue(data)
+    local id = data[2]
+    return self.map[id]
+end
+
 function W:traceIf(ifNode)
     local lastStack
     for i = 2, #ifNode do
@@ -152,6 +159,9 @@ function W:traceCondition(condition)
     local kind = condition[1]
     if kind == 'ref' then
         self:traceTruly(condition)
+    elseif kind == 'equal' then
+        self:traceEqual(condition[2], condition[3])
+        self:traceEqual(condition[3], condition[2])
     end
 end
 
@@ -160,6 +170,15 @@ function W:traceTruly(exp)
         local value = self:traceRef(exp)
         self:setNarrowResult(exp[2], value.truly, value.falsy)
     end
+end
+
+function W:traceEqual(left, right)
+    if left[1] ~= 'ref' then
+        return
+    end
+    local var = self:traceRef(left)
+    local value = self.map[right[2]]
+    self:setNarrowResult(left[2], var:narrowEqual(value))
 end
 
 function W:setNarrowResult(id, result, otherSide)

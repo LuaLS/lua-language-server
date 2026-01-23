@@ -24,6 +24,7 @@ function M:__init()
     self.variableMap = {}
     ---@type table<LuaParser.Node.Base, string>
     self.sourceVarNameMap = {}
+    self.tracerFlowMap = {}
 end
 
 function M:__del()
@@ -72,22 +73,23 @@ end
 ---@async
 ---@param file File
 function M:makeFromFile(file)
-    local code = self.coderMaster:awaitRequest('makeCode', {
+    local result = self.coderMaster:awaitRequest('makeCode', {
         text = file:getText(),
         source = file.uri,
     })
-    if not code then
+    if not result.code then
         log.error('Failed to make coder from file: ' .. file.uri)
 
         return
     end
-    local func = load(code, code, 't', self.env)
+    local func = load(result.code, result.code, 't', self.env)
     if not func then
         log.error('Failed to load coder function from file: ' .. file.uri)
         return
     end
-    self.code = code
+    self.code = result.code
     self.func = func
+    self.tracerFlowMap = result.tracerFlowMap
 end
 
 ---@param code string

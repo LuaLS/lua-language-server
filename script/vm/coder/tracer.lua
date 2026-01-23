@@ -46,7 +46,7 @@ function T:__init(coder, id)
     self.visibleVars = {}
 end
 
----@param kind 'var'|'ref'
+---@param kind string
 ---@param id string
 ---@param alias string
 function T:append(kind, id, alias)

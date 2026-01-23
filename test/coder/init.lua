@@ -27,7 +27,7 @@ require 'test.coder.meta'
 require 'test.coder.common'
 require 'test.coder.metatable'
 require 'test.coder.block'
---require 'test.coder.flow'
+require 'test.coder.flow'
 require 'test.coder.custom'
 --require 'test.coder.find-local'
 

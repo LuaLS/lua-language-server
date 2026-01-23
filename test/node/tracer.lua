@@ -261,3 +261,74 @@ do
     assert(r['x3']:view() == '{ a: 2 }')
     assert(r['x4']:view() == '{ a: 1 } | { a: 2 }')
 end
+
+do
+    --[[
+    ---@class A
+    ---@field a { x: 1 }
+
+    ---@class B
+    ---@field a { x: 2 }
+    
+    ---@type A | B
+    local x
+    if x.a.x == 1 then
+        x
+    else
+        x
+    end
+    x
+    ]]
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local A = rt.class('A')
+        : addField(rt.field('a', rt.table { x = rt.value(1) }))
+
+    local B = rt.class('B')
+        : addField(rt.field('a', rt.table { x = rt.value(2) }))
+
+    local tracer = rt.tracer(r, p)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.type 'A' | rt.type 'B')
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x.a1'] = r['x0']:getChild('a')
+    r['x.a1']:setTracer(tracer)
+    r['x.a.x1'] = r['x.a1']:getChild('x')
+    r['x.a.x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+
+    r['value'] = rt.value(1)
+
+    p['x.a'] = { 'x', 'a' }
+    p['x.a.x'] = { 'x.a', 'x' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'ref', 'x', 'x1' },
+            { 'ref', 'x.a', 'x.a1' },
+            { 'condition', { 'equal', { 'ref', 'x.a.x', 'x.a.x1' }, { 'value', 'value' } } },
+            { 'ref', 'x', 'x2' }
+        }, {
+            { 'ref', 'x', 'x3' }
+        } },
+        { 'ref', 'x', 'x4' },
+    }
+
+    assert(r['x0']:view() == 'A | B')
+    assert(r['x1']:view() == 'A | B')
+    assert(r['x2']:view() == 'A')
+    assert(r['x3']:view() == 'B')
+    assert(r['x4']:view() == 'A | B')
+end

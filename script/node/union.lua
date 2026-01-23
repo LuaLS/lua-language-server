@@ -194,6 +194,12 @@ end
 
 function M:narrowEqual(other)
     local rt = self.scope.rt
+    if other == rt.TRULY then
+        return self.truly, self.falsy
+    end
+    if other == rt.FALSY then
+        return self.falsy, self.truly
+    end
     local matched = {}
     for _, v in ipairs(self.values) do
         local l = v:findValue(ls.node.kind['value'] | ls.node.kind['type'])

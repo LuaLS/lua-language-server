@@ -363,11 +363,18 @@ end
 ---@return Node narrowed
 ---@return Node otherSide
 function M:narrowEqual(other)
+    local rt = self.scope.rt
+    if other == rt.TRULY then
+        return self.truly, self.falsy
+    end
+    if other == rt.FALSY then
+        return self.falsy, self.truly
+    end
     local v = self:findValue(ls.node.kind['value'] | ls.node.kind['type'] | ls.node.kind['union'])
     if v then
         return v:narrowEqual(other)
     end
-    return self.scope.rt.NEVER, self
+    return rt.NEVER, self
 end
 
 ---@type boolean

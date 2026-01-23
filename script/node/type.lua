@@ -512,6 +512,13 @@ function M:narrowEqual(other)
         return self, rt.NEVER
     end
 
+    if other == rt.TRULY then
+        return self.truly, self.falsy
+    end
+    if other == rt.FALSY then
+        return self.falsy, self.truly
+    end
+
     if self == rt.ANY then
         if other == rt.NIL then
             return rt.NIL, rt.UNKNOWN

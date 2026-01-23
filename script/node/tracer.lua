@@ -130,9 +130,9 @@ function W:traceRef(ref)
     local id, alias = ref[2], ref[3]
     self.aliasID[alias] = id
     local value = self:getValue(id)
-               or self.map[alias].value
     if not value then
-        return nil
+        value = self.map[alias].value
+        self:setValue(id, value)
     end
     self.map[alias]:setCurrentValue(value)
     return value
@@ -180,44 +180,43 @@ function W:traceTruly(exp)
     if exp[1] ~= 'ref' then
         return
     end
-    local id = exp[2]
-    local value = self:traceRef(exp)
-    if not value then
-        return
-    end
-    self:setNarrowResult(id, value.truly, value.falsy)
 
-    local pdata = self.parentMap[id]
-    if pdata then
-        local pvalue = self:getValue(pdata[1])
-        if pvalue then
-            local narrowed, otherSide = pvalue:narrowByField(pdata[2], self.scope.rt.TRULY)
-            self:setNarrowResult(pdata[1], narrowed, otherSide)
-        end
-    end
+    self:traceByValue(exp, self.scope.rt.TRULY)
 end
 
 function W:traceEqual(left, right)
     if left[1] ~= 'ref' then
         return
     end
-    local lvalue = self:traceRef(left)
-    if not lvalue then
-        return
-    end
     local rvalue = self:traceValue(right)
     if not rvalue then
         return
     end
-    local id = left[2]
-    self:setNarrowResult(id, lvalue:narrowEqual(rvalue))
 
-    local pdata = self.parentMap[id]
-    if pdata then
-        local pvalue = self:getValue(pdata[1])
+    self:traceByValue(left, rvalue)
+end
+
+function W:traceByValue(var, value)
+    local vvalue = self:traceRef(var)
+    if not vvalue then
+        return
+    end
+
+    local id = var[2]
+    local narrowed, otherSide = vvalue:narrowEqual(value)
+    self:setNarrowResult(id, narrowed, otherSide)
+
+    while true do
+        local pdata = self.parentMap[id]
+        if not pdata then
+            break
+        end
+        id = pdata[1]
+        local pvalue = self:getValue(id)
         if pvalue then
-            local narrowed, otherSide = pvalue:narrowByField(pdata[2], rvalue)
-            self:setNarrowResult(pdata[1], narrowed, otherSide)
+            local key = pdata[2]
+            narrowed, otherSide = pvalue:narrowByField(key, narrowed)
+            self:setNarrowResult(id, narrowed, otherSide)
         end
     end
 end

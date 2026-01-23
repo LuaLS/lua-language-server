@@ -39,11 +39,18 @@ function M:onCanCast(other)
 end
 
 function M:narrowEqual(other)
+    local rt = self.scope.rt
+    if other == rt.TRULY then
+        return self.truly, self.falsy
+    end
+    if other == rt.FALSY then
+        return self.falsy, self.truly
+    end
     local v = other:findValue(ls.node.kind['value'])
     if v and self.literal == v.literal then
-        return self, self.scope.rt.NEVER
+        return self, rt.NEVER
     else
-        return self.scope.rt.NEVER, self
+        return rt.NEVER, self
     end
 end
 

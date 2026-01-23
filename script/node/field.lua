@@ -40,6 +40,9 @@ function M:setHideInView()
 end
 
 function M:simplify()
+    if self.value == self then
+        return self
+    end
     return self.value:simplify()
 end
 
@@ -47,6 +50,7 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    self.hasGeneric = false
     self.key:addRef(self)
     self.value:addRef(self)
     return self.key.hasGeneric or self.value.hasGeneric, true

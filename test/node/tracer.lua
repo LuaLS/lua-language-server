@@ -81,7 +81,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { 'equal', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -130,7 +130,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { 'equal', { 'value', 'value' }, { 'ref', 'x', 'x1' } } },
+            { 'condition', { '==', { 'value', 'value' }, { 'ref', 'x', 'x1' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -174,7 +174,7 @@ do
     r['x1'] = r['x0']:shadow()
     r['x1']:setTracer(tracer)
     r['x.a1'] = r['x0']:getChild('a')
-    r['x.a1']:setTracer(tracer)
+    --r['x.a1']:setTracer(tracer)
     r['x2'] = r['x0']:shadow()
     r['x2']:setTracer(tracer)
     r['x3'] = r['x0']:shadow()
@@ -247,7 +247,7 @@ do
         { 'var', 'x', 'x0' },
         { 'if' , {
             { 'ref', 'x', 'x1' },
-            { 'condition', { 'equal', { 'ref', 'x.a', 'x.a1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x.a', 'x.a1' }, { 'value', 'value' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -318,7 +318,7 @@ do
         { 'if' , {
             { 'ref', 'x', 'x1' },
             { 'ref', 'x.a', 'x.a1' },
-            { 'condition', { 'equal', { 'ref', 'x.a.x', 'x.a.x1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x.a.x', 'x.a.x1' }, { 'value', 'value' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -367,7 +367,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { 'equal', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
             { 'var', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }

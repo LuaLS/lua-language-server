@@ -4,6 +4,12 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         key = coder:getKey(source),
         value = coder:makeVarKey(source),
     })
+
+    if source.value then
+        coder:getTracer():appendVar(source)
+    else
+        coder:getTracer():appendRef(source)
+    end
 end)
 
 ls.vm.registerCoderProvider('field', function (coder, source)
@@ -37,6 +43,12 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             })
         end
     end
+
+    if source.value then
+        coder:getTracer():appendVar(source)
+    else
+        coder:getTracer():appendRef(source)
+    end
 end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)
@@ -49,6 +61,7 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
+    coder:getTracer():appendVar(source)
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -61,6 +74,8 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
+
+    coder:getTracer():appendVar(source)
 
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 

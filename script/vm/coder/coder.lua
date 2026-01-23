@@ -43,6 +43,7 @@ function M:makeFromAst(ast)
     self:addLine 'local rt  = vfile.scope.rt'
     self:addLine 'local uri = vfile.uri'
     self:addLine 'local r   = coder.map'
+    self:addLine 'local p   = {}'
     self:addLine ''
 
     self:compile(ast.main)
@@ -513,6 +514,7 @@ function M:makeVarKey(source)
     error('Cannot make var key for kind ' .. tostring(source.kind))
 end
 
+---形如 `a.b.c` 的名字，用于变量跟踪
 ---@param var LuaParser.Node.Base
 ---@return string?
 function M:getVarName(var)

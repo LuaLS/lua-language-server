@@ -190,26 +190,31 @@ function W:traceIfChild(block, lastStack)
     return stack
 end
 
-function W:traceCondition(condition)
+function W:traceCondition(condition, revert)
     local exp = condition[2]
     local kind = exp[1]
     if kind == 'ref' then
-        self:traceTruly(exp)
-    elseif kind == 'equal' then
-        self:traceEqual(exp[2], exp[3])
-        self:traceEqual(exp[3], exp[2])
+        self:traceTruly(exp, revert)
+    elseif kind == '==' then
+        self:traceEqual(exp[2], exp[3], revert)
+        self:traceEqual(exp[3], exp[2], revert)
+    elseif kind == '~=' then
+        self:traceEqual(exp[2], exp[3], not revert)
+        self:traceEqual(exp[3], exp[2], not revert)
+    elseif kind == 'not' then
+        self:traceCondition(exp[2], not revert)
     end
 end
 
-function W:traceTruly(exp)
+function W:traceTruly(exp, revert)
     if exp[1] ~= 'ref' then
         return
     end
 
-    self:traceByValue(exp, self.scope.rt.TRULY)
+    self:traceByValue(exp, self.scope.rt.TRULY, revert)
 end
 
-function W:traceEqual(left, right)
+function W:traceEqual(left, right, revert)
     if left[1] ~= 'ref' then
         return
     end
@@ -218,10 +223,10 @@ function W:traceEqual(left, right)
         return
     end
 
-    self:traceByValue(left, rvalue)
+    self:traceByValue(left, rvalue, revert)
 end
 
-function W:traceByValue(var, value)
+function W:traceByValue(var, value, revert)
     local vvalue = self:traceRef(var)
     if not vvalue then
         return
@@ -229,7 +234,11 @@ function W:traceByValue(var, value)
 
     local id = var[2]
     local narrowed, otherSide = vvalue:narrowEqual(value)
-    self:setNarrowResult(id, narrowed, otherSide)
+    if revert then
+        self:setNarrowResult(id, otherSide, narrowed)
+    else
+        self:setNarrowResult(id, narrowed, otherSide)
+    end
 
     while true do
         local pdata = self.parentMap[id]
@@ -241,7 +250,11 @@ function W:traceByValue(var, value)
         if pvalue then
             local key = pdata[2]
             narrowed, otherSide = pvalue:narrowByField(key, narrowed)
-            self:setNarrowResult(id, narrowed, otherSide)
+            if revert then
+                self:setNarrowResult(id, otherSide, narrowed)
+            else
+                self:setNarrowResult(id, narrowed, otherSide)
+            end
         end
     end
 end

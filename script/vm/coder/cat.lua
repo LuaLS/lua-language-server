@@ -560,6 +560,6 @@ ls.vm.registerCoderProvider('catblock', function (coder, source)
     end
     coder:addLine('local playground = coder:bindGC(rt:playground())')
     coder:addLine('local _ENV = playground.env')
-    coder:addLine('global <const> coder, vfile, rt, r, uri')
+    coder:addLine('global <const> coder, vfile, rt, r, uri, p')
     coder:addLine(source.code)
 end)

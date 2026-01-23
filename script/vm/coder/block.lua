@@ -14,6 +14,7 @@ end
 ls.vm.registerCoderProvider('main', function (coder, source)
     ---@cast source LuaParser.Node.Main
 
+    coder:startTracer(source)
     local env = source.ast:findLocal(source.ast.envMode, 0)
     assert(env)
     coder:compile(env)
@@ -29,6 +30,7 @@ ls.vm.registerCoderProvider('main', function (coder, source)
     end
 
     parseBlock(coder, source)
+    coder:finishTracer()
 end)
 
 ls.vm.registerCoderProvider('do', function (coder, source)

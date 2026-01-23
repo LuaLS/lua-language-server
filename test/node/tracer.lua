@@ -40,11 +40,11 @@ do
         { 'ref', 'x', 'x4' },
     }
 
-    assert(r['x0']:view() == 'string | nil')
-    assert(r['x1']:view() == 'string | nil')
-    assert(r['x2']:view() == 'string')
-    assert(r['x3']:view() == 'nil')
-    assert(r['x4']:view() == 'string | nil')
+    lt.assertEquals(r['x0']:view(), 'string | nil')
+    lt.assertEquals(r['x1']:view(), 'string | nil')
+    lt.assertEquals(r['x2']:view(), 'string')
+    lt.assertEquals(r['x3']:view(), 'nil')
+    lt.assertEquals(r['x4']:view(), 'string | nil')
 end
 
 do
@@ -89,11 +89,11 @@ do
         { 'ref', 'x', 'x4' },
     }
 
-    assert(r['x0']:view() == '1 | 2')
-    assert(r['x1']:view() == '1 | 2')
-    assert(r['x2']:view() == '1')
-    assert(r['x3']:view() == '2')
-    assert(r['x4']:view() == '1 | 2')
+    lt.assertEquals(r['x0']:view(), '1 | 2')
+    lt.assertEquals(r['x1']:view(), '1 | 2')
+    lt.assertEquals(r['x2']:view(), '1')
+    lt.assertEquals(r['x3']:view(), '2')
+    lt.assertEquals(r['x4']:view(), '1 | 2')
 end
 
 do
@@ -138,11 +138,11 @@ do
         { 'ref', 'x', 'x4' },
     }
 
-    assert(r['x0']:view() == '1 | 2')
-    assert(r['x1']:view() == '1 | 2')
-    assert(r['x2']:view() == '1')
-    assert(r['x3']:view() == '2')
-    assert(r['x4']:view() == '1 | 2')
+    lt.assertEquals(r['x0']:view(), '1 | 2')
+    lt.assertEquals(r['x1']:view(), '1 | 2')
+    lt.assertEquals(r['x2']:view(), '1')
+    lt.assertEquals(r['x3']:view(), '2')
+    lt.assertEquals(r['x4']:view(), '1 | 2')
 end
 
 do
@@ -196,11 +196,11 @@ do
         { 'ref', 'x', 'x4' },
     }
 
-    assert(r['x0']:view() == '{ a: 1 } | { b: 2 }')
-    assert(r['x1']:view() == '{ a: 1 } | { b: 2 }')
-    assert(r['x2']:view() == '{ a: 1 }')
-    assert(r['x3']:view() == '{ b: 2 }')
-    assert(r['x4']:view() == '{ a: 1 } | { b: 2 }')
+    lt.assertEquals(r['x0']:view(), '{ a: 1 } | { b: 2 }')
+    lt.assertEquals(r['x1']:view(), '{ a: 1 } | { b: 2 }')
+    lt.assertEquals(r['x2']:view(), '{ a: 1 }')
+    lt.assertEquals(r['x3']:view(), '{ b: 2 }')
+    lt.assertEquals(r['x4']:view(), '{ a: 1 } | { b: 2 }')
 end
 
 do
@@ -255,11 +255,11 @@ do
         { 'ref', 'x', 'x4' },
     }
 
-    assert(r['x0']:view() == '{ a: 1 } | { a: 2 }')
-    assert(r['x1']:view() == '{ a: 1 } | { a: 2 }')
-    assert(r['x2']:view() == '{ a: 1 }')
-    assert(r['x3']:view() == '{ a: 2 }')
-    assert(r['x4']:view() == '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(r['x0']:view(), '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(r['x1']:view(), '{ a: 1 } | { a: 2 }')
+    lt.assertEquals(r['x2']:view(), '{ a: 1 }')
+    lt.assertEquals(r['x3']:view(), '{ a: 2 }')
+    lt.assertEquals(r['x4']:view(), '{ a: 1 } | { a: 2 }')
 end
 
 do
@@ -326,9 +326,58 @@ do
         { 'ref', 'x', 'x4' },
     }
 
-    assert(r['x0']:view() == 'A | B')
-    assert(r['x1']:view() == 'A | B')
-    assert(r['x2']:view() == 'A')
-    assert(r['x3']:view() == 'B')
-    assert(r['x4']:view() == 'A | B')
+    lt.assertEquals(r['x0']:view(), 'A | B')
+    lt.assertEquals(r['x1']:view(), 'A | B')
+    lt.assertEquals(r['x2']:view(), 'A')
+    lt.assertEquals(r['x3']:view(), 'B')
+    lt.assertEquals(r['x4']:view(), 'A | B')
+end
+
+do
+    --[[
+    ---@type 1 | 2
+    local x
+    if x == 1 then
+        x = 3
+    else
+        x
+    end
+    x
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.value(1) | rt.value(2))
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow(rt.value(3))
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+
+    r['value'] = rt.value(1)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'condition', { 'equal', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
+            { 'var', 'x', 'x2' }
+        }, {
+            { 'ref', 'x', 'x3' }
+        } },
+        { 'ref', 'x', 'x4' },
+    }
+
+    lt.assertEquals(r['x0']:view(), '1 | 2')
+    lt.assertEquals(r['x1']:view(), '1 | 2')
+    lt.assertEquals(r['x2']:view(), '3')
+    lt.assertEquals(r['x3']:view(), '2')
+    lt.assertEquals(r['x4']:view(), '2 | 3')
 end

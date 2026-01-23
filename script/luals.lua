@@ -4,6 +4,7 @@ Delete  = require 'class'.delete
 Type    = require 'class'.type
 IsValid = require 'class'.isValid
 Extends = require 'class'.extends
+Presize = require 'class'.presize
 
 require 'tools.log'
 

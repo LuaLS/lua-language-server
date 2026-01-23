@@ -38,6 +38,8 @@ end
 ---@class Node.Tracer.Walker
 local W = Class 'Node.Tracer.Walker'
 
+Presize(W, 3)
+
 ---@param scope Scope
 ---@param map table<string, Node.Variable>
 ---@param parentMap table<string, [string, string]>
@@ -86,9 +88,15 @@ function W:getValue(id)
     return nil
 end
 
-function W:setValue(id, value)
+function W:setValue(id, value, isAssign)
     local stack = self:currentStack()
     stack.current[id] = value
+    if isAssign then
+        if not stack.changed then
+            stack.changed = {}
+        end
+        stack.changed[id] = true
+    end
 end
 
 ---@param block table[]
@@ -121,7 +129,7 @@ function W:traceVar(var)
     local id, alias = var[2], var[3]
     self.aliasID[alias] = id
 
-    self:setValue(id, self.map[alias].value)
+    self:setValue(id, self.map[alias].value, true)
 end
 
 ---@param ref ['ref', string, string]
@@ -146,9 +154,26 @@ function W:traceValue(data)
 end
 
 function W:traceIf(ifNode)
+    local rt = self.scope.rt
     local lastStack
+    local stacks = {}
+    local changed = {}
     for i = 2, #ifNode do
         lastStack = self:traceIfChild(ifNode[i], lastStack)
+        stacks[#stacks+1] = lastStack
+        if lastStack.changed then
+            ls.util.tableMerge(changed, lastStack.changed)
+        end
+    end
+
+    for id in pairs(changed) do
+        local union = {}
+        for _, stack in ipairs(stacks) do
+            local value = stack.current[id]
+            union[#union+1] = value
+        end
+        local value = rt.union(union)
+        self:setValue(id, value, true)
     end
 end
 
@@ -229,6 +254,11 @@ end
 
 ---@class Node.Tracer.Stack
 local S = Class 'Node.Tracer.Stack'
+
+Presize(S, 3)
+
+---@type table<string, true>?
+S.changed = nil
 
 ---@param parent? Node.Tracer.Stack
 function S:__init(parent)

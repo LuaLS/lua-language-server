@@ -651,9 +651,9 @@ function M.compressKeys(name, keys)
     config.compress = keys
 end
 
-function M.presize(name, nreq)
+function M.presize(name, nrec)
     local config = M.getConfig(name)
-    config.presize = nreq
+    config.presize = nrec
 end
 
 return M

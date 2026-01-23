@@ -102,6 +102,9 @@ end
 ---@param block table[]
 ---@param start? integer
 function W:traceBlock(block, start)
+    if not block then
+        return
+    end
     for i = start or 1, #block do
         local v = block[i]
         local tag = v[1]

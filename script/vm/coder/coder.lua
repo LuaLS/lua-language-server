@@ -259,7 +259,10 @@ function M:run(vfile)
         ls.util.saveFile(ls.env.LOG_PATH / 'last_failed_coder.log', self.code)
     end
 
-    LAST_CODE = self.code
+    if test then
+        LAST_CODE = self.code
+        LAST_FLOW = ls.util.dump(self.tracerFlowMap, { noArrayKey = true })
+    end
     if ls.args.SAVE_CODER then
         local path = vfile.scope:getRelativePath(vfile.uri)
         if path then

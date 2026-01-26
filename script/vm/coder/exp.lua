@@ -6,6 +6,7 @@ local function makeValue(coder, source, value)
         key   = coder:getKey(source),
         value = value,
     })
+    coder:getTracer():append('value', source.uniqueKey)
 end
 
 ls.vm.registerCoderProvider('integer', function (coder, source)
@@ -157,13 +158,26 @@ local bopMap = {
 ls.vm.registerCoderProvider('binary', function (coder, source)
     ---@cast source LuaParser.Node.Binary
 
+    local op = bopMap[source.op]
+
+    local needPopStack
+    if source.op == '==' or source.op == '~=' then
+        if source.exp1 and source.exp2 then
+            coder:getTracer():pushStack(source.op)
+            needPopStack = true
+        end
+    end
     if source.exp1 then
         coder:compile(source.exp1)
     end
     if source.exp2 then
         coder:compile(source.exp2)
     end
-    local op = bopMap[source.op]
+
+    if needPopStack then
+        coder:getTracer():popStack()
+    end
+
     if not op or not source.exp1 or not source.exp2 then
         coder:addUnknown(source)
         return
@@ -175,6 +189,7 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
         arg1  = coder:getKey(source.exp1),
         arg2  = coder:getKey(source.exp2),
     })
+
 end)
 
 local uopMap = {

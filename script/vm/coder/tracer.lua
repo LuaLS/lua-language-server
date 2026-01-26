@@ -28,14 +28,14 @@ end
 function M:finishTracer()
     ---@type Coder.Tracer
     local top = table.remove(self.tracers)
-    local data = top:getData()
+    local data = top:getStack()
     self.tracerFlowMap[top.id] = data
 end
 
 ---@class Coder.Tracer
 local T = Class 'Coder.Tracer'
 
-Presize(T, 3)
+Presize(T, 4)
 
 ---@param coder Coder
 ---@param id string
@@ -47,11 +47,10 @@ function T:__init(coder, id)
 end
 
 ---@param kind string
----@param id string
----@param alias string
-function T:append(kind, id, alias)
+---@param ... any
+function T:append(kind, ...)
     local top = self.stack[#self.stack]
-    top[#top+1] = { kind, id, alias }
+    top[#top+1] = { kind, ... }
 end
 
 function T:appendVar(source)
@@ -78,14 +77,17 @@ function T:appendRef(source)
     self.visibleVars[id] = true
 end
 
-function T:pushStack()
-    self.stack[#self.stack+1] = {}
+---@param kind? string
+function T:pushStack(kind)
+    local top = self.stack[#self.stack]
+    top[#top+1] = {kind}
+    self.stack[#self.stack+1] = top[#top]
 end
 
 function T:popStack()
     self.stack[#self.stack] = nil
 end
 
-function T:getData()
+function T:getStack()
     return self.stack[#self.stack]
 end

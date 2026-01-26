@@ -41,14 +41,21 @@ end)
 
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
+
+    coder:getTracer():pushStack('if')
     for _, child in ipairs(source.childs) do
         coder:withIndentation(function ()
+            coder:getTracer():pushStack()
             if child.condition then
+                coder:getTracer():pushStack('condition')
                 coder:compile(child.condition)
+                coder:getTracer():popStack()
             end
             parseBlock(coder, child)
+            coder:getTracer():popStack()
         end, child)
     end
+    coder:getTracer():popStack()
 end)
 
 ls.vm.registerCoderProvider('for', function (coder, source)

@@ -23,16 +23,30 @@ local function isBooleanOnly(infer, uri)
     if infer:hasAny(uri) or infer:hasUnknown(uri) then
         return nil
     end
-    local hasBoolean = infer:hasType(uri, 'boolean')
-    if not hasBoolean then
-        return false
-    end
     for view in infer:eachView(uri) do
-        if view ~= 'boolean' then
+        if view ~= 'boolean'
+        and view ~= 'true'
+        and view ~= 'false' then
             return false
         end
     end
     return true
+end
+
+---@param source parser.object?
+---@return boolean
+local function isConditionFilter(source)
+    if not source or not source.parent then
+        return false
+    end
+    local parent = source.parent
+    if parent.type ~= 'ifblock'
+    and parent.type ~= 'elseifblock'
+    and parent.type ~= 'while'
+    and parent.type ~= 'repeat' then
+        return false
+    end
+    return parent.filter == source
 end
 
 ---@param source parser.object?
@@ -88,6 +102,11 @@ return function (uri, callback)
         await.delay()
         local op = source.op and source.op.type
         if op ~= 'and' and op ~= 'or' then
+            return
+        end
+        if isConditionFilter(source) then
+            checkExpression(source[1], uri, callback)
+            checkExpression(source[2], uri, callback)
             return
         end
         checkExpression(source[1], uri, callback)

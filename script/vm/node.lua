@@ -148,9 +148,6 @@ end
 ---Almost an inverse of alwaysTruthy, but strict about "any" and "unknown" types.
 ---@return boolean
 function mt:alwaysFalsy()
-    if self.optional then
-        return false
-    end
     if #self == 0 then
         return false
     end

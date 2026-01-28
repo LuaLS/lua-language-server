@@ -19,6 +19,10 @@ local y = <!d!> and "4"
 local e
 if e then end
 
+---@type true
+local t
+if t then end
+
 ---@type boolean|nil
 local g
 if <!g!> then end
@@ -26,6 +30,10 @@ if <!g!> then end
 ---@type number
 local h
 if <!h!> and true then end
+
+---@type number
+local i
+if true and <!i!> then end
 
 ---@type any
 local f

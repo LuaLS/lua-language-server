@@ -56,6 +56,11 @@ local function checkExpression(source, uri, callback)
     if not source then
         return
     end
+    local infer = vm.getInfer(source)
+    local onlyBoolean = isBooleanOnly(infer, uri)
+    if onlyBoolean == true or onlyBoolean == nil then
+        return
+    end
     local node = vm.compileNode(source)
     local truthiness = getTruthiness(node)
     if truthiness then
@@ -64,11 +69,6 @@ local function checkExpression(source, uri, callback)
             finish  = source.finish,
             message = lang.script('DIAG_BOOLEAN_CONTEXT_ALWAYS', truthiness),
         }
-        return
-    end
-    local infer = vm.getInfer(source)
-    local onlyBoolean = isBooleanOnly(infer, uri)
-    if onlyBoolean == true or onlyBoolean == nil then
         return
     end
     callback {

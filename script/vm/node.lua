@@ -145,6 +145,26 @@ function mt:alwaysTruthy()
     return true
 end
 
+---Almost an inverse of alwaysTruthy, but strict about "any" and "unknown" types.
+---@return boolean
+function mt:alwaysFalsy()
+    if #self == 0 then
+        return false
+    end
+    for _, c in ipairs(self) do
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
+            -- ok
+        else
+            return false
+        end
+    end
+    return true
+end
+
 ---@return boolean
 function mt:hasKnownType()
     for _, c in ipairs(self) do

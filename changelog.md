@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Add `boolean-context` diagnostic to warn on non-boolean values in boolean contexts and on always-true/false expressions [#2609](https://github.com/LuaLS/lua-language-server/issues/2609)
 
 ## 3.17.1
 `2026-01-20`

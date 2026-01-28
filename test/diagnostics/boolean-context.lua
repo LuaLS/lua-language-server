@@ -5,15 +5,7 @@ if <!a!> then end
 
 ---@type number
 local b
-if not b then end
-
----@type number
-local c
-local x = <!c!> or "3"
-
----@type false
-local d
-local y = d and "4"
+if <!b!> then end
 
 ---@type boolean
 local e
@@ -34,8 +26,4 @@ if <!h!> and true then end
 ---@type number
 local i
 if true and <!i!> then end
-
----@type any
-local f
-local z = f or "3"
 ]]

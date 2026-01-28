@@ -107,6 +107,10 @@ DIAG_DISCARD_RETURNS    =
 'No se pueden descartar los valores retornados por esta función.'
 DIAG_NEED_CHECK_NIL     =
 'Un chequeo de nil es necesario.'
+DIAG_BOOLEAN_CONTEXT_ALWAYS =
+'Esta expresión siempre es {}.'
+DIAG_BOOLEAN_CONTEXT_NONBOOLEAN =
+'El contexto booleano espera boolean, se obtuvo {}.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Clases con herencia circular.'
 DIAG_DOC_FIELD_NO_CLASS               =

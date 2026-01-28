@@ -107,6 +107,10 @@ DIAG_DISCARD_RETURNS    =
 '不能丢弃此函数的返回值。'
 DIAG_NEED_CHECK_NIL     =
 '需要判空。'
+DIAG_BOOLEAN_CONTEXT_ALWAYS =
+'该表达式始终为 {}。'
+DIAG_BOOLEAN_CONTEXT_NONBOOLEAN =
+'此处需要 boolean，但得到 {}。'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =

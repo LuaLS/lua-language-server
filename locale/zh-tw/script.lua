@@ -107,6 +107,10 @@ DIAG_DISCARD_RETURNS    =
 '不能丟棄此函式的回傳值。'
 DIAG_NEED_CHECK_NIL     =
 '需要判空'
+DIAG_BOOLEAN_CONTEXT_ALWAYS =
+'此表達式始終為 {}。'
+DIAG_BOOLEAN_CONTEXT_NONBOOLEAN =
+'此處需要 boolean，但得到 {}。'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循環繼承的類別。'
 DIAG_DOC_FIELD_NO_CLASS               =

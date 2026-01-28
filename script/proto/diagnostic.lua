@@ -71,6 +71,7 @@ m.register {
 
 m.register {
     'need-check-nil',
+    'boolean-context',
     'undefined-field',
     'cast-local-type',
     'assign-type-mismatch',

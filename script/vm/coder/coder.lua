@@ -25,6 +25,7 @@ function M:__init()
     ---@type table<LuaParser.Node.Base, string>
     self.sourceVarNameMap = {}
     self.tracerFlowMap = {}
+    self.parentMap = {}
 end
 
 function M:__del()
@@ -44,7 +45,7 @@ function M:makeFromAst(ast)
     self:addLine 'local rt  = vfile.scope.rt'
     self:addLine 'local uri = vfile.uri'
     self:addLine 'local r   = coder.map'
-    self:addLine 'local p   = {}'
+    self:addLine 'local p   = coder.parentMap'
     self:addLine ''
 
     self:compile(ast.main)
@@ -90,6 +91,7 @@ function M:makeFromFile(file)
     self.code = result.code
     self.func = func
     self.tracerFlowMap = result.tracerFlowMap
+    self.parentMap = result.parentMap
 end
 
 ---@param code string
@@ -262,6 +264,7 @@ function M:run(vfile)
     if test then
         LAST_CODE = self.code
         LAST_FLOW = ls.util.dump(self.tracerFlowMap, { noArrayKey = true })
+        LAST_PMAP = ls.util.dump(self.parentMap, { noArrayKey = true })
     end
     if ls.args.SAVE_CODER then
         local path = vfile.scope:getRelativePath(vfile.uri)

@@ -47,6 +47,23 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             })
         end
     end
+
+    local sourceName = coder:getVarName(source)
+    if sourceName and source.key then
+        local keyLiteral
+
+        if source.subtype == 'field' or source.subtype == 'method' then
+            keyLiteral = source.key.id
+        elseif source.subtype == 'index' then
+            if source.key.isLiteral then
+                keyLiteral = source.key.value
+            end
+        end
+
+        if keyLiteral then
+            coder.parentMap[sourceName] = { coder:getVarName(last), keyLiteral }
+        end
+    end
 end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)

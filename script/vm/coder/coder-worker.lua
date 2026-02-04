@@ -10,6 +10,7 @@ function methods.makeCode(params)
     return {
         code = coder.code,
         tracerFlowMap = coder.tracerFlowMap,
+        parentMap = coder.parentMap,
     }
 end
 

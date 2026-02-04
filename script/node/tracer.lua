@@ -229,7 +229,7 @@ function W:traceCondition(condition, revert)
         self:traceEqual(left, right, not revert)
         self:traceEqual(right, left, not revert)
     elseif kind == 'not' then
-        self:traceCondition(exp[2], not revert)
+        self:traceCondition(exp, not revert)
     end
 end
 

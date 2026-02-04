@@ -81,7 +81,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'value', 'value' }, 'v', { 'ref', 'x', 'x1' }, 'v' } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -130,7 +130,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'value', 'value' }, { 'ref', 'x', 'x1' } } },
+            { 'condition', { '==', { 'value', 'value' }, 'v', { 'ref', 'x', 'x1' }, 'v' } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -187,8 +187,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'ref', 'x', 'x1' },
-            { 'condition', { 'ref', 'x.a', 'x.a1' } },
+            { 'condition', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -246,8 +245,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'ref', 'x', 'x1' },
-            { 'condition', { '==', { 'ref', 'x.a', 'x.a1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' }, 'v', { 'value', 'value' }, 'v' } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -316,9 +314,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'ref', 'x', 'x1' },
-            { 'ref', 'x.a', 'x.a1' },
-            { 'condition', { '==', { 'ref', 'x.a.x', 'x.a.x1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' }, { 'ref', 'x.a.x', 'x.a.x1' }, 'v', { 'value', 'value' }, 'v' } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -367,7 +363,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, 'v', { 'value', 'value' }, 'v' } },
             { 'var', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }

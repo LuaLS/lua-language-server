@@ -169,9 +169,15 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
     end
     if source.exp1 then
         coder:compile(source.exp1)
+        if needPopStack then
+            coder:getTracer():appendMark('v')
+        end
     end
     if source.exp2 then
         coder:compile(source.exp2)
+        if needPopStack then
+            coder:getTracer():appendMark('v')
+        end
     end
 
     if needPopStack then

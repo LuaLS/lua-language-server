@@ -107,24 +107,7 @@ function W:traceBlock(block, start)
     end
     for i = start or 1, #block do
         local v = block[i]
-        local tag = v[1]
-        if tag == 'var' then
-            self:traceVar(v)
-            goto continue
-        end
-        if tag == 'ref' then
-            self:traceRef(v)
-            goto continue
-        end
-        if tag == 'if' then
-            self:traceIf(v)
-            goto continue
-        end
-        if tag == 'condition' then
-            self:traceCondition(v)
-            goto continue
-        end
-        ::continue::
+        self:traceUnit(v)
     end
 end
 
@@ -193,17 +176,58 @@ function W:traceIfChild(block, lastStack)
     return stack
 end
 
+function W:traceUnit(unit)
+    local tag = unit[1]
+    if tag == 'var' then
+        self:traceVar(unit)
+        return
+    end
+    if tag == 'ref' then
+        self:traceRef(unit)
+        return
+    end
+    if tag == 'if' then
+        self:traceIf(unit)
+        return
+    end
+    if tag == 'condition' then
+        self:traceCondition(unit)
+        return
+    end
+end
+
+function W:trace2Refs(exp)
+    local a, b
+    for i = 2, #exp do
+        if exp[i] == 'v' then
+            if not a then
+                a = exp[i - 1]
+            else
+                b = exp[i - 1]
+            end
+        else
+            self:traceUnit(exp[i])
+        end
+    end
+    return a, b
+end
+
 function W:traceCondition(condition, revert)
-    local exp = condition[2]
+    local exp = condition[#condition]
+    for i = 2, #condition - 1 do
+        self:traceUnit(condition[i])
+    end
     local kind = exp[1]
     if kind == 'ref' then
         self:traceTruly(exp, revert)
     elseif kind == '==' then
-        self:traceEqual(exp[2], exp[3], revert)
-        self:traceEqual(exp[3], exp[2], revert)
+        local left, right = self:trace2Refs(exp)
+        self:traceEqual(left, right, revert)
+        self:traceEqual(right, left, revert)
     elseif kind == '~=' then
-        self:traceEqual(exp[2], exp[3], not revert)
-        self:traceEqual(exp[3], exp[2], not revert)
+        local left, right = self:trace2Refs(exp)
+        self:traceEqual(left, right, not revert)
+        self:traceEqual(right, left, not revert)
     elseif kind == 'not' then
         self:traceCondition(exp[2], not revert)
     end

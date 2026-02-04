@@ -105,7 +105,7 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
     local isTable = {}
     for i, exp in ipairs(source.exps) do
         if exp.last then
-            coder:compile(exp.last)
+            --coder:compile(exp.last)
         end
     end
     for i, value in ipairs(source.values) do

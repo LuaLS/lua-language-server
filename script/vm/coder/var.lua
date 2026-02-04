@@ -19,20 +19,24 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         return
     end
 
-    if not source.value then
-        -- 有 value 的情况在 assign 里处理
-        coder:compile(last)
-    end
     if source.subtype == 'index' then
         if source.key then
             coder:compile(source.key)
         end
     end
 
+    coder:compile(last)
+
     coder:addLine('{var} = {value}:shadow()' % {
         var   = coder:getKey(source),
         value = coder:makeVarKey(source),
     })
+
+    if source.value then
+        coder:getTracer():appendVar(source)
+    else
+        coder:getTracer():appendRef(source)
+    end
 
     if source.subtype ~= 'index' then
         -- 字段的id即为整个字段
@@ -42,12 +46,6 @@ ls.vm.registerCoderProvider('field', function (coder, source)
                 r2 = coder:getKey(source.key),
             })
         end
-    end
-
-    if source.value then
-        coder:getTracer():appendVar(source)
-    else
-        coder:getTracer():appendRef(source)
     end
 end)
 

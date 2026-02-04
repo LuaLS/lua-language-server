@@ -52,6 +52,10 @@ function T:append(kind, ...)
     local top = self.stack[#self.stack]
     top[#top+1] = { kind, ... }
 end
+function T:appendMark(mark)
+    local top = self.stack[#self.stack]
+    top[#top+1] = mark
+end
 
 function T:appendVar(source)
     local id = self.coder:getVarName(source)

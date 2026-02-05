@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Deduplicate documentation bindings for parameters
 
 ## 3.17.1
 `2026-01-20`

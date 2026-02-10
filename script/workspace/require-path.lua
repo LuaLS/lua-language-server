@@ -149,6 +149,7 @@ end
 
 --- 查找符合指定require name的所有uri
 ---@param name string
+---@param suri uri
 ---@return uri[]
 ---@return table<uri, string>?
 function mt:searchUrisByRequireName(name, suri)

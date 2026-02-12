@@ -212,11 +212,26 @@ function W:trace2Refs(exp)
     return a, b
 end
 
+function W:traceOne(exp, start)
+    for i = start, #exp do
+        if exp[i] == 'v' then
+            return exp[i - 1], i + 1
+        else
+            self:traceUnit(exp[i])
+        end
+    end
+    return nil
+end
+
 function W:traceCondition(condition, revert)
     local exp = condition[#condition]
     for i = 2, #condition - 1 do
         self:traceUnit(condition[i])
     end
+    self:traceConditionUnit(exp, revert)
+end
+
+function W:traceConditionUnit(exp, revert)
     local kind = exp[1]
     if kind == 'ref' then
         self:traceTruly(exp, revert)
@@ -230,7 +245,16 @@ function W:traceCondition(condition, revert)
         self:traceEqual(right, left, not revert)
     elseif kind == 'not' then
         self:traceCondition(exp, not revert)
+    elseif kind == 'and' then
+        self:traceAnd(exp, revert)
     end
+end
+
+function W:traceAnd(exp, revert)
+    local left, nextIndex = self:traceOne(exp, 2)
+    self:traceConditionUnit(left, revert)
+    local right = self:traceOne(exp, nextIndex)
+    self:traceConditionUnit(right, revert)
 end
 
 function W:traceTruly(exp, revert)

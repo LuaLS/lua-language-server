@@ -377,3 +377,73 @@ do
     lt.assertEquals(r['x3']:view(), '2')
     lt.assertEquals(r['x4']:view(), '2 | 3')
 end
+
+do
+    --[[
+    ---@type string?
+    local x
+    ---@type string?
+    local y
+    if x and y then
+        x
+        y
+    else
+        x
+        y
+    end
+    x
+    y
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.STRING | rt.NIL)
+    r['y0'] = rt.variable 'y'
+    r['y0']:addType(rt.STRING | rt.NIL)
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['y1'] = r['y0']:shadow()
+    r['y1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['y2'] = r['y0']:shadow()
+    r['y2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['y3'] = r['y0']:shadow()
+    r['y3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+    r['y4'] = r['y0']:shadow()
+    r['y4']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'condition', { 'and', { 'ref', 'x', 'x1' }, 'v', { 'ref', 'y', 'y1' }, 'v' } },
+            { 'ref', 'x', 'x2' },
+            { 'ref', 'y', 'y2' },
+        }, {
+            { 'ref', 'x', 'x3' },
+            { 'ref', 'y', 'y3' },
+        } },
+        { 'ref', 'x', 'x4' },
+        { 'ref', 'y', 'y4' },
+    }
+
+    lt.assertEquals(r['x0']:view(), 'string | nil')
+    lt.assertEquals(r['x1']:view(), 'string | nil')
+    lt.assertEquals(r['x2']:view(), 'string')
+    lt.assertEquals(r['x3']:view(), 'nil')
+    lt.assertEquals(r['x4']:view(), 'string | nil')
+    lt.assertEquals(r['y0']:view(), 'string | nil')
+    lt.assertEquals(r['y1']:view(), 'string | nil')
+    lt.assertEquals(r['y2']:view(), 'string')
+    lt.assertEquals(r['y3']:view(), 'nil')
+    lt.assertEquals(r['y4']:view(), 'string | nil')
+end

@@ -1,7 +1,7 @@
 # changelog
 
 ## Unreleased
-<!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Added TIC-80 definitions to Lua-language-server
 
 ## 3.17.1
 `2026-01-20`

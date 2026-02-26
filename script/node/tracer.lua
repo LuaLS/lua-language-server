@@ -251,10 +251,13 @@ function W:traceConditionUnit(exp, revert)
 end
 
 function W:traceAnd(exp, revert)
+    local stack = self:pushStack()
     local left, nextIndex = self:traceOne(exp, 2)
     self:traceConditionUnit(left, revert)
     local right = self:traceOne(exp, nextIndex)
     self:traceConditionUnit(right, revert)
+    self:popStack()
+    ls.util.tableMerge(self:currentStack().current, stack.current)
 end
 
 function W:traceTruly(exp, revert)

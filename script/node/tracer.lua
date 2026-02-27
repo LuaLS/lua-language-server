@@ -251,13 +251,26 @@ function W:traceConditionUnit(exp, revert)
 end
 
 function W:traceAnd(exp, revert)
-    local stack = self:pushStack()
+    local stack1 = self:pushStack()
     local left, nextIndex = self:traceOne(exp, 2)
     self:traceConditionUnit(left, revert)
+
+    local stack2 = self:pushStack()
     local right = self:traceOne(exp, nextIndex)
     self:traceConditionUnit(right, revert)
     self:popStack()
-    ls.util.tableMerge(self:currentStack().current, stack.current)
+    self:popStack()
+
+    local currentStack = self:currentStack()
+
+    ls.util.tableMerge(currentStack.current, stack1.current)
+    ls.util.tableMerge(currentStack.current, stack2.current)
+
+    for k in pairs(stack2.otherSide) do
+        if stack1.otherSide[k] then
+            currentStack.otherSide[k] = stack2.otherSide[k] | stack1.otherSide[k]
+        end
+    end
 end
 
 function W:traceTruly(exp, revert)

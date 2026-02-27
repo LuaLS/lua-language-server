@@ -247,6 +247,8 @@ function W:traceConditionUnit(exp, revert)
         self:traceCondition(exp, not revert)
     elseif kind == 'and' then
         self:traceAnd(exp, revert)
+    elseif kind == 'or' then
+        self:traceOr(exp, revert)
     end
 end
 
@@ -271,6 +273,34 @@ function W:traceAnd(exp, revert)
             currentStack.otherSide[k] = stack2.otherSide[k] | stack1.otherSide[k]
         end
     end
+end
+
+function W:traceOr(exp, revert)
+    -- stack1 和 stack2 从同一基础出发独立收窄（平行而非嵌套）
+    local stack1 = self:pushStack()
+    local left, nextIndex = self:traceOne(exp, 2)
+    self:traceConditionUnit(left, revert)
+    self:popStack()
+
+    local stack2 = self:pushStack()
+    local right = self:traceOne(exp, nextIndex)
+    self:traceConditionUnit(right, revert)
+    self:popStack()
+
+    local currentStack = self:currentStack()
+
+    -- true 分支：左侧或右侧任一为真
+    -- 若某变量两侧都有收窄结果，取并集；
+    -- 若只有一侧有，说明另一侧对此变量无约束，无法收窄，不写入（保持原始值）
+    for k in pairs(stack1.current) do
+        if stack2.current[k] then
+            currentStack.current[k] = stack1.current[k] | stack2.current[k]
+        end
+    end
+
+    -- false 分支：左侧且右侧都为假，两侧 otherSide 依次应用（交叠）
+    ls.util.tableMerge(currentStack.otherSide, stack1.otherSide)
+    ls.util.tableMerge(currentStack.otherSide, stack2.otherSide)
 end
 
 function W:traceTruly(exp, revert)

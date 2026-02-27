@@ -527,6 +527,153 @@ end
 
 do
     --[[
+    ---@type string?
+    local x
+    ---@type string?
+    local y
+    if x or y then
+        x
+        y
+    else
+        x
+        y
+    end
+    x
+    y
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.STRING | rt.NIL)
+    r['y0'] = rt.variable 'y'
+    r['y0']:addType(rt.STRING | rt.NIL)
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['y1'] = r['y0']:shadow()
+    r['y1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['y2'] = r['y0']:shadow()
+    r['y2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['y3'] = r['y0']:shadow()
+    r['y3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+    r['y4'] = r['y0']:shadow()
+    r['y4']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'condition', { 'or', { 'ref', 'x', 'x1' }, 'v', { 'ref', 'y', 'y1' }, 'v' } },
+            { 'ref', 'x', 'x2' },
+            { 'ref', 'y', 'y2' },
+        }, {
+            { 'ref', 'x', 'x3' },
+            { 'ref', 'y', 'y3' },
+        } },
+        { 'ref', 'x', 'x4' },
+        { 'ref', 'y', 'y4' },
+    }
+
+    lt.assertEquals(r['x0']:view(), 'string | nil')
+    lt.assertEquals(r['x1']:view(), 'string | nil')
+    lt.assertEquals(r['x2']:view(), 'string | nil')
+    lt.assertEquals(r['x3']:view(), 'nil')
+    lt.assertEquals(r['x4']:view(), 'string | nil')
+    lt.assertEquals(r['y0']:view(), 'string | nil')
+    lt.assertEquals(r['y1']:view(), 'string | nil')
+    lt.assertEquals(r['y2']:view(), 'string | nil')
+    lt.assertEquals(r['y3']:view(), 'nil')
+    lt.assertEquals(r['y4']:view(), 'string | nil')
+end
+
+do
+    --[[
+    ---@type 1 | 2
+    local x
+    ---@type 3 | 4
+    local y
+    if x == 1 or y == 3 then
+        x
+        y
+    else
+        x
+        y
+    end
+    x
+    y
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.value(1) | rt.value(2))
+    r['y0'] = rt.variable 'y'
+    r['y0']:addType(rt.value(3) | rt.value(4))
+
+    r['v1'] = rt.value(1)
+    r['v3'] = rt.value(3)
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['y1'] = r['y0']:shadow()
+    r['y1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['y2'] = r['y0']:shadow()
+    r['y2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['y3'] = r['y0']:shadow()
+    r['y3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+    r['y4'] = r['y0']:shadow()
+    r['y4']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if' , {
+            { 'condition', {
+                'or',
+                { '==', { 'ref', 'x', 'x1' }, 'v', {'value', 'v1'}, 'v' }, 'v',
+                { '==', { 'ref', 'y', 'y1' }, 'v', {'value', 'v3'}, 'v' }, 'v'
+            } },
+            { 'ref', 'x', 'x2' },
+            { 'ref', 'y', 'y2' },
+        }, {
+            { 'ref', 'x', 'x3' },
+            { 'ref', 'y', 'y3' },
+        } },
+        { 'ref', 'x', 'x4' },
+        { 'ref', 'y', 'y4' },
+    }
+
+    lt.assertEquals(r['x0']:view(), '1 | 2')
+    lt.assertEquals(r['x1']:view(), '1 | 2')
+    lt.assertEquals(r['x2']:view(), '1 | 2')
+    lt.assertEquals(r['x3']:view(), '2')
+    lt.assertEquals(r['x4']:view(), '1 | 2')
+    lt.assertEquals(r['y0']:view(), '3 | 4')
+    lt.assertEquals(r['y1']:view(), '3 | 4')
+    lt.assertEquals(r['y2']:view(), '3 | 4')
+    lt.assertEquals(r['y3']:view(), '4')
+    lt.assertEquals(r['y4']:view(), '3 | 4')
+end
+
+do
+    --[[
     ---@type [1,1] | [1,2] | [2,1] | [2,2]
     local t
     if t[1] == 1 and t[2] == 1 thent

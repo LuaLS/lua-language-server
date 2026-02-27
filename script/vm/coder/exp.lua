@@ -187,8 +187,32 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
         coder:getTracer():popStack()
     end
 
-    if not op or not source.exp1 or not source.exp2 then
+    if not source.op or not source.exp1 or not source.exp2 then
         coder:addUnknown(source)
+        return
+    end
+
+    if source.op == 'and' then
+        -- and: 若左侧为假则取左侧（假值），否则取右侧
+        coder:addLine('{key} = rt.ternary({value1}, {value2}, rt.narrow({value1}):matchFalsy())' % {
+            key    = coder:getKey(source),
+            value1 = coder:getKey(source.exp1),
+            value2 = coder:getKey(source.exp2),
+        })
+        return
+    end
+
+    if source.op == 'or' then
+        -- or: 若左侧为真则取左侧（真值），否则取右侧
+        coder:addLine('{key} = rt.ternary({value1}, rt.narrow({value1}):matchTruly(), {value2})' % {
+            key    = coder:getKey(source),
+            value1 = coder:getKey(source.exp1),
+            value2 = coder:getKey(source.exp2),
+        })
+        return
+    end
+
+    if not op then
         return
     end
 

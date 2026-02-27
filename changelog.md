@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
+* `FIX` string.match and string.gmatch may return `string|integer?` [#3357](https://github.com/LuaLS/lua-language-server/issues/3357)
 
 ## 3.17.1
 `2026-01-20`

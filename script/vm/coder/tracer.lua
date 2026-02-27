@@ -81,6 +81,16 @@ function T:appendRef(source)
     self.visibleVars[id] = true
 end
 
+---@param source LuaParser.Node.Call
+function T:appendCall(source)
+    local funcAlias = source.node.uniqueKey
+    local argAliases = {}
+    for _, arg in ipairs(source.args) do
+        argAliases[#argAliases+1] = arg.uniqueKey
+    end
+    self:append('call', source.uniqueKey, funcAlias, argAliases)
+end
+
 ---@param kind? string
 function T:pushStack(kind)
     local top = self.stack[#self.stack]

@@ -235,14 +235,20 @@ function W:traceConditionUnit(exp, revert)
     local kind = exp[1]
     if kind == 'ref' then
         self:traceTruly(exp, revert)
+    elseif kind == 'call' then
+        self:traceCallTruly(exp, revert)
     elseif kind == '==' then
         local left, right = self:trace2Refs(exp)
         self:traceEqual(left, right, revert)
         self:traceEqual(right, left, revert)
+        self:traceCallEqual(left, right, revert)
+        self:traceCallEqual(right, left, revert)
     elseif kind == '~=' then
         local left, right = self:trace2Refs(exp)
         self:traceEqual(left, right, not revert)
         self:traceEqual(right, left, not revert)
+        self:traceCallEqual(left, right, not revert)
+        self:traceCallEqual(right, left, not revert)
     elseif kind == 'not' then
         self:traceCondition(exp, not revert)
     elseif kind == 'and' then
@@ -312,10 +318,18 @@ function W:traceTruly(exp, revert)
 end
 
 function W:traceEqual(left, right, revert)
-    if left[1] ~= 'ref' then
+    if not left or left[1] ~= 'ref' then
         return
     end
-    local rvalue = self:traceValue(right)
+    if not right then
+        return
+    end
+    local rvalue
+    if right[1] == 'ref' then
+        rvalue = self:traceRef(right)
+    else
+        rvalue = self:traceValue(right)
+    end
     if not rvalue then
         return
     end
@@ -353,6 +367,145 @@ function W:traceByValue(var, value, revert)
                 self:setNarrowResult(id, narrowed, otherSide)
             end
         end
+    end
+end
+
+---通过函数调用返回值（truthy检测）收窄参数类型
+---call entry: {'call', callAlias, funcAlias, {arg1Alias, ...}}
+function W:traceCallTruly(exp, revert)
+    if exp[1] ~= 'call' then
+        return
+    end
+    local rt = self.scope.rt
+    local funcAlias = exp[3]
+    local argAliases = exp[4]
+    local ok, funcVar = pcall(function() return self.map[funcAlias] end)
+    if not ok or not funcVar then
+        return
+    end
+    local func = funcVar.value
+    if not func then
+        return
+    end
+    for i, argAlias in ipairs(argAliases) do
+        -- 找到对应的 ref（通过 aliasID 找 id，再通过 id 找 ref entry）
+        local id = self.aliasID[argAlias]
+        if not id then
+            goto continue
+        end
+        local argValue = self:getValue(id)
+        if not argValue then
+            goto continue
+        end
+        local narrowed, otherSide = rt.narrow(argValue):asCall {
+            func        = func,
+            myType      = 'param',
+            myIndex     = i,
+            mode        = 'match',
+            targetType  = 'return',
+            targetIndex = 1,
+            targetValue = rt.TRULY,
+        }:narrowCall()
+        if revert then
+            self:setNarrowResult(id, otherSide, narrowed)
+        else
+            self:setNarrowResult(id, narrowed, otherSide)
+        end
+        -- 向上传播到父变量
+        local pid = id
+        while true do
+            local pdata = self.parentMap[pid]
+            if not pdata then
+                break
+            end
+            pid = pdata[1]
+            local pvalue = self:getValue(pid)
+            if pvalue then
+                local key = pdata[2]
+                local pnarrowed, potherSide = pvalue:narrowByField(key, revert and otherSide or narrowed)
+                if revert then
+                    self:setNarrowResult(pid, potherSide, pnarrowed)
+                else
+                    self:setNarrowResult(pid, pnarrowed, potherSide)
+                end
+            end
+        end
+        ::continue::
+    end
+end
+
+---通过函数调用返回值（equal检测）收窄参数类型
+---call entry: {'call', callAlias, funcAlias, {arg1Alias, ...}}
+function W:traceCallEqual(callExp, valueExp, revert)
+    if not callExp or callExp[1] ~= 'call' then
+        return
+    end
+    if not valueExp then
+        return
+    end
+    local rvalue
+    if valueExp[1] == 'ref' then
+        rvalue = self:traceRef(valueExp)
+    else
+        rvalue = self:traceValue(valueExp)
+    end
+    if not rvalue then
+        return
+    end
+    local rt = self.scope.rt
+    local funcAlias = callExp[3]
+    local argAliases = callExp[4]
+    local ok2, funcVar = pcall(function() return self.map[funcAlias] end)
+    if not ok2 or not funcVar then
+        return
+    end
+    local func = funcVar.value
+    if not func then
+        return
+    end
+    for i, argAlias in ipairs(argAliases) do
+        local id = self.aliasID[argAlias]
+        if not id then
+            goto continue
+        end
+        local argValue = self:getValue(id)
+        if not argValue then
+            goto continue
+        end
+        local narrowed, otherSide = rt.narrow(argValue):asCall {
+            func        = func,
+            myType      = 'param',
+            myIndex     = i,
+            mode        = 'equal',
+            targetType  = 'return',
+            targetIndex = 1,
+            targetValue = rvalue,
+        }:narrowCall()
+        if revert then
+            self:setNarrowResult(id, otherSide, narrowed)
+        else
+            self:setNarrowResult(id, narrowed, otherSide)
+        end
+        -- 向上传播到父变量
+        local pid = id
+        while true do
+            local pdata = self.parentMap[pid]
+            if not pdata then
+                break
+            end
+            pid = pdata[1]
+            local pvalue = self:getValue(pid)
+            if pvalue then
+                local key = pdata[2]
+                local pnarrowed, potherSide = pvalue:narrowByField(key, revert and otherSide or narrowed)
+                if revert then
+                    self:setNarrowResult(pid, potherSide, pnarrowed)
+                else
+                    self:setNarrowResult(pid, pnarrowed, potherSide)
+                end
+            end
+        end
+        ::continue::
     end
 end
 

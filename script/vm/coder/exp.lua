@@ -33,6 +33,7 @@ ls.vm.registerCoderProvider('nil', function (coder, source)
     coder:addLine('{key} = rt.NIL' % {
         key = coder:getKey(source),
     })
+    coder:getTracer():append('value', source.uniqueKey)
 end)
 
 ls.vm.registerCoderProvider('boolean', function (coder, source)
@@ -120,6 +121,7 @@ ls.vm.registerCoderProvider('call', function (coder, source)
         func  = func,
         args  = table.concat(args, ', '),
     })
+    coder:getTracer():appendCall(source)
 end)
 
 ls.vm.registerCoderProvider('paren', function (coder, source)

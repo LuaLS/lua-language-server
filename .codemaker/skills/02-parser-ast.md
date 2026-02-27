@@ -2,7 +2,7 @@
 
 ## 概述
 
-`script/parser/` 负责将 Lua 源码解析为 AST（抽象语法树）。解析器是手写的递归下降解析器，支持完整 Lua 语法以及 EmmyLua 注解（`---@xxx`）。
+`script/parser/` 负责将 Lua 源码解析为 AST（抽象语法树）。解析器是手写的递归下降解析器，支持完整 Lua 语法以及 LuaCats 注解（`---@xxx`）。
 
 ## 目录结构
 
@@ -21,7 +21,7 @@ script/parser/
     │   ├── local.lua
     │   ├── for.lua
     │   └── ...
-    └── cats/           # EmmyLua 注解（CAT = Comment Annotation Type）
+    └── cats/           # LuaCats 注解
         ├── class.lua   # ---@class
         ├── field.lua   # ---@field
         ├── param.lua   # ---@param
@@ -63,7 +63,7 @@ AST 节点是 Lua table，包含：
 { type='binary', op='and', left=..., right=... }
 ```
 
-## EmmyLua 注解（cats）
+## LuaCats 注解（cats）
 
 注解解析在 `ast/cats/` 中，每个文件对应一种注解标签：
 

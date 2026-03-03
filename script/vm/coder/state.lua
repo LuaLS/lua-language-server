@@ -135,13 +135,6 @@ end)
 
 ls.vm.registerCoderProvider('localdef', function (coder, source)
     ---@cast source LuaParser.Node.LocalDef
-    local vcount = source.values and #source.values or 0
-    print('[DEBUG localdef] called, vars=' .. tostring(#source.vars) .. ' values=' .. tostring(vcount))
-    if vcount == 2 and #source.vars == 2 then
-        for i, v in ipairs(source.values) do
-            print('[DEBUG localdef] value[' .. i .. '].kind=' .. tostring(v.kind))
-        end
-    end
 
     local valueKeys = {}
     local isTable = {}

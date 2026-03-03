@@ -161,6 +161,9 @@ end
 ---@param data ['value', string]
 ---@return Node?
 function W:traceValue(data)
+    if data[1] ~= 'value' then
+        return nil
+    end
     local id = data[2]
     return self.map[id]
 end

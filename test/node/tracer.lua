@@ -81,7 +81,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'value', 'value' }, 'v', { 'ref', 'x', 'x1' }, 'v' } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -130,7 +130,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'value', 'value' }, 'v', { 'ref', 'x', 'x1' }, 'v' } },
+            { 'condition', { '==', { 'value', 'value' }, { 'ref', 'x', 'x1' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -245,7 +245,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' }, 'v', { 'value', 'value' }, 'v' } },
+            { 'condition', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' }, { '==', { 'ref', 'x.a', 'x.a1' }, { 'value', 'value' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -314,7 +314,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' }, { 'ref', 'x.a.x', 'x.a.x1' }, 'v', { 'value', 'value' }, 'v' } },
+            { 'condition', { 'ref', 'x', 'x1' }, { 'ref', 'x.a', 'x.a1' }, { 'ref', 'x.a.x', 'x.a.x1' }, { '==', { 'ref', 'x.a.x', 'x.a.x1' }, { 'value', 'value' } } },
             { 'ref', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -363,7 +363,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { '==', { 'ref', 'x', 'x1' }, 'v', { 'value', 'value' }, 'v' } },
+            { 'condition', { '==', { 'ref', 'x', 'x1' }, { 'value', 'value' } } },
             { 'var', 'x', 'x2' }
         }, {
             { 'ref', 'x', 'x3' }
@@ -425,7 +425,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { 'and', { 'ref', 'x', 'x1' }, 'v', { 'ref', 'y', 'y1' }, 'v' } },
+            { 'condition', { 'and', { 'ref', 'x', 'x1' }, { 'ref', 'y', 'y1' } } },
             { 'ref', 'x', 'x2' },
             { 'ref', 'y', 'y2' },
         }, {
@@ -500,8 +500,8 @@ do
         { 'if' , {
             { 'condition', {
                 'and',
-                { '==', { 'ref', 'x', 'x1' }, 'v', {'value', 'v1'}, 'v' }, 'v',
-                { '==', { 'ref', 'y', 'y1' }, 'v', {'value', 'v3'}, 'v' }, 'v'
+                { '==', { 'ref', 'x', 'x1' }, {'value', 'v1'} },
+                { '==', { 'ref', 'y', 'y1' }, {'value', 'v3'} }
             } },
             { 'ref', 'x', 'x2' },
             { 'ref', 'y', 'y2' },
@@ -572,7 +572,7 @@ do
     tracer:setFlow {
         { 'var', 'x', 'x0' },
         { 'if' , {
-            { 'condition', { 'or', { 'ref', 'x', 'x1' }, 'v', { 'ref', 'y', 'y1' }, 'v' } },
+            { 'condition', { 'or', { 'ref', 'x', 'x1' }, { 'ref', 'y', 'y1' } } },
             { 'ref', 'x', 'x2' },
             { 'ref', 'y', 'y2' },
         }, {
@@ -647,8 +647,8 @@ do
         { 'if' , {
             { 'condition', {
                 'or',
-                { '==', { 'ref', 'x', 'x1' }, 'v', {'value', 'v1'}, 'v' }, 'v',
-                { '==', { 'ref', 'y', 'y1' }, 'v', {'value', 'v3'}, 'v' }, 'v'
+                { '==', { 'ref', 'x', 'x1' }, {'value', 'v1'} },
+                { '==', { 'ref', 'y', 'y1' }, {'value', 'v3'} }
             } },
             { 'ref', 'x', 'x2' },
             { 'ref', 'y', 'y2' },
@@ -718,8 +718,8 @@ do
         { 'if' , {
             { 'condition', {
                 'and',
-                { '==', { 'ref', 't', 't1' }, { 'ref', 't[1]', 't[1]'}, 'v', {'value', 'v1'}, 'v' }, 'v',
-                { '==', { 'ref', 't', 't2' }, { 'ref', 't[2]', 't[2]'}, 'v', {'value', 'v1'}, 'v' }, 'v'
+                { '==', { 'ref', 't', 't1' }, { 'ref', 't[1]', 't[1]'}, {'value', 'v1'} },
+                { '==', { 'ref', 't', 't2' }, { 'ref', 't[2]', 't[2]'}, {'value', 'v1'} }
             } },
             { 'ref', 't', 't3' },
         }, {

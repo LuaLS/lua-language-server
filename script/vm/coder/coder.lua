@@ -258,7 +258,8 @@ function M:run(vfile)
     self.map = map
     -- self:simplifyMap()
     if not suc then
-        ls.util.saveFile(ls.env.LOG_PATH / 'last_failed_coder.log', self.code)
+        local fname = vfile.uri:gsub('[/\\:?*"<>|%%]', '_')
+        ls.util.saveFile(ls.env.LOG_PATH / ('failed_coder_' .. fname .. '.log'), self.code)
     end
 
     if test then

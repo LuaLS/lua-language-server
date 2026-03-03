@@ -1,5 +1,6 @@
 /log
 /build
+/tmp
 /test/temp.lua
 /meta/*
 !/meta/template

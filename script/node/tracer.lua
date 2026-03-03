@@ -114,8 +114,14 @@ end
 function W:traceVar(var)
     local id, alias = var[2], var[3]
     self.aliasID[alias] = id
-
-    self:setValue(id, self.map[alias].value, true)
+    local node = self.map[alias]
+    -- 用 getCurrentValue()（不触发 tracer）而非 .value（会触发新 Walker 递归）。
+    -- 赋值点 shadow 的 currentValue 即是 Coder 编译时已设置好的赋值表达式值。
+    local value = node:getCurrentValue()
+               or node:getExpectValue()
+               or node:getGuessValue()
+               or self.scope.rt.ANY
+    self:setValue(id, value, true)
 end
 
 ---@param ref ['ref', string, string]
@@ -123,9 +129,29 @@ end
 function W:traceRef(ref)
     local id, alias = ref[2], ref[3]
     self.aliasID[alias] = id
+    -- 建立 id -> aliases 的反向映射，供 link 查找 funcVar 使用
+    if not self.idAliasMap then
+        self.idAliasMap = {}
+    end
+    if not self.idAliasMap[id] then
+        self.idAliasMap[id] = {}
+    end
+    self.idAliasMap[id][alias] = true
+
     local value = self:getValue(id)
     if not value then
-        value = self.map[alias].value
+        local node = self.map[alias]
+        -- 若节点有 tracer（其 .value 会启动新 Walker，引发递归），
+        -- 则用 getCurrentValue/getExpectValue/getGuessValue 作为初始值；
+        -- 普通节点（无 tracer）直接用 .value。
+        if node.tracer then
+            value = node:getCurrentValue()
+                 or node:getExpectValue()
+                 or node:getGuessValue()
+                 or self.scope.rt.ANY
+        else
+            value = node.value or self.scope.rt.ANY
+        end
         self:setValue(id, value)
     end
     self.map[alias]:setCurrentValue(value)
@@ -144,6 +170,7 @@ function W:traceIf(ifNode)
     local lastStack
     local stacks = {}
     local changed = {}
+    -- ifNode: {'if', ifchild1, ifchild2, ...}
     for i = 2, #ifNode do
         lastStack = self:traceIfChild(ifNode[i], lastStack)
         stacks[#stacks+1] = lastStack
@@ -163,15 +190,27 @@ function W:traceIf(ifNode)
     end
 end
 
----@param block table
+--- 处理单个 if 分支数组：{conditionNode?, ...block_entries}
+--- conditionNode 为 {'condition', condExp}，可选（else 分支没有）
+--- ifchild[1] 可以是 condition 节点，或者 false/nil（匿名分支）
+---@param ifchild table
 ---@param lastStack? Node.Tracer.Stack
 ---@return Node.Tracer.Stack
-function W:traceIfChild(block, lastStack)
+function W:traceIfChild(ifchild, lastStack)
     local stack = self:pushStack()
     if lastStack then
         stack.current = lastStack.otherSide
     end
-    self:traceBlock(block)
+
+    -- ifchild 是一个数组，第一个元素若为 condition 节点则处理条件
+    local bodyStart = 1
+    local first = ifchild[1]
+    if type(first) == 'table' and first[1] == 'condition' then
+        self:traceCondition(first)
+        bodyStart = 2
+    end
+    self:traceBlock(ifchild, bodyStart)
+
     self:popStack()
     return stack
 end
@@ -194,6 +233,45 @@ function W:traceUnit(unit)
         self:traceCondition(unit)
         return
     end
+    if tag == 'link' then
+        self:traceLink(unit)
+        return
+    end
+end
+
+--- 通过逻辑变量名 funcVarId 在 idAliasMap 中找到对应的 Node.Variable
+---@param funcVarId string 逻辑变量名（如 'type', 'f'）
+---@return Node.Variable?
+function W:getFuncVar(funcVarId)
+    if not funcVarId then return nil end
+    local aliases = self.idAliasMap and self.idAliasMap[funcVarId]
+    if not aliases then return nil end
+    for alias in pairs(aliases) do
+        local v = self.map[alias]
+        if v then return v end
+    end
+    return nil
+end
+
+--- 记录变量 id 与函数调用的关联，供间接窄化使用
+--- link entry: {'link', varId, callAlias, funcVarId, argAliases, returnIndex}
+function W:traceLink(link)
+    if not self.varLinkMap then
+        self.varLinkMap = {}
+    end
+    if not self.callLinkMap then
+        self.callLinkMap = {}
+    end
+    local varId      = link[2]
+    local callAlias  = link[3]
+    local returnIndex = link[6] or 1
+    self.varLinkMap[varId] = link
+    -- callLinkMap: callAlias -> list of {varId, returnIndex}
+    if not self.callLinkMap[callAlias] then
+        self.callLinkMap[callAlias] = {}
+    end
+    local list = self.callLinkMap[callAlias]
+    list[#list+1] = { varId = varId, returnIndex = returnIndex }
 end
 
 function W:trace2Refs(exp)
@@ -223,12 +301,20 @@ function W:traceOne(exp, start)
     return nil
 end
 
+--- 处理 condition 节点：{'condition', [副作用ref...], condExp}
+--- 最后一个子节点是 condExp（树形 exp 节点），
+--- 前面的子节点是副作用 ref（用于建立 aliasID，供 parentMap 链追踪）
 function W:traceCondition(condition, revert)
-    local exp = condition[#condition]
-    for i = 2, #condition - 1 do
+    -- condition[1] == 'condition'
+    -- condition[2..n-1] 是副作用 ref，condition[n] 是 condExp
+    local n = #condition
+    for i = 2, n - 1 do
         self:traceUnit(condition[i])
     end
-    self:traceConditionUnit(exp, revert)
+    local exp = condition[n]
+    if exp then
+        self:traceConditionUnit(exp, revert)
+    end
 end
 
 function W:traceConditionUnit(exp, revert)
@@ -238,19 +324,36 @@ function W:traceConditionUnit(exp, revert)
     elseif kind == 'call' then
         self:traceCallTruly(exp, revert)
     elseif kind == '==' then
-        local left, right = self:trace2Refs(exp)
+        -- 结构：{'==', [副作用ref...], left, right}
+        -- 最后两个子节点是左右操作数，前面的是副作用 ref
+        local n     = #exp
+        local left  = exp[n - 1]
+        local right = exp[n]
+        -- 先处理副作用 ref
+        for i = 2, n - 2 do
+            self:traceUnit(exp[i])
+        end
         self:traceEqual(left, right, revert)
         self:traceEqual(right, left, revert)
         self:traceCallEqual(left, right, revert)
         self:traceCallEqual(right, left, revert)
     elseif kind == '~=' then
-        local left, right = self:trace2Refs(exp)
+        local n     = #exp
+        local left  = exp[n - 1]
+        local right = exp[n]
+        for i = 2, n - 2 do
+            self:traceUnit(exp[i])
+        end
         self:traceEqual(left, right, not revert)
         self:traceEqual(right, left, not revert)
         self:traceCallEqual(left, right, not revert)
         self:traceCallEqual(right, left, not revert)
     elseif kind == 'not' then
-        self:traceCondition(exp, not revert)
+        -- 树形：exp[2] 是被取反的子表达式
+        local inner = exp[2]
+        if inner then
+            self:traceConditionUnit(inner, not revert)
+        end
     elseif kind == 'and' then
         self:traceAnd(exp, revert)
     elseif kind == 'or' then
@@ -259,12 +362,14 @@ function W:traceConditionUnit(exp, revert)
 end
 
 function W:traceAnd(exp, revert)
+    -- 树形：exp[2] 是左操作数，exp[3] 是右操作数
+    local left  = exp[2]
+    local right = exp[3]
+
     local stack1 = self:pushStack()
-    local left, nextIndex = self:traceOne(exp, 2)
     self:traceConditionUnit(left, revert)
 
     local stack2 = self:pushStack()
-    local right = self:traceOne(exp, nextIndex)
     self:traceConditionUnit(right, revert)
     self:popStack()
     self:popStack()
@@ -282,29 +387,29 @@ function W:traceAnd(exp, revert)
 end
 
 function W:traceOr(exp, revert)
+    -- 树形：exp[2] 是左操作数，exp[3] 是右操作数
+    local left  = exp[2]
+    local right = exp[3]
+
     -- stack1 和 stack2 从同一基础出发独立收窄（平行而非嵌套）
     local stack1 = self:pushStack()
-    local left, nextIndex = self:traceOne(exp, 2)
     self:traceConditionUnit(left, revert)
     self:popStack()
 
     local stack2 = self:pushStack()
-    local right = self:traceOne(exp, nextIndex)
     self:traceConditionUnit(right, revert)
     self:popStack()
 
     local currentStack = self:currentStack()
 
-    -- true 分支：左侧或右侧任一为真
-    -- 若某变量两侧都有收窄结果，取并集；
-    -- 若只有一侧有，说明另一侧对此变量无约束，无法收窄，不写入（保持原始值）
+    -- true 分支：左侧或右侧任一为真，取并集
     for k in pairs(stack1.current) do
         if stack2.current[k] then
             currentStack.current[k] = stack1.current[k] | stack2.current[k]
         end
     end
 
-    -- false 分支：左侧且右侧都为假，两侧 otherSide 依次应用（交叠）
+    -- false 分支：左侧且右侧都为假，两侧 otherSide 依次应用
     ls.util.tableMerge(currentStack.otherSide, stack1.otherSide)
     ls.util.tableMerge(currentStack.otherSide, stack2.otherSide)
 end
@@ -315,6 +420,52 @@ function W:traceTruly(exp, revert)
     end
 
     self:traceByValue(exp, self.scope.rt.TRULY, revert)
+
+    -- 间接窄化：若该 ref 的变量值来自函数调用的返回值，
+    -- 通过 callLinkMap 窄化同一 call 的其他返回值
+    local id = exp[2]
+    if self.varLinkMap and self.callLinkMap then
+        local linkEntry = self.varLinkMap[id]
+        if linkEntry then
+            local callAlias   = linkEntry[3]
+            local funcKey     = linkEntry[4]
+            local myRetIndex  = linkEntry[6] or 1
+            local funcVar = self.map[funcKey]
+            if not funcVar then
+                goto traceTruly_done
+            end
+            local func = funcVar.value
+            if not func then
+                goto traceTruly_done
+            end
+            local rt = self.scope.rt
+            local otherReturns = self.callLinkMap[callAlias]
+            if otherReturns then
+                for _, info in ipairs(otherReturns) do
+                    if info.varId ~= id then
+                        local otherValue = self:getValue(info.varId)
+                        if otherValue then
+                            local narrowed, otherSide = rt.narrow(otherValue):asCall {
+                                func        = func,
+                                myType      = 'return',
+                                myIndex     = info.returnIndex,
+                                mode        = 'match',
+                                targetType  = 'return',
+                                targetIndex = myRetIndex,
+                                targetValue = rt.TRULY,
+                            }:narrowCall()
+                            if revert then
+                                self:setNarrowResult(info.varId, otherSide, narrowed)
+                            else
+                                self:setNarrowResult(info.varId, narrowed, otherSide)
+                            end
+                        end
+                    end
+                end
+            end
+            ::traceTruly_done::
+        end
+    end
 end
 
 function W:traceEqual(left, right, revert)
@@ -335,6 +486,17 @@ function W:traceEqual(left, right, revert)
     end
 
     self:traceByValue(left, rvalue, revert)
+
+    -- 间接窄化：若该 ref 的变量值来自函数调用，通过 link 窄化参数
+    local id = left[2]
+    if self.varLinkMap then
+        local linkEntry = self.varLinkMap[id]
+        if linkEntry then
+            -- linkEntry = {'link', varId, callAlias, funcAlias, argAliases}
+            local callExp = { 'call', linkEntry[3], linkEntry[4], linkEntry[5] }
+            self:traceCallEqual(callExp, right, revert)
+        end
+    end
 end
 
 function W:traceByValue(var, value, revert)
@@ -379,10 +541,7 @@ function W:traceCallTruly(exp, revert)
     local rt = self.scope.rt
     local funcAlias = exp[3]
     local argAliases = exp[4]
-    local ok, funcVar = pcall(function() return self.map[funcAlias] end)
-    if not ok or not funcVar then
-        return
-    end
+    local funcVar = self.map[funcAlias]
     local func = funcVar.value
     if not func then
         return
@@ -455,10 +614,7 @@ function W:traceCallEqual(callExp, valueExp, revert)
     local rt = self.scope.rt
     local funcAlias = callExp[3]
     local argAliases = callExp[4]
-    local ok2, funcVar = pcall(function() return self.map[funcAlias] end)
-    if not ok2 or not funcVar then
-        return
-    end
+    local funcVar = self.map[funcAlias]
     local func = funcVar.value
     if not func then
         return

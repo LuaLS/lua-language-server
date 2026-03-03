@@ -524,6 +524,16 @@ function M:removeField(field, path)
     return current
 end
 
+--- 获取变量的静态初始值（不触发 Tracer），供 Walker 使用
+---@return Node
+function M:getStaticValue()
+    local rt = self.scope.rt
+    return self:getCurrentValue()
+        or self:getExpectValue()
+        or self:getGuessValue()
+        or rt.ANY
+end
+
 ---@return Node?
 function M:getExpectValue()
     local master = self.masterVariable or self

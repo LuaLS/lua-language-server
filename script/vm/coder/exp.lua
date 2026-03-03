@@ -162,31 +162,25 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
 
     local op = bopMap[source.op]
 
-    local needPopStack
+    local needCloseNode
     if source.op == '=='
     or source.op == '~='
     or source.op == 'and'
     or source.op == 'or' then
         if source.exp1 and source.exp2 then
-            coder:getTracer():pushStack(source.op)
-            needPopStack = true
+            coder:getTracer():openNode(source.op)
+            needCloseNode = true
         end
     end
     if source.exp1 then
         coder:compile(source.exp1)
-        if needPopStack then
-            coder:getTracer():appendMark('v')
-        end
     end
     if source.exp2 then
         coder:compile(source.exp2)
-        if needPopStack then
-            coder:getTracer():appendMark('v')
-        end
     end
 
-    if needPopStack then
-        coder:getTracer():popStack()
+    if needCloseNode then
+        coder:getTracer():closeNode()
     end
 
     if not source.op or not source.exp1 or not source.exp2 then
@@ -237,16 +231,16 @@ local uopMap = {
 ls.vm.registerCoderProvider('unary', function (coder, source)
     ---@cast source LuaParser.Node.Unary
 
-    local needPopStack
+    local needCloseNode
     if source.op == 'not' and source.exp then
-        coder:getTracer():pushStack(source.op)
-        needPopStack = true
+        coder:getTracer():openNode(source.op)
+        needCloseNode = true
     end
 
     coder:compile(source.exp)
 
-    if needPopStack then
-        coder:getTracer():popStack()
+    if needCloseNode then
+        coder:getTracer():closeNode()
     end
 
     local op = uopMap[source.op]

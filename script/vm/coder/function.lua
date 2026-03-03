@@ -61,6 +61,14 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             location = coder:makeLocationCode(source),
         })
 
+        -- function name() end 翻译为 name = function() end：
+        -- 先注册名字（建立 key），但 appendVar 要推迟到函数体构建之后，
+        -- 保证 flow 中 ref（函数体内对名字的引用）先于 var（名字赋值）出现。
+        local tracer = coder:getTracer()
+        if source.name and tracer then
+            tracer:beginDeferVar()
+        end
+
         if source.name then
             coder:withIndentation(function ()
                 coder:addLine('')
@@ -148,6 +156,11 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         end
 
         if source.name then
+            -- 函数体已构建完毕，现在 flush 推迟的 appendVar（名字赋值），
+            -- 保证 flow 中顺序为：ref（函数体内引用名字）→ var（名字赋值）
+            if tracer then
+                tracer:flushDeferVar()
+            end
             coder:compileAssign(source.name, 1, coder:getKey(source))
         end
 

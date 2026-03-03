@@ -42,20 +42,27 @@ end)
 ls.vm.registerCoderProvider('if', function (coder, source)
     ---@cast source LuaParser.Node.If
 
-    coder:getTracer():pushStack('if')
+    -- 生成树形 DSL: {'if', child1, child2, ...}
+    -- 每个 child: {'condition', condExp} 后接 block entries（平铺在同一 table 里）
+    -- 实际结构: {'if', {condExp?, ...block_entries}, {condExp?, ...block_entries}, ...}
+    local tracer = coder:getTracer()
+    tracer:openNode('if')
     for _, child in ipairs(source.childs) do
         coder:withIndentation(function ()
-            coder:getTracer():pushStack()
+            -- 每个 if/elseif/else 分支是一个匿名数组子节点
+            tracer:openNode(false)
             if child.condition then
-                coder:getTracer():pushStack('condition')
+                -- 条件表达式嵌入为第一个子节点
+                tracer:openNode('condition')
                 coder:compile(child.condition)
-                coder:getTracer():popStack()
+                tracer:closeNode()
             end
+            -- 分支 block 的 entries 平铺在此节点里
             parseBlock(coder, child)
-            coder:getTracer():popStack()
+            tracer:closeNode()
         end, child)
     end
-    coder:getTracer():popStack()
+    tracer:closeNode()
 end)
 
 ls.vm.registerCoderProvider('for', function (coder, source)

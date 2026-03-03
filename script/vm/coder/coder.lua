@@ -263,6 +263,7 @@ function M:run(vfile)
     end
 
     if test then
+        LAST_URI  = vfile.uri
         LAST_CODE = self.code
         LAST_FLOW = ls.util.dump(self.tracerFlowMap, { noArrayKey = true })
         LAST_PMAP = ls.util.dump(self.parentMap, { noArrayKey = true })

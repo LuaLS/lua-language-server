@@ -51,6 +51,12 @@ ls.await.call(function ()
         print('测试完成')
     else
         print('测试失败：\n' .. err)
+        if LAST_URI then
+            print('最后处理的文件：' .. LAST_URI)
+        end
+        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_CODE', LAST_CODE)
+        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_FLOW', LAST_FLOW)
+        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_PMAP', LAST_PMAP)
     end
     thread.sleep(1000)
     os.exit(true)

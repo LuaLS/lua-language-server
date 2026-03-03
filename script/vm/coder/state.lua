@@ -175,6 +175,7 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
             end
         end
         if callNode then
+            ---@cast callNode LuaParser.Node.Call
             local tracer = coder:getTracer()
             if tracer then
                 tracer:appendLink(var, callNode, returnIndex)

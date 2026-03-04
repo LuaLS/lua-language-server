@@ -44,7 +44,11 @@ end
 --- 使用 package.searchpath 定位文件，io.open 读取，load 编译后执行
 ---@param modname string
 ---@return any
-function test.dofile(modname)
+---@return string?
+local function testRequire(modname)
+    if package.loaded[modname] ~= nil then
+        return package.loaded[modname]
+    end
     local path, err = package.searchpath(modname, package.path)
     if not path then
         error('module not found: ' .. modname .. '\n' .. (err or ''), 2)
@@ -59,7 +63,9 @@ function test.dofile(modname)
     if not chunk then
         error(lerr, 2)
     end
-    return chunk()
+    package.loaded[modname] = false
+    package.loaded[modname] = chunk()
+    return package.loaded[modname], path
 end
 
 --- 带过滤器的 require，只有 modname 匹配过滤器时才执行
@@ -74,7 +80,7 @@ function test.require(modname)
             return
         end
     end
-    test.dofile(modname)
+    testRequire(modname)
 end
 
 ---@async
@@ -92,6 +98,9 @@ ls.await.call(function ()
         test.require 'test.coder'
         test.require 'test.feature'
         test.require 'test.project'
+        if test.filter and not test.loadedCount then
+            error('过滤器 "' .. test.filter .. '" 没有匹配到任何测试文件，请检查路径是否正确')
+        end
     end)
     ls.await.sleep(1)
     ls.eventLoop.stop()

@@ -27,7 +27,10 @@
             "?.lua",
             "?/init.lua"
         ],
-        "pathStrict": true
+        "pathStrict": true,
+        "special": {
+            "test.require": "require"
+        }
     },
     "workspace": {
         "maxPreload": 1600,

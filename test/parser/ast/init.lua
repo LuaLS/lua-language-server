@@ -1,13 +1,23 @@
-NIL = {'<NIL>'}
+NIL          = {'<NIL>'}
+EXISTS       = {'<EXISTS>'}
+IGNORE_REST  = '<IGNORE_REST>'
 
 ---@param result any
 ---@param expect any
-function Match(result, expect)
+---@param exact? boolean # 为 true 时要求列表长度完全一致（精确匹配）
+function Match(result, expect, exact)
     local path = {}
 
-    local function eq(exp, res)
+    local function eq(exp, res, parentExact)
         if exp == NIL then
             if res == nil then
+                return
+            else
+                error({exp, res})
+            end
+        end
+        if exp == EXISTS then
+            if res ~= nil then
                 return
             else
                 error({exp, res})
@@ -17,10 +27,22 @@ function Match(result, expect)
             error({exp, res})
         end
         if type(exp) == 'table' then
+            -- 如果此表含 IGNORE_REST，则本层退回子集模式
+            local thisExact = parentExact and not exp[IGNORE_REST]
+            if thisExact then
+                -- 精确匹配：检查列表长度
+                local expLen = #exp
+                local resLen = res and #res or 0
+                if expLen ~= resLen then
+                    error({exp, res})
+                end
+            end
             for k, v in pairs(exp) do
-                path[#path+1] = k
-                eq(v, res[k])
-                path[#path] = nil
+                if k ~= IGNORE_REST then
+                    path[#path+1] = k
+                    eq(v, res[k], thisExact)
+                    path[#path] = nil
+                end
             end
         else
             if exp ~= res then
@@ -29,7 +51,7 @@ function Match(result, expect)
         end
     end
 
-    local suc, expres = pcall(eq, expect, result)
+    local suc, expres = pcall(eq, expect, result, exact)
     if suc then
         return
     end

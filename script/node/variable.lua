@@ -424,22 +424,37 @@ function M:addField(field, path)
     return current
 end
 
+-- 用于检测 get(key) 递归调用中的循环引用
+local _getVisiting = {}
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists
 function M:get(key)
-    if self:getCurrentValue() then
-        return self:getCurrentValue():get(key)
+    if _getVisiting[self] then
+        -- 检测到循环，返回 ANY
+        return self.scope.rt.ANY, false
+    end
+    _getVisiting[self] = true
+    local cv = self:getCurrentValue()
+    if cv then
+        local r, e = cv:get(key)
+        _getVisiting[self] = nil
+        return r, e
     end
     if self.masterVariable then
-        return self.masterVariable:get(key)
+        local r, e = self.masterVariable:get(key)
+        _getVisiting[self] = nil
+        return r, e
     end
     local rt = self.scope.rt
     if type(key) ~= 'table' then
         ---@cast key -Node
         key = rt.value(key)
     end
-    return self.value:get(key)
+    local r, e = self.value:get(key)
+    _getVisiting[self] = nil
+    return r, e
 end
 
 ---@param key Node.Key

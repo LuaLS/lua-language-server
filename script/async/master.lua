@@ -18,8 +18,9 @@ function M:__init(name, num, entry, useDebugger)
     self.queue   = ls.tools.linkedTable.create()
     self.useDebugger = useDebugger
 
+    local pid = require 'bee.subprocess'.get_id()
     for i = 1, num do
-        local workerName = '{}-{}' % { name, i }
+        local workerName = '{}-{}-{}' % { name, i, pid }
         self.workers[i] = New 'Async.Worker' (workerName, entry, useDebugger)
         self.idles:pushHead(self.workers[i])
     end

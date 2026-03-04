@@ -117,15 +117,24 @@ function M:viewAsVariable(options)
     return viewer:viewAsVariable(self, options)
 end
 
+-- 防止 value 链路循环引用导致死循环
+local _getVisiting = {}
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists
 function M:get(key)
+    if _getVisiting[self] then
+        return self.scope.rt.NEVER, false
+    end
     local value = self.value
     if value == self then
         return self.scope.rt.NEVER, false
     end
-    return value:get(key)
+    _getVisiting[self] = true
+    local r, e = value:get(key)
+    _getVisiting[self] = nil
+    return r, e
 end
 
 ---@param key Node.Key
@@ -331,32 +340,42 @@ end
 ---@type boolean | number | string | nil
 M.literal = nil
 
+local _narrowVisiting = {}
+
 ---@param other Node
 ---@return Node narrowed
 ---@return Node otherSide
 function M:narrow(other)
-    if self.value ~= self then
-        return self.value:narrow(other)
+    if self.value == self or _narrowVisiting[self] then
+        if self:canCast(other) then
+            return self, self.scope.rt.NEVER
+        end
+        return self.scope.rt.NEVER, self
     end
-    if self:canCast(other) then
-        return self, self.scope.rt.NEVER
-    end
-    return self.scope.rt.NEVER, self
+    _narrowVisiting[self] = true
+    local n, o = self.value:narrow(other)
+    _narrowVisiting[self] = nil
+    return n, o
 end
+
+local _narrowByFieldVisiting = {}
 
 ---@param key Node.Key
 ---@param value Node.Key
 ---@return Node narrowed
 ---@return Node otherSide
 function M:narrowByField(key, value)
-    if self.value ~= self then
-        return self.value:narrowByField(key, value)
+    if self.value == self or _narrowByFieldVisiting[self] then
+        local myValue = self:get(key)
+        if myValue:canCast(value) then
+            return self, self.scope.rt.NEVER
+        end
+        return self.scope.rt.NEVER, self
     end
-    local myValue = self:get(key)
-    if myValue:canCast(value) then
-        return self, self.scope.rt.NEVER
-    end
-    return self.scope.rt.NEVER, self
+    _narrowByFieldVisiting[self] = true
+    local n, o = self.value:narrowByField(key, value)
+    _narrowByFieldVisiting[self] = nil
+    return n, o
 end
 
 ---@param other Node

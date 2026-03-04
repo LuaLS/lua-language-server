@@ -1100,7 +1100,7 @@ local function parseCmdLine(cmdLine)
     end
     return result
 end
-local options = parseCmdLine(rawget(_G, "arg") or {})
+local options = parseCmdLine(test.arg or {})
 local marks = {}
 local output = io.stdout
 

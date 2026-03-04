@@ -30,7 +30,11 @@ ls.env = {}
 ls.env.ROOT_PATH   = ls.util.expandPath(findRoot())
 ls.env.LOG_PATH    = ls.util.expandPath(ls.args.LOGPATH, ls.env)
 ls.env.META_PATH   = ls.util.expandPath(ls.args.METAPATH, ls.env)
-ls.env.LOG_FILE    = ls.util.expandPath(ls.args.LOGFILE, ls.env)
+if ls.args.TEST then
+    ls.env.LOG_FILE = ls.util.expandPath('$LOG_PATH/test.log', ls.env)
+else
+    ls.env.LOG_FILE = ls.util.expandPath(ls.args.LOGFILE, ls.env)
+end
 ls.env.ROOT_URI    = ls.uri.encode(ls.env.ROOT_PATH)
 ls.env.LOG_URI     = ls.uri.encode(ls.env.LOG_PATH)
 ls.env.META_URI    = ls.uri.encode(ls.env.META_PATH)

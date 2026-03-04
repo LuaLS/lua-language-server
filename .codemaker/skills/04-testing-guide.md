@@ -6,15 +6,15 @@
 # Windows（在 server/ 目录下）
 
 # 运行全部测试
-bin\lua-language-server.exe test.lua
+bin\lua-language-server.exe --test
 
-# 运行指定测试文件（支持路径过滤，斜杠/反斜杠均可）
-bin\lua-language-server.exe test.lua test/feature/definition/luadoc.lua
-bin\lua-language-server.exe test.lua test/node/tracer.lua
+# 运行指定测试文件
+bin\lua-language-server.exe --test feature.definition.luadoc
+bin\lua-language-server.exe --test node.tracer
 
 # 也可以指定到目录层级（运行该目录下所有测试）
-bin\lua-language-server.exe test.lua test/feature/definition
-bin\lua-language-server.exe test.lua test/node
+bin\lua-language-server.exe --test feature.definition
+bin\lua-language-server.exe --test node.tracer
 ```
 
 测试通过时输出 `[xxx] 测试完毕`，失败时输出：

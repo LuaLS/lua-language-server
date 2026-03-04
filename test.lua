@@ -1,19 +1,13 @@
 print(_VERSION)
 local thread = require 'bee.thread'
 
-collectgarbage('generational')
-print(collectgarbage('param', 'minormul', 20))
-print(collectgarbage('param', 'minormajor', 100))
-print(collectgarbage('param', 'majorminor', 20))
-
 package.path = package.path.. ';./?.lua;./?/init.lua'
 
 ---@class Test
 test = {}
 
-require 'luals'
-require 'runtime'
-ls.env.LOG_FILE = ls.util.expandPath('$LOG_PATH/test.log', ls.env)
+test.arg = {}
+
 require 'master'
 require 'scope'
 require 'config'
@@ -29,13 +23,11 @@ test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create('test', test.rootUri)
 
--- 支持命令行过滤：bin\lua-language-server.exe test.lua test/feature/definition/luadoc.lua
--- 将路径参数转换为 module 名，如 "test/feature/definition/luadoc.lua" -> "test.feature.definition.luadoc"
 do
-    local filterArg = arg and arg[1]
-    if filterArg then
+    local testTarget = ls.args.TEST
+    if type(testTarget) == 'string' then
         -- 去掉 .lua 后缀，替换斜杠为点
-        test.filter = filterArg:gsub('%.lua$', ''):gsub('[/\\]', '.')
+        test.filter = 'test.' .. testTarget:gsub('%.lua$', ''):gsub('[/\\]', '.')
         print('测试过滤器：' .. test.filter)
     end
 end
@@ -81,6 +73,7 @@ function test.require(modname)
         end
     end
     testRequire(modname)
+    test.loadedAnyFile = true
 end
 
 ---@async
@@ -98,7 +91,7 @@ ls.await.call(function ()
         test.require 'test.coder'
         test.require 'test.feature'
         test.require 'test.project'
-        if test.filter and not test.loadedCount then
+        if test.filter and not test.loadedAnyFile then
             error('过滤器 "' .. test.filter .. '" 没有匹配到任何测试文件，请检查路径是否正确')
         end
     end)

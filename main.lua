@@ -9,6 +9,11 @@ collectgarbage('param', 'majorminor', 20)
 require 'luals'
 require 'master'
 
+if ls.args.TEST then
+    dofile 'test.lua'
+    return
+end
+
 xpcall(function ()
     if not ls.args.DEVELOP then
         return

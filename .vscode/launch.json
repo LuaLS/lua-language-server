@@ -7,7 +7,7 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"program": "test.lua",
+			"program": "${workspaceFolder}/main.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"windows": {
 				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
@@ -22,6 +22,9 @@
 			],
 			"skipFiles": [
 				"script/class.lua"
+			],
+			"arg": [
+				"--test"
 			]
 		},
 		{

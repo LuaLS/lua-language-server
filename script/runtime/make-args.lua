@@ -44,5 +44,9 @@ ls.args = {
 
     -- 命令行：生成文档
     DOC = '',
+
+    -- 命令行：单元测试
+    ---@type boolean|string
+    TEST = false,
 }
 ls.util.tableMerge(ls.args, argparser.parse(arg, true))

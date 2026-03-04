@@ -16,11 +16,11 @@ function M:__init(scope, key, value, optional)
     ---@type Node
     self.key = key
     ---@type Node
-    self.value = value or scope.rt.UNKNOWN
+    self.fvalue = value or scope.rt.UNKNOWN
     ---@type boolean?
     self.optional = optional
     if optional then
-        self.value = self.value | scope.rt.NIL
+        self.fvalue = self.fvalue | scope.rt.NIL
     end
 end
 
@@ -44,6 +44,10 @@ function M:simplify()
         return self
     end
     return self.value:simplify()
+end
+
+M.__getter.value = function (self)
+    return self.fvalue, true
 end
 
 ---@param self Node.Field

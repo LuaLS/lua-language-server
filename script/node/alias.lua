@@ -15,7 +15,7 @@ function M:__init(scope, name, params, value)
     self.aliasName = name
     self.scope = scope
     self.params = params
-    self.value = value
+    self.aliasValue = value
 
     self.masterType = scope.rt.type(name)
     self.masterType:addAlias(self)
@@ -78,6 +78,9 @@ function M:call(args)
 end
 
 M.__getter.value = function (self)
+    if self.aliasValue then
+        return self.aliasValue
+    end
     if self.extendsValue then
         self.extendsValue:addRef(self)
         return self.extendsValue, true

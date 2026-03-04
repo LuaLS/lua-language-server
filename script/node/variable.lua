@@ -464,6 +464,10 @@ function M:getExpect(key)
         local expectValue = self.value
         return expectValue:get(key)
     end
+    local cv = self:getCurrentValue()
+    if cv then
+        return cv:get(key)
+    end
     return rt.ANY, false
 end
 

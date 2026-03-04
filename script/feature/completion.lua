@@ -51,17 +51,15 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    guide.eachVisibleLocal(source, param.offset, function (loc)
+    local locals = guide.getVisibleLocals(source, param.offset)
+    for _, loc in ipairs(locals) do
         local name = loc.id
-        if type(name) ~= 'string' or name == word then
-            return
-        end
-        -- 简单前缀匹配
-        if name:sub(1, #word) == word then
+        -- 简单前缀匹配（排除自身）
+        if name ~= word and name:sub(1, #word) == word then
             action.push {
                 label = name,
                 kind  = ls.spec.CompletionItemKind.Variable,
             }
         end
-    end)
+    end
 end)

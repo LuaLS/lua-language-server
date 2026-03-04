@@ -2,5 +2,6 @@
 local M = Class 'LuaParser'
 
 require 'parser.compile'
+require 'parser.guide'
 
 return M

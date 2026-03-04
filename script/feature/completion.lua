@@ -1,5 +1,6 @@
 ---@type Feature.Provider<Feature.Completion.Param>
 local providers = ls.feature.helper.providers()
+local guide = require 'parser.guide'
 
 ---@class Feature.Completion.Param
 ---@field uri Uri
@@ -38,5 +39,29 @@ function ls.feature.provider.completion(callback, priority)
     end
 end
 
+-- 当前作用域内的局部变量补全
 ls.feature.provider.completion(function (param, action)
+    local source = param.sources[1]
+    if not source or source.kind ~= 'var' then
+        return
+    end
+    ---@cast source LuaParser.Node.Var
+    local word = source.id
+    if not word or word == '' then
+        return
+    end
+
+    guide.eachVisibleLocal(source, param.offset, function (loc)
+        local name = loc.id
+        if type(name) ~= 'string' or name == word then
+            return
+        end
+        -- 简单前缀匹配
+        if name:sub(1, #word) == word then
+            action.push {
+                label = name,
+                kind  = ls.spec.CompletionItemKind.Variable,
+            }
+        end
+    end)
 end)

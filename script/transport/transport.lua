@@ -1,6 +1,5 @@
 local jsonrpc = require 'transport.jsonrpc'
 local stdio   = require 'transport.stdio'
-local spec    = require 'lsp.spec'
 
 ---@class Transport
 local M = Class 'Transport'
@@ -84,7 +83,7 @@ function M:next()
                         })
                     end
                     if err == ls.task.REJECT_CLOSED then
-                        pushError(spec.ErrorCodes.InternalError, 'Method `{method}` forgot response.' % data)
+                        pushError(ls.spec.ErrorCodes.InternalError, 'Method `{method}` forgot response.' % data)
                         return
                     end
                     if type(err) == 'table' then
@@ -92,11 +91,11 @@ function M:next()
                             pushError(err.code, err.message)
                         end, function (...)
                             local msg = log.error(...)
-                            pushError(spec.ErrorCodes.InternalError, msg)
+                            pushError(ls.spec.ErrorCodes.InternalError, msg)
                         end)
                         return
                     end
-                    pushError(spec.ErrorCodes.InternalError, ls.inspect(err))
+                    pushError(ls.spec.ErrorCodes.InternalError, ls.inspect(err))
                 end
             end)
             return task, data.id

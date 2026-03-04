@@ -7,6 +7,7 @@ print('[feature] 测试中...')
 ---@return table<string, table[]>
 function TEST_FRAME(script, callback)
     test.scope.rt:reset()
+    test.loadedCount = (test.loadedCount or 0) + 1
     local _ <close> = test.checkInclude(script)
     local newScript, catched = test.catch(script, '!?')
 
@@ -17,5 +18,6 @@ function TEST_FRAME(script, callback)
 end
 
 test.require 'test.feature.definition'
+test.require 'test.feature.completion'
 
 print('[feature] 测试完毕')

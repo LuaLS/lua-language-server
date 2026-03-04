@@ -22,6 +22,7 @@ ls.encoder = require 'tools.encoder'
 ls.gc      = require 'tools.gc'
 ls.json    = require 'tools.json'
 ls.glob    = require 'tools.glob'
+ls.spec    = require 'lsp.spec'
 package.loaded['json'] = ls.json
 package.loaded['json-beautify'] = require 'tools.json-beautify'
 package.loaded['jsonc']         = require 'tools.jsonc'

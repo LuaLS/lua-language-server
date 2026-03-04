@@ -1,5 +1,4 @@
 local transport = require 'transport'
-local spec      = require 'lsp.spec'
 local client    = require 'language-server.language-client'
 
 ---@class LanguageServer: Class.Base
@@ -54,7 +53,7 @@ function M:resolveTask(task)
         local registered = ls.capability.registered[method]
         if not registered then
             task:reject {
-                code = spec.ErrorCodes.MethodNotFound,
+                code = ls.spec.ErrorCodes.MethodNotFound,
                 message = 'Method not found: ' .. tostring(method),
             }
             return
@@ -64,14 +63,14 @@ function M:resolveTask(task)
 
         if self.status ~= 'initialized' and options.needInitialized then
             task:reject {
-                code = spec.ErrorCodes.ServerNotInitialized,
+                code = ls.spec.ErrorCodes.ServerNotInitialized,
                 message = 'Server not initialized.',
             }
             return
         end
         if self.status == 'shutdown' and not options.validAfterShutdown then
             task:reject {
-                code = spec.ErrorCodes.InvalidRequest,
+                code = ls.spec.ErrorCodes.InvalidRequest,
                 message = 'Server is shut down.',
             }
             return

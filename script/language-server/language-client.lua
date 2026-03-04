@@ -1,5 +1,3 @@
-local spec = require 'lsp.spec'
-
 ---@class LanguageClient: Class.Base
 local M = Class 'LanguageClient'
 
@@ -27,7 +25,7 @@ function M:logMessage(type, message)
         return
     end
     self.transport:notify('window/logMessage', {
-        type    = spec[type] or type,
+        type    = ls.spec[type] or type,
         message = message,
     })
 end

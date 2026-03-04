@@ -1,7 +1,5 @@
-local spec = require 'lsp.spec'
-
 ls.capability.registerCapability.textDocumentSync = {
-    change = spec.TextDocumentSyncKind.Incremental,
+    change = ls.spec.TextDocumentSyncKind.Incremental,
 }
 
 ls.capability.register('textDocument/didChange', function (server, params, task)

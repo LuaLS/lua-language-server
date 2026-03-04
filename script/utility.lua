@@ -1191,6 +1191,52 @@ function m.stringLess(a, b)
     return true
 end
 
+---@param s1 string
+---@param s2 string
+---@param ignoreCase? boolean
+---@return boolean isMatch
+---@return integer matchScore
+function m.stringSimilar(s1, s2, ignoreCase)
+    if s1 == s2 then
+        return true, 0
+    end
+    if s1 == '' then
+        return true, 0
+    end
+    if #s1 > #s2 then
+        return false, 0
+    end
+
+    if ignoreCase then
+        s1 = s1:upper()
+        s2 = s2:upper()
+    end
+
+    local inputCodes = { stringByte(s1, 1, #s1) }
+    local otherCodes = { stringByte(s2, 1, #s2) }
+
+    local matchScore = 1
+    if inputCodes[1] ~= otherCodes[1] then
+        matchScore = 2
+    end
+
+    local inputBit = 0
+    for i = 1, #inputCodes do
+        inputBit = inputBit | (1 << (inputCodes[i] - 64))
+    end
+
+    local otherBit = 0
+    for i = 1, #otherCodes do
+        otherBit = otherBit | (1 << (otherCodes[i] - 64))
+    end
+
+    if inputBit == (inputBit & otherBit) then
+        return true, matchScore
+    end
+
+    return false, 0
+end
+
 ---@param v any
 ---@param d any
 ---@return any

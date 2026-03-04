@@ -47,15 +47,14 @@ ls.feature.provider.completion(function (param, action)
     end
     ---@cast source LuaParser.Node.Var
     local word = source.id
-    if not word or word == '' then
+    if not word then
         return
     end
 
     local locals = guide.getVisibleLocals(source, param.offset)
     for _, loc in ipairs(locals) do
         local name = loc.id
-        -- 简单前缀匹配（排除自身）
-        if name ~= word and name:sub(1, #word) == word then
+        if ls.util.stringSimilar(word, name, true) then
             action.push {
                 label = name,
                 kind  = ls.spec.CompletionItemKind.Variable,

@@ -136,11 +136,10 @@ end
 mt:<?x?>()
 ]]
 
--- TODO 通过代码执行顺序来判断?
 TEST_DEF [[
 --!include setmetatable
 local mt = {}
-function mt:<!x!>()
+function mt:x()
 end
 
 local obj = setmetatable({}, {__index = mt})

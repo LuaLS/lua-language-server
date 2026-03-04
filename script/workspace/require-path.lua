@@ -149,9 +149,10 @@ end
 
 --- 查找符合指定require name的所有uri
 ---@param name string
+---@param suri uri
 ---@return uri[]
 ---@return table<uri, string>?
-function mt:searchUrisByRequireName(name)
+function mt:searchUrisByRequireName(name, suri)
     local vm          = require 'vm'
     local searchers   = config.get(self.scp.uri, 'Lua.runtime.path')
     local strict      = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
@@ -161,7 +162,7 @@ function mt:searchUrisByRequireName(name)
     local searcherMap = {}
     local excludes    = {}
 
-    local pluginSuccess, pluginResults = plugin.dispatch('ResolveRequire', self.scp.uri, name)
+    local pluginSuccess, pluginResults = plugin.dispatch('ResolveRequire', self.scp.uri, name, suri)
     if pluginSuccess and pluginResults ~= nil then
         return pluginResults
     end
@@ -226,7 +227,7 @@ function mt:findUrisByRequireName(suri, name)
     end
     local cache = self.requireCache[name]
     if not cache then
-        local results, searcherMap = self:searchUrisByRequireName(name)
+        local results, searcherMap = self:searchUrisByRequireName(name, suri)
         cache = {
             results = results,
             searcherMap = searcherMap,

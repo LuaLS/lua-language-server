@@ -16,6 +16,6 @@ function TEST_FRAME(script, callback)
     return callback(catched), catched
 end
 
-require 'test.feature.definition'
+test.require 'test.feature.definition'
 
 print('[feature] 测试完毕')

@@ -23,12 +23,12 @@ end
 
 print('[coder] 测试中...')
 
-require 'test.coder.meta'
-require 'test.coder.common'
-require 'test.coder.metatable'
-require 'test.coder.block'
-require 'test.coder.flow'
-require 'test.coder.custom'
+test.require 'test.coder.meta'
+test.require 'test.coder.common'
+test.require 'test.coder.metatable'
+test.require 'test.coder.block'
+test.require 'test.coder.flow'
+test.require 'test.coder.custom'
 --require 'test.coder.find-local'
 
 print('[coder] 测试完毕')

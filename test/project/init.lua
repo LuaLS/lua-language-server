@@ -1,2 +1,2 @@
-dofile 'test/project/index.lua'
-dofile 'test/project/self.lua'
+test.require 'test.project.index'
+test.require 'test.project.self'

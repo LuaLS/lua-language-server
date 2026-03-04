@@ -1,8 +1,8 @@
 print('[parser] 测试中...')
 
-require 'test.parser.ast'
-require 'test.parser.grammar'
-require 'test.parser.syntax_check'
+test.require 'test.parser.ast'
+test.require 'test.parser.grammar'
+test.require 'test.parser.syntax_check'
 --require 'test.parser.perform'
 
 print('[parser] 测试完毕')

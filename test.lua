@@ -29,6 +29,54 @@ test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create('test', test.rootUri)
 
+-- 支持命令行过滤：bin\lua-language-server.exe test.lua test/feature/definition/luadoc.lua
+-- 将路径参数转换为 module 名，如 "test/feature/definition/luadoc.lua" -> "test.feature.definition.luadoc"
+do
+    local filterArg = arg and arg[1]
+    if filterArg then
+        -- 去掉 .lua 后缀，替换斜杠为点
+        test.filter = filterArg:gsub('%.lua$', ''):gsub('[/\\]', '.')
+        print('测试过滤器：' .. test.filter)
+    end
+end
+
+--- 支持协程穿透的模块加载器（不经过 package.loaded 缓存）
+--- 使用 package.searchpath 定位文件，io.open 读取，load 编译后执行
+---@param modname string
+---@return any
+function test.dofile(modname)
+    local path, err = package.searchpath(modname, package.path)
+    if not path then
+        error('module not found: ' .. modname .. '\n' .. (err or ''), 2)
+    end
+    local f, ferr = io.open(path, 'r')
+    if not f then
+        error('cannot open: ' .. path .. '\n' .. (ferr or ''), 2)
+    end
+    local src = f:read('*a')
+    f:close()
+    local chunk, lerr = load(src, '@' .. path, 't')
+    if not chunk then
+        error(lerr, 2)
+    end
+    return chunk()
+end
+
+--- 带过滤器的 require，只有 modname 匹配过滤器时才执行
+---@param modname string
+function test.require(modname)
+    if test.filter then
+        -- 只运行前缀匹配的模块（含子模块）或精确匹配
+        if modname ~= test.filter
+            and modname:sub(1, #test.filter + 1) ~= test.filter .. '.'
+            and test.filter:sub(1, #modname + 1) ~= modname .. '.'
+        then
+            return
+        end
+    end
+    test.dofile(modname)
+end
+
 ---@async
 ls.await.call(function ()
     -- 加载一些工具
@@ -38,12 +86,12 @@ ls.await.call(function ()
     lt = require 'test.ltest'
     local suc, err = pcall(function ()
         print('开始测试')
-        dofile 'test/tools/init.lua'
-        require 'test.parser'
-        require 'test.node'
-        require 'test.coder'
-        require 'test.feature'
-        dofile 'test/project/init.lua'
+        test.require 'test.tools'
+        test.require 'test.parser'
+        test.require 'test.node'
+        test.require 'test.coder'
+        test.require 'test.feature'
+        test.require 'test.project'
     end)
     ls.await.sleep(1)
     ls.eventLoop.stop()

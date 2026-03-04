@@ -1,3 +1,3 @@
-dofile 'test/tools/afs.lua'
-dofile 'test/tools/textmerger.lua'
-dofile 'test/tools/time.lua'
+test.require 'test.tools.afs'
+test.require 'test.tools.textmerger'
+test.require 'test.tools.time'

@@ -48,5 +48,8 @@ ls.args = {
     -- 命令行：单元测试
     ---@type boolean|string
     TEST = false,
+    -- 命令行：测试指定外部项目路径（配合 --test 使用）
+    ---@type boolean|string
+    TEST_PROJECT = false,
 }
 ls.util.tableMerge(ls.args, argparser.parse(arg, true))

@@ -1354,7 +1354,7 @@ local function compileFunctionParam(func, source)
         local found = false
         for n in funcNode:eachObject() do
             if (n.type == 'doc.type.function' or n.type == 'function')
-            and n.args and n.args[aindex] and n.args[aindex] ~= source
+            and n.args[aindex] and n.args[aindex] ~= source
             then
                 local argNode = vm.compileNode(n.args[aindex])
                 for an in argNode:eachObject() do
@@ -1461,7 +1461,7 @@ local function compileFunctionParam(func, source)
                         vm.getClassFields(suri, extClass, key, function (field, _isMark)
                             for n in vm.compileNode(field):eachObject() do
                                 if (n.type == 'function' or n.type == 'doc.type.function')
-                                and n.args and n.args[aindex]
+                                and n.args[aindex]
                                 then
                                     local argNode = vm.compileNode(n.args[aindex])
                                     for an in argNode:eachObject() do

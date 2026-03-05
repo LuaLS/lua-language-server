@@ -1353,10 +1353,16 @@ local function compileFunctionParam(func, source)
         ]]
         local found = false
         for n in funcNode:eachObject() do
-            if (n.type == 'doc.type.function' or n.type == 'function')
-            and n.args[aindex] and n.args[aindex] ~= source
+          -- Extract actual function type node
+            local funcType = n
+            if n.type == 'doc.field' and n.extends then
+                funcType = n.extends
+        end
+
+            if (funcType.type == 'doc.type.function' or funcType.type == 'function')
+            and funcType.args and funcType.args[aindex] and funcType.args[aindex] ~= source
             then
-                local argNode = vm.compileNode(n.args[aindex])
+                local argNode = vm.compileNode(funcType.args[aindex])
                 for an in argNode:eachObject() do
                     if an.type ~= 'doc.generic.name' then
                         vm.setNode(source, an)
@@ -1460,8 +1466,16 @@ local function compileFunctionParam(func, source)
                         end
                         vm.getClassFields(suri, extClass, key, function (field, _isMark)
                             for n in vm.compileNode(field):eachObject() do
-                                if n.type == 'function' and n.args[aindex] then
-                                    local argNode = vm.compileNode(n.args[aindex])
+                                -- Extract actual function type node
+                                local funcType = n
+                                if n.type == 'doc.field' and n.extends then
+                                    funcType = n.extends
+                                end
+
+                                if (funcType.type == 'function' or funcType.type == 'doc.type.function')
+                                and funcType.args and funcType.args[aindex]
+                                then
+                                    local argNode = vm.compileNode(funcType.args[aindex])
                                     for an in argNode:eachObject() do
                                         if an.type ~= 'doc.generic.name' then
                                             vm.setNode(source, an)

@@ -143,6 +143,14 @@ function M:removeAssign(field)
     return self
 end
 
+---@return boolean
+function M:hasAssign()
+    if self.masterVariable then
+        return self.masterVariable:hasAssign()
+    end
+    return self.assigns ~= nil
+end
+
 ---@return fun(): Node.Field?
 ---@return ...
 function M:eachAssign()

@@ -51,4 +51,65 @@ function M.getVisibleLocals(source, offset)
     return result
 end
 
+--- 从 source 所在的 AST 中，找到在 offset 处可见的指定名字的局部变量节点。
+--- 从最内层 block 向外查找，返回第一个匹配的（即最近的遮蔽者）。
+---
+---@param id     string               # 要查找的局部变量名（如 `'_ENV'`）
+---@param offset integer              # 光标偏移量
+---@param ast    LuaParser.Ast        # 语法树（内部会自动读取 ast.envMode 等信息）
+---@return (LuaParser.Node.Local | LuaParser.Node.Param)?
+function M.getLocal(ast, offset, id)
+    -- 从 main block 向内找到包含 offset 的最深 block
+    local innerBlock = ast.main
+    local function findDeepest(block)
+        for _, child in ipairs(block.childs) do
+            if  child.isBlock
+            and child.start <= offset
+            and offset      <= child.finish then
+                innerBlock = child
+                findDeepest(child)
+                return
+            end
+        end
+    end
+    findDeepest(ast.main)
+
+    -- 从最内层向外遍历，返回第一个匹配的（即最近的遮蔽者）
+    ---@type LuaParser.Node.Block | false
+    local b = innerBlock
+    while b do
+        local locals = b.locals
+        for i = #locals, 1, -1 do
+            local loc = locals[i]
+            if loc.id == id and loc.effectStart <= offset then
+                return loc
+            end
+        end
+        if b.isFunction then
+            ---@cast b LuaParser.Node.Function
+            local params = b.params
+            if params then
+                for i = #params, 1, -1 do
+                    local param = params[i]
+                    if param.id == id then
+                        return param
+                    end
+                end
+            end
+        end
+        b = b.parentBlock
+    end
+
+    return nil
+end
+
+--- 找到在 offset 处可见的 _ENV local 节点（自动使用 ast.envMode）。
+---
+---@param offset integer
+---@param ast    LuaParser.Ast
+---@return (LuaParser.Node.Local | LuaParser.Node.Param)?
+function M.getEnvLocal(ast, offset)
+    return M.getLocal(ast, offset, ast.envMode)
+end
+
 return M

@@ -32,3 +32,18 @@ zace<??>
         kind = ls.spec.CompletionItemKind.Variable,
     }
 }
+
+TEST_COMPLETION [[
+ZABC = x
+local zabc
+zac<??>
+]] {
+    {
+        label = 'zabc',
+        kind = ls.spec.CompletionItemKind.Variable,
+    },
+    {
+        label = 'ZABC',
+        kind = ls.spec.CompletionItemKind.Field,
+    },
+}

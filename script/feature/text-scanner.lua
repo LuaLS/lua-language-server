@@ -67,4 +67,63 @@ function M:getWordBack()
     return self.text:sub(wordStart, self.offset - 1), wordStart
 end
 
+--- 检测光标前是否是一次字段访问（`.` 或 `:`），并返回触发字符和对象表达式右端的偏移量。
+---
+--- 算法：
+---   1. 跳过光标前的标识符前缀（当前正在输入的字段名）
+---   2. 检查其左侧字符是否为 `.` 或 `:`
+---   3. 继续往左跳过空白，返回剩余位置（即对象表达式的末尾字符所在的 offset）
+---
+--- 返回值：
+---   trigger  — '.' | ':' | nil（nil 表示不是字段访问）
+---   objEnd   — 对象表达式末尾字符的位置（1-based，inclusive），可传给 findSources
+---@return string|nil trigger  # '.' 或 ':'，不是字段访问则为 nil
+---@return integer    objEnd   # 对象末尾字符在文本中的 1-based 位置
+---@return string     word     # 字段名前缀（光标前正在输入的部分，可能为空字符串）
+function M:getFieldTriggerBack()
+    -- 1. 扫描光标前的标识符前缀（字段名前缀）
+    local pos = self.offset - 1
+    local wordStart = pos + 1
+    while pos >= 1 and M.isIdentChar(self.text:sub(pos, pos)) do
+        pos = pos - 1
+    end
+    -- pos 现在指向前缀左侧的字符
+
+    -- 2. 检查触发字符
+    --    情形A：触发符在前缀左侧（如 "t.ab<??>", pos 在 '.'）
+    --    情形B：offset 本身就是触发符（如 "t.<??>", offset 指向 '.'，pos == offset-1 == 't'）
+    local trigger = self.text:sub(pos, pos)
+    if trigger ~= '.' and trigger ~= ':' then
+        -- 情形B：检查 offset 位置本身是否是触发符
+        trigger = self.text:sub(self.offset, self.offset)
+        if trigger ~= '.' and trigger ~= ':' then
+            return nil, 0, ''
+        end
+        -- offset 就是触发符，字段前缀为空，对象末尾在 offset-1 左侧（跳过空白）
+        pos = self.offset - 1
+        while pos >= 1 and (self.text:sub(pos, pos) == ' ' or self.text:sub(pos, pos) == '\t') do
+            pos = pos - 1
+        end
+        if pos < 1 then
+            return nil, 0, ''
+        end
+        return trigger, pos, ''
+    end
+
+    -- 情形A：pos 就是触发符，前缀是 [pos+1, offset-1]
+    local word = self.text:sub(pos + 1, self.offset - 1)
+    pos = pos - 1  -- 跳过触发符
+
+    -- 3. 向左跳过空白，定位对象表达式的末尾字符
+    while pos >= 1 and (self.text:sub(pos, pos) == ' ' or self.text:sub(pos, pos) == '\t') do
+        pos = pos - 1
+    end
+
+    if pos < 1 then
+        return nil, 0, ''
+    end
+
+    return trigger, pos, word
+end
+
 return M

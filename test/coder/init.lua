@@ -29,6 +29,5 @@ test.require 'test.coder.metatable'
 test.require 'test.coder.block'
 test.require 'test.coder.flow'
 test.require 'test.coder.custom'
---require 'test.coder.find-local'
 
 print('[coder] 测试完毕')

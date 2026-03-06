@@ -151,6 +151,16 @@ function M:hasAssign()
     return self.assigns ~= nil
 end
 
+--- 是否有定义（有赋值或有类型注入，如标准库函数）。
+---@return boolean
+function M:isDefined()
+    if self.masterVariable then
+        return self.masterVariable:isDefined()
+    end
+    return self.assigns ~= nil
+        or self.types   ~= nil
+end
+
 ---@return fun(): Node.Field?
 ---@return ...
 function M:eachAssign()

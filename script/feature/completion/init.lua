@@ -1,0 +1,6 @@
+require 'feature.completion.provider'
+require 'feature.completion.luacats'
+require 'feature.completion.word'
+require 'feature.completion.field'
+require 'feature.completion.string'
+require 'feature.completion.postfix'

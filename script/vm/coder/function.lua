@@ -98,12 +98,14 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         if source.params then
             coder:withIndentation(function ()
                 for i, param in ipairs(source.params) do
+                    local catParam = coder:findMatchedCatParam(param)
                     coder:addLine('-- ' .. param.code)
                     coder:compile(param)
-                    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode})' % {
+                    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode}, {optional%q})' % {
                         funcKey   = funcKey,
                         paramKey  = param.id,
                         paramNode = coder:getKey(param),
+                        optional  = catParam and catParam.optional or nil,
                     })
                 end
             end, 'function params --')

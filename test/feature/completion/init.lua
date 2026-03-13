@@ -12,6 +12,11 @@ function TEST_COMPLETION(script)
     end)
 
     return function (expects)
+        -- 自定义断言函数
+        if type(expects) == 'function' then
+            expects(results)
+            return
+        end
         -- nil 表示期望没有结果
         if expects == nil then
             if results == nil or #results == 0 then
@@ -36,5 +41,6 @@ test.require 'test.feature.completion.keyword'
 test.require 'test.feature.completion.field'
 test.require 'test.feature.completion.luadoc'
 test.require 'test.feature.completion.string'
+test.require 'test.feature.completion.postfix'
 test.require 'test.feature.completion.special'
 -- test.require 'test.feature.completion.continue'  -- 旧系统测试，依赖已删除的 proto.define

@@ -231,6 +231,12 @@ function M:getMasterVariable()
     return self.masterVariable or self
 end
 
+---@return table<Node.Key, Node.Variable>?
+function M:getChilds()
+    local master = self.masterVariable or self
+    return master.childs
+end
+
 ---@type Node|false
 M.classValue = nil
 

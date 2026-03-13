@@ -28,6 +28,32 @@
 			]
 		},
 		{
+			"name": "🍺test luadoc",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceFolder}/main.lua",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe"
+			},
+			"luaVersion": "lua55",
+			"sourceCoding": "utf8",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
+			"outputCapture": [
+				"print",
+				"stderr"
+			],
+			"skipFiles": [
+				"script/class.lua"
+			],
+			"arg": [
+				"--test",
+				"feature.completion.luadoc"
+			]
+		},
+		{
 			"name": "🍄attach",
 			"type": "lua",
 			"request": "attach",

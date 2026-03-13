@@ -122,6 +122,37 @@ end
     },
 }
 
+-- 光标位于字段名前缀与点号之间（ab|.c）时，应对 t 的字段名做前缀补全
+TEST_COMPLETION [[
+local t = {}
+t.ab = {}
+t.ab<??>.c
+]] {
+    {
+        label = 'ab',
+        kind  = ls.spec.CompletionItemKind.Field,
+    },
+}
+
+-- 光标位于点号之后（ab.|c）时，应对 t.ab 的字段补全
+TEST_COMPLETION [[
+local t = {}
+t.ab = {
+    c1 = 1,
+    c2 = 2,
+}
+t.ab.<??>c
+]] {
+    {
+        label = 'c1',
+        kind  = ls.spec.CompletionItemKind.Field,
+    },
+    {
+        label = 'c2',
+        kind  = ls.spec.CompletionItemKind.Field,
+    },
+}
+
 -- TODO: setmetatable + __index 场景（需要 metatable 类型推导支持）
 -- TEST_COMPLETION [[
 -- local mt = {}

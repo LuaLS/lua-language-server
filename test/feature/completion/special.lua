@@ -8,3 +8,5 @@ TEST_COMPLETION [[
 local function f(a, <??>)
 end
 ]] (nil)
+
+-- postfix 语法补全测试已迁移到未加载文件 `test/feature/completion/postfix.lua`

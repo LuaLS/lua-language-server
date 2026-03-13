@@ -153,3 +153,14 @@ end
         kind = ls.spec.CompletionItemKind.Variable,
     },
 }
+
+-- 光标位于单词中间（ab|c）时，前缀应为左侧部分 ab
+TEST_COMPLETION [[
+local abc
+ab<??>c
+]] {
+    {
+        label = 'abc',
+        kind = ls.spec.CompletionItemKind.Variable,
+    },
+}

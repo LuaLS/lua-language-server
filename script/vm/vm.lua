@@ -80,6 +80,40 @@ function M:getVariable(source)
     return vfile:getVariable(source)
 end
 
+local BUILTIN_LUADOC_TYPES = {
+    ['any']      = true,
+    ['boolean']  = true,
+    ['function'] = true,
+    ['integer']  = true,
+    ['never']    = true,
+    ['nil']      = true,
+    ['number']   = true,
+    ['string']   = true,
+    ['table']    = true,
+    ['thread']   = true,
+    ['truly']    = true,
+    ['unknown']  = true,
+    ['userdata'] = true,
+}
+
+---@return table<string, integer>
+function M:getLuaDocTypes()
+    local results = {}
+    for name, typeNode in pairs(self.rt.TYPE_POOL) do
+        if type(name) ~= 'string' or name == '_' then
+            goto continue
+        end
+        if not BUILTIN_LUADOC_TYPES[name]
+        and not typeNode.isBasicType
+        and not typeNode:isComplex() then
+            goto continue
+        end
+        results[name] = ls.spec.CompletionItemKind.Class
+        ::continue::
+    end
+    return results
+end
+
 ---@param source LuaParser.Node.Base
 ---@return Coder?
 function M:getCoder(source)

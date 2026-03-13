@@ -1,0 +1,2 @@
+-- luadoc 补全测试
+-- TODO: 实现 luadoc 补全 provider 后补充用例

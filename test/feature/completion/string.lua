@@ -1,0 +1,2 @@
+-- string 补全测试
+-- TODO: 实现字符串枚举补全 provider 后补充用例

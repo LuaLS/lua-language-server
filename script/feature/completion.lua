@@ -22,6 +22,16 @@ function ls.feature.completion(uri, offset)
     local text    = ls.file.get(uri):getText()
     local scanner = New 'Feature.TextScanner' (text, offset)
 
+    -- `function f(a, <??>)` / `function (a, <??>)` 参数定义空位不做补全
+    local word = scanner:getWordBack()
+    if word == '' then
+        local left = text:sub(1, offset)
+        if  left:match('function%s+[%w_%.:]+%s*%([^()%[%]{}\n]*$')
+        or  left:match('function%s*%([^()%[%]{}\n]*$') then
+            return {}
+        end
+    end
+
     local param = {
         uri     = uri,
         offset  = offset,
@@ -43,6 +53,84 @@ function ls.feature.provider.completion(callback, priority)
     end
 end
 
+-- Lua 关键字列表
+local LUA_KEYWORDS = {
+    'and', 'break', 'do', 'else', 'elseif', 'end',
+    'for', 'function', 'if', 'in', 'local', 'not',
+    'or', 'repeat', 'return', 'then', 'until', 'while',
+    'true', 'false', 'nil',
+}
+
+--- 判断当前补全位置是否处于"语句"位置（即可以写语句的 block 上下文）。
+--- 使用词法规则：
+---   - 行首/文件首可视为语句位置
+---   - `.` `:` `(` `[` `{` `,` `=` 后不是语句位置
+---   - 标识符字符后不是语句位置
+---@param param Feature.Completion.Param
+---@return boolean
+local function isStatementPosition(param)
+    local _, wordStart = param.scanner:getWordBack()
+    local text = param.scanner.text
+
+    local pos = wordStart - 1
+    while pos >= 1 do
+        local ch = text:sub(pos, pos)
+        if ch ~= ' ' and ch ~= '\t' then
+            break
+        end
+        pos = pos - 1
+    end
+
+    if pos < 1 then
+        return true
+    end
+
+    local ch = text:sub(pos, pos)
+    if ch == '\n' or ch == '\r' or ch == ';' then
+        return true
+    end
+    if ch == '.' or ch == ':' or ch == '(' or ch == '[' or ch == '{' or ch == ',' or ch == '=' then
+        return false
+    end
+    if  ch == '_'
+    or (ch >= 'a' and ch <= 'z')
+    or (ch >= 'A' and ch <= 'Z')
+    or (ch >= '0' and ch <= '9') then
+        return false
+    end
+    return true
+end
+
+-- 关键字补全（priority=0，field provider 的 skip() 会阻止本 provider）
+-- 仅在语句位置（block 上下文）才补全关键字
+ls.feature.provider.completion(function (param, action)
+    local word = param.scanner:getWordBack()
+    if word == '' then
+        return
+    end
+
+    -- 只在语句位置补全关键字
+    if not isStatementPosition(param) then
+        return
+    end
+
+    local matches = {}
+    for _, kw in ipairs(LUA_KEYWORDS) do
+        -- 关键字使用前缀匹配（不做模糊匹配）
+        if kw:sub(1, #word) == word then
+            matches[#matches+1] = kw
+        end
+    end
+    table.sort(matches, ls.util.stringLess)
+
+    for _, kw in ipairs(matches) do
+        action.push {
+            label = kw,
+            kind  = ls.spec.CompletionItemKind.Keyword,
+        }
+    end
+end)
+
 -- 当前作用域内的局部变量补全（priority=0）
 ls.feature.provider.completion(function (param, action)
     local source = param.sources[1]
@@ -56,9 +144,18 @@ ls.feature.provider.completion(function (param, action)
     local names  = {}
     for _, loc in ipairs(locals) do
         local name = loc.id
+        -- 跳过 Lua 内部隐式局部变量
+        if name == '_ENV' then
+            goto continue
+        end
+        -- 跳过当前正在定义的变量自身（光标在其定义 AST 节点范围内）
+        if loc.start <= param.offset and loc.finish >= param.offset then
+            goto continue
+        end
         if ls.util.stringSimilar(word, name, true) then
             names[#names+1] = name
         end
+        ::continue::
     end
     table.sort(names, ls.util.stringLess)
 

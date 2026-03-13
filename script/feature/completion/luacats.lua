@@ -143,6 +143,145 @@ ls.feature.provider.completion(function (param, action)
     end
 end, 20)
 
+---@param argHead string
+---@return integer
+local function countArgsOutsideTables(argHead)
+    local count = 1
+    local braceDepth = 0
+    for i = 1, #argHead do
+        local ch = argHead:sub(i, i)
+        if ch == '{' then
+            braceDepth = braceDepth + 1
+        elseif ch == '}' then
+            if braceDepth > 0 then
+                braceDepth = braceDepth - 1
+            end
+        elseif ch == ',' and braceDepth == 0 then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+---@param argHead string
+---@return string? content
+---@return integer braceDepth
+local function currentTableContent(argHead)
+    local braceDepth = 0
+    local startPos
+    for i = 1, #argHead do
+        local ch = argHead:sub(i, i)
+        if ch == '{' then
+            braceDepth = braceDepth + 1
+            if braceDepth == 1 then
+                startPos = i
+            end
+        elseif ch == '}' and braceDepth > 0 then
+            braceDepth = braceDepth - 1
+        end
+    end
+    if not startPos or braceDepth <= 0 then
+        return nil, braceDepth
+    end
+    return argHead:sub(startPos + 1), braceDepth
+end
+
+-- `f({<??>})` 属性补全：根据 `---@param x Class` 推导 Class 字段
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local fnName, argHead = left:match('([%w_%.:]+)%s*%(([^()]*)$')
+    if not fnName then
+        return
+    end
+
+    local tableContent, braceDepth = currentTableContent(argHead)
+    if tableContent and braceDepth > 1 then
+        action.skip()
+        return
+    end
+    if not tableContent or braceDepth ~= 1 then
+        return
+    end
+
+    -- `f({aaa <??>})` 这种非法键位不做补全
+    if tableContent:match('^%s*[%w_]+%s+$') then
+        return
+    end
+
+    fnName = fnName:gsub(':', '.')
+    local argIndex = countArgsOutsideTables(argHead)
+
+    local params, paramTypes = util.findFunctionDocParamTypes(text, fnName)
+    if not params or not paramTypes then
+        return
+    end
+    local pName = params[argIndex]
+    if not pName then
+        return
+    end
+
+    local pType = paramTypes[pName]
+    if not pType then
+        return
+    end
+    local typeName = pType:match('^([%w_%.]+)%??$')
+    if not typeName then
+        return
+    end
+
+    local typeNode = param.scope.rt.type(typeName)
+    if not typeNode or not typeNode:isClassLike() then
+        return
+    end
+
+    local expectValue = typeNode.expectValue
+    if not expectValue then
+        return
+    end
+    local keys = expectValue.keys
+    if not keys then
+        return
+    end
+
+    local used = {}
+    local allNames = {}
+    for name in tableContent:gmatch('([%w_]+)%s*=') do
+        used[name] = true
+    end
+
+    for _, keyNode in ipairs(keys) do
+        if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
+            allNames[keyNode.literal] = true
+        end
+    end
+
+    local tailIdent = tableContent:match('([%w_]+)%s*$')
+    if  tailIdent
+    and not tableContent:match('[=,]%s*$')
+    and allNames[tailIdent] then
+        return
+    end
+
+    local word = tableContent:match('([%w_]*)$') or ''
+
+    action.skip()
+    for _, keyNode in ipairs(keys) do
+        if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
+            local name = keyNode.literal
+            ---@cast name string
+            if not used[name] and (word == '' or name:sub(1, #word) == word) then
+                action.push {
+                    label = name,
+                    kind = ls.spec.CompletionItemKind.Property,
+                }
+            end
+        end
+    end
+end, 18)
+
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
     local textOffset = util.toTextOffset(text, param.offset, param)

@@ -91,6 +91,12 @@ Known open points:
 
 For multi-condition `if` blocks using `and/or`, keep project-consistent aligned layout.
 
+## 9) Debugging Workflow Rule
+
+- When needed, prefer VSCode-Operator tools to inspect LSP information and drive debugger-based flow tracing.
+- Before starting a new debugger run, always stop/disconnect any existing debugger session first.
+- Always stop/disconnect debugger sessions after use to avoid stale sessions affecting later tests and diagnosis.
+
 ---
 
 Maintainer note:

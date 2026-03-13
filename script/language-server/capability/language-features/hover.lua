@@ -1,4 +1,4 @@
-local markdown = require 'tools.markdown'
+local hoverUtil = require 'feature.hover-util'
 
 ls.capability.registerCapability.hoverProvider = true
 
@@ -18,21 +18,17 @@ ls.capability.register('textDocument/hover', function (server, params, task)
         return
     end
 
-    local type = scope.vm:getNode(source)
-    local view
-    if type then
-        view = type:view()
-    else
-        view = source.code
+    local view = hoverUtil.getSourceView(scope, source)
+    local value = hoverUtil.toLuaCodeBlock(view)
+    if not value then
+        return
     end
 
     ---@type LSP.Hover
     local hover = {
         contents = {
             kind  = 'markdown',
-            value = markdown.create()
-                : append('lua', view)
-                : string(),
+            value = value,
         },
         range = converter:range(source.start, source.finish)
     }

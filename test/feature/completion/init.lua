@@ -22,14 +22,18 @@ function TEST_COMPLETION(script)
             if results == nil or #results == 0 then
                 return
             end
-            error(string.format('期望无补全结果，但得到了 %d 个：%s', #results, ls.inspect(results)))
+            error(string.format('期望无补全结果，但得到了 %d 个：%s\n脚本片段:\n%s', #results, ls.inspect(results), script))
         end
         -- EXISTS 表示期望有结果（不关心具体内容）
         if expects == EXISTS then
             if results and #results > 0 then
                 return
             end
-            error('期望有补全结果，但结果为空')
+            error(string.format('期望有补全结果，但结果为空\n脚本片段:\n%s', script))
+        end
+        if type(expects) == 'table' and expects.include == true then
+            expects = table.move(expects, 1, #expects, 1, {})
+            expects[IGNORE_REST] = true
         end
         -- 精确匹配列表
         Match(results, expects, true)

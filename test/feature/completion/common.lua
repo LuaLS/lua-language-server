@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global
+
 local define = require 'proto.define'
 local config = require 'config'
 

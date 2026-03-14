@@ -492,6 +492,18 @@ local function normalizeEnumLiteral(literal)
     return literal
 end
 
+---@param start integer
+---@param finish integer
+---@param newText string
+---@return any
+local function makeLegacyTextEdit(start, finish, newText)
+    return {
+        start = start,
+        finish = finish,
+        newText = newText,
+    }
+end
+
 ---@param text string
 ---@param fnName string
 ---@param argHead string
@@ -565,6 +577,9 @@ ls.feature.provider.completion(function (param, action)
     if not pType then
         return
     end
+    if not argHead then
+        return
+    end
 
     local inTableArg = argHead:find('{', 1, true) ~= nil
     if not inTableArg and normalizeTypeExpr(pType):match('%[%]$') then
@@ -612,11 +627,7 @@ ls.feature.provider.completion(function (param, action)
         action.push {
             label = label,
             kind = ls.spec.CompletionItemKind.EnumMember,
-            textEdit = {
-                start = editStart,
-                finish = editFinish,
-                newText = label,
-            },
+            textEdit = makeLegacyTextEdit(editStart, editFinish, label),
         }
         ::continue::
     end
@@ -862,11 +873,7 @@ ls.feature.provider.completion(function (param, action)
     action.push {
         label = funTypeLabel,
         kind = ls.spec.CompletionItemKind.Function,
-        textEdit = {
-            start = editStart,
-            finish = editFinish,
-            newText = newText,
-        }
+        textEdit = makeLegacyTextEdit(editStart, editFinish, newText),
     }
 end, 17)
 
@@ -920,11 +927,7 @@ ls.feature.provider.completion(function (param, action)
         action.push {
             label = label,
             kind = ls.spec.CompletionItemKind.EnumMember,
-            textEdit = {
-                start = editStart,
-                finish = editFinish,
-                newText = label,
-            },
+            textEdit = makeLegacyTextEdit(editStart, editFinish, label),
         }
         ::continue::
     end
@@ -980,11 +983,7 @@ ls.feature.provider.completion(function (param, action)
         local item = {
             label = label,
             kind = ls.spec.CompletionItemKind.EnumMember,
-            textEdit = {
-                start = editStart,
-                finish = editFinish,
-                newText = label,
-            },
+            textEdit = makeLegacyTextEdit(editStart, editFinish, label),
         }
         action.push(item)
         ::continue::

@@ -21,10 +21,6 @@ local function getObjectNameBack(text, endOffset)
     return name
 end
 
----@param text string
----@param objName string
----@param textOffset integer
----@return string?
 local function inferObjectTypeByText(text, objName, textOffset)
     local left = text:sub(1, textOffset)
     local callName
@@ -49,6 +45,31 @@ local function inferObjectTypeByText(text, objName, textOffset)
     return returnType
 end
 
+---@param text string
+---@param objName string
+---@return string[]
+local function inferTypedStringKeyTableLiteralKeys(text, objName)
+    local escapedName = objName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    for typeExpr, localName, body in text:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+([%w_]+)%s*=%s*{(.-)}') do
+        if localName == objName then
+            local normalized = util.trim(typeExpr):gsub('%s+', '')
+            if normalized:match('^table<string,.+>$') then
+                local keys = {}
+                local seen = {}
+                for key in body:gmatch('([%w_]+)%s*=') do
+                    if not seen[key] then
+                        seen[key] = true
+                        keys[#keys+1] = key
+                    end
+                end
+                table.sort(keys, ls.util.stringLess)
+                return keys
+            end
+        end
+    end
+    return {}
+end
+
 ---@param ast any
 ---@param textOffset integer
 ---@return any
@@ -71,8 +92,10 @@ end
 ---@param trigger string
 ---@return integer
 local function fieldCompletionKind(fieldNode, trigger)
-    local valueNode = fieldNode and fieldNode.value or nil
-    if util.hasFunctionNode(valueNode) then
+    if fieldNode and fieldNode.kind == 'field' then
+        return ls.spec.CompletionItemKind.Field
+    end
+    if util.hasFunctionNode(fieldNode) then
         return trigger == ':'
             and ls.spec.CompletionItemKind.Method
             or  ls.spec.CompletionItemKind.Function
@@ -80,9 +103,6 @@ local function fieldCompletionKind(fieldNode, trigger)
     return ls.spec.CompletionItemKind.Field
 end
 
----@param node Node?
----@param trigger string
----@return integer
 local function runtimeFieldCompletionKind(node, trigger)
     if not node then
         return ls.spec.CompletionItemKind.Field
@@ -121,6 +141,45 @@ local function appendFieldsFromTable(tableNode, word, matches, seen)
             end
         end
     end
+end
+
+---@param tableNode Node.Table?
+---@param intMatches {literal: integer, valueNode: Node?}[]
+local function appendIntegerFieldsFromTable(tableNode, intMatches)
+    if not tableNode then
+        return
+    end
+    local keys = tableNode.keys
+    local valueMap = tableNode.valueMap
+    if not keys then
+        return
+    end
+    for _, keyNode in ipairs(keys) do
+        if keyNode.kind == 'value' and math.type(keyNode.literal) == 'integer' then
+            local lit = keyNode.literal
+            ---@cast lit integer
+            intMatches[#intMatches+1] = {
+                literal   = lit,
+                valueNode = valueMap and valueMap[lit] or nil,
+            }
+        end
+    end
+end
+
+---@param node Node?
+---@param intMatches {literal: integer, valueNode: Node?}[]
+local function appendIntegerFieldsFromNode(node, intMatches)
+    if not node then
+        return
+    end
+    node:each('table', function (tableNode)
+        ---@cast tableNode Node.Table
+        appendIntegerFieldsFromTable(tableNode, intMatches)
+    end, {})
+    node:each('type', function (typeNode)
+        ---@cast typeNode Node.Type
+        appendIntegerFieldsFromTable(typeNode.fieldTable, intMatches)
+    end, {})
 end
 
 ---@param node Node?
@@ -261,6 +320,11 @@ ls.feature.provider.completion(function (param, action)
     if not document then
         return
     end
+
+    -- collect integer-key completions (only on '.' trigger with empty word)
+    local intMatches = {}
+    local intSeen   = {}
+
     local objSources = document:findSources(objEnd)
     if (not objSources or #objSources == 0) and objEnd > 1 then
         objSources = document:findSources(objEnd - 1)
@@ -311,6 +375,24 @@ ls.feature.provider.completion(function (param, action)
         appendFieldsFromNode(objVar:getStaticValue(), word, matches, seen)
     end
 
+    if trigger == '.' and word == '' then
+        appendIntegerFieldsFromNode(objNode, intMatches)
+        if objVar then
+            appendIntegerFieldsFromNode(objVar:getCurrentValue(), intMatches)
+            appendIntegerFieldsFromNode(objVar:getGuessValue(), intMatches)
+            appendIntegerFieldsFromNode(objVar:getStaticValue(), intMatches)
+        end
+        -- deduplicate integer matches
+        local deduped = {}
+        for _, item in ipairs(intMatches) do
+            if not intSeen[item.literal] then
+                intSeen[item.literal] = true
+                deduped[#deduped+1] = item
+            end
+        end
+        intMatches = deduped
+    end
+
     local objTypeName = getTypeName(objNode)
                     or (objVar and getTypeName(objVar:getCurrentValue()) or nil)
                     or (objVar and getTypeName(objVar:getGuessValue()) or nil)
@@ -342,6 +424,11 @@ ls.feature.provider.completion(function (param, action)
                             appendFieldsFromNode(objVar:getCurrentValue(), word, matches, seen)
                             appendFieldsFromNode(objVar:getGuessValue(), word, matches, seen)
                             appendFieldsFromNode(objVar:getStaticValue(), word, matches, seen)
+                            if trigger == '.' and word == '' then
+                                appendIntegerFieldsFromNode(objVar:getCurrentValue(), intMatches)
+                                appendIntegerFieldsFromNode(objVar:getGuessValue(), intMatches)
+                                appendIntegerFieldsFromNode(objVar:getStaticValue(), intMatches)
+                            end
                             break
                         end
                     end
@@ -412,53 +499,208 @@ ls.feature.provider.completion(function (param, action)
                 end)
             end
         end
-        if #matches == 0 then
+        if #matches == 0 and #intMatches == 0 then
             return
         end
     end
 
+    if #matches == 0 and #intMatches == 0 then
+        return
+    end
+
     action.skip()
 
+    local outItems = {}
+    local function emit(item)
+        outItems[#outItems+1] = item
+    end
+
+    -- push integer-key items with a textEdit that replaces '.' with '[N]'
+    if trigger == '.' and #intMatches > 0 then
+        table.sort(intMatches, function (a, b) return a.literal < b.literal end)
+        local dotDisplayOffset = util.toDisplayOffset(param, objEnd)
+        for _, item in ipairs(intMatches) do
+            emit {
+                label = tostring(item.literal),
+                kind  = ls.spec.CompletionItemKind.Field,
+                textEdit = {
+                    start  = dotDisplayOffset,
+                    finish = param.offset,
+                    newText = string.format('[%d]', item.literal),
+                },
+            }
+        end
+    end
+
     for _, item in ipairs(matches) do
-        local functionKind = fieldCompletionKind(item.valueNode, trigger)
+        local baseKind = fieldCompletionKind(item.valueNode, trigger)
+        local functionKind = baseKind
+        local functionValueNode = item.valueNode
+        local rawValueNode = item.valueNode and item.valueNode.kind == 'field' and item.valueNode.value or nil
+
+        if rawValueNode and rawValueNode.kind == 'variable' then
+            functionValueNode = rawValueNode
+            local funcs = util.collectFunctionNodes(rawValueNode)
+            if #funcs > 0 then
+                local firstParam = funcs[1].paramsDef[1]
+                if firstParam and firstParam.key == 'self' then
+                    functionKind = ls.spec.CompletionItemKind.Method
+                else
+                    functionKind = ls.spec.CompletionItemKind.Function
+                end
+            end
+        end
+
         if functionKind == ls.spec.CompletionItemKind.Field then
             local objVar = param.scope.vm:getVariable(objSource)
             if objVar then
                 local childVar = objVar:getChild(item.name)
-                local childValue = childVar:getCurrentValue()
-                                or childVar:getGuessValue()
-                                or childVar:getStaticValue()
-                if childValue and childValue.kind == 'field' then
-                    ---@cast childValue Node.Field
-                    childValue = childValue.value and childValue.value.truly or nil
-                end
-                functionKind = runtimeFieldCompletionKind(childValue, trigger)
-                if functionKind == ls.spec.CompletionItemKind.Field and childVar:hasAssign() then
-                    for assign in childVar:eachAssign() do
-                        ---@cast assign Node.Field
-                        if assign.value and util.hasFunctionNode(assign.value) then
-                            functionKind = trigger == ':'
-                                and ls.spec.CompletionItemKind.Method
-                                or  ls.spec.CompletionItemKind.Function
-                            break
+                if childVar:hasAssign() then
+                    local childValue = childVar:getCurrentValue()
+                                    or childVar:getGuessValue()
+                                    or childVar:getStaticValue()
+                    if childValue and childValue.kind == 'field' then
+                        ---@cast childValue Node.Field
+                        childValue = childValue.value and childValue.value.truly or nil
+                    end
+                    if childValue then
+                        functionValueNode = childValue
+                    end
+                    functionKind = runtimeFieldCompletionKind(childValue, trigger)
+                    if functionKind == ls.spec.CompletionItemKind.Field then
+                        for assign in childVar:eachAssign() do
+                            ---@cast assign Node.Field
+                            if assign.value and util.hasFunctionNode(assign.value) then
+                                functionValueNode = assign.value
+                                functionKind = trigger == ':'
+                                    and ls.spec.CompletionItemKind.Method
+                                    or  ls.spec.CompletionItemKind.Function
+                                break
+                            end
                         end
                     end
                 end
             end
         end
 
-        if trigger ~= ':' or functionKind == ls.spec.CompletionItemKind.Field then
-            action.push {
-                label = item.name,
-                kind = ls.spec.CompletionItemKind.Field,
-                description = buildFieldDescription(objTypeName, item.name, item.valueNode),
-            }
+        local signatureLabel
+        local snippetText
+        local classMemberLike = rawValueNode and rawValueNode.kind == 'variable'
+        if classMemberLike and functionKind ~= ls.spec.CompletionItemKind.Field and functionValueNode then
+            local funcs = util.collectFunctionNodes(functionValueNode)
+            if #funcs > 0 then
+                local label
+                label, snippetText = util.buildFunctionSignature(item.name, funcs[1])
+                if trigger == ':' then
+                    signatureLabel = item.name .. '()'
+                else
+                    signatureLabel = label
+                end
+            end
         end
-        if functionKind ~= ls.spec.CompletionItemKind.Field then
-            action.push {
-                label = item.name .. '()',
-                kind = functionKind,
+        if not snippetText and signatureLabel then
+            snippetText = signatureLabel
+        end
+
+        if trigger == ':' then
+            if functionKind ~= ls.spec.CompletionItemKind.Field or util.hasFunctionNode(item.valueNode) then
+                emit {
+                    label = signatureLabel or item.name,
+                    kind  = functionKind,
+                    insertText = functionKind ~= ls.spec.CompletionItemKind.Field and item.name or nil,
+                }
+            end
+        elseif baseKind == ls.spec.CompletionItemKind.Field
+            and functionKind ~= ls.spec.CompletionItemKind.Field
+            and not util.hasFunctionNode(item.valueNode) then
+            emit {
+                label = item.name,
+                kind  = ls.spec.CompletionItemKind.Field,
             }
+            emit {
+                label = signatureLabel or (item.name .. '()'),
+                kind  = functionKind,
+                insertText = item.name,
+            }
+            if objTypeName and objTypeName:find('.', 1, true) then
+                emit {
+                    label = signatureLabel or (item.name .. '()'),
+                    kind  = ls.spec.CompletionItemKind.Snippet,
+                    insertText = snippetText or signatureLabel or (item.name .. '()'),
+                }
+            end
+        else
+            emit {
+                label = signatureLabel or item.name,
+                kind  = functionKind,
+                insertText = functionKind ~= ls.spec.CompletionItemKind.Field and item.name or nil,
+            }
+            if trigger == '.' and objTypeName and objTypeName:find('.', 1, true) and functionKind ~= ls.spec.CompletionItemKind.Field then
+                emit {
+                    label = signatureLabel or item.name,
+                    kind  = ls.spec.CompletionItemKind.Snippet,
+                    insertText = snippetText or signatureLabel or (item.name .. '()'),
+                }
+            end
         end
     end
+
+    local function rank(kind)
+        if trigger == ':' then
+            if kind == ls.spec.CompletionItemKind.Method then
+                return 1
+            end
+            if kind == ls.spec.CompletionItemKind.Function then
+                return 2
+            end
+            return 3
+        end
+        if kind == ls.spec.CompletionItemKind.Field then
+            return 1
+        end
+        if kind == ls.spec.CompletionItemKind.Function then
+            return 2
+        end
+        if kind == ls.spec.CompletionItemKind.Method then
+            return 3
+        end
+        return 4
+    end
+
+    table.sort(outItems, function (a, b)
+        local ra = rank(a.kind)
+        local rb = rank(b.kind)
+        if ra ~= rb then
+            return ra < rb
+        end
+        return ls.util.stringLess(a.label, b.label)
+    end)
+
+    for _, item in ipairs(outItems) do
+        action.push(item)
+    end
 end, 10)
+
+ls.feature.provider.completion(function (param, action)
+    local trigger, objEnd = param.scanner:getFieldTriggerBack()
+    if trigger ~= '.' then
+        return
+    end
+    local objName = getObjectNameBack(param.scanner.text, objEnd)
+    if not objName then
+        return
+    end
+
+    local keys = inferTypedStringKeyTableLiteralKeys(param.scanner.text, objName)
+    if #keys == 0 then
+        return
+    end
+
+    action.skip()
+    for _, key in ipairs(keys) do
+        action.push {
+            label = key,
+            kind  = ls.spec.CompletionItemKind.Enum,
+        }
+    end
+end, 9)

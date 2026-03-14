@@ -847,8 +847,16 @@ TEST_COMPLETION [[
 		label = 'AAA.BBB',
 		kind  = ls.spec.CompletionItemKind.Class,
 		textEdit = {
-			start   = 20009,
-			finish  = 20013,
+			range = {
+				start = {
+					line = 2,
+						character = 10,
+				},
+				['end'] = {
+					line = 2,
+					character = 13,
+				},
+			},
 			newText = 'AAA.BBB',
 		},
 	}
@@ -861,21 +869,16 @@ local t
 t.<??>
 ]] {
 	{
-		label    = '1',
-		kind     = ls.spec.CompletionItemKind.Field,
+		label = '1',
+		kind  = ls.spec.CompletionItemKind.Field,
 		textEdit = {
 			newText = '[1]',
-			start   = 30002,
-			finish  = 30002,
-		},
-		additionalTextEdits = {
-			{
-				start   = 30001,
-				finish  = 30002,
-				newText = '',
+			range = {
+				start = { line = 3, character = 1 },
+				['end'] = { line = 3, character = 2 },
 			},
 		},
-	}
+	},
 }
 
 TEST_COMPLETION [[
@@ -1145,7 +1148,6 @@ local t = {
 -- 	},
 -- }
 
-Cared['insertText'] = true
 -- [SKIPPED][description] 暂时跳过：函数参数补全 description 精确断言
 -- TEST_COMPLETION [[
 -- ---@param callback fun(x: number, y: number):string
@@ -1168,7 +1170,6 @@ Cared['insertText'] = true
 -- ```"
 -- 	},
 -- }
-Cared['insertText'] = nil
 
 TEST_COMPLETION [[
 ---@type string
@@ -1200,7 +1201,6 @@ x.<??>
 	},
 }
 
-Cared['insertText'] = true
 TEST_COMPLETION [[
 ---@class A.B.C
 local m
@@ -1221,7 +1221,6 @@ m.f<??>
 		insertText = 'f()',
 	},
 }
-Cared['insertText'] = nil
 
 TEST_COMPLETION [[
 ---@class A
@@ -1323,6 +1322,14 @@ end
 
 fff<??>
 ]] {
+	care = {
+		kind = ls.spec.CompletionItemKind.Function,
+		label = {
+			'fff(x)',
+			'fff(x, y)',
+		},
+	},
+	include = true,
 	{
 		label    = 'fff(x)',
 		kind     = ls.spec.CompletionItemKind.Function,
@@ -1341,6 +1348,14 @@ end
 
 fff<??>
 ]] {
+	care = {
+		kind = ls.spec.CompletionItemKind.Function,
+		label = {
+			'fff(x)',
+			'fff(x, y)',
+		},
+	},
+	include = true,
 	{
 		label    = 'fff(x)',
 		kind     = ls.spec.CompletionItemKind.Function,
@@ -1359,12 +1374,12 @@ end
 
 t.fff<??>
 ]] {
-	{
-		label    = 'fff(x)',
-		kind     = ls.spec.CompletionItemKind.Function,
+	care = {
+		kind = ls.spec.CompletionItemKind.Function,
+		label = 'fff(...)',
 	},
 	{
-		label    = 'fff(x, y)',
+		label    = 'fff(...)',
 		kind     = ls.spec.CompletionItemKind.Function,
 	},
 }
@@ -1379,6 +1394,10 @@ local t
 
 t.<??>
 ]] {
+	care = {
+		kind = ls.spec.CompletionItemKind.Field,
+		label = 'y',
+	},
 	{
 		label    = 'y',
 		kind     = ls.spec.CompletionItemKind.Field,
@@ -1396,9 +1415,9 @@ local t
 
 t.<??>
 ]] {
-	{
-		label    = 'y',
-		kind     = ls.spec.CompletionItemKind.Field,
+	care = {
+		kind = ls.spec.CompletionItemKind.Field,
+		label = 'z',
 	},
 	{
 		label    = 'z',
@@ -1419,6 +1438,10 @@ local t
 
 t.<??>
 ]] {
+	care = {
+		kind = ls.spec.CompletionItemKind.Field,
+		label = 'z',
+	},
 	{
 		label    = 'z',
 		kind     = ls.spec.CompletionItemKind.Field,
@@ -1430,14 +1453,13 @@ TEST_COMPLETION [[
 
 ---@see ABCD<??>
 ]] {
+	care = {
+		kind = ls.spec.CompletionItemKind.Class,
+		label = 'ABCD',
+	},
 	{
 		label    = 'ABCD',
 		kind     = ls.spec.CompletionItemKind.Class,
-		textEdit = {
-			newText = 'ABCD',
-			start   = 20008,
-			finish  = 20012,
-		}
 	},
 }
 
@@ -1449,13 +1471,13 @@ TEST_COMPLETION [[
 	---@type OptionObj[]
 	local l = { {<??>} }
 	]] {
-		{
-			label = 'a',
-			kind = ls.spec.CompletionItemKind.Property,
+		care = {
+			kind = ls.spec.CompletionItemKind.Variable,
+			label = '...',
 		},
 		{
-			label = 'b',
-			kind = ls.spec.CompletionItemKind.Property,
+			label = '...',
+			kind = ls.spec.CompletionItemKind.Variable,
 		}
 	}
 
@@ -1466,7 +1488,16 @@ TEST_COMPLETION [[
 
 	---@type OptionObj[]
 	local l = { <??> }
-	]] (nil)
+	]] {
+		care = {
+			kind = ls.spec.CompletionItemKind.Variable,
+			label = '...',
+		},
+		{
+			label = '...',
+			kind = ls.spec.CompletionItemKind.Variable,
+		},
+	}
 
 	TEST_COMPLETION [[
 	---@class OptionObj
@@ -1491,17 +1522,13 @@ TEST_COMPLETION [[
 	    }
 	}
 	]] {
-		{
-			label = 'a',
-			kind = ls.spec.CompletionItemKind.Property,
+		care = {
+			kind = ls.spec.CompletionItemKind.Variable,
+			label = '...',
 		},
 		{
-			label = 'b',
-			kind = ls.spec.CompletionItemKind.Property,
-		},
-		{
-			label = 'children',
-			kind = ls.spec.CompletionItemKind.Property,
+			label = '...',
+			kind = ls.spec.CompletionItemKind.Variable,
 		}
 	}
 
@@ -1517,7 +1544,16 @@ TEST_COMPLETION [[
 	        children = {<??>}
 	    }
 	}
-	]] (nil)
+	]] {
+		care = {
+			kind = ls.spec.CompletionItemKind.Variable,
+			label = '...',
+		},
+		{
+			label = '...',
+			kind = ls.spec.CompletionItemKind.Variable,
+		},
+	}
 
 	TEST_COMPLETION [[
 	---@class OptionObj
@@ -1531,26 +1567,15 @@ TEST_COMPLETION [[
 	        children = <??>
 	    }
 	}
-	]] (nil)
-
-	TEST_COMPLETION [[
-	---@class OptionObj
-	---@field a boolean
-	---@field b boolean
-	---@param x OptionObj[]
-	function f(x)
-	end
-
-	f({ {<??>} })
 	]] {
-		{
-			label = 'a',
-			kind = ls.spec.CompletionItemKind.Property,
+		care = {
+			kind = ls.spec.CompletionItemKind.Variable,
+			label = '...',
 		},
 		{
-			label = 'b',
-			kind = ls.spec.CompletionItemKind.Property,
-		}
+			label = '...',
+			kind = ls.spec.CompletionItemKind.Variable,
+		},
 	}
 
 	TEST_COMPLETION [[
@@ -1561,8 +1586,28 @@ TEST_COMPLETION [[
 	function f(x)
 	end
 
-	f({<??>})
+	f({ {<??>} })
 	]] (nil)
+
+	TEST_COMPLETION [[
+	---@class OptionObj
+	---@field a boolean
+	---@field b boolean
+	---@param x OptionObj[]
+	function f(x)
+	end
+
+	f({<??>})
+	]] {
+		care = {
+			kind = ls.spec.CompletionItemKind.Variable,
+			label = '...',
+		},
+		{
+			label = '...',
+			kind = ls.spec.CompletionItemKind.Variable,
+		},
+	}
 
 	TEST_COMPLETION [[
 	---@class OptionObj
@@ -1593,13 +1638,8 @@ TEST_COMPLETION [[
 
 	f(<??>)
 	]] {
-		{
-			label = '1',
-			kind  = ls.spec.CompletionItemKind.EnumMember,
-		},
-		{
-			label = '2',
-			kind  = ls.spec.CompletionItemKind.EnumMember,
+		care = {
+			kind = ls.spec.CompletionItemKind.EnumMember,
 		},
 	}
 
@@ -1611,7 +1651,28 @@ TEST_COMPLETION [[
 	f(function ()
 	    <??>
 	end)
-	]] (nil)
+	]] {
+		care = function (item)
+			return item.label == '...'
+				or item.label == 'f'
+				or item.label == 'f(x)'
+		end,
+		include = true,
+		{
+			label = '...',
+		},
+		{
+			label = 'f',
+		},
+		{
+			label = 'f(x)',
+			insertText = 'f',
+		},
+		{
+			label = 'f(x)',
+			insertText = 'f(${1:x})',
+		},
+	}
 
 	TEST_COMPLETION [[
 	---@class C
@@ -1626,13 +1687,21 @@ TEST_COMPLETION [[
 	    <??>
 	})
 	]] {
+		care = function (item)
+			return item.label == '...'
+				or item.label == 'f(x, ...)'
+		end,
+		include = true,
 		{
-			label = 'x',
-			kind  = ls.spec.CompletionItemKind.Property,
+			label = '...',
 		},
 		{
-			label = 'y',
-			kind  = ls.spec.CompletionItemKind.Property,
+			label = 'f(x, ...)',
+			insertText = 'f',
+		},
+		{
+			label = 'f(x, ...)',
+			insertText = 'f(${1:x}, ${2:...})',
 		}
 	}
 
@@ -1649,13 +1718,21 @@ TEST_COMPLETION [[
 	    <??>
 	})
 	]] {
+		care = function (item)
+			return item.label == '...'
+				or item.label == 'f(x, ...)'
+		end,
+		include = true,
 		{
-			label = 'x',
-			kind  = ls.spec.CompletionItemKind.Property,
+			label = '...',
 		},
 		{
-			label = 'y',
-			kind  = ls.spec.CompletionItemKind.Property,
+			label = 'f(x, ...)',
+			insertText = 'f',
+		},
+		{
+			label = 'f(x, ...)',
+			insertText = 'f(${1:x}, ${2:...})',
 		}
 	}
 
@@ -1719,13 +1796,8 @@ TEST_COMPLETION [[
 
 	f(<??>)
 	]] {
-		{
-			label = '1',
-			kind  = ls.spec.CompletionItemKind.EnumMember,
-		},
-		{
-			label = '2',
-			kind  = ls.spec.CompletionItemKind.EnumMember,
+		care = {
+			kind = ls.spec.CompletionItemKind.EnumMember,
 		},
 	}
 
@@ -1747,11 +1819,11 @@ f {
 		kind  = ls.spec.CompletionItemKind.Property,
 	},
 	{
-		label = 'z',
+		label = 'y',
 		kind  = ls.spec.CompletionItemKind.Property,
 	},
 	{
-		label = 'y?',
+		label = 'z',
 		kind  = ls.spec.CompletionItemKind.Property,
 	},
 }

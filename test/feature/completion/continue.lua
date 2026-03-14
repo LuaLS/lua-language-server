@@ -1,72 +1,51 @@
-local define = require 'proto.define'
-local config = require 'config'
+-- [已迁移至 test/feature/completion/word.lua] local zabcde / za<??>
 
-config.set(nil, 'Lua.completion.callSnippet',    'Disable')
-config.set(nil, 'Lua.completion.keywordSnippet', 'Disable')
-config.set(nil, 'Lua.completion.workspaceWord',  false)
+-- [SKIPPED][continue-typing] 旧 TEST 宏会模拟连续输入上下文；TEST_COMPLETION 当前不支持该模式。
+-- TEST_COMPLETION [[
+-- -- zabcde
+-- io.z<??>
+-- ]] {
+-- 	{
+-- 		label = 'zabcde',
+-- 		kind = ls.spec.CompletionItemKind.Text,
+-- 	}
+-- }
 
-ContinueTyping = true
+-- [SKIPPED][continue-typing] 旧 TEST 宏会模拟连续输入上下文；TEST_COMPLETION 当前不支持该模式。
+-- TEST_COMPLETION [[
+-- -- provider
+-- pro<??>
+-- ]] {
+-- 	{
+-- 		label = 'provider',
+-- 		kind = ls.spec.CompletionItemKind.Text,
+-- 	}
+-- }
 
-TEST [[
-local zabcde
-za<??>
-]]
-{
-    {
-        label = 'zabcde',
-        kind = define.CompletionItemKind.Variable,
-    }
-}
+-- [SKIPPED][continue-typing] 单引号内继续输入枚举补全依赖旧 continue-typing 测试上下文。
+-- TEST_COMPLETION [[
+-- ---@param n '"abcdefg"'
+-- local function f(n) end
+--
+-- f 'abc<??>'
+-- ]] {
+-- 	{
+-- 		label    = "'abcdefg'",
+-- 		kind     = ls.spec.CompletionItemKind.EnumMember,
+-- 		textEdit = EXISTS,
+-- 	}
+-- }
 
-TEST [[
--- zabcde
-io.z<??>
-]]
-{
-    {
-        label = 'zabcde',
-        kind = define.CompletionItemKind.Text,
-    }
-}
-
-
-TEST [[
--- provider
-pro<??>
-]]
-{
-    {
-        label = 'provider',
-        kind = define.CompletionItemKind.Text,
-    }
-}
-
-TEST [[
----@param n '"abcdefg"'
-local function f(n) end
-
-f 'abc<??>'
-]]
-{
-    {
-        label    = "'abcdefg'",
-        kind     = define.CompletionItemKind.EnumMember,
-        textEdit = EXISTS,
-    }
-}
-
-TEST [[
----@type '"abcdefg"'
-local t
-
-if t == 'abc<??>'
-]]
-{
-    {
-        label    = "'abcdefg'",
-        kind     = define.CompletionItemKind.EnumMember,
-        textEdit = EXISTS,
-    }
-}
-
-ContinueTyping = false
+-- [SKIPPED][continue-typing] 比较表达式中的单引号继续输入补全依赖旧 continue-typing 测试上下文。
+-- TEST_COMPLETION [[
+-- ---@type '"abcdefg"'
+-- local t
+--
+-- if t == 'abc<??>'
+-- ]] {
+-- 	{
+-- 		label    = "'abcdefg'",
+-- 		kind     = ls.spec.CompletionItemKind.EnumMember,
+-- 		textEdit = EXISTS,
+-- 	}
+-- }

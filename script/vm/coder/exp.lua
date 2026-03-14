@@ -50,6 +50,9 @@ ls.vm.registerCoderProvider('table', function (coder, source)
     })
 
     for _, field in ipairs(source.fields) do
+        if not field.value then
+            goto CONTINUE
+        end
         coder:withIndentation(function ()
             coder:compile(field)
             coder:addLine('{key}:addField({field})' % {
@@ -57,6 +60,7 @@ ls.vm.registerCoderProvider('table', function (coder, source)
                 field = coder:getKey(field),
             })
         end, field)
+        ::CONTINUE::
     end
 end)
 

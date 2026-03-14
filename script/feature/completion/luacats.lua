@@ -125,6 +125,7 @@ ls.feature.provider.completion(function (param, action)
     action.skip()
     local names = param.scope.vm:getLuaDocTypes()
     local absWordStart = lineStart + wordStart - 1
+    local displayWordStart = util.toDisplayOffset(param, absWordStart)
     for name, kind in pairs(names) do
         if name ~= currentClass and name:sub(1, #typePrefix) == typePrefix then
             local item = {
@@ -133,7 +134,7 @@ ls.feature.provider.completion(function (param, action)
             }
             if name:find('[^%w_]') then
                 item.textEdit = {
-                    start = absWordStart,
+                    start = displayWordStart,
                     finish = param.offset,
                     newText = name,
                 }
@@ -186,6 +187,68 @@ local function currentTableContent(argHead)
     return argHead:sub(startPos + 1), braceDepth
 end
 
+---@param pType string
+---@return string[]
+local function extractInlineTableTypeKeys(pType)
+    local keys = {}
+    local body = pType:match('^%s*{(.-)}%s*%??%s*$')
+    if not body then
+        return keys
+    end
+    local seen = {}
+    for part in body:gmatch('[^,]+') do
+        local name = util.trim(part):match('^([%w_]+)%s*%??%s*:')
+        if name and not seen[name] then
+            seen[name] = true
+            keys[#keys+1] = name
+        end
+    end
+    return keys
+end
+
+---@param text string
+---@param textOffset integer
+---@return string?
+local function findTypedLocalTableClassName(text, textOffset)
+    local left = text:sub(1, textOffset)
+    local varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
+    if not varName then
+        return nil
+    end
+    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local classType
+    for t in left:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+' .. escapedName .. '%s*=') do
+        classType = util.trim(t)
+    end
+    if not classType then
+        return nil
+    end
+    return classType:match('^([%w_%.]+)%??$')
+end
+
+---@param text string
+---@param fnName string
+---@return string?
+local function findOverloadFirstParamType(text, fnName)
+    local escaped = fnName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local fnStart = text:find('local%s+function%s+' .. escaped .. '%s*%(')
+    if not fnStart then
+        fnStart = text:find('function%s+' .. escaped .. '%s*%(')
+    end
+    if not fnStart then
+        return nil
+    end
+    local docHead = text:sub(1, fnStart)
+    local result
+    for overloadArgs in docHead:gmatch('%-%-%-@overload%s+fun%s*%((.-)%)') do
+        local paramType = util.trim(overloadArgs):match('^[%w_]+%s*:%s*(.+)$')
+        if paramType then
+            result = util.trim(paramType)
+        end
+    end
+    return result
+end
+
 -- `f({<??>})` 属性补全：根据 `---@param x Class` 推导 Class 字段
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
@@ -193,6 +256,11 @@ ls.feature.provider.completion(function (param, action)
     local left = text:sub(1, textOffset)
 
     local fnName, argHead = left:match('([%w_%.:]+)%s*%(([^()]*)$')
+    local callWithoutParens = false
+    if not fnName then
+        fnName, argHead = left:match('([%w_%.:]+)%s*({[^()]*)$')
+        callWithoutParens = fnName ~= nil
+    end
     if not fnName then
         return
     end
@@ -212,7 +280,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     fnName = fnName:gsub(':', '.')
-    local argIndex = countArgsOutsideTables(argHead)
+    local argIndex = callWithoutParens and 1 or countArgsOutsideTables(argHead)
 
     local params, paramTypes = util.findFunctionDocParamTypes(text, fnName)
     if not params or not paramTypes then
@@ -227,23 +295,28 @@ ls.feature.provider.completion(function (param, action)
     if not pType then
         return
     end
+    local propNames = {}
     local typeName = pType:match('^([%w_%.]+)%??$')
-    if not typeName then
-        return
-    end
+    if typeName then
+        local typeNode = param.scope.rt.type(typeName)
+        if not typeNode or not typeNode:isClassLike() then
+            return
+        end
 
-    local typeNode = param.scope.rt.type(typeName)
-    if not typeNode or not typeNode:isClassLike() then
-        return
-    end
-
-    local expectValue = typeNode.expectValue
-    if not expectValue then
-        return
-    end
-    local keys = expectValue.keys
-    if not keys then
-        return
+        local expectValue = typeNode.expectValue
+        if not expectValue or not expectValue.keys then
+            return
+        end
+        for _, keyNode in ipairs(expectValue.keys) do
+            if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
+                propNames[#propNames+1] = keyNode.literal
+            end
+        end
+    else
+        propNames = extractInlineTableTypeKeys(pType)
+        if #propNames == 0 then
+            return
+        end
     end
 
     local used = {}
@@ -252,10 +325,8 @@ ls.feature.provider.completion(function (param, action)
         used[name] = true
     end
 
-    for _, keyNode in ipairs(keys) do
-        if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
-            allNames[keyNode.literal] = true
-        end
+    for _, name in ipairs(propNames) do
+        allNames[name] = true
     end
 
     local tailIdent = tableContent:match('([%w_]+)%s*$')
@@ -267,18 +338,126 @@ ls.feature.provider.completion(function (param, action)
 
     local word = tableContent:match('([%w_]*)$') or ''
 
+    table.sort(propNames, ls.util.stringLess)
+
     action.skip()
-    for _, keyNode in ipairs(keys) do
+    for _, name in ipairs(propNames) do
+        if not used[name] and (word == '' or name:sub(1, #word) == word) then
+            action.push {
+                label = name,
+                kind = ls.spec.CompletionItemKind.Property,
+            }
+        end
+    end
+end, 23)
+
+-- `new 'A' { <??> }` 这类构造风格调用，从 overload 的内联表参数补属性
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local fnName, tableContent = left:match('([%w_%.:]+)%s+["\'][^"\'\r\n]*["\']%s*{([^{}]*)$')
+    if not fnName then
+        return
+    end
+
+    local pType = findOverloadFirstParamType(text, fnName:gsub(':', '.'))
+    if not pType then
+        return
+    end
+
+    local propNames = extractInlineTableTypeKeys(pType)
+    if #propNames == 0 then
+        return
+    end
+
+    local used = {}
+    for name in tableContent:gmatch('([%w_]+)%s*=') do
+        used[name] = true
+    end
+    local word = tableContent:match('([%w_]*)$') or ''
+
+    action.skip()
+    for _, name in ipairs(propNames) do
+        if not used[name] and (word == '' or name:sub(1, #word) == word) then
+            action.push {
+                label = name,
+                kind = ls.spec.CompletionItemKind.Property,
+            }
+        end
+    end
+end, 18)
+
+-- `---@type A local t = { <??> }` 属性补全
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+    if not left:match('local%s+[%w_]+%s*=%s*{[^{}]*$') then
+        return
+    end
+
+    local className = findTypedLocalTableClassName(text, textOffset)
+    if not className then
+        return
+    end
+
+    local typeNode = param.scope.rt.type(className)
+    if not typeNode or not typeNode:isClassLike() then
+        return
+    end
+    local expectValue = typeNode.expectValue
+    if not expectValue or not expectValue.keys then
+        return
+    end
+    local fieldTable = typeNode.fieldTable or expectValue
+    local rt = param.scope.rt
+
+    local used = {}
+    for name in left:gmatch('([%w_]+)%s*=') do
+        used[name] = true
+    end
+
+    local items = {}
+    local pushed = {}
+    for _, keyNode in ipairs(expectValue.keys) do
         if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
             local name = keyNode.literal
             ---@cast name string
-            if not used[name] and (word == '' or name:sub(1, #word) == word) then
-                action.push {
-                    label = name,
-                    kind = ls.spec.CompletionItemKind.Property,
+            if not used[name] and not pushed[name] then
+                pushed[name] = true
+                local fieldKey = rt.nodeKey(keyNode)
+                local field = fieldTable.fieldMap and fieldTable.fieldMap[fieldKey] or nil
+                local label = name
+                if field and field.optional then
+                    label = label .. '?'
+                end
+                items[#items+1] = {
+                    label = label,
+                    name = name,
+                    optional = field and field.optional == true or false,
                 }
             end
         end
+    end
+    if #items == 0 then
+        return
+    end
+
+    table.sort(items, function (a, b)
+        if a.optional ~= b.optional then
+            return not a.optional
+        end
+        return ls.util.stringLess(a.name, b.name)
+    end)
+
+    action.skip()
+    for _, item in ipairs(items) do
+        action.push {
+            label = item.label,
+            kind = ls.spec.CompletionItemKind.Property,
+        }
     end
 end, 18)
 

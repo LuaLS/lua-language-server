@@ -69,11 +69,12 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
 
     local field = coder:getKey(source)
     coder:addLine([[
-{field} = rt.field({key}, {value}):setLocation {location}
+{field} = rt.field({key}, {value}, {optional}):setLocation {location}
 ]] % {
         field = field,
         key = key,
         value = value,
+        optional = source.optional,
         location = coder:makeLocationCode(source),
     })
 

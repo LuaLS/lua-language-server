@@ -104,8 +104,239 @@ local function inferEnumTypeFromTypedTableLiteral(text, textOffset)
     return nil
 end
 
+---@param text string
+---@param className string
+---@param fieldName string
+---@return string?
+local function findClassFieldTypeInText(text, className, fieldName)
+    local inClass = false
+    for line in text:gmatch('[^\r\n]+') do
+        local thisClass = line:match('^%s*%-%-%-%s*@class%s+([%w_%.]+)')
+        if thisClass then
+            inClass = (thisClass == className)
+            goto continue
+        end
+        if not inClass then
+            goto continue
+        end
+
+        local thisField, thisType = line:match('^%s*%-%-%-%s*@field%s+([%w_]+)%s+(.+)$')
+        if thisField then
+            if thisField == fieldName then
+                return util.trim(thisType)
+            end
+            goto continue
+        end
+
+        if line:match('^%s*%-%-%-%s*@') then
+            goto continue
+        end
+        if line:match('^%s*%-%-%-') then
+            goto continue
+        end
+        inClass = false
+        ::continue::
+    end
+    return nil
+end
+
+---@param text string
+---@param textOffset integer
+---@return string?
+local function inferEnumTypeFromTypedClassFieldLiteral(text, textOffset)
+    local left = text:sub(1, textOffset)
+    local varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
+    if not varName then
+        return nil
+    end
+    local fieldName = left:match('([%w_]+)%s*=%s*["\'][^"\'\r\n]*$')
+                  or left:match('([%w_]+)%s*=%s*$')
+    if not fieldName then
+        return nil
+    end
+
+    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local classType
+    for t in left:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+' .. escapedName .. '%s*=') do
+        classType = normalizeTypeExpr(t)
+    end
+    if not classType or classType:find('|', 1, true) then
+        return nil
+    end
+
+    return findClassFieldTypeInText(text, classType, fieldName)
+end
+
+---@param text string
+---@param textOffset integer
+---@return string? classType
+---@return string? fieldName
+local function inferTypedClassFieldLiteralContext(text, textOffset)
+    local left = text:sub(1, textOffset)
+    local varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
+    if not varName then
+        return nil, nil
+    end
+    local fieldName = left:match('([%w_]+)%s*=%s*["\'][^"\'\r\n]*$')
+                  or left:match('([%w_]+)%s*=%s*$')
+    if not fieldName then
+        return nil, nil
+    end
+
+    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local classType
+    for t in left:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+' .. escapedName .. '%s*=') do
+        classType = normalizeTypeExpr(t)
+    end
+    if not classType or classType:find('|', 1, true) then
+        return nil, nil
+    end
+    return classType, fieldName
+end
+
+---@param param Feature.Completion.Param
+---@param text string
+---@param textOffset integer
+---@return string?
+local function inferFunctionTypeFromTypedClassFieldLiteralNodeView(param, text, textOffset)
+    local classType, fieldName = inferTypedClassFieldLiteralContext(text, textOffset)
+    if not classType or not fieldName then
+        return nil
+    end
+
+    local typeNode = param.scope.rt.type(classType)
+    if not typeNode then
+        return nil
+    end
+    local fieldTable = typeNode.fieldTable
+    local valueMap = fieldTable and fieldTable.valueMap or nil
+    local fieldNode = valueMap and valueMap[fieldName] or nil
+    if not fieldNode or fieldNode.kind ~= 'field' then
+        return nil
+    end
+
+    ---@cast fieldNode Node.Field
+    local value = fieldNode.value
+    if not value or not util.hasFunctionNode(value) then
+        return nil
+    end
+
+    local viewed = value:view()
+    if not viewed or viewed == '' then
+        return nil
+    end
+    return viewed
+end
+
+---@param text string
+---@param varName string
+---@return string?
+local function findLocalTypeExpr(text, varName)
+    for t, localName in text:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+([%w_]+)') do
+        if localName == varName then
+            return normalizeTypeExpr(t)
+        end
+    end
+    return nil
+end
+
+---@param text string
+---@param className string
+---@param fieldName string
+---@return string[]
+local function collectClassFieldFunctionTypes(text, className, fieldName)
+    local results = {}
+    local inClass = false
+    for line in text:gmatch('[^\r\n]+') do
+        local thisClass = line:match('^%s*%-%-%-%s*@class%s+([%w_%.]+)')
+        if thisClass then
+            inClass = (thisClass == className)
+            goto continue
+        end
+        if not inClass then
+            goto continue
+        end
+
+        local thisField, thisType = line:match('^%s*%-%-%-%s*@field%s+([%w_]+)%s+(.+)$')
+        if thisField then
+            if thisField == fieldName and thisType:match('^fun%s*%(') then
+                results[#results+1] = util.trim(thisType)
+            end
+            goto continue
+        end
+
+        if line:match('^%s*%-%-%-%s*@') or line:match('^%s*%-%-%-') then
+            goto continue
+        end
+        inClass = false
+        ::continue::
+    end
+    return results
+end
+
+---@param text string
+---@param textOffset integer
+---@return string?
+local function inferEnumTypeFromTypedLocalVarExpr(text, textOffset)
+    local left = text:sub(1, textOffset)
+    local varName = left:match('([%w_]+)%s*==%s*$')
+                or left:match('([%w_]+)%s*~=%s*$')
+                or left:match('([%w_]+)%s*<=%s*$')
+                or left:match('([%w_]+)%s*>=%s*$')
+                or left:match('([%w_]+)%s*<%s*$')
+                or left:match('([%w_]+)%s*>%s*$')
+    if not varName then
+        return nil
+    end
+
+    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local typeExpr
+    for t, localName in text:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+([%w_]+)') do
+        if localName == escapedName or localName == varName then
+            typeExpr = util.trim(t)
+        end
+    end
+    return typeExpr
+end
+
 local parseFunParams
 local extractParamType
+
+---@param text string
+---@param textOffset integer
+---@return string? pType
+---@return string? argHead
+local function inferArgTypeFromTypedFunctionVarCall(text, textOffset)
+    local left = text:sub(1, textOffset)
+    local rawFnName, capturedArgHead = left:match('([%w_%.:]+)%s*%(([^()]*)$')
+    if not rawFnName then
+        return nil, nil
+    end
+
+    local varName = rawFnName:match('([%w_]+)$')
+    if not varName then
+        return nil, nil
+    end
+
+    local argIndex = 1
+    for _ in capturedArgHead:gmatch(',') do
+        argIndex = argIndex + 1
+    end
+
+    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local declaredType = text:match('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+' .. escapedName .. '%f[%W]')
+    if not declaredType or not declaredType:match('^fun%s*%(') then
+        return nil, nil
+    end
+
+    local params = parseFunParams(declaredType)
+    local pType = extractParamType(params[argIndex])
+    if not pType or pType == '' then
+        return nil, nil
+    end
+
+    return pType, capturedArgHead
+end
 
 ---@param funType string
 ---@return string[]
@@ -192,6 +423,17 @@ local function inferArgTypeFromTypedFunctionVar(text, rawFnName, argIndex, isMet
         return nil
     end
     local mappedArgIndex = isMethodCall and (argIndex + 1) or argIndex
+
+    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
+    local declaredType = text:match('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+' .. escapedName .. '%f[%W]')
+    if declaredType then
+        local params = parseFunParams(declaredType)
+        local pType = extractParamType(params[mappedArgIndex])
+        if pType and pType ~= '' then
+            return pType
+        end
+    end
+
     for funType, localName in text:gmatch('%-%-%-@type%s+(fun%b())%s*\r?\n%s*local%s+([%w_]+)') do
         if localName == varName then
             local params = parseFunParams(funType)
@@ -255,8 +497,9 @@ end
 ---@param argHead string
 ---@param argIndex integer
 ---@param isMethodCall boolean
+---@param objTypeName string?
 ---@return string?
-local function inferFunctionArgTypeFromFieldOverloads(text, fnName, argHead, argIndex, isMethodCall)
+local function inferFunctionArgTypeFromFieldOverloads(text, fnName, argHead, argIndex, isMethodCall, objTypeName)
     local mappedArgIndex = isMethodCall and (argIndex + 1) or argIndex
     if mappedArgIndex < 2 then
         return nil
@@ -268,24 +511,116 @@ local function inferFunctionArgTypeFromFieldOverloads(text, fnName, argHead, arg
     local firstArg = normalizeQuotedLiteralType(argHead:match('["\'](.-)["\']'))
 
     local fallback
-    for line in text:gmatch('[^\r\n]+') do
-        local typeExpr = line:match('^%s*%-%-%-%s*@field%s+' .. fieldName .. '%s+(.+)$')
-        if typeExpr and typeExpr:match('^fun%s*%(') then
+
+    local function scanTypeExpr(typeExpr)
+        if not typeExpr or not typeExpr:match('^fun%s*%(') then
+            return nil
+        end
             local params = parseFunParams(typeExpr)
             local hasSelfParam = params[1] and params[1]:match('^%s*self%s*:') ~= nil
             local eventArgIndex = (isMethodCall or hasSelfParam) and 2 or 1
             local p1Type = extractParamType(params[eventArgIndex])
             local pNType = extractParamType(params[mappedArgIndex])
+            if pNType and pNType ~= '' and not pNType:match('^fun%s*%(') and not firstArg then
+            return pNType
+            end
             if pNType and pNType:match('^fun%s*%(') then
                 fallback = fallback or pNType
                 if firstArg and resolveEventLiteral(text, p1Type) == firstArg then
-                    return pNType
+                return pNType
                 end
+            end
+        return nil
+    end
+
+    if objTypeName and objTypeName ~= '' then
+        local typeExprs = collectClassFieldFunctionTypes(text, objTypeName, fieldName)
+        for _, typeExpr in ipairs(typeExprs) do
+            local resolved = scanTypeExpr(typeExpr)
+            if resolved then
+                return resolved
+            end
+        end
+        return fallback
+    end
+
+    for line in text:gmatch('[^\r\n]+') do
+        local typeExpr = line:match('^%s*%-%-%-%s*@field%s+' .. fieldName .. '%s+(.+)$')
+        if typeExpr then
+            local resolved = scanTypeExpr(typeExpr)
+            if resolved then
+                return resolved
             end
         end
     end
     return fallback
 end
+
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local pType, argHead = inferArgTypeFromTypedFunctionVarCall(text, textOffset)
+    if not pType then
+        return
+    end
+
+    local inTableArg = argHead:find('{', 1, true) ~= nil
+    if not inTableArg and normalizeTypeExpr(pType):match('%[%]$') then
+        action.skip()
+        return
+    end
+
+    local aliases = util.collectAliases(text)
+    pType = resolveEnumTypeExprFromText(text, aliases, pType, inTableArg)
+    local enums = util.extractEnumLiterals(pType)
+    if #enums == 0 then
+        return
+    end
+
+    action.skip()
+
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local inDoubleQuote = left:match('"[^"\n]*$') ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and (inSingleQuote or inDoubleQuote) then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if label:match('^\'".+"\'$') then
+            goto continue
+        end
+        if label:match("^''.+''$") then
+            goto continue
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        action.push {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = {
+                start = editStart,
+                finish = editFinish,
+                newText = label,
+            },
+        }
+        ::continue::
+    end
+end, 17)
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
@@ -304,6 +639,9 @@ ls.feature.provider.completion(function (param, action)
     for _ in argHead:gmatch(',') do
         argIndex = argIndex + 1
     end
+
+    local objName = rawFnName:match('^([%w_]+)[%.:]')
+    local objTypeName = objName and findLocalTypeExpr(text, objName) or nil
 
     local pType
     local fromFieldOverload = false
@@ -326,7 +664,7 @@ ls.feature.provider.completion(function (param, action)
         pType = inferArgTypeFromTypedFunctionVar(text, rawFnName, argIndex, isMethodCall)
     end
     if not pType then
-        pType = inferFunctionArgTypeFromFieldOverloads(text, rawFnName, argHead, argIndex, isMethodCall)
+        pType = inferFunctionArgTypeFromFieldOverloads(text, rawFnName, argHead, argIndex, isMethodCall, objTypeName)
         fromFieldOverload = pType ~= nil
     end
 
@@ -405,6 +743,9 @@ ls.feature.provider.completion(function (param, action)
         argIndex = argIndex + 1
     end
 
+    local objName = rawFnName:match('^([%w_]+)[%.:]')
+    local objTypeName = objName and findLocalTypeExpr(text, objName) or nil
+
     local params, paramTypes = util.findFunctionDocParamTypes(text, fnName)
     local pType
     if params and paramTypes then
@@ -422,6 +763,9 @@ ls.feature.provider.completion(function (param, action)
     end
     if not pType then
         pType = inferArgTypeFromTypedFunctionVar(text, rawFnName, argIndex, isMethodCall)
+    end
+    if not pType then
+        pType = inferFunctionArgTypeFromFieldOverloads(text, rawFnName, argHead, argIndex, isMethodCall, objTypeName)
     end
     if not pType then
         return
@@ -477,6 +821,170 @@ ls.feature.provider.completion(function (param, action)
             start = editStart,
             finish = editFinish,
             newText = label,
+        }
+        action.push(item)
+        ::continue::
+    end
+end, 15)
+
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local funTypeLabel = inferFunctionTypeFromTypedClassFieldLiteralNodeView(param, text, textOffset)
+    if not funTypeLabel or not funTypeLabel:match('^fun%s*%(') then
+        return
+    end
+
+    local word = util.getCompletionWord(param)
+    if word ~= '' and not (('function'):sub(1, #word) == word) then
+        return
+    end
+
+    local args = funTypeLabel:match('^fun%s*%((.-)%)') or ''
+    local placeholders = {}
+    local idx = 1
+    for part in args:gmatch('[^,]+') do
+        local name = util.trim(part):match('^([%w_]+)%s*:')
+                  or util.trim(part):match('^([%w_]+)')
+        if name and name ~= '...' then
+            placeholders[#placeholders+1] = string.format('${%d:%s}', idx, name)
+            idx = idx + 1
+        end
+    end
+
+    local newText = string.format('function (%s)\n\t$0\nend', table.concat(placeholders, ', '))
+    local editStart = util.toDisplayOffset(param, textOffset - #word)
+    local editFinish = util.toDisplayOffset(param, textOffset)
+
+    action.skip()
+    action.push {
+        label = funTypeLabel,
+        kind = ls.spec.CompletionItemKind.Function,
+        textEdit = {
+            start = editStart,
+            finish = editFinish,
+            newText = newText,
+        }
+    }
+end, 17)
+
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local inferredType = inferEnumTypeFromTypedClassFieldLiteral(text, textOffset)
+    if not inferredType then
+        return
+    end
+
+    local aliases = util.collectAliases(text)
+    local resolvedType = resolveEnumTypeExprFromText(text, aliases, inferredType, false)
+    local enums = util.extractEnumLiterals(resolvedType)
+    if #enums == 0 then
+        return
+    end
+
+    action.skip()
+
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local inDoubleQuote = left:match('"[^"\n]*$') ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and (inSingleQuote or inDoubleQuote) then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if label:match('^\'".+"\'$') then
+            goto continue
+        end
+        if label:match("^''.+''$") then
+            goto continue
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        action.push {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = {
+                start = editStart,
+                finish = editFinish,
+                newText = label,
+            },
+        }
+        ::continue::
+    end
+end, 15)
+
+ls.feature.provider.completion(function (param, action)
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local inferredType = inferEnumTypeFromTypedLocalVarExpr(text, textOffset)
+    if not inferredType then
+        return
+    end
+
+    local aliases = util.collectAliases(text)
+    local resolvedType = resolveEnumTypeExprFromText(text, aliases, inferredType, false)
+    local enums = util.extractEnumLiterals(resolvedType)
+    if #enums == 0 then
+        return
+    end
+
+    action.skip()
+
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local inDoubleQuote = left:match('"[^"\n]*$') ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and (inSingleQuote or inDoubleQuote) then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if label:match('^\'".+"\'$') then
+            goto continue
+        end
+        if label:match("^''.+''$") then
+            goto continue
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        local item = {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = {
+                start = editStart,
+                finish = editFinish,
+                newText = label,
+            },
         }
         action.push(item)
         ::continue::

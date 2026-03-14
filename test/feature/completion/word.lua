@@ -53,8 +53,10 @@ TEST_COMPLETION [[
 function myfunc() end
 myf<??>
 ]] {
+	care = ls.spec.CompletionItemKind.Function,
+	include = true,
     {
-        label = 'myfunc',
+		label = 'myfunc()',
         kind  = ls.spec.CompletionItemKind.Function,
     },
 }

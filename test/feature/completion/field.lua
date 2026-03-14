@@ -38,8 +38,11 @@ local t = {}
 function t.myfunc() end
 t.my<??>
 ]] {
+    care = {
+        kind = ls.spec.CompletionItemKind.Function,
+    },
     {
-        label = 'myfunc',
+        label = 'myfunc()',
         kind  = ls.spec.CompletionItemKind.Function,
     },
 }
@@ -51,7 +54,7 @@ function t:mymethod() end
 t:my<??>
 ]] {
     {
-        label = 'mymethod',
+		label = 'mymethod()',
         kind  = ls.spec.CompletionItemKind.Method,
     },
 }

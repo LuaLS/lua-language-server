@@ -116,7 +116,45 @@ ls.feature.completion = function (uri, offset)
         scanner = scanner,
     }
 
-    return providers.runner(param)
+    local results = providers.runner(param)
+
+    -- Normalize legacy completion textEdit {start, finish, newText} to strict
+    -- LSP textEdit {range={start={line,character}, end={line,character}}, newText}.
+    local function normalizeToTextOffset(v)
+        if v <= #text then
+            return v
+        end
+        if v < 10000 then
+            return #text
+        end
+        local row = v // 10000
+        local col = v % 10000
+        return document.positionConverter:positionToOffset(row, col)
+    end
+
+    for _, item in ipairs(results) do
+        local textEdit = item.textEdit
+        if textEdit and textEdit.start and textEdit.finish and not textEdit.range then
+            local startOffset = normalizeToTextOffset(textEdit.start)
+            local finishOffset = normalizeToTextOffset(textEdit.finish)
+            local startLine, startCharacter = document.positionConverter:offsetToPosition(startOffset)
+            local endLine, endCharacter = document.positionConverter:offsetToPosition(finishOffset)
+            textEdit.range = {
+                start = {
+                    line = startLine,
+                    character = startCharacter,
+                },
+                ['end'] = {
+                    line = endLine,
+                    character = endCharacter,
+                },
+            }
+            textEdit.start = nil
+            textEdit.finish = nil
+        end
+    end
+
+    return results
 end
 
 ---@param callback fun(param: Feature.Completion.Param, action: Feature.ProviderActions<LSP.CompletionItem>)

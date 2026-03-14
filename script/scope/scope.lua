@@ -25,6 +25,8 @@ function M:__init(name, uri, fs)
     ---@type table<Uri, Document?>
     self.documents = {}
 
+    self.wordIndex = New 'Scope.WordIndex' (self)
+
     self.vm = ls.vm.create(self)
 end
 
@@ -250,6 +252,7 @@ function ls.scope.watchFiles()
         if not scope then
             return
         end
+        scope.wordIndex:markDirty(uri)
         ---@async
         ls.await.call(function ()
             scope.vm:awaitIndexFile(uri)
@@ -261,6 +264,7 @@ function ls.scope.watchFiles()
         if not scope then
             return
         end
+        scope.wordIndex:markRemoved(uri)
         scope.vm:removeFile(uri)
     end)
 end

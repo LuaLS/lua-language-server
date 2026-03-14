@@ -48,10 +48,39 @@ end
 ---@class Feature.ProviderActions<R>
 ---@field push fun(item: R)
 ---@field skip fun(priority?: integer)
+---@field has fun(predicate: fun(item: R): boolean): boolean
+---@field hasLabel fun(label: string): boolean
+---@field hasWord fun(word: string): boolean
 
 ---@return Feature.ProviderActions<any>
 function ls.feature.helper.providers()
     local queue = ls.tools.pqueue.create()
+
+    ---@param item any
+    ---@return table<string, true>
+    local function extractWords(item)
+        local words = {}
+        if type(item) ~= 'table' then
+            return words
+        end
+
+        local function addFromString(s)
+            if type(s) ~= 'string' then
+                return
+            end
+            local w = s:match('^([%a_][%w_]*)')
+            if w then
+                words[w] = true
+            end
+        end
+
+        addFromString(item.label)
+        addFromString(item.insertText)
+        if type(item.textEdit) == 'table' then
+            addFromString(item.textEdit.newText)
+        end
+        return words
+    end
 
     return {
         queue = queue,
@@ -71,6 +100,30 @@ function ls.feature.helper.providers()
                         if skipPriorty < p then
                             skipPriorty = p
                         end
+                    end,
+                    has = function (predicate)
+                        for _, item in ipairs(results) do
+                            if predicate(item) then
+                                return true
+                            end
+                        end
+                        return false
+                    end,
+                    hasLabel = function (label)
+                        for _, item in ipairs(results) do
+                            if item.label == label then
+                                return true
+                            end
+                        end
+                        return false
+                    end,
+                    hasWord = function (word)
+                        for _, item in ipairs(results) do
+                            if extractWords(item)[word] then
+                                return true
+                            end
+                        end
+                        return false
                     end
                 })
             end

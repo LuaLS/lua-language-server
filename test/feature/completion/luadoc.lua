@@ -955,14 +955,6 @@ f({
 		label = 'abc3',
 		kind  = ls.spec.CompletionItemKind.Variable,
 	},
-	{
-		label = 'abc',
-		kind  = ls.spec.CompletionItemKind.Text,
-	},
-	{
-		label = 'abc2',
-		kind  = ls.spec.CompletionItemKind.Text,
-	},
 }
 
 -- [SKIPPED][description] 暂时跳过：带引号字段与普通字段 description 精确断言

@@ -42,6 +42,24 @@ M.__getter.text = function (self)
     return self.file:getText() or ''
 end
 
+---@type table<string, true>
+M.words = nil
+
+---@param self Document
+---@return table<string, true>
+---@return true
+M.__getter.words = function (self)
+    local text = self.file:getText() or ''
+    ---@type table<string, true>
+    local words = {}
+    for word in text:gmatch('[%a_][%w_]*') do
+        if #word >= 2 then
+            words[word] = true
+        end
+    end
+    return words, true
+end
+
 ---@type LuaParser.Ast
 M.ast = nil
 

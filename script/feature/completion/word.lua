@@ -115,49 +115,37 @@ ls.feature.provider.completion(function (param, action)
         ::continue::
     end
 
-    -- `f({ abc = function() abc<??> end })`：补充首参类字段名，追加在本地词之后
-    if word ~= '' then
-        local left = param.scanner.text:sub(1, textOffset)
-        if not left:match('{%s*[%w_]+%s*$') then
-            local fnName
-            for call in left:gmatch('([%w_%.:]+)%s*%(%s*{') do
-                fnName = call
-            end
-            if not fnName then
-                for call in left:gmatch('([%w_%.:]+)%s*{') do
-                    fnName = call
-                end
-            end
-            if fnName then
-                fnName = fnName:gsub(':', '.')
-                local params, paramTypes = util.findFunctionDocParamTypes(param.scanner.text, fnName)
-                local pType = params and paramTypes and params[1] and paramTypes[params[1]] or nil
-                local typeName = pType and pType:match('^([%w_%.]+)%??$') or nil
-                if typeName then
-                    local typeNode = param.scope.rt.type(typeName)
-                    local expectValue = typeNode and typeNode:isClassLike() and typeNode.expectValue or nil
-                    local keys = expectValue and expectValue.keys or nil
-                    if keys then
-                        local pushed = {}
-                        for _, keyNode in ipairs(keys) do
-                            if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
-                                local name = keyNode.literal
-                                ---@cast name string
-                                if not pushed[name] and name:sub(1, #word) == word then
-                                    pushed[name] = true
-                                    action.push {
-                                        label = name,
-                                        kind = ls.spec.CompletionItemKind.Text,
-                                    }
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
 end)
+
+ls.feature.provider.completion(function (param, action)
+    local word = util.getCompletionWord(param)
+    if word == '' then
+        return
+    end
+
+    if param.scope.config:get(param.uri, 'Lua.completion.showWord') ~= 'Enable' then
+        return
+    end
+    if not param.scope.config:get(param.uri, 'Lua.completion.workspaceWord') then
+        return
+    end
+
+    if not util.isStatementPosition(param) then
+        return
+    end
+
+    local words = param.scope.wordIndex:match(word)
+    for _, name in ipairs(words) do
+        if action.hasWord(name) then
+            goto continue
+        end
+        action.push {
+            label = name,
+            kind = ls.spec.CompletionItemKind.Text,
+        }
+        ::continue::
+    end
+end, -1000)
 
 ls.feature.provider.completion(function (param, action)
     local source = param.sources[1]

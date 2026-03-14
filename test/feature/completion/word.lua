@@ -100,18 +100,7 @@ xxxx<??>
     },
 }
 
--- TODO: 表字段作为 word 补全（kind=Text）—— 需要 workspaceWord 特性支持
--- TEST_COMPLETION [[
--- local t = {
---     xxxxx = 1,
--- }
--- xx<??>
--- ]] {
---     {
---         label = 'xxxxx',
---         kind = ls.spec.CompletionItemKind.Text,
---     },
--- }
+-- [SKIPPED][workspaceWord-dependent] 表字段作为 word 补全（kind=Text）当前无稳定结果，暂不迁移
 
 -- 方括号内的变量补全
 TEST_COMPLETION [[

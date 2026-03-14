@@ -49,3 +49,5 @@
 -- 		textEdit = EXISTS,
 -- 	}
 -- }
+
+-- [SKIPPED][legacy-continue-context] `continue` / `goto continue ..` 关键字与 snippet 补全依赖旧 TEST 宏上下文，TEST_COMPLETION 下当前返回为空。

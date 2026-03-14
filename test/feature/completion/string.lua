@@ -1,6 +1,16 @@
 -- string 补全测试
 -- TODO: 实现字符串枚举补全 provider 后补充用例
 
+-- [SKIPPED][stdlib-dependent] collectgarbage(<?>) EXISTS 依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] collectgarbage('<?>') 枚举补全依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] io.read(<?>) 枚举补全依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] io.open('', <?>) EXISTS 依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] io.close(1, <?>) nil 依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] local t = type(); print(t == <?>) EXISTS 依赖标准库类型推断，暂不迁移
+-- [SKIPPED][stdlib-dependent] if type(arg) == '<?>' EXISTS 依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] if type(arg) == <?> EXISTS 依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] if type() == '<?>' EXISTS 依赖标准库，暂不迁移
+
 TEST_COMPLETION [[
 ---@param x string | "AAA" | "BBB" | "CCC"
 function f(y, x)

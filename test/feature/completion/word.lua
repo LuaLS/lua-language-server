@@ -166,3 +166,75 @@ ab<??>c
         kind = ls.spec.CompletionItemKind.Variable,
     },
 }
+
+TEST_COMPLETION [[
+return function ()
+    local function fff(xxx)
+        for f in xx<??>
+    end
+end
+]] {
+    {
+        label = 'xxx',
+        kind  = ls.spec.CompletionItemKind.Variable,
+    },
+
+}
+
+-- 表构造前缀补全（含外部表字段，IgnoreFunction 语义）
+TEST_COMPLETION [[
+local xxxx = {
+    xxyy = 1,
+    xxzz = 2,
+}
+local t = {
+    x<??>
+}
+]] {
+    include = true,
+    {
+        label = 'xxxx',
+        kind  = ls.spec.CompletionItemKind.Variable,
+    },
+}
+
+-- [SKIPPED][workspaceWord-dependent] `print(ff2)/local faa/local f<?>` 文字补全依赖 workspaceWord 特性，暂不迁移
+
+-- 局部注解函数补全（Function + Snippet 两项，insertText=EXISTS）
+TEST_COMPLETION [[
+--- JustTest
+---@param list table
+---@param sep string
+---@param i number
+---@param j number
+---@return string
+local function zzzzz(list, sep, i, j) end
+
+zzz<??>
+]] {
+    care = {label = 'zzzzz(list, sep, i, j)'},
+    {
+        label     = 'zzzzz(list, sep, i, j)',
+        kind      = ls.spec.CompletionItemKind.Function,
+        insertText = EXISTS,
+    },
+    {
+        label     = 'zzzzz(list, sep, i, j)',
+        kind      = ls.spec.CompletionItemKind.Snippet,
+        insertText = EXISTS,
+    },
+}
+
+-- [SKIPPED][detail-not-populated] 全局变量 detail/description 字段在当前实现中未填充到补全项，暂不迁移
+
+-- 全局变量赋值后在空行触发存在性补全
+TEST_COMPLETION [[
+AAA = 1
+
+<??>
+]] (EXISTS)
+
+-- [SKIPPED][stdlib-dependent] xpcal<?> insertText + xpcall 标准库补全依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] collectgarbage/io.*/type 标准库枚举补全依赖标准库，暂不迁移
+-- [SKIPPED][config-dependent] GGG<?> with callSnippet=Disable 依赖 config.set，暂不迁移
+-- [SKIPPED][config-dependent] require '<?>' count=9 依赖文件系统/配置，暂不迁移

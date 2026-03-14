@@ -125,9 +125,10 @@ function TEST_COMPLETION(script)
         end
         if type(expects) == 'table' and expects.care ~= nil then
             finalResults = filterByCare(finalResults, expects.care)
+            local savedInclude = expects.include
             expects = table.move(expects, 1, #expects, 1, {})
-            if expects.include == true then
-                expects.include = true
+            if savedInclude then
+                expects.include = savedInclude
             end
         end
         if type(expects) == 'table' and expects.include == true then

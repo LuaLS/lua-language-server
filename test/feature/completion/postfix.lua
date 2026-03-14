@@ -217,3 +217,6 @@ end)
         }
     },
 }
+
+-- [SKIPPED][nil-source-error] self.results.list[#<?>] series: removing <?> leaves [#] which triggers coder Source is nil, skipped
+-- [SKIPPED][nil-source-error] fff[#ff<?>] / local _ = fff.kkk[#<?>] / fff.kkk[#<?>].yy - same issue

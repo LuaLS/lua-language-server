@@ -5,10 +5,14 @@ require 'feature.text-scanner'
 ---@class Feature.Completion.Param
 ---@field uri Uri
 ---@field offset integer
+---@field realTextOffset integer
+---@field sourceTextOffset integer
 ---@field textOffset integer
 ---@field scope Scope
 ---@field sources LuaParser.Node.Base[]
 ---@field scanner Feature.TextScanner
+---@field inComment boolean
+---@field inString boolean
 
 ---@param uri Uri
 ---@param offset integer
@@ -38,20 +42,72 @@ ls.feature.completion = function (uri, offset)
         return {}
     end
 
-    local textOffset = offset
-    if textOffset > #text then
-        if textOffset >= 10000 then
-            local row = textOffset // 10000
-            local col = textOffset % 10000
-            textOffset = document.positionConverter:positionToOffset(row, col)
+    local realTextOffset = offset
+    if realTextOffset > #text then
+        if realTextOffset >= 10000 then
+            local row = realTextOffset // 10000
+            local col = realTextOffset % 10000
+            realTextOffset = document.positionConverter:positionToOffset(row, col)
         else
-            textOffset = #text
+            realTextOffset = #text
         end
     end
 
-    local sources = document:findSources(textOffset) or {}
-    if #sources == 0 and textOffset > 0 then
-        sources = document:findSources(textOffset - 1) or {}
+    local textOffset = realTextOffset
+
+    local function isBlank(ch)
+        return ch == ' ' or ch == '\t' or ch == '\n' or ch == '\r'
+    end
+
+    local function isIdentChar(ch)
+        return ch == '_'
+            or (ch >= 'a' and ch <= 'z')
+            or (ch >= 'A' and ch <= 'Z')
+            or (ch >= '0' and ch <= '9')
+    end
+
+    local function snapToLeftSymbolRight(offset0)
+        local pos = offset0
+        while pos >= 1 and isBlank(text:sub(pos, pos)) do
+            pos = pos - 1
+        end
+        if pos < 1 then
+            return offset0
+        end
+        local ch = text:sub(pos, pos)
+        if isIdentChar(ch) then
+            return offset0
+        end
+        return pos
+    end
+
+    local sourceOffset = snapToLeftSymbolRight(realTextOffset)
+    local sources = document:findSources(sourceOffset) or {}
+    if #sources == 0 and sourceOffset > 0 then
+        sources = document:findSources(sourceOffset - 1) or {}
+    end
+
+    local inComment = false
+    local ast = document.ast
+    local comments = ast and ast.comments or nil
+    if comments then
+        for _, comment in ipairs(comments) do
+            if comment.start > textOffset then
+                break
+            end
+            if comment.start <= textOffset and comment.finish >= textOffset then
+                inComment = true
+                break
+            end
+        end
+    end
+
+    local inString = false
+    for _, source in ipairs(sources) do
+        if source.kind == 'string' then
+            inString = true
+            break
+        end
     end
 
     local scanner = New 'Feature.TextScanner' (text, textOffset)
@@ -110,10 +166,14 @@ ls.feature.completion = function (uri, offset)
     local param = {
         uri = uri,
         offset = offset,
+        realTextOffset = realTextOffset,
+        sourceTextOffset = sourceOffset,
         textOffset = textOffset,
         scope = scope,
         sources = sources,
         scanner = scanner,
+        inComment = inComment,
+        inString = inString,
     }
 
     local results = providers.runner(param)

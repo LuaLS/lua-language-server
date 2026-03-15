@@ -314,6 +314,9 @@ ls.feature.provider.completion(function (param, action)
     if not trigger then
         return
     end
+    if param.inComment then
+        return
+    end
     word = word or ''
 
     local document = param.scope:getDocument(param.uri)
@@ -684,6 +687,9 @@ end, 10)
 ls.feature.provider.completion(function (param, action)
     local trigger, objEnd = param.scanner:getFieldTriggerBack()
     if trigger ~= '.' then
+        return
+    end
+    if param.inComment then
         return
     end
     local objName = getObjectNameBack(param.scanner.text, objEnd)

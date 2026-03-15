@@ -2,6 +2,10 @@ local guide = require 'parser.guide'
 local util = ls.feature.completionUtil
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local word = util.getCompletionWord(param)
     if word == '' then
         return
@@ -28,6 +32,10 @@ ls.feature.provider.completion(function (param, action)
 end)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     ---@type any
     local source = param.sources[1]
     local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset, param)
@@ -118,6 +126,10 @@ ls.feature.provider.completion(function (param, action)
 end)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local word = util.getCompletionWord(param)
     if word == '' then
         return
@@ -148,6 +160,10 @@ ls.feature.provider.completion(function (param, action)
 end, -1000)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local source = param.sources[1]
     local word = util.getCompletionWord(param)
 

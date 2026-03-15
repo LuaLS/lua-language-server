@@ -748,28 +748,7 @@ emit:on('AAA', <??>)
 	}
 }
 
--- [SKIPPED][overload-alias] 暂时跳过：method overload + multiline alias 参数枚举
--- TEST_COMPLETION [[
--- ---@meta
---
--- ---@alias testAlias
--- ---| "'test1'"
--- ---| "'test2'"
--- ---| "'test3'"
---
--- ---@class TestClass
--- local TestClass = {}
---
--- ---@overload fun(self: TestClass, arg2: testAlias)
--- ---@param arg1 integer
--- ---@param arg2 testAlias
--- function TestClass:testFunc2(arg1, arg2) end
---
--- ---@type TestClass
--- local t
---
--- t:testFunc2(<??>)
--- ]] (EXISTS)
+-- [SKIPPED][overload-alias] method overload + multiline alias 参数枚举当前返回空，暂不迁移
 
 TEST_COMPLETION [[
 ---@class ZZZZZ.XXXX
@@ -789,29 +768,9 @@ TEST_COMPLETION [[
 	assert(count == 1)
 end)
 
--- [SKIPPED][cast-local] 暂时跳过：---@cast 空前缀局部变量补全
--- TEST_COMPLETION [[
--- local xyz
---
--- ---@cast <??>
--- ]] {
--- 	{
--- 		label = 'xyz',
--- 		kind  = ls.spec.CompletionItemKind.Variable,
--- 	},
--- }
+-- [SKIPPED][cast-local] ---@cast 空前缀局部变量补全当前返回空，暂不迁移
 
--- [SKIPPED][cast-local] 暂时跳过：---@cast 前缀局部变量补全
--- TEST_COMPLETION [[
--- local xyz
---
--- ---@cast x<??>
--- ]] {
--- 	{
--- 		label = 'xyz',
--- 		kind  = ls.spec.CompletionItemKind.Variable,
--- 	}
--- }
+-- [SKIPPED][cast-local] ---@cast 前缀局部变量补全当前返回空，暂不迁移
 
 TEST_COMPLETION [[
 --- @alias event.AAA "AAA"

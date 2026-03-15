@@ -229,179 +229,99 @@ TEST_COMPLETION [[
 local l = <??>
 ]] (nil)
 
--- [SKIPPED][literal-union] 暂时跳过：局部变量字面量联合类型比较补全
--- TEST_COMPLETION [[
--- ---@type "a"|"b"|"c"
--- local x
---
--- print(x == <??>)
--- ]] {
--- 	{
--- 		label  = '"a"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"b"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"c"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- }
+TEST_COMPLETION [[
+---@type "a"|"b"|"c"
+local x
 
--- [SKIPPED][literal-union] 暂时跳过：局部变量字面量联合类型赋值补全
--- TEST_COMPLETION [[
--- ---@type "a"|"b"|"c"
--- local x
---
--- x = <??>
--- ]] {
--- 	{
--- 		label  = '"a"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"b"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"c"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- }
+print(x == <??>)
+]] {
+	{
+		label  = '"a"',
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+	},
+	{
+		label  = '"b"',
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+	},
+	{
+		label  = '"c"',
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+	},
+}
 
--- [SKIPPED][literal-union] 暂时跳过：局部变量字面量联合类型（单引号）比较补全
--- TEST_COMPLETION [[
--- ---@type "a"|"b"|"c"
--- local x
---
--- print(x == '<??>')
--- ]] {
--- 	{
--- 		label  = "'a'",
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 		textEdit = EXISTS,
--- 	},
--- 	{
--- 		label  = "'b'",
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 		textEdit = EXISTS,
--- 	},
--- 	{
--- 		label  = "'c'",
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 		textEdit = EXISTS,
--- 	},
--- }
+TEST_COMPLETION [[
+---@type "a"|"b"|"c"
+local x
 
--- [SKIPPED][literal-union] 暂时跳过：局部变量字面量联合类型（单引号）赋值补全
--- TEST_COMPLETION [[
--- ---@type "a"|"b"|"c"
--- local x
---
--- x = '<??>'
--- ]] {
--- 	{
--- 		label  = "'a'",
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 		textEdit = EXISTS,
--- 	},
--- 	{
--- 		label  = "'b'",
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 		textEdit = EXISTS,
--- 	},
--- 	{
--- 		label  = "'c'",
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 		textEdit = EXISTS,
--- 	},
--- }
+x = <??>
+]] {
+	{
+		label  = '"a"',
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+	},
+	{
+		label  = '"b"',
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+	},
+	{
+		label  = '"c"',
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+	},
+}
 
--- [SKIPPED][table-literal-union] 暂时跳过：table<string, literal-union> 字段赋值补全（dot）
--- TEST_COMPLETION [[
--- ---@type table<string, "a"|"b"|"c">
--- local x
---
--- x.a = <??>
--- ]] {
--- 	{
--- 		label  = '"a"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"b"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"c"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- }
+TEST_COMPLETION [[
+---@type "a"|"b"|"c"
+local x
 
--- [SKIPPED][table-literal-union] 暂时跳过：table<string, literal-union> 字段赋值补全（index）
--- TEST_COMPLETION [[
--- ---@type table<string, "a"|"b"|"c">
--- local x
---
--- x['a'] = <??>
--- ]] {
--- 	{
--- 		label  = '"a"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"b"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"c"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- }
+print(x == '<??>')
+]] {
+	{
+		label  = "'a'",
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+		textEdit = EXISTS,
+	},
+	{
+		label  = "'b'",
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+		textEdit = EXISTS,
+	},
+	{
+		label  = "'c'",
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+		textEdit = EXISTS,
+	},
+}
 
--- [SKIPPED][table-literal-union] 暂时跳过：table<string, literal-union> 构造器赋值补全（dot）
--- TEST_COMPLETION [[
--- ---@type table<string, "a"|"b"|"c">
--- local x = {
---     a = <??>
--- }
--- ]] {
--- 	{
--- 		label  = '"a"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"b"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"c"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- }
+TEST_COMPLETION [[
+---@type "a"|"b"|"c"
+local x
 
--- [SKIPPED][table-literal-union] 暂时跳过：table<string, literal-union> 构造器赋值补全（index）
--- TEST_COMPLETION [[
--- ---@type table<string, "a"|"b"|"c">
--- local x = {
---     ['a'] = <??>
--- }
--- ]] {
--- 	{
--- 		label  = '"a"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"b"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- 	{
--- 		label  = '"c"',
--- 		kind   = ls.spec.CompletionItemKind.EnumMember,
--- 	},
--- }
+x = '<??>'
+]] {
+	{
+		label  = "'a'",
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+		textEdit = EXISTS,
+	},
+	{
+		label  = "'b'",
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+		textEdit = EXISTS,
+	},
+	{
+		label  = "'c'",
+		kind   = ls.spec.CompletionItemKind.EnumMember,
+		textEdit = EXISTS,
+	},
+}
+
+-- [SKIPPED][table-literal-union] table<string, literal-union> 字段赋值补全（dot）当前返回空，暂不迁移
+
+-- [SKIPPED][table-literal-union] table<string, literal-union> 字段赋值补全（index）当前返回空，暂不迁移
+
+-- [SKIPPED][table-literal-union] table<string, literal-union> 构造器赋值补全（dot）当前返回空，暂不迁移
+
+-- [SKIPPED][table-literal-union] table<string, literal-union> 构造器赋值补全（index）当前返回空，暂不迁移
 
 TEST_COMPLETION [[
 ---@alias enum '"aaa"'|'"bbb"'

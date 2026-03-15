@@ -1,4 +1,5 @@
 local util = ls.feature.completionUtil
+local findLocalTypeExpr
 
 ---@param expr string
 ---@return string
@@ -102,6 +103,61 @@ local function inferEnumTypeFromTypedTableLiteral(text, textOffset)
         return util.trim(elem)
     end
     return nil
+end
+
+---@param text string
+---@param textOffset integer
+---@return string?
+local function inferEnumTypeFromTypedTableFieldAssign(text, textOffset)
+    local left = text:sub(1, textOffset)
+    local varName = left:match('([%w_]+)%.[%w_]+%s*=%s*$')
+                or left:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*$')
+                or left:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*$")
+                or left:match('([%w_]+)%.[%w_]+%s*=%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*["\'][^"\'\r\n]*$')
+                or left:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*[\"\'][^\"\'\r\n]*$")
+    if not varName then
+        return nil
+    end
+
+    local typeExpr = findLocalTypeExpr(text, varName)
+    if not typeExpr then
+        return nil
+    end
+
+    local elem = typeExpr:match('^table%s*<%s*string%s*,%s*(.-)%s*>$')
+    if elem then
+        return util.trim(elem)
+    end
+    return nil
+end
+
+---@param typeExpr string
+---@return string?
+local function extractTableStringValueType(typeExpr)
+    return typeExpr:match('^table%s*<%s*string%s*,%s*(.-)%s*>$')
+end
+
+---@param text string
+---@param varName string
+---@return string?
+local function findTypedLocalTableValueType(text, varName)
+    local typeExpr = findLocalTypeExpr(text, varName)
+    local v = typeExpr and extractTableStringValueType(typeExpr) or nil
+    if v then
+        return util.trim(v)
+    end
+
+    local escapedVar = varName:gsub('([^%w_])', '%%%1')
+    local direct = text:match('%-%-%-@type%s+table%s*<%s*string%s*,%s*(.-)%s*>%s*\r?\n%s*local%s+' .. escapedVar .. '%f[^%w_]')
+    if not direct then
+        return nil
+    end
+    v = util.trim(direct)
+    if not v then
+        return nil
+    end
+    return v
 end
 
 ---@param text string
@@ -231,7 +287,7 @@ end
 ---@param text string
 ---@param varName string
 ---@return string?
-local function findLocalTypeExpr(text, varName)
+findLocalTypeExpr = function (text, varName)
     for t, localName in text:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+([%w_]+)') do
         if localName == varName then
             return normalizeTypeExpr(t)
@@ -285,18 +341,19 @@ local function inferEnumTypeFromTypedLocalVarExpr(text, textOffset)
                 or left:match('([%w_]+)%s*>=%s*$')
                 or left:match('([%w_]+)%s*<%s*$')
                 or left:match('([%w_]+)%s*>%s*$')
+                or left:match('([%w_]+)%s*=%s*$')
+                or left:match('([%w_]+)%s*==%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%s*~=%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%s*<=%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%s*>=%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%s*<%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%s*>%s*["\'][^"\'\r\n]*$')
+                or left:match('([%w_]+)%s*=%s*["\'][^"\'\r\n]*$')
     if not varName then
         return nil
     end
 
-    local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
-    local typeExpr
-    for t, localName in text:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+([%w_]+)') do
-        if localName == escapedName or localName == varName then
-            typeExpr = util.trim(t)
-        end
-    end
-    return typeExpr
+    return findLocalTypeExpr(text, varName)
 end
 
 local parseFunParams
@@ -569,6 +626,10 @@ local function inferFunctionArgTypeFromFieldOverloads(text, fnName, argHead, arg
 end
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
@@ -634,6 +695,10 @@ ls.feature.provider.completion(function (param, action)
 end, 17)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
@@ -737,6 +802,10 @@ ls.feature.provider.completion(function (param, action)
 end, 16)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
@@ -836,9 +905,81 @@ ls.feature.provider.completion(function (param, action)
         action.push(item)
         ::continue::
     end
-end, 15)
+end, 24)
+
+-- `---@type table<string, "a"|"b"> local x` 的值位补全：
+-- 支持 `x.a = <??>` / `x['a'] = <??>` / `local x = { a = <??> }`
+ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+    local scanLeft = left:gsub('[%<%?]+$', '')
+    local lineLeft = scanLeft:match('[^\r\n]*$') or scanLeft
+
+    local varName = lineLeft:match('([%w_]+)%.[%w_]+%s*=%s*$')
+                or lineLeft:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*$')
+                or lineLeft:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*$")
+                or lineLeft:match('([%w_]+)%.[%w_]+%s*=%s*["\'][^"\'\r\n]*$')
+                or lineLeft:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*["\'][^"\'\r\n]*$')
+                or lineLeft:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*[\"\'][^\"\'\r\n]*$")
+                or scanLeft:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
+    if not varName then
+        return
+    end
+
+    local valueType = findTypedLocalTableValueType(text, varName)
+    if not valueType then
+        return
+    end
+
+    local aliases = util.collectAliases(text)
+    local resolvedType = resolveEnumTypeExprFromText(text, aliases, valueType, false)
+    local enums = util.extractEnumLiterals(resolvedType)
+    if #enums == 0 then
+        return
+    end
+
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local inDoubleQuote = left:match('"[^"\n]*$') ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and (inSingleQuote or inDoubleQuote) then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    action.skip()
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        action.push {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = makeLegacyTextEdit(editStart, editFinish, label),
+        }
+        ::continue::
+    end
+end, 1001)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
@@ -878,6 +1019,10 @@ ls.feature.provider.completion(function (param, action)
 end, 17)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
@@ -931,9 +1076,13 @@ ls.feature.provider.completion(function (param, action)
         }
         ::continue::
     end
-end, 15)
+end, 24)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
@@ -988,14 +1137,19 @@ ls.feature.provider.completion(function (param, action)
         action.push(item)
         ::continue::
     end
-end, 15)
+end, 24)
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
 
     local inferredType = inferEnumTypeFromTypedTableLiteral(text, textOffset)
+                    or inferEnumTypeFromTypedTableFieldAssign(text, textOffset)
     if not inferredType then
         return
     end
@@ -1048,4 +1202,4 @@ ls.feature.provider.completion(function (param, action)
         action.push(item)
         ::continue::
     end
-end, 15)
+end, 24)

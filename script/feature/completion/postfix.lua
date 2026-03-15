@@ -1,6 +1,13 @@
 local util = ls.feature.completionUtil
 
 ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+    if param.inString then
+        return
+    end
+
     local text = param.scanner.text
     local lineStart, lineLeft = util.getLineLeft(text, param.offset)
 

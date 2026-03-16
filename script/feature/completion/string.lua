@@ -1,4 +1,5 @@
 local util = ls.feature.completionUtil
+local guide = require 'parser.guide'
 local findLocalTypeExpr
 
 ---@param expr string
@@ -77,15 +78,129 @@ local function resolveEnumTypeExprFromText(text, aliases, typeExpr, inTableArg)
     return expr
 end
 
+---@param ast any
+---@param textOffset integer
+---@return any
+local function findDeepestBlock(ast, textOffset)
+    local block = ast.main
+    local function step(b)
+        for _, child in ipairs(b.childs) do
+            if child.isBlock and child.start <= textOffset and textOffset <= child.finish then
+                block = child
+                step(child)
+                return
+            end
+        end
+    end
+    step(block)
+    return block
+end
+
+---@param param Feature.Completion.Param
+---@param textOffset integer
+---@param varName string
+---@param keyLiteral string
+---@return string?
+local function inferTableValueTypeByNode(param, textOffset, varName, keyLiteral)
+    if not keyLiteral or keyLiteral == '' then
+        return nil
+    end
+
+    local document = param.scope:getDocument(param.uri)
+    ---@type any
+    local source = param.sources[1]
+    if not source and document then
+        local sources = document:findSources(textOffset) or {}
+        source = sources[1]
+        if not source and textOffset > 1 then
+            sources = document:findSources(textOffset - 1) or {}
+            source = sources[1]
+        end
+    end
+    if not source and document then
+        local ast = document.ast
+        if ast and ast.main then
+            source = {
+                parentBlock = findDeepestBlock(ast, textOffset),
+            }
+        end
+    end
+    if not source then
+        return nil
+    end
+
+    local var
+    for _, loc in ipairs(guide.getVisibleLocals(source, textOffset)) do
+        if loc.id == varName then
+            var = param.scope.vm:getVariable(loc)
+            if var then
+                break
+            end
+        end
+    end
+    if not var then
+        return nil
+    end
+
+    local rt = param.scope.rt
+    local keyNode = rt.value(keyLiteral)
+    ---@param node Node?
+    ---@return string?
+    local function inferFromNode(node)
+        if not node then
+            return nil
+        end
+
+        local value, exists = node:get(keyNode)
+        if not exists or not value or value == rt.NIL or value == rt.NEVER then
+            return nil
+        end
+
+        if value.kind == 'field' then
+            ---@cast value Node.Field
+            value = value.value
+            if not value or value == rt.NIL or value == rt.NEVER then
+                return nil
+            end
+        end
+
+        local viewed = normalizeTypeExpr(value:view())
+        if viewed == '' then
+            return nil
+        end
+        return viewed
+    end
+
+    local inferred = inferFromNode(var:getCurrentValue())
+        or inferFromNode(var:getGuessValue())
+        or inferFromNode(var:getStaticValue())
+    if inferred then
+        return inferred
+    end
+    return nil
+end
+
+---@param param Feature.Completion.Param
 ---@param text string
 ---@param textOffset integer
 ---@return string?
-local function inferEnumTypeFromTypedTableLiteral(text, textOffset)
+local function inferEnumTypeFromTypedTableLiteral(param, text, textOffset)
     local left = text:sub(1, textOffset)
     local varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
     if not varName then
         return nil
     end
+
+    local fieldKey = left:match('([%w_]+)%s*=%s*$')
+                  or left:match('%["([^"\r\n]+)"%]%s*=%s*$')
+                  or left:match("%['([^'\r\n]+)'%]%s*=%s*$")
+    if fieldKey then
+        local valueType = inferTableValueTypeByNode(param, textOffset, varName, fieldKey)
+        if valueType then
+            return valueType
+        end
+    end
+
     local escapedName = varName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
     local typeExpr
     for t in left:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+' .. escapedName .. '%s*=') do
@@ -105,19 +220,37 @@ local function inferEnumTypeFromTypedTableLiteral(text, textOffset)
     return nil
 end
 
+---@param param Feature.Completion.Param
 ---@param text string
 ---@param textOffset integer
 ---@return string?
-local function inferEnumTypeFromTypedTableFieldAssign(text, textOffset)
+local function inferEnumTypeFromTypedTableFieldAssign(param, text, textOffset)
     local left = text:sub(1, textOffset)
-    local varName = left:match('([%w_]+)%.[%w_]+%s*=%s*$')
-                or left:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*$')
-                or left:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*$")
-                or left:match('([%w_]+)%.[%w_]+%s*=%s*["\'][^"\'\r\n]*$')
-                or left:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*["\'][^"\'\r\n]*$')
-                or left:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*[\"\'][^\"\'\r\n]*$")
+    local varName, fieldKey = left:match('([%w_]+)%.([%w_]+)%s*=%s*$')
+    if not varName then
+        varName, fieldKey = left:match('([%w_]+)%[\"([^\"\r\n]*)\"%]%s*=%s*$')
+    end
+    if not varName then
+        varName, fieldKey = left:match("([%w_]+)%['([^'\r\n]*)'%]%s*=%s*$")
+    end
+    if not varName then
+        varName, fieldKey = left:match('([%w_]+)%.([%w_]+)%s*=%s*["\'][^"\'\r\n]*$')
+    end
+    if not varName then
+        varName, fieldKey = left:match('([%w_]+)%[\"([^\"\r\n]*)\"%]%s*=%s*["\'][^"\'\r\n]*$')
+    end
+    if not varName then
+        varName, fieldKey = left:match("([%w_]+)%['([^'\r\n]*)'%]%s*=%s*[\"\'][^\"\'\r\n]*$")
+    end
     if not varName then
         return nil
+    end
+
+    if fieldKey then
+        local valueType = inferTableValueTypeByNode(param, textOffset, varName, fieldKey)
+        if valueType then
+            return valueType
+        end
     end
 
     local typeExpr = findLocalTypeExpr(text, varName)
@@ -132,20 +265,18 @@ local function inferEnumTypeFromTypedTableFieldAssign(text, textOffset)
     return nil
 end
 
----@param typeExpr string
----@return string?
-local function extractTableStringValueType(typeExpr)
-    return typeExpr:match('^table%s*<%s*string%s*,%s*(.-)%s*>$')
-end
-
+---@param param Feature.Completion.Param
 ---@param text string
+---@param textOffset integer
 ---@param varName string
+---@param fieldKey string?
 ---@return string?
-local function findTypedLocalTableValueType(text, varName)
-    local typeExpr = findLocalTypeExpr(text, varName)
-    local v = typeExpr and extractTableStringValueType(typeExpr) or nil
-    if v then
-        return util.trim(v)
+local function findTypedLocalTableValueType(param, text, textOffset, varName, fieldKey)
+    if fieldKey then
+        local valueType = inferTableValueTypeByNode(param, textOffset, varName, fieldKey)
+        if valueType then
+            return valueType
+        end
     end
 
     local escapedVar = varName:gsub('([^%w_])', '%%%1')
@@ -153,7 +284,7 @@ local function findTypedLocalTableValueType(text, varName)
     if not direct then
         return nil
     end
-    v = util.trim(direct)
+    local v = util.trim(direct)
     if not v then
         return nil
     end
@@ -920,18 +1051,36 @@ ls.feature.provider.completion(function (param, action)
     local scanLeft = left:gsub('[%<%?]+$', '')
     local lineLeft = scanLeft:match('[^\r\n]*$') or scanLeft
 
-    local varName = lineLeft:match('([%w_]+)%.[%w_]+%s*=%s*$')
-                or lineLeft:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*$')
-                or lineLeft:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*$")
-                or lineLeft:match('([%w_]+)%.[%w_]+%s*=%s*["\'][^"\'\r\n]*$')
-                or lineLeft:match('([%w_]+)%[\"[^\"\r\n]*\"%]%s*=%s*["\'][^"\'\r\n]*$')
-                or lineLeft:match("([%w_]+)%['[^'\r\n]*'%]%s*=%s*[\"\'][^\"\'\r\n]*$")
-                or scanLeft:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
+    local varName, fieldKey = lineLeft:match('([%w_]+)%.([%w_]+)%s*=%s*$')
+    if not varName then
+        varName, fieldKey = lineLeft:match('([%w_]+)%[\"([^\"\r\n]*)\"%]%s*=%s*$')
+    end
+    if not varName then
+        varName, fieldKey = lineLeft:match("([%w_]+)%['([^'\r\n]*)'%]%s*=%s*$")
+    end
+    if not varName then
+        varName, fieldKey = lineLeft:match('([%w_]+)%.([%w_]+)%s*=%s*["\'][^"\'\r\n]*$')
+    end
+    if not varName then
+        varName, fieldKey = lineLeft:match('([%w_]+)%[\"([^\"\r\n]*)\"%]%s*=%s*["\'][^"\'\r\n]*$')
+    end
+    if not varName then
+        varName, fieldKey = lineLeft:match("([%w_]+)%['([^'\r\n]*)'%]%s*=%s*[\"\'][^\"\'\r\n]*$")
+    end
+    if not varName then
+        varName, fieldKey = scanLeft:match('local%s+([%w_]+)%s*=%s*{[^{}]*([%w_]+)%s*=%s*$')
+    end
+    if not varName then
+        varName, fieldKey = scanLeft:match('local%s+([%w_]+)%s*=%s*{[^{}]*%[\"([^\"\r\n]+)\"%]%s*=%s*$')
+    end
+    if not varName then
+        varName, fieldKey = scanLeft:match("local%s+([%w_]+)%s*=%s*{[^{}]*%['([^'\r\n]+)'%]%s*=%s*$")
+    end
     if not varName then
         return
     end
 
-    local valueType = findTypedLocalTableValueType(text, varName)
+    local valueType = findTypedLocalTableValueType(param, text, textOffset, varName, fieldKey)
     if not valueType then
         return
     end
@@ -1148,8 +1297,8 @@ ls.feature.provider.completion(function (param, action)
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
 
-    local inferredType = inferEnumTypeFromTypedTableLiteral(text, textOffset)
-                    or inferEnumTypeFromTypedTableFieldAssign(text, textOffset)
+    local inferredType = inferEnumTypeFromTypedTableLiteral(param, text, textOffset)
+                    or inferEnumTypeFromTypedTableFieldAssign(param, text, textOffset)
     if not inferredType then
         return
     end

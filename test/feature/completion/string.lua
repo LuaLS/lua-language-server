@@ -324,6 +324,38 @@ x = '<??>'
 -- [SKIPPED][table-literal-union] table<string, literal-union> 构造器赋值补全（index）当前返回空，暂不迁移
 
 TEST_COMPLETION [[
+---@type table<"foo"|"bar", "red"|"blue">
+local t
+
+t.foo = <??>
+]] {
+	{
+		label = '"red"',
+		kind  = ls.spec.CompletionItemKind.EnumMember,
+	},
+	{
+		label = '"blue"',
+		kind  = ls.spec.CompletionItemKind.EnumMember,
+	},
+}
+
+TEST_COMPLETION [[
+---@type table<"foo"|"bar", "red"|"blue">
+local t
+
+t["foo"] = <??>
+]] {
+	{
+		label = '"red"',
+		kind  = ls.spec.CompletionItemKind.EnumMember,
+	},
+	{
+		label = '"blue"',
+		kind  = ls.spec.CompletionItemKind.EnumMember,
+	},
+}
+
+TEST_COMPLETION [[
 ---@alias enum '"aaa"'|'"bbb"'
 
 ---@param x enum

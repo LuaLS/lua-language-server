@@ -1,6 +1,45 @@
 local guide = require 'parser.guide'
 local util = ls.feature.completionUtil
 
+---@param param Feature.Completion.Param
+---@return boolean
+local function isEmptyRhsCompletionPosition(param)
+    local text = param.scanner.text
+    local offset = param.realTextOffset or param.textOffset or util.toTextOffset(text, param.offset, param)
+    if offset <= 1 then
+        return false
+    end
+
+    local pos = offset
+    while pos >= 1 do
+        local ch = text:sub(pos, pos)
+        if ch ~= ' ' and ch ~= '\t' and ch ~= '\n' and ch ~= '\r' then
+            break
+        end
+        pos = pos - 1
+    end
+    if pos < 1 or text:sub(pos, pos) ~= '=' then
+        return false
+    end
+    if pos > 1 and text:sub(pos - 1, pos - 1) == '=' then
+        return false
+    end
+
+    local lineStart = offset
+    while lineStart > 1 do
+        local ch = text:sub(lineStart - 1, lineStart - 1)
+        if ch == '\n' or ch == '\r' then
+            break
+        end
+        lineStart = lineStart - 1
+    end
+    local lineLeft = text:sub(lineStart, offset)
+    if lineLeft:match('^%s*local%s+[%w_,%s]+=%s*$') then
+        return true
+    end
+    return false
+end
+
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -33,6 +72,10 @@ end)
 
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
+        return
+    end
+
+    if isEmptyRhsCompletionPosition(param) then
         return
     end
 

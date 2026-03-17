@@ -8,23 +8,6 @@ local function normalizeTypeExpr(expr)
     return util.trim(expr:gsub('%?$', ''))
 end
 
----@param aliases table<string, string>
----@param typeExpr string
----@param inTableArg boolean
----@return string
-local function resolveEnumTypeExpr(aliases, typeExpr, inTableArg)
-    local expr = normalizeTypeExpr(typeExpr)
-    if inTableArg then
-        expr = normalizeTypeExpr(expr:gsub('%[%]$', ''))
-    end
-    local visited = {}
-    while aliases[expr] and not visited[expr] do
-        visited[expr] = true
-        expr = normalizeTypeExpr(aliases[expr])
-    end
-    return expr
-end
-
 ---@param text string
 ---@param aliasName string
 ---@return string?

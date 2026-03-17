@@ -21,31 +21,6 @@ local function getObjectNameBack(text, endOffset)
     return name
 end
 
----@param text string
----@param objName string
----@return string[]
-local function inferTypedStringKeyTableLiteralKeys(text, objName)
-    local escapedName = objName:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
-    for typeExpr, localName, body in text:gmatch('%-%-%-@type%s+([^\r\n]+)%s*\r?\n%s*local%s+([%w_]+)%s*=%s*{(.-)}') do
-        if localName == objName then
-            local normalized = util.trim(typeExpr):gsub('%s+', '')
-            if normalized:match('^table<string,.+>$') then
-                local keys = {}
-                local seen = {}
-                for key in body:gmatch('([%w_]+)%s*=') do
-                    if not seen[key] then
-                        seen[key] = true
-                        keys[#keys+1] = key
-                    end
-                end
-                table.sort(keys, ls.util.stringLess)
-                return keys
-            end
-        end
-    end
-    return {}
-end
-
 ---@param ast any
 ---@param textOffset integer
 ---@return any
@@ -257,32 +232,6 @@ local function getTypeName(node)
         end
     end, {})
     return found
-end
-
----@param ownerTypeName string?
----@param name string
----@param valueNode Node?
----@return string?
-local function buildFieldDescription(ownerTypeName, name, valueNode)
-    if not ownerTypeName or not valueNode or valueNode.kind ~= 'field' then
-        return nil
-    end
-    ---@cast valueNode Node.Field
-    local value = valueNode.value
-    if not value then
-        return nil
-    end
-    local fieldType = value:view()
-    if not fieldType or fieldType == '' then
-        return nil
-    end
-    local access
-    if name:match('^[_%a][_%w]*$') then
-        access = '.' .. name
-    else
-        access = string.format('[%q]', name)
-    end
-    return hoverUtil.toLuaCodeBlock(string.format('(field) %s%s: %s', ownerTypeName, access, fieldType))
 end
 
 ls.feature.provider.completion(function (param, action)

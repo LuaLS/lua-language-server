@@ -21,30 +21,6 @@ local function getObjectNameBack(text, endOffset)
     return name
 end
 
-local function inferObjectTypeByText(text, objName, textOffset)
-    local left = text:sub(1, textOffset)
-    local callName
-    for fn in left:gmatch('local%s+' .. objName .. '%s*=%s*([%w_%.:]+)%s*%(') do
-        callName = fn
-    end
-    if not callName then
-        return nil
-    end
-    local plainFn = callName:gsub(':', '.')
-    local escapedFn = plainFn:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
-    local returnType
-    for r in left:gmatch('%-%-%-@return%s+([%w_%.]+)%s*[^\r\n]*\r?\n%s*local%s+function%s+' .. escapedFn .. '%s*%(') do
-        returnType = r
-    end
-    if returnType then
-        return returnType
-    end
-    for r in left:gmatch('%-%-%-@return%s+([%w_%.]+)%s*[^\r\n]*\r?\n%s*function%s+' .. escapedFn .. '%s*%(') do
-        returnType = r
-    end
-    return returnType
-end
-
 ---@param text string
 ---@param objName string
 ---@return string[]
@@ -446,7 +422,7 @@ ls.feature.provider.completion(function (param, action)
         local objCurrent = objVar and objVar:getCurrentValue() or nil
         local objGuess = objVar and objVar:getGuessValue() or nil
         local objStatic = objVar and objVar:getStaticValue() or nil
-        local inferredType = objName and inferObjectTypeByText(param.scanner.text, objName, textOffset) or nil
+        local inferredType = getTypeName(objCurrent) or getTypeName(objGuess) or getTypeName(objStatic)
         local stringLike = hasStringType(objNode)
                         or hasStringType(objCurrent)
                         or hasStringType(objGuess)
@@ -683,30 +659,3 @@ ls.feature.provider.completion(function (param, action)
         action.push(item)
     end
 end, 10)
-
-ls.feature.provider.completion(function (param, action)
-    local trigger, objEnd = param.scanner:getFieldTriggerBack()
-    if trigger ~= '.' then
-        return
-    end
-    if param.inComment then
-        return
-    end
-    local objName = getObjectNameBack(param.scanner.text, objEnd)
-    if not objName then
-        return
-    end
-
-    local keys = inferTypedStringKeyTableLiteralKeys(param.scanner.text, objName)
-    if #keys == 0 then
-        return
-    end
-
-    action.skip()
-    for _, key in ipairs(keys) do
-        action.push {
-            label = key,
-            kind  = ls.spec.CompletionItemKind.Enum,
-        }
-    end
-end, 9)

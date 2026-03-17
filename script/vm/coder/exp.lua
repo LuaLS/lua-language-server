@@ -131,6 +131,10 @@ end)
 ls.vm.registerCoderProvider('paren', function (coder, source)
     ---@cast source LuaParser.Node.Paren
 
+    if not source.value then
+        coder:addUnknown(source)
+        return
+    end
     coder:compile(source.value)
     coder:addLine('{key} = {value}' % {
         key   = coder:getKey(source),
@@ -241,7 +245,9 @@ ls.vm.registerCoderProvider('unary', function (coder, source)
         needCloseNode = true
     end
 
-    coder:compile(source.exp)
+    if source.exp then
+        coder:compile(source.exp)
+    end
 
     if needCloseNode then
         coder:getTracer():closeNode()

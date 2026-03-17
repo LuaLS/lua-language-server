@@ -286,12 +286,10 @@ function M:addIndentation(delta)
 end
 
 ---@param source? LuaParser.Node.Base
----@param canBeNil? boolean
 ---@return boolean
-function M:compile(source, canBeNil)
+function M:compile(source)
     if not source then
-        assert(canBeNil, 'Source is nil')
-        return false
+        error('Source is nil')
     end
     if self.compiled[source] then
         error('Source already compiled: ' .. source.kind)

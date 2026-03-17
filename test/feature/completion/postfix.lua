@@ -380,5 +380,22 @@ end)
     },
 }
 
--- [SKIPPED][nil-source-error] self.results.list[#<?>] series: removing <?> leaves [#] which triggers coder Source is nil, skipped
--- [SKIPPED][nil-source-error] fff[#ff<?>] / local _ = fff.kkk[#<?>] / fff.kkk[#<?>].yy - same issue
+-- 修复前会崩溃: [#] 中 unary 节点 exp=nil 导致 assert
+-- cursor 紧跟 # 后，word 为空，返回所有可见局部变量（主 chunk 的 ...）
+TEST_COMPLETION [[
+self.results.list[#<??>]
+]] (EXISTS)
+
+-- word=ff，无匹配局部或全局，返回 nil
+TEST_COMPLETION [[
+fff[#ff<??>]
+]] (nil)
+
+-- cursor 紧跟 # 后，同 case 1
+TEST_COMPLETION [[
+local b = fff.kkk[#<??>]
+]] (EXISTS)
+
+TEST_COMPLETION [[
+local c = fff.kkk[#<??>].yy
+]] (EXISTS)

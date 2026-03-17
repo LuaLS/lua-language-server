@@ -90,8 +90,52 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
+    if op == 'ifcall' then
+        local fn, args = expr:match('^([%w_%.:]+)%((.*)%)$')
+        if fn then
+            if args ~= '' then
+                pushPostfix('ifcall', 'if ' .. fn .. ' then ' .. fn .. '(' .. args .. ') end$0')
+            else
+                pushPostfix('ifcall', 'if ' .. fn .. ' then ' .. fn .. '() end$0')
+            end
+        else
+            pushPostfix('ifcall', 'if ' .. expr .. ' then ' .. expr .. '($1) end$0')
+        end
+        return
+    end
+
+    if op == 'local' then
+        pushPostfix('local', 'local $1 = ' .. expr .. '$0')
+        return
+    end
+
+    if op == 'ipairs' then
+        pushPostfix('ipairs', 'for ${1:i}, ${2:v} in ipairs(' .. expr .. ') do\n\t$0\nend')
+        return
+    end
+
+    if op == 'pairs' then
+        pushPostfix('pairs', 'for ${1:k}, ${2:v} in pairs(' .. expr .. ') do\n\t$0\nend')
+        return
+    end
+
+    if op == 'unpack' then
+        pushPostfix('unpack', 'unpack(' .. expr .. ')')
+        return
+    end
+
     if op == 'insert' then
         pushPostfix('insert', 'table.insert(' .. expr .. ', $0)')
+        return
+    end
+
+    if op == 'remove' then
+        pushPostfix('remove', 'table.remove(' .. expr .. ', $0)')
+        return
+    end
+
+    if op == 'concat' then
+        pushPostfix('concat', 'table.concat(' .. expr .. ', $0)')
         return
     end
 

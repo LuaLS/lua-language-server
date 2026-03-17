@@ -199,6 +199,168 @@ xx++<??>
     },
 }
 
+-- ifcall: 标识符形式
+TEST_COMPLETION [[
+xx@ifcall<??>
+]] {
+    [1] = {
+        label = 'ifcall',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- ifcall: 调用形式（无参数）
+TEST_COMPLETION [[
+xx()@ifcall<??>
+]] {
+    [1] = {
+        label = 'ifcall',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- ifcall: 调用形式（有参数）
+TEST_COMPLETION [[
+xx(1, 2)@ifcall<??>
+]] {
+    [1] = {
+        label = 'ifcall',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- local
+TEST_COMPLETION [[
+xx@local<??>
+]] {
+    [1] = {
+        label = 'local',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- ipairs
+TEST_COMPLETION [[
+xx@ipairs<??>
+]] {
+    [1] = {
+        label = 'ipairs',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- pairs
+TEST_COMPLETION [[
+xx@pairs<??>
+]] {
+    [1] = {
+        label = 'pairs',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- unpack
+TEST_COMPLETION [[
+xx@unpack<??>
+]] {
+    [1] = {
+        label = 'unpack',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- remove
+TEST_COMPLETION [[
+xx@remove<??>
+]] {
+    [1] = {
+        label = 'remove',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
+-- concat
+TEST_COMPLETION [[
+xx@concat<??>
+]] {
+    [1] = {
+        label = 'concat',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        textEdit = EXISTS,
+        additionalTextEdits = {
+            {
+                start   = EXISTS,
+                finish  = EXISTS,
+                newText = ''
+            }
+        }
+    },
+}
+
 TEST_COMPLETION [[
 fff(function ()
     xx@xpcall<??>

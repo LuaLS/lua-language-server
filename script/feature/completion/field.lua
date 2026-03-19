@@ -1,6 +1,11 @@
+-- 字段补全 provider：处理 '.' 和 ':' 触发的补全请求。
+-- 从类型系统（Node.Table / Node.Type fieldTable）以及光标处可见的变量中收集候选项。
+
 local util = ls.feature.completionUtil
 local guide = require 'parser.guide'
 
+-- 从 `endOffset` 位置向前扫描 `text`，提取触发字符前的标识符
+-- （例如 "foo.bar" 中的 "foo"）。
 ---@param text string
 ---@param endOffset integer
 ---@return string?
@@ -20,6 +25,8 @@ local function getObjectNameBack(text, endOffset)
     return name
 end
 
+-- 遍历 AST，找到包含 `textOffset` 的最深层 block。
+-- 在 `param.sources` 为空时作为兜底作用域锚点使用。
 ---@param ast any
 ---@param textOffset integer
 ---@return any
@@ -38,6 +45,9 @@ local function findDeepestBlock(ast, textOffset)
     return block
 end
 
+-- 根据静态节点判断候选项的 LSP CompletionItemKind。
+-- 未展开的 Node.Field 包装节点一律返回 Field；
+-- 若值可调用，则根据 trigger 返回 Function 或 Method。
 ---@param fieldNode Node.Field?
 ---@param trigger string
 ---@return integer
@@ -53,6 +63,8 @@ local function fieldCompletionKind(fieldNode, trigger)
     return ls.spec.CompletionItemKind.Field
 end
 
+-- 同 fieldCompletionKind，但用于运行时已展开的节点
+-- （调用方已经解包 Node.Field，无需再检查 kind == 'field'）。
 local function runtimeFieldCompletionKind(node, trigger)
     if not node then
         return ls.spec.CompletionItemKind.Field
@@ -65,6 +77,8 @@ local function runtimeFieldCompletionKind(node, trigger)
     return ls.spec.CompletionItemKind.Field
 end
 
+-- 从 Node.Table（或类型的 fieldTable）中追加与 `word` 模糊匹配的字符串键字段。
+-- 已在 `seen` 中的键跳过，避免重复。
 ---@param tableNode Node.Table?
 ---@param word string
 ---@param matches {name: string, valueNode: Node?}[]
@@ -93,6 +107,8 @@ local function appendFieldsFromTable(tableNode, word, matches, seen)
     end
 end
 
+-- 从 Node.Table 中追加整数键字段（数组风格）。
+-- 在 '.' 触发时会以 '[N]' 的形式输出补全项。
 ---@param tableNode Node.Table?
 ---@param intMatches {literal: integer, valueNode: Node?}[]
 local function appendIntegerFieldsFromTable(tableNode, intMatches)
@@ -234,6 +250,11 @@ local function getTypeName(node)
 end
 
 ls.feature.provider.completion(function (param, action)
+    -- ── 阶段 1：扫描触发字符 ────────────────────────────────────────────────
+    -- 检测光标前是否存在 '.' 或 ':' 触发字符。
+    -- `trigger`  = '.' 或 ':'
+    -- `objEnd`   = 对象表达式最后一个字符的文本偏移
+    -- `word`     = 已输入的字段名前缀（可为空串）
     local trigger, objEnd, word = param.scanner:getFieldTriggerBack()
     if not trigger then
         return
@@ -248,10 +269,13 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    -- collect integer-key completions (only on '.' trigger with empty word)
+    -- ── 阶段 2：定位对象的 AST 源节点 ──────────────────────────────────────
+    -- 整数键补全项（仅在 '.' 触发且 word 为空时使用）
     local intMatches = {}
     local intSeen   = {}
 
+    -- findSources 根据文本偏移返回对应的 AST 源节点。
+    -- 偏移量 ±1 容错，处理边界差一问题。
     local objSources = document:findSources(objEnd)
     if (not objSources or #objSources == 0) and objEnd > 1 then
         objSources = document:findSources(objEnd - 1)
@@ -263,6 +287,8 @@ ls.feature.provider.completion(function (param, action)
 
     local objName = getObjectNameBack(param.scanner.text, objEnd)
 
+    -- 第一轮：优先找 kind=='var' 且 id 与对象名完全一致的源节点。
+    -- 第二轮：退而求其次，取 VM 中有对应 node 或 variable 的任意节点。
     local objSource
     local objNode
     local objVar
@@ -292,24 +318,25 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
+    -- ── 阶段 3：快速路径收集 ────────────────────────────────────────────────
+    -- 直接使用 VM 已找到的 node/var，遍历其 Node.Table / Node.Type 子节点，
+    -- 收集匹配的字段名。
     local matches = {}
     local seen = {}
     appendFieldsFromNode(objNode, word, matches, seen)
 
     if objVar then
-        appendFieldsFromNode(objVar:getCurrentValue(), word, matches, seen)
-        appendFieldsFromNode(objVar:getGuessValue(), word, matches, seen)
-        appendFieldsFromNode(objVar:getStaticValue(), word, matches, seen)
+        appendFieldsFromNode(objVar.value, word, matches, seen)
     end
 
+    -- 整数键字段（数组下标）只在 '.' 触发且没有前缀词时才有意义，
+    -- 输出时会生成替换 '.' 为 '[N]' 的 textEdit。
     if trigger == '.' and word == '' then
         appendIntegerFieldsFromNode(objNode, intMatches)
         if objVar then
-            appendIntegerFieldsFromNode(objVar:getCurrentValue(), intMatches)
-            appendIntegerFieldsFromNode(objVar:getGuessValue(), intMatches)
-            appendIntegerFieldsFromNode(objVar:getStaticValue(), intMatches)
+            appendIntegerFieldsFromNode(objVar.value, intMatches)
         end
-        -- deduplicate integer matches
+        -- 对整数键去重
         local deduped = {}
         for _, item in ipairs(intMatches) do
             if not intSeen[item.literal] then
@@ -320,6 +347,8 @@ ls.feature.provider.completion(function (param, action)
         intMatches = deduped
     end
 
+    -- 类型名用于后续在 runtime 中查找 fieldTable，
+    -- 也用于判断是否需要为点调用风格额外生成 Snippet 项。
     local objTypeName = getTypeName(objNode)
                     or (objVar and getTypeName(objVar.value) or nil)
 
@@ -327,13 +356,18 @@ ls.feature.provider.completion(function (param, action)
         return ls.util.stringLess(a.name, b.name)
     end)
 
+    -- ── 阶段 4：快速路径无结果时的兜底处理 ────────────────────────────────
     if #matches == 0 then
         local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset, param)
+        -- 再次尝试解析 objVar：先直接从 objSource 查 VM，
+        -- 若仍失败则通过 guide.getVisibleLocals 遍历光标处所有可见局部变量，按名称匹配。
         objVar = objVar or (objSource and param.scope.vm:getVariable(objSource) or nil)
         if not objVar then
             ---@type any
             local source = param.sources[1]
             if not source then
+                -- param.sources 在隐式位置可能为空；
+                -- 用最深的包含光标的 AST block 合成一个最小作用域锚点。
                 local ast = document.ast
                 if ast and ast.main then
                     source = {
@@ -363,13 +397,19 @@ ls.feature.provider.completion(function (param, action)
         end
         local objValue = objVar and objVar.value or nil
         local inferredType = getTypeName(objNode) or getTypeName(objValue)
+        -- 字符串类型的对象需要追加完整的 string 标准库成员。
         local stringLike = hasStringType(objNode)
                         or hasStringType(objValue)
                         or inferredType == 'string'
 
+        -- 具名类型补全：在 runtime 中查找该类型的 fieldTable。
         if inferredType then
             appendFieldsFromTable(param.scope.rt.type(inferredType).fieldTable, word, matches, seen)
         end
+        -- 字符串专项补全，依次尝试：
+        --   1. runtime 中 'string' 类型的 fieldTable
+        --   2. 当前环境中用户自定义的 string 表
+        --   3. 硬编码的 DEFAULT_STRING_MEMBERS 兜底列表
         if stringLike then
             local rtStringType = param.scope.rt.type('string')
             if rtStringType then
@@ -425,6 +465,8 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
+    -- ── 阶段 5：构建并输出补全项 ──────────────────────────────────────────
+    -- 通知框架本 provider 已接管此次请求，阻止低优先级 provider 继续处理同一触发位置。
     action.skip()
 
     local outItems = {}
@@ -432,7 +474,7 @@ ls.feature.provider.completion(function (param, action)
         outItems[#outItems+1] = item
     end
 
-    -- push integer-key items with a textEdit that replaces '.' with '[N]'
+    -- 整数键补全项：生成将 '.' 替换为 '[N]' 的 textEdit
     if trigger == '.' and #intMatches > 0 then
         table.sort(intMatches, function (a, b) return a.literal < b.literal end)
         local dotDisplayOffset = util.toDisplayOffset(param, objEnd)
@@ -450,9 +492,16 @@ ls.feature.provider.completion(function (param, action)
     end
 
     for _, item in ipairs(matches) do
+        -- `baseKind`：从类型系统中的节点静态推断出的 Kind。
+        -- `functionKind`：经运行时探查后可能升级为 Method/Function。
+        -- `functionValueNode`：用于生成签名标签的节点。
         local baseKind = fieldCompletionKind(item.valueNode, trigger)
         local functionKind = baseKind
         local functionValueNode = item.valueNode
+
+        -- Node.Field 包裹 Node.Variable 是类成员模式：
+        -- `MyClass.method = function(self, ...) end`。
+        -- 展开到内层变量，以便检查其函数节点。
         local rawValueNode = item.valueNode and item.valueNode.kind == 'field' and item.valueNode.value or nil
 
         if rawValueNode and rawValueNode.kind == 'variable' then
@@ -468,6 +517,9 @@ ls.feature.provider.completion(function (param, action)
             end
         end
 
+        -- 运行时精化：若静态分析未能确定 Kind，
+        -- 从实际对象的子变量赋值记录中查找函数值
+        -- （例如函数在其他文件中赋值的情况）。
         if functionKind == ls.spec.CompletionItemKind.Field then
             local itemObjVar = param.scope.vm:getVariable(objSource)
             if itemObjVar then
@@ -500,6 +552,8 @@ ls.feature.provider.completion(function (param, action)
 
         local signatureLabel
         local snippetText
+        -- `classMemberLike` 为 true 表示该字段以变量形式声明（类成员风格），
+        -- 只有此类字段才会生成完整的签名标签。
         local classMemberLike = rawValueNode and rawValueNode.kind == 'variable'
         if classMemberLike and functionKind ~= ls.spec.CompletionItemKind.Field and functionValueNode then
             local funcs = util.collectFunctionNodes(functionValueNode)
@@ -560,6 +614,9 @@ ls.feature.provider.completion(function (param, action)
         end
     end
 
+    -- ── 阶段 6：排序并推送 ────────────────────────────────────────────────
+    -- ':' 触发：Method > Function > Field（方法调用优先）。
+    -- '.' 触发：Field > Function > Method（数据字段优先）。
     local function rank(kind)
         if trigger == ':' then
             if kind == ls.spec.CompletionItemKind.Method then

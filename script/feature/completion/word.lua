@@ -134,7 +134,7 @@ ls.feature.provider.completion(function (param, action)
     end)
 
     for _, entry in ipairs(entries) do
-        local value = entry.var and entry.var:getStaticValue() or nil
+        local value = entry.var and entry.var.value or nil
         local funcs = util.collectFunctionNodes(value)
 
         if #funcs == 0 then
@@ -251,7 +251,7 @@ ls.feature.provider.completion(function (param, action)
     end)
 
     for _, item in ipairs(matches) do
-        local value = item.var:getStaticValue()
+        local value = item.var.value
         local funcs = util.collectFunctionNodes(value)
 
         action.push {

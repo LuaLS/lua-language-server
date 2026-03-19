@@ -8,6 +8,26 @@ local function normalizeTypeExpr(expr)
     return util.trim(expr:gsub('%?$', ''))
 end
 
+--- 直接从 Node 树中收集所有字符串字面量（"a"、'b' 等）。
+--- 自动穿透 union / field / type / call 等节点，无需文本解析。
+---@param node any
+---@return string[]
+local function collectStringLiteralsFromNode(node)
+    if not node then return {} end
+    local results = {}
+    local seen    = {}
+    node:each('value', function (n)
+        if n.typeName == 'string' then
+            local lit = n:view()
+            if not seen[lit] then
+                seen[lit] = true
+                results[#results+1] = lit
+            end
+        end
+    end)
+    return results
+end
+
 ---@param text string
 ---@param aliasName string
 ---@return string?
@@ -349,147 +369,41 @@ local function findVisibleLocalVariable(param, textOffset, varName)
     return nil
 end
 
+--- 根据一组候选 key 节点，在变量的当前/猜测/静态值上依次调用 :get，
+--- 返回第一个非 NIL/NEVER 的值节点，供直接收集字面量使用。
 ---@param param Feature.Completion.Param
 ---@param textOffset integer
 ---@param varName string
----@param keyNode Node
----@return string?
-local function inferTableValueTypeByNodeWithKeyNode(param, textOffset, varName, keyNode)
+---@param keyNodes any[]  候选 key，依次尝试（第一个命中即返回）
+---@return any?          值节点（Node）
+local function lookupTableValueNode(param, textOffset, varName, keyNodes)
     local var = findVisibleLocalVariable(param, textOffset, varName)
     if not var then
         return nil
     end
-
     local rt = param.scope.rt
 
-    ---@param node Node?
-    ---@return string?
-    local function inferFromNode(node)
-        if not node then
+    local function tryGet(node)
+        if not node or node == rt.NIL or node == rt.NEVER then
             return nil
         end
-
-        local value, exists = node:get(keyNode)
-        if not exists or not value or value == rt.NIL or value == rt.NEVER then
-            return nil
-        end
-
-        if value.kind == 'field' then
-            ---@cast value Node.Field
-            value = value.value
-            if not value or value == rt.NIL or value == rt.NEVER then
-                return nil
+        for _, keyNode in ipairs(keyNodes) do
+            local v, exists = node:get(keyNode)
+            if exists and v and v ~= rt.NIL and v ~= rt.NEVER then
+                if v.kind == 'field' then
+                    v = v.value
+                end
+                if v and v ~= rt.NIL and v ~= rt.NEVER then
+                    return v
+                end
             end
         end
-
-        local viewed = normalizeTypeExpr(value:view())
-        if viewed == '' then
-            return nil
-        end
-        return viewed
-    end
-
-    local inferred = inferFromNode(var:getCurrentValue())
-        or inferFromNode(var:getGuessValue())
-        or inferFromNode(var:getStaticValue())
-    if inferred then
-        return inferred
-    end
-    return nil
-end
-
----@param param Feature.Completion.Param
----@param textOffset integer
----@param varName string
----@param keyLiteral string
----@return string?
-local function inferTableValueTypeByNode(param, textOffset, varName, keyLiteral)
-    if not keyLiteral or keyLiteral == '' then
-        return nil
-    end
-    return inferTableValueTypeByNodeWithKeyNode(param, textOffset, varName, param.scope.rt.value(keyLiteral))
-end
-
----@param param Feature.Completion.Param
----@param textOffset integer
----@param varName string
----@return string?
-local function inferTableValueTypeByNodeForStringKey(param, textOffset, varName)
-    return inferTableValueTypeByNodeWithKeyNode(param, textOffset, varName, param.scope.rt.STRING)
-end
-
----@param param Feature.Completion.Param
----@param textOffset integer
----@param varName string
----@return string?
-local function inferTableValueTypeByNodeForIntegerKey(param, textOffset, varName)
-    return inferTableValueTypeByNodeWithKeyNode(param, textOffset, varName, param.scope.rt.INTEGER)
-end
-
----@param param Feature.Completion.Param
----@param text string
----@param textOffset integer
----@return string?
-local function inferEnumTypeFromTypedTableLiteral(param, text, textOffset)
-    local varName, fieldKey = resolveAssignedVarAndKeyFromSources(param, textOffset)
-    local left = text:sub(1, textOffset)
-    if not varName then
-        varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
-    end
-    if not varName then
         return nil
     end
 
-    if fieldKey then
-        local valueType = inferTableValueTypeByNode(param, textOffset, varName, fieldKey)
-        if valueType then
-            return valueType
-        end
-    end
-
-    local inferred = inferTableValueTypeByNodeForIntegerKey(param, textOffset, varName)
-    if inferred then
-        return inferred
-    end
-
-    return nil
-end
-
----@param param Feature.Completion.Param
----@param text string
----@param textOffset integer
----@return string?
-local function inferEnumTypeFromTypedTableFieldAssign(param, text, textOffset)
-    local varName, fieldKey = resolveAssignedVarAndKeyFromSources(param, textOffset)
-    if not varName then
-        return nil
-    end
-
-    if fieldKey then
-        local valueType = inferTableValueTypeByNode(param, textOffset, varName, fieldKey)
-        if valueType then
-            return valueType
-        end
-    end
-
-    return nil
-end
-
----@param param Feature.Completion.Param
----@param text string
----@param textOffset integer
----@param varName string
----@param fieldKey string?
----@return string?
-local function findTypedLocalTableValueType(param, text, textOffset, varName, fieldKey)
-    if fieldKey then
-        local valueType = inferTableValueTypeByNode(param, textOffset, varName, fieldKey)
-        if valueType then
-            return valueType
-        end
-    end
-
-    return inferTableValueTypeByNodeForStringKey(param, textOffset, varName)
+    return tryGet(var:getCurrentValue())
+        or tryGet(var:getGuessValue())
+        or tryGet(var:getStaticValue())
 end
 
 ---@param param Feature.Completion.Param
@@ -751,9 +665,12 @@ parseFunParams = function (funType)
     return params
 end
 
----@param paramDef string
+---@param paramDef string?
 ---@return string?
 extractParamType = function (paramDef)
+    if not paramDef then
+        return nil
+    end
     return util.trim((paramDef:match('^[%w_%.]+%s*:%s*(.+)$') or paramDef))
 end
 
@@ -771,7 +688,7 @@ local function inferArgTypeFromOverloads(text, rawFnName, argIndex, isMethodCall
 
     local pos = 1
     while true do
-        local fnPos, fnEnd, fnDecl = text:find('()function%s+([%w_%.:]+)%s*%(', pos)
+        local fnPos, fnEnd, fnDecl = text:find('function%s+([%w_%.:]+)%s*%(', pos)
         if not fnPos then
             break
         end
@@ -953,6 +870,8 @@ local function inferFunctionArgTypeFromFieldOverloads(text, fnName, argHead, arg
     return fallback
 end
 
+-- 函数变量调用，参数位置的 fun(...) 类型 → 函数代码片段补全
+-- e.g. `---@type fun(x: "a") local f; f(<??>)`
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1022,6 +941,8 @@ ls.feature.provider.completion(function (param, action)
     end
 end, 17)
 
+-- 具名函数调用，形参类型为 fun(...) 时在调用处补全函数代码片段
+-- e.g. `---@overload fun(cb: fun()) function setup(cb) end; setup(<??>)`
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1129,6 +1050,8 @@ ls.feature.provider.completion(function (param, action)
     }
 end, 16)
 
+-- 具名函数调用，形参类型为字符串枚举时的枚举字面量补全
+-- e.g. `---@param mode "r"|"w" function open(mode) end; open(<??>)`
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1235,8 +1158,9 @@ ls.feature.provider.completion(function (param, action)
     end
 end, 24)
 
--- `---@type table<string, "a"|"b"> local x` 的值位补全：
--- 支持 `x.a = <??>` / `x['a'] = <??>` / `local x = { a = <??> }`
+-- `---@type table<string, "a"|"b"> local x` 具名字段值补全（高优先级）
+-- 处理：`x.foo = <??>` / `x["foo"] = <??>` / `local x = { foo = <??> }`
+-- 须通过 AST 拿到 varName + fieldKey；无具名字段的位置不在此处理
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1250,14 +1174,15 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    local valueType = findTypedLocalTableValueType(param, text, textOffset, varName, fieldKey)
-    if not valueType then
-        return
+    local rt = param.scope.rt
+    local keyNodes = {}
+    if fieldKey and fieldKey ~= '' then
+        keyNodes[#keyNodes+1] = rt.value(fieldKey)
     end
+    keyNodes[#keyNodes+1] = rt.STRING
 
-    local aliases = util.collectAliases(text)
-    local resolvedType = resolveEnumTypeExprFromText(text, aliases, valueType, false)
-    local enums = util.extractEnumLiterals(resolvedType)
+    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local enums = collectStringLiteralsFromNode(valueNode)
     if #enums == 0 then
         return
     end
@@ -1294,6 +1219,8 @@ ls.feature.provider.completion(function (param, action)
     end
 end, 1001)
 
+-- 类字段类型为 fun(...) 时赋值处的函数代码片段补全
+-- e.g. `---@class Foo; ---@field cb fun(x: integer); local o: Foo; o.cb = <??>` 
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1337,6 +1264,8 @@ ls.feature.provider.completion(function (param, action)
     }
 end, 17)
 
+-- 局部变量赋值/比较时，从该变量的类型注解推断枚举字面量（文本路径，非表类型变量）
+-- e.g. `---@type "a"|"b" local x; x == <??>` 或 `x = <??>` 
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1398,6 +1327,9 @@ ls.feature.provider.completion(function (param, action)
     end
 end, 24)
 
+-- 具名字段值补全（普通优先级）
+-- 处理：`t.foo = <??>` / `t["foo"] = <??>` / `local t = { foo = <??> }` 中具名字段的值位置
+-- 须通过 AST 拿到 varName + fieldKey；无具名字段（数组元素）的位置不在此处理
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return
@@ -1407,15 +1339,206 @@ ls.feature.provider.completion(function (param, action)
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
 
-    local inferredType = inferEnumTypeFromTypedTableLiteral(param, text, textOffset)
-                    or inferEnumTypeFromTypedTableFieldAssign(param, text, textOffset)
-    if not inferredType then
+    local varName, fieldKey = resolveAssignedVarAndKeyFromSources(param, textOffset)
+    if not varName or not fieldKey or fieldKey == '' then
         return
     end
 
-    local aliases = util.collectAliases(text)
-    local resolvedType = resolveEnumTypeExprFromText(text, aliases, inferredType, true)
-    local enums = util.extractEnumLiterals(resolvedType)
+    local rt = param.scope.rt
+    local keyNodes = { rt.value(fieldKey), rt.STRING }
+
+    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local enums = collectStringLiteralsFromNode(valueNode)
+    if #enums == 0 then
+        return
+    end
+
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and inSingleQuote then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    action.skip()
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if label:match('^\'".+"\'$') then
+            goto continue
+        end
+        if label:match("^''.+''$") then
+            goto continue
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        ---@type any
+        local item = {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = {
+                start = editStart,
+                finish = editFinish,
+                newText = label,
+            },
+        }
+        action.push(item)
+        ::continue::
+    end
+end, 24)
+
+-- 数组元素补全（表构造器数组位置，由 AST 确定当前下标）
+-- 处理：`local l = {<??>}` / `local l = {x, <??>}` / `local l = {<??>, x}` 等
+-- 找到包含光标的最小 table 节点，统计其中 finish < cursor 的数组元素（subtype=='exp'）个数得到下标。
+-- 若光标处于具名字段（subtype~='exp'）的范围内，则跳过（交由 B2 provider 处理）。
+ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+
+    -- 在父链中找到包含光标的最小（span 最短）table 节点，同时不在具名字段范围内
+    local varName, index
+    local bestSpan = math.maxinteger
+
+    for _, source in ipairs(collectAssignmentCandidateSources(param, textOffset)) do
+        local current = source
+        for _ = 1, 10 do
+            if not current then break end
+            if current.kind == 'table'
+            and current.start <= textOffset
+            and textOffset <= current.finish then
+                local span = current.finish - current.start
+                if span < bestSpan then
+                    local name = inferOwnerVarNameFromTableNode(current)
+                    if name then
+                        -- 若光标落在某个具名字段（field/index subtype）的范围内，属于 B2 场景
+                        local inNamedField = false
+                        for _, field in ipairs(current.fields or {}) do
+                            if field.subtype ~= 'exp'
+                            and field.start <= textOffset
+                            and textOffset <= field.finish then
+                                inNamedField = true
+                                break
+                            end
+                        end
+                        if not inNamedField then
+                            bestSpan = span
+                            -- 统计在光标之前已完成的数组元素数（finish < cursor）
+                            local count = 0
+                            for _, field in ipairs(current.fields or {}) do
+                                if field.subtype == 'exp' and field.finish < textOffset then
+                                    count = count + 1
+                                end
+                            end
+                            varName = name
+                            index   = count + 1
+                        end
+                    end
+                end
+            end
+            current = current.parent
+        end
+    end
+
+    if not varName then
+        return
+    end
+
+    local left = text:sub(1, textOffset)
+    local rt = param.scope.rt
+    local keyNodes = { rt.value(index) }
+
+    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local enums = collectStringLiteralsFromNode(valueNode)
+    if #enums == 0 then
+        return
+    end
+
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and inSingleQuote then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    action.skip()
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if label:match('^\'".+"\'$') then
+            goto continue
+        end
+        if label:match("^''.+''$") then
+            goto continue
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        ---@type any
+        local item = {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = {
+                start = editStart,
+                finish = editFinish,
+                newText = label,
+            },
+        }
+        action.push(item)
+        ::continue::
+    end
+end, 24)
+
+-- 表构造器具名字段值补全（文本匹配兜底）
+-- 处理：`local t = { foo = <??>}` / `local t = { ["foo"] = <??>}` 等光标在 `key =` 之后的位置
+-- resolveAssignedVarAndKeyFromSources 在表构造器值位置无法解析 fieldKey，故用文本匹配兜底。
+ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local left = text:sub(1, textOffset)
+
+    local varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')
+    if not varName then
+        return
+    end
+
+    -- 必须在 `key =` 之后才由本 provider 处理（word: foo = 或 bracket: ["foo"] = / ['foo'] =）
+    local afterBrace = left:match('{([^{}]-)$') or ''
+    local fieldKey = afterBrace:match('([%w_]+)%s*=%s*["\']?[^"\'\r\n,{}]*$')
+                  or afterBrace:match('%[["\']([^"\']-)["\']%]%s*=%s*["\']?[^"\'\r\n,{}]*$')
+    if not fieldKey then
+        return
+    end
+
+    local rt = param.scope.rt
+    local keyNodes = { rt.value(fieldKey) }
+
+    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local enums = collectStringLiteralsFromNode(valueNode)
     if #enums == 0 then
         return
     end

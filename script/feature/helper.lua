@@ -91,7 +91,7 @@ function ls.feature.helper.providers()
                 if priority <= skipPriorty then
                     break
                 end
-                xpcall(provider, log.error, param, {
+                provider(param, {
                     push = function (loc)
                         results[#results+1] = loc
                     end,

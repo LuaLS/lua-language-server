@@ -315,13 +315,88 @@ x = '<??>'
 	},
 }
 
--- [SKIPPED][table-literal-union] table<string, literal-union> 字段赋值补全（dot）当前返回空，暂不迁移
+-- table<string, literal-union> 四种场景
+TEST_COMPLETION [[
+---@type table<string, "a"|"b"|"c">
+local t
 
--- [SKIPPED][table-literal-union] table<string, literal-union> 字段赋值补全（index）当前返回空，暂不迁移
+t.foo = <??>
+]] {
+	{ label = '"a"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"b"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"c"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
 
--- [SKIPPED][table-literal-union] table<string, literal-union> 构造器赋值补全（dot）当前返回空，暂不迁移
+TEST_COMPLETION [[
+---@type table<string, "a"|"b"|"c">
+local t
 
--- [SKIPPED][table-literal-union] table<string, literal-union> 构造器赋值补全（index）当前返回空，暂不迁移
+t["foo"] = <??>
+]] {
+	{ label = '"a"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"b"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"c"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type ["a", "b", "c"]
+local t = { <??> }
+]] {
+	{ label = '"a"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type ["a", "b", "c"]
+local t = { x, <??> }
+]] {
+	{ label = '"b"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type ["a", "b", "c"]
+local t = { x, y, <??> }
+]] {
+	{ label = '"c"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type table<string, "a"|"b"|"c">
+local t = { foo = <??> }
+]] {
+	{ label = '"a"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"b"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"c"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type table<string, "a"|"b"|"c">
+local t = { ["foo"] = <??> }
+]] {
+	{ label = '"a"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"b"', kind = ls.spec.CompletionItemKind.EnumMember },
+	{ label = '"c"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type { x: "a", y: "b", z: "c" }
+local t = { x = <??> }
+]] {
+	{ label = '"a"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type { x: "a", y: "b", z: "c" }
+local t = { y = <??> }
+]] {
+	{ label = '"b"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
+
+TEST_COMPLETION [[
+---@type { x: "a", y: "b", z: "c" }
+local t = { z = <??> }
+]] {
+	{ label = '"c"', kind = ls.spec.CompletionItemKind.EnumMember },
+}
 
 TEST_COMPLETION [[
 ---@type table<"foo"|"bar", "red"|"blue">

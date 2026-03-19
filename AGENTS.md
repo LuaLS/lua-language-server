@@ -6,8 +6,7 @@ It is intended for both human collaborators and coding agents.
 ## 1) Run and Test Rules
 
 - Run tests from the `server` root with:
-  - `bin\\lua-language-server.exe test.lua`
-  - or `bin\\lua-language-server.exe --test <suite-or-file>`
+  - `bin\\lua-language-server.exe --test <suite-or-file>`
 - Do not run tasks `PreCompile` or `Compile` for feature work in this repo context.
 - Keep changes focused. Avoid unrelated refactors and broad formatting-only edits.
 - Put temporary debug outputs in `tmp/` only.

@@ -224,6 +224,7 @@ do
 
     local x2 = x:shadow()
     x2:setCurrentValue(rt.call('op.add', { x, rt.value(1) }))
+    ---@diagnostic disable-next-line: invisible
     x2:addAssign(rt.field('x', x2:getCurrentValue()))
 
     local W = rt:globalGet('W'):shadow()

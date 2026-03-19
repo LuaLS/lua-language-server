@@ -1,6 +1,5 @@
 local util = ls.feature.completionUtil
 local guide = require 'parser.guide'
-local hoverUtil = require 'feature.hover-util'
 
 ---@param text string
 ---@param endOffset integer
@@ -322,9 +321,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local objTypeName = getTypeName(objNode)
-                    or (objVar and getTypeName(objVar:getCurrentValue()) or nil)
-                    or (objVar and getTypeName(objVar:getGuessValue()) or nil)
-                    or (objVar and getTypeName(objVar:getStaticValue()) or nil)
+                    or (objVar and getTypeName(objVar.value) or nil)
 
     table.sort(matches, function (a, b)
         return ls.util.stringLess(a.name, b.name)
@@ -349,13 +346,9 @@ ls.feature.provider.completion(function (param, action)
                     if loc.id == objName then
                         objVar = param.scope.vm:getVariable(loc)
                         if objVar then
-                            appendFieldsFromNode(objVar:getCurrentValue(), word, matches, seen)
-                            appendFieldsFromNode(objVar:getGuessValue(), word, matches, seen)
-                            appendFieldsFromNode(objVar:getStaticValue(), word, matches, seen)
+                            appendFieldsFromNode(objVar.value, word, matches, seen)
                             if trigger == '.' and word == '' then
-                                appendIntegerFieldsFromNode(objVar:getCurrentValue(), intMatches)
-                                appendIntegerFieldsFromNode(objVar:getGuessValue(), intMatches)
-                                appendIntegerFieldsFromNode(objVar:getStaticValue(), intMatches)
+                                appendIntegerFieldsFromNode(objVar.value, intMatches)
                             end
                             break
                         end
@@ -368,14 +361,10 @@ ls.feature.provider.completion(function (param, action)
                 return ls.util.stringLess(a.name, b.name)
             end)
         end
-        local objCurrent = objVar and objVar:getCurrentValue() or nil
-        local objGuess = objVar and objVar:getGuessValue() or nil
-        local objStatic = objVar and objVar:getStaticValue() or nil
-        local inferredType = getTypeName(objCurrent) or getTypeName(objGuess) or getTypeName(objStatic)
+        local objValue = objVar and objVar.value or nil
+        local inferredType = getTypeName(objNode) or getTypeName(objValue)
         local stringLike = hasStringType(objNode)
-                        or hasStringType(objCurrent)
-                        or hasStringType(objGuess)
-                        or hasStringType(objStatic)
+                        or hasStringType(objValue)
                         or inferredType == 'string'
 
         if inferredType then
@@ -390,7 +379,7 @@ ls.feature.provider.completion(function (param, action)
             local envVar = envLocal and param.scope.vm:getVariable(envLocal) or nil
             local childs = envVar and envVar:getChilds() or nil
             local stringVar = childs and childs['string'] or nil
-            local stringValue = stringVar and stringVar:getStaticValue() or nil
+            local stringValue = stringVar and stringVar.value or nil
             local stringKeys
             local stringMap
             if stringValue and stringValue.kind == 'table' then
@@ -480,13 +469,11 @@ ls.feature.provider.completion(function (param, action)
         end
 
         if functionKind == ls.spec.CompletionItemKind.Field then
-            local objVar = param.scope.vm:getVariable(objSource)
-            if objVar then
-                local childVar = objVar:getChild(item.name)
+            local itemObjVar = param.scope.vm:getVariable(objSource)
+            if itemObjVar then
+                local childVar = itemObjVar:getChild(item.name)
                 if childVar:hasAssign() then
-                    local childValue = childVar:getCurrentValue()
-                                    or childVar:getGuessValue()
-                                    or childVar:getStaticValue()
+                    local childValue = childVar.value
                     if childValue and childValue.kind == 'field' then
                         ---@cast childValue Node.Field
                         childValue = childValue.value and childValue.value.truly or nil

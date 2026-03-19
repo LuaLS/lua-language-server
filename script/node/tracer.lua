@@ -117,10 +117,7 @@ function W:traceVar(var)
     local node = self.map[alias]
     -- 用 getCurrentValue()（不触发 tracer）而非 .value（会触发新 Walker 递归）。
     -- 赋值点 shadow 的 currentValue 即是 Coder 编译时已设置好的赋值表达式值。
-    local value = node:getCurrentValue()
-               or node:getExpectValue()
-               or node:getGuessValue()
-               or self.scope.rt.ANY
+    local value = node:getStaticValue()
     self:setValue(id, value, true)
 end
 
@@ -145,10 +142,7 @@ function W:traceRef(ref)
         -- 则用 getCurrentValue/getExpectValue/getGuessValue 作为初始值；
         -- 普通节点（无 tracer）直接用 .value。
         if node.tracer then
-            value = node:getCurrentValue()
-                 or node:getExpectValue()
-                 or node:getGuessValue()
-                 or self.scope.rt.ANY
+            value = node:getStaticValue()
         else
             value = node.value or self.scope.rt.ANY
         end

@@ -577,6 +577,7 @@ function M:getStaticValue()
         or rt.ANY
 end
 
+---@package
 ---@return Node?
 function M:getExpectValue()
     local master = self.masterVariable or self
@@ -587,6 +588,7 @@ function M:getExpectValue()
         or nil
 end
 
+---@package
 ---@return Node?
 function M:getGuessValue()
     local master = self.masterVariable or self
@@ -616,6 +618,7 @@ function M:setCurrentValue(value)
     self:flushCache()
 end
 
+---@package
 ---@return Node?
 function M:getCurrentValue()
     local node = self.currentValue

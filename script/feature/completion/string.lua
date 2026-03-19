@@ -374,36 +374,20 @@ end
 ---@param param Feature.Completion.Param
 ---@param textOffset integer
 ---@param varName string
----@param keyNodes any[]  候选 key，依次尝试（第一个命中即返回）
+---@param keyNode Node.Key 候选 key
 ---@return any?          值节点（Node）
-local function lookupTableValueNode(param, textOffset, varName, keyNodes)
+local function lookupTableValueNode(param, textOffset, varName, keyNode)
     local var = findVisibleLocalVariable(param, textOffset, varName)
     if not var then
         return nil
     end
     local rt = param.scope.rt
 
-    local function tryGet(node)
-        if not node or node == rt.NIL or node == rt.NEVER then
-            return nil
-        end
-        for _, keyNode in ipairs(keyNodes) do
-            local v, exists = node:get(keyNode)
-            if exists and v and v ~= rt.NIL and v ~= rt.NEVER then
-                if v.kind == 'field' then
-                    v = v.value
-                end
-                if v and v ~= rt.NIL and v ~= rt.NEVER then
-                    return v
-                end
-            end
-        end
-        return nil
+    local v, exists = var:get(keyNode)
+    if exists and v and v ~= rt.NIL and v ~= rt.NEVER then
+        return v
     end
-
-    return tryGet(var:getCurrentValue())
-        or tryGet(var:getGuessValue())
-        or tryGet(var:getStaticValue())
+    return nil
 end
 
 ---@param param Feature.Completion.Param
@@ -452,23 +436,16 @@ local function inferFunctionTypeFromTypedClassFieldLiteralNodeView(param, text, 
         return nil
     end
 
-    local classNode = getClassNode(var:getCurrentValue())
-                   or getClassNode(var:getGuessValue())
-                   or getClassNode(var:getStaticValue())
+    local classNode = getClassNode(var.value)
     if not classNode then
         return nil
     end
 
-    local keyNode = rt.value(fieldKey)
-    local fieldNode, exists = classNode:get(keyNode)
+    local fieldNode, exists = classNode:get(fieldKey)
     if not exists or not fieldNode then
         return nil
     end
-    if fieldNode.kind == 'field' then
-        ---@cast fieldNode Node.Field
-        fieldNode = fieldNode.value
-    end
-    if not fieldNode or not util.hasFunctionNode(fieldNode) then
+    if not util.hasFunctionNode(fieldNode) then
         return nil
     end
 
@@ -560,9 +537,7 @@ local function inferEnumTypeFromTypedLocalVarExpr(param, textOffset)
             local viewed = normalizeTypeExpr(node:view())
             return viewed ~= '' and viewed or nil
         end
-        local inferred = inferFromNode(var:getCurrentValue())
-            or inferFromNode(var:getGuessValue())
-            or inferFromNode(var:getStaticValue())
+        local inferred = inferFromNode(var.value)
         if inferred then
             return inferred
         end
@@ -588,9 +563,7 @@ local function inferLocalVarTypeView(param, textOffset, varName)
             local v = normalizeTypeExpr(node:view())
             return v ~= '' and v or nil
         end
-        local viewed = getView(var:getCurrentValue())
-                    or getView(var:getGuessValue())
-                    or getView(var:getStaticValue())
+        local viewed = getView(var.value)
         if viewed then
             return viewed
         end
@@ -1170,18 +1143,11 @@ ls.feature.provider.completion(function (param, action)
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
     local left = text:sub(1, textOffset)
     local varName, fieldKey = resolveAssignedVarAndKeyFromSources(param, textOffset)
-    if not varName then
+    if not varName or not fieldKey then
         return
     end
 
-    local rt = param.scope.rt
-    local keyNodes = {}
-    if fieldKey and fieldKey ~= '' then
-        keyNodes[#keyNodes+1] = rt.value(fieldKey)
-    end
-    keyNodes[#keyNodes+1] = rt.STRING
-
-    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local valueNode = lookupTableValueNode(param, textOffset, varName, fieldKey)
     local enums = collectStringLiteralsFromNode(valueNode)
     if #enums == 0 then
         return
@@ -1228,7 +1194,6 @@ ls.feature.provider.completion(function (param, action)
 
     local text = param.scanner.text
     local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
-    local left = text:sub(1, textOffset)
 
     local funTypeLabel = inferFunctionTypeFromTypedClassFieldLiteralNodeView(param, text, textOffset)
     if not funTypeLabel or not funTypeLabel:match('^fun%s*%(') then
@@ -1344,10 +1309,7 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    local rt = param.scope.rt
-    local keyNodes = { rt.value(fieldKey), rt.STRING }
-
-    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local valueNode = lookupTableValueNode(param, textOffset, varName, fieldKey)
     local enums = collectStringLiteralsFromNode(valueNode)
     if #enums == 0 then
         return
@@ -1457,10 +1419,8 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local left = text:sub(1, textOffset)
-    local rt = param.scope.rt
-    local keyNodes = { rt.value(index) }
 
-    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local valueNode = lookupTableValueNode(param, textOffset, varName, index)
     local enums = collectStringLiteralsFromNode(valueNode)
     if #enums == 0 then
         return
@@ -1534,10 +1494,7 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    local rt = param.scope.rt
-    local keyNodes = { rt.value(fieldKey) }
-
-    local valueNode = lookupTableValueNode(param, textOffset, varName, keyNodes)
+    local valueNode = lookupTableValueNode(param, textOffset, varName, fieldKey)
     local enums = collectStringLiteralsFromNode(valueNode)
     if #enums == 0 then
         return

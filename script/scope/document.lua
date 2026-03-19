@@ -86,7 +86,7 @@ M.__getter.positionConverter = function (self)
     return positionConverter.parse(text), true
 end
 
----@param positionEncoding Encoder.Encoding
+---@param positionEncoding? Encoder.Encoding  # 默认 'utf-8'
 ---@return Document.LSPConverter
 function M:makeLSPConverter(positionEncoding)
     return New 'Document.LSPConverter' (self, positionEncoding)

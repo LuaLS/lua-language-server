@@ -16,7 +16,7 @@ require 'feature.text-scanner'
 
 ---@param uri Uri
 ---@param offset integer  # 字节偏移量（0-based）
----@return LSP.CompletionItem[]
+---@return CompletionItem[]
 ls.feature.completion = function (uri, offset)
     if not offset then
         return {}
@@ -184,33 +184,10 @@ ls.feature.completion = function (uri, offset)
 
     local results = providers.runner(param)
 
-    -- 将 provider 产出的 textEdit {start, finish, newText} 规范化为 LSP
-    -- textEdit {range={start={line,char}, end={line,char}}, newText}。
-    -- start/finish 均为字节偏移量（由 provider 直接存入）。
-    for _, item in ipairs(results) do
-        local textEdit = item.textEdit
-        if textEdit and textEdit.start and textEdit.finish and not textEdit.range then
-            local startLine, startCharacter = document.positionConverter:offsetToPosition(textEdit.start)
-            local endLine, endCharacter = document.positionConverter:offsetToPosition(textEdit.finish)
-            textEdit.range = {
-                start = {
-                    line = startLine,
-                    character = startCharacter,
-                },
-                ['end'] = {
-                    line = endLine,
-                    character = endCharacter,
-                },
-            }
-            textEdit.start = nil
-            textEdit.finish = nil
-        end
-    end
-
     return results
 end
 
----@param callback fun(param: Feature.Completion.Param, action: Feature.ProviderActions<LSP.CompletionItem>)
+---@param callback fun(param: Feature.Completion.Param, action: Feature.ProviderActions<CompletionItem>)
 ---@param priority integer?
 ---@return fun() disposable
 ls.feature.provider.completion = function (callback, priority)

@@ -8,7 +8,52 @@ require 'test.parser.ast'
 function TEST_COMPLETION(script)
     local results = TEST_FRAME(script, function (catched)
         local cursor = catched['?'][1][1]
-        return ls.feature.completion(test.fileUri, cursor)
+        local items = ls.feature.completion(test.fileUri, cursor)
+
+        -- 将 provider 产出的 textEdit {start, finish} 字节偏移规范化为 LSP range
+        -- （capability 层在真实 LSP 服务器中做此事；测试直接调用此处，需自行规范化）
+        local scope = ls.scope.find(test.fileUri)
+        local document = scope and scope:getDocument(test.fileUri)
+        local converter = document and document:makeLSPConverter()
+        if converter and items then
+            ---@type LSP.CompletionItem[]
+            local lspItems = {}
+            for i, item in ipairs(items) do
+                local te   = item.textEdit
+
+                ---@type LSP.TextEdit?
+                local lspTE
+                if te then
+                    lspTE = { range = converter:range(te.start, te.finish), newText = te.newText }
+                end
+
+                ---@type LSP.CompletionItem
+                lspItems[i] = {
+                    label               = item.label,
+                    labelDetails        = item.labelDetails,
+                    kind                = item.kind,
+                    tags                = item.tags,
+                    detail              = item.detail,
+                    documentation       = item.documentation,
+                    deprecated          = item.deprecated,
+                    preselect           = item.preselect,
+                    sortText            = item.sortText,
+                    filterText          = item.filterText,
+                    insertText          = item.insertText,
+                    insertTextFormat    = item.insertTextFormat,
+                    insertTextMode      = item.insertTextMode,
+                    textEdit            = lspTE,
+                    textEditText        = item.textEditText,
+                    additionalTextEdits = item.additionalTextEdits,
+                    commitCharacters    = item.commitCharacters,
+                    command             = item.command,
+                    data                = item.data,
+                }
+            end
+            return lspItems
+        end
+
+        return items
     end)
 
     ---@param item any

@@ -2,10 +2,10 @@
 local M = Class 'Document.LSPConverter'
 
 ---@param document Document
----@param encoding Encoder.Encoding
+---@param encoding? Encoder.Encoding  # 默认 'utf-8'
 function M:__init(document, encoding)
     self.document = document
-    self.encoding = encoding
+    self.encoding = encoding or 'utf-8'
 end
 
 ---@param position LSP.Position

@@ -76,6 +76,14 @@ function test.require(modname)
     test.loadedAnyFile = true
 end
 
+---@param f async function
+---@param handler async function
+---@param ... any
+---@return boolean, ...
+xpcall = function (f, handler, ...)
+    return f(...)
+end
+
 ---@async
 ls.await.call(function ()
     -- 加载一些工具

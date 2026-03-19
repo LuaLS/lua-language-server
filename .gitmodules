@@ -61,3 +61,6 @@
 [submodule "meta/3rd/luv"]
 	path = meta/3rd/luv
   url = https://github.com/LuaCATS/luv.git
+[submodule "meta/3rd/oxwm"]
+	path = meta/3rd/oxwm
+	url = https://github.com/tonybanters/oxwm-lsp.git

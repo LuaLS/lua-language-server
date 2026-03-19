@@ -470,7 +470,8 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    local params, isMethod = util.findNextFunctionParams(text, textOffset)
+    local document = param.scope:getDocument(param.uri)
+    local params, isMethod = util.findNextFunctionParams(document, textOffset)
     if #params == 0 then
         return
     end
@@ -520,7 +521,8 @@ ls.feature.provider.completion(function (param, action)
 
     action.skip()
 
-    local params, isMethod = util.findNextFunctionParams(text, textOffset)
+    local document = param.scope:getDocument(param.uri)
+    local params, isMethod = util.findNextFunctionParams(document, textOffset)
     local filtered = {}
     for _, name in ipairs(params) do
         if name:sub(1, #prefix) == prefix then
@@ -552,16 +554,8 @@ ls.feature.provider.completion(function (param, action)
 end, 20)
 
 ls.feature.provider.completion(function (param, action)
-    local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
-    local left = text:sub(1, textOffset)
-    if  not left:match('function%s+[%w_%.:]*%s*%([^()%[%]{}\n]*$')
-    and not left:match('function%s*%([^()%[%]{}\n]*$') then
-        return
-    end
-
     local word = param.scanner:getWordBack()
-    local docParams = util.findDocParamsBeforeCurrentFunction(text, textOffset)
+    local docParams = util.findDocParamsBeforeCurrentFunction(param.sources, param.sourceTextOffset)
     if #docParams == 0 then
         return
     end

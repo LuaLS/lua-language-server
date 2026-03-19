@@ -121,34 +121,50 @@ ls.feature.completion = function (uri, offset)
     ::skipAdjustScanner::
 
     local function hasDocParamBeforeCurrentFunction()
-        local left = text:sub(1, textOffset)
-        local funcStart = left:match('.*()function%s+[%w_%.:]*%s*%([^()%[%]{}\n]*$')
-                       or left:match('.*()function%s*%([^()%[%]{}\n]*$')
-        if not funcStart then
-            return false
+        -- 从 sources 中找包含当前偏移的最近 function 节点
+        local funcNode
+        for _, source in ipairs(sources) do
+            if source.kind == 'function' then
+                funcNode = source
+                break
+            end
         end
-        local from = math.max(1, funcStart - 600)
-        local near = left:sub(from, funcStart)
-        return near:match('%-%-%-@param%s+[%w_]+') ~= nil
+        if not funcNode then return false end
+        -- funcNode.parent 是声明该函数的外层 block（blockParseChilds 中设置 state.parent = block）
+        local block = funcNode.parent
+        if not block or not block.cats then return false end
+        -- 检查外层 block.cats 里是否有 @param cat 紧挨在 function 前一行
+        -- 与 coder 的 getCatGroup 使用相同的邻接条件：cat.finishRow == funcRow - 1
+        local funcRow = funcNode.startRow
+        for _, cat in ipairs(block.cats) do
+            if cat.kind == 'cat'
+            and cat.value
+            and cat.value.kind == 'catstateparam'
+            and cat.finishRow == funcRow - 1 then
+                return true
+            end
+        end
+        return false
     end
 
     if word == '' then
-        local lineStart = textOffset
-        while lineStart > 0 do
-            local c = text:sub(lineStart, lineStart)
-            if c == '\n' or c == '\r' then
+        -- 检测光标是否在具名函数的参数列表括号内（AST symbolPos1/symbolPos2）
+        local onFuncParams = false
+        for _, source in ipairs(sources) do
+            ---@cast source LuaParser.Node.Function
+            if source.kind == 'function'
+            and source.name
+            and source.symbolPos1
+            and source.symbolPos2
+            and sourceOffset >= source.symbolPos1
+            and sourceOffset <= source.symbolPos2 then
+                onFuncParams = true
                 break
             end
-            lineStart = lineStart - 1
         end
-        local lineLeft = text:sub(lineStart + 1, textOffset)
-        if lineLeft:match('^%s*local%s+function%s+') or lineLeft:match('^%s*function%s+') then
-            local left = text:sub(1, textOffset)
-            if  left:match('function%s+[%w_%.:]+%s*%([^()%[%]{}\n]*$')
-            or  left:match('function%s*%([^()%[%]{}\n]*$') then
-                if not hasDocParamBeforeCurrentFunction() then
-                    return {}
-                end
+        if onFuncParams then
+            if not hasDocParamBeforeCurrentFunction() then
+                return {}
             end
         end
     end
@@ -420,64 +436,86 @@ function util.trim(s)
     return (s:gsub('^%s+', ''):gsub('%s+$', ''))
 end
 
----@param text string
+---@param document Document?
 ---@param offset integer
 ---@return string[]
 ---@return boolean isMethod
-function util.findNextFunctionParams(text, offset)
-    local after = text:sub(offset + 1)
-    local startPos = after:find('function%s+[%w_%.:]+%s*%(')
-                  or after:find('function%s*%(')
-    if not startPos then
+function util.findNextFunctionParams(document, offset)
+    local ast = document and document.ast
+    local nodes = ast and ast.nodesMap and ast.nodesMap['function']
+    if not nodes then
         return {}, false
     end
-
-    local segment = after:sub(startPos)
-    local head, args = segment:match('function%s+([%w_%.:]+)%s*%(([^)]*)%)')
-    if not args then
-        args = segment:match('function%s*%(([^)]*)%)')
-    end
-    if not args then
-        return {}, false
-    end
-
-    local params = {}
-    for part in args:gmatch('[^,]+') do
-        local name = util.trim(part)
-        if name ~= '' then
-            params[#params+1] = name
+    -- 在 offset 之后找 start 最小的函数节点（即紧跟光标的那个函数声明）
+    ---@type LuaParser.Node.Function?
+    local bestFunc = nil
+    for _, funcNode in ipairs(nodes) do
+        ---@cast funcNode LuaParser.Node.Function
+        if funcNode.start > offset then
+            if not bestFunc or funcNode.start < bestFunc.start then
+                bestFunc = funcNode
+            end
         end
     end
-
-    local isMethod = head and head:find(':', 1, true) ~= nil or false
+    if not bestFunc then
+        return {}, false
+    end
+    local params = {}
+    if bestFunc.params then
+        for _, p in ipairs(bestFunc.params) do
+            if not p.dummy then
+                params[#params+1] = p.id
+            end
+        end
+    end
+    local isMethod = bestFunc.name ~= nil and bestFunc.name.subtype == 'method'
     return params, isMethod
 end
 
----@param text string
----@param offset integer
+---@param sources LuaParser.Node.Base[]
+---@param sourceOffset integer
 ---@return string[] names
-function util.findDocParamsBeforeCurrentFunction(text, offset)
-    local left = text:sub(1, offset)
-    local funcStart = left:match('.*()function%s+[%w_%.:]*%s*%([^()%[%]{}\n]*$')
-                   or left:match('.*()function%s*%([^()%[%]{}\n]*$')
-    if not funcStart then
-        return {}
-    end
-
-    local lineStart = funcStart
-    while lineStart > 1 do
-        local c = text:sub(lineStart - 1, lineStart - 1)
-        if c == '\n' or c == '\r' then
+function util.findDocParamsBeforeCurrentFunction(sources, sourceOffset)
+    -- 从 sources（已按坐标过滤）中找光标所在的函数节点
+    -- 要求光标在左括号之后，且在右括号之前（右括号不存在时同样接受）
+    local funcNode = nil
+    for _, source in ipairs(sources) do
+        ---@cast source LuaParser.Node.Function
+        if source.kind == 'function' and source.symbolPos1
+        and sourceOffset >= source.symbolPos1
+        and (not source.symbolPos2 or sourceOffset <= source.symbolPos2) then
+            funcNode = source
             break
         end
-        lineStart = lineStart - 1
     end
-
-    local from = math.max(1, lineStart - 800)
-    local block = text:sub(from, lineStart - 1)
+    if not funcNode then
+        return {}
+    end
+    local block = funcNode.parent
+    if not block or not block.cats then
+        return {}
+    end
+    -- 正向遍历 block.cats，收集紧挨在函数前的连续 cat 注释组，提取其中的 @param 名称
+    local funcRow = funcNode.startRow
+    local groupCats = {}
+    local prevEnd = -1
+    for _, cat in ipairs(block.cats) do
+        if cat.kind ~= 'cat' then goto continue end
+        if cat.finishRow >= funcRow then break end
+        if prevEnd ~= -1 and cat.startRow ~= prevEnd + 1 then
+            groupCats = {}
+        end
+        groupCats[#groupCats+1] = cat
+        prevEnd = cat.finishRow
+        ::continue::
+    end
     local names = {}
-    for name in block:gmatch('%-%-%-@param%s+([%w_]+)') do
-        names[#names+1] = name
+    if #groupCats > 0 and groupCats[#groupCats].finishRow == funcRow - 1 then
+        for _, cat in ipairs(groupCats) do
+            if cat.value and cat.value.kind == 'catstateparam' then
+                names[#names+1] = cat.value.key.id
+            end
+        end
     end
     return names
 end

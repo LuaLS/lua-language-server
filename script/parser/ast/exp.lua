@@ -155,7 +155,8 @@ function Ast:parseTerm()
                 or    self:parseCall(current)
 
         if  current.kind == 'field'
-        and current.subtype == 'method' then
+        and current.subtype == 'method'
+        and not current.dummy then
             if not chain or chain.kind ~= 'call' then
                 self:throwMissSymbol(current.finish, '(')
             end

@@ -79,7 +79,18 @@ function Ast:parseField(last, onlyDot)
             key.parent  = field
             return field
         end
-        return nil
+        -- 无 key：创建 dummy Field 节点，供补全检测 `var.` / `var:` 场景使用
+        local field = self:createNode('LuaParser.Node.Field', {
+            start     = last.start,
+            finish    = pos + 1,
+            subtype   = (token == '.') and 'field' or 'method',
+            last      = last,
+            symbolPos = pos,
+            dummy     = true,
+        })
+        last.next   = field
+        last.parent = field
+        return field
     end
     if token == '[' and not onlyDot then
         local nextChar = self.code:sub(pos + 2, pos + 2)

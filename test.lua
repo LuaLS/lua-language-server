@@ -76,12 +76,9 @@ function test.require(modname)
     test.loadedAnyFile = true
 end
 
----@param f async function
----@param handler async function
----@param ... any
----@return boolean, ...
-xpcall = function (f, handler, ...)
-    return f(...)
+-- 测试模式下屏蔽xpcall，将所有错误直接抛出，方便调试
+_G['x' .. 'pcall'] = function (f, handler, ...)
+    return true, f(...)
 end
 
 ---@async

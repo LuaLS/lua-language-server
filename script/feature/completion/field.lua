@@ -283,7 +283,7 @@ local function buildFieldItems(param, source, key, options)
     -- ── 兜底：快速路径无结果时逐步扩大查找范围 ───────────────────────────
     if #matches == 0 then
         local textOffset = param.textOffset
-                        or util.toTextOffset(param.scanner.text, param.offset, param)
+                        or util.toTextOffset(param.scanner.text, param.offset)
         local document   = param.scope:getDocument(param.uri)
 
         objVar = objVar or param.scope.vm:getVariable(source)
@@ -606,9 +606,8 @@ ls.feature.provider.completion(function(param, action)
 
     local isMethod  = fieldSource.subtype == 'method'
     local objName   = objSource.kind == 'var' and objSource.id or nil
-    -- symbolPos（0-indexed）与 getFieldTriggerBack 返回的 objEnd（1-indexed）数值相等，
-    -- 均可直接传给 toDisplayOffset，表示 '.' 触发符的起始位置。
-    local dotOffset = not isMethod and util.toDisplayOffset(param, fieldSource.symbolPos) or nil
+    -- symbolPos（0-indexed）就是字节偏移，直接作为 dotOffset 传入。
+    local dotOffset = not isMethod and fieldSource.symbolPos or nil
     local items = buildFieldItems(param, objSource, '', {
         isMethod  = isMethod,
         dotOffset = dotOffset,
@@ -640,7 +639,7 @@ ls.feature.provider.completion(function(param, action)
 
     -- 计算光标前已输入的字段名前缀（支持光标在标识符中间的情形）
     local textOffset = param.textOffset
-                    or util.toTextOffset(param.scanner.text, param.offset, param)
+                    or util.toTextOffset(param.scanner.text, param.offset)
     local word = fieldSource.key
              and param.scanner.text:sub(fieldSource.key.start + 1, textOffset)
              or  ''

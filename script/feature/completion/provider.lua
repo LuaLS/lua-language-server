@@ -15,7 +15,7 @@ require 'feature.text-scanner'
 ---@field inString boolean
 
 ---@param uri Uri
----@param offset integer
+---@param offset integer  # 字节偏移量（0-based）
 ---@return LSP.CompletionItem[]
 ls.feature.completion = function (uri, offset)
     if not offset then
@@ -43,16 +43,6 @@ ls.feature.completion = function (uri, offset)
     end
 
     local realTextOffset = offset
-    if realTextOffset > #text then
-        if realTextOffset >= 10000 then
-            local row = realTextOffset // 10000
-            local col = realTextOffset % 10000
-            realTextOffset = document.positionConverter:positionToOffset(row, col)
-        else
-            realTextOffset = #text
-        end
-    end
-
     local textOffset = realTextOffset
 
     local function isBlank(ch)
@@ -178,27 +168,14 @@ ls.feature.completion = function (uri, offset)
 
     local results = providers.runner(param)
 
-    -- Normalize legacy completion textEdit {start, finish, newText} to strict
-    -- LSP textEdit {range={start={line,character}, end={line,character}}, newText}.
-    local function normalizeToTextOffset(v)
-        if v <= #text then
-            return v
-        end
-        if v < 10000 then
-            return #text
-        end
-        local row = v // 10000
-        local col = v % 10000
-        return document.positionConverter:positionToOffset(row, col)
-    end
-
+    -- 将 provider 产出的 textEdit {start, finish, newText} 规范化为 LSP
+    -- textEdit {range={start={line,char}, end={line,char}}, newText}。
+    -- start/finish 均为字节偏移量（由 provider 直接存入）。
     for _, item in ipairs(results) do
         local textEdit = item.textEdit
         if textEdit and textEdit.start and textEdit.finish and not textEdit.range then
-            local startOffset = normalizeToTextOffset(textEdit.start)
-            local finishOffset = normalizeToTextOffset(textEdit.finish)
-            local startLine, startCharacter = document.positionConverter:offsetToPosition(startOffset)
-            local endLine, endCharacter = document.positionConverter:offsetToPosition(finishOffset)
+            local startLine, startCharacter = document.positionConverter:offsetToPosition(textEdit.start)
+            local endLine, endCharacter = document.positionConverter:offsetToPosition(textEdit.finish)
             textEdit.range = {
                 start = {
                     line = startLine,
@@ -246,40 +223,19 @@ util.LUADOC_TAGS = {
 
 ---@param text string
 ---@param offset integer
----@param param? Feature.Completion.Param
 ---@return integer
-function util.toTextOffset(text, offset, param)
+function util.toTextOffset(text, offset)
     if offset <= #text then
         return offset
     end
-    if offset < 10000 then
-        return #text
-    end
-    if not param then
-        return #text
-    end
-    local document = param.scope:getDocument(param.uri)
-    if not document then
-        return #text
-    end
-    local row = offset // 10000
-    local col = offset % 10000
-    return document.positionConverter:positionToOffset(row, col)
+    return #text
 end
 
 ---@param param Feature.Completion.Param
 ---@param textOffset integer
 ---@return integer
 function util.toDisplayOffset(param, textOffset)
-    local document = param.scope:getDocument(param.uri)
-    if not document then
-        return textOffset
-    end
-    local row, col = document.positionConverter:offsetToPosition(textOffset)
-    if not row or not col then
-        return textOffset
-    end
-    return row * 10000 + col
+    return textOffset
 end
 
 ---@param text string
@@ -313,7 +269,7 @@ end
 ---@param param Feature.Completion.Param
 ---@return boolean
 function util.hasMissCatNameAtCursor(param)
-    local textOffset = util.toTextOffset(param.scanner.text, param.offset, param)
+    local textOffset = util.toTextOffset(param.scanner.text, param.offset)
     local document = param.scope:getDocument(param.uri)
     if not document or not document.ast or not document.ast.errors then
         return false

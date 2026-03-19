@@ -2,7 +2,7 @@ local util = ls.feature.completionUtil
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = util.toTextOffset(text, param.offset, param)
+    local textOffset = util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
     local currentClass = left:match('%-%-%-@class%s+([%w_%.]+)%s*:%s*$')
     if not currentClass then
@@ -23,7 +23,7 @@ end, 22)
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = util.toTextOffset(text, param.offset, param)
+    local textOffset = util.toTextOffset(text, param.offset)
     local _, lineLeft = util.getLineLeft(text, textOffset)
     if not lineLeft:match('^%s*%-%-%-@type%s*$') then
         return
@@ -41,7 +41,7 @@ end, 22)
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = util.toTextOffset(text, param.offset, param)
+    local textOffset = util.toTextOffset(text, param.offset)
     local lineStart, lineLeft = util.getLineLeft(text, textOffset)
     local left = text:sub(1, textOffset)
     local leftLine = left:match('[^\r\n]*$') or ''
@@ -252,7 +252,7 @@ end
 -- `f({<??>})` 属性补全：根据 `---@param x Class` 推导 Class 字段
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local fnName, argHead = left:match('([%w_%.:]+)%s*%(([^()]*)$')
@@ -354,7 +354,7 @@ end, 23)
 -- `new 'A' { <??> }` 这类构造风格调用，从 overload 的内联表参数补属性
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local fnName, tableContent = left:match('([%w_%.:]+)%s+["\'][^"\'\r\n]*["\']%s*{([^{}]*)$')
@@ -392,7 +392,7 @@ end, 18)
 -- `---@type A local t = { <??> }` 属性补全
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
     if not left:match('local%s+[%w_]+%s*=%s*{[^{}]*$') then
         return
@@ -463,7 +463,7 @@ end, 18)
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = util.toTextOffset(text, param.offset, param)
+    local textOffset = util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
     local prefix = left:match('%-%-%-@param%s+([%w_]*)%s*$')
     if prefix == nil then
@@ -511,7 +511,7 @@ end, 21)
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = util.toTextOffset(text, param.offset, param)
+    local textOffset = util.toTextOffset(text, param.offset)
     local _, lineLeft = util.getLineLeft(text, textOffset)
     local prefix = lineLeft:match('^%s*%-%-%-@param%s+([%w_]*)$')
     if prefix == nil then
@@ -553,7 +553,7 @@ end, 20)
 
 ls.feature.provider.completion(function (param, action)
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
     if  not left:match('function%s+[%w_%.:]*%s*%([^()%[%]{}\n]*$')
     and not left:match('function%s*%([^()%[%]{}\n]*$') then

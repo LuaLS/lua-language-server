@@ -5,7 +5,7 @@ local util = ls.feature.completionUtil
 ---@return boolean
 local function isEmptyRhsCompletionPosition(param)
     local text = param.scanner.text
-    local offset = param.realTextOffset or param.textOffset or util.toTextOffset(text, param.offset, param)
+    local offset = param.realTextOffset or param.textOffset or util.toTextOffset(text, param.offset)
     if offset <= 1 then
         return false
     end
@@ -81,7 +81,7 @@ ls.feature.provider.completion(function (param, action)
 
     ---@type any
     local source = param.sources[1]
-    local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset)
 
     if not source then
         local document = param.scope:getDocument(param.uri)
@@ -217,13 +217,13 @@ ls.feature.provider.completion(function (param, action)
 
     local shadowedByLocal = {}
     if source then
-        local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset, param)
+        local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset)
         for _, loc in ipairs(guide.getVisibleLocals(source, textOffset)) do
             shadowedByLocal[loc.id] = true
         end
     end
 
-    local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset)
     local envLocal = guide.getEnvLocal(document.ast, textOffset)
     if not envLocal then
         return

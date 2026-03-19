@@ -851,7 +851,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local pType, argHead = inferArgTypeFromTypedFunctionVarCall(param, textOffset)
@@ -922,7 +922,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local rawFnName, argHead = left:match('([%w_%.:]+)%s*%(([^()]*)$')
@@ -1031,7 +1031,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local rawFnName, argHead = left:match('([%w_%.:]+)%s*%(([^()]*)$')
@@ -1140,7 +1140,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
     local varName, fieldKey = resolveAssignedVarAndKeyFromSources(param, textOffset)
     if not varName or not fieldKey then
@@ -1193,7 +1193,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
 
     local funTypeLabel = inferFunctionTypeFromTypedClassFieldLiteralNodeView(param, text, textOffset)
     if not funTypeLabel or not funTypeLabel:match('^fun%s*%(') then
@@ -1237,7 +1237,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local inferredType = inferEnumTypeFromTypedLocalVarExpr(param, textOffset)
@@ -1301,7 +1301,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local varName, fieldKey = resolveAssignedVarAndKeyFromSources(param, textOffset)
@@ -1368,7 +1368,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
 
     -- 在父链中找到包含光标的最小（span 最短）table 节点，同时不在具名字段范围内
     local varName, index
@@ -1478,7 +1478,7 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local text = param.scanner.text
-    local textOffset = param.textOffset or util.toTextOffset(text, param.offset, param)
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
     local left = text:sub(1, textOffset)
 
     local varName = left:match('local%s+([%w_]+)%s*=%s*{[^{}]*$')

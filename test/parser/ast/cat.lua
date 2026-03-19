@@ -235,6 +235,36 @@ TEST [[
     }
 }
 
+-- 嵌套泛型 `>>` 不能被当作运算符 token，应正确拆分闭合
+TEST [[
+---@type table<string, table<string, integer>>
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatetype',
+                exp  = {
+                    kind = 'catcall',
+                    node = { kind = 'catid', id = 'table' },
+                    args = {
+                        [1] = { kind = 'catid', id = 'string' },
+                        [2] = {
+                            kind = 'catcall',
+                            node = { kind = 'catid', id = 'table' },
+                            args = {
+                                [1] = { kind = 'catid', id = 'string' },
+                                [2] = { kind = 'catid', id = 'integer' },
+                            }
+                        },
+                    }
+                }
+            }
+        },
+    }
+}
+
 TEST [[
 ---@type async fun<T1: table, T2>(a: T1, ...: T2)
 ---: T2[]

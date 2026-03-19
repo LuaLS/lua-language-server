@@ -62,12 +62,25 @@ local Ast = Class 'LuaParser.Ast'
 ---@return integer? opLevel
 function Ast:parseBinary(curExp, curLevel, asState)
     local token, _, pos = self.lexer:peek()
-    if not BinarySymbol[token] then
+    if not token then
+        return nil
+    end
+
+    -- 检测双字符位移操作符 << 和 >>：
+    -- 分词器不再产生'<<'/'>>'单个 token，需要判断两个相同且位置相邻的单字符
+    local op = token
+    if token == '<' or token == '>' then
+        local nextToken, _, nextPos = self.lexer:peek(1)
+        if nextToken == token and nextPos == pos + 1 then
+            op = token .. token  -- '<<' 或 '>>'
+        end
+    end
+
+    if not BinarySymbol[op] then
         return nil
     end
     ---@cast pos -?
 
-    local op = token
     local myLevel = BinarySymbol[op]
     if curLevel then
         if myLevel < curLevel then
@@ -108,7 +121,13 @@ function Ast:parseBinary(curExp, curLevel, asState)
         end
     end
 
-    self.lexer:next()
+    -- 消耗 token：双字符位移操作符需要连续消耗两个单字符
+    if op == '<<' or op == '>>' then
+        self.lexer:next()
+        self.lexer:next()
+    else
+        self.lexer:next()
+    end
     self:skipSpace()
 
     local exp2 = self:parseExp(false, false, myLevel)

@@ -12,12 +12,8 @@ Lexer.Symbol = l.P'=='
             +  l.P'~='
             +  l.P'--'
             -- non-standard:
-            +  l.P'<<='
-            +  l.P'>>='
             +  l.P'//='
             -- end non-standard
-            +  l.P'<<'
-            +  l.P'>>'
             +  l.P'<='
             +  l.P'>='
             +  l.P'//'
@@ -133,6 +129,17 @@ end
 function M:consume(token)
     local ci = self.ci
     if self.tokens[ci] == token then
+        self.ci = ci + 1
+        return self.poses[ci]
+    end
+    return nil
+end
+
+-- 消耗一个 '>'（泛型闭合符，>> 已从分词器移除，直接等同 consume '>'）
+---@return integer?
+function M:consumeGT()
+    local ci = self.ci
+    if self.tokens[ci] == '>' then
         self.ci = ci + 1
         return self.poses[ci]
     end

@@ -8,7 +8,7 @@ M.requestID = 0
 
 function M:__init()
     self.requestMap = {}
-    ---@type table<integer, Task>
+    ---@type table<integer|string, Task>
     self.pendingMap = {}
 end
 
@@ -86,6 +86,10 @@ function M:next()
                         pushError(ls.spec.ErrorCodes.InternalError, 'Method `{method}` forgot response.' % data)
                         return
                     end
+                    if err == ls.task.REJECT_CANCELED then
+                        pushError(ls.spec.ErrorCodes.RequestCancelled, 'Request `{method}` was cancelled.' % data)
+                        return
+                    end
                     if type(err) == 'table' then
                         xpcall(function ()
                             pushError(err.code, err.message)
@@ -128,6 +132,11 @@ function M:listen()
         end
 
         self.pendingMap[id] = task
+        local originalCallback = task.callback
+        task.callback = function (result, err)
+            self.pendingMap[id] = nil
+            originalCallback(result, err)
+        end
         return task
     end, nil, nil, function (err)
         for _, task in pairs(self.pendingMap) do

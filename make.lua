@@ -19,6 +19,13 @@ local includeCodeFormat = true
 
 require "make.detect_platform"
 
+-- Increase Lua's max nested C-call depth.
+-- Default is 200; deeply nested method chains (e.g. 70-level FCall chains)
+-- consume ~8 C frames per level via __index getters, requiring ~560 slots.
+lm:conf {
+    defines = 'LUAI_MAXCCALLS=1000',
+}
+
 lm:import "3rd/bee.lua/make.lua"
 lm:import "make/code_format.lua"
 
@@ -104,7 +111,7 @@ lm:rule "run-bee-test" {
 }
 
 lm:rule "run-unit-test" {
-    args = { "bin/lua-language-server" .. exe, "$in" },
+    args = { "bin/lua-language-server" .. exe, "--test" },
     description = "Run test: $in.",
     pool = "console",
 }
@@ -118,7 +125,6 @@ lm:build "bee-test" {
 lm:build 'unit-test' {
     rule = "run-unit-test",
     deps = { "bee-test", "all" },
-    inputs = "test.lua",
 }
 
 lm:default {

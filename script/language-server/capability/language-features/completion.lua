@@ -5,8 +5,12 @@ ls.capability.registerCapability.completionProvider = {
     }
 }
 
+---@async
 ls.capability.register('textDocument/completion', function (server, params, task)
     ---@cast params LSP.CompletionParams
+
+    -- 0.1秒防抖
+    ls.await.sleep(0.1)
 
     local uri = params.textDocument.uri
     local document = ls.scope.findDocument(uri)

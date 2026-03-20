@@ -69,6 +69,7 @@ end
 ls.task = {}
 
 ls.task.REJECT_CLOSED = { '<REJECT_CLOSED>' }
+ls.task.REJECT_CANCELED = { '<REJECT_CANCELED>' }
 
 ---@param context? table
 ---@param callback? Task.Callback

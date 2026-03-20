@@ -14,6 +14,7 @@ require 'language-server.capability.lifecycle-messages.initialize'
 require 'language-server.capability.lifecycle-messages.shutdown'
 require 'language-server.capability.lifecycle-messages.exit'
 require 'language-server.capability.lifecycle-messages.initialized'
+require 'language-server.capability.lifecycle-messages.cancel-request'
 
 require 'language-server.capability.document-synchronization.did-open-text-document'
 require 'language-server.capability.document-synchronization.did-change-text-document'

@@ -38,7 +38,7 @@ end
 ---@return ArgParser.Value?
 ---@return boolean? consumedNextArg
 function M.parseOne(argv, nextArg)
-    local key, tail = argv:match '^%-%-([%w_]+)(.*)$'
+    local key, tail = argv:match '^%-%-([%w_%-]+)(.*)$'
     if not key then
         return nil
     end

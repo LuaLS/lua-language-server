@@ -127,11 +127,12 @@ function M:get(key)
     if _getVisiting[self] then
         return self.scope.rt.NEVER, false
     end
+    _getVisiting[self] = true
     local value = self.value
     if value == self then
+        _getVisiting[self] = nil
         return self.scope.rt.NEVER, false
     end
-    _getVisiting[self] = true
     local r, e = value:get(key)
     _getVisiting[self] = nil
     return r, e

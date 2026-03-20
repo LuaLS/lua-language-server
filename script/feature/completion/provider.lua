@@ -308,21 +308,10 @@ function util.collectFunctionNodes(node)
     if not node then
         return {}
     end
-    local root = node:findValue(
-        ls.node.kind['function']
-      | ls.node.kind['union']
-      | ls.node.kind['intersection']
-    )
-    if not root then
-        return {}
-    end
-    if root.kind == 'function' then
-        return { root }
-    end
     ---@type Node.Function[]
     local funcs = {}
     local used = {}
-    root:each('function', function (func)
+    node:each('function', function (func)
         ---@cast func Node.Function
         if used[func] then
             return

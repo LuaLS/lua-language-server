@@ -12,13 +12,20 @@ function M:__init()
     self.pendingMap = {}
 end
 
+function M:write(data)
+    if ls.args.TRACE_RPC then
+        log.info('RPC >>>', ls.inspect(data))
+    end
+    self.io:write(jsonrpc.encode(data))
+end
+
 ---@param method string
 ---@param params? table
 function M:notify(method, params)
-    self.io:write(jsonrpc.encode {
+    self:write {
         method = method,
         params = params,
-    })
+    }
 end
 
 ---@param method string
@@ -31,7 +38,7 @@ function M:request(method, params, callback)
         method = method,
         params = params,
     }
-    self.io:write(jsonrpc.encode(data))
+    self:write(data)
     self.requestMap[self.requestID] = {
         request  = data,
         callback = callback,
@@ -57,6 +64,9 @@ function M:next()
         local data = jsonrpc.decode(function (...)
             return self.io:read(...)
         end)
+        if ls.args.TRACE_RPC then
+            log.info('RPC <<<', ls.inspect(data))
+        end
         if data.method then
             -- request or notification
 
@@ -64,23 +74,27 @@ function M:next()
                 if not data.id then
                     return
                 end
+                if not self.pendingMap[data.id] then
+                    return
+                end
+                self.pendingMap[data.id] = nil
                 if not err then
                     if result == nil then
                         result = ls.json.null
                     end
-                    self.io:write(jsonrpc.encode {
+                    self:write {
                         id     = data.id,
                         result = result,
-                    })
+                    }
                 else
                     local function pushError(code, message)
-                        self.io:write(jsonrpc.encode {
+                        self:write {
                             id    = data.id,
                             error = {
                                 code    = code,
                                 message = message,
                             },
-                        })
+                        }
                     end
                     if err == ls.task.REJECT_CLOSED then
                         pushError(ls.spec.ErrorCodes.InternalError, 'Method `{method}` forgot response.' % data)
@@ -102,6 +116,9 @@ function M:next()
                     pushError(ls.spec.ErrorCodes.InternalError, ls.inspect(err))
                 end
             end)
+            if data.id then
+                self.pendingMap[data.id] = task
+            end
             return task, data.id
         end
         if data.id then
@@ -125,18 +142,8 @@ end
 function M:listen()
     ---@async
     return function ()
-        local task, id = self:next()
+        local task = self:next()
 
-        if not id then
-            return task
-        end
-
-        self.pendingMap[id] = task
-        local originalCallback = task.callback
-        task.callback = function (result, err)
-            self.pendingMap[id] = nil
-            originalCallback(result, err)
-        end
         return task
     end, nil, nil, function (err)
         for _, task in pairs(self.pendingMap) do

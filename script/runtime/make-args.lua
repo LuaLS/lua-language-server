@@ -12,6 +12,8 @@ ls.args = {
     LOGFILE = '$LOG_PATH/service.log',
     -- 是否为开发模式
     DEVELOP = false,
+    -- 追踪RPC
+    TRACE_RPC = false,
     -- 调试器端口号，默认为 11411
     DBGPORT = 11411,
     -- 调试器地址，默认为 '127.0.0.1'

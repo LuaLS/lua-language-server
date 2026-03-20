@@ -360,14 +360,19 @@ end
 
 function W:traceAnd(exp, revert)
     -- 树形：exp[2] 是左操作数，exp[3] 是右操作数
+    -- 如果某一侧编译时没有产生 flow 条目（如字面量），则该位置为 nil，跳过
     local left  = exp[2]
     local right = exp[3]
 
     local stack1 = self:pushStack()
-    self:traceConditionUnit(left, revert)
+    if left then
+        self:traceConditionUnit(left, revert)
+    end
 
     local stack2 = self:pushStack()
-    self:traceConditionUnit(right, revert)
+    if right then
+        self:traceConditionUnit(right, revert)
+    end
     self:popStack()
     self:popStack()
 
@@ -385,16 +390,21 @@ end
 
 function W:traceOr(exp, revert)
     -- 树形：exp[2] 是左操作数，exp[3] 是右操作数
+    -- 如果某一侧编译时没有产生 flow 条目（如字面量），则该位置为 nil，跳过
     local left  = exp[2]
     local right = exp[3]
 
     -- stack1 和 stack2 从同一基础出发独立收窄（平行而非嵌套）
     local stack1 = self:pushStack()
-    self:traceConditionUnit(left, revert)
+    if left then
+        self:traceConditionUnit(left, revert)
+    end
     self:popStack()
 
     local stack2 = self:pushStack()
-    self:traceConditionUnit(right, revert)
+    if right then
+        self:traceConditionUnit(right, revert)
+    end
     self:popStack()
 
     local currentStack = self:currentStack()

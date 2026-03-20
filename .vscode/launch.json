@@ -59,7 +59,7 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11422",
+			"address": "127.0.0.1:11431",
 			"outputCapture": [
 			],
 			"sourceFormat": "string",
@@ -79,6 +79,32 @@
 			},
 			"skipFiles": [
 				"script/class.lua"
+			]
+		},
+		{
+			"name": "🎏test_external",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceFolder}/main.lua",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			},
+			"luaVersion": "lua55",
+			"sourceCoding": "utf8",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
+			"skipFiles": [
+				"script/class.lua"
+			],
+			"arg": [
+				"--test=project.external",
+				"--test_project=D:\\github\\vscode-lua\\server"
 			]
 		},
 		{

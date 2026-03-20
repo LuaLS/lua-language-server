@@ -19,6 +19,11 @@ do
     local c1 = os.clock()
 
     local result = scope:load({}, function (event, status, uri)
+        if event == 'scanning' then
+            if status.scanned % 100 == 0 then
+                print('正在扫描... 已扫描 {scanned} 个文件' % status)
+            end
+        end
         if event == 'found' then
             print('已发现 {found} 个文件' % status)
         end
@@ -27,6 +32,9 @@ do
             if doc then
                 local ast = doc.ast
                 assert(ast, 'AST 为 nil：' .. tostring(uri))
+            end
+            if status.loaded % 100 == 0 then
+                print('正在加载... 已加载 {loaded} 个文件' % status)
             end
         end
         if event == 'loaded' then

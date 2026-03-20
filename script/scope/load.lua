@@ -6,7 +6,12 @@ function M:initGlob(options)
     if self.glob then
         return
     end
-    self.glob = ls.glob.gitignore(options.ignores)
+    local ignores = options.ignores or {}
+    ignores[#ignores+1] = '.git'
+    ignores[#ignores+1] = '.svn'
+    ignores[#ignores+1] = '.hg'
+    ignores[#ignores+1] = '.DS_Store'
+    self.glob = ls.glob.gitignore(ignores)
     self.glob:setOption('root', self.uri)
     self.glob:setOption('ignoreCase', true)
     self.glob:setInterface('type', function (uri)
@@ -63,6 +68,7 @@ end
 
 ---@alias Scope.Load.Event
 ---| 'start'
+---| 'scanning'
 ---| 'finding'
 ---| 'found'
 ---| 'loading'
@@ -72,6 +78,7 @@ end
 ---| 'finish'
 
 ---@class Scope.Load.Status
+---@field scanned integer
 ---@field found integer
 ---@field loaded integer
 ---@field indexed integer
@@ -92,6 +99,7 @@ function M:load(options, callback)
 
     ---@type Scope.Load.Status
     local status = {
+        scanned = 0,
         found = 0,
         loaded = 0,
         indexed = 0,
@@ -118,6 +126,8 @@ end
 ---@param status Scope.Load.Status
 function M:loadFiles(callback, status)
     self.glob:scan(self.uri, function (uri)
+        status.scanned = status.scanned + 1
+        xpcall(callback, log.error, 'scanning', status, uri)
         if self:isValidUri(uri) then
             self.uris[#self.uris+1] = uri
             status.found = status.found + 1

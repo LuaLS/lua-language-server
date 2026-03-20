@@ -18,6 +18,7 @@ function M:__init(uri)
     self.onDidChange = ls.sevent.create()
 
     ls.file.all[uri] = self
+    ls.file.traceMap[self] = true
 end
 
 function M:__del()
@@ -112,6 +113,7 @@ end
 
 ---@type table<Uri, File>
 ls.file.all = ls.fs.newMap()
+ls.file.traceMap = ls.util.weakKTable()
 
 ls.file.onDidRemove = ls.sevent.create()
 ls.file.onDidChange = ls.sevent.create()

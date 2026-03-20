@@ -62,3 +62,23 @@ log.info('LOGPATH:', ls.env.LOG_URI)
 log.info('METAPATH:', ls.env.META_URI)
 log.info('VERSION:', ls.env.version)
 log.info('LOGLEVEL:', ls.args.LOGLEVEL)
+
+local function reportStatus()
+    local document = require 'scope.document'
+    local vfile = require 'vm.virtual_file'
+
+    local lines = {}
+    lines[#lines+1] = ''
+    lines[#lines+1] = '======== LuaLS Status ========'
+    lines[#lines+1] = '  Memory Usage: {%.3f} MB' % { collectgarbage('count') / 1024 }
+    lines[#lines+1] = '  Idle Time: {%.3f} seconds' % { (time.monotonic() - ls.eventLoop.busyTime) / 1000 }
+    lines[#lines+1] = '  Scope Count: {}' % { #ls.scope.all }
+    lines[#lines+1] = '  File Count: {} / {}' % { ls.util.countTable(ls.file.all), ls.util.countTable(ls.file.traceMap) }
+    lines[#lines+1] = '  Document Count: {}' % { ls.util.countTable(document.traceDocumentMap) }
+    lines[#lines+1] = '  AST Count: {}' % { ls.util.countTable(document.traceAstMap) }
+    lines[#lines+1] = '  Virtual File Count: {}' % { ls.util.countTable(vfile.traceMap) }
+    lines[#lines+1] = '=============================='
+    log.info(table.concat(lines, '\n'))
+end
+
+ls.timer.loop(60, reportStatus)

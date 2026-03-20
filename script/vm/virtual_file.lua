@@ -15,12 +15,15 @@ M.nextVersion = -1
 ---@type Document?
 M.document = nil
 
+M.traceMap = ls.util.weakKTable()
+
 ---@param scope Scope
 ---@param uri Uri
 function M:__init(scope, uri)
     self.scope = scope
     self.uri = uri
     self.onDidIndex = ls.sevent.create()
+    M.traceMap[self] = true
 end
 
 function M:__close()
@@ -204,3 +207,5 @@ end
 function ls.vm.createVfile(scope, uri)
     return New 'VM.Vfile' (scope, uri)
 end
+
+return M

@@ -55,7 +55,7 @@ function M:start(options)
                 return
             end
             if event == 'found' then
-                log.info('[Scope]({}) Found {} files in {%.3f} seconds.' % { self.name, status.found, (time.monotonic() - startTime) // 1000 })
+                log.info('[Scope]({}) Found {} files in {%.3f} seconds.' % { self.name, status.found, (time.monotonic() - startTime) / 1000 })
                 return
             end
             if event == 'loading' then
@@ -63,7 +63,7 @@ function M:start(options)
                 return
             end
             if event == 'loaded' then
-                log.info('[Scope]({}) Loaded {} files in {%.3f} seconds.' % { self.name, status.loaded, (time.monotonic() - startTime) // 1000 })
+                log.info('[Scope]({}) Loaded {} files in {%.3f} seconds.' % { self.name, status.loaded, (time.monotonic() - startTime) / 1000 })
                 return
             end
             if event == 'indexing' then
@@ -71,11 +71,11 @@ function M:start(options)
                 return
             end
             if event == 'indexed' then
-                log.info('[Scope]({}) Indexed {} files in {%.3f} seconds.' % { self.name, status.indexed, (time.monotonic() - startTime) // 1000 })
+                log.info('[Scope]({}) Indexed {} files in {%.3f} seconds.' % { self.name, status.indexed, (time.monotonic() - startTime) / 1000 })
                 return
             end
             if event == 'finish' then
-                log.info('[Scope] Finished loading: {} in {%.3f} seconds.' % { self.name, (time.monotonic() - startTime) // 1000 })
+                log.info('[Scope] Finished loading: {} in {%.3f} seconds.' % { self.name, (time.monotonic() - startTime) / 1000 })
                 return
             end
         end)
@@ -159,7 +159,6 @@ function M:remove()
     Delete(self)
 end
 
----@package
 ---@type Scope[]
 ls.scope.all = {}
 

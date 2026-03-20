@@ -7,6 +7,9 @@ local M = Class 'Document'
 
 Extends('Document', 'GCHost')
 
+M.traceDocumentMap = ls.util.weakKTable()
+M.traceAstMap = ls.util.weakKTable()
+
 M.version = 0
 M.astPool = ls.tools.activePool.create {
     { 1,   10 * 60 * 1000 },
@@ -33,6 +36,7 @@ function M:__init(file)
     end)
 
     file:bindGC(self)
+    M.traceDocumentMap[self] = true
 end
 
 ---@type string
@@ -72,6 +76,7 @@ M.__getter.ast = function (self)
         return false, true
     end
     M.astPool:push(self, ls.timer.clock())
+    M.traceAstMap[ast] = true
     return ast, true
 end
 
@@ -148,3 +153,5 @@ function M:findSources(offset, accepts)
 
     return sources
 end
+
+return M

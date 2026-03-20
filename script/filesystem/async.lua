@@ -1,4 +1,4 @@
-local reader = ls.async.create('afs-reader', 1, 'filesystem.async-worker', true)
+local reader = ls.async.create('afs-reader', 2, 'filesystem.async-worker', true)
 local writer = ls.async.create('afs-writer', 1, 'filesystem.async-worker', true)
 
 ---@class AsyncFileSystem: FileSystem

@@ -61,6 +61,7 @@ function M:request(method, params, callback)
         callback = callback,
     }
     self:pickJob()
+    ls.eventLoop.markBusy()
 end
 
 ---@param method string

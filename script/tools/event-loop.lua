@@ -1,10 +1,12 @@
 local thread = require 'bee.thread'
+local time   = require 'bee.time'
 
 ---@class EventLoop
 local M = {}
 
 M.tasks = {}
 M.started = false
+M.busyTime = 0
 
 ---@param sleeper? fun(seconds: number)
 function M.start(sleeper)
@@ -17,8 +19,17 @@ function M.start(sleeper)
     while M.started do
         M.runTask()
         local busy = M.runDelayQueue(100)
-        if not busy then
+        if busy then
+            M.markBusy()
+        end
+        local idleTime = time.monotonic() - M.busyTime
+        if idleTime < 1000 then
+        elseif idleTime < 10000 then
+            sleeper(0.001)
+        elseif idleTime < 60000 then
             sleeper(0.01)
+        else
+            sleeper(0.1)
         end
     end
 end
@@ -71,6 +82,10 @@ function M.addDelayQueue(callback)
         M.delayQueue = {}
     end
     M.delayQueue[#M.delayQueue+1] = callback
+end
+
+function M.markBusy()
+    M.busyTime = time.monotonic()
 end
 
 return M

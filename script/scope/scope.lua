@@ -1,3 +1,4 @@
+local time = require 'bee.time'
 require 'file'
 
 ---@class Scope
@@ -43,6 +44,7 @@ function M:start(options)
     -- TODO: 需要先读配置文件
     ---@async
     ls.await.call(function ()
+        local startTime = time.monotonic()
         self:load(options, function (event, status, uri)
             if event == 'start' then
                 log.info('[Scope] Start loading: {}' % { self.name })
@@ -53,7 +55,7 @@ function M:start(options)
                 return
             end
             if event == 'found' then
-                log.info('[Scope]({}) Found {} files.' % { self.name, status.found })
+                log.info('[Scope]({}) Found {} files in {%.3f} seconds.' % { self.name, status.found, (time.monotonic() - startTime) // 1000 })
                 return
             end
             if event == 'loading' then
@@ -61,7 +63,7 @@ function M:start(options)
                 return
             end
             if event == 'loaded' then
-                log.info('[Scope]({}) Loaded {} files.' % { self.name, status.loaded })
+                log.info('[Scope]({}) Loaded {} files in {%.3f} seconds.' % { self.name, status.loaded, (time.monotonic() - startTime) // 1000 })
                 return
             end
             if event == 'indexing' then
@@ -69,11 +71,11 @@ function M:start(options)
                 return
             end
             if event == 'indexed' then
-                log.info('[Scope]({}) Indexed {} files.' % { self.name, status.indexed })
+                log.info('[Scope]({}) Indexed {} files in {%.3f} seconds.' % { self.name, status.indexed, (time.monotonic() - startTime) // 1000 })
                 return
             end
             if event == 'finish' then
-                log.info('[Scope] Finished loading: {}' % { self.name })
+                log.info('[Scope] Finished loading: {} in {%.3f} seconds.' % { self.name, (time.monotonic() - startTime) // 1000 })
                 return
             end
         end)

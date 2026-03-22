@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
+* `FIX` Correct `os` and `io` meta return types.
 
 ## 3.17.1
 `2026-01-20`

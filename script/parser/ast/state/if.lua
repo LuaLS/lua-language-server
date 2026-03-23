@@ -84,6 +84,9 @@ function Ast:parseIfChildIf()
         start     = pos,
         condition = condition,
     })
+    if condition then
+        condition.parent = node
+    end
 
     self:skipSpace()
     node.symbolPos = self:assertSymbolThen(condition ~= nil)
@@ -113,6 +116,9 @@ function Ast:parseIfChildElseIf()
         start     = pos,
         condition = condition,
     })
+    if condition then
+        condition.parent = node
+    end
 
     self:skipSpace()
     node.symbolPos = self:assertSymbolThen(condition ~= nil)

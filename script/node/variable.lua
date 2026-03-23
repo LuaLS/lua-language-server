@@ -334,6 +334,57 @@ M.__getter.parentFieldValue = function (self)
     return false, true
 end
 
+-- 通过同名 class 的其他绑定变量找到同 key 的 child（跨变量字段共享）
+---@type Node|false
+M.parentClassFieldValue = nil
+
+---@param self Node.Variable
+---@return Node|false
+---@return true?
+M.__getter.parentClassFieldValue = function (self)
+    if self.masterVariable then
+        return self.masterVariable.parentClassFieldValue, true
+    end
+    local parent = self.parent
+    if not parent or parent.kind ~= 'variable' then
+        return false, true
+    end
+    ---@cast parent Node.Variable
+    parent:addRef(self)
+    local masterParent = parent.masterVariable or parent
+    if not masterParent.classes then
+        return false, true
+    end
+    local rt = self.scope.rt
+    local childKey = rt.luaKey(self.key)
+    local result
+    local visited = {}
+    for _, cls in ipairs(masterParent.classes) do
+        local masterType = cls.masterType
+        if masterType then
+            for _, otherCls in ipairs(masterType.protoClasses) do
+                if otherCls.variables then
+                    for _, sibVar in ipairs(otherCls.variables) do
+                        local masterSib = sibVar.masterVariable or sibVar
+                        if masterSib ~= masterParent and not visited[masterSib] then
+                            visited[masterSib] = true
+                            local sibChild = masterSib.childs and masterSib.childs[childKey]
+                            if sibChild then
+                                sibChild:addRef(self)
+                                result = result | sibChild
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    if result then
+        return result, true
+    end
+    return false, true
+end
+
 -- 仅包含自身显式赋值，以及赋值一张字面量表所产生的字段
 ---@type Node.Table|false
 M.fields = nil
@@ -366,7 +417,7 @@ M.__getter.fields = function (self)
     return self.scope.rt.mergeTables(childs), true
 end
 
----@type table<Node, Node.Variable>?
+---@type table<Node.Key, Node.Variable>?
 M.childs = nil
 
 ---@param key1 Node.Key
@@ -595,6 +646,7 @@ function M:getGuessValue()
     master:addRef(self)
     return master.equivalentValue
         or master.parentFieldValue
+        or master.parentClassFieldValue
         or nil
 end
 

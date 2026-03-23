@@ -78,7 +78,7 @@
 				],
 			},
 			"skipFiles": [
-				"script/class.lua"
+				"${workspaceFolder}/script/class.lua"
 			]
 		},
 		{

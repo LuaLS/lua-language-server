@@ -266,3 +266,21 @@ do
     lt.assertEquals(t:get('x'):view(), '"x" | nil')
     lt.assertEquals(t:get('y'):view(), '"y" | nil')
 end
+
+do
+    local c1 = rt.class 'Test'
+    local v1 = rt.variable('a')
+    c1:addVariable(v1)
+    v1:addClass(c1)
+    v1:addField(rt.field('value', rt.value 'a'))
+
+    local c2 = rt.class 'Test'
+    local v2 = rt.variable('a')
+    c2:addVariable(v2)
+    v2:addClass(c2)
+
+    lt.assertEquals(v1:get('value'):view(), '"a"')
+
+    local f = v2:getChild('value')
+    lt.assertEquals(f:view(), '"a"')
+end

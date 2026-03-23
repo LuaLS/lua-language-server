@@ -58,6 +58,14 @@ function M:index()
         return
     end
 
+    local _ <close> = function ()
+        self.version = version
+        self.document = document
+
+        self.onDidIndex:fire(self)
+        self.scope.vm.onDidIndex:fire(self)
+    end
+
     ls.util.withDuration(function ()
         local coder = self:makeCoder(document)
         if self.coder then
@@ -81,12 +89,6 @@ function M:index()
             log.debug('Run coder for {} in {%.2f} seconds.' % { self.uri, duration })
         end
     end)
-
-    self.version = version
-    self.document = document
-
-    self.onDidIndex:fire(self)
-    self.scope.vm.onDidIndex:fire(self)
 end
 
 ---@async
@@ -128,6 +130,16 @@ function M:awaitIndex()
     self.indexingVersion = version
     table.insert(self.scope.vm.indexingFiles, self)
 
+    local _ <close> = function ()
+        self.indexingVersion = nil
+        self.version = version
+        self.document = document
+
+        ls.util.arrayRemove(self.scope.vm.indexingFiles, self, true)
+        self.onDidIndex:fire(self)
+        self.scope.vm.onDidIndex:fire(self)
+    end
+
     ---@async
     ls.util.withDuration(function ()
         local coder = self:awaitMakeCoder(document)
@@ -153,14 +165,6 @@ function M:awaitIndex()
             log.debug('Run coder for {} in {%.3f} seconds.' % { self.uri, duration })
         end
     end)
-
-    self.indexingVersion = nil
-    self.version = version
-    self.document = document
-
-    ls.util.arrayRemove(self.scope.vm.indexingFiles, self, true)
-    self.onDidIndex:fire(self)
-    self.scope.vm.onDidIndex:fire(self)
 end
 
 ---@param source LuaParser.Node.Base

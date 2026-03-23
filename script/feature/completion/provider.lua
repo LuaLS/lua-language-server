@@ -12,6 +12,7 @@ require 'feature.text-scanner'
 ---@field sources LuaParser.Node.Base[]
 ---@field scanner Feature.TextScanner
 ---@field inComment boolean
+---@field inLuaDoc boolean  # 光标所在行是否为 LuaCats 文档注释行（以 `---` 开头）
 ---@field inString boolean
 
 ---@param uri Uri
@@ -90,6 +91,14 @@ ls.feature.completion = function (uri, offset)
                 break
             end
         end
+    end
+
+    -- 纯文本判断：光标所在行是否以 `---` 开头（LuaCats 文档注释行）。
+    -- 不依赖 AST，比 inComment 更可靠，专门用于隔离 LuaCats 补全与 Lua 补全。
+    local inLuaDoc = false
+    do
+        local lineLeft = text:sub(1, textOffset):match('[^\r\n]*$') or ''
+        inLuaDoc = lineLeft:match('^%s*%-%-%-') ~= nil
     end
 
     local inString = false
@@ -179,6 +188,7 @@ ls.feature.completion = function (uri, offset)
         sources = sources,
         scanner = scanner,
         inComment = inComment,
+        inLuaDoc = inLuaDoc,
         inString = inString,
     }
 
@@ -262,6 +272,10 @@ end
 ---@param param Feature.Completion.Param
 ---@return boolean
 function util.hasMissCatNameAtCursor(param)
+    -- 只在 LuaCats 行上才需要检测，避免误触相邻行的错误
+    if not param.inLuaDoc then
+        return false
+    end
     local textOffset = util.toTextOffset(param.scanner.text, param.offset)
     local document = param.scope:getDocument(param.uri)
     if not document or not document.ast or not document.ast.errors then
@@ -270,9 +284,6 @@ function util.hasMissCatNameAtCursor(param)
     local cursorRow = document.positionConverter:offsetToPosition(textOffset)
     for _, err in ipairs(document.ast.errors) do
         if err.errorCode == 'MISS_CAT_NAME' then
-            if err.start >= textOffset - 64 and err.start <= textOffset + 8 then
-                return true
-            end
             local errRow = document.positionConverter:offsetToPosition(err.start)
             if errRow == cursorRow then
                 return true

@@ -2,7 +2,8 @@ ls.capability.registerCapability.completionProvider = {
     resolveProvider = true,
     completionItem = {
         labelDetailsSupport = true,
-    }
+    },
+    triggerCharacters = { '.', ':', ' ', '=', },
 }
 
 ---@async

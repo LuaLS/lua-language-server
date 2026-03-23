@@ -111,7 +111,7 @@ ls.feature.provider.completion(function (param, action)
         typePrefix = ''
     end
 
-    local catSource = util.getLuadocCatSource(param)
+    local catSource = param.inLuaDoc and util.getLuadocCatSource(param) or nil
     local missCatName = util.hasMissCatNameAtCursor(param)
     if missCatName then
         inTypeRef = true

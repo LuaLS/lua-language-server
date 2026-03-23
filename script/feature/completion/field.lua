@@ -608,14 +608,15 @@ ls.feature.provider.completion(function(param, action)
     local objName   = objSource.kind == 'var' and objSource.id or nil
     -- symbolPos（0-indexed）就是字节偏移，直接作为 dotOffset 传入。
     local dotOffset = not isMethod and fieldSource.symbolPos or nil
+    -- 只对 '.' ':' 访问阻止 word provider，'[]' 下标访问保留 word 补全。
+    if fieldSource.subtype == 'field' or fieldSource.subtype == 'method' then
+        action.skip()
+    end
     local items = buildFieldItems(param, objSource, '', {
         isMethod  = isMethod,
         dotOffset = dotOffset,
         objName   = objName,
     })
-    if #items == 0 then return end
-
-    action.skip()
     for _, item in ipairs(items) do
         action.push(item)
     end
@@ -653,13 +654,14 @@ ls.feature.provider.completion(function(param, action)
 
     local isMethod = fieldSource.subtype == 'method'
     local objName  = objSource.kind == 'var' and objSource.id or nil
+    -- 只对 '.' ':' 访问阻止 word provider，'[]' 下标访问保留 word 补全。
+    if fieldSource.subtype == 'field' or fieldSource.subtype == 'method' then
+        action.skip()
+    end
     local items = buildFieldItems(param, objSource, word, {
         isMethod = isMethod,
         objName  = objName,
     })
-    if #items == 0 then return end
-
-    action.skip()
     for _, item in ipairs(items) do
         action.push(item)
     end

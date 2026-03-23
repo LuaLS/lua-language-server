@@ -368,9 +368,9 @@ M.__getter.parentClassFieldValue = function (self)
                         local masterSib = sibVar.masterVariable or sibVar
                         if masterSib ~= masterParent and not visited[masterSib] then
                             visited[masterSib] = true
+                            masterSib:addRef(self)
                             local sibChild = masterSib.childs and masterSib.childs[childKey]
                             if sibChild then
-                                sibChild:addRef(self)
                                 result = result | sibChild
                             end
                         end

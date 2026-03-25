@@ -1481,6 +1481,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            ---Description comment
             ---@alias A
             ---| 1 # comment1
             ---| 2 # comment2
@@ -1497,8 +1498,31 @@ local x: 1|2
 ---
 
 #### A:
+Description comment
+
   - `1` — comment1
   - `2` — comment2]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---Description comment
+            ---@alias A number
+
+            ---@type A
+            local <?x?>
+        ]]
+    },
+    hover = [[
+```lua
+local x: number
+```
+
+---
+
+Description comment]]
 }
 
 TEST {

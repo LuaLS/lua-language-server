@@ -212,11 +212,11 @@ local function lookUpDocComments(source)
     return table.concat(lines, '\n')
 end
 
-local function tryDocClassComment(source)
+local function tryDocClassComment(source, types)
+    types = types or {['doc.class'] = true}
+
     for _, def in ipairs(vm.getDefs(source)) do
-        if def.type == 'doc.class'
-        or def.type == 'doc.alias'
-        or def.type == 'doc.enum' then
+        if types[def.type] then
             local comment = getBindComment(def)
             if comment then
                 return comment
@@ -238,7 +238,9 @@ local function buildEnumChunk(docType, name, uri)
     end
     local enums = {}
     local types = {}
-    local lines = {}
+    local lines = {('#### %s:'):format(name)}
+    local commentTypes = {['doc.enum'] = true, ['doc.alias'] = true}
+
     for _, tp in ipairs(vm.getDefs(docType)) do
         types[#types+1] = vm.getInfer(tp):view(guide.getUri(docType))
         if tp.type == 'doc.type.string'
@@ -247,20 +249,22 @@ local function buildEnumChunk(docType, name, uri)
         or tp.type == 'doc.type.code' then
             enums[#enums+1] = tp
         end
-        local comment = tryDocClassComment(tp)
+
+        local comment = tryDocClassComment(tp, commentTypes)
         if comment then
             for line in util.eachLine(comment) do
                 lines[#lines+1] = line
             end
         end
     end
+
     if #enums == 0 then
         return nil
     end
-    if #lines > 0 and lines[#lines] ~= "" then
+    if #lines > 1 then
         lines[#lines+1] = ""
     end
-    lines[#lines+1] = ('#### %s:'):format(name)
+
     for _, enum in ipairs(enums) do
         local suffix = (enum.default and ' (default)')
             or (enum.additional and ' (additional)')
@@ -410,21 +414,24 @@ local function tryDocComment(source, raw)
         md:add('md', getFunctionCommentMarkdown(source, raw))
         source = source.parent
     end
+
     local comment = lookUpDocComments(source)
     md:add('md', comment)
+
     if source.type == 'doc.alias' then
         local enums = buildEnumChunk(source, source.alias[1], guide.getUri(source))
+            or tryDocClassComment(source, {['doc.alias'] = true})
+
         md:add('md', enums)
-    end
-    if source.type == 'doc.enum' then
+    elseif source.type == 'doc.enum' then
         local enums = buildEnumChunk(source, source.enum[1], guide.getUri(source))
+            or tryDocClassComment(source, {['doc.enum'] = true})
+
         md:add('md', enums)
     end
+
     local result = md:string()
-    if result == '' then
-        return nil
-    end
-    return result
+    return result ~= '' and result or nil
 end
 
 ---@async

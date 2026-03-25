@@ -31,7 +31,7 @@ function export.eq(a, b)
         end
         for k in pairs(b) do
             if not mark[k] then
-                return false, string.format(".%s: missing key in result", k)
+                return false, string.format(".%s: unexpected key in result", k)
             end
         end
         return true

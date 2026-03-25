@@ -56,20 +56,13 @@ local function getHover(source, level)
     local oop
     if vm.getInfer(source):view(guide.getUri(source)) == 'function' then
         local defs = vm.getDefs(source)
+
         -- make sure `function` is before `doc.type.function`
-        local orders = {}
-        for i, def in ipairs(defs) do
-            if def.type == 'function' then
-                orders[def] = i - 20000
-            elseif def.type == 'doc.type.function' then
-                orders[def] = i - 10000
-            else
-                orders[def] = i
-            end
-        end
+        local orders = {'function', 'doc.type.function'}
         table.sort(defs, function (a, b)
-            return orders[a] < orders[b]
+            return (orders[a.type] or (#orders + 1)) < (orders[b.type] or (#orders + 1))
         end)
+
         local hasFunc
         for _, def in ipairs(defs) do
             if guide.isOOP(def) then
@@ -90,21 +83,15 @@ local function getHover(source, level)
         end
     else
         addHover(source, true, oop)
+
         for _, def in ipairs(vm.getDefs(source)) do
-            if def.type == 'global'
-            or def.type == 'setlocal' then
-                goto CONTINUE
+            if def.type ~= 'global'
+            and def.type ~= 'setlocal' then
+                oop = oop or guide.isOOP(def)
+                local isFunction = def.type == 'function' or def.type == 'doc.type.function'
+
+                addHover(def, isFunction, oop)
             end
-            if guide.isOOP(def) then
-                oop = true
-            end
-            local isFunction
-            if def.type == 'function'
-            or def.type == 'doc.type.function' then
-                isFunction = true
-            end
-            addHover(def, isFunction, oop)
-            ::CONTINUE::
         end
     end
 

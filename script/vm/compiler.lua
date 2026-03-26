@@ -1460,7 +1460,9 @@ local function compileFunctionParam(func, source)
                         end
                         vm.getClassFields(suri, extClass, key, function (field, _isMark)
                             for n in vm.compileNode(field):eachObject() do
-                                if n.type == 'function' and n.args[aindex] then
+                                if (n.type == 'function' or n.type == 'doc.type.function')
+                                and n.args[aindex]
+                                then
                                     local argNode = vm.compileNode(n.args[aindex])
                                     for an in argNode:eachObject() do
                                         if an.type ~= 'doc.generic.name' then

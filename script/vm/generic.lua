@@ -1,5 +1,6 @@
 ---@class vm
 local vm      = require 'vm.vm'
+local guide   = require 'parser.guide'
 
 ---@class parser.object
 ---@field package _generic vm.generic
@@ -131,15 +132,20 @@ local function cloneObject(source, resolved)
     if source.type == 'doc.type.sign' and source.signs then
         local needsClone = false
         for _, sign in ipairs(source.signs) do
-            if sign.type == 'doc.type' then
-                for _, tp in ipairs(sign.types) do
-                    if (tp.type == 'doc.type.name' or tp.type == 'doc.generic.name') and resolved[tp[1]] then
-                        needsClone = true
-                        break
-                    end
+            -- Recursively check for any resolvable type names in sign
+            -- parameters, including nested doc.type.sign (e.g. list<T>
+            -- inside table<uint32, list<T>>)
+            guide.eachSourceType(sign, 'doc.type.name', function (src)
+                if resolved[src[1]] then
+                    needsClone = true
                 end
-            elseif (sign.type == 'doc.type.name' or sign.type == 'doc.generic.name') and resolved[sign[1]] then
-                needsClone = true
+            end)
+            if not needsClone then
+                guide.eachSourceType(sign, 'doc.generic.name', function (src)
+                    if resolved[src[1]] then
+                        needsClone = true
+                    end
+                end)
             end
             if needsClone then break end
         end

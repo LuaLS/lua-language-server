@@ -176,6 +176,21 @@ function mt:resolve(uri, args)
             end
             return
         end
+        if object.type == 'doc.type.sign' and object.signs then
+            -- list<T> -> list<string>: match sign parameters positionally
+            for n in node:eachObject() do
+                if  n.type == 'doc.type.sign' and n.signs
+                and n.node and object.node
+                and n.node[1] == object.node[1] then
+                    for i, signParam in ipairs(object.signs) do
+                        if n.signs[i] then
+                            resolve(vm.compileNode(signParam), vm.compileNode(n.signs[i]))
+                        end
+                    end
+                end
+            end
+            return
+        end
     end
 
     ---@param sign vm.node
@@ -191,7 +206,8 @@ function mt:resolve(uri, args)
             end
             if obj.type == 'doc.type.table'
             or obj.type == 'doc.type.function'
-            or obj.type == 'doc.type.array' then
+            or obj.type == 'doc.type.array'
+            or obj.type == 'doc.type.sign' then
                 ---@cast obj parser.object
                 local hasGeneric
                 guide.eachSourceType(obj, 'doc.generic.name', function (src)
@@ -203,7 +219,8 @@ function mt:resolve(uri, args)
                 end
             end
             if obj.type == 'variable'
-            or obj.type == 'local' then
+            or obj.type == 'local'
+            or obj.type == 'self' then
                 goto CONTINUE
             end
             local view = vm.getInfer(obj):view(uri)

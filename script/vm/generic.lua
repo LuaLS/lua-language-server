@@ -133,12 +133,12 @@ local function cloneObject(source, resolved)
         for _, sign in ipairs(source.signs) do
             if sign.type == 'doc.type' then
                 for _, tp in ipairs(sign.types) do
-                    if tp.type == 'doc.type.name' and resolved[tp[1]] then
+                    if (tp.type == 'doc.type.name' or tp.type == 'doc.generic.name') and resolved[tp[1]] then
                         needsClone = true
                         break
                     end
                 end
-            elseif sign.type == 'doc.type.name' and resolved[sign[1]] then
+            elseif (sign.type == 'doc.type.name' or sign.type == 'doc.generic.name') and resolved[sign[1]] then
                 needsClone = true
             end
             if needsClone then break end

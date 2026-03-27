@@ -4,6 +4,8 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
 * `CHG` Improved the output of test failures during development
+* `FIX` Fix type inference for `x == nil and "default" or x` idiom [#2236](https://github.com/LuaLS/lua-language-server/issues/2236)
+* `FIX` Fix type loss for assignments inside `if`/`for` blocks due to circular dependency in tracer [#2374](https://github.com/LuaLS/lua-language-server/issues/2374) [#2494](https://github.com/LuaLS/lua-language-server/issues/2494)
 
 ## 3.17.1
 `2026-01-20`

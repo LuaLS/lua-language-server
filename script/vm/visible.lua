@@ -105,6 +105,9 @@ end
 ---@return vm.global?
 function vm.getParentClass(source)
     if source.type == 'doc.field' then
+        if not source.class then
+            return nil
+        end
         return vm.getGlobalNode(source.class)
     end
     if source.type == 'setfield'

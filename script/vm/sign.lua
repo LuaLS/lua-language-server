@@ -2,6 +2,53 @@ local guide         = require 'parser.guide'
 ---@class vm
 local vm            = require 'vm.vm'
 
+--- Find a generic name referenced in a doc.type.table's fields
+--- that exists in the given genericMap.
+---@param tableType parser.object  doc.type.table with fields
+---@param genericMap table<string, vm.node>
+---@return string?  The matching generic key name
+local function findGenericInTableFields(tableType, genericMap)
+    for _, field in ipairs(tableType.fields) do
+        if field.extends then
+            local found
+            guide.eachSourceType(field.extends, 'doc.generic.name', function (src)
+                if genericMap[src[1]] then
+                    found = src[1]
+                end
+            end)
+            if found then
+                return found
+            end
+        end
+    end
+    return nil
+end
+
+--- Search for a generic name in extends tables of a class definition.
+--- For classes like `@class list<T>: {[integer]:T}`, the [integer] field
+--- lives in the extends doc.type.table, not in @field annotations.
+---@param uri uri
+---@param classGlobal vm.global
+---@param genericMap table<string, vm.node>
+---@return string?  The class generic name that maps to the integer field
+local function findGenericInExtendsTable(uri, classGlobal, genericMap)
+    for _, set in ipairs(classGlobal:getSets(uri)) do
+        if set.type ~= 'doc.class' or not set.extends then
+            goto CONTINUE
+        end
+        for _, ext in ipairs(set.extends) do
+            if ext.type == 'doc.type.table' and ext.fields then
+                local key = findGenericInTableFields(ext, genericMap)
+                if key then
+                    return key
+                end
+            end
+        end
+        ::CONTINUE::
+    end
+    return nil
+end
+
 ---@class vm.sign
 ---@field parent    parser.object
 ---@field signList  vm.node[]
@@ -83,28 +130,67 @@ function mt:resolve(uri, args)
             return
         end
         if object.type == 'doc.type.array' then
+            -- If the argument contains a doc.type.sign (generic class like
+            -- list<T> extending { [integer]: V }), resolve element type
+            -- exclusively through class generic map. This directly maps
+            -- the array element generic (V) to the sign parameter, even
+            -- when it's another generic name (T inside a method body).
+            local handled = false
             for n in node:eachObject() do
-                if n.type == 'doc.type.array' then
-                    -- number[] -> T[]
-                    resolve(object.node, vm.compileNode(n.node))
-                end
-                if n.type == 'doc.type.table' then
-                    -- { [integer]: number } -> T[]
-                    local tvalueNode = vm.getTableValue(uri, node, 'integer', true)
-                    if tvalueNode then
-                        resolve(object.node, tvalueNode)
+                if n.type == 'doc.type.sign' and n.signs and n.node and n.node[1] then
+                    local classGlobal = vm.getGlobal('type', n.node[1])
+                    if classGlobal then
+                        local genericMap = vm.getClassGenericMap(uri, classGlobal, n.signs)
+                        if genericMap and object.node and object.node.type == 'doc.generic.name' then
+                            -- V[] matching list<T>: look up [integer] field,
+                            -- find which class generic it references, then
+                            -- map V directly to the sign's concrete parameter
+                            local vKey = object.node[1]
+                            -- First try @field annotations
+                            vm.getClassFields(uri, classGlobal, vm.declareGlobal('type', 'integer'), function (field)
+                                if field.extends then
+                                    guide.eachSourceType(field.extends, 'doc.generic.name', function (src)
+                                        if genericMap[src[1]] then
+                                            resolved[vKey] = genericMap[src[1]]
+                                            handled = true
+                                        end
+                                    end)
+                                end
+                            end)
+                            -- Also search extends tables (for @class list<T>: {[integer]:T})
+                            if not handled then
+                                local genericKey = findGenericInExtendsTable(uri, classGlobal, genericMap)
+                                if genericKey then
+                                    resolved[vKey] = genericMap[genericKey]
+                                    handled = true
+                                end
+                            end
+                        end
                     end
+                    if handled then break end
                 end
-                if n.type == 'global' and n.cate == 'type' then
-                    -- ---@field [integer]: number -> T[]
-                    ---@cast n vm.global
-                    vm.getClassFields(uri, n, vm.declareGlobal('type', 'integer'), function (field)
-                        resolve(object.node, vm.compileNode(field.extends))
-                    end)
-                end
-                if n.type == 'table' and #n >= 1 then
-                    -- { x } / { ... } -> T[]
-                    resolve(object.node, vm.compileNode(n[1]))
+            end
+            if not handled then
+                for n in node:eachObject() do
+                    if n.type == 'doc.type.array' then
+                        -- number[] -> T[]
+                        resolve(object.node, vm.compileNode(n.node))
+                    elseif n.type == 'doc.type.table' then
+                        -- { [integer]: number } -> T[]
+                        local tvalueNode = vm.getTableValue(uri, node, 'integer', true)
+                        if tvalueNode then
+                            resolve(object.node, tvalueNode)
+                        end
+                    elseif n.type == 'global' and n.cate == 'type' then
+                        -- ---@field [integer]: number -> T[]
+                        ---@cast n vm.global
+                        vm.getClassFields(uri, n, vm.declareGlobal('type', 'integer'), function (field)
+                            resolve(object.node, vm.compileNode(field.extends))
+                        end)
+                    elseif n.type == 'table' and #n >= 1 then
+                        -- { x } / { ... } -> T[]
+                        resolve(object.node, vm.compileNode(n[1]))
+                    end
                 end
             end
             return
@@ -176,6 +262,21 @@ function mt:resolve(uri, args)
             end
             return
         end
+        if object.type == 'doc.type.sign' and object.signs then
+            -- list<T> -> list<string>: match sign parameters positionally
+            for n in node:eachObject() do
+                if  n.type == 'doc.type.sign' and n.signs
+                and n.node and object.node
+                and n.node[1] == object.node[1] then
+                    for i, signParam in ipairs(object.signs) do
+                        if n.signs[i] then
+                            resolve(vm.compileNode(signParam), vm.compileNode(n.signs[i]))
+                        end
+                    end
+                end
+            end
+            return
+        end
     end
 
     ---@param sign vm.node
@@ -191,7 +292,8 @@ function mt:resolve(uri, args)
             end
             if obj.type == 'doc.type.table'
             or obj.type == 'doc.type.function'
-            or obj.type == 'doc.type.array' then
+            or obj.type == 'doc.type.array'
+            or obj.type == 'doc.type.sign' then
                 ---@cast obj parser.object
                 local hasGeneric
                 guide.eachSourceType(obj, 'doc.generic.name', function (src)
@@ -203,7 +305,8 @@ function mt:resolve(uri, args)
                 end
             end
             if obj.type == 'variable'
-            or obj.type == 'local' then
+            or obj.type == 'local'
+            or obj.type == 'self' then
                 goto CONTINUE
             end
             local view = vm.getInfer(obj):view(uri)

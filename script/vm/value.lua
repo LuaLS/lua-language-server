@@ -139,7 +139,7 @@ function vm.getInteger(v)
             hasNonInteger = true
         end
     end
-    if hasNonInteger and not result then
+    if hasNonInteger then
         result = nil
     end
     -- If value not found via compiled node, try the local's

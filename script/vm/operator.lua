@@ -58,6 +58,12 @@ vm.OP_UNARY_MAP  = util.revertMap(unaryMap)
 vm.OP_BINARY_MAP = util.revertMap(binaryMap)
 vm.OP_OTHER_MAP  = util.revertMap(otherMap)
 
+---@param source parser.object
+---@return uri, vm.infer, vm.infer
+local function getOperandInfers(source)
+    return guide.getUri(source), vm.getInfer(source[1]), vm.getInfer(source[2])
+end
+
 ---@param operators parser.object[]
 ---@param op string
 ---@param value? parser.object
@@ -270,9 +276,7 @@ vm.binarySwitch = util.switch()
                 return
             end
             -- Bitwise ops on integers always produce integer
-            local uri = guide.getUri(source)
-            local infer1 = vm.getInfer(source[1])
-            local infer2 = vm.getInfer(source[2])
+            local uri, infer1, infer2 = getOperandInfers(source)
             if  infer1:hasType(uri, 'integer')
             and infer2:hasType(uri, 'integer') then
                 vm.setNode(source, vm.declareGlobal('type', 'integer'))
@@ -395,9 +399,7 @@ vm.binarySwitch = util.switch()
                 [1]    = a .. b,
             })
         else
-            local uri = guide.getUri(source)
-            local infer1 = vm.getInfer(source[1])
-            local infer2 = vm.getInfer(source[2])
+            local uri, infer1, infer2 = getOperandInfers(source)
             if  (
                 infer1:hasType(uri, 'integer')
             or  infer1:hasType(uri, 'number')

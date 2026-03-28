@@ -142,7 +142,13 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         infer._hasClass = true
         local buf = {}
         for i, sign in ipairs(source.signs) do
-            buf[i] = vm.getInfer(sign):view(uri)
+            local view = vm.getInfer(sign):view(uri)
+            -- Strip outer <> from generic names since the sign
+            -- already wraps parameters in <>, avoiding list<<T>>
+            if view and view:sub(1, 1) == '<' and view:sub(-1) == '>' then
+                view = view:sub(2, -2)
+            end
+            buf[i] = view
         end
         local node = vm.compileNode(source)
         for c in node:eachObject() do

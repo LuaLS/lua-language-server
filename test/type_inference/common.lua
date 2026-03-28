@@ -733,7 +733,7 @@ local f2 = f(1)
 local i, <?v?> = f2(true)
 ]]
 
-TEST 'fun(table: table<<K>, <V>>, index?: <K>):<K>, <V>' [[
+TEST 'fun(table: table<K, V>, index?: <K>):<K>, <V>' [[
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index?: K):K, V
@@ -5026,8 +5026,7 @@ local <?result?> = w:unwrap()
 ]]
 
 -- Issue #1856: Generic class display format
--- Current behavior shows list<<T>>|{...} - the <<T>> indicates an unresolved generic
--- The resolved table type is also shown
+-- Generic class with resolved type parameters
 TEST 'list<string>|{ [integer]: string }' [[
 ---@class list<T>: {[integer]:T}
 

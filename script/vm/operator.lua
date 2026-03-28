@@ -267,6 +267,15 @@ vm.binarySwitch = util.switch()
             end
             if node then
                 vm.setNode(source, node)
+                return
+            end
+            -- Bitwise ops on integers always produce integer
+            local uri = guide.getUri(source)
+            local infer1 = vm.getInfer(source[1])
+            local infer2 = vm.getInfer(source[2])
+            if  infer1:hasType(uri, 'integer')
+            and infer2:hasType(uri, 'integer') then
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
             end
         end
     end)

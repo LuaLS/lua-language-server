@@ -118,6 +118,7 @@ function vm.getInteger(v)
     end
     local node = vm.compileNode(v)
     local result
+    local hasNonInteger = false
     for n in node:eachObject() do
         if n.type == 'integer' then
             if result then
@@ -135,7 +136,18 @@ function vm.getInteger(v)
             end
         elseif n.type ~= 'local'
         and    n.type ~= 'global' then
-            return nil
+            hasNonInteger = true
+        end
+    end
+    if hasNonInteger and not result then
+        result = nil
+    end
+    -- If value not found via compiled node, try the local's
+    -- definition value directly (tracer may not preserve literals)
+    if result == nil and v.type == 'getlocal' then
+        local loc = v.node
+        if loc and loc.value then
+            return vm.getInteger(loc.value)
         end
     end
     return result

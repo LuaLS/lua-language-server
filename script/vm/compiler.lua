@@ -1671,7 +1671,22 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                     else
                         local clonedObject = vm.cloneObject(nd, resolved)
                         if clonedObject then
-                            result:merge(vm.compileNode(clonedObject))
+                            if clonedObject.type == 'doc.generic.name' and clonedObject._resolved then
+                                local allGeneric = true
+                                for rn in clonedObject._resolved:eachObject() do
+                                    if rn.type ~= 'doc.generic.name' then
+                                        allGeneric = false
+                                        break
+                                    end
+                                end
+                                if allGeneric then
+                                    result:merge(clonedObject)
+                                else
+                                    result:merge(vm.compileNode(clonedObject))
+                                end
+                            else
+                                result:merge(vm.compileNode(clonedObject))
+                            end
                         end
                     end
                 end
@@ -1686,7 +1701,7 @@ local function bindReturnOfFunction(source, mfunc, index, args)
         end
     end
 
-    if mfunc.type == 'function' then
+    if mfunc.type == 'function' or mfunc.type == 'doc.type.function' then
         local hasUnresolvedGeneric = false
         for rnode in returnNode:eachObject() do
             if vm.isGenericUnsolved(rnode) then
@@ -1772,6 +1787,21 @@ local function bindReturnOfFunction(source, mfunc, index, args)
         for rnode in returnNode:eachObject() do
             if rnode.type ~= 'doc.generic.name' then
                 vm.setNode(source, rnode)
+            elseif rnode._resolved then
+                -- Allow generics that resolved to another generic type
+                -- parameter (e.g. V -> T in generic method's ipairs(self)).
+                -- Only allow when resolved purely to other generics, not
+                -- to concrete types like string/boolean.
+                local allGeneric = true
+                for rn in rnode._resolved:eachObject() do
+                    if rn.type ~= 'doc.generic.name' then
+                        allGeneric = false
+                        break
+                    end
+                end
+                if allGeneric then
+                    vm.setNode(source, rnode)
+                end
             end
         end
         if returnNode:isOptional() then

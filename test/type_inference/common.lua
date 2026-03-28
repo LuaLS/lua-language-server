@@ -914,6 +914,43 @@ for _, <?v?> in ipairs(t) do
 end
 ]]
 
+TEST '<T>' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@class list<T>
+---@field [integer] T
+
+---@generic T
+---@param self list<T>
+function list:foo()
+    for _, <?v?> in ipairs(self) do
+    end
+end
+]]
+
+TEST '<T>' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@class listB<T>: {[integer]:T}
+
+---@generic T
+---@param self listB<T>
+function listB:foo()
+    for _, <?v?> in ipairs(self) do
+    end
+end
+]]
+
 TEST 'boolean' [[
 ---@generic T: table, K, V
 ---@param t T
@@ -4883,7 +4920,7 @@ local a, b, <?c?>, d = unpack(t)
 ]]
 
 -- Test for overflow in circular resolve, only pass requirement is no overflow
-TEST 'Callback<<T>>|fun():fun():fun():Success, string' [[
+TEST 'Callback<string>' [[
 --- @alias Success fun(): Success
 --- @alias Callback<T> fun(): Success, T
 
@@ -4991,7 +5028,7 @@ local <?result?> = w:unwrap()
 -- Issue #1856: Generic class display format
 -- Current behavior shows list<<T>>|{...} - the <<T>> indicates an unresolved generic
 -- The resolved table type is also shown
-TEST 'list<<T>>|{ [integer]: string }' [[
+TEST 'list<string>|{ [integer]: string }' [[
 ---@class list<T>: {[integer]:T}
 
 ---@generic T

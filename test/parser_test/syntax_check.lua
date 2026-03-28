@@ -867,6 +867,98 @@ global <const> x = 1
 ]]
 (nil)
 
+TEST [[
+local <close>x = setmetatable({}, { __close = function () end })
+]]
+(nil)
+
+TEST [[
+local <close> x = setmetatable({}, { __close = function () end })
+]]
+(nil)
+
+Version = 'Lua 5.4'
+TEST [[
+local <!<close>!>x = setmetatable({}, { __close = function () end })
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = 'Lua 5.5',
+}
+
+TEST [[
+local <!<const>!>x = 1
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = 'Lua 5.5',
+}
+Version = 'Lua 5.5'
+
+TEST [[
+local <close>a, <!b!> = setmetatable({}, { __close = function () end }), {}
+]]
+{
+    type = 'MULTI_CLOSE',
+}
+
+TEST [[
+local <close>a, b <!<close>!> = setmetatable({}, { __close = function () end }), setmetatable({}, { __close = function () end })
+]]
+{
+    type = 'MULTI_CLOSE',
+}
+
+TEST [[
+local <close>a, <!<!>close>b = setmetatable({}, { __close = function () end }), setmetatable({}, { __close = function () end })
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    multi = 2,
+    info = {
+        symbol = '<',
+    }
+}
+
+TEST [[
+local <const>x = 1
+]]
+(nil)
+
+TEST [[
+local <const> x = 1
+]]
+(nil)
+
+TEST [[
+local <const>x, y = 1, 2
+]]
+(nil)
+
+TEST [[
+local <close>a, b <const> = setmetatable({}, { __close = function () end }), 1
+]]
+(nil)
+
+TEST [[
+local <!function!> f() end
+]]
+(nil)
+
+TEST [[
+local <close> <!function!> f() end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST [[
+local <const> <!function!> f() end
+]]
+{
+    type = 'MISS_NAME',
+}
+
 -- Shadowing rules (Lua 5.5): local variables shadow globals within lexical scope
 
 TEST [[

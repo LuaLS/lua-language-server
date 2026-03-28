@@ -2,6 +2,53 @@ local guide         = require 'parser.guide'
 ---@class vm
 local vm            = require 'vm.vm'
 
+--- Find a generic name referenced in a doc.type.table's fields
+--- that exists in the given genericMap.
+---@param tableType parser.object  doc.type.table with fields
+---@param genericMap table<string, vm.node>
+---@return string?  The matching generic key name
+local function findGenericInTableFields(tableType, genericMap)
+    for _, field in ipairs(tableType.fields) do
+        if field.extends then
+            local found
+            guide.eachSourceType(field.extends, 'doc.generic.name', function (src)
+                if genericMap[src[1]] then
+                    found = src[1]
+                end
+            end)
+            if found then
+                return found
+            end
+        end
+    end
+    return nil
+end
+
+--- Search for a generic name in extends tables of a class definition.
+--- For classes like `@class list<T>: {[integer]:T}`, the [integer] field
+--- lives in the extends doc.type.table, not in @field annotations.
+---@param uri uri
+---@param classGlobal vm.global
+---@param genericMap table<string, vm.node>
+---@return string?  The class generic name that maps to the integer field
+local function findGenericInExtendsTable(uri, classGlobal, genericMap)
+    for _, set in ipairs(classGlobal:getSets(uri)) do
+        if set.type ~= 'doc.class' or not set.extends then
+            goto CONTINUE
+        end
+        for _, ext in ipairs(set.extends) do
+            if ext.type == 'doc.type.table' and ext.fields then
+                local key = findGenericInTableFields(ext, genericMap)
+                if key then
+                    return key
+                end
+            end
+        end
+        ::CONTINUE::
+    end
+    return nil
+end
+
 ---@class vm.sign
 ---@field parent    parser.object
 ---@field signList  vm.node[]
@@ -112,26 +159,10 @@ function mt:resolve(uri, args)
                             end)
                             -- Also search extends tables (for @class list<T>: {[integer]:T})
                             if not handled then
-                                for _, set in ipairs(classGlobal:getSets(uri)) do
-                                    if set.type == 'doc.class' and set.extends then
-                                        for _, ext in ipairs(set.extends) do
-                                            if ext.type == 'doc.type.table' and ext.fields then
-                                                for _, field in ipairs(ext.fields) do
-                                                    if field.extends then
-                                                        guide.eachSourceType(field.extends, 'doc.generic.name', function (src)
-                                                            if genericMap[src[1]] then
-                                                                resolved[vKey] = genericMap[src[1]]
-                                                                handled = true
-                                                            end
-                                                        end)
-                                                    end
-                                                    if handled then break end
-                                                end
-                                            end
-                                            if handled then break end
-                                        end
-                                    end
-                                    if handled then break end
+                                local genericKey = findGenericInExtendsTable(uri, classGlobal, genericMap)
+                                if genericKey then
+                                    resolved[vKey] = genericMap[genericKey]
+                                    handled = true
                                 end
                             end
                         end

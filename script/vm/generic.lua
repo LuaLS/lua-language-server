@@ -199,20 +199,10 @@ function mt:resolve(uri, args)
                 -- inside a generic method), keep the resolved wrapper so
                 -- the resolution chain is preserved and downstream filters
                 -- can distinguish "resolved to generic T" from "unresolved".
-                if clonedObject.type == 'doc.generic.name' and clonedObject._resolved then
-                    local allGeneric = true
-                    for rn in clonedObject._resolved:eachObject() do
-                        if rn.type ~= 'doc.generic.name' then
-                            allGeneric = false
-                            break
-                        end
-                    end
-                    if allGeneric then
-                        result:merge(clonedObject)
-                    else
-                        local clonedNode = vm.compileNode(clonedObject)
-                        result:merge(clonedNode)
-                    end
+                if clonedObject.type == 'doc.generic.name'
+                and clonedObject._resolved
+                and vm.isResolvedToGeneric(clonedObject._resolved) then
+                    result:merge(clonedObject)
                 else
                     local clonedNode   = vm.compileNode(clonedObject)
                     result:merge(clonedNode)
@@ -241,6 +231,20 @@ function vm.isGenericUnsolved(source)
         return true
     end
     return false
+end
+
+--- Check if a resolved node contains only generic name objects.
+--- Used to distinguish "V resolved to generic T" (preserve wrapper)
+--- from "V resolved to concrete string" (unwrap normally).
+---@param node vm.node
+---@return boolean
+function vm.isResolvedToGeneric(node)
+    for rn in node:eachObject() do
+        if rn.type ~= 'doc.generic.name' then
+            return false
+        end
+    end
+    return true
 end
 
 ---@param source parser.object

@@ -1671,19 +1671,10 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                     else
                         local clonedObject = vm.cloneObject(nd, resolved)
                         if clonedObject then
-                            if clonedObject.type == 'doc.generic.name' and clonedObject._resolved then
-                                local allGeneric = true
-                                for rn in clonedObject._resolved:eachObject() do
-                                    if rn.type ~= 'doc.generic.name' then
-                                        allGeneric = false
-                                        break
-                                    end
-                                end
-                                if allGeneric then
-                                    result:merge(clonedObject)
-                                else
-                                    result:merge(vm.compileNode(clonedObject))
-                                end
+                            if clonedObject.type == 'doc.generic.name'
+                            and clonedObject._resolved
+                            and vm.isResolvedToGeneric(clonedObject._resolved) then
+                                result:merge(clonedObject)
                             else
                                 result:merge(vm.compileNode(clonedObject))
                             end
@@ -1790,16 +1781,7 @@ local function bindReturnOfFunction(source, mfunc, index, args)
             elseif rnode._resolved then
                 -- Allow generics that resolved to another generic type
                 -- parameter (e.g. V -> T in generic method's ipairs(self)).
-                -- Only allow when resolved purely to other generics, not
-                -- to concrete types like string/boolean.
-                local allGeneric = true
-                for rn in rnode._resolved:eachObject() do
-                    if rn.type ~= 'doc.generic.name' then
-                        allGeneric = false
-                        break
-                    end
-                end
-                if allGeneric then
+                if vm.isResolvedToGeneric(rnode._resolved) then
                     vm.setNode(source, rnode)
                 end
             end

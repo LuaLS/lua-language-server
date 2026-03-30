@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` Deduplicate documentation bindings for parameters
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
+* `CHG` Improved the output of test failures during development
 
 ## 3.17.1
 `2026-01-20`

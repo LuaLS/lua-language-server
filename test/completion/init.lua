@@ -1,35 +1,10 @@
-local core   = require 'core.completion'
-local files  = require 'files'
-local catch  = require 'catch'
-local guide  = require 'parser.guide'
+local core     = require 'core.completion'
+local files    = require 'files'
+local catch    = require 'catch'
+local guide    = require 'parser.guide'
+local compare  = require 'compare'
 
-EXISTS = {'EXISTS'}
-
-local function eq(a, b)
-    if a == EXISTS and b ~= nil then
-        return true
-    end
-    local tp1, tp2 = type(a), type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k in pairs(a) do
-            if not eq(a[k], b[k]) then
-                return false
-            end
-            mark[k] = true
-        end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
-            end
-        end
-        return true
-    end
-    return a == b
-end
+EXISTS = compare.EXISTS
 
 local function include(a, b)
     if a == EXISTS and b ~= nil then
@@ -46,7 +21,7 @@ local function include(a, b)
         for _, v1 in ipairs(a) do
             local ok = false
             for _, v2 in ipairs(b) do
-                if eq(v1, v2) then
+                if compare.eq(v1, v2) then
                     ok = true
                     break
                 end
@@ -57,7 +32,7 @@ local function include(a, b)
         end
         return true
     end
-    return a == b
+    return compare.eq(a, b)
 end
 
 rawset(_G, 'TEST', true)
@@ -138,7 +113,7 @@ function TEST(script)
                 expect.include = nil
                 assert(include(expect, result))
             else
-                assert(eq(expect, result))
+                assert(compare.eq(expect, result))
             end
         end
         files.remove(TESTURI)

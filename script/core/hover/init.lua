@@ -59,8 +59,9 @@ local function getHover(source, level)
 
         -- make sure `function` is before `doc.type.function`
         local orders = {'function', 'doc.type.function'}
+        local orderAnyOtherType = #orders + 1
         table.sort(defs, function (a, b)
-            return (orders[a.type] or (#orders + 1)) < (orders[b.type] or (#orders + 1))
+            return (orders[a.type] or orderAnyOtherType) < (orders[b.type] or orderAnyOtherType)
         end)
 
         local hasFunc

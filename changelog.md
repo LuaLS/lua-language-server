@@ -8,6 +8,7 @@
 * `FIX` Fix type inference for bitwise operators (`<<`, `>>`, `&`, `|`, `~`) on integer variables
 * `FIX` Fix constant value computation for chained bitwise expressions in hover tooltips
 * `FIX` Support Lua 5.5 prefix local attributes such as `local <close>x` and `local <const>x`
+* `FIX` Correct `os` and `io` meta return types.
 
 ## 3.17.1
 `2026-01-20`

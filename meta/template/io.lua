@@ -26,7 +26,7 @@ io = {}
 
 ---#DES 'io.close'
 ---@param file? file*
----@return boolean?  suc
+---@return true?     suc
 ---@return exitcode? exitcode
 ---@return integer?  code
 function io.close(file) end
@@ -119,7 +119,7 @@ local file = {}
 ---@alias exitcode "exit"|"signal"
 
 ---#DES 'file:close'
----@return boolean?  suc
+---@return true?     suc
 ---@return exitcode? exitcode
 ---@return integer?  code
 function file:close() end

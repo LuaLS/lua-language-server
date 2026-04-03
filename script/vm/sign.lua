@@ -196,6 +196,7 @@ function mt:resolve(uri, args)
             return
         end
         if object.type == 'doc.type.table' then
+            ---@cast object parser.object
             for _, ufield in ipairs(object.fields) do
                 local ufieldNode = vm.compileNode(ufield.name)
                 local uvalueNode = vm.compileNode(ufield.extends)

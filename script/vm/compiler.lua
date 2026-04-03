@@ -1702,6 +1702,7 @@ local function bindReturnOfFunction(source, mfunc, index, args)
             -- Also check inside doc.type.sign for unresolved generics
             -- (e.g. list<T> where T is not yet resolved)
             if rnode.type == 'doc.type.sign' and rnode.signs then
+                ---@cast rnode parser.object
                 guide.eachSourceType(rnode, 'doc.generic.name', function (src)
                     if not src._resolved then
                         hasUnresolvedGeneric = true

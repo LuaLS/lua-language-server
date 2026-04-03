@@ -1671,7 +1671,13 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                     else
                         local clonedObject = vm.cloneObject(nd, resolved)
                         if clonedObject then
-                            result:merge(vm.compileNode(clonedObject))
+                            if clonedObject.type == 'doc.generic.name'
+                            and clonedObject._resolved
+                            and vm.isResolvedToGeneric(clonedObject._resolved) then
+                                result:merge(clonedObject)
+                            else
+                                result:merge(vm.compileNode(clonedObject))
+                            end
                         end
                     end
                 end
@@ -1686,12 +1692,24 @@ local function bindReturnOfFunction(source, mfunc, index, args)
         end
     end
 
-    if mfunc.type == 'function' then
+    if mfunc.type == 'function' or mfunc.type == 'doc.type.function' then
         local hasUnresolvedGeneric = false
         for rnode in returnNode:eachObject() do
             if vm.isGenericUnsolved(rnode) then
                 hasUnresolvedGeneric = true
                 break
+            end
+            -- Also check inside doc.type.sign for unresolved generics
+            -- (e.g. list<T> where T is not yet resolved)
+            if rnode.type == 'doc.type.sign' and rnode.signs then
+                guide.eachSourceType(rnode, 'doc.generic.name', function (src)
+                    if not src._resolved then
+                        hasUnresolvedGeneric = true
+                    end
+                end)
+                if hasUnresolvedGeneric then
+                    break
+                end
             end
         end
         if hasUnresolvedGeneric then
@@ -1760,6 +1778,12 @@ local function bindReturnOfFunction(source, mfunc, index, args)
         for rnode in returnNode:eachObject() do
             if rnode.type ~= 'doc.generic.name' then
                 vm.setNode(source, rnode)
+            elseif rnode._resolved then
+                -- Allow generics that resolved to another generic type
+                -- parameter (e.g. V -> T in generic method's ipairs(self)).
+                if vm.isResolvedToGeneric(rnode._resolved) then
+                    vm.setNode(source, rnode)
+                end
             end
         end
         if returnNode:isOptional() then

@@ -4,6 +4,8 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
 * `CHG` Improved the output of test failures during development
+* `FIX` Fix type inference for bitwise operators (`<<`, `>>`, `&`, `|`, `~`) on integer variables
+* `FIX` Fix constant value computation for chained bitwise expressions in hover tooltips
 * `FIX` Support Lua 5.5 prefix local attributes such as `local <close>x` and `local <const>x`
 
 ## 3.17.1

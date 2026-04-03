@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
 * `CHG` Improved the output of test failures during development
+* `FIX` Support Lua 5.5 prefix local attributes such as `local <close>x` and `local <const>x`
 
 ## 3.17.1
 `2026-01-20`

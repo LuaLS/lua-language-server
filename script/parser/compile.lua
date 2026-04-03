@@ -652,7 +652,8 @@ local function expectAssign(isAction)
     return false
 end
 
-local function parseLocalAttrs()
+---@param kind? '"prefix"'|'"suffix"'
+local function parseLocalAttrs(kind)
     local attrs
     while true do
         skipSpace()
@@ -672,6 +673,7 @@ local function parseLocalAttrs()
             parent = attrs,
             start  = getPosition(Tokens[Index], 'left'),
             finish = getPosition(Tokens[Index], 'right'),
+            kind   = kind or 'suffix',
         }
         attrs[#attrs+1] = attr
         Index = Index + 2
@@ -723,6 +725,20 @@ local function parseLocalAttrs()
         attrs.finish = attr.finish
     end
     return attrs
+end
+
+local function mergeLocalAttrs(attrsBefore, attrsAfter)
+    if not attrsBefore then
+        return attrsAfter
+    end
+    if not attrsAfter then
+        return attrsBefore
+    end
+    for i = 1, #attrsAfter do
+        attrsBefore[#attrsBefore + 1] = attrsAfter[i]
+    end
+    attrsBefore.finish = attrsAfter[#attrsAfter].finish
+    return attrsBefore
 end
 
 ---@param obj table
@@ -949,6 +965,79 @@ local function hasAttr(attrs, attrName)
         end
     end
     return false
+end
+
+local function hasAttrKind(attrs, attrName, attrKind)
+    if not attrs then
+        return false
+    end
+    for i = 1, #attrs do
+        if attrs[i][1] == attrName and attrs[i].kind == attrKind then
+            return true
+        end
+    end
+    return false
+end
+
+local function checkLocalCloseList(n1, n2, nrest)
+    if State.version ~= 'Lua 5.4' and State.version ~= 'Lua 5.5' then
+        return
+    end
+
+    if State.version == 'Lua 5.5' and hasAttrKind(n1 and n1.attrs, 'close', 'prefix') then
+        local extra
+        if n2 and not n2.attrs then
+            extra = n2
+        elseif nrest then
+            for i = 1, #nrest do
+                if not nrest[i].attrs then
+                    extra = nrest[i]
+                    break
+                end
+            end
+        end
+        if extra then
+            pushError {
+                type   = 'MULTI_CLOSE',
+                start  = extra.start,
+                finish = extra.finish,
+            }
+            return
+        end
+    end
+
+    local function collectCloseAttrs(node, list)
+        local attrs = node and node.attrs
+        if not attrs then
+            return
+        end
+        for i = 1, #attrs do
+            local a = attrs[i]
+            if a[1] == 'close' then
+                list[#list + 1] = a
+            end
+        end
+    end
+
+    local closeList = {}
+    collectCloseAttrs(n1, closeList)
+    if n2 then
+        collectCloseAttrs(n2, closeList)
+    end
+    if nrest then
+        for i = 1, #nrest do
+            collectCloseAttrs(nrest[i], closeList)
+        end
+    end
+
+    if #closeList > 1 then
+        local second = closeList[2]
+        pushError {
+            type   = 'MULTI_CLOSE',
+            start  = second.start,
+            finish = second.finish,
+        }
+    end
 end
 
 local function resolveLable(label, obj)
@@ -3208,43 +3297,8 @@ local function parseMultiVars(n1, parser, isLocal)
         end
     end
 
-    do
-        -- Lua 5.4: only one <close> attribute allowed across a local declaration
-        -- Lua 5.5: multiple <close> are allowed
-        if State.version == 'Lua 5.4' then
-            local function collectCloseAttrs(node, list)
-                local attrs = node and node.attrs
-                if not attrs then
-                    return
-                end
-                for i = 1, #attrs do
-                    local a = attrs[i]
-                    if a[1] == 'close' then
-                        list[#list + 1] = a
-                    end
-                end
-            end
-
-            local closeList = {}
-            collectCloseAttrs(n1, closeList)
-            if n2 then
-                collectCloseAttrs(n2, closeList)
-            end
-            if nrest then
-                for i = 1, #nrest do
-                    collectCloseAttrs(nrest[i], closeList)
-                end
-            end
-
-            if #closeList > 1 then
-                local second = closeList[2]
-                pushError {
-                    type   = 'MULTI_CLOSE',
-                    start  = second.start,
-                    finish = second.finish,
-                }
-            end
-        end
+    if isLocal then
+        checkLocalCloseList(n1, n2, nrest)
     end
 
     if v2 and not n2 then
@@ -3343,13 +3397,30 @@ local function parseLocal()
     local locPos = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
-    local word = peekWord()
+    local attrsBefore = parseLocalAttrs('prefix')
+    if attrsBefore and State.version ~= 'Lua 5.5' then
+        pushError {
+            type    = 'UNSUPPORT_SYMBOL',
+            start   = attrsBefore.start,
+            finish  = attrsBefore.finish,
+            version = 'Lua 5.5',
+        }
+    end
+    skipSpace()
+    local word, wstart, wfinish = peekWord()
     if not word then
         missName()
         return nil
     end
 
     if word == 'function' then
+        if attrsBefore then
+            pushError {
+                type   = 'MISS_NAME',
+                start  = wstart,
+                finish = wfinish,
+            }
+        end
         local func = parseFunction('local', true)
         local name = func.name
         if name then
@@ -3373,7 +3444,9 @@ local function parseLocal()
         missName()
         return nil
     end
-    local loc = createLocal(name, parseLocalAttrs())
+    local attrsAfter = parseLocalAttrs('suffix')
+    local attrs = mergeLocalAttrs(attrsBefore, attrsAfter)
+    local loc = createLocal(name, attrs)
     loc.locPos = locPos
     loc.effect = maxinteger
     pushActionIntoCurrentChunk(loc)

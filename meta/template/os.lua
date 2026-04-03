@@ -50,7 +50,7 @@ function os.difftime(t2, t1) end
 function os.execute(command) end
 ---#else
 ---@param command? string
----@return boolean?  suc
+---@return true?     suc
 ---@return exitcode? exitcode
 ---@return integer?  code
 function os.execute(command) end
@@ -75,15 +75,17 @@ function os.getenv(varname) end
 
 ---#DES 'os.remove'
 ---@param filename string
----@return boolean suc
+---@return true? suc
 ---@return string? errmsg
+---@return integer? errcode
 function os.remove(filename) end
 
 ---#DES 'os.rename'
 ---@param oldname string
 ---@param newname string
----@return boolean suc
+---@return true? suc
 ---@return string? errmsg
+---@return integer? errcode
 function os.rename(oldname, newname) end
 
 ---@alias localecategory

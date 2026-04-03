@@ -146,6 +146,16 @@ TEST 'integer' [[
 <?x?> = 1 << 2
 ]]
 
+TEST 'integer' [[
+local a = 1 << 20
+local <?b?> = a << 1
+]]
+
+TEST 'integer' [[
+local a = 1 << 20
+local <?b?> = (a << 1) - 1
+]]
+
 TEST 'unknown' [[
 <?x?> = a .. b
 ]]

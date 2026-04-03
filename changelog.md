@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `CHG` Always track symbol-links
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
 * `CHG` Improved the output of test failures during development
 * `FIX` Fix type inference for `x == nil and "default" or x` idiom [#2236](https://github.com/LuaLS/lua-language-server/issues/2236)
@@ -10,6 +11,10 @@
 * `FIX` Fix `ipairs(self)` type resolution in generic class methods
 * `FIX` Fix double angle brackets in generic sign display (`list<<T>>` -> `list<T>`)
 * `FIX` Fix nil crash in `getParentClass` for `doc.field` without class
+* `FIX` Fix type inference for bitwise operators (`<<`, `>>`, `&`, `|`, `~`) on integer variables
+* `FIX` Fix constant value computation for chained bitwise expressions in hover tooltips
+* `FIX` Support Lua 5.5 prefix local attributes such as `local <close>x` and `local <const>x`
+* `FIX` Correct `os` and `io` meta return types.
 
 ## 3.17.1
 `2026-01-20`

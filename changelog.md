@@ -9,6 +9,7 @@
 
 ## 3.18.0
 `2026-04-03`
+* `NEW` Render `@alias` value types with markdown instead of code blocks
 * `CHG` Always track symbol-links
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
 * `CHG` Improved the output of test failures during development

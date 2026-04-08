@@ -1,7 +1,7 @@
-# Workflow And Style
+# 工作流与风格
 
-## Validation Commands
-Run from the server root.
+## 验证命令
+从 server 根目录运行。
 
 ```powershell
 bin\lua-language-server.exe --test
@@ -12,24 +12,24 @@ bin\lua-language-server.exe --test feature.completion
 bin\lua-language-server.exe --test feature.completion.field
 ```
 
-## Test Workflow
-- Prefer the narrowest relevant suite first, then expand only if needed.
-- For parser work, add tests under `test/parser/`.
-- For node or tracer work, add tests under `test/node/` or `test/coder/` depending on ownership.
-- For LSP-facing behavior, add tests under `test/feature/`.
-- Completion tests use the local harness in `test/feature/completion/init.lua`; remember that `TEST_COMPLETION` runs in a bare environment.
+## 测试工作流
+- 先跑最小相关 suite，只有需要时再扩大验证范围。
+- parser 改动优先在 `test/parser/` 增加测试。
+- node 或 tracer 改动根据归属放到 `test/node/` 或 `test/coder/`。
+- 面向 LSP 行为的改动，优先在 `test/feature/` 补测试。
+- completion 测试使用 `test/feature/completion/init.lua` 中的 harness；要记住 `TEST_COMPLETION` 运行在裸环境。
 
-## Debugging Workflow
-- For tracer or flow failures, inspect `tmp/LAST_CODE`, `tmp/LAST_FLOW`, and `tmp/LAST_PMAP` after a failing test.
-- If `self.map` reports `No such key`, investigate read-before-write ordering in coder output instead of bypassing the map.
-- Keep temporary logs and diagnostic artifacts in `tmp/` only.
-- If using a debugger, stop any existing session before starting another one, and disconnect when done.
+## 调试工作流
+- tracer 或 flow 失败后，先看 `tmp/LAST_CODE`、`tmp/LAST_FLOW`、`tmp/LAST_PMAP`。
+- 如果 `self.map` 报 `No such key`，优先检查 coder 输出中的读写顺序，不要直接绕过 map。
+- 临时日志和诊断产物统一留在 `tmp/`。
+- 如果使用 debugger，启动新会话前先停掉旧会话，用完后及时断开。
 
-## Style Expectations
-- Lua files use spaces with width 4.
-- Keep line length near the repository limit of 120.
-- Preserve existing alignment style, especially for assignments, parameter lists, and `if` branches.
-- Project-specific multi-condition `if` formatting is intentionally aligned, for example:
+## 风格约定
+- Lua 文件使用 4 空格缩进。
+- 行宽尽量接近仓库限制 120。
+- 保持现有对齐风格，尤其是 assign、参数列表和 `if` 分支。
+- 项目中多条件 `if` 的对齐格式是有意设计的，例如：
 
 ```lua
 if  condA
@@ -39,11 +39,11 @@ and condC then
 end
 ```
 
-- Follow existing class patterns from `script/class.lua`, including `Class` and `New` usage.
-- Avoid broad formatting-only edits.
+- 延续 `script/class.lua` 中已有的 class 写法，包括 `Class` 和 `New` 的使用方式。
+- 避免大范围纯格式化改动。
 
-## Practical Constraints
-- Do not run the `PreCompile` or `Compile` tasks for routine feature work.
-- Worker-thread boundaries only accept serializable plain data.
-- Completion-related logic should prefer VM/Node-derived type information over raw text rescans.
-- Keep changes focused and local to the owning subsystem.
+## 实际约束
+- 日常功能开发不要运行 `PreCompile` 或 `Compile` 任务。
+- worker-thread 边界只能传递可序列化的 plain data。
+- completion 相关逻辑优先复用 VM/Node 推导出的类型信息，不要回退成大段原始文本重扫。
+- 改动尽量聚焦在拥有该职责的子系统内。

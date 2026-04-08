@@ -868,6 +868,17 @@ global <const> x = 1
 (nil)
 
 TEST [[
+global = 1
+]]
+(nil)
+
+TEST [[
+local global = 1
+return global
+]]
+(nil)
+
+TEST [[
 local <close>x = setmetatable({}, { __close = function () end })
 ]]
 (nil)

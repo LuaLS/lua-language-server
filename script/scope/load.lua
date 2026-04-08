@@ -13,7 +13,7 @@ function M:initGlob(options)
     ignores[#ignores+1] = '.DS_Store'
     self.glob = ls.glob.gitignore(ignores)
     self.glob:setOption('root', self.uri)
-    self.glob:setOption('ignoreCase', true)
+    self.glob:setOption('ignoreCase', ls.env.IGNORE_CASE)
     self.glob:setInterface('type', function (uri)
         return self.fs.getType(uri)
     end)
@@ -88,14 +88,12 @@ end
 ---@field ignores? string[]
 
 ---@async
+---@param uri Uri
 ---@param options Scope.Load.Options
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
 ---@return Scope.Load.Status
-function M:load(options, callback)
+function M:load(uri, options, callback)
     self:initGlob(options)
-
-    ---@type Uri[]
-    self.uris = {}
 
     ---@type Scope.Load.Status
     local status = {
@@ -103,14 +101,14 @@ function M:load(options, callback)
         found = 0,
         loaded = 0,
         indexed = 0,
-        uris = self.uris,
+        uris = {},
     }
 
     xpcall(callback, log.error, 'start', status)
 
     ---@async
     ls.util.withDuration(function ()
-        self:loadFiles(callback, status)
+        self:loadFiles(uri, callback, status)
     end, function (duration)
         log.info('Load files for "{}" in {%.2f} seconds.' % { self.name, duration })
     end)
@@ -122,14 +120,15 @@ end
 
 ---@package
 ---@async
+---@param targetUri Uri
 ---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
 ---@param status Scope.Load.Status
-function M:loadFiles(callback, status)
-    self.glob:scan(self.uri, function (uri)
+function M:loadFiles(targetUri, callback, status)
+    self.glob:scan(targetUri, function (uri)
         status.scanned = status.scanned + 1
         xpcall(callback, log.error, 'scanning', status, uri)
         if self:isValidUri(uri) then
-            self.uris[#self.uris+1] = uri
+            status.uris[#status.uris+1] = uri
             status.found = status.found + 1
             xpcall(callback, log.error, 'finding', status, uri)
         end
@@ -138,7 +137,7 @@ function M:loadFiles(callback, status)
 
     local loadTasks = {}
 
-    for _, uri in ipairs(self.uris) do
+    for _, uri in ipairs(status.uris) do
         ---@async
         loadTasks[#loadTasks+1] = function ()
             local content = self.fs.read(uri)

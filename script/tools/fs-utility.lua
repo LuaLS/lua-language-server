@@ -51,7 +51,6 @@ end
 ---@return string?
 function m.saveFile(path, content)
     if type(path) ~= 'string' then
-        ---@diagnostic disable-next-line: undefined-field
         path = path:string()
     end
     local f, e = ioOpen(path, "wb")

@@ -96,7 +96,7 @@ function M:initialized()
     if self.client.params.workspaceFolders then
         for i, folder in ipairs(self.client.params.workspaceFolders) do
             local scope = ls.scope.create(folder.name, folder.uri, ls.afs)
-            scope:start({})
+            scope:reload({})
             self.scopes[i] = scope
         end
     end

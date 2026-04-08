@@ -23,6 +23,8 @@ function M:__init(name, uri, fs)
     self.rt = ls.node.createRuntime(self)
     self.rt:reset()
 
+    ---@type Uri[]
+    self.uris = {}
     ---@type table<Uri, Document?>
     self.documents = {}
 
@@ -40,12 +42,12 @@ function M:__close()
 end
 
 ---@param options Scope.Load.Options
-function M:start(options)
+function M:reload(options)
     -- TODO: 需要先读配置文件
     ---@async
     ls.await.call(function ()
         local startTime = time.monotonic()
-        self:load(options, function (event, status, uri)
+        local result = self:load(self.uri, options, function (event, status, uri)
             if event == 'start' then
                 log.info('[Scope] Start loading: {}' % { self.name })
                 return
@@ -79,6 +81,7 @@ function M:start(options)
                 return
             end
         end)
+        self.uris = result.uris
     end)
 
     self.ready = true

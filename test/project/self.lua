@@ -124,7 +124,7 @@ do
     collectgarbage()
     print('加载项目前的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
-    local result = scope:load({
+    local result = scope:load(scope.uri, {
         ignores = {
             'log',
         }
@@ -167,7 +167,7 @@ do
     local mem = collectgarbage 'count' / 1024
     print('索引后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
 
-    for _, uri in ipairs(scope.uris) do
+    for _, uri in ipairs(result.uris) do
         local document = scope:getDocument(uri)
         document.ast = nil
     end

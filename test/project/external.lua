@@ -18,7 +18,7 @@ do
 
     local c1 = os.clock()
 
-    local result = scope:load({}, function (event, status, uri)
+    local result = scope:load(scope.uri, {}, function (event, status, uri)
         if event == 'scanning' then
             if status.scanned % 100 == 0 then
                 print('正在扫描... 已扫描 {scanned} 个文件' % status)

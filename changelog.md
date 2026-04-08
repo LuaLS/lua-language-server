@@ -2,6 +2,8 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.18.1
 * `FIX` Allow `global` to be used as an identifier in Lua 5.5 when it is not part of a `global` declaration
 
 ## 3.18.0

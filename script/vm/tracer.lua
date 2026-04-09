@@ -638,22 +638,9 @@ local lookIntoChild = util.switch()
             tracer:lookIntoChild(action[2], topNode)
             return topNode, outNode
         end
-        if action.op.type == 'and' then
-            local topNode1, outNode1 = tracer:lookIntoChild(action[1], topNode, topNode:copy())
-            topNode = tracer:lookIntoChild(action[2], topNode1, topNode1:copy())
-            -- When the right side of `and` is a truthy literal (string, number,
-            -- true, table, function), the `and` can only be false when the left
-            -- side is false. Propagate the narrowed outNode so that patterns
-            -- like `x == nil and "default" or x` correctly infer x as non-nil.
-            local tp2 = action[2].type
-            if  tp2 == 'string'
-            or  tp2 == 'number'
-            or  tp2 == 'integer'
-            or  tp2 == 'table'
-            or  tp2 == 'function'
-            or (tp2 == 'boolean' and action[2][1] == true) then
-                outNode = outNode1
-            end
+        if     action.op.type == 'and' then
+            topNode = tracer:lookIntoChild(action[1], topNode, topNode:copy())
+            topNode = tracer:lookIntoChild(action[2], topNode, topNode:copy())
         elseif action.op.type == 'or' then
             outNode = outNode or topNode:copy()
             local topNode1, outNode1 = tracer:lookIntoChild(action[1], topNode, outNode)
@@ -857,40 +844,12 @@ function mt:calcNode(source)
         return
     end
     if self.assignMap[source] then
-        -- Guard against circular dependency: when this setlocal is already
-        -- being compiled (e.g. if-handler's getNode triggers calcNode for
-        -- a setlocal whose value is currently being compiled), skip
-        -- lookIntoBlock to avoid propagating incomplete types and setting
-        -- marks that would prevent later correct processing.
-        if self._compilingAssigns and self._compilingAssigns[source] then
-            self.nodes[source] = vm.compileNode(source)
-            return
-        end
-        if not self._compilingAssigns then
-            self._compilingAssigns = {}
-        end
-        self._compilingAssigns[source] = true
         local node = vm.compileNode(source)
-        -- When the compiled node has no known type (only contains a 'variable'
-        -- due to circular dependency), fall back to the variable's base
-        -- declaration node. This prevents incomplete nodes from propagating
-        -- through control flow analysis (e.g. if-blocks inside for-loops),
-        -- which would otherwise cause the type to degrade to 'unknown'.
-        if  not node:hasKnownType()
-        and self.mode == 'local'
-        and self.source.type == 'variable'
-        and self.source.base then
-            local baseNode = vm.compileNode(self.source.base)
-            if baseNode:hasKnownType() then
-                node = baseNode
-            end
-        end
         self.nodes[source] = node
         local parentBlock = guide.getParentBlock(source)
         if parentBlock then
             self:lookIntoBlock(parentBlock, source.finish, node)
         end
-        self._compilingAssigns[source] = nil
         return
     end
 end

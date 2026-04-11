@@ -107,6 +107,10 @@ DIAG_DISCARD_RETURNS    =
 'この関数の戻り値は破棄できません。'
 DIAG_NEED_CHECK_NIL     =
 'nil チェックが必要です。'
+DIAG_BOOLEAN_CONTEXT_ALWAYS =
+'この式は常に {} です。'
+DIAG_BOOLEAN_CONTEXT_NONBOOLEAN =
+'この箇所は boolean を期待していますが、{} です。'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循環継承されたクラスです。'
 DIAG_DOC_FIELD_NO_CLASS               =

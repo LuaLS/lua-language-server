@@ -2,7 +2,10 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.18.2
 * `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed
+* `REVERT` Reverted commit 1dd194da537df432f97295ea167dfef19acd7a4e which fix for type inference in and/or idioms. The circular dependency guard introduced issues with type narrowing in if-blocks where variables are reassigned (e.g., `if x then x = 0 end` would lose type information from the if-block in subsequent code). This needs a more refined solution to balance fixing circular dependencies without breaking type narrowing.
 
 ## 3.18.1
 `2026-04-08`

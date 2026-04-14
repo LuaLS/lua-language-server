@@ -222,11 +222,10 @@ function m.getLibraryMatchers(scp)
     end
 
     local librarys = {}
-    for _, pathVal in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
-        local path = pathVal
-        path = m.getAbsolutePath(scp.uri, path)
-        if path then
-            librarys[files.normalize(path)] = true
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+        local apath = m.getAbsolutePath(scp.uri, path)
+        if apath then
+            librarys[files.normalize(apath)] = true
         end
     end
     local metaPaths = scp:get 'metaPaths'

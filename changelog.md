@@ -2,6 +2,16 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Support per library settings in ignoreDir
+```jsonc
+{
+  "workspace.library": [ "/path/to/lib", "/path/to/lib2" ],
+  "workspace.ignoreDir": [
+    "/path/to/lib/**/lib-ignore", // extracted pattern will be "/**/lib-ignore" and only applies to "/path/to/lib"
+    "global-ignore" // this will still apply to all of "/path/to/lib", "/path/to/lib2", current workspace
+  ]
+}
+```
 
 ## 3.18.2
 * `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed

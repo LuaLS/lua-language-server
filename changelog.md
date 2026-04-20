@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Allow capture object types with backticks in generics
 
 ## 3.18.2
 * `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed

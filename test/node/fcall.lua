@@ -151,6 +151,36 @@ do
     lt.assertEquals(r2:view(), '2 | 4')
 end
 
+do
+    rt:reset()
+    --[[
+    local function f(...)
+        return ...
+    end
+
+    local n = f()
+    --> unknown
+    ]]
+    local f = rt.func()
+        : addReturnList(rt.list { rt.UNKNOWN })
+
+    lt.assertEquals(rt.UNKNOWN.kind, 'type')
+
+    local myList = rt.list { rt.UNKNOWN }
+    lt.assertEquals(myList.raw[1].kind, 'type')          -- raw[1] stored kind
+    local vals = myList.values
+    lt.assertEquals(#vals, 1)
+    lt.assertEquals(vals[1].kind, 'type')                -- values[1] kind
+    lt.assertEquals(myList:select(1).kind, 'type')       -- list:select(1)
+    lt.assertEquals(f:getReturn(1).kind, 'type')         -- returnsPack:select(1)
+    lt.assertEquals(f:getReturn(1):view(), 'unknown')
+
+    local fcall = rt.fcall(f, {})
+    lt.assertEquals(fcall.returns:select(1).kind, 'type') -- fcall.returns:select(1)
+    lt.assertEquals(fcall:select(1).kind, 'type')
+    lt.assertEquals(fcall:select(1):view(), 'unknown')
+end
+
 do -- 方案1
     rt:reset()
     --[[

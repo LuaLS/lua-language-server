@@ -125,7 +125,10 @@ M.__getter.returnsPack = function (self)
         for i = 1, maxReturn do
             local unionValues = {}
             for _, list in ipairs(self.returnList) do
-                local value = list:select(i):finalValue()
+                local raw = list:select(i)
+                local value = (raw.kind == 'fcall' or raw.kind == 'select')
+                    and raw:finalValue()
+                    or  raw
                 unionValues[#unionValues+1] = value
             end
             returns[i] = rt.union(unionValues)

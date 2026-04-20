@@ -29,7 +29,7 @@
 		},
 		{
 			// 这个配置是AI专用的，AI可以随意修改并使用这个配置来调试
-			"name": "🍺test luadoc",
+			"name": "🍺test hover",
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
@@ -51,7 +51,7 @@
 			],
 			"arg": [
 				"--test",
-				"feature.completion.luadoc"
+				"feature.hover"
 			]
 		},
 		{

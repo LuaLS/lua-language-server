@@ -47,6 +47,62 @@ end
 ---@type Node
 M.returns = nil
 
+---@param var Node.Variable
+---@return boolean
+local function isUndefinedGlobalVariable(var)
+    if var:isDefined() then
+        return false
+    end
+    local rt = var.scope.rt
+    local current = var.masterVariable or var
+    for _ = 1, 100 do
+        local parent = current.parent
+        if not parent then
+            return false
+        end
+        if parent == rt.VAR_G then
+            return true
+        end
+        if parent.kind ~= 'variable' then
+            return false
+        end
+        ---@cast parent Node.Variable
+        current = parent
+    end
+    return false
+end
+
+---@param var Node.Variable
+---@return boolean
+local function isFieldOfUndefinedGlobal(var)
+    local current = var.masterVariable or var
+    local parent = current.parent
+    if not parent or parent.kind ~= 'variable' then
+        return false
+    end
+    ---@cast parent Node.Variable
+    return isUndefinedGlobalVariable(parent)
+end
+
+---@param head Node
+---@return boolean
+local function shouldUseUnknownForAnyHead(head)
+    if head.kind == 'select' then
+        ---@cast head Node.Select
+        local selectHead = head.head
+        if selectHead.kind == 'variable' then
+            ---@cast selectHead Node.Variable
+            return isUndefinedGlobalVariable(selectHead)
+        end
+        return false
+    end
+    if head.kind == 'variable' then
+        ---@cast head Node.Variable
+        return isFieldOfUndefinedGlobal(head)
+    end
+    return false
+end
+
 ---@param self Node.FCall
 ---@return Node
 ---@return true
@@ -62,6 +118,10 @@ M.__getter.returns = function (self)
 
     self.head:addRef(self)
     args:addRef(self)
+
+    if shouldUseUnknownForAnyHead(self.head) then
+        return rt.UNKNOWN, true
+    end
 
     self.head:each('function', function (f)
         ---@cast f Node.Function
@@ -87,6 +147,9 @@ M.__getter.returns = function (self)
         if headFinal.kind == 'type' then
             ---@cast headFinal Node.Type
             if headFinal.typeName == 'any' then
+                if shouldUseUnknownForAnyHead(self.head) then
+                    return rt.UNKNOWN, true
+                end
                 return rt.ANY, true
             end
             if headFinal.typeName == 'unknown' then

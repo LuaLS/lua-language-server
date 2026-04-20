@@ -1,7 +1,12 @@
+local beefw = require 'bee.filewatch'
+local bfs   = require 'bee.filesystem'
+
 ---@class Scope
 local Scope = Class 'Scope'
 
 ---@class Scope.Root
+---@field uriSet table<Uri, true>
+---@field private _watcher bee.filewatch.watch?
 local M = Class 'Scope.Root'
 
 ---@param scope Scope
@@ -10,11 +15,13 @@ local M = Class 'Scope.Root'
 ---@param fs FileSystem
 ---@param config Config
 function M:__init(scope, kind, uri, fs, config)
-    self.scope  = scope
-    self.kind   = kind
-    self.uri    = uri
-    self.fs     = fs
-    self.config = config
+    self.scope   = scope
+    self.kind    = kind
+    self.uri     = uri
+    self.fs      = fs
+    self.config  = config
+    self.uriSet  = ls.fs.newMap()
+    self._watcher = nil
 end
 
 ---@param options Scope.Load.Options
@@ -149,6 +156,7 @@ function M:loadFiles(targetUri, callback, status)
         xpcall(callback, log.error, 'scanning', status, uri)
         if self.scope:isValidUri(uri) then
             status.uris[#status.uris+1] = uri
+            self.uriSet[uri] = true
             status.found = status.found + 1
             xpcall(callback, log.error, 'finding', status, uri)
         end
@@ -184,6 +192,150 @@ function M:loadFiles(targetUri, callback, status)
     ls.await.waitAll(loadTasks)
 
     xpcall(callback, log.error, 'indexed', status)
+end
+
+--- 全局待轮询 Root 列表
+---@type Scope.Root[]
+local watchRoots = {}
+
+---启动文件监控，在 load 完成后调用
+---@package
+function M:startWatch()
+    if self._watcher then
+        return
+    end
+    local nativePath = ls.uri.decode(self.uri)
+    local watcher = beefw.create()
+    watcher:set_recursive(true)
+    watcher:set_follow_symlinks(false)
+    watcher:add(nativePath)
+    self._watcher = watcher
+    watchRoots[#watchRoots+1] = self
+end
+
+---停止文件监控
+---@package
+function M:stopWatch()
+    if not self._watcher then
+        return
+    end
+    for i = #watchRoots, 1, -1 do
+        if watchRoots[i] == self then
+            table.remove(watchRoots, i)
+            break
+        end
+    end
+    self._watcher = nil
+end
+
+---轮询一次底层 watcher 事件
+---@package
+function M:pollWatch()
+    if not self._watcher then
+        return
+    end
+    while true do
+        local eventType, nativePath = self._watcher:select()
+        if not eventType then
+            break
+        end
+        ---@cast nativePath -?
+        self:_onWatchEvent(eventType, nativePath)
+    end
+end
+
+---处理单条 bee.filewatch 原始事件
+---@package
+---@param eventType string
+---@param nativePath string
+function M:_onWatchEvent(eventType, nativePath)
+    local uri = ls.uri.encode(nativePath)
+
+    if eventType == 'modify' then
+        if self.uriSet[uri] then
+            local content = self.fs.read(uri)
+            if content then
+                ls.file.setServerText(uri, content)
+            end
+        end
+        return
+    end
+
+    -- 'rename' 事件：通过 exists + is_directory 区分四种情况
+    local bPath = bfs.path(nativePath)
+    if bfs.exists(bPath) then
+        -- 出现了：目录 → 扫描新文件；文件 → 直接创建
+        if bfs.is_directory(bPath) then
+            self:_expandDirCreate(uri)
+        elseif not self.uriSet[uri] and self.scope:isValidUri(uri) then
+            self:_onFileCreate(uri)
+        end
+    else
+        -- 消失了：已知文件 → 删除；未知路径 → 尝试目录展开
+        if self.uriSet[uri] then
+            self:_onFileDelete(uri)
+        else
+            self:_expandDirDelete(uri)
+        end
+    end
+end
+
+---目录消失：遍历 uriSet 找前缀匹配的所有已知文件并删除
+---@package
+---@param dirUri Uri
+function M:_expandDirDelete(dirUri)
+    local toDelete = {}
+    for uri in pairs(self.uriSet) do
+        if ls.uri.relativePath(uri, dirUri) then
+            toDelete[#toDelete+1] = uri
+        end
+    end
+    for _, uri in ipairs(toDelete) do
+        self:_onFileDelete(uri)
+    end
+end
+
+---目录出现：用 glob 扫描新目录，将尚未记录的文件加入
+---@package
+---@param dirUri Uri
+function M:_expandDirCreate(dirUri)
+    if not self.glob then
+        return
+    end
+    self.glob:scan(dirUri, function (uri)
+        if self.scope:isValidUri(uri) and not self.uriSet[uri] then
+            self:_onFileCreate(uri)
+        end
+    end)
+end
+
+---文件出现：写入 ls.file 并记录到 uriSet
+---@package
+---@param uri Uri
+function M:_onFileCreate(uri)
+    self.uriSet[uri] = true
+    local content = self.fs.read(uri)
+    if content then
+        ls.file.setServerText(uri, content)
+    end
+end
+
+---文件消失：从 uriSet 移除并通知 ls.file
+---@package
+---@param uri Uri
+function M:_onFileDelete(uri)
+    self.uriSet[uri] = nil
+    local file = ls.file.get(uri)
+    if file then
+        file:removeByServer()
+    end
+end
+
+---轮询所有活跃 Root 的 watcher（供 event loop 调用）
+function ls.scope.pollWatchers()
+    for _, root in ipairs(watchRoots) do
+        root:pollWatch()
+    end
 end
 
 ---@param path string
@@ -291,6 +443,7 @@ function Scope:load(options, callback)
             end
             xpcall(callback, log.error, event, status, uri)
         end)
+        root:startWatch()
     end
 
     xpcall(callback, log.error, 'finish', status)

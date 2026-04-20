@@ -271,6 +271,8 @@ function ls.scope.findSources(uri, offset, accepts)
 end
 
 function ls.scope.watchFiles()
+    ls.eventLoop.addTask(ls.scope.pollWatchers)
+
     ls.file.onDidChange:on(function (uri)
         local scope = ls.scope.find(uri)
         if not scope then

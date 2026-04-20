@@ -124,7 +124,7 @@ do
     collectgarbage()
     print('加载项目前的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
 
-    local result = scope:load(scope.uri, {
+    local result = scope:load({
         ignores = {
             'log',
         }

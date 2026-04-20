@@ -17,6 +17,8 @@ function M:__init(name, uri, fs)
 
     ---@type Uri[]
     self.includeUris = {}
+    ---@type Scope.Root[]
+    self.roots = {}
     ---@type Config
     self.config = ls.config.create(self.uri)
 
@@ -46,8 +48,13 @@ function M:reload(options)
     -- TODO: 需要先读配置文件
     ---@async
     ls.await.call(function ()
+        if self.uri then
+            self.config:loadRC(self.uri / '.luarc.json')
+        end
+        self:buildRoots(options)
+
         local startTime = time.monotonic()
-        local result = self:load(self.uri, options, function (event, status, uri)
+        local result = self:load(options, function (event, status, uri)
             if event == 'start' then
                 log.info('[Scope] Start loading: {}' % { self.name })
                 return
@@ -90,6 +97,14 @@ end
 ---@param uri Uri
 ---@return 'workspace' | 'include' | nil
 function M:testUri(uri)
+    for _, root in ipairs(self.roots) do
+        if root.uri == uri or ls.uri.relativePath(uri, root.uri) then
+            if root.kind == 'workspace' then
+                return 'workspace'
+            end
+            return 'include'
+        end
+    end
     if self.uri then
         if self.uri == uri or ls.uri.relativePath(uri, self.uri) then
             return 'workspace'
@@ -135,10 +150,15 @@ end
 ---@param uri Uri
 ---@return boolean
 function M:isIgnored(uri)
-    if not self.glob then
-        return false
+    for _, root in ipairs(self.roots) do
+        if root.uri == uri or ls.uri.relativePath(uri, root.uri) then
+            if not root.glob then
+                return false
+            end
+            return root.glob:check(uri)
+        end
     end
-    return self.glob:check(uri)
+    return false
 end
 
 ---@param uri Uri

@@ -1,12 +1,31 @@
 ---@class Scope
-local M = Class 'Scope'
+local Scope = Class 'Scope'
+
+---@class Scope.Root
+local M = Class 'Scope.Root'
+
+---@param scope Scope
+---@param kind 'workspace' | 'library'
+---@param uri Uri
+---@param fs FileSystem
+---@param config Config
+function M:__init(scope, kind, uri, fs, config)
+    self.scope  = scope
+    self.kind   = kind
+    self.uri    = uri
+    self.fs     = fs
+    self.config = config
+end
 
 ---@param options Scope.Load.Options
 function M:initGlob(options)
     if self.glob then
         return
     end
-    local ignores = options.ignores or {}
+    local ignores = {}
+    if options.ignores then
+        ls.util.arrayMerge(ignores, options.ignores)
+    end
     ignores[#ignores+1] = '.git'
     ignores[#ignores+1] = '.svn'
     ignores[#ignores+1] = '.hg'
@@ -87,6 +106,7 @@ end
 ---@class Scope.Load.Options
 ---@field ignores? string[]
 
+---@package
 ---@async
 ---@param uri Uri
 ---@param options Scope.Load.Options
@@ -110,7 +130,7 @@ function M:load(uri, options, callback)
     ls.util.withDuration(function ()
         self:loadFiles(uri, callback, status)
     end, function (duration)
-        log.info('Load files for "{}" in {%.2f} seconds.' % { self.name, duration })
+        log.info('Load files for "{}:{}" in {%.2f} seconds.' % { self.scope.name, self.kind, duration })
     end)
 
     xpcall(callback, log.error, 'finish', status)
@@ -127,7 +147,7 @@ function M:loadFiles(targetUri, callback, status)
     self.glob:scan(targetUri, function (uri)
         status.scanned = status.scanned + 1
         xpcall(callback, log.error, 'scanning', status, uri)
-        if self:isValidUri(uri) then
+        if self.scope:isValidUri(uri) then
             status.uris[#status.uris+1] = uri
             status.found = status.found + 1
             xpcall(callback, log.error, 'finding', status, uri)
@@ -154,7 +174,7 @@ function M:loadFiles(targetUri, callback, status)
 
             ls.await.sleep(0)
 
-            self.vm:awaitIndexFile(uri)
+            self.scope.vm:awaitIndexFile(uri)
             status.indexed = status.indexed + 1
 
             xpcall(callback, log.error, 'indexing', status, uri)
@@ -164,4 +184,116 @@ function M:loadFiles(targetUri, callback, status)
     ls.await.waitAll(loadTasks)
 
     xpcall(callback, log.error, 'indexed', status)
+end
+
+---@param path string
+---@return Uri?
+function Scope:resolveLibraryUri(path)
+    if path == '' then
+        return nil
+    end
+    if ls.uri.isFile(path) then
+        return ls.uri.normalize(path)
+    end
+    if path:find('^%a+://') then
+        return nil
+    end
+    if  path:find('^%a:[/\\]')
+    or  path:find('^[/\\][/\\]')
+    or  path:sub(1, 1) == '/' then
+        return ls.uri.encode(path)
+    end
+    if not self.uri then
+        return nil
+    end
+    return ls.uri.normalize(self.uri / path)
+end
+
+---@param options Scope.Load.Options
+function Scope:buildRoots(options)
+    self.roots = {}
+    self.includeUris = {}
+
+    if self.uri then
+        self.roots[#self.roots+1] = New 'Scope.Root' (self, 'workspace', self.uri, self.fs, self.config)
+    end
+
+    if not self.uri then
+        return
+    end
+
+    local libraries = self.config:get(self.uri, 'Lua.workspace.library')
+    if type(libraries) ~= 'table' then
+        return
+    end
+
+    local seen = {}
+
+    for _, path in ipairs(libraries) do
+        if type(path) == 'string' then
+            local libUri = self:resolveLibraryUri(path)
+            if libUri
+            and (not self.uri or not ls.uri.relativePath(libUri, self.uri)) then
+                if seen[libUri] then
+                    goto CONTINUE
+                end
+                local ftype = self.fs.getType(libUri)
+                if ftype == 'directory' then
+                    seen[libUri] = true
+                    self.roots[#self.roots+1] = New 'Scope.Root' (self, 'library', libUri, self.fs, self.config)
+                    self.includeUris[#self.includeUris+1] = libUri
+                else
+                    log.warn('[Scope] Ignore library path: {} ({})' % { path, ftype or 'not found' })
+                end
+            end
+        end
+        ::CONTINUE::
+    end
+end
+
+---@async
+---@param options Scope.Load.Options
+---@param callback fun(event: Scope.Load.Event, status: Scope.Load.Status, uri?: Uri)
+---@return Scope.Load.Status
+function Scope:load(options, callback)
+    if #self.roots == 0 then
+        if self.uri then
+            self.config:loadRC(self.uri / '.luarc.json')
+        end
+        self:buildRoots(options)
+    end
+
+    ---@type Scope.Load.Status
+    local status = {
+        scanned = 0,
+        found = 0,
+        loaded = 0,
+        indexed = 0,
+        uris = {},
+    }
+
+    xpcall(callback, log.error, 'start', status)
+
+    for _, root in ipairs(self.roots) do
+        root:load(root.uri, options, function (event, _, uri)
+            if event == 'start' or event == 'finish' then
+                return
+            end
+            if event == 'scanning' then
+                status.scanned = status.scanned + 1
+            elseif event == 'finding' then
+                status.found = status.found + 1
+                status.uris[#status.uris+1] = uri
+            elseif event == 'loading' then
+                status.loaded = status.loaded + 1
+            elseif event == 'indexing' then
+                status.indexed = status.indexed + 1
+            end
+            xpcall(callback, log.error, event, status, uri)
+        end)
+    end
+
+    xpcall(callback, log.error, 'finish', status)
+
+    return status
 end

@@ -19,6 +19,46 @@ end
 do
     rt:reset()
     --[[
+    local y
+    y()
+    --> any
+    ]]
+    local y = rt.variable 'y'
+    local fcall = rt.fcall(y, {})
+    lt.assertEquals(fcall.value:view(), 'any')
+end
+
+do
+    rt:reset()
+    --[[
+    local y
+    local function x()
+        return y()
+    end
+    --> any
+    ]]
+    local y = rt.variable 'y'
+    local f = rt.func()
+        : addReturnList(rt.list { rt.fcall(y, {}) })
+    lt.assertEquals(f:getReturn(1):view(), 'any')
+end
+
+do
+    rt:reset()
+    --[[
+    local y: unknown
+    y()
+    --> unknown
+    ]]
+    local y = rt.variable 'y'
+    y:setCurrentValue(rt.UNKNOWN)
+    local fcall = rt.fcall(y, {})
+    lt.assertEquals(fcall.value:view(), 'unknown')
+end
+
+do
+    rt:reset()
+    --[[
     (fun<T1, T2>(x: T1, y: T2): T1[], T2[])(number, string)
     --> number[], string[]
     ]]

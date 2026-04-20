@@ -83,6 +83,16 @@ M.__getter.returns = function (self)
     end
 
     if #defs == 0 then
+        local headFinal = self.head:finalValue()
+        if headFinal.kind == 'type' then
+            ---@cast headFinal Node.Type
+            if headFinal.typeName == 'any' then
+                return rt.ANY, true
+            end
+            if headFinal.typeName == 'unknown' then
+                return rt.UNKNOWN, true
+            end
+        end
         return rt.UNKNOWN, true
     end
 

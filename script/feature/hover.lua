@@ -13,6 +13,7 @@ local providers = ls.feature.helper.providers()
 
 ---@class Feature.Hover.Result
 ---@field source LuaParser.Node.Base
+---@field items Feature.Hover.Item[]
 ---@field value string
 
 ---@async
@@ -40,19 +41,20 @@ function ls.feature.hover(uri, offset)
         node    = hoverUtil.getSemanticNode(scope, source),
     }
 
-    local blocks = providers.runner(param)
-    local value = hoverUtil.concatMarkdownBlocks(blocks)
+    local items = providers.runner(param)
+    local value = hoverUtil.concatHoverItems(items)
     if not value then
         return nil
     end
 
     return {
         source = source,
+        items  = items,
         value  = value,
     }
 end
 
----@param callback fun(param: Feature.Hover.Param, action: Feature.ProviderActions<string>)
+---@param callback fun(param: Feature.Hover.Param, action: Feature.ProviderActions<Feature.Hover.Item>)
 ---@param priority integer?
 ---@return fun() disposable
 function ls.feature.provider.hover(callback, priority)
@@ -63,8 +65,8 @@ function ls.feature.provider.hover(callback, priority)
 end
 
 ls.feature.provider.hover(function (param, action)
-    for _, block in ipairs(hoverUtil.buildMarkdownBlocks(param.node, param.source)) do
-        action.push(block)
+    for _, item in ipairs(hoverUtil.buildHoverItems(param.scope, param.source, param.node)) do
+        action.push(item)
     end
 end)
 

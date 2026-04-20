@@ -17,6 +17,7 @@ function TEST_FRAME(script, callback)
 end
 
 test.require 'test.feature.definition'
+test.require 'test.feature.hover'
 test.require 'test.feature.completion'
 
 print('[feature] 测试完毕')

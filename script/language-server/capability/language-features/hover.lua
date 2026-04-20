@@ -1,7 +1,6 @@
-local hoverUtil = require 'feature.hover-util'
-
 ls.capability.registerCapability.hoverProvider = true
 
+---@async
 ls.capability.register('textDocument/hover', function (server, params, task)
     ---@cast params LSP.HoverParams
 
@@ -12,23 +11,18 @@ ls.capability.register('textDocument/hover', function (server, params, task)
     end
     local converter = document:makeLSPConverter(server.positionEncoding)
 
-    local sources, scope = ls.scope.findSources(uri, converter:at(params.position))
-    local source = sources and sources[1]
-    if not source or not scope then
+    local result = ls.feature.hover(uri, converter:at(params.position))
+    if not result then
         return
     end
 
-    local view = hoverUtil.getSourceView(scope, source)
-    local value = hoverUtil.toLuaCodeBlock(view)
-    if not value then
-        return
-    end
+    local source = result.source
 
     ---@type LSP.Hover
     local hover = {
         contents = {
             kind  = 'markdown',
-            value = value,
+            value = result.value,
         },
         range = converter:range(source.start, source.finish)
     }

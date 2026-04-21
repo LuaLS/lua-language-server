@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+  "runtime": {
+    "version": "Lua 5.4",
+    "extension": { ".devsper": "lua" }
+  },
+  "workspace": {
+    "library": ["${3rd}/devsper/library"],
+    "checkThirdParty": false
+  },
+  "diagnostics": {
+    "globals": ["devsper"]
+  }
+}

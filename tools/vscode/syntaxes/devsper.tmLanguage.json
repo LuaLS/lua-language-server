@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Devsper",
+  "scopeName": "source.devsper",
+  "patterns": [
+    { "include": "#devsper-keywords" },
+    { "include": "source.lua" }
+  ],
+  "repository": {
+    "devsper-keywords": {
+      "patterns": [
+        {
+          "comment": "devsper global and wf builder",
+          "match": "\\b(devsper|wf)\\b(?=\\.)",
+          "name": "support.class.devsper"
+        },
+        {
+          "comment": "builtin: plugin name prefix",
+          "match": "\"builtin:[a-zA-Z0-9_-]+\"",
+          "name": "support.constant.devsper"
+        },
+        {
+          "comment": "devsper method names",
+          "match": "\\.(workflow|tool|exec|log|http|get|post|task|plugin|input)\\b",
+          "name": "support.function.devsper"
+        }
+      ]
+    }
+  }
+}

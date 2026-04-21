@@ -1,0 +1,32 @@
+{
+  "name": "devsper-lsp",
+  "displayName": "Devsper Language Support",
+  "description": "Autocomplete, hover docs, and diagnostics for .devsper workflow and tool files",
+  "version": "0.1.0",
+  "publisher": "devsper",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages", "Snippets"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "devsper",
+        "aliases": ["Devsper", "devsper"],
+        "extensions": [".devsper"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "devsper",
+        "scopeName": "source.devsper",
+        "path": "./syntaxes/devsper.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "devsper",
+        "path": "./snippets/devsper.json"
+      }
+    ]
+  }
+}

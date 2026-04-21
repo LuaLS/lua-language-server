@@ -1,0 +1,61 @@
+{
+  "Workflow": {
+    "prefix": "workflow",
+    "body": [
+      "local wf = devsper.workflow({",
+      "\tname    = \"${1:my-workflow}\",",
+      "\tmodel   = \"${2:auto}\",",
+      "\tworkers = ${3:4},",
+      "})",
+      "",
+      "wf.task(\"${4:task-1}\", {",
+      "\tprompt = \"${5:Describe what this task should do.}\",",
+      "})",
+      "",
+      "return wf"
+    ],
+    "description": "New devsper workflow"
+  },
+  "Task": {
+    "prefix": "task",
+    "body": [
+      "wf.task(\"${1:task-name}\", {",
+      "\tprompt     = \"${2:Describe what this task should do.}\",",
+      "\tdepends_on = { ${3} },",
+      "})"
+    ],
+    "description": "Add a task to the workflow DAG"
+  },
+  "Plugin": {
+    "prefix": "plugin",
+    "body": [
+      "wf.plugin(\"${1:git}\", { source = \"builtin:${1:git}\" })"
+    ],
+    "description": "Load a builtin plugin (git, search, http, code, filesystem)"
+  },
+  "Input": {
+    "prefix": "input",
+    "body": [
+      "wf.input(\"${1:param_name}\", {",
+      "\ttype     = \"${2|string,number,boolean,object|}\",",
+      "\trequired = ${3|true,false|},",
+      "})"
+    ],
+    "description": "Declare a typed workflow input"
+  },
+  "Tool": {
+    "prefix": "tool",
+    "body": [
+      "devsper.tool(\"${1:tool.name}\", {",
+      "\tdescription = \"${2:What this tool does.}\",",
+      "\tparams = {",
+      "\t\t${3:param} = { type = \"${4|string,number,boolean,object|}\", required = ${5|true,false|} },",
+      "\t},",
+      "\trun = function(ctx, args)",
+      "\t\t${6:-- implementation}",
+      "\tend,",
+      "})"
+    ],
+    "description": "Register a new devsper tool"
+  }
+}

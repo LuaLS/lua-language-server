@@ -48,6 +48,14 @@ return function (uri, callback)
         end
     end)
 
+    -- Build sorted ID list once for error messages
+    local sortedIds = {}
+    for k in pairs(declaredIds) do
+        sortedIds[#sortedIds + 1] = k
+    end
+    table.sort(sortedIds)
+    local declaredIdsStr = table.concat(sortedIds, ', ')
+
     -- Pass 2: check depends_on entries in each wf.task spec
     guide.eachSourceType(state.ast, 'call', function (source)
         await.delay()
@@ -60,29 +68,25 @@ return function (uri, callback)
         local dependsOn = tableGet(spec, 'depends_on')
         if not dependsOn or dependsOn.type ~= 'table' then return end
 
-        -- Build sorted list of declared IDs for error messages
-        local sortedIds = {}
-        for k in pairs(declaredIds) do
-            sortedIds[#sortedIds + 1] = k
-        end
-        table.sort(sortedIds)
-
-        -- Iterate direct children of the depends_on array table
+        -- Array table elements are wrapped in tableexp nodes in the luals AST
         for i = 1, #dependsOn do
-            local child = dependsOn[i]
-            if child and child.type == 'string' then
-                local val = child[1]
-                if val and val ~= '*' and not declaredIds[val] then
-                    callback {
-                        start   = child.start,
-                        finish  = child.finish,
-                        message = ("devsper: unknown task id '%s' in depends_on — declared ids: %s"):format(
-                            val, table.concat(sortedIds, ', ')
-                        ),
-                    }
+            local exp = dependsOn[i]
+            if exp and exp.type == 'tableexp' then
+                local child = exp.value
+                if child and child.type == 'string' then
+                    local val = child[1]
+                    if val and val ~= '*' and not declaredIds[val] then
+                        callback {
+                            start   = child.start,
+                            finish  = child.finish,
+                            message = ("devsper: unknown task id '%s' in depends_on — declared ids: %s"):format(
+                                val, declaredIdsStr
+                            ),
+                        }
+                    end
                 end
             end
-            -- Non-string children (variables, function calls) are silently skipped
+            -- Non-string/non-literal children silently skipped
         end
     end)
 end

@@ -2,6 +2,11 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Add devsper language support for `.devsper` workflow and tool files: type library (`meta/3rd/devsper/`) with full `---@class` annotations for the `devsper` global, `WorkflowBuilder`, and all spec types — enabling autocomplete and hover docs in any editor using this LSP
+* `NEW` Add `devsper-schema` diagnostic: warns on missing required fields (`prompt` in `wf.task`, `source` in `wf.plugin`, `description`/`run` in `devsper.tool`), unknown `builtin:` plugin names, and missing spec arguments
+* `NEW` Add `devsper-depends` diagnostic: cross-references `depends_on` task IDs against declared tasks in the same file; `"*"` wildcard always valid
+* `NEW` Add `devsper-model` diagnostic: hints on unrecognized literal model strings; skips variables and known provider prefixes (`claude-*`, `gpt-*`, `gemini-*`, `llama*`, etc.)
+* `NEW` Add VS Code extension scaffold (`tools/vscode/`) with `.devsper` file association, TextMate grammar inheriting Lua base, and five snippets (`workflow`, `task`, `plugin`, `input`, `tool`)
 
 ## 3.18.2
 * `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed

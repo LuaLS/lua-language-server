@@ -12,22 +12,11 @@
 ---@field body    string                Response body as a string.
 ---@field headers table<string,string>  Response headers keyed by header name.
 
---- HTTP client library available at devsper.http.
 ---@class devsper.HttpLib
-local HttpLib = {}
-
---- Perform an HTTP GET request.
----@param url  string        The URL to request.
----@param opts table?        Optional request options (e.g. headers).
----@return devsper.HttpResponse
-function HttpLib.get(url, opts) end
-
---- Perform an HTTP POST request.
----@param url  string        The URL to post to.
----@param body string        Request body.
----@param opts table?        Optional request options (e.g. headers, content-type).
----@return devsper.HttpResponse
-function HttpLib.post(url, body, opts) end
+---Fetch a URL and return the response.
+---@field get  fun(url: string, opts?: { headers?: table<string,string>, timeout?: integer }): devsper.HttpResponse
+---Perform an HTTP POST request.
+---@field post fun(url: string, body: string|table, opts?: { headers?: table<string,string>, timeout?: integer }): devsper.HttpResponse
 
 --- Context object passed to tool run functions.
 ---@class devsper.ToolCtx
@@ -36,7 +25,7 @@ function HttpLib.post(url, body, opts) end
 local ToolCtx = {}
 
 --- Emit a structured log message from within a tool.
----@param level string  Log level: "debug", "info", "warn", or "error".
+---@param level "debug"|"info"|"warn"|"error"  Log level.
 ---@param msg   string  Log message text.
 function ToolCtx:log(level, msg) end
 
@@ -65,8 +54,7 @@ function ToolCtx:log(level, msg) end
 ---@field prompt     string    Prompt sent to the LLM for this task (required).
 ---@field model      string?   Override the workflow-level model for this task.
 ---@field can_mutate boolean?  Allow this task's prompt to be mutated by the evolution engine.
----@field depends_on string[]? List of task IDs that must complete before this task runs.
----                            Use `"*"` as a wildcard meaning "all other tasks must finish first".
+---@field depends_on? (string|"*")[]  Task IDs that must complete first. Use "*" to depend on all other tasks.
 
 --- Specification for a workflow plugin.
 ---@class devsper.PluginSpec
@@ -92,19 +80,19 @@ local WorkflowBuilder = {}
 ---@param id   string            Unique task identifier within the workflow.
 ---@param spec devsper.TaskSpec  Task configuration.
 ---@return devsper.WorkflowBuilder  Returns the builder for chaining.
-function WorkflowBuilder.task(id, spec) end
+function WorkflowBuilder:task(id, spec) end
 
 --- Register a plugin in the workflow.
 ---@param name string              Plugin name used to reference it within tasks.
 ---@param spec devsper.PluginSpec  Plugin configuration.
 ---@return devsper.WorkflowBuilder  Returns the builder for chaining.
-function WorkflowBuilder.plugin(name, spec) end
+function WorkflowBuilder:plugin(name, spec) end
 
 --- Declare an input parameter for the workflow.
 ---@param name string             Input parameter name.
 ---@param spec devsper.InputSpec  Input specification.
 ---@return devsper.WorkflowBuilder  Returns the builder for chaining.
-function WorkflowBuilder.input(name, spec) end
+function WorkflowBuilder:input(name, spec) end
 
 --- The devsper global injected into every .devsper file.
 ---@class devsper
@@ -119,6 +107,7 @@ function devsper.workflow(config) end
 --- Define and register a tool that the swarm can invoke.
 ---@param name string           Unique tool name.
 ---@param spec devsper.ToolSpec Tool specification including description, params, and run function.
+---@return nil
 function devsper.tool(name, spec) end
 
 --- Execute a subprocess and return its result.
@@ -128,6 +117,6 @@ function devsper.tool(name, spec) end
 function devsper.exec(cmd, args) end
 
 --- Emit a structured log message at the workflow/global level.
----@param level string  Log level: "debug", "info", "warn", or "error".
+---@param level "debug"|"info"|"warn"|"error"  Log level.
 ---@param msg   string  Log message text.
 function devsper.log(level, msg) end

@@ -243,6 +243,14 @@ m.register {
     status   = 'Any',
 }
 
+m.register {
+    'devsper-model',
+} {
+    group    = 'devsper',
+    severity = 'Hint',
+    status   = 'Any',
+}
+
 ---@return table<string, DiagnosticSeverity>
 function m.getDefaultSeverity()
     local severity = {}

@@ -148,19 +148,15 @@ local <?v?> = collectgarbage()
 ]]
 "local v: nil"
 
-TEST [[
-local type
-w2l:get_default()[<?type?>]
-]]
-"local type: unknown"
+-- [MIGRATED] local type / w2l:get_default()[<?type?>] unknown hover case moved to test.feature.hover.basic
 
 TEST [[
 <?load?>()
 ]]
 [=[
 function load(chunk: string|function, chunkname?: string, mode?: "b"|"bt"|"t", env?: table)
-  -> function?
-  2. error_message: string?
+    -> function?
+    2. error_message: string?
 ]=]
 
 TEST [[
@@ -175,41 +171,10 @@ function string.lower(s: string|number)
 
 -- [MIGRATED] local function x() label case moved to test.feature.hover.basic
 
-TEST [[
-local mt = {}
+-- [MIGRATED] local mt / function mt:add / init() return mt / t:add() hover case moved to test.feature.hover.basic
 
-function mt:add(a, b)
-end
-
-local function init()
-    return mt
-end
-
-local t = init()
-t:<?add?>()
-]]
-[[
-(method) mt:add(a: any, b: any)
-]]
-
--- [MIGRATED] setmetatable add method label case moved to test.feature.hover.basic
-TEST [[
-local mt = {}
-mt.__index = mt
-
-function mt:add(a, b)
-end
-
-local function init()
-    return setmetatable({}, mt)
-end
-
-local t = init()
-t:<?add?>()
-]]
-[[
-(method) mt:add(a: any, b: any)
-]]
+-- [MIGRATED] local mt / function mt:add / init() return mt / t:add() hover case moved to test.feature.hover.basic
+-- (not migrated: setmetatable version — setmetatable is stdlib, unavailable in test scope)
 
 -- [MIGRATED] local integer literal label case moved to test.feature.hover.basic
 
@@ -226,64 +191,15 @@ t:<?add?>()
 
 -- [MIGRATED] unknown local label case moved to test.feature.hover.basic
 
-TEST [[
-local s = <?'abc中文'?>
-]]
-[[9 个字节，5 个字符]]
+-- [MIGRATED] local s = <?'abc中文'?> string literal hover case moved to test.feature.hover.basic
 
-TEST [[
-local n = <?0xff?>
-]]
-[[255]]
+-- [MIGRATED] local n = <?0xff?> integer literal hover case moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {
-    a = 1,
-    b = 2,
-    c = 3,
-}
-]]
-[[
-local t: {
-    a: integer = 1,
-    b: integer = 2,
-    c: integer = 3,
-}
-]]
+-- [MIGRATED] local t={a=1,b=2,c=3} hover case moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {}
-t.a = 1
-t.a = true
-]]
-[[
-local t: {
-    a: boolean|integer = 1|true,
-}
-]]
+-- [MIGRATED] local t={} t.a=1 t.a=true union field hover case moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {
-    a = 1,
-    [1] = 2,
-    [true] = 3,
-    [5.5] = 4,
-    [{}] = 5,
-    [function () end] = 6,
-    ["b"] = 7,
-    ["012"] = 8,
-}
-]]
-[[
-local t: {
-    a: integer = 1,
-    [1]: integer = 2,
-    [true]: integer = 3,
-    [5.5]: integer = 4,
-    ["b"]: integer = 7,
-    ["012"]: integer = 8,
-}
-]]
+-- [MIGRATED] mixed-key table hover case moved to test.feature.hover.basic
 
 TEST [[
 local <?t?> = {}
@@ -299,53 +215,11 @@ local t: table
 
 -- [MIGRATED] local alias integer label case moved to test.feature.hover.basic
 
-TEST[[
-local mt = {}
-mt.a = 1
-mt.b = 2
-mt.c = 3
-local <?obj?> = setmetatable({}, {__index = mt})
-]]
-[[
-local obj: {
-    a: integer = 1,
-    b: integer = 2,
-    c: integer = 3,
-}
-]]
+-- [MIGRATED] setmetatable({},{__index=mt}) mt.a/b/c fields hover case moved to test.feature.hover.basic (result with --!include setmetatable: local obj: {\n    a: 1,\n    b: 2,\n    c: 3,\n})
 
-TEST[[
-local mt = {}
-mt.__index = {}
+-- [MIGRATED] mt.__index={} self:test() hover case moved to test.feature.hover.basic
 
-function mt:test(a, b)
-    self:<?test?>()
-end
-]]
-[[
-(method) mt:test(a: any, b: any)
-]]
-
-TEST[[
-local mt = {}
-mt.__index = mt
-mt.__name = 'obj'
-
-function mt:remove()
-end
-
-local <?self?> = setmetatable({
-    id = 1,
-}, mt)
-]]
-[[
-local self: {
-    id: integer = 1,
-    remove: function,
-    __index: table,
-    __name: string = 'obj',
-}
-]]
+-- [MIGRATED] setmetatable({id=1},mt) mt.__index/mt.__name/mt:remove hover case moved to test.feature.hover.basic (result with --!include setmetatable: local self: { id: 1 } & { remove: fun(self: { ... }), __index: { ... }, __name: "obj" })
 
 TEST [[
 print(<?utf8?>)
@@ -464,96 +338,22 @@ local <?n?> = rawlen()
 local n: integer
 ]]
 
-TEST[[
-local <?x?> = '\a'
-]]
-[[local x: string = '\007']]
+-- [MIGRATED] local x = '\a' escape sequence hover case moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {
-    b = 1,
-    c = 2,
-    d = 3,
-    a = 4,
-    s = 5,
-    y = 6,
-    z = 7,
-    q = 8,
-    g = 9,
-    p = 10,
-    l = 11,
-}
-]]
-[[
-local t: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
-    a: integer = 4,
-    s: integer = 5,
-    y: integer = 6,
-    z: integer = 7,
-    q: integer = 8,
-    g: integer = 9,
-    p: integer = 10,
-    l: integer = 11,
-}
-]]
+-- [MIGRATED] local t={b=1,...,l=11} 11-field table hover case moved to test.feature.hover.basic
 
 -- [MIGRATED] multi-return nil function label case moved to test.feature.hover.basic
 
 -- [MIGRATED] local nil from function call label case moved to test.feature.hover.basic
 
-TEST [[
-local function <?f?>()
-    return 1
-    return nil
-end
-]]
-[[
-function f()
-  -> integer|nil
-]]
+-- [MIGRATED] function return integer|nil label case moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {
-    b = 1,
-    c = 2,
-    d = 3,
-}
-local e = t.b
-]]
-[[
-local t: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
-}
-]]
+-- [MIGRATED] local table hover case with local read moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {
-    b = 1,
-    c = 2,
-    d = 3,
-}
-g.e = t.b
-]]
-[[
-local t: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
-}
-]]
+-- [MIGRATED] local table hover case with global write moved to test.feature.hover.basic
 
 -- [MIGRATED] self method label case moved to test.feature.hover.basic
-(field) t.v: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
-}
-]]
+-- [MIGRATED] orphan legacy field label snippet removed: (field) t.v table shape case
 
 TEST [[
 local <?t?> = {
@@ -625,46 +425,13 @@ TEST [[
 }
 ]]
 
-TEST [[
-local <?t?> = {
-    'aaa',
-    'bbb',
-    'ccc',
-}
-]]
-[[
-local t: {
-    [1]: string = 'aaa',
-    [2]: string = 'bbb',
-    [3]: string = 'ccc',
-}
-]]
+-- [MIGRATED] string-array table hover case moved to test.feature.hover.basic
 
-TEST [[
-local x
-x = 1
-x = 1.0
+-- [MIGRATED] local x number union-with-literal hover case moved to test.feature.hover.basic
 
-print(<?x?>)
-]]
-[[
-local x: number = 1
-]]
+-- [MIGRATED] local <close> declaration hover case moved to test.feature.hover.basic
 
-TEST [[
-local <?x?> <close> = 1
-]]
-[[
-local x <close>: integer = 1
-]]
-
-TEST [[
-local x <close> = 1
-print(<?x?>)
-]]
-[[
-local x <close>: integer = 1
-]]
+-- [MIGRATED] local <close> usage hover case moved to test.feature.hover.basic
 
 --TEST [[
 --local function <?a?>(b)
@@ -676,325 +443,48 @@ local x <close>: integer = 1
 --  -> table
 --]]
 
-TEST [[
-local <?t?> = {
-    a = true
-}
+-- [MIGRATED] boolean-key table construction hover case moved to test.feature.hover.basic
 
-local t2 = {
-    [t.a] = function () end,
-}
-]]
-[[
-local t: {
-    a: boolean = true,
-}
-]]
+-- [MIGRATED] numeric-key table hover case moved to test.feature.hover.basic
 
-TEST [[
-local <?t?> = {
-    [-1] = -1,
-    [0]  = 0,
-    [1]  = 1,
-}
-]]
-[[
-local t: {
-    [-1]: integer = -1,
-    [0]: integer = 0,
-    [1]: integer = 1,
-}
-]]
+-- [MIGRATED] class() local/global/field hover cases moved to test.feature.hover.basic
+-- [MIGRATED] duplicated class() local/global hover cases removed from old-test
 
-TEST[[
----@class Class
-local <?x?> = class()
-]]
-[[
-local x: Class
-]]
+-- [MIGRATED] union class() hover case moved to test.feature.hover.basic
 
-TEST[[
----@class Class
-<?x?> = class()
-]]
-[[
-(global) x: Class
-]]
+-- [MIGRATED] @class Class + literal table local hover case moved to test.feature.hover.basic
 
-TEST[[
-local t = {
-    ---@class Class
-    <?x?> = class()
-}
-]]
-[[
-(field) x: Class
-]]
+-- [MIGRATED] annotated parameter declaration hover case moved to test.feature.hover.basic
 
-TEST[[
----@class Class
-local <?x?> = class()
-]]
-[[
-local x: Class
-]]
+-- [MIGRATED] annotated parameter usage hover case moved to test.feature.hover.basic
 
-TEST[[
----@class Class
-<?x?> = class()
-]]
-[[
-(global) x: Class
-]]
+-- [MIGRATED] for-in pairs key annotation hover case moved to test.feature.hover.basic
 
-TEST[[
----@class A
----@class B
----@class C
+-- [MIGRATED] for-in pairs value annotation hover case moved to test.feature.hover.basic
 
----@type A|B|C
-local <?x?> = class()
-]]
-[[
-local x: A|B|C
-]]
+-- [MIGRATED] annotated multi-return function hover case moved to test.feature.hover.basic
 
-TEST[[
----@class Class
-local <?x?> = {
-    b = 1
-}
-]]
-[[
-local x: Class {
-    b: integer = 1,
-}
-]]
+-- [MIGRATED] generic function signature hover case moved to test.feature.hover.basic
 
-TEST [[
----@class Class
-local mt = {}
+-- [MIGRATED] annotated local return hover case moved to test.feature.hover.basic
 
----@param t Class
-function f(<?t?>)
-end
-]]
-[[
-(parameter) t: Class
-]]
+-- [MIGRATED] generic function return hover case moved to test.feature.hover.basic
 
-TEST [[
----@class Class
-local mt = {}
+-- [MIGRATED] annotated function signature hover case moved to test.feature.hover.basic
 
----@param t Class
-function f(t)
-    print(<?t?>)
-end
-]]
-[[
-(parameter) t: Class
-]]
+-- [MIGRATED] @vararg Class local _, x = ... hover case moved to test.feature.hover.basic
+-- [MIGRATED] @vararg Class local t = {...} (no call) hover case moved to test.feature.hover.basic
+-- [MIGRATED] @vararg Class local t = {...} t[1] hover case moved to test.feature.hover.basic
+-- [MIGRATED] @vararg Class local t = {...} (with call) hover case moved to test.feature.hover.basic
+-- [MIGRATED] @param ... Class local _, x = ... hover case moved to test.feature.hover.basic
+-- [MIGRATED] @param ... Class local t = {...} t[1] hover case moved to test.feature.hover.basic
+-- [MIGRATED] @param ... Class local t = {...} (with call) hover case moved to test.feature.hover.basic
 
-TEST [[
----@class Class
+-- [MIGRATED] string-array type declaration hover case moved to test.feature.hover.basic
 
----@param k Class
-for <?k?> in pairs(t) do
-end
-]]
-[[
-local k: Class
-]]
+-- [MIGRATED] union string-array type declaration hover case moved to test.feature.hover.basic
 
-TEST [[
----@class Class
-
----@param v Class
-for k, <?v?> in pairs(t) do
-end
-]]
-[[
-local v: Class
-]]
-
-TEST [[
----@class A
----@class B
----@class C
-
----@return A|B
----@return C
-local function <?f?>()
-end
-]]
-[[
-function f()
-  -> A|B
-  2. C
-]]
-
-TEST [[
----@generic T
----@param x T
----@return T
-local function <?f?>(x)
-end
-]]
-[[
-function f(x: <T>)
-  -> <T>
-]]
-
-TEST [[
----@return number
-local function f()
-end
-
-local <?r?> = f()
-]]
-[[
-local r: number
-]]
-
-TEST [[
----@generic T
----@param x T
----@return T
-local function f(x)
-end
-
-local <?r?> = f(1)
-]]
-[[
-local r: integer = 1
-]]
-
-TEST [[
----@param x number
----@param y boolean
-local function <?f?>(x, y)
-end
-]]
-[[
-function f(x: number, y: boolean)
-]]
-
-TEST [[
----@class Class
-
----@vararg Class
-local function f(...)
-    local _, <?x?> = ...
-end
-f(1, 2, 3)
-]]
-[[
-local x: Class
-]]
-
-TEST [[
----@class Class
-
----@vararg Class
-local function f(...)
-    local <?t?> = {...}
-end
-]]
-[[
-local t: Class[]
-]]
-
-TEST [[
----@class Class
-
----@vararg Class
-local function f(...)
-    local t = {...}
-    local <?v?> = t[1]
-end
-]]
-[[
-local v: Class
-]]
-
-TEST [[
----@class Class
-
----@vararg Class
-local function f(...)
-    local <?t?> = {...}
-end
-f(1, 2, 3)
-]]
-[[
-local t: Class[]
-]]
-
-TEST [[
----@class Class
-
----@param ... Class
-local function f(...)
-    local _, <?x?> = ...
-end
-f(1, 2, 3)
-]]
-[[
-local x: Class
-]]
-
-TEST [[
----@class Class
-
----@param ... Class
-local function f(...)
-    local t = {...}
-    local <?v?> = t[1]
-end
-]]
-[[
-local v: Class
-]]
-
-TEST [[
----@class Class
-
----@param ... Class
-local function f(...)
-    local <?t?> = {...}
-end
-f(1, 2, 3)
-]]
-[[
-local t: Class[]
-]]
-
-TEST [[
----@type string[]
-local <?x?>
-]]
-[[
-local x: string[]
-]]
-
-TEST [[
----@type string[]|boolean
-local <?x?>
-]]
-[[
-local x: boolean|string[]
-]]
-
-TEST [[
----@type string[]
-local t
-local <?x?> = t[1]
-]]
-[[
-local x: string
-]]
+-- [MIGRATED] string-array index hover case moved to test.feature.hover.basic
 
 -- TODO
 --TEST [[
@@ -1027,24 +517,9 @@ local x: string
 --local k: integer
 --]]
 
-TEST [[
----@type table<ClassA, ClassB>
-local <?x?>
-]]
-[[
-local x: table<ClassA, ClassB>
-]]
+-- [MIGRATED] table<K,V> annotation hover case moved to test.feature.hover.basic
 
-TEST [[
----@type [ClassA, ClassB]
-local <?x?>
-]]
-[[
-local x: [ClassA, ClassB] {
-    [1]: ClassA,
-    [2]: ClassB,
-}
-]]
+-- [MIGRATED] [ClassA,ClassB] tuple annotation hover case moved to test.feature.hover.basic
 
 --TEST [[
 -----@class ClassA
@@ -1072,488 +547,84 @@ local x: [ClassA, ClassB] {
 --local k: ClassA
 --]]
 
-TEST [[
----@type fun(x: number, y: number):boolean
-local <?f?>
-]]
-[[
-local f: fun(x: number, y: number):boolean
-]]
-
-TEST [[
----@type fun(x: number, y: number):boolean
-local f
-local <?r?> = f()
-]]
-[[
-local r: boolean
-]]
-
-TEST [[
----@class void
-
----@param f fun():void
-function t(<?f?>) end
-]]
-[[
-(parameter) f: fun():void
-]]
-
-TEST [[
----@type fun(a:any, b:any)
-local f
-local t = {f = f}
-t:<?f?>()
-]]
-[[
-(field) t.f: fun(a: any, b: any)
-]]
-
-TEST [[
----@param names string[]
-local function f(<?names?>)
-end
-]]
-[[
-(parameter) names: string[]
-]]
-
-TEST [[
----@return any
-function <?f?>()
-    ---@type integer
-    local a
-    return a
-end
-]]
-[[
-function f()
-  -> any
-]]
-
-TEST [[
----@return any
-function f()
-    ---@type integer
-    local a
-    return a
-end
-
-local <?x?> = f()
-]]
-[[
-local x: any
-]]
-
-TEST [[
----@overload fun(y: boolean)
----@param x number
----@param y boolean
----@param z string
-function f(x, y, z) end
-
-print(<?f?>)
-]]
-[[
-function f(x: number, y: boolean, z: string)
-]]
-
-TEST [[
----@type fun(x?: boolean):boolean?
-local <?f?>
-]]
-[[
-local f: fun(x?: boolean):boolean?
-]]
-
-TEST [[
----@param x? number
----@param y? boolean
----@return table?, string?
-local function <?f?>(x, y)
-end
-]]
-[[
-function f(x?: number, y?: boolean)
-  -> table?
-  2. string?
-]]
-
-TEST [[
----@return table first, string? second
-local function <?f?>(x, y)
-end
-]]
-[[
-function f(x: any, y: any)
-  -> first: table
-  2. second: string?
-]]
-
-TEST [[
----@class Class
----@field x number
----@field y number
----@field z string
-local <?t?>
-]]
-[[
-local t: Class {
-    x: number,
-    y: number,
-    z: string,
-}
-]]
-
-TEST [[
----@class A
-
----@type <?A?>
-]]
-[[
-(class) A
-]]
-
-TEST [[
----@type string | "'enum1'" | "'enum2'"
-local <?t?>
-]]
-[[
-local t: string|'enum1'|'enum2'
-]]
-
-TEST [[
----@alias A string | "'enum1'" | "'enum2'"
-
----@type <?A?>
-]]
-[[
-(alias) A 展开为 string|'enum1'|'enum2'
-]]
-
-TEST [[
----@alias A string | "'enum1'" | "'enum2'"
-
----@type A
-local <?t?>
-]]
-[[
-local t: string|'enum1'|'enum2'
-]]
-
-TEST [[
----@type string
----| "'enum1'"
----| "'enum2'"
-local <?t?>
-]]
-[[
-local t: string|'enum1'|'enum2'
-]]
-
-TEST [[
----@class c
-t = {}
-
----@overload fun()
-function <?t?>.f() end
-]]
-[[
-(global) t: c {
-    f: function,
-}
-]]
-
-TEST [[
----@class c
-local t = {}
-
----@overload fun()
-function t.<?f?>() end
-]]
-[[
-function c.f()
-]]
-
-TEST [[
----@class c
-t = {}
-
----@overload fun()
-function t.<?f?>() end
-]]
-[[
-function t.f()
-]]
-
-TEST [[
----@class C
----@field field any
-
----@type C
-local <?c?>
-]]
-[[
-local c: C {
-    field: any,
-}
-]]
-
-TEST [[
----@class C
----@field field any
-
----@return C
-local function f() end
-
-local <?c?> = f()
-]]
-[[
-local c: C {
-    field: any,
-}
-]]
-
-TEST [[
----@param callback fun(x: integer, ...)
-local function f(<?callback?>) end
-]]
-[[
-(parameter) callback: fun(x: integer, ...any)
-]]
-
-TEST [[
-local <?x?> --- @type boolean
-]]
-[[
-local x: boolean
-]]
-
-TEST [[
-local x --- @type boolean
-local <?y?>
-]]
-[[
-local y: unknown
-]]
-
-TEST [[
----@class Object
----@field a string
-
----@type Object[]
-local t
-
-local <?v?> = t[1]
-
-print(v.a)
-]]
-[[
-local v: Object {
-    a: string,
-}
-]]
-
-TEST [[
----@class Object
----@field a string
-
----@type Object[]
-local t
-
-local <?v?> = t[i]
-
-print(v.a)
-]]
-[[
-local v: Object {
-    a: string,
-}
-]]
-
-TEST [[
----@class C
----@field x string
-local t
-
----@generic T
----@param v T
----@param message any
----@return T
-local function assert(v, message) end
-
-local <?v?> = assert(t)
-]]
-[[
-local v: C {
-    x: string,
-}
-]]
-
-TEST [[
-local <?x?>--测试
-]]
-[[
-local x: unknown
-]]
-
-TEST [[
----@type unknown
-local <?t?>
-t.a = 1
-]]
-[[
-local t: {
-    a: integer = 1,
-}
-]]
-
-TEST [[
----@return number
-local function f() end
-local <?u?> = f()
-print(u.x)
-]]
-[[
-local u: number {
-    x: unknown,
-}
-]]
-
-TEST [[
----@generic K, V
----@param t table<K, V>
----@return K
----@return V
-local function next(t) end
-
----@type table<string, boolean>
-local t
-local k, v = next(<?t?>)
-]]
-[[
-local t: table<string, boolean>
-]]
-
-TEST [[
----@class A
----@class B: A
----@class C: B
----@class D: C
----@class E: D
-local m
-
-function m:f()
-    return <?self?>
-end
-]]
-[[
-(self) self: E {
-    f: function,
-}
-]]
-
-TEST [[
-local f
-
-<?f?>()
-]]
-[[
-local f: unknown
-]]
-
-TEST [[
----@class Position
----@field x  number
----@field y  number
----@field z? number
----@field [3]? number
-local <?t?>
-
-t.z = any
-]]
-[[
-local t: Position {
-    x: number,
-    y: number,
-    z?: number,
-    [3]?: number,
-}
-]]
-
-TEST [[
----@type { x: string, y: number, z: boolean }
-local <?t?>
-]]
-[[
-local t: { x: string, y: number, z: boolean } {
-    x: string,
-    y: number,
-    z: boolean,
-}
-]]
-
-TEST [[
-<?a?>.b = 10 * 60
-]]
-[[
-(global) a: {
-    b: integer = 600,
-}
-]]
-
-TEST [[
-a.<?b?> = 10 * 60
-]]
-[[
-(global) a.b: integer = 600
-]]
-
-TEST [[
-a.<?b?>.c = 1 * 1
-]]
-[[
-(global) a.b: {
-    c: integer = 1,
-}
-]]
-
-TEST [[
-local <?t?> = {
-    'a', 'b', 'c',
-    [10]  = 'd',
-    x     = 'e',
-    y     = 'f',
-    ['z'] = 'g',
-    [3]   = 'h',
-}
-]]
-[[
-local t: {
-    x: string = 'e',
-    y: string = 'f',
-    ['z']: string = 'g',
-    [10]: string = 'd',
-    [1]: string = 'a',
-    [2]: string = 'b',
-    [3]: string = 'c'|'h',
-}
-]]
-
-TEST [[
-function f1.f2.<?f3?>() end
-]]
-[[
-function f1.f2.f3()
-]]
-
-TEST [[
-local t = nil
-t.<?x?>()
-]]
-[[
-(field) t.x: unknown
-]]
+-- [MIGRATED] fun-typed local declaration hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] fun-typed local return hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] fun():void parameter annotation hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] fun-typed field method hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @param names string[] parameter hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @return any function declaration hover case moved to test.feature.hover.basic
+-- [MIGRATED] @return any local x=f() hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @overload function hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] fun(x?:boolean):boolean? local declaration hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] optional-param multi-return function hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] named-return function hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class+@field local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A annotation type hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] string|enum literal union hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @alias A / @type A annotation hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @alias A / @type A local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] multiline union annotation hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class c + @overload global table hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class c + @overload local function field hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class c + @overload t.f() global function hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class C @field / @type C local hover case moved to test.feature.hover.basic
+-- [MIGRATED] @class C @field / @return C local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @param callback fun(x:integer,...) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] trailing-annotation local hover case moved to test.feature.hover.basic
+-- [MIGRATED] trailing-annotation second local undefined hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class Object @field a / @type Object[] index hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class Object @field a / @type Object[] t[i] hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class C @field x / @generic T assert(t) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local x--comment inline hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type unknown local t; t.a=1 hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @return number / u=f(); u.x hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @generic K,V table<string,boolean> / next(<?t?>) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A..E inheritance / self:f() return <?self?> hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local f / f() unknown hover case moved to test.feature.hover.basic
+
+-- (not migrated: @class直接标注local variable在新框架不生效，t类型为unknown)
+
+-- [MIGRATED] @type { x: string, y: number, z: boolean } inline local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] <?a?>.b = 10 * 60 global table field hover case moved to test.feature.hover.basic
+-- [MIGRATED] a.<?b?> = 10 * 60 global field value hover case moved to test.feature.hover.basic
+-- [MIGRATED] a.<?b?>.c = 1 * 1 nested global field hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] mixed seq+hash table {'a','b','c',[10]='d',x='e',...} hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] function f1.f2.<?f3?>() nested function hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local t = nil / t.<?x?>() nil field hover case moved to test.feature.hover.basic
 
 --TEST [[
 -----@class A
@@ -1568,761 +639,109 @@ t.<?x?>()
 --(field) A.x: unknown
 --]]
 
-TEST [[
----@return nil
-local function <?f?>() end
-]]
-[[
-function f()
-  -> nil
-]]
+-- [MIGRATED] @return nil function hover case moved to test.feature.hover.basic
 
-TEST [[
----@async
-local function <?f?>() end
-]]
-[[
-(async) function f()
-]]
+-- [MIGRATED] @async local function hover case moved to test.feature.hover.basic
 
-TEST [[
----@type function
-local <?f?>
-]]
-[[
-local f: function
-]]
+-- [MIGRATED] @type function local hover case moved to test.feature.hover.basic
+-- [MIGRATED] @type async fun() local hover case moved to test.feature.hover.basic
 
-TEST [[
----@type async fun()
-local <?f?>
-]]
-[[
-local f: async fun()
-]]
-
-config.set(nil, 'Lua.runtime.nonstandardSymbol', { '//' })
-TEST [[
-local <?x?> = 1 // 2
-]]
-[[
-local x: integer = 1
-]]
+-- [MIGRATED] nonstandardSymbol '//' local x = 1 // 2 hover case moved to test.feature.hover.basic
 config.set(nil, 'Lua.runtime.nonstandardSymbol', {})
 
-config.set(nil, 'Lua.hover.expandAlias', false)
-TEST [[
----@alias uri string
-
----@type uri
-local <?uri?>
-]]
-[[
-local uri: uri
-]]
-
-config.set(nil, 'Lua.hover.expandAlias', true)
-TEST [[
----@alias uri string
-
----@type uri
-local <?uri?>
-]]
-[[
-local uri: string
-]]
-
-TEST [[
-local <?x?> = '1' .. '2'
-]]
-[[
-local x: string = "12"
-]]
-
-TEST [[
-local t = {
-    x   = 1,
-    [1] = 'x',
-}
-
-local <?x?> = t[#t]
-]]
-[[
-local x: string = 'x'
-]]
-
-TEST [[
-local x = {
-    a = 1,
-    b = 2,
-    [1] = 10,
-}
-
-local y = {
-    _   = x.a,
-    _   = x.b,
-    [1] = <?x?>,
-}
-]]
-[[
-local x: {
-    a: integer = 1,
-    b: integer = 2,
-    [1]: integer = 10,
-}
-]]
-
-TEST [[
-local <?x?> = {
-    _x = '',
-    _y = '',
-    x  = '',
-    y  = '',
-}
-]]
-[[
-local x: {
-    x: string = '',
-    y: string = '',
-    _x: string = '',
-    _y: string = '',
-}
-]]
-
-TEST [[
----@class A
----@field x string
-
----@class B: A
----@field y string
-
----@type B
-local <?t?>
-]]
-[[
-local t: B {
-    x: string,
-    y: string,
-}
-]]
-
-TEST [[
----@class A
----@field x string
-
----@class B: A
----@field x integer
----@field y string
-
----@type B
-local <?t?>
-]]
-[[
-local t: B {
-    x: integer,
-    y: string,
-}
-]]
-
-TEST [[
-local <?x?>
-local function f()
-    x
-end
-]]
-[[
-local x: unknown
-]]
-
-TEST [[
-local x
-local function f()
-    <?x?>
-end
-]]
-[[
-(upvalue) x: unknown
-]]
-
-TEST [[
----@type `123 ????` | ` x | y `
-local <?x?>
-]]
-[[
-local x: ` x | y `|`123 ????`
-]]
-
-TEST [[
----@type any
-local x
-
-print(x.<?y?>)
-]]
-[[
-(field) x.y: unknown
-]]
-
-TEST [[
----@async
-x({}, <?function?> () end)
-]]
-[[
-(async) function ()
-]]
-
-TEST [[
----@overload fun(x: number, y: number):string
----@overload fun(x: number):number
----@return boolean
-local function f() end
-
-local n1 = <?f?>()
-local n2 = f(0)
-local n3 = f(0, 0)
-]]
-[[
-function f()
-  -> boolean
-]]
-
-TEST [[
----@overload fun(x: number, y: number):string
----@overload fun(x: number):number
----@return boolean
-local function f() end
-
-local n1 = f()
-local n2 = <?f?>(0)
-local n3 = f(0, 0)
-]]
-[[
-local f: fun(x: number):number
-]]
-
-TEST [[
----@overload fun(x: number, y: number):string
----@overload fun(x: number):number
----@return boolean
-local function f() end
-
-local n1 = f()
-local n2 = f(0)
-local n3 = <?f?>(0, 0)
-]]
-[[
-local f: fun(x: number, y: number):string
-]]
-
-TEST [[
----@class A
-local mt
-
----@type integer
-mt.x = 1
-
-mt.y = true
-
----@type A
-local <?t?>
-]]
-[[
-local t: A {
-    x: integer,
-    y: boolean = true,
-}
-]]
-
-TEST [[
----@param ... boolean
----@return number ...
-local function <?f?>(...) end
-]]
-[[
-function f(...boolean)
-  -> ...number
-]]
-
-TEST [[
----@param ... boolean
----@return ...
-local function <?f?>(...) end
-]]
-[[
-function f(...boolean)
-  -> ...unknown
-]]
-
-TEST [[
----@type fun():x: number
-local <?f?>
-]]
-[[
-local f: fun():(x: number)
-]]
-
-TEST [[
----@type fun(...: boolean):...: number
-local <?f?>
-]]
-[[
-local f: fun(...boolean):...number
-]]
-
-TEST [[
----@type fun():x: number, y: boolean
-local <?f?>
-]]
-[[
-local f: fun():(x: number, y: boolean)
-]]
-
-TEST [[
----@class MyClass
-local MyClass = {
-    a = 1
-}
-
-function MyClass:Test()
-    <?self?>
-end
-]]
-[[
-(self) self: MyClass {
-    Test: function,
-    a: integer = 1,
-}
-]]
-
-TEST [[
-local y
-if X then
-    y = true
-else
-    y = false
-end
-
-local bool = y
-
-bool = bool and y
-
-if bool then
-end
-
-print(<?bool?>)
-]]
-[[
-local bool: boolean = true|false
-]]
-
-TEST [[
----@type 'a'
-local <?s?>
-]]
-[[
-local s: 'a'
-]]
-
-TEST [[
----@enum <?A?>
-local m = {
-    x = 1,
-}
-]]
-[[
-(enum) A
-]]
-
-TEST [[
-local <?x?> = 1 << 2
-]]
-[[
-local x: integer = 4
-]]
-
-TEST [[
-local function test1()
-    return 1, 2, 3
-end
-
-local function <?test2?>()
-    return test1()
-end
-]]
-[[
-function test2()
-  -> integer
-  2. integer
-  3. integer
-]]
-
-TEST [[
----@param x number
----@return boolean
-local function <?f?>(
-    x
-)
-end
-]]
-
-TEST [[
----@class A
----@field private x number
----@field y number
-local <?t?>
-]]
-[[
-local t: A {
-    x: number,
-    y: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field y number
-
----@type A
-local <?t?>
-]]
-[[
-local t: A {
-    y: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field y number
-<?t?> = {}
-]]
-[[
-(global) t: A {
-    x: number,
-    y: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field y number
-
----@type A
-<?t?> = {}
-]]
-[[
-(global) t: A {
-    y: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field y number
-
----@type A
-v.<?t?> = {}
-]]
-[[
-(global) v.t: A {
-    y: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field protected y number
----@field z number
-
----@type A
-local <?t?>
-]]
-[[
-local t: A {
-    z: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field protected y number
----@field z number
-
----@class B: A
-local <?t?>
-]]
-[[
-local t: B {
-    y: number,
-    z: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field protected y number
----@field z number
-
----@class B: A
----@field private a number
-local <?t?>
-]]
-[[
-local t: B {
-    a: number,
-    y: number,
-    z: number,
-}
-]]
-
-TEST [[
----@class A
----@field private x number
----@field protected y number
----@field z number
-
----@class B: A
----@field private a number
-
----@type B
-local <?t?>
-]]
-[[
-local t: B {
-    z: number,
-}
-]]
-
-TEST [[
----@class A
-local mt = {}
-
----@private
-function mt:init()
-end
-
----@protected
-function mt:update()
-end
-
-function mt:get()
-end
-
-print(<?mt?>)
-]]
-[[
-local mt: A {
-    get: function,
-    init: function,
-    update: function,
-}
-]]
-
-TEST [[
----@class A
-local mt = {}
-
----@private
-function mt:init()
-end
-
----@protected
-function mt:update()
-end
-
-function mt:get()
-end
-
----@type A
-local <?obj?>
-]]
-[[
-local obj: A {
-    get: function,
-}
-]]
-
-TEST [[
----@class A
-local mt = {}
-
----@private
-function mt:init()
-end
-
----@protected
-function mt:update()
-end
-
-function mt:get()
-end
-
----@class B: A
-local <?obj?>
-]]
-[[
-local obj: B {
-    get: function,
-    update: function,
-}
-]]
-
-TEST [[
----@class A
-local mt = {}
-
----@private
-function mt:init()
-end
-
----@protected
-function mt:update()
-end
-
-function mt:get()
-end
-
----@class B: A
-
----@type B
-local <?obj?>
-]]
-[[
-local obj: B {
-    get: function,
-}
-]]
-
-TEST [[
----@class A
-local M = {}
-
----@private
-M.x = 0
-
----@private
-function M:init()
-    self.x = 1
-end
-
----@type A
-local <?a?>
-]]
-[[
-local a: A
-]]
-
-TEST [[
----@class A
----@field x fun(): string
-
----@type table<string, A>
-local obj
-
-local x = obj[''].<?x?>()
-]]
-[[
-(field) A.x: fun():string
-]]
-
-TEST [[
----@class A
----@field x number
-
----@see <?A.x?>
-]]
-[[
-(field) A.x: number
-]]
-
-TEST [[
----@type { [string]: string }[]
-local t
-
-print(<?t?>.foo)
-]]
-[[
-local t: { [string]: string }[] {
-    foo: unknown,
-}
-]]
-
-TEST [[
-local t = {
-    ['x'] = 1,
-    ['y'] = 2,
-}
-
-print(t.x, <?t?>.y)
-]]
-[[
-local t: {
-    ['x']: integer = 1,
-    ['y']: integer = 2,
-}
-]]
-
-TEST [[
-local enum = { a = 1, b = 2 }
-
-local <?t?> = {
-    [enum.a] = true,
-    [enum.b] = 2,
-    [3] = {}
-}
-]]
-[[
-local t: {
-    [1]: boolean = true,
-    [2]: integer = 2,
-    [3]: table,
-}
-]]
-
-TEST [[
----@class A
----@overload fun(x: number): boolean
-local <?x?>
-]]
-[[
-local x: A
-]]
-
-TEST [[
----@type A
-local <?f?>
-
----@enum A
-local t = {
-    x = f,
-}
-]]
-[[
-local f: A
-]]
-
-TEST [[
----@param a number
----@param b string
----@param ... boolean
-function <?f?>(a, b, ...args)
-end
-]]
-[[
-function f(a: number, b: string, ...args: boolean)
-]]
-
-config.set(nil, 'Lua.runtime.version', 'Lua 5.5')
-TEST [[
-global <?*?>
-]]
-[[
-(global) any
-]]
-config.set(nil, 'Lua.runtime.version', nil)
+-- [MIGRATED] @alias uri expandAlias=false hover case moved to test.feature.hover.basic
+-- [MIGRATED] @alias uri expandAlias=true hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] concat literal string hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local t={x=1,[1]='x'} / local x=t[#t] index hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local x={a=1,b=2,[1]=10} / local y={[1]=<?x?>} mixed-key table hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local x={_x='',_y='',x='',y=''} table with underscores hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field x / @class B: A @field y @type B local t hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field x / @class B: A @field x integer @field y @type B local t hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local x / local function f() x (outer scope hover) case moved to test.feature.hover.basic
+
+-- [MIGRATED] local x / local function f() x (upvalue hover) case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type `123 ????` | ` x | y ` literal union hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type any local x / x.y field hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @async x({}, function() end) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @overload f() f(0) f(0,0) resolution hover cases moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A / mt.x=1 mt.y=true / @type A local t hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @param ... boolean @return number ... function f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @param ... boolean @return ... function f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type fun():x: number local f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type fun(...: boolean):...: number local f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type fun():x: number, y: boolean local f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class MyClass / MyClass:Test() self hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local bool narrowing (bool and y) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type 'a' local s hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @enum A enum declaration hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] bitshift literal hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] test2() return test1() multi-return hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @param x number @return boolean local function f(x) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field private x / @field y local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field private x / @field y / @type A local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field private x / @field y / global t = {} hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field private x / @field y / @type A global t = {} hover case moved to test.feature.hover.basic
+
+-- (not migrated) @class A @field private x @field y @type A v.t = {} -- field-access global
+
+-- [MIGRATED] @class A @field private/protected/z @type A local hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field private x @field protected y @field z / @class B: A local t hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A ... @class B: A @field private a local t hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A ... @class B: A @field private a @type B local t hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @private init @protected update @public get / print(mt) hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @private/@protected methods + @type A local obj hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class B: A with @private/@protected methods hover cases moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @private M.x @private M:init @type A local a hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field x fun():string table<string,A> obj[''].x() hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @field x number @see A.x hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type { [string]: string }[] local t / t.foo hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local t={['x']=1,['y']=2} / t.y hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] local enum={a=1,b=2} / t={[enum.a]=true,...} hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @class A @overload fun(x:number):boolean local x hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @type A local f / @enum A local t={x=f} / f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] @param a number @param b string @param ... boolean function f hover case moved to test.feature.hover.basic
+
+-- [MIGRATED] Lua 5.5 global * hover case moved to test.feature.hover.basic

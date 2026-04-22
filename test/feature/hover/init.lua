@@ -39,13 +39,13 @@ function TEST_HOVER(script)
             return item.label
         end)
         if type(expects) == 'string' then
-            expects = expects:gsub('\n$', '')
+            expects = expects:gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
             assert(labels[1] == expects, ('expected first label:\n%s\nactual:\n%s'):format(expects, tostring(labels[1])))
             return
         end
         assert(#labels == #expects, ('expected %d labels, actual %d'):format(#expects, #labels))
         for i, label in ipairs(expects) do
-            label = label:gsub('\n$', '')
+            label = label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
             assert(labels[i] == label, ('expected label[%d]:\n%s\nactual:\n%s'):format(i, label, tostring(labels[i])))
         end
     end

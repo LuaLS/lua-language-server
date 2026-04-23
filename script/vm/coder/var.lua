@@ -95,6 +95,9 @@ ls.vm.registerCoderProvider('param', function (coder, source)
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 
     if looksLikeSelf then
+        coder:addLine('{key}:setSelfLike()' % {
+            key = coder:getKey(source),
+        })
         if parentVariable then
             coder:addLine('{key}:setMasterVariable({parent})' % {
                 parent = coder:getKey(parentVariable),

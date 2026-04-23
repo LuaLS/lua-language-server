@@ -35,6 +35,7 @@ ls.tools = {
     caselessTable = require 'tools.caseless-table',
     pqueue        = require 'tools.priority-queue',
     activePool    = require 'tools.active-pool',
+    markdown      = require 'tools.markdown',
 }
 ls.uri           = require 'tools.uri'
 ls.timer         = require 'tools.timer'

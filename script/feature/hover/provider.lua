@@ -1,5 +1,3 @@
-local hoverUtil = require 'feature.hover-util'
-
 ---@type Feature.Provider<Feature.Hover.Param>
 local providers = ls.feature.helper.providers()
 
@@ -7,6 +5,7 @@ local providers = ls.feature.helper.providers()
 ---@field uri Uri
 ---@field offset integer
 ---@field scope Scope
+---@field vm VM
 ---@field sources LuaParser.Node.Base[]
 ---@field source LuaParser.Node.Base
 ---@field node? Node
@@ -15,6 +14,10 @@ local providers = ls.feature.helper.providers()
 ---@field source LuaParser.Node.Base
 ---@field items Feature.Hover.Item[]
 ---@field value string
+
+---@class Feature.Hover.Item
+---@field label string
+---@field description? string
 
 ---@async
 ---@param uri Uri
@@ -27,30 +30,34 @@ function ls.feature.hover(uri, offset)
         return nil
     end
 
-    local source = hoverUtil.getTargetSource(sources)
-    if not source then
-        return nil
-    end
-
     local param = {
         uri     = uri,
         offset  = offset,
         scope   = scope,
+        vm      = scope.vm,
         sources = sources,
-        source  = source,
-        node    = hoverUtil.getSemanticNode(scope, source),
+        source  = sources[1],
     }
 
+    ---@type Feature.Hover.Item[]
     local items = providers.runner(param)
-    local value = hoverUtil.concatHoverItems(items)
-    if not value then
+
+    if #items == 0 then
         return nil
     end
 
+    local result = ls.tools.markdown.create()
+    for _, item in ipairs(items) do
+        result:append('lua', item.label)
+        if item.description then
+            result:appendText(item.description)
+        end
+    end
+
     return {
-        source = source,
+        source = sources[1],
         items  = items,
-        value  = value,
+        value  = result:string(),
     }
 end
 
@@ -63,11 +70,3 @@ function ls.feature.provider.hover(callback, priority)
         providers.queue:remove(callback)
     end
 end
-
-ls.feature.provider.hover(function (param, action)
-    for _, item in ipairs(hoverUtil.buildHoverItems(param.scope, param.source, param.node)) do
-        action.push(item)
-    end
-end)
-
-return ls.feature.hover

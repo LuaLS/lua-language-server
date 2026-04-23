@@ -5,6 +5,7 @@ local providers = ls.feature.helper.providers()
 ---@field uri Uri
 ---@field offset integer
 ---@field scope Scope
+---@field vm VM
 ---@field sources LuaParser.Node.Base[]
 
 ---@async
@@ -14,7 +15,7 @@ local providers = ls.feature.helper.providers()
 function ls.feature.definition(uri, offset)
     ls.scope.waitIndexing(uri)
     local sources, scope = ls.scope.findSources(uri, offset)
-    if not sources or #sources == 0 then
+    if not sources or #sources == 0 or not scope then
         return {}
     end
 
@@ -22,6 +23,7 @@ function ls.feature.definition(uri, offset)
         uri     = uri,
         offset  = offset,
         scope   = scope,
+        vm      = scope.vm,
         sources = sources,
     }
 
@@ -114,15 +116,12 @@ ls.feature.provider.definition(function (param, action)
     local p = var.loc
     if p and p.kind == 'param' then
         ---@cast p LuaParser.Node.Param
-        local coder = param.scope.vm:getCoder(var)
-        if coder then
-            local looksLikeSelf, parent = coder:looksLikeSelf(p)
-            if looksLikeSelf and parent then
-                local parentVariable = param.scope.vm:getVariable(parent)
-                if parentVariable then
-                    findDefinition(parentVariable)
-                    return
-                end
+        local paramVariable = param.scope.vm:getVariable(p)
+        if paramVariable and paramVariable:isSelfLike() then
+            local parentVariable = paramVariable.masterVariable
+            if parentVariable then
+                findDefinition(parentVariable)
+                return
             end
         end
     end

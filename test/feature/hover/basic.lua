@@ -143,7 +143,9 @@ function a(v)
     return 'a'
 end
 local <?r?> = a(1)
-]] 'local r: string = "a"'
+]] [[
+local r: string = 'a'
+]]
 
 TEST_HOVER [[
 local function <?f?>()
@@ -151,7 +153,7 @@ local function <?f?>()
 end
 ]] [[
 function f()
-  1. nil
+  -> nil
   2. nil
 ]]
 
@@ -170,7 +172,6 @@ end
 <?x?>()
 ]] [[
 function x()
-  -> any
 ]]
 
 TEST_HOVER [[
@@ -205,15 +206,15 @@ end
 
 TEST_HOVER [[
 local s = <?'abc中文'?>
-]] "'abc中文': string"
+]] '9 个字节，5 个字符'
 
 TEST_HOVER [[
 local n = <?0xff?>
-]] '0xff: integer'
+]] '255'
 
 TEST_HOVER [[
 local <?x?> = '\a'
-]] 'local x: string = "\\007"'
+]] [[local x: string = '\007']]
 
 TEST_HOVER [[
 local function <?f?>()
@@ -235,9 +236,9 @@ local <?t?> = {
 local e = t.b
 ]] [[
 local t: {
-    b: 1,
-    c: 2,
-    d: 3,
+    b: integer = 1,
+    c: integer = 2,
+    d: integer = 3,
 }
 ]]
 
@@ -250,9 +251,9 @@ local <?t?> = {
 g.e = t.b
 ]] [[
 local t: {
-    b: 1,
-    c: 2,
-    d: 3,
+    b: integer = 1,
+    c: integer = 2,
+    d: integer = 3,
 }
 ]]
 
@@ -264,9 +265,9 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [-1]: -1,
-    [0]: 0,
-    [1]: 1,
+    [-1]: integer = -1,
+    [0]: integer = 0,
+    [1]: integer = 1,
 }
 ]]
 
@@ -278,9 +279,9 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [1]: "aaa",
-    [2]: "bbb",
-    [3]: "ccc",
+    [1]: string = 'aaa',
+    [2]: string = 'bbb',
+    [3]: string = 'ccc',
 }
 ]]
 
@@ -290,16 +291,22 @@ x = 1
 x = 1.0
 
 print(<?x?>)
-]] 'local x: integer = 1'
+]] [[
+local x: number = 1
+]]
 
 TEST_HOVER [[
 local <?x?> <close> = 1
-]] 'local x: integer = 1'
+]] [[
+local x <close>: integer = 1
+]]
 
 TEST_HOVER [[
 local x <close> = 1
 print(<?x?>)
-]] 'local x: integer = 1'
+]] [[
+local x <close>: integer = 1
+]]
 
 TEST_HOVER [[
 local <?t?> = {
@@ -309,7 +316,11 @@ local <?t?> = {
 local t2 = {
     [t.a] = function () end,
 }
-]] 'local t: { a: true }'
+]] [[
+local t: {
+    a: boolean = true,
+}
+]]
 
 TEST_HOVER [[
 ---@class Class
@@ -318,7 +329,7 @@ local mt = {}
 ---@param t Class
 function f(<?t?>)
 end
-]] 'function f(t: Class)'
+]] '(parameter) t: Class'
 
 TEST_HOVER [[
 ---@class Class
@@ -328,7 +339,7 @@ local mt = {}
 function f(t)
     print(<?t?>)
 end
-]] 'function f(t: Class)'
+]] '(parameter) t: Class'
 
 TEST_HOVER [[
 ---@return number
@@ -429,19 +440,25 @@ local <?r?> = f()
 TEST_HOVER [[
 ---@class Class
 local <?x?> = class()
-]] 'local x: table'
+]] [[
+local x: Class
+]]
 
 TEST_HOVER [[
 ---@class Class
 <?x?> = class()
-]] '(global) x: table'
+]] [[
+(global) x: Class
+]]
 
 TEST_HOVER [[
 local t = {
     ---@class Class
     <?x?> = class()
 }
-]] '(field) x: any'
+]] [[
+(field) x: Class
+]]
 
 TEST_HOVER [[
 ---@class A
@@ -450,7 +467,9 @@ TEST_HOVER [[
 
 ---@type A|B|C
 local <?x?> = class()
-]] 'local x: table'
+]] [[
+local x: A|B|C
+]]
 
 -- pairs for-in key/value annotation cases
 TEST_HOVER [[
@@ -459,7 +478,9 @@ TEST_HOVER [[
 ---@param k Class
 for <?k?> in pairs(t) do
 end
-]] 'local k: any'
+]] [[
+local k: Class
+]]
 
 TEST_HOVER [[
 ---@class Class
@@ -467,13 +488,17 @@ TEST_HOVER [[
 ---@param v Class
 for k, <?v?> in pairs(t) do
 end
-]] 'local v: never'
+]] [[
+local v: Class
+]]
 
 -- table<K,V> annotation
 TEST_HOVER [[
 ---@type table<ClassA, ClassB>
 local <?x?>
-]] 'local x: { [ClassA]: ClassB }'
+]] [[
+local x: table<ClassA, ClassB>
+]]
 
 -- fun():void parameter
 TEST_HOVER [[
@@ -481,7 +506,9 @@ TEST_HOVER [[
 
 ---@param f fun():void
 function t(<?f?>) end
-]] 'function t(f: fun():void)'
+]] [[
+(parameter) f: fun():void
+]]
 
 -- fun(a,b) field method
 TEST_HOVER [[
@@ -489,14 +516,18 @@ TEST_HOVER [[
 local f
 local t = {f = f}
 t:<?f?>()
-]] 'function t.f(a: any, b: any)'
+]] [[
+(field) t.f: fun(a: any, b: any)
+]]
 
 -- @param names string[] parameter
 TEST_HOVER [[
 ---@param names string[]
 local function f(<?names?>)
 end
-]] 'function f(names: string[])'
+]] [[
+(parameter) names: string[]
+]]
 
 -- @return any function declaration hover
 TEST_HOVER [[
@@ -546,7 +577,12 @@ end)
 TEST_HOVER [[
 ---@type [ClassA, ClassB]
 local <?x?>
-]] 'local x: [ClassA, ClassB]'
+]] [[
+local x: [ClassA, ClassB] {
+    [1]: ClassA,
+    [2]: ClassB,
+}
+]]
 
 -- fun(x?: boolean):boolean? local declaration
 TEST_HOVER [[
@@ -599,25 +635,35 @@ TEST_HOVER [[
 ---@field y number
 ---@field z string
 local <?t?>
-]] 'local t: unknown'
+]] [[
+local t: Class {
+    x: number,
+    y: number,
+    z: string,
+}
+]]
 
 -- @class A annotation type hover
 TEST_HOVER [[
 ---@class A
 
 ---@type <?A?>
-]] 'A: table'
+]] [[
+(class) A
+]]
 
 -- string | enum literal union
 TEST_HOVER [[
 ---@type string | "'enum1'" | "'enum2'"
 local <?t?>
-]] "local t: string"
+]] [[local t: string|'enum1'|'enum2']]
 TEST_HOVER [[
 ---@alias A string | "'enum1'" | "'enum2'"
 
 ---@type <?A?>
-]] 'A: string'
+]] [[
+(alias) A 展开为 string|'enum1'|'enum2'
+]]
 
 -- @alias A / @type A local hover
 TEST_HOVER [[
@@ -625,7 +671,9 @@ TEST_HOVER [[
 
 ---@type A
 local <?t?>
-]] 'local t: string'
+]] [[
+local t: string|'enum1'|'enum2'
+]]
 
 -- multiline union annotation
 TEST_HOVER [[
@@ -633,7 +681,9 @@ TEST_HOVER [[
 ---| "'enum1'"
 ---| "'enum2'"
 local <?t?>
-]] 'local t: string'
+]] [[
+local t: string|'enum1'|'enum2'
+]]
 
 -- @class Class + literal table local hover
 TEST_HOVER [[
@@ -641,7 +691,11 @@ TEST_HOVER [[
 local <?x?> = {
     b = 1
 }
-]] 'local x: { b: 1 }'
+]] [[
+local x: Class {
+    b: integer = 1,
+}
+]]
 
 -- @class c + @overload global table hover
 TEST_HOVER [[
@@ -650,7 +704,11 @@ t = {}
 
 ---@overload fun()
 function <?t?>.f() end
-]] 'function t.f()'
+]] [[
+(global) t: c {
+    f: function,
+}
+]]
 
 -- @class c + @overload local function field hover
 TEST_HOVER [[
@@ -659,7 +717,9 @@ local t = {}
 
 ---@overload fun()
 function t.<?f?>() end
-]] 'function t.f()'
+]] [[
+function c.f()
+]]
 
 -- @class C @field field any / @type C local hover
 TEST_HOVER [[
@@ -668,7 +728,11 @@ TEST_HOVER [[
 
 ---@type C
 local <?c?>
-]] 'local c: { field: any }'
+]] [[
+local c: C {
+    field: any,
+}
+]]
 
 -- @class C @field field any / @return C local hover
 TEST_HOVER [[
@@ -679,24 +743,34 @@ TEST_HOVER [[
 local function f() end
 
 local <?c?> = f()
-]] 'local c: C'
+]] [[
+local c: C {
+    field: any,
+}
+]]
 
 -- @param callback fun(x: integer, ...) parameter
 TEST_HOVER [[
 ---@param callback fun(x: integer, ...)
 local function f(<?callback?>) end
-]] 'function f(callback: fun(x: integer, ...: unknown))'
+]] [[
+(parameter) callback: fun(x: integer, ...any)
+]]
 
 -- trailing-annotation local
 TEST_HOVER [[
 local <?x?> --- @type boolean
-]] 'local x: unknown'
+]] [[
+local x: boolean
+]]
 
 -- trailing-annotation with second local undefined
 TEST_HOVER [[
 local x --- @type boolean
 local <?y?>
-]] 'local y: boolean'
+]] [[
+local y: unknown
+]]
 
 -- @class Object @field a string / @type Object[] index
 TEST_HOVER [[
@@ -709,13 +783,19 @@ local t
 local <?v?> = t[1]
 
 print(v.a)
-]] 'local v: Object'
+]] [[
+local v: Object {
+    a: string,
+}
+]]
 
 -- @async local function f() hover
 TEST_HOVER [[
 ---@async
 local function <?f?>() end
-]] 'function f()'
+]] [[
+(async) function f()
+]]
 
 -- @return nil function hover
 TEST_HOVER [[
@@ -737,7 +817,11 @@ t = {}
 
 ---@overload fun()
 function t.<?f?>() end
-]] 'function t.f()'
+]] [[
+(global) t: c {
+    f: function,
+}
+]]
 
 -- @class Object @field a / @type Object[] t[i]
 TEST_HOVER [[
@@ -750,7 +834,11 @@ local t
 local <?v?> = t[i]
 
 print(v.a)
-]] 'local v: Object'
+]] [[
+local v: Object {
+    a: string,
+}
+]]
 
 -- @class C @field x / @generic T assert(t)
 TEST_HOVER [[
@@ -765,7 +853,11 @@ local t
 local function assert(v, message) end
 
 local <?v?> = assert(t)
-]] 'local v: C'
+]] [[
+local v: C {
+    x: string,
+}
+]]
 
 -- local x--测试 inline comment local
 TEST_HOVER [[
@@ -777,7 +869,11 @@ TEST_HOVER [[
 ---@type unknown
 local <?t?>
 t.a = 1
-]] 'local t: {}'
+]] [[
+local t: {
+    a: integer = 1,
+}
+]]
 
 -- @return number / local u=f(); u.x
 TEST_HOVER [[
@@ -785,19 +881,27 @@ TEST_HOVER [[
 local function f() end
 local <?u?> = f()
 print(u.x)
-]] 'local u: number'
+]] [[
+local u: number {
+    x: unknown,
+}
+]]
 
 -- local f / f() unknown
 TEST_HOVER [[
 local f
 
 <?f?>()
-]] '(global) f: unknown'
+]] [[
+local f: unknown
+]]
 
 -- concat literal string
 TEST_HOVER [[
 local <?x?> = '1' .. '2'
-]] 'local x: op.concat<"1", "2">'
+]] [[
+local x: string = "12"
+]]
 
 -- @type function local
 TEST_HOVER [[
@@ -809,7 +913,9 @@ local <?f?>
 TEST_HOVER [[
 ---@type async fun()
 local <?f?>
-]] 'function f()'
+]] [[
+local f: async fun()
+]]
 
 -- @alias uri string / expandAlias=false
 config:set(test.fileUri, 'Lua.hover.expandAlias', false)
@@ -818,7 +924,9 @@ TEST_HOVER [[
 
 ---@type uri
 local <?uri?>
-]] 'local uri: string'
+]] [[
+local uri: uri
+]]
 
 -- @alias uri string / expandAlias=true
 config:set(test.fileUri, 'Lua.hover.expandAlias', true)
@@ -827,7 +935,9 @@ TEST_HOVER [[
 
 ---@type uri
 local <?uri?>
-]] 'local uri: string'
+]] [[
+local uri: uri
+]]
 
 -- reset expandAlias to default
 config:set(test.fileUri, 'Lua.hover.expandAlias', nil)
@@ -851,7 +961,9 @@ end)
 -- bitshift literal
 TEST_HOVER [[
 local <?x?> = 1 << 2
-]] 'local x: op.shl<1, 2>'
+]] [[
+local x: integer = 4
+]]
 
 -- @class A @field private x / @field y local hover
 TEST_HOVER [[
@@ -859,7 +971,12 @@ TEST_HOVER [[
 ---@field private x number
 ---@field y number
 local <?t?>
-]] 'local t: unknown'
+]] [[
+local t: A {
+    x: number,
+    y: number,
+}
+]]
 
 -- @class A @field private x @field y / @type A local hover (private hidden)
 TEST_HOVER [[
@@ -870,10 +987,10 @@ TEST_HOVER [[
 ---@type A
 local <?t?>
 ]] [[
-local t: {
-    private: x,
+local t: A {
     y: number,
-}]]
+}
+]]
 
 -- @class A @field private x @field y / global t = {} (all fields visible)
 TEST_HOVER [[
@@ -882,10 +999,11 @@ TEST_HOVER [[
 ---@field y number
 <?t?> = {}
 ]] [[
-(global) t: {
-    private: x,
+(global) t: A {
+    x: number,
     y: number,
-}]]
+}
+]]
 
 -- @class A @field private x @field y / @type A global t = {} (private hidden)
 TEST_HOVER [[
@@ -896,10 +1014,10 @@ TEST_HOVER [[
 ---@type A
 <?t?> = {}
 ]] [[
-(global) t: {
-    private: x,
+(global) t: A {
     y: number,
-}]]
+}
+]]
 
 -- @class A @field private/protected/z @type A local (private+protected hidden)
 TEST_HOVER [[
@@ -911,11 +1029,10 @@ TEST_HOVER [[
 ---@type A
 local <?t?>
 ]] [[
-local t: {
-    private: x,
-    protected: y,
+local t: A {
     z: number,
-}]]
+}
+]]
 
 -- @class A @private init @protected update @public get / print(mt)
 TEST_HOVER [[
@@ -935,11 +1052,12 @@ end
 
 print(<?mt?>)
 ]] [[
-local mt: {
-    get: fun(self: A),
-    init: fun(self: A),
-    update: fun(self: A),
-}]]
+local mt: A {
+    get: function,
+    init: function,
+    update: function,
+}
+]]
 
 -- @class A @private init @protected update @public get / @type A local obj
 TEST_HOVER [[
@@ -960,11 +1078,10 @@ end
 ---@type A
 local <?obj?>
 ]] [[
-local obj: {
-    get: fun(self: A),
-    init: fun(self: A),
-    update: fun(self: A),
-}]]
+local obj: A {
+    get: function,
+}
+]]
 
 -- @class A @private init @protected update @public get / @class B: A local obj
 TEST_HOVER [[
@@ -984,7 +1101,12 @@ end
 
 ---@class B: A
 local <?obj?>
-]] 'local obj: unknown'
+]] [[
+local obj: B {
+    get: function,
+    update: function,
+}
+]]
 
 -- @class A @private init @protected update @public get / @class B: A @type B local obj
 TEST_HOVER [[
@@ -1007,11 +1129,10 @@ end
 ---@type B
 local <?obj?>
 ]] [[
-local obj: {
-    get: fun(self: A),
-    init: fun(self: A),
-    update: fun(self: A),
-}]]
+local obj: B {
+    get: function,
+}
+]]
 
 -- @class A @private M.x @private M:init @type A local a
 TEST_HOVER [[
@@ -1029,10 +1150,8 @@ end
 ---@type A
 local <?a?>
 ]] [[
-local a: {
-    init: fun(self: A),
-    x: 0 | 1,
-}]]
+local a: A
+]]
 
 -- @class A @field x fun(): string / table<string, A> obj[''].x() field hover
 TEST_HOVER [[
@@ -1044,8 +1163,7 @@ local obj
 
 local x = obj[''].<?x?>()
 ]] [[
-function obj[""].x()
-  -> string
+(field) A.x: fun():string
 ]]
 
 -- @class A @field x number @see A.x / @see field hover
@@ -1054,7 +1172,9 @@ TEST_HOVER [[
 ---@field x number
 
 ---@see <?A.x?>
-]] 'A.x: unknown'
+]] [[
+(field) A.x: number
+]]
 
 -- @type { [string]: string }[] local t / t.foo hover
 TEST_HOVER [[
@@ -1062,7 +1182,11 @@ TEST_HOVER [[
 local t
 
 print(<?t?>.foo)
-]] 'local t: { [string]: string }[]'
+]] [[
+local t: { [string]: string }[] {
+    foo: unknown,
+}
+]]
 
 -- local t = {['x']=1, ['y']=2} / t.y hover
 TEST_HOVER [[
@@ -1074,9 +1198,10 @@ local t = {
 print(t.x, <?t?>.y)
 ]] [[
 local t: {
-    x: 1,
-    y: 2,
-}]]
+    ['x']: integer = 1,
+    ['y']: integer = 2,
+}
+]]
 
 -- local enum = {a=1,b=2} / local t = {[enum.a]=true,...} hover
 TEST_HOVER [[
@@ -1089,16 +1214,20 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [3]: {},
-    [unknown]: 2,
-}]]
+    [1]: boolean = true,
+    [2]: integer = 2,
+    [3]: table,
+}
+]]
 
 -- @class A @overload fun(x: number): boolean / local x hover
 TEST_HOVER [[
 ---@class A
 ---@overload fun(x: number): boolean
 local <?x?>
-]] 'local x: unknown'
+]] [[
+local x: A
+]]
 
 -- @type A local f / @enum A local t = {x=f} / f hover
 TEST_HOVER [[
@@ -1118,7 +1247,9 @@ TEST_HOVER [[
 ---@param ... boolean
 function <?f?>(a, b, ...args)
 end
-]] 'function f(a: number, b: string, args: any, ...boolean)'
+]] [[
+function f(a: number, b: string, ...args: boolean)
+]]
 
 -- Lua 5.5 global * hover
 do
@@ -1126,7 +1257,9 @@ do
     config:set(test.fileUri, 'Lua.runtime.version', 'Lua 5.5')
     TEST_HOVER [[
 global <?*?>
-]] 'global *: {}'
+]] [[
+(global) any
+]]
     config:set(test.fileUri, 'Lua.runtime.version', nil)
 end
 
@@ -1139,7 +1272,12 @@ TEST_HOVER [[
 
 ---@class B: A
 local <?t?>
-]] 'local t: unknown'
+]] [[
+local t: B {
+    y: number,
+    z: number,
+}
+]]
 
 -- @class A @field private x @field protected y @field z / @class B: A @field private a local t
 TEST_HOVER [[
@@ -1151,7 +1289,13 @@ TEST_HOVER [[
 ---@class B: A
 ---@field private a number
 local <?t?>
-]] 'local t: unknown'
+]] [[
+local t: B {
+    a: number,
+    y: number,
+    z: number,
+}
+]]
 
 -- @class A ... @class B: A @field private a @type B local t (private hidden)
 TEST_HOVER [[
@@ -1166,11 +1310,10 @@ TEST_HOVER [[
 ---@type B
 local <?t?>
 ]] [[
-local t: {
-    private: a,
-    protected: y,
+local t: B {
     z: number,
-}]]
+}
+]]
 
 -- local bool narrowing hover (bool and y)
 TEST_HOVER [[
@@ -1189,13 +1332,17 @@ if bool then
 end
 
 print(<?bool?>)
-]] 'local bool: boolean'
+]] [[
+local bool: boolean = true|false
+]]
 
 -- @type 'a' local s hover
 TEST_HOVER [[
 ---@type 'a'
 local <?s?>
-]] 'local s: string = "a"'
+]] [[
+local s: 'a'
+]]
 
 -- @class A / mt.x=1 mt.y=true / @type A local t hover
 TEST_HOVER [[
@@ -1210,42 +1357,55 @@ mt.y = true
 ---@type A
 local <?t?>
 ]] [[
-local t: {
+local t: A {
     x: integer,
-    y: true,
-}]]
+    y: boolean = true,
+}
+]]
 
 -- @param ... boolean @return number ... function f hover
 TEST_HOVER [[
 ---@param ... boolean
 ---@return number ...
 local function <?f?>(...) end
-]] 'function f(...boolean)\n  -> number'
+]] [[
+function f(...boolean)
+  -> ...number
+]]
 
 -- @param ... boolean @return ... function f hover
 TEST_HOVER [[
 ---@param ... boolean
 ---@return ...
 local function <?f?>(...) end
-]] 'function f(...boolean)\n  -> ...'
+]] [[
+function f(...boolean)
+  -> ...unknown
+]]
 
 -- @type fun():x: number local f hover
 TEST_HOVER [[
 ---@type fun():x: number
 local <?f?>
-]] 'function f()\n  1. x: number'
+]] [[
+local f: fun():(x: number)
+]]
 
 -- @type fun(...: boolean):...: number local f hover
 TEST_HOVER [[
 ---@type fun(...: boolean):...: number
 local <?f?>
-]] 'function f(...boolean)\n  1. ...: number'
+]] [[
+local f: fun(...boolean):...number
+]]
 
 -- @type fun():x: number, y: boolean local f hover
 TEST_HOVER [[
 ---@type fun():x: number, y: boolean
 local <?f?>
-]] 'function f()\n  1. x: number\n  2. y: boolean'
+]] [[
+local f: fun():(x: number, y: boolean)
+]]
 
 -- @overload f() @overload f(0) @overload f(0,0) hover
 TEST_HOVER [[
@@ -1257,7 +1417,10 @@ local function f() end
 local n1 = <?f?>()
 local n2 = f(0)
 local n3 = f(0, 0)
-]] 'function f()\n  -> boolean'
+]] [[
+function f()
+  -> boolean
+]]
 
 TEST_HOVER [[
 ---@overload fun(x: number, y: number):string
@@ -1268,7 +1431,10 @@ local function f() end
 local n1 = f()
 local n2 = <?f?>(0)
 local n3 = f(0, 0)
-]] 'function f()\n  -> boolean'
+]] [[
+function f()
+  -> boolean
+]]
 
 TEST_HOVER [[
 ---@overload fun(x: number, y: number):string
@@ -1279,7 +1445,10 @@ local function f() end
 local n1 = f()
 local n2 = f(0)
 local n3 = <?f?>(0, 0)
-]] 'function f()\n  -> boolean'
+]] [[
+function f()
+  -> boolean
+]]
 
 -- @class MyClass / MyClass:Test() self hover
 TEST_HOVER [[
@@ -1307,7 +1476,12 @@ end
 local function <?test2?>()
     return test1()
 end
-]] 'function test2()\n  1. integer\n  2. integer\n  3. integer'
+]] [[
+function test2()
+  -> integer
+  2. integer
+  3. integer
+]]
 
 -- @param x number @return boolean local function f(x) hover
 TEST_HOVER [[
@@ -1330,10 +1504,11 @@ TEST_HOVER [[
 ---@type B
 local <?t?>
 ]] [[
-local t: {
+local t: B {
     x: string,
     y: string,
-}]]
+}
+]]
 
 -- @class A @field x string / @class B: A @field x integer @field y / @type B local t (field override)
 TEST_HOVER [[
@@ -1347,10 +1522,11 @@ TEST_HOVER [[
 ---@type B
 local <?t?>
 ]] [[
-local t: {
+local t: B {
     x: integer,
     y: string,
-}]]
+}
+]]
 
 -- local x / local function f() uses x (outer scope, no upvalue marker)
 TEST_HOVER [[
@@ -1366,13 +1542,17 @@ local x
 local function f()
     <?x?>
 end
-]] 'function f()'
+]] [[
+local x: unknown
+]]
 
 -- @type `123 ????` | ` x | y ` literal union
 TEST_HOVER [[
 ---@type `123 ????` | ` x | y `
 local <?x?>
-]] 'local x: {}'
+]] [[
+local x: ` x | y `|`123 ????`
+]]
 
 -- nonstandardSymbol '//' / local x = 1 // 2
 do
@@ -1380,7 +1560,9 @@ do
     config:set(test.fileUri, 'Lua.runtime.nonstandardSymbol', { '//' })
     TEST_HOVER [[
 local <?x?> = 1 // 2
-]] 'local x: op.idiv<1, 2>'
+]] [[
+local x: integer = 1
+]]
     config:set(test.fileUri, 'Lua.runtime.nonstandardSymbol', {})
 end
 
@@ -1392,7 +1574,9 @@ local t = {
 }
 
 local <?x?> = t[#t]
-]] 'local x: string'
+]] [[
+local x: string = 'x'
+]]
 
 -- local x = {a=1,b=2,[1]=10} / local y = {[1]=<?x?>} mixed-key table hover
 TEST_HOVER [[
@@ -1409,10 +1593,11 @@ local y = {
 }
 ]] [[
 local x: {
-    [1]: 10,
-    a: 1,
-    b: 2,
-}]]
+    a: integer = 1,
+    b: integer = 2,
+    [1]: integer = 10,
+}
+]]
 
 -- local x = {_x='',_y='',x='',y=''} table with underscores
 TEST_HOVER [[
@@ -1424,11 +1609,12 @@ local <?x?> = {
 }
 ]] [[
 local x: {
-    x: "",
-    y: "",
-    _x: "",
-    _y: "",
-}]]
+    x: string = '',
+    y: string = '',
+    _x: string = '',
+    _y: string = '',
+}
+]]
 
 -- @type any local x / x.y field hover
 TEST_HOVER [[
@@ -1442,7 +1628,9 @@ print(x.<?y?>)
 TEST_HOVER [[
 ---@async
 x({}, <?function?> () end)
-]] 'function function () end()'
+]] [[
+(async) function ()
+]]
 
 -- local mt / function mt:add / init() return mt / t:<?add?>()
 TEST_HOVER [[
@@ -1457,7 +1645,9 @@ end
 
 local t = init()
 t:<?add?>()
-]] '(method) t:add(a: any, b: any)'
+]] [[
+(method) mt:add(a: any, b: any)
+]]
 
 -- @vararg Class / local _, <?x?> = ...
 TEST_HOVER [[
@@ -1468,7 +1658,9 @@ local function f(...)
     local _, <?x?> = ...
 end
 f(1, 2, 3)
-]] 'function f(...Class)'
+]] [[
+local x: Class
+]]
 
 -- @vararg Class / local <?t?> = {...} (no call)
 TEST_HOVER [[
@@ -1478,7 +1670,9 @@ TEST_HOVER [[
 local function f(...)
     local <?t?> = {...}
 end
-]] 'function f(...Class)'
+]] [[
+local t: Class[]
+]]
 
 -- @vararg Class / local t = {...} / local <?v?> = t[1]
 TEST_HOVER [[
@@ -1489,7 +1683,9 @@ local function f(...)
     local t = {...}
     local <?v?> = t[1]
 end
-]] 'function f(...Class)'
+]] [[
+local v: Class
+]]
 
 -- @vararg Class / local <?t?> = {...} (with call)
 TEST_HOVER [[
@@ -1500,7 +1696,9 @@ local function f(...)
     local <?t?> = {...}
 end
 f(1, 2, 3)
-]] 'function f(...Class)'
+]] [[
+local t: Class[]
+]]
 
 -- @param ... Class / local _, <?x?> = ...
 TEST_HOVER [[
@@ -1511,7 +1709,9 @@ local function f(...)
     local _, <?x?> = ...
 end
 f(1, 2, 3)
-]] 'function f(...Class)'
+]] [[
+local x: Class
+]]
 
 -- @param ... Class / local t = {...} / local <?v?> = t[1]
 TEST_HOVER [[
@@ -1522,7 +1722,9 @@ local function f(...)
     local t = {...}
     local <?v?> = t[1]
 end
-]] 'function f(...Class)'
+]] [[
+local v: Class
+]]
 
 -- @param ... Class / local <?t?> = {...} (with call)
 TEST_HOVER [[
@@ -1533,7 +1735,9 @@ local function f(...)
     local <?t?> = {...}
 end
 f(1, 2, 3)
-]] 'function f(...Class)'
+]] [[
+local t: Class[]
+]]
 
 -- local t = {a=1,b=2,c=3}
 TEST_HOVER [[
@@ -1544,17 +1748,22 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    a: 1,
-    b: 2,
-    c: 3,
-}]]
+    a: integer = 1,
+    b: integer = 2,
+    c: integer = 3,
+}
+]]
 
 -- local t = {} / t.a = 1 / t.a = true (union field)
 TEST_HOVER [[
 local <?t?> = {}
 t.a = 1
 t.a = true
-]] 'local t: { a: 1 | true }'
+]] [[
+local t: {
+    a: boolean|integer = 1|true,
+}
+]]
 
 -- mixed-key table: a=1,[1]=2,[true]=3,[5.5]=4,[{}]=5,[function()end]=6,["b"]=7,["012"]=8
 TEST_HOVER [[
@@ -1570,14 +1779,14 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [1]: 2,
-    [5.5]: 4,
-    ["012"]: 8,
-    a: 1,
-    b: 7,
-    [true]: 3,
-    [unknown]: 6,
-}]]
+    a: integer = 1,
+    [1]: integer = 2,
+    [true]: integer = 3,
+    [5.5]: integer = 4,
+    ["b"]: integer = 7,
+    ["012"]: integer = 8,
+}
+]]
 
 -- mt.__index = {} / self:<?test?>()
 TEST_HOVER [[
@@ -1606,18 +1815,19 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    a: 4,
-    b: 1,
-    c: 2,
-    d: 3,
-    g: 9,
-    l: 11,
-    p: 10,
-    q: 8,
-    s: 5,
-    y: 6,
-    z: 7,
-}]]
+    b: integer = 1,
+    c: integer = 2,
+    d: integer = 3,
+    a: integer = 4,
+    s: integer = 5,
+    y: integer = 6,
+    z: integer = 7,
+    q: integer = 8,
+    g: integer = 9,
+    p: integer = 10,
+    l: integer = 11,
+}
+]]
 
 -- local s = <?'abc中文'?> string literal hover
 TEST_HOVER [[
@@ -1630,12 +1840,12 @@ end)
 -- local n = <?0xff?> integer literal hover
 TEST_HOVER [[
 local n = <?0xff?>
-]] '0xff: integer'
+]] '255'
 
 -- local x = <?'\a'?> escape sequence hover
 TEST_HOVER [[
 local <?x?> = '\a'
-]] [[local x: string = "\007"]]
+]] [[local x: string = '\007']]
 
 -- @generic K,V / @param t table<K,V> / local t: table<string,boolean> / next(<?t?>)
 TEST_HOVER [[
@@ -1648,7 +1858,9 @@ local function next(t) end
 ---@type table<string, boolean>
 local t
 local k, v = next(<?t?>)
-]] 'local t: { [string]: boolean }'
+]] [[
+local t: table<string, boolean>
+]]
 
 -- @class A..E inheritance chain / self:f() return <?self?>
 TEST_HOVER [[
@@ -1663,8 +1875,9 @@ function m:f()
     return <?self?>
 end
 ]] [[
-(method) m:f()
-  -> E
+(self) self: E {
+    f: function,
+}
 ]]
 
 -- @class Position @field x,y,z — SKIP: @class直接标注local在新框架不生效
@@ -1675,11 +1888,12 @@ TEST_HOVER [[
 ---@type { x: string, y: number, z: boolean }
 local <?t?>
 ]] [[
-local t: {
+local t: { x: string, y: number, z: boolean } {
     x: string,
     y: number,
     z: boolean,
-}]]
+}
+]]
 
 -- function f1.f2.<?f3?>() end nested function
 TEST_HOVER [[
@@ -1704,35 +1918,48 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [1]: "a",
-    [2]: "b",
-    [3]: "h",
-    [10]: "d",
-    x: "e",
-    y: "f",
-    z: "g",
-}]]
+    x: string = 'e',
+    y: string = 'f',
+    ['z']: string = 'g',
+    [10]: string = 'd',
+    [1]: string = 'a',
+    [2]: string = 'b',
+    [3]: string = 'c'|'h',
+}
+]]
 
 -- local type / w2l:get_default()[<?type?>] unknown local
 TEST_HOVER [[
 local type
 w2l:get_default()[<?type?>]
-]] '(global) type: unknown'
+]] 'local type: unknown'
 
 -- <?a?>.b = 10 * 60 global table field
 TEST_HOVER [[
 <?a?>.b = 10 * 60
-]] '(global) a: unknown'
+]] [[
+(global) a: {
+    b: integer = 600,
+}
+]]
 
 -- a.<?b?> = 10 * 60 global field value
 TEST_HOVER [[
 a.<?b?> = 10 * 60
-]] '(global) a.b: op.mul<10, 60>'
+]] [[
+(global) a: {
+    b: integer = 600,
+}
+]]
 
 -- a.<?b?>.c = 1 * 1 nested global field
 TEST_HOVER [[
 a.<?b?>.c = 1 * 1
-]] '(global) a.b: unknown'
+]] [[
+(global) a.b: {
+    c: integer = 1,
+}
+]]
 
 -- setmetatable({}, {__index=mt}) — mt.a/b/c fields
 TEST_HOVER [[

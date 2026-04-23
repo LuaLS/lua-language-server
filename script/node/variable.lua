@@ -7,6 +7,20 @@ M.hideInUnionView = true
 ---@type Node.Variable?
 M.masterVariable = nil
 
+---@private
+M._selfLike = false
+
+---@return self
+function M:setSelfLike()
+    self._selfLike = true
+    return self
+end
+
+---@return boolean
+function M:isSelfLike()
+    return self._selfLike
+end
+
 ---@alias Node.Key string | number | boolean | Node
 
 ---@type Node.Value

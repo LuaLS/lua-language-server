@@ -76,6 +76,7 @@ obj:<?init?>(1, '测试')
 }
 
 TEST_HOVER [[
+--!include setmetatable
 local mt = {}
 mt.__index = mt
 
@@ -86,12 +87,16 @@ end
 local obj = setmetatable({}, mt)
 
 obj:<?init?>(1, '测试')
-]] [[
-(method) mt:init(a: any, b: any, c: any)
+]] {
+    '(method) obj.init: function',
+[[
+function mt:init(a: any, b: any, c: any)
   -> table
 ]]
+    }
 
 TEST_HOVER [[
+--!include setmetatable
 local mt = {}
 mt.__index = mt
 
@@ -103,10 +108,13 @@ local obj = setmetatable({}, mt)
 
 obj:init(1, '测试')
 obj.<?init?>(obj, 1, '测试')
-]] [[
+]] {
+    '(method) obj.init: function',
+[[
 (method) mt:init(a: any, b: any, c: any)
   -> table
 ]]
+    }
 
 TEST_HOVER [[
 function obj.xxx()

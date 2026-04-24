@@ -1,6 +1,6 @@
 ---@param variable Node.Variable
 ---@param source LuaParser.Node.Base
----@return 'local' | 'global' | '(field)' | '(method)' | '(parameter)' | '(self)'
+---@return 'local' | 'global' | '(field)' | '(method)' | '(parameter)' | '(self)' | '(upvalue)'
 local function getVariableType(variable, source)
     local kind = source.kind
 

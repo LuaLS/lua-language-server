@@ -1017,6 +1017,15 @@ function M:isGlobal()
     return parent:isGlobal()
 end
 
+function M:setMethod()
+    self._isMethod = true
+    return self
+end
+
+function M:isMethod()
+    return self._isMethod or false
+end
+
 ---@param viewer Node.Viewer
 ---@param options Node.Viewer.Options
 ---@return string
@@ -1069,7 +1078,11 @@ function M:onViewAsVariable(viewer, options)
             skipLevel = options.skipLevel,
         })
         if view:sub(1, 1) ~= '[' then
-            view = '.' .. view
+            if viewer.preferMethod and var:isMethod() then
+                view = ':' .. view
+            else
+                view = '.' .. view
+            end
         end
         views[#views+1] = view
     end

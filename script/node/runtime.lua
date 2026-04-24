@@ -252,12 +252,6 @@ function M:fillAPIs()
         return New 'Node.OddTemplate' (scope, params)
     end
 
-    ---@param options? Node.Viewer.Options
-    ---@return Node.Viewer
-    function self.viewer(options)
-        return New 'Node.Viewer' (options)
-    end
-
     ---@param key Node.Key
     ---@param value? Node
     ---@param optional? boolean

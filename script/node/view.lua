@@ -5,6 +5,7 @@ local M = Class 'Node.Viewer'
 ---@field skipLevel? integer
 ---@field needParentheses? boolean
 ---@field noFunctionDetail? boolean
+---@field preferMethod? boolean
 ---@field [any] never
 
 ---@param options? Node.Viewer.Options
@@ -13,6 +14,7 @@ function M:__init(options)
     self.skipLevel = options and options.skipLevel or 0
     self.deep = 0
     self.noFunctionDetail = options and options.noFunctionDetail or false
+    self.preferMethod = options and options.preferMethod or false
     ---@type table<Node, integer?>
     self.visited = {}
 end
@@ -89,4 +91,10 @@ end
 ---@return string
 function M:format(fmt, node, options)
     return string.format(fmt, self:view(node, options))
+end
+
+---@param options? Node.Viewer.Options
+---@return Node.Viewer
+function ls.node.viewer(options)
+    return New 'Node.Viewer' (options)
 end

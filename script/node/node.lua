@@ -99,21 +99,21 @@ end
 ---@param options? Node.Viewer.Options
 ---@return string
 function M:view(options)
-    local viewer = self.scope.rt.viewer(options)
+    local viewer = ls.node.viewer(options)
     return viewer:view(self, options)
 end
 
 ---@param options? Node.Viewer.Options
 ---@return string
 function M:viewAsList(options)
-    local viewer = self.scope.rt.viewer(options)
+    local viewer = ls.node.viewer(options)
     return viewer:viewAsList(self, options)
 end
 
 ---@param options? Node.Viewer.Options
 ---@return string
 function M:viewAsVariable(options)
-    local viewer = self.scope.rt.viewer(options)
+    local viewer = ls.node.viewer(options)
     return viewer:viewAsVariable(self, options)
 end
 

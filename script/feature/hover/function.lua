@@ -48,7 +48,9 @@ ls.feature.provider.hover(function (param, action)
             return
         end
 
-        local viewData = node:makeView()
+        local viewData = node:makeView(ls.node.viewer {
+            preferMethod = true,
+        })
         local label = 'function {name}{typeParams}({args}){returns}' % {
             name       = buildName(viewData),
             typeParams = buildTypeParams(viewData),

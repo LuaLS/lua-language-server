@@ -377,7 +377,7 @@ end
 ---@return Node.Function.ViewData
 function M:makeView(viewer)
     if not viewer then
-        viewer = self.scope.rt.viewer()
+        viewer = ls.node.viewer()
     end
     local params = {}
     local paramPart = ''
@@ -390,6 +390,13 @@ function M:makeView(viewer)
             })
         )
     end
+    if  viewer.preferMethod
+    and self._name
+    and self._name:isMethod()
+    and #params > 1 then
+        table.remove(params, 1)
+    end
+
     if self.varargParamDef then
         params[#params+1] = string.format('...: %s', viewer:view(self.varargParamDef))
     end

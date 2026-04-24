@@ -52,8 +52,13 @@ ls.vm.registerCoderProvider('field', function (coder, source)
     if sourceName and source.key then
         local keyLiteral
 
-        if source.subtype == 'field' or source.subtype == 'method' then
+        if source.subtype == 'field' then
             keyLiteral = source.key.id
+        elseif source.subtype == 'method' then
+            keyLiteral = source.key.id
+            coder:addLine('{var}:setMethod()' % {
+                var = coder:getKey(source),
+            })
         elseif source.subtype == 'index' then
             if source.key.isLiteral then
                 keyLiteral = source.key.value

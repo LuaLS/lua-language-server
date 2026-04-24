@@ -76,6 +76,10 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                 --     coder:compile(source.name.last)
                 -- end
                 coder:compile(source.name)
+                coder:addLine('{func}:setName({nameKey})' % {
+                    func    = funcKey,
+                    nameKey = coder:getKey(source.name),
+                })
             end, 'function name --')
         end
 

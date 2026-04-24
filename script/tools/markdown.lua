@@ -63,9 +63,9 @@ M.__getter.value = function (self)
         end
         if content.language then
             lines[#lines+1] = '```' .. content.language
-            lines[#lines+1] = content.value
             lastLanguage = content.language
         end
+        lines[#lines+1] = content.value
         ::continue::
     end
     if lastLanguage then

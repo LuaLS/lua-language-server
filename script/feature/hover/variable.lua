@@ -1,6 +1,6 @@
 ---@param variable Node.Variable
 ---@param source LuaParser.Node.Base
----@return 'local' | 'global' | 'field' | 'method' | 'parameter' | 'self'
+---@return 'local' | 'global' | '(field)' | '(method)' | '(parameter)' | '(self)'
 local function getVariableType(variable, source)
     local kind = source.kind
 
@@ -10,9 +10,13 @@ local function getVariableType(variable, source)
 
     if kind == 'param' then
         if variable:isSelfLike() then
-            return 'self'
+            return '(self)'
         end
-        return 'parameter'
+        return '(parameter)'
+    end
+
+    if variable:isGlobal() then
+        return 'global'
     end
 
     if kind == 'var' then
@@ -23,19 +27,20 @@ local function getVariableType(variable, source)
         local loc = source.loc
         if loc and loc.kind == 'param' then
             if variable:isSelfLike() then
-                return 'self'
+                return '(self)'
             end
-            return 'parameter'
+            return '(parameter)'
         end
         return 'local'
     end
 
-    if kind == 'field' then
-        ---@cast source LuaParser.Node.Field
-        if source.subtype == 'method' then
-            return 'method'
+    if kind == 'fieldid' then
+        ---@cast source LuaParser.Node.FieldID
+        local field = source.parent
+        if field.subtype == 'method' then
+            return '(method)'
         end
-        return 'field'
+        return '(field)'
     end
 
     return 'local'
@@ -44,11 +49,7 @@ end
 ---@param variable Node.Variable
 ---@return string
 local function getVariableName(variable)
-    local literal = variable.key.literal
-    if type(literal) == 'string' then
-        return literal
-    end
-    return tostring(literal)
+    return variable:viewAsVariable()
 end
 
 ls.feature.provider.hover(function (param, action)
@@ -58,9 +59,9 @@ ls.feature.provider.hover(function (param, action)
     end
     local variableType = getVariableType(variable, param.source)
     local varibaleName = getVariableName(variable)
-    local variableValue = variable:view()
-
-    local md = ls.tools.markdown.create()
+    local variableValue = variable:view {
+        noFunctionDetail = true,
+    }
 
     local label = '{} {}: {}' % { variableType, varibaleName, variableValue }
 

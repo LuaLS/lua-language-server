@@ -10,15 +10,15 @@ TEST_HOVER [[
 ---@type string|integer
 local x
 print(x<??>)
-]] ({
-    'local x: string',
-    'local x: integer',
-})
+]] 'local x: string | integer'
 
 TEST_HOVER [[
 local function <?x?>(a, b)
 end
-]] 'function x(a: any, b: any)'
+]] {
+    'local x: function',
+    'function x(a: any, b: any)',
+}
 
 TEST_HOVER [[
 local <?function?> x(a, b)
@@ -29,9 +29,37 @@ TEST_HOVER [[
 local function x(a, b)
 end
 <?x?>()
-]] 'function x(a: any, b: any)'
+]] {
+    'local x: function',
+    'function x(a: any, b: any)'
+}
 
 TEST_HOVER [[
+function <?x?>(a, b)
+end
+]] {
+    'global x: function',
+    'function x(a: any, b: any)',
+}
+
+TEST_HOVER [[
+function M.<?x?>(a, b)
+end
+]] {
+    'global M.x: function',
+    'function M.x(a: any, b: any)',
+}
+
+TEST_HOVER [[
+function M:<?x?>(a, b)
+end
+]] {
+    'global M.x: function',
+    'function M:x(a: any, b: any)',
+}
+
+TEST_HOVER [[
+--!include setmetatable
 local mt = {}
 mt.__index = mt
 
@@ -42,7 +70,10 @@ end
 local obj = setmetatable({}, mt)
 
 obj:<?init?>(1, '测试')
-]] '(method) mt:init(a: any, b: any, c: any)'
+]] {
+    '(method) obj.init: function',
+    'function mt:init(a: any, b: any, c: any)',
+}
 
 TEST_HOVER [[
 local mt = {}

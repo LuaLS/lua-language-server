@@ -52,6 +52,7 @@ function ls.feature.hover(uri, offset)
         if item.description then
             result:appendText(item.description)
         end
+        result:appendText('---')
     end
 
     return {

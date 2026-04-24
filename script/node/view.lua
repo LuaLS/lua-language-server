@@ -4,6 +4,7 @@ local M = Class 'Node.Viewer'
 ---@class Node.Viewer.Options
 ---@field skipLevel? integer
 ---@field needParentheses? boolean
+---@field noFunctionDetail? boolean
 ---@field [any] never
 
 ---@param options? Node.Viewer.Options
@@ -11,6 +12,7 @@ function M:__init(options)
     ---@type integer
     self.skipLevel = options and options.skipLevel or 0
     self.deep = 0
+    self.noFunctionDetail = options and options.noFunctionDetail or false
     ---@type table<Node, integer?>
     self.visited = {}
 end

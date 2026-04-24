@@ -57,6 +57,17 @@ function M:isDummy()
     return self.dummy == true
 end
 
+---@param var Node.Variable
+function M:setName(var)
+    ---@private
+    self._name = var
+end
+
+---@return Node.Variable?
+function M:getName()
+    return self._name
+end
+
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
@@ -352,11 +363,24 @@ function M:inferGeneric(other, result)
     end
 end
 
-function M:onView(viewer, options)
-    if viewer.visited[self] > 1 then
-        return 'function'
+---@class Node.Function.ViewData
+---@field async string
+---@field name string
+---@field typeParams string[]
+---@field params string[]
+---@field returns string[]
+---@field typeParamPart string
+---@field paramPart string
+---@field returnPart string
+
+---@param viewer? Node.Viewer
+---@return Node.Function.ViewData
+function M:makeView(viewer)
+    if not viewer then
+        viewer = self.scope.rt.viewer()
     end
     local params = {}
+    local paramPart = ''
     for i, v in ipairs(self.paramsDef) do
         params[i] = string.format('%s%s: %s'
             , v.key
@@ -369,10 +393,11 @@ function M:onView(viewer, options)
     if self.varargParamDef then
         params[#params+1] = string.format('...: %s', viewer:view(self.varargParamDef))
     end
+    paramPart = table.concat(params, ', ')
 
+    local returns = {}
     local returnPart = ''
     if #self.returnsDef > 0 then
-        local returns = {}
         for i, v in ipairs(self.returnsDef) do
             if v.key then
                 returns[i] = string.format('(%s%s: %s)'
@@ -396,9 +421,10 @@ function M:onView(viewer, options)
         returnPart = ':' .. returnPart
     end
 
-    local typeParams = ''
+    local typeParams = {}
+    local typeParamsPart = ''
     if self.typeParams and #self.typeParams > 0 then
-        typeParams = '<' .. table.concat(ls.util.map(self.typeParams, function (v)
+        typeParamsPart = '<' .. table.concat(ls.util.map(self.typeParams, function (v)
             if v.kind == 'generic' then
                 ---@cast v Node.Generic
                 return viewer:viewAsParam(v)
@@ -407,13 +433,35 @@ function M:onView(viewer, options)
         end), ', ') .. '>'
     end
 
+    return {
+        async = self.async and 'async ' or '',
+        name = self._name and viewer:viewAsVariable(self._name) or '',
+        typeParams = typeParams,
+        params = params,
+        returns = returns,
+        typeParamPart = typeParamsPart,
+        paramPart = paramPart,
+        returnPart = returnPart,
+    }
+end
+
+function M:onView(viewer, options)
+    if viewer.visited[self] > 1 then
+        return 'function'
+    end
+    if viewer.noFunctionDetail then
+        return 'function'
+    end
+
+    local viewData = self:makeView(viewer)
+
     local view = string.format('%sfun%s(%s)%s'
-        , self.async and 'async ' or ''
-        , typeParams
-        , table.concat(params, ', ')
-        , returnPart
+        , viewData.async
+        , viewData.typeParamPart
+        , viewData.paramPart
+        , viewData.returnPart
     )
-    if options.needParentheses and returnPart ~= '' then
+    if options.needParentheses and viewData.returnPart ~= '' then
         view = '({%s})' % { view }
     end
     return view

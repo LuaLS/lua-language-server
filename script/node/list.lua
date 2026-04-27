@@ -297,12 +297,22 @@ function M:onCanCast(other)
     return true
 end
 
-function M:onViewAsList(viewer, options)
+---@param viewer? Node.Viewer
+---@param maxLen? integer
+---@return string[]
+---@return string? tail
+function M:makeViews(viewer, maxLen)
     local values = self.values
     if #values == 0 then
-        return 'nil'
+        return {}, nil
     end
-    local maxLen = 8
+    if not maxLen then
+        maxLen = 8
+    end
+    if not viewer then
+        viewer = ls.node.viewer()
+    end
+
     local buf = {}
 
     local function push(i)
@@ -362,6 +372,15 @@ function M:onViewAsList(viewer, options)
         elseif self.max > #values then
             tail = '...(+{})' % { self.max - #values }
         end
+    end
+
+    return buf, tail
+end
+
+function M:onViewAsList(viewer, options)
+    local buf, tail = self:makeViews(viewer)
+    if #buf == 0 then
+        return 'nil'
     end
 
     local view = table.concat(buf, ', ')

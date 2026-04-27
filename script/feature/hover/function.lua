@@ -22,14 +22,14 @@ local function buildReturns(viewData)
     if #viewData.returns == 0 then
         return ''
     end
-    local buf = {}
+    local buf = { '' }
     for i, ret in ipairs(viewData.returns) do
         if i == 1 then
-            buf[i] = '  -> ' .. ret
+            buf[#buf+1] = '  -> ' .. ret
         elseif i < 10 then
-            buf[i] = '  {}. {}' % { i, ret }
+            buf[#buf+1] = '  {}. {}' % { i, ret }
         else
-            buf[i] = '  {} {}' % { i, ret }
+            buf[#buf+1] = '  {} {}' % { i, ret }
         end
     end
 
@@ -50,6 +50,7 @@ ls.feature.provider.hover(function (param, action)
 
         local viewData = node:makeView(ls.node.viewer {
             preferMethod = true,
+            noFunctionDetail = true,
         })
         local label = 'function {name}{typeParams}({args}){returns}' % {
             name       = buildName(viewData),

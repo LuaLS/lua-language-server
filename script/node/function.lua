@@ -422,6 +422,13 @@ function M:makeView(viewer)
         end
         returnPart = ':' .. returnPart
     elseif #self.returnsPack.values > 0 then
+        local buf, tail = self.returnsPack:makeViews(viewer, 100)
+        for i = 1, #buf do
+            returns[i] = buf[i]
+        end
+        if tail then
+            returns[#returns] = '...: ' .. returns[#returns]
+        end
         returnPart = viewer:viewAsList(self.returnsPack, {
             needParentheses = true,
         })

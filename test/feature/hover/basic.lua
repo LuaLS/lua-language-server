@@ -91,7 +91,7 @@ obj:<?init?>(1, '测试')
     '(method) obj.init: function',
 [[
 function mt:init(a: any, b: any, c: any)
-  -> table
+  -> {}
 ]]
     }
 
@@ -109,10 +109,10 @@ local obj = setmetatable({}, mt)
 obj:init(1, '测试')
 obj.<?init?>(obj, 1, '测试')
 ]] {
-    '(method) obj.init: function',
+    '(field) obj.init: function',
 [[
-(method) mt:init(a: any, b: any, c: any)
-  -> table
+function mt:init(a: any, b: any, c: any)
+  -> {}
 ]]
     }
 
@@ -121,11 +121,14 @@ function obj.xxx()
 end
 
 obj.<?xxx?>()
-]] 'function obj.xxx()'
+]] {
+    'global obj.xxx: function',
+    'function obj.xxx()',
+}
 
 TEST_HOVER [[
 obj.<?xxx?>()
-]] '(global) obj.xxx: unknown'
+]] 'global obj.xxx: unknown'
 
 TEST_HOVER [[
 local <?x?> = 1

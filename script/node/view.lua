@@ -10,11 +10,11 @@ local M = Class 'Node.Viewer'
 
 ---@param options? Node.Viewer.Options
 function M:__init(options)
-    ---@type integer
-    self.skipLevel = options and options.skipLevel or 0
     self.deep = 0
+    ---@type integer
+    self.skipLevel        = options and options.skipLevel        or 0
     self.noFunctionDetail = options and options.noFunctionDetail or false
-    self.preferMethod = options and options.preferMethod or false
+    self.preferMethod     = options and options.preferMethod     or false
     ---@type table<Node, integer?>
     self.visited = {}
 end

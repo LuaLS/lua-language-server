@@ -163,22 +163,25 @@ local function x(a, ...)
 end
 
 <?x?>(1, 2, 3, 4, 5, 6, 7)
-]] 'function x(a: any, ...any)'
+]] {
+    'local x: function',
+    'function x(a: any, ...: any)',
+}
 
 TEST_HOVER [[
 local <?t?> = - 1000
-]] 'local t: integer = -1000'
+]] 'local t: -1000'
 
 TEST_HOVER [[
 local <?n?>
 table.pack(n)
-]] 'local n: unknown'
+]] 'local n: any'
 
 TEST_HOVER [[
 local x = 1
 local y = x
 print(<?y?>)
-]] 'local y: integer = 1'
+]] 'local y: 1'
 
 TEST_HOVER [[
 function a(v)
@@ -186,18 +189,17 @@ function a(v)
 end
 local <?r?> = a(1)
 ]] [[
-local r: string = 'a'
+local r: "a"
 ]]
 
 TEST_HOVER [[
 local function <?f?>()
     return nil, nil
 end
-]] [[
-function f()
-  -> nil
-  2. nil
-]]
+]] {
+    'local f: function',
+    'function f()\n  -> nil\n  2. nil',
+}
 
 TEST_HOVER [[
 local function f()
@@ -212,9 +214,13 @@ local function x()
 end
 
 <?x?>()
-]] [[
+]] {
+    'local x: function',
+    [[
 function x()
-]]
+  -> any
+]],
+}
 
 TEST_HOVER [[
 local function f()
@@ -235,7 +241,10 @@ end
 function F(a)
 end
 <?F?>()
-]] 'function F(a: any)'
+]] {
+    'global F: function',
+    'function F(a: any)',
+}
 
 TEST_HOVER [[
 local mt = {}
@@ -244,30 +253,32 @@ mt.__index = {}
 function mt:test(a, b)
     self:<?test?>()
 end
-]] '(method) mt:test(a: any, b: any)'
+]] {
+    '(method) mt.test: function',
+    'function mt:test(a: any, b: any)',
+}
 
 TEST_HOVER [[
 local s = <?'abc中文'?>
-]] '9 个字节，5 个字符'
+]] (nil)
 
 TEST_HOVER [[
 local n = <?0xff?>
-]] '255'
+]] (nil)
 
 TEST_HOVER [[
 local <?x?> = '\a'
-]] [[local x: string = '\007']]
+]] [[local x: "\007"]]
 
 TEST_HOVER [[
 local function <?f?>()
     return 1
     return nil
 end
-]] (function (result)
-    local expected = ([==[function f()
-    -> 1 | nil]==]):gsub('\n    ', '\n  ')
-    assert(result.items[1].label == expected)
-end)
+]] {
+    'local f: function',
+    'function f()\n  -> 1 | nil',
+}
 
 TEST_HOVER [[
 local <?t?> = {
@@ -278,9 +289,9 @@ local <?t?> = {
 local e = t.b
 ]] [[
 local t: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
+    b: 1,
+    c: 2,
+    d: 3,
 }
 ]]
 
@@ -293,9 +304,9 @@ local <?t?> = {
 g.e = t.b
 ]] [[
 local t: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
+    b: 1,
+    c: 2,
+    d: 3,
 }
 ]]
 
@@ -307,9 +318,9 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [-1]: integer = -1,
-    [0]: integer = 0,
-    [1]: integer = 1,
+    [-1]: -1,
+    [0]: 0,
+    [1]: 1,
 }
 ]]
 
@@ -321,9 +332,9 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [1]: string = 'aaa',
-    [2]: string = 'bbb',
-    [3]: string = 'ccc',
+    [1]: "aaa",
+    [2]: "bbb",
+    [3]: "ccc",
 }
 ]]
 
@@ -334,20 +345,20 @@ x = 1.0
 
 print(<?x?>)
 ]] [[
-local x: number = 1
+local x: 1
 ]]
 
 TEST_HOVER [[
 local <?x?> <close> = 1
 ]] [[
-local x <close>: integer = 1
+local x: 1
 ]]
 
 TEST_HOVER [[
 local x <close> = 1
 print(<?x?>)
 ]] [[
-local x <close>: integer = 1
+local x: 1
 ]]
 
 TEST_HOVER [[
@@ -359,9 +370,7 @@ local t2 = {
     [t.a] = function () end,
 }
 ]] [[
-local t: {
-    a: boolean = true,
-}
+local t: { a: true }
 ]]
 
 TEST_HOVER [[
@@ -396,7 +405,10 @@ TEST_HOVER [[
 ---@param y boolean
 local function <?f?>(x, y)
 end
-]] 'function f(x: number, y: boolean)'
+]] {
+    'local f: function',
+    'function f(x: number, y: boolean)',
+}
 
 TEST_HOVER [[
 ---@class A
@@ -407,15 +419,14 @@ TEST_HOVER [[
 ---@return C
 local function <?f?>()
 end
-]] (function (result)
-    local expected = ([==[function f()
-    1. A | B
-    2. table]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected, result.items[1].label)
-end)
+]] {
+    'local f: function',
+    [[
+function f()
+  -> A | B
+  2. C
+]],
+}
 
 TEST_HOVER [[
 ---@type string[]
@@ -425,10 +436,7 @@ local <?x?>
 TEST_HOVER [[
 ---@type string[]|boolean
 local <?x?>
-]] ({
-    'local x: string[]',
-    'local x: boolean',
-})
+]] 'local x: string[] | boolean'
 
 TEST_HOVER [[
 ---@type string[]
@@ -442,14 +450,13 @@ TEST_HOVER [[
 ---@return T
 local function <?f?>(x)
 end
-]] (function (result)
-        local expected = ([==[function f(x: <T>)
-    -> <T>]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected, result.items[1].label)
-end)
+]] {
+    'local f: function',
+    [[
+function f<T>(x: <T>)
+  -> <T>
+]],
+}
 
 TEST_HOVER [[
 ---@generic T
@@ -459,19 +466,12 @@ local function f(x)
 end
 
 local <?r?> = f(1)
-]] 'local r: integer = 1'
+]] 'local r: 1'
 
 TEST_HOVER [[
 ---@type fun(x: number, y: number):boolean
 local <?f?>
-]] (function (result)
-        local expected = ([==[function f(x: number, y: number)
-        -> boolean]==])
-                :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-                :gsub('\r\n', '\n')
-                :gsub('\n%s+', '\n  ')
-        assert(result.items[1].label == expected, result.items[1].label)
-end)
+]] 'local f: function'
 
 TEST_HOVER [[
 ---@type fun(x: number, y: number):boolean
@@ -510,7 +510,7 @@ TEST_HOVER [[
 ---@type A|B|C
 local <?x?> = class()
 ]] [[
-local x: A|B|C
+local x: A | B | C
 ]]
 
 -- pairs for-in key/value annotation cases
@@ -580,12 +580,13 @@ function <?f?>()
     return a
 end
 ]] (function (result)
+    assert(result.items[1] and result.items[1].label == 'global f: function', tostring(result.items[1] and result.items[1].label))
     local expected = ([==[function f()
   -> any]==])
         :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
         :gsub('\r\n', '\n')
         :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected, result.items[1].label)
+    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
 end)
 
 -- @return any local x = f() hover
@@ -610,9 +611,10 @@ function f(x, y, z) end
 
 print(<?f?>)
 ]] (function (result)
+    assert(result.items[1] and result.items[1].label == 'global f: function', tostring(result.items[1] and result.items[1].label))
     local expected = ([==[function f(x: number, y: boolean, z: string)]==])
         :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-    assert(result.items[1].label == expected, result.items[1].label)
+    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
 end)
 
 -- [ClassA, ClassB] tuple annotation
@@ -631,12 +633,13 @@ TEST_HOVER [[
 ---@type fun(x?: boolean):boolean?
 local <?f?>
 ]] (function (result)
+    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
     local expected = ([==[function f(x?: boolean)
   -> boolean | nil]==])
         :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
         :gsub('\r\n', '\n')
         :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected, result.items[1].label)
+    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
 end)
 
 -- optional params + multi-return
@@ -647,12 +650,13 @@ TEST_HOVER [[
 local function <?f?>(x, y)
 end
 ]] (function (result)
+    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
     local expected = ([==[function f(x?: number, y?: boolean)
   -> table | nil]==])
         :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
         :gsub('\r\n', '\n')
         :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected, result.items[1].label)
+    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
 end)
 
 -- named return
@@ -661,13 +665,14 @@ TEST_HOVER [[
 local function <?f?>(x, y)
 end
 ]] (function (result)
+    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
     local expected = ([==[function f(x: any, y: any)
   1. first: table]==])
         :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
         :gsub('\r\n', '\n')
         :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected,
-        'named return: ' .. tostring(result.items[1] and result.items[1].label))
+    assert(result.items[2] and result.items[2].label == expected,
+        'named return: ' .. tostring(result.items[2] and result.items[2].label))
 end)
 
 -- @class + @field local hover
@@ -735,7 +740,7 @@ local <?x?> = {
 }
 ]] [[
 local x: Class {
-    b: integer = 1,
+    b: 1,
 }
 ]]
 
@@ -835,21 +840,23 @@ local v: Object {
 TEST_HOVER [[
 ---@async
 local function <?f?>() end
-]] [[
-(async) function f()
-]]
+]] {
+    'local f: function',
+    '(async) function f()',
+}
 
 -- @return nil function hover
 TEST_HOVER [[
 ---@return nil
 local function <?f?>() end
 ]] (function (result)
+    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
     local expected = ([==[function f()
   -> nil]==])
         :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
         :gsub('\r\n', '\n')
         :gsub('\n%s+', '\n  ')
-    assert(result.items[1].label == expected, result.items[1].label)
+    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
 end)
 
 -- @class c + @overload t.f() global hover (function t.f)
@@ -913,7 +920,7 @@ local <?t?>
 t.a = 1
 ]] [[
 local t: {
-    a: integer = 1,
+    a: 1,
 }
 ]]
 
@@ -1004,7 +1011,7 @@ end)
 TEST_HOVER [[
 local <?x?> = 1 << 2
 ]] [[
-local x: integer = 4
+local x: 4
 ]]
 
 -- @class A @field private x / @field y local hover
@@ -1240,8 +1247,8 @@ local t = {
 print(t.x, <?t?>.y)
 ]] [[
 local t: {
-    ['x']: integer = 1,
-    ['y']: integer = 2,
+    ['x']: 1,
+    ['y']: 2,
 }
 ]]
 
@@ -1257,7 +1264,7 @@ local <?t?> = {
 ]] [[
 local t: {
     [1]: boolean = true,
-    [2]: integer = 2,
+    [2]: 2,
     [3]: table,
 }
 ]]
@@ -1603,7 +1610,7 @@ do
     TEST_HOVER [[
 local <?x?> = 1 // 2
 ]] [[
-local x: integer = 1
+local x: 1
 ]]
     config:set(test.fileUri, 'Lua.runtime.nonstandardSymbol', {})
 end
@@ -1635,9 +1642,9 @@ local y = {
 }
 ]] [[
 local x: {
-    a: integer = 1,
-    b: integer = 2,
-    [1]: integer = 10,
+    a: 1,
+    b: 2,
+    [1]: 10,
 }
 ]]
 
@@ -1790,9 +1797,9 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    a: integer = 1,
-    b: integer = 2,
-    c: integer = 3,
+    a: 1,
+    b: 2,
+    c: 3,
 }
 ]]
 
@@ -1821,12 +1828,12 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    a: integer = 1,
-    [1]: integer = 2,
-    [true]: integer = 3,
-    [5.5]: integer = 4,
-    ["b"]: integer = 7,
-    ["012"]: integer = 8,
+    a: 1,
+    [1]: 2,
+    [true]: 3,
+    [5.5]: 4,
+    ["b"]: 7,
+    ["012"]: 8,
 }
 ]]
 
@@ -1857,17 +1864,17 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    b: integer = 1,
-    c: integer = 2,
-    d: integer = 3,
-    a: integer = 4,
-    s: integer = 5,
-    y: integer = 6,
-    z: integer = 7,
-    q: integer = 8,
-    g: integer = 9,
-    p: integer = 10,
-    l: integer = 11,
+    b: 1,
+    c: 2,
+    d: 3,
+    a: 4,
+    s: 5,
+    y: 6,
+    z: 7,
+    q: 8,
+    g: 9,
+    p: 10,
+    l: 11,
 }
 ]]
 
@@ -1981,7 +1988,7 @@ TEST_HOVER [[
 <?a?>.b = 10 * 60
 ]] [[
 global a: {
-    b: integer = 600,
+    b: 600,
 }
 ]]
 
@@ -1990,7 +1997,7 @@ TEST_HOVER [[
 a.<?b?> = 10 * 60
 ]] [[
 global a: {
-    b: integer = 600,
+    b: 600,
 }
 ]]
 
@@ -1999,7 +2006,7 @@ TEST_HOVER [[
 a.<?b?>.c = 1 * 1
 ]] [[
 global a.b: {
-    c: integer = 1,
+    c: 1,
 }
 ]]
 

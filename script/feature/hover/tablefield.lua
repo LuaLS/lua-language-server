@@ -22,7 +22,7 @@ ls.feature.provider.hover(function (param, action)
     end
 
     local variableName = getName(source)
-    local variableValue = valueNode:view {
+    local variableValue = valueNode:simplify():view {
         noFunctionDetail = true,
     }
 

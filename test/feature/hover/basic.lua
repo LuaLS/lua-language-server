@@ -128,35 +128,35 @@ obj.<?xxx?>()
 
 TEST_HOVER [[
 obj.<?xxx?>()
-]] 'global obj.xxx: unknown'
+]] 'global obj.xxx: any'
 
 TEST_HOVER [[
 local <?x?> = 1
-]] 'local x: integer = 1'
+]] 'local x: 1'
 
 TEST_HOVER [[
 <?x?> = 1
-]] '(global) x: integer = 1'
+]] 'global x: 1'
 
 TEST_HOVER [[
 local t = {}
 t.<?x?> = 1
-]] '(field) t.x: integer = 1'
+]] '(field) t.x: 1'
 
 TEST_HOVER [[
 t = {}
 t.<?x?> = 1
-]] '(global) t.x: integer = 1'
+]] 'global t.x: 1'
 
 TEST_HOVER [[
 t = {
     <?x?> = 1
 }
-]] '(field) x: integer = 1'
+]] '(field) x: 1'
 
 TEST_HOVER [[
 local <?obj?> = {}
-]] 'local obj: table'
+]] 'local obj: {}'
 
 TEST_HOVER [[
 local function x(a, ...)
@@ -490,7 +490,7 @@ TEST_HOVER [[
 ---@class Class
 <?x?> = class()
 ]] [[
-(global) x: Class
+global x: Class
 ]]
 
 TEST_HOVER [[
@@ -747,7 +747,7 @@ t = {}
 ---@overload fun()
 function <?t?>.f() end
 ]] [[
-(global) t: c {
+global t: c {
     f: function,
 }
 ]]
@@ -860,7 +860,7 @@ t = {}
 ---@overload fun()
 function t.<?f?>() end
 ]] [[
-(global) t: c {
+global t: c {
     f: function,
 }
 ]]
@@ -1041,7 +1041,7 @@ TEST_HOVER [[
 ---@field y number
 <?t?> = {}
 ]] [[
-(global) t: A {
+global t: A {
     x: number,
     y: number,
 }
@@ -1056,7 +1056,7 @@ TEST_HOVER [[
 ---@type A
 <?t?> = {}
 ]] [[
-(global) t: A {
+global t: A {
     y: number,
 }
 ]]
@@ -1300,7 +1300,7 @@ do
     TEST_HOVER [[
 global <?*?>
 ]] [[
-(global) any
+global any
 ]]
     config:set(test.fileUri, 'Lua.runtime.version', nil)
 end
@@ -1980,7 +1980,7 @@ w2l:get_default()[<?type?>]
 TEST_HOVER [[
 <?a?>.b = 10 * 60
 ]] [[
-(global) a: {
+global a: {
     b: integer = 600,
 }
 ]]
@@ -1989,7 +1989,7 @@ TEST_HOVER [[
 TEST_HOVER [[
 a.<?b?> = 10 * 60
 ]] [[
-(global) a: {
+global a: {
     b: integer = 600,
 }
 ]]
@@ -1998,7 +1998,7 @@ a.<?b?> = 10 * 60
 TEST_HOVER [[
 a.<?b?>.c = 1 * 1
 ]] [[
-(global) a.b: {
+global a.b: {
     c: integer = 1,
 }
 ]]

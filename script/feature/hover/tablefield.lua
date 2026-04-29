@@ -16,13 +16,13 @@ ls.feature.provider.hover(function (param, action)
         return
     end
 
-    local valueNode = param.vm:getNode(field.value)
-    if not valueNode then
+    local fieldNode = param.vm:getNode(field)
+    if not fieldNode then
         return
     end
 
     local variableName = getName(source)
-    local variableValue = valueNode:simplify():view {
+    local variableValue = fieldNode:simplify():view {
         noFunctionDetail = true,
     }
 

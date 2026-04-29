@@ -513,7 +513,6 @@ local <?x?> = class()
 local x: A | B | C
 ]]
 
--- pairs for-in key/value annotation cases
 TEST_HOVER [[
 ---@class Class
 

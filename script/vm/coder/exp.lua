@@ -9,6 +9,41 @@ local function makeValue(coder, source, value)
     coder:getTracer():append('value', source.uniqueKey)
 end
 
+---@param source LuaParser.Node.TableField
+---@return LuaParser.Node.CatStateClass?
+local function findTableFieldClassCat(source)
+    local tableNode = source.parent
+    if not tableNode or tableNode.kind ~= 'table' then
+        return nil
+    end
+
+    local block = tableNode.parentBlock
+    if not block or not block.childs then
+        return nil
+    end
+
+    local targetLine = source.startRow - 1
+    local childs = block.childs
+    for i = #childs, 1, -1 do
+        local child = childs[i]
+        if  child.kind == 'cat'
+        and child.finishRow == targetLine
+        and child.start >= tableNode.start
+        and child.finish <= tableNode.finish then
+            local catValue = child.value
+            if catValue and catValue.kind == 'catstateclass' then
+                ---@cast catValue LuaParser.Node.CatStateClass
+                return catValue
+            end
+        end
+        if child.finish < tableNode.start then
+            break
+        end
+    end
+
+    return nil
+end
+
 ls.vm.registerCoderProvider('integer', function (coder, source)
     ---@cast source LuaParser.Node.Integer
 
@@ -74,10 +109,36 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
     end
     coder:compile(source.value)
 
+    local valueKey = coder:getKey(source.value)
+    local tableNode = source.parent
+    local catGroup = coder:getCatGroup(source)
+    if catGroup then
+        for _, catState in ipairs(catGroup) do
+            local cat = catState.value
+            if cat and cat.kind == 'catstateclass' then
+                -- 验证 cat 节点在 table 范围内，避免绑定到表外的 @class
+                local catNode = cat.parent  ---@cast catNode LuaParser.Node.Cat
+                if  catNode
+                and catNode.start >= tableNode.start
+                and catNode.finish <= tableNode.finish then
+                    valueKey = 'rt.type {%q}' % { cat.classID.id }
+                    break
+                end
+            end
+        end
+    end
+
+    if valueKey == coder:getKey(source.value) then
+        local classCat = findTableFieldClassCat(source)
+        if classCat then
+            valueKey = 'rt.type {%q}' % { classCat.classID.id }
+        end
+    end
+
     coder:addLine('{field} = rt.field({key}, {value}):setLocation {location}' % {
         field    = coder:getKey(source),
         key      = key,
-        value    = coder:getKey(source.value),
+        value    = valueKey,
         location = coder:makeLocationCode(source),
     })
     if source.subtype == 'field' then

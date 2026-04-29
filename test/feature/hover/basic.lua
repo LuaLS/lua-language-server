@@ -189,7 +189,7 @@ function a(v)
 end
 local <?r?> = a(1)
 ]] [[
-local r: "a"
+local r: 'a'
 ]]
 
 TEST_HOVER [[
@@ -268,7 +268,7 @@ local n = <?0xff?>
 
 TEST_HOVER [[
 local <?x?> = '\a'
-]] [[local x: "\007"]]
+]] [[local x: '\007']]
 
 TEST_HOVER [[
 local function <?f?>()
@@ -332,9 +332,9 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [1]: "aaa",
-    [2]: "bbb",
-    [3]: "ccc",
+    [1]: 'aaa',
+    [2]: 'bbb',
+    [3]: 'ccc',
 }
 ]]
 
@@ -681,13 +681,16 @@ TEST_HOVER [[
 ---@field y number
 ---@field z string
 local <?t?>
-]] [[
-local t: Class {
+]] {
+    'local t: Class',
+    [[
+{
     x: number,
     y: number,
     z: string,
 }
-]]
+    ]],
+}
 
 -- @class A annotation type hover
 TEST_HOVER [[
@@ -700,35 +703,36 @@ TEST_HOVER [[
 
 -- string | enum literal union
 TEST_HOVER [[
----@type string | "'enum1'" | "'enum2'"
+---@type string | 'enum1' | 'enum2'
 local <?t?>
-]] [[local t: string|'enum1'|'enum2']]
+]] [[local t: 'enum1' | 'enum2' | string]]
+
 TEST_HOVER [[
----@alias A string | "'enum1'" | "'enum2'"
+---@alias A string | 'enum1' | 'enum2'
 
 ---@type <?A?>
 ]] [[
-(alias) A 展开为 string|'enum1'|'enum2'
+(alias) A 展开为 'enum1' | 'enum2' | string
 ]]
 
 -- @alias A / @type A local hover
 TEST_HOVER [[
----@alias A string | "'enum1'" | "'enum2'"
+---@alias A string | 'enum1' | 'enum2'
 
 ---@type A
 local <?t?>
 ]] [[
-local t: string|'enum1'|'enum2'
+local t: A
 ]]
 
 -- multiline union annotation
 TEST_HOVER [[
 ---@type string
----| "'enum1'"
----| "'enum2'"
+---| 'enum1'
+---| 'enum2'
 local <?t?>
 ]] [[
-local t: string|'enum1'|'enum2'
+local t: 'enum1' | 'enum2' | string
 ]]
 
 -- @class Class + literal table local hover

@@ -103,7 +103,7 @@ function M:getLuaDocTypes()
         if type(name) ~= 'string' or name == '_' then
             goto continue
         end
-        if not BUILTIN_LUADOC_TYPES[name]
+        if  not BUILTIN_LUADOC_TYPES[name]
         and not typeNode.isBasicType
         and not typeNode:isComplex() then
             goto continue

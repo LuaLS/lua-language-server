@@ -115,7 +115,7 @@ do
     lt.assertEquals(X0:view(), 'integer | nil')
     lt.assertEquals(X1:view(), 'integer')
     lt.assertEquals(X2:view(), 'nil')
-    lt.assertEquals(X3:view(), '"string" | integer')
+    lt.assertEquals(X3:view(), [['string' | integer]])
 end
 
 do

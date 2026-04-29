@@ -2,10 +2,19 @@
 ---@param source LuaParser.Node.Base
 ---@param value string | number | boolean
 local function makeValue(coder, source, value)
-    coder:addLine('{key} = rt.value({value%q})' % {
-        key   = coder:getKey(source),
-        value = value,
-    })
+    if source.kind == 'string' then
+        ---@cast source LuaParser.Node.String
+        coder:addLine('{key} = rt.value({value%q}, {quo%q})' % {
+            key   = coder:getKey(source),
+            value = value,
+            quo   = source.quo,
+        })
+    else
+        coder:addLine('{key} = rt.value({value%q})' % {
+            key   = coder:getKey(source),
+            value = value,
+        })
+    end
     coder:getTracer():append('value', source.uniqueKey)
 end
 

@@ -39,6 +39,26 @@ local function tryBindCat(coder, var, index)
                 })
                 return coder:getKey(cat.exp)
             end
+        elseif cat.kind == 'catstateparam' then
+            ---@cast cat LuaParser.Node.CatStateParam
+            -- 在 for 变量场景下，将 @param 视为 type 绑定，按变量名匹配
+            if cat.value then
+                local varId
+                if var.kind == 'var' then
+                    ---@cast var LuaParser.Node.Var
+                    varId = var.id
+                elseif var.kind == 'local' then
+                    ---@cast var LuaParser.Node.Local
+                    varId = var.id
+                end
+                if varId and cat.key and cat.key.id == varId then
+                    coder:addLine('{var}:addType({type})' % {
+                        var  = coder:getKey(var),
+                        type = coder:getKey(cat.value),
+                    })
+                    return coder:getKey(cat.value)
+                end
+            end
         end
         ::continue::
     end

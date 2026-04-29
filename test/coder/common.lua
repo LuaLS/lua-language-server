@@ -408,24 +408,25 @@ do
     lt.assertEquals(rt.type('r').value.value:view(), 'number[]')
 end
 
-do
-    TEST_INDEX [[
-    ---@alias r X ? 1 : 2
-    ]]
-
-    lt.assertEquals(rt.type('r'):view(), 'r')
-    lt.assertEquals(rt.type('r').value:view(), '1 | 2')
-
-    do
-        local trueNode <close> = rt.alias('X', nil, rt.TRUE)
-        lt.assertEquals(rt.type('r').value.value:view(), '1')
-    end
-
-    do
-        local falseNode <close> = rt.alias('X', nil, rt.FALSE)
-        lt.assertEquals(rt.type('r').value.value:view(), '2')
-    end
-end
+-- [SKIPPED][cat-ternary-removed] LuaCats `X ? A : B` 语法已下线。
+-- do
+--     TEST_INDEX [[
+--     ---@alias r X ? 1 : 2
+--     ]]
+--
+--     lt.assertEquals(rt.type('r'):view(), 'r')
+--     lt.assertEquals(rt.type('r').value:view(), '1 | 2')
+--
+--     do
+--         local trueNode <close> = rt.alias('X', nil, rt.TRUE)
+--         lt.assertEquals(rt.type('r').value.value:view(), '1')
+--     end
+--
+--     do
+--         local falseNode <close> = rt.alias('X', nil, rt.FALSE)
+--         lt.assertEquals(rt.type('r').value.value:view(), '2')
+--     end
+-- end
 
 do
     TEST_INDEX [[

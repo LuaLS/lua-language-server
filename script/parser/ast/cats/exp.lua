@@ -14,7 +14,6 @@
 ---| LuaParser.Node.CatString
 ---| LuaParser.Node.CatTuple
 ---| LuaParser.Node.CatFCall
----| LuaParser.Node.CatTernary
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatExp
@@ -65,16 +64,6 @@ local CatFCall = Class('LuaParser.Node.CatFCall', 'LuaParser.Node.Base')
 
 CatFCall.kind = 'catfcall'
 
----@class LuaParser.Node.CatTernary: LuaParser.Node.Base
----@field cond LuaParser.Node.CatExp
----@field thenExp LuaParser.Node.CatExp
----@field elseExp LuaParser.Node.CatExp
----@field symbolPos1 integer # ? 的位置
----@field symbolPos2 integer # : 的位置
-local CatTernary = Class('LuaParser.Node.CatTernary', 'LuaParser.Node.Base')
-
-CatTernary.kind = 'catternary'
-
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
 
@@ -82,55 +71,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@param required? boolean
 ---@return LuaParser.Node.CatExp?
 function Ast:parseCatExp(required)
-    local catType = self:parseCatTernary(required)
-    return catType
-end
-
----@private
----@param required? boolean
----@return LuaParser.Node.CatExp?
-function Ast:parseCatTernary(required)
-    local cond = self:parseCatUnion(required)
-    if not cond then
-        return nil
-    end
-
-    self:skipSpace()
-    if self.lexer:peek() == '?' then
-        local nextToken, nextType = self.lexer:peek(1)
-        local isTernaryHead = (nextType == 'Word' or nextType == 'Num'
-            or nextToken == '(' or nextToken == '{' or nextToken == '['
-            or nextToken == '"' or nextToken == '\'' or nextToken == '-')
-
-        if isTernaryHead then
-            local posQ = self.lexer:consume '?'
-            self:skipSpace()
-            local thenExp = self:parseCatExp(true)
-            self:skipSpace()
-            local posColon = self.lexer:consume ':'
-            if posColon and thenExp then
-                self:skipSpace()
-                local elseExp = self:parseCatExp(true)
-                if elseExp then
-                    local tern = self:createNode('LuaParser.Node.CatTernary', {
-                        start = cond.start,
-                        cond = cond,
-                        thenExp = thenExp,
-                        elseExp = elseExp,
-                        symbolPos1 = posQ,
-                        symbolPos2 = posColon,
-                    })
-                    cond.parent = tern
-                    thenExp.parent = tern
-                    elseExp.parent = tern
-                    tern.finish = self:getLastPos()
-                    return tern
-                end
-            end
-        end
-    end
-
-    return cond
+    return self:parseCatUnion(required)
 end
 
 ---@private
@@ -170,25 +111,10 @@ function Ast:parseCatTerm(required)
         end
     end
 
-    -- 可选标记：消费 '?' 前先 peek 下一个 token，判断是否可能为三元的开始
+    -- 三元表达式已禁用，`?` 统一作为可选类型后缀。
     self:skipSpace()
-    if self.lexer:peek() == '?' then
-        local nextToken, nextType = self.lexer:peek(1)
-        local isTernaryHead =  nextType == 'Word'
-                            or nextType == 'Num'
-                            or nextToken == '('
-                            or nextToken == '{'
-                            or nextToken == '['
-                            or nextToken == '"'
-                            or nextToken == '\''
-                            or nextToken == '-'
-
-        if not isTernaryHead then
-            -- 下一个 token 不像类型开始，消费 '?' 作为可选后缀
-            self.lexer:consume '?'
-            current.optional = true
-        end
-        -- 否则留给上层（交集解析）处理三元
+    if self.lexer:consume '?' then
+        current.optional = true
     end
 
     return current

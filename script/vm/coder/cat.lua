@@ -173,7 +173,13 @@ end)
 ls.vm.registerCoderProvider('catstatereturn', function (coder, source)
     ---@cast source LuaParser.Node.CatStateReturn
 
-    coder:compile(source.value)
+    if source.returns and #source.returns > 0 then
+        for _, ret in ipairs(source.returns) do
+            coder:compile(ret.value)
+        end
+    else
+        coder:compile(source.value)
+    end
 
     coder:addToCatGroup(source.parent, true)
 end)
@@ -532,21 +538,6 @@ ls.vm.registerCoderProvider('catfcall', function (coder, source)
         key   = coder:getKey(source),
         head  = coder:getKey(source.head),
         args  = table.concat(args, ', '),
-    })
-end)
-
-ls.vm.registerCoderProvider('catternary', function (coder, source)
-    ---@cast source LuaParser.Node.CatTernary
-
-    coder:compile(source.cond)
-    coder:compile(source.thenExp)
-    coder:compile(source.elseExp)
-
-    coder:addLine('{key} = rt.ternary({cond}, {thenExp}, {elseExp})' % {
-        key     = coder:getKey(source),
-        cond    = coder:getKey(source.cond),
-        thenExp = coder:getKey(source.thenExp),
-        elseExp = coder:getKey(source.elseExp),
     })
 end)
 

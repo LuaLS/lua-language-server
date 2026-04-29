@@ -402,18 +402,21 @@ function M:makeView(viewer)
     local returns = {}
     local returnPart = ''
     if #self.returnsDef > 0 then
+        local returnBuf = {}
         for i, v in ipairs(self.returnsDef) do
             if v.key then
-                returns[i] = string.format('(%s%s: %s)'
+                returns[i] = string.format('%s%s: %s'
                     , v.key
                     , v.optional and '?' or ''
                     , viewer:view(v.value)
                 )
+                returnBuf[i] = '(' .. returns[i] .. ')'
             else
                 returns[i] = viewer:view(v.value)
+                returnBuf[i] = returns[i]
             end
         end
-        returnPart = table.concat(returns, ', ')
+        returnPart = table.concat(returnBuf, ', ')
         if #returns > 1 then
             returnPart = '(' .. returnPart .. ')'
         end

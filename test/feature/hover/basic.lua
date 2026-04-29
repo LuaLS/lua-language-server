@@ -547,9 +547,13 @@ TEST_HOVER [[
 
 ---@param f fun():void
 function t(<?f?>) end
-]] [[
-(parameter) f: fun():void
+]] {
+    '(parameter) f: function',
+    [[
+function ()
+  -> void
 ]]
+}
 
 -- fun(a,b) field method
 TEST_HOVER [[
@@ -557,9 +561,12 @@ TEST_HOVER [[
 local f
 local t = {f = f}
 t:<?f?>()
-]] [[
-(field) t.f: fun(a: any, b: any)
+]] {
+    '(method) t.f: function',
+    [[
+function (a: any, b: any)
 ]]
+}
 
 -- @param names string[] parameter
 TEST_HOVER [[
@@ -578,15 +585,13 @@ function <?f?>()
     local a
     return a
 end
-]] (function (result)
-    assert(result.items[1] and result.items[1].label == 'global f: function', tostring(result.items[1] and result.items[1].label))
-    local expected = ([==[function f()
-  -> any]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
-end)
+]] {
+    'global f: function',
+    [[
+function f()
+  -> any
+]],
+}
 
 -- @return any local x = f() hover
 TEST_HOVER [[
@@ -609,37 +614,35 @@ TEST_HOVER [[
 function f(x, y, z) end
 
 print(<?f?>)
-]] (function (result)
-    assert(result.items[1] and result.items[1].label == 'global f: function', tostring(result.items[1] and result.items[1].label))
-    local expected = ([==[function f(x: number, y: boolean, z: string)]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
-end)
+]] {
+    'global f: function',
+    [[
+function f(x: number, y: boolean, z: string)
+    ]],
+    [[
+function f(y: boolean)
+    ]],
+}
 
 -- [ClassA, ClassB] tuple annotation
 TEST_HOVER [[
 ---@type [ClassA, ClassB]
 local <?x?>
 ]] [[
-local x: [ClassA, ClassB] {
-    [1]: ClassA,
-    [2]: ClassB,
-}
+local x: [ClassA, ClassB]
 ]]
 
 -- fun(x?: boolean):boolean? local declaration
 TEST_HOVER [[
 ---@type fun(x?: boolean):boolean?
 local <?f?>
-]] (function (result)
-    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
-    local expected = ([==[function f(x?: boolean)
-  -> boolean | nil]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
-end)
+]] {
+    'local f: function',
+    [[
+function (x?: boolean)
+  -> boolean | nil
+]]
+}
 
 -- optional params + multi-return
 TEST_HOVER [[
@@ -648,31 +651,28 @@ TEST_HOVER [[
 ---@return table?, string?
 local function <?f?>(x, y)
 end
-]] (function (result)
-    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
-    local expected = ([==[function f(x?: number, y?: boolean)
-  -> table | nil]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
-end)
+]] {
+    'local f: function',
+    [[
+function f(x?: number, y?: boolean)
+  -> table | nil
+  2. string | nil
+]],
+}
 
 -- named return
 TEST_HOVER [[
 ---@return table first, string? second
 local function <?f?>(x, y)
 end
-]] (function (result)
-    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
-    local expected = ([==[function f(x: any, y: any)
-  1. first: table]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[2] and result.items[2].label == expected,
-        'named return: ' .. tostring(result.items[2] and result.items[2].label))
-end)
+]] {
+    'local f: function',
+    [[
+function f(x: any, y: any)
+  -> first: table
+  2. second: string | nil
+    ]],
+}
 
 -- @class + @field local hover
 TEST_HOVER [[

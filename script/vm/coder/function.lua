@@ -120,7 +120,17 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         if returns then
             coder:withIndentation(function ()
                 for _, cat in ipairs(returns) do
-                    if cat.value then
+                    local returnItems = cat.returns
+                    if returnItems and #returnItems > 0 then
+                        coder:addLine('-- ' .. cat.code)
+                        for _, ret in ipairs(returnItems) do
+                            coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
+                                funcKey    = funcKey,
+                                returnKey  = ret.key and ('%q'):format(ret.key.id) or 'nil',
+                                returnType = coder:getKey(ret.value),
+                            })
+                        end
+                    elseif cat.value then
                         coder:addLine('-- ' .. cat.code)
                         coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
                             funcKey    = funcKey,
@@ -150,7 +160,14 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             local overloadKeys = { funcKey }
 
             for _, overload in ipairs(overloads) do
-                overloadKeys[#overloadKeys+1] = coder:getKey(overload.value)
+                local overloadKey = coder:getKey(overload.value)
+                overloadKeys[#overloadKeys+1] = overloadKey
+                if source.name then
+                    coder:addLine('{overloadKey}:setName({nameKey})' % {
+                        overloadKey = overloadKey,
+                        nameKey     = coder:getKey(source.name),
+                    })
+                end
             end
 
             coder:addLine('-- function overloads --')

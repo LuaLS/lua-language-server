@@ -42,6 +42,8 @@ ls.feature.provider.hover(function (param, action)
         return
     end
 
+    snode = snode:simplify()
+
     snode:each('function', function (node)
         ---@cast node Node.Function
         if node:isDummy() then

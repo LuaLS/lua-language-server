@@ -404,7 +404,7 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
             coder:addLine('{func}:addParamDef({name%q}, {param}, {optional%q})' % {
                 func     = coder:getKey(source),
                 name     = param.name.id,
-                param    = param.value and coder:getKey(param.value) or 'rt.UNKNOWN',
+                param    = param.value and coder:getKey(param.value) or 'rt.ANY',
                 optional = param.optional,
             })
         end

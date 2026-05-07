@@ -741,11 +741,10 @@ TEST_HOVER [[
 local <?x?> = {
     b = 1
 }
-]] [[
-local x: Class {
-    b: 1,
+]] {
+    'local x: Class',
+    '{ b: 1 }',
 }
-]]
 
 -- @class c + @overload global table hover
 TEST_HOVER [[
@@ -754,11 +753,10 @@ t = {}
 
 ---@overload fun()
 function <?t?>.f() end
-]] [[
-global t: c {
-    f: function,
+]] {
+    'global t: c',
+    '{ f: function }',
 }
-]]
 
 -- @class c + @overload local function field hover
 TEST_HOVER [[
@@ -767,24 +765,22 @@ local t = {}
 
 ---@overload fun()
 function t.<?f?>() end
-]] [[
-function c.f()
-]]
+]] {
+    '(field) t.f: function',
+    'function t.f()',
+}
 
--- @class C @field field any / @type C local hover
 TEST_HOVER [[
 ---@class C
 ---@field field any
 
 ---@type C
 local <?c?>
-]] [[
-local c: C {
-    field: any,
+]] {
+    'local c: C',
+    '{ field: any }',
 }
-]]
 
--- @class C @field field any / @return C local hover
 TEST_HOVER [[
 ---@class C
 ---@field field any
@@ -793,19 +789,19 @@ TEST_HOVER [[
 local function f() end
 
 local <?c?> = f()
-]] [[
-local c: C {
-    field: any,
+]] {
+    'local c: C',
+    '{ field: any }',
 }
-]]
 
 -- @param callback fun(x: integer, ...) parameter
 TEST_HOVER [[
 ---@param callback fun(x: integer, ...)
 local function f(<?callback?>) end
-]] [[
-(parameter) callback: fun(x: integer, ...any)
-]]
+]] {
+    '(parameter) callback: function',
+    'function (x: integer, ...: any)',
+}
 
 -- trailing-annotation local
 TEST_HOVER [[

@@ -55,6 +55,7 @@ function Ast:parseFor()
         end
     else
         self:throwMissSymbol(self:getLastPos(), 'in')
+        forNode.finish = self:getLastPos()
         return forNode
     end
 

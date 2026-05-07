@@ -162,13 +162,15 @@ function Ast:blockParseChilds(block)
             self:skipSpace(false)
             self:parseDelayedComments(block)
             -- 将本次新增的、与当前语句在同一行的 cat 标记为尾随注解
-            local stateRow = state.finishRow
-            local cats = block.cats
-            if cats then
-                for i = prevCatCount + 1, #cats do
-                    local cat = cats[i]
-                    if cat.startRow == stateRow then
-                        cat.trailing = true
+            if state.finish ~= nil then
+                local stateRow = state.finishRow
+                local cats = block.cats
+                if cats then
+                    for i = prevCatCount + 1, #cats do
+                        local cat = cats[i]
+                        if cat.startRow == stateRow then
+                            cat.trailing = true
+                        end
                     end
                 end
             end

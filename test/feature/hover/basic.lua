@@ -815,7 +815,7 @@ TEST_HOVER [[
 local x --- @type boolean
 local <?y?>
 ]] [[
-local y: unknown
+local y: any
 ]]
 
 -- @class Object @field a string / @type Object[] index
@@ -829,11 +829,11 @@ local t
 local <?v?> = t[1]
 
 print(v.a)
-]] [[
-local v: Object {
-    a: string,
-}
 ]]
+{
+    'local v: Object',
+    '{ a: string }',
+}
 
 -- @async local function f() hover
 TEST_HOVER [[

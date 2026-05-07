@@ -2,11 +2,23 @@
 ---@param block LuaParser.Node.Block
 local function parseBlock(coder, block)
     coder:pushBlock()
+    -- 预编译所有尾随注解，使它们在语句编译前填充 trailingCatMap
     for _, child in ipairs(block.childs) do
-        coder:withIndentation(function ()
-            coder:compile(child)
-        end, child)
-        coder:addLine('')
+        if child.kind == 'cat' and child.trailing then
+            coder:withIndentation(function ()
+                coder:compile(child)
+            end, child)
+            coder:addLine('')
+        end
+    end
+    -- 正常编译其余子节点（跳过已编译的尾随注解）
+    for _, child in ipairs(block.childs) do
+        if not (child.kind == 'cat' and child.trailing) then
+            coder:withIndentation(function ()
+                coder:compile(child)
+            end, child)
+            coder:addLine('')
+        end
     end
     coder:popBlock()
 end

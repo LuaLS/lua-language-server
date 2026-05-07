@@ -369,6 +369,23 @@ end
 ---@param cat LuaParser.Node.Cat
 ---@param nearby? boolean
 function M:addToCatGroup(cat, nearby)
+    -- 尾随注解不进入普通 catGroup，单独存入 trailingCatMap
+    if cat.trailing then
+        local trailingMap = self:getBlockKV('trailingCatMap')
+        if not trailingMap then
+            trailingMap = {}
+            self:setBlockKV('trailingCatMap', trailingMap)
+        end
+        local row = cat.startRow
+        local group = trailingMap[row]
+        if not group then
+            group = {}
+            trailingMap[row] = group
+        end
+        group[#group+1] = cat
+        return
+    end
+
     local group = self:getBlockKV('catGroup')
 
     if not group
@@ -389,6 +406,17 @@ end
 ---@param nearbySource? LuaParser.Node.Base
 ---@return LuaParser.Node.Cat[]?
 function M:getCatGroup(nearbySource)
+    -- 优先检查尾随注解组：若当前源节点所在行有尾随注解，则只返回该行的尾随组
+    if nearbySource then
+        local trailingMap = self:getBlockKV('trailingCatMap')
+        if trailingMap then
+            local group = trailingMap[nearbySource.startRow]
+            if group then
+                return group
+            end
+        end
+    end
+
     local group = self:getBlockKV('catGroup')
     if not group then
         return nil

@@ -32,6 +32,7 @@ require 'parser.ast.cats.block'
 ---@field extends? LuaParser.Node.CatExp
 ---@field tail? string
 ---@field used? boolean
+---@field trailing? boolean # 是否是尾随注解（出现在语句右侧同一行）
 local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 Cat.kind = 'cat'

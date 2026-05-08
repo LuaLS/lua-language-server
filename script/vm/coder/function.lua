@@ -61,6 +61,18 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             location = coder:makeLocationCode(source),
         })
 
+        local catGroup = coder:getCatGroup(source)
+        if catGroup then
+            for _, cat in ipairs(catGroup) do
+                if cat.subtype == 'async' then
+                    coder:addLine('{key}:setAsync()' % {
+                        key = funcKey,
+                    })
+                    break
+                end
+            end
+        end
+
         -- function name() end 翻译为 name = function() end：
         -- 先注册名字（建立 key），但 appendVar 要推迟到函数体构建之后，
         -- 保证 flow 中 ref（函数体内对名字的引用）先于 var（名字赋值）出现。

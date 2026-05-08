@@ -3,6 +3,7 @@ ls.vm.registerCoderProvider('cat', function (coder, source)
 
     if not source.value then
         --print('未实现：', source.code)
+        coder:addToCatGroup(source, true)
         return
     end
     coder:compile(source.value)

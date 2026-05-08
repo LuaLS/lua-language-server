@@ -848,15 +848,13 @@ local function <?f?>() end
 TEST_HOVER [[
 ---@return nil
 local function <?f?>() end
-]] (function (result)
-    assert(result.items[1] and result.items[1].label == 'local f: function', tostring(result.items[1] and result.items[1].label))
-    local expected = ([==[function f()
-  -> nil]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-        :gsub('\n%s+', '\n  ')
-    assert(result.items[2] and result.items[2].label == expected, tostring(result.items[2] and result.items[2].label))
-end)
+]] {
+    'local f: function',
+    [[
+function f()
+  -> nil
+]],
+}
 
 -- @class c + @overload t.f() global hover (function t.f)
 TEST_HOVER [[

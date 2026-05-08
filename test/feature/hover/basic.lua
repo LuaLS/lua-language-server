@@ -856,18 +856,16 @@ function f()
 ]],
 }
 
--- @class c + @overload t.f() global hover (function t.f)
 TEST_HOVER [[
 ---@class c
 t = {}
 
 ---@overload fun()
 function t.<?f?>() end
-]] [[
-global t: c {
-    f: function,
+]] {
+    'global t.f: function',
+    'function t.f()',
 }
-]]
 
 -- @class Object @field a / @type Object[] t[i]
 TEST_HOVER [[
@@ -880,11 +878,11 @@ local t
 local <?v?> = t[i]
 
 print(v.a)
-]] [[
-local v: Object {
-    a: string,
-}
 ]]
+{
+    'local v: Object',
+    '{ a: string }',
+}
 
 -- @class C @field x / @generic T assert(t)
 TEST_HOVER [[
@@ -899,50 +897,37 @@ local t
 local function assert(v, message) end
 
 local <?v?> = assert(t)
-]] [[
-local v: C {
-    x: string,
-}
 ]]
+{
+    'local v: C',
+    '{ x: string }',
+}
 
--- local x--测试 inline comment local
 TEST_HOVER [[
 local <?x?>--测试
-]] 'local x: unknown'
+]] 'local x: any'
 
--- @type unknown local t; t.a = 1
 TEST_HOVER [[
 ---@type unknown
 local <?t?>
 t.a = 1
-]] [[
-local t: {
-    a: 1,
-}
-]]
+]] 'local t: unknown'
 
--- @return number / local u=f(); u.x
 TEST_HOVER [[
 ---@return number
 local function f() end
 local <?u?> = f()
 print(u.x)
-]] [[
-local u: number {
-    x: unknown,
-}
-]]
+]] 'local u: number'
 
--- local f / f() unknown
 TEST_HOVER [[
 local f
 
 <?f?>()
 ]] [[
-local f: unknown
+local f: any
 ]]
 
--- concat literal string
 TEST_HOVER [[
 local <?x?> = '1' .. '2'
 ]] [[

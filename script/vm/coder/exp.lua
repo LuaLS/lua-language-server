@@ -290,6 +290,29 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
         return
     end
 
+    if source.op == '..' then
+        if  source.exp1.kind == 'string'
+        and source.exp2.kind == 'string' then
+            coder:addLine('{key} = rt.value({value1%q} .. {value2%q})' % {
+                key    = coder:getKey(source),
+                value1 = source.exp1.value,
+                value2 = source.exp2.value,
+            })
+        end
+        return
+    end
+
+    if  (source.exp1.kind == 'integer' or source.exp1.kind == 'number')
+    and (source.exp2.kind == 'integer' or source.exp2.kind == 'number') then
+        coder:addLine('{key} = rt.value({value1%q} {op} {value2%q})' % {
+            key    = coder:getKey(source),
+            value1 = source.exp1.value,
+            op     = source.op,
+            value2 = source.exp2.value,
+        })
+        return
+    end
+
     coder:addLine('{key} = rt.call({op%q}, { {arg1}, {arg2} })' % {
         key   = coder:getKey(source),
         op    = op,

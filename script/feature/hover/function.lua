@@ -55,7 +55,7 @@ ls.feature.provider.hover(function (param, action)
             noFunctionDetail = true,
         })
         local label = '{async}function {name}{typeParams}({args}){returns}' % {
-            async      = viewData.async ~= '' and '(async) ' or '',
+            async      = viewData.async ~= '' and 'async ' or '',
             name       = buildName(viewData),
             typeParams = buildTypeParams(viewData),
             args       = buildArgs(viewData),

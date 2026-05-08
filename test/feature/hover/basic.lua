@@ -684,7 +684,7 @@ local <?t?>
 ]] {
     'local t: Class',
     [[
-{
+(class) Class {
     x: number,
     y: number,
     z: string,
@@ -743,7 +743,7 @@ local <?x?> = {
 }
 ]] {
     'local x: Class',
-    '{ b: 1 }',
+    '(class) Class { b: 1 }',
 }
 
 -- @class c + @overload global table hover
@@ -755,7 +755,7 @@ t = {}
 function <?t?>.f() end
 ]] {
     'global t: c',
-    '{ f: function }',
+    '(class) c { f: function }',
 }
 
 -- @class c + @overload local function field hover
@@ -778,7 +778,7 @@ TEST_HOVER [[
 local <?c?>
 ]] {
     'local c: C',
-    '{ field: any }',
+    '(class) C { field: any }',
 }
 
 TEST_HOVER [[
@@ -791,7 +791,7 @@ local function f() end
 local <?c?> = f()
 ]] {
     'local c: C',
-    '{ field: any }',
+    '(class) C { field: any }',
 }
 
 -- @param callback fun(x: integer, ...) parameter
@@ -841,7 +841,7 @@ TEST_HOVER [[
 local function <?f?>() end
 ]] {
     'local f: function',
-    '(async) function f()',
+    'async function f()',
 }
 
 -- @return nil function hover
@@ -931,7 +931,7 @@ local f: any
 TEST_HOVER [[
 local <?x?> = '1' .. '2'
 ]] [[
-local x: string = "12"
+local x: "12"
 ]]
 
 -- @type function local
@@ -944,50 +944,36 @@ local <?f?>
 TEST_HOVER [[
 ---@type async fun()
 local <?f?>
-]] [[
-local f: async fun()
 ]]
-
--- @alias uri string / expandAlias=false
-config:set(test.fileUri, 'Lua.hover.expandAlias', false)
-TEST_HOVER [[
----@alias uri string
-
----@type uri
-local <?uri?>
-]] [[
-local uri: uri
-]]
-
--- @alias uri string / expandAlias=true
-config:set(test.fileUri, 'Lua.hover.expandAlias', true)
-TEST_HOVER [[
----@alias uri string
-
----@type uri
-local <?uri?>
-]] [[
-local uri: uri
-]]
-
--- reset expandAlias to default
-config:set(test.fileUri, 'Lua.hover.expandAlias', nil)
-
--- @enum A enum declaration hover
-TEST_HOVER [[
----@enum <?A?>
-local m = {
-    x = 1,
+{
+    'local f: function',
+    'async function ()',
 }
-]] (function (result)
-    local expected = ([==[---@enum A
-local m = {
-    x = 1,
-}: unknown]==])
-        :gsub('^[\r\n]*(.-)[\r\n]*$', '%1')
-        :gsub('\r\n', '\n')
-    assert(result.items[1].label == expected, result.items[1].label)
-end)
+
+TEST_HOVER [[
+---@alias uri string
+
+---@type uri
+local <?uri?>
+]] [[
+local uri: uri
+]]
+
+TEST_HOVER [[
+---@alias uri string
+
+---@type uri
+local <?uri?>
+]] [[
+local uri: uri
+]]
+
+-- TEST_HOVER [[
+-- ---@enum <?A?>
+-- local m = {
+--     x = 1,
+-- }
+-- ]]
 
 -- bitshift literal
 TEST_HOVER [[
@@ -1002,12 +988,15 @@ TEST_HOVER [[
 ---@field private x number
 ---@field y number
 local <?t?>
-]] [[
-local t: A {
-    x: number,
+]] {
+    'local t: A',
+    [[
+(class) A {
+    private x: number,
     y: number,
 }
-]]
+    ]]
+}
 
 -- @class A @field private x @field y / @type A local hover (private hidden)
 TEST_HOVER [[

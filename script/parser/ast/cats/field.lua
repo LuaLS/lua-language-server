@@ -4,6 +4,7 @@
 ---@field pos? integer
 ---@field pos2? integer
 ---@field optional? boolean
+---@field visibleType? 'private' | 'public' | 'package'
 ---@field value? LuaParser.Node.CatExp
 local CatStateField = Class('LuaParser.Node.CatStateField', 'LuaParser.Node.Base')
 
@@ -37,7 +38,7 @@ end
 ---@return LuaParser.Node.CatStateField?
 function Ast:parseCatStateField()
     local token, _, pos = self.lexer:peek()
-    local key, start, pos2
+    local key, start, pos2, visibleType
     if token == '[' then
         self.lexer:next()
         self:skipSpace()
@@ -46,6 +47,11 @@ function Ast:parseCatStateField()
         start = pos
         pos2 = self:assertSymbol ']'
     else
+        if token == 'private' or token == 'public' or token == 'package' then
+            self.lexer:next()
+            self:skipSpace()
+            visibleType = token
+        end
         key = self:parseID('LuaParser.Node.CatFieldName', false, 'yes')
         start = key and key.start
     end
@@ -59,6 +65,7 @@ function Ast:parseCatStateField()
         pos = pos,
         pos2 = pos2,
         optional = optional,
+        visibleType = visibleType,
         start = start,
     })
 

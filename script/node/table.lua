@@ -610,7 +610,8 @@ function M:onView(viewer, options)
         ---@type Node.Key
         local k = rt.luaKey(key)
         local value = self.valueMap[k]
-        fields[#fields+1] = string.format('%s%s: %s'
+        fields[#fields+1] = string.format('%s%s%s: %s'
+            , field.visibleType and (field.visibleType .. ' ') or ''
             , viewer:viewAsKey(key)
             , isOptional and '?' or ''
             , viewer:view(value)

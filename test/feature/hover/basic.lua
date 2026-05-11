@@ -982,7 +982,6 @@ local <?x?> = 1 << 2
 local x: 4
 ]]
 
--- @class A @field private x / @field y local hover
 TEST_HOVER [[
 ---@class A
 ---@field private x number

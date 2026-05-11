@@ -32,6 +32,14 @@ function M:setLocation(location)
     return self
 end
 
+---@param visibleType 'private' | 'public' | 'package'
+---@return Node.Field
+function M:setVisibleType(visibleType)
+    ---@type string?
+    self.visibleType = visibleType
+    return self
+end
+
 ---@return Node.Field
 function M:setHideInView()
     ---@type boolean?
@@ -69,6 +77,7 @@ function M:resolveGeneric(map)
     local newField = self.scope.rt.field(key, value)
     newField.location = self.location
     newField.hideInView = self.hideInView
+    newField.visibleType = self.visibleType
     return newField
 end
 

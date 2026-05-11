@@ -79,6 +79,13 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
         location = coder:makeLocationCode(source),
     })
 
+    if source.visibleType then
+        coder:addLine('{field}:setVisibleType({visibleType%q})' % {
+            field = field,
+            visibleType = source.visibleType,
+        })
+    end
+
     coder:addLine('{class}:addField({field})' % {
         class = classParams.class,
         field = field,

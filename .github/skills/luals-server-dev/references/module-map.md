@@ -28,6 +28,43 @@
 - 排查 tracer 时，应把 middle code 和 flow metadata 视为第一事实来源。
 - 不要往 legacy `flow.lua` 或 `branch.lua` 里新增 narrowing 行为。
 
+## Variable 与类型绑定关系
+
+`Node.Variable` 上有两个关键集合，在 feature 层经常需要用来判断变量的绑定来源：
+
+| 字段 | 含义 | 对应 LuaCats 注解 | coder 调用 |
+|---|---|---|---|
+| `variable.types` | 变量被 `---@type X` 标注 | `catstatetype` | `var:addType(type_node)` |
+| `variable.classes` | 变量是 `---@class X` 的声明者 | `catstateclass` | `var:addClass(class_node)` |
+
+### 从 source 找到 variable
+
+```lua
+local variable = param.vm:getVariable(param.source)
+```
+
+`param.vm:getVariable(source)` 通过 `virtual_file:getVariable(source)` 从 VM 文件中查找对应的 `Node.Variable`。
+
+- `source` 是 `LuaParser.Node.Base`（如 `local`、`var`、`fieldid`、`catid` 等）。
+- 返回 `Node.Variable?`，找不到时为 `nil`。
+
+### 常见判断模式
+
+```lua
+-- 判断 local/var 变量是否通过 @type 引用了某个类（而不是类的定义者）
+local variable = param.vm:getVariable(param.source)
+local isTypeRef = variable and variable.types and not variable.classes
+```
+
+- `variable.types ~= nil` 且 `variable.classes == nil`：变量通过 `---@type X` 持有类型，属于类型使用者（应 hidePrivate）。
+- `variable.classes ~= nil`：变量是 `---@class X` 的声明变量，属于类的定义者（可查看 private）。
+- `param.source.kind == 'catid'`：光标直接位于 `---@type <?A?>` 中的类型名（也是类型使用者，应 hidePrivate）。
+
+### 相关文件
+- `script/node/variable.lua`：`Node.Variable` 定义，含 `types`、`classes`、`addType`、`addClass`。
+- `script/vm/coder/state.lua`：`tryBindCat()`，在编译 local/var 时将 catgroup 中的 `catstatetype`/`catstateclass` 绑定到变量。
+- `script/vm/vm.lua` + `script/vm/virtual_file.lua`：`getVariable(source)` 实现。
+
 ## Language Features
 - `script/feature/`：高层语言特性。
 - `script/feature/completion/init.lua`：加载 completion providers。

@@ -743,7 +743,11 @@ local <?x?> = {
 }
 ]] {
     'local x: Class',
-    '(class) Class { b: 1 }',
+    [[
+(class) Class {
+    b: 1,
+}
+    ]],
 }
 
 -- @class c + @overload global table hover
@@ -755,7 +759,11 @@ t = {}
 function <?t?>.f() end
 ]] {
     'global t: c',
-    '(class) c { f: function }',
+    [[
+(class) c {
+    f: function,
+}
+    ]],
 }
 
 -- @class c + @overload local function field hover
@@ -778,7 +786,11 @@ TEST_HOVER [[
 local <?c?>
 ]] {
     'local c: C',
-    '(class) C { field: any }',
+    [[
+(class) C {
+    field: any,
+}
+    ]],
 }
 
 TEST_HOVER [[
@@ -791,7 +803,11 @@ local function f() end
 local <?c?> = f()
 ]] {
     'local c: C',
-    '(class) C { field: any }',
+    [[
+(class) C {
+    field: any,
+}
+    ]],
 }
 
 -- @param callback fun(x: integer, ...) parameter
@@ -832,7 +848,11 @@ print(v.a)
 ]]
 {
     'local v: Object',
-    '{ a: string }',
+    [[
+{
+    a: string,
+}
+    ]],
 }
 
 -- @async local function f() hover
@@ -881,7 +901,11 @@ print(v.a)
 ]]
 {
     'local v: Object',
-    '{ a: string }',
+    [[
+{
+    a: string,
+}
+    ]],
 }
 
 -- @class C @field x / @generic T assert(t)
@@ -900,7 +924,11 @@ local <?v?> = assert(t)
 ]]
 {
     'local v: C',
-    '{ x: string }',
+    [[
+{
+    x: string,
+}
+    ]],
 }
 
 TEST_HOVER [[
@@ -997,7 +1025,21 @@ local <?t?>
     ]]
 }
 
--- @class A @field private x @field y / @type A local hover (private hidden)
+TEST_HOVER [[
+---@class A
+---@field private x number
+---@field y number
+
+---@type <?A?>
+]] {
+    '(class) A',
+    [[
+(class) A {
+    y: number,
+}
+    ]]
+}
+
 TEST_HOVER [[
 ---@class A
 ---@field private x number
@@ -1005,13 +1047,15 @@ TEST_HOVER [[
 
 ---@type A
 local <?t?>
-]] [[
-local t: A {
+]] {
+    'local t: A',
+    [[
+(class) A {
     y: number,
 }
-]]
+    ]]
+}
 
--- @class A @field private x @field y / global t = {} (all fields visible)
 TEST_HOVER [[
 ---@class A
 ---@field private x number
@@ -1024,7 +1068,6 @@ global t: A {
 }
 ]]
 
--- @class A @field private x @field y / @type A global t = {} (private hidden)
 TEST_HOVER [[
 ---@class A
 ---@field private x number
@@ -1038,7 +1081,6 @@ global t: A {
 }
 ]]
 
--- @class A @field private/protected/z @type A local (private+protected hidden)
 TEST_HOVER [[
 ---@class A
 ---@field private x number
@@ -1053,7 +1095,6 @@ local t: A {
 }
 ]]
 
--- @class A @private init @protected update @public get / print(mt)
 TEST_HOVER [[
 ---@class A
 local mt = {}
@@ -1078,7 +1119,6 @@ local mt: A {
 }
 ]]
 
--- @class A @private init @protected update @public get / @type A local obj
 TEST_HOVER [[
 ---@class A
 local mt = {}

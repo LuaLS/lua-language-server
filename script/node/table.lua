@@ -600,6 +600,9 @@ function M:onView(viewer, options)
         if field.hideInView then
             goto continue
         end
+        if viewer.hidePrivate and field.visibleType == 'private' then
+            goto continue
+        end
         if field.optional then
             isOptional = true
         end
@@ -627,8 +630,8 @@ function M:onView(viewer, options)
         return '{}'
     end
 
-    if #fields == 1 then
-        return '{ ' .. fields[1] .. ' }'
+    if #fields <= viewer.inlineMax then
+        return '{ ' .. table.concat(fields, ', ') .. ' }'
     end
 
     return '{\n    ' .. table.concat(fields, ',\n    ') .. ',\n}'

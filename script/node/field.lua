@@ -32,7 +32,7 @@ function M:setLocation(location)
     return self
 end
 
----@param visibleType 'private' | 'public' | 'package'
+---@param visibleType 'private' | 'public' | 'package' | 'protected'
 ---@return Node.Field
 function M:setVisibleType(visibleType)
     ---@type string?

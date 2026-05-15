@@ -4,7 +4,7 @@
 ---@field pos? integer
 ---@field pos2? integer
 ---@field optional? boolean
----@field visibleType? 'private' | 'public' | 'package'
+---@field visibleType? 'private' | 'public' | 'package' | 'protected'
 ---@field value? LuaParser.Node.CatExp
 local CatStateField = Class('LuaParser.Node.CatStateField', 'LuaParser.Node.Base')
 
@@ -47,7 +47,7 @@ function Ast:parseCatStateField()
         start = pos
         pos2 = self:assertSymbol ']'
     else
-        if token == 'private' or token == 'public' or token == 'package' then
+        if token == 'private' or token == 'public' or token == 'package' or token == 'protected' then
             self.lexer:next()
             self:skipSpace()
             visibleType = token

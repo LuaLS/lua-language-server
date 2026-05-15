@@ -600,7 +600,9 @@ function M:onView(viewer, options)
         if field.hideInView then
             goto continue
         end
-        if viewer.hidePrivate and field.visibleType == 'private' then
+        if viewer.hidePrivate and (field.visibleType == 'private'
+                                 -- TODO: protected should only be hidden from external classes, not subclasses
+                                 or  field.visibleType == 'protected') then
             goto continue
         end
         if field.optional then

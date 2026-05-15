@@ -1095,11 +1095,14 @@ TEST_HOVER [[
 
 ---@type A
 local <?t?>
-]] [[
-local t: A {
+]] {
+    'local t: A',
+    [[
+(class) A {
     z: number,
 }
-]]
+    ]]
+}
 
 TEST_HOVER [[
 ---@class A

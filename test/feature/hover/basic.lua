@@ -1061,12 +1061,15 @@ TEST_HOVER [[
 ---@field private x number
 ---@field y number
 <?t?> = {}
-]] [[
-global t: A {
-    x: number,
+]] {
+    'global t: A',
+    [[
+(class) A {
+    private x: number,
     y: number,
 }
-]]
+    ]],
+}
 
 TEST_HOVER [[
 ---@class A
@@ -1075,11 +1078,14 @@ TEST_HOVER [[
 
 ---@type A
 <?t?> = {}
-]] [[
-global t: A {
+]] {
+    'global t: A',
+    [[
+(class) A {
     y: number,
 }
-]]
+    ]],
+}
 
 TEST_HOVER [[
 ---@class A

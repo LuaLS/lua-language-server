@@ -31,7 +31,10 @@ ls.feature.provider.hover(function (param, action)
             return true
         end
         local variable = param.vm:getVariable(source)
-        if variable and variable.types and not variable.classes then
+        if not variable then
+            return false
+        end
+        if variable.types then
             return true
         end
         return false

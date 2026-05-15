@@ -48,8 +48,16 @@ function M:getLocation()
     return self.location
 end
 
+---@package
+---@type Node[]?
+M._types = nil
+
 ---@type Node[]?
 M.types = nil
+
+M.__getter.types = function (self)
+    return (self.masterVariable or self)._types
+end
 
 ---@param node Node
 ---@return Node.Variable
@@ -58,10 +66,10 @@ function M:addType(node)
         self.masterVariable:addType(node)
         return self
     end
-    if not self.types then
-        self.types = {}
+    if not self._types then
+        self._types = {}
     end
-    table.insert(self.types, node)
+    table.insert(self._types, node)
     self:flushCache()
 
     return self
@@ -74,12 +82,12 @@ function M:removeType(node)
         self.masterVariable:removeType(node)
         return self
     end
-    if not self.types then
+    if not self._types then
         return self
     end
-    ls.util.arrayRemove(self.types, node, true)
-    if #self.types == 0 then
-        self.types = nil
+    ls.util.arrayRemove(self._types, node, true)
+    if #self._types == 0 then
+        self._types = nil
     end
     self:flushCache()
 
@@ -161,7 +169,7 @@ function M:isDefined()
         return self.masterVariable:isDefined()
     end
     return self.assigns ~= nil
-        or self.types   ~= nil
+        or self._types  ~= nil
 end
 
 ---@return fun(): Node.Field?
@@ -180,8 +188,16 @@ function M:eachAssign()
     end
 end
 
+---@package
+---@type Node.Class[]?
+M._classes = nil
+
 ---@type Node.Class[]?
 M.classes = nil
+
+M.__getter.classes = function (self)
+    return (self.masterVariable or self)._classes
+end
 
 ---@param node Node.Class
 ---@return Node.Variable
@@ -190,10 +206,10 @@ function M:addClass(node)
         self.masterVariable:addClass(node)
         return self
     end
-    if not self.classes then
-        self.classes = {}
+    if not self._classes then
+        self._classes = {}
     end
-    table.insert(self.classes, node)
+    table.insert(self._classes, node)
     self:flushCache()
 
     return self
@@ -206,12 +222,12 @@ function M:removeClass(node)
         self.masterVariable:removeClass(node)
         return self
     end
-    if not self.classes then
+    if not self._classes then
         return self
     end
-    ls.util.arrayRemove(self.classes, node, true)
-    if #self.classes == 0 then
-        self.classes = nil
+    ls.util.arrayRemove(self._classes, node, true)
+    if #self._classes == 0 then
+        self._classes = nil
     end
     self:flushCache()
 
@@ -250,11 +266,11 @@ M.__getter.classValue = function (self)
     if self.masterVariable then
         return self.masterVariable.classValue, true
     end
-    if not self.classes then
+    if not self._classes then
         return false, true
     end
     local rt = self.scope.rt
-    local union = rt.union(ls.util.map(self.classes, function (v)
+    local union = rt.union(ls.util.map(self._classes, function (v)
         ---@cast v Node.Class
         return v.masterType
     end))
@@ -272,11 +288,11 @@ M.__getter.typeValue = function (self)
     if self.masterVariable then
         return self.masterVariable.typeValue, true
     end
-    if not self.types then
+    if not self._types then
         return false, true
     end
     local rt = self.scope.rt
-    local union = rt.union(self.types)
+    local union = rt.union(self._types)
     union:addRef(self)
     return union, true
 end
@@ -546,14 +562,14 @@ function M:getExpect(key)
         return self.parentExpectValue:get(key)
     end
     local rt = self.scope.rt
-    if self.classes then
-        local expectValue = rt.union(ls.util.map(self.classes, function (v)
+    if self._classes then
+        local expectValue = rt.union(ls.util.map(self._classes, function (v)
             ---@cast v Node.Class
             return v.masterType.expectValue
         end))
         return expectValue:get(key)
     end
-    if self.types then
+    if self._types then
         local expectValue = self.value
         return expectValue:get(key)
     end

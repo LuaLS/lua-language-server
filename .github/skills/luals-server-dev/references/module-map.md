@@ -47,18 +47,22 @@ local variable = param.vm:getVariable(param.source)
 
 - `source` 是 `LuaParser.Node.Base`（如 `local`、`var`、`fieldid`、`catid` 等）。
 - 返回 `Node.Variable?`，找不到时为 `nil`。
+- **注意 shadow variable**：全局赋值 `t = {}` 中的 `var` 节点是 shadow，`addType`/`addClass` 等操作会被转发到 `masterVariable`。直接读 `variable.types` 可能为 nil，需用 `variable.masterVariable or variable` 拿到存储实际状态的节点。
 
 ### 常见判断模式
 
 ```lua
--- 判断 local/var 变量是否通过 @type 引用了某个类（而不是类的定义者）
+-- 判断 local/var 变量是否通过 @type 显式标注（而不是类的定义者）
 local variable = param.vm:getVariable(param.source)
-local isTypeRef = variable and variable.types and not variable.classes
+if variable then
+    local effective = variable.masterVariable or variable
+    local isTypeRef = effective.types ~= nil
+end
 ```
 
-- `variable.types ~= nil` 且 `variable.classes == nil`：变量通过 `---@type X` 持有类型，属于类型使用者（应 hidePrivate）。
-- `variable.classes ~= nil`：变量是 `---@class X` 的声明变量，属于类的定义者（可查看 private）。
-- `param.source.kind == 'catid'`：光标直接位于 `---@type <?A?>` 中的类型名（也是类型使用者，应 hidePrivate）。
+- `effective.types ~= nil`：变量通过 `---@type X` 持有类型，属于类型使用者。
+- `effective.classes ~= nil`（且无 types）：变量是 `---@class X` 的声明变量，属于类的定义者。
+- `param.source.kind == 'catid'`：光标直接位于 `---@type <?A?>` 中的类型名，也是类型使用者。
 
 ### 相关文件
 - `script/node/variable.lua`：`Node.Variable` 定义，含 `types`、`classes`、`addType`、`addClass`。

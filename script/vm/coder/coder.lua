@@ -462,6 +462,10 @@ function M:makeFieldCode(source)
     if source.isLiteral then
         ---@cast source LuaParser.Node.Literal
         if source.value ~= nil then
+            if source.kind == 'string' then
+                ---@cast source LuaParser.Node.String
+                return ('rt.value(%q, %q)'):format(source.value, source.quo)
+            end
             return string.format('%q', source.value)
         end
     end

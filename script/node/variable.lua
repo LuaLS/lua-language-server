@@ -475,17 +475,18 @@ function M:getChild(key1, key2, ...)
             local nk = rt.luaKey(k)
             local child = current.childs and current.childs[nk]
             if not child then
-                child = rt.variable(nk, current)
+                child = rt.variable(k, current)
                 current.childs = current.childs or ls.util.weakVTable()
                 current.childs[nk] = child
             end
             current = child
         end
     end
+    local origKey = key
     key = rt.luaKey(key)
     local child = current.childs and current.childs[key]
     if not child then
-        child = rt.variable(key, current)
+        child = rt.variable(origKey, current)
         current.childs = current.childs or ls.util.weakVTable()
         current.childs[key] = child
     end
@@ -943,8 +944,14 @@ function M:getEquivalentLocations(onlySameVariable, onlySameKey)
             return
         end
         visited[equivalent] = true
-        if onlySameKey and equivalent.key ~= self.key then
-            return
+        if onlySameKey then
+            local ek = equivalent.key
+            local sk = self.key
+            local el = type(ek) == 'table' and ek.literal or ek
+            local sl = type(sk) == 'table' and sk.literal or sk
+            if el ~= sl then
+                return
+            end
         end
         if equivalent.kind == 'variable' then
             ---@cast equivalent Node.Variable

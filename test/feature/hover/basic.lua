@@ -1259,7 +1259,6 @@ local <?a?>
 local a: A
 ]]
 
--- @class A @field x fun(): string / table<string, A> obj[''].x() field hover
 TEST_HOVER [[
 ---@class A
 ---@field x fun(): string
@@ -1268,9 +1267,13 @@ TEST_HOVER [[
 local obj
 
 local x = obj[''].<?x?>()
-]] [[
-(field) A.x: fun():string
-]]
+]] {
+    "(field) obj[''].x: function",
+    [[
+function ()
+  -> string
+    ]],
+}
 
 -- @class A @field x number @see A.x / @see field hover
 TEST_HOVER [[

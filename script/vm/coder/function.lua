@@ -197,6 +197,20 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                 tracer:flushDeferVar()
             end
             coder:compileAssign(source.name, 1, coder:getKey(source))
+
+            if catGroup then
+                for _, cat in ipairs(catGroup) do
+                    if cat.subtype == 'private'
+                    or cat.subtype == 'protected'
+                    or cat.subtype == 'public' then
+                        coder:addLine('{varKey}:setVisibleType({visibleType%q})' % {
+                            varKey      = coder:getKey(source.name),
+                            visibleType = cat.subtype,
+                        })
+                        break
+                    end
+                end
+            end
         end
 
         -- 一个潜规则：

@@ -7,6 +7,7 @@ local M = Class 'Node.Viewer'
 ---@field noFunctionDetail? boolean
 ---@field preferMethod? boolean
 ---@field hidePrivate? boolean
+---@field hideOnlyPrivate? boolean
 ---@field inlineMax? integer # 字段数 <= 该值时单行显示，默认为 1
 ---@field [any] never
 
@@ -18,6 +19,7 @@ function M:__init(options)
     self.noFunctionDetail = options and options.noFunctionDetail or false
     self.preferMethod     = options and options.preferMethod     or false
     self.hidePrivate      = options and options.hidePrivate      or false
+    self.hideOnlyPrivate  = options and options.hideOnlyPrivate  or false
     self.inlineMax        = options and options.inlineMax        ~= nil and options.inlineMax or 1
     ---@type table<Node, integer?>
     self.visited = {}

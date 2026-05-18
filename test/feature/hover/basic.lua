@@ -1019,7 +1019,7 @@ local <?t?>
     'local t: A',
     [[
 (class) A {
-    private x: number,
+    x: number,
     y: number,
 }
     ]]
@@ -1065,7 +1065,7 @@ TEST_HOVER [[
     'global t: A',
     [[
 (class) A {
-    private x: number,
+    x: number,
     y: number,
 }
     ]],
@@ -1120,13 +1120,16 @@ function mt:get()
 end
 
 print(<?mt?>)
-]] [[
-local mt: A {
+]] {
+    'local mt: A',
+    [[
+(class) A {
     get: function,
     init: function,
     update: function,
 }
-]]
+    ]],
+}
 
 TEST_HOVER [[
 ---@class A
@@ -1145,13 +1148,15 @@ end
 
 ---@type A
 local <?obj?>
-]] [[
-local obj: A {
+]] {
+    'local obj: A',
+    [[
+(class) A {
     get: function,
 }
-]]
+    ]],
+}
 
--- @class A @private init @protected update @public get / @class B: A local obj
 TEST_HOVER [[
 ---@class A
 local mt = {}
@@ -1169,14 +1174,16 @@ end
 
 ---@class B: A
 local <?obj?>
-]] [[
-local obj: B {
+]] {
+    'local obj: B',
+    [[
+(class) B {
     get: function,
     update: function,
 }
-]]
+    ]],
+}
 
--- @class A @private init @protected update @public get / @class B: A @type B local obj
 TEST_HOVER [[
 ---@class A
 local mt = {}
@@ -1196,13 +1203,15 @@ end
 
 ---@type B
 local <?obj?>
-]] [[
-local obj: B {
+]] {
+    'local obj: B',
+    [[
+(class) B {
     get: function,
 }
-]]
+    ]],
+}
 
--- @class A @private M.x @private M:init @type A local a
 TEST_HOVER [[
 ---@class A
 local M = {}

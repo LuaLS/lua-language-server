@@ -601,8 +601,10 @@ function M:onView(viewer, options)
             goto continue
         end
         if viewer.hidePrivate and (field.visibleType == 'private'
-                                 -- TODO: protected should only be hidden from external classes, not subclasses
                                  or  field.visibleType == 'protected') then
+            goto continue
+        end
+        if viewer.hideOnlyPrivate and field.visibleType == 'private' then
             goto continue
         end
         if field.optional then
@@ -615,8 +617,7 @@ function M:onView(viewer, options)
         ---@type Node.Key
         local k = rt.luaKey(key)
         local value = self.valueMap[k]
-        fields[#fields+1] = string.format('%s%s%s: %s'
-            , field.visibleType and (field.visibleType .. ' ') or ''
+        fields[#fields+1] = string.format('%s%s: %s'
             , viewer:viewAsKey(key)
             , isOptional and '?' or ''
             , viewer:view(value)

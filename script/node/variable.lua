@@ -94,6 +94,20 @@ function M:removeType(node)
     return self
 end
 
+---@type ('private' | 'public' | 'package' | 'protected')?
+M.visibleType = nil
+
+---@param visibleType 'private' | 'public' | 'package' | 'protected'
+---@return Node.Variable
+function M:setVisibleType(visibleType)
+    if self.masterVariable then
+        self.masterVariable:setVisibleType(visibleType)
+        return self
+    end
+    self.visibleType = visibleType
+    return self
+end
+
 ---@package
 ---@type Node.Field[]?
 M.assigns = nil
@@ -981,7 +995,11 @@ M.__getter.childsValue = function (self)
     for key, var in pairs(self.childs) do
         var:addRef(self)
         if var.assigns or var.childs then
-            fields[#fields+1] = rt.field(key, var)
+            local f = rt.field(key, var)
+            if var.visibleType then
+                f:setVisibleType(var.visibleType)
+            end
+            fields[#fields+1] = f
         end
     end
     if #fields == 0 then

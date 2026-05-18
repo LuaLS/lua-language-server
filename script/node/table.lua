@@ -391,6 +391,10 @@ local function defaultOnSameKey(a, b)
     if location then
         field:setLocation(location)
     end
+    local visibleType = a.visibleType or b.visibleType
+    if visibleType then
+        field:setVisibleType(visibleType)
+    end
     return field
 end
 

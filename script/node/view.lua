@@ -6,8 +6,8 @@ local M = Class 'Node.Viewer'
 ---@field needParentheses? boolean
 ---@field noFunctionDetail? boolean
 ---@field preferMethod? boolean
----@field hidePrivate? boolean
----@field hideOnlyPrivate? boolean
+---@field viewType? Node.Type  # 外部视角：传入被观察的类型，隐藏 private 和 protected
+---@field viewClass? Node.Type # 子类视角：传入当前所在类，只隐藏从父类继承的 private 字段
 ---@field inlineMax? integer # 字段数 <= 该值时单行显示，默认为 1
 ---@field [any] never
 
@@ -18,8 +18,8 @@ function M:__init(options)
     self.skipLevel        = options and options.skipLevel        or 0
     self.noFunctionDetail = options and options.noFunctionDetail or false
     self.preferMethod     = options and options.preferMethod     or false
-    self.hidePrivate      = options and options.hidePrivate      or false
-    self.hideOnlyPrivate  = options and options.hideOnlyPrivate  or false
+    self.viewType         = options and options.viewType         or nil
+    self.viewClass        = options and options.viewClass        or nil
     self.inlineMax        = options and options.inlineMax        ~= nil and options.inlineMax or 1
     ---@type table<Node, integer?>
     self.visited = {}

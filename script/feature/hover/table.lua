@@ -41,22 +41,22 @@ ls.feature.provider.hover(function (param, action)
     end
 
     ---@param source LuaParser.Node.Base
-    ---@return boolean
-    local function isClassHover(source)
+    ---@return Node.Type?
+    local function getSubclassType(source)
         local variable = param.vm:getVariable(source)
         if not variable then
-            return false
+            return nil
         end
         if not variable.classes or variable.types then
-            return false
+            return nil
         end
         -- 只对子类（有 extends）生效；根类定义显示所有字段
         for _, cls in ipairs(variable.classes) do
             if cls.extends and #cls.extends > 0 then
-                return true
+                return cls.masterType
             end
         end
-        return false
+        return nil
     end
 
     if snode.kind == 'type' then
@@ -65,8 +65,9 @@ ls.feature.provider.hover(function (param, action)
         if value.kind == 'table' then
             ---@cast value Node.Table
             if snode:isClassLike() then
-                local viewOptions = isTypeHover(param.source)  and { hidePrivate = true }
-                               or   isClassHover(param.source) and { hideOnlyPrivate = true }
+                local classType = getSubclassType(param.source)
+                local viewOptions = isTypeHover(param.source) and { viewType = snode }
+                               or   classType                 and { viewClass = classType }
                                or   nil
                 pushWithPrefix('(class) ' .. snode:view() .. ' ', value, viewOptions)
                 return

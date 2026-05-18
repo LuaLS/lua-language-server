@@ -1214,6 +1214,35 @@ local <?obj?>
 
 TEST_HOVER [[
 ---@class A
+local mt = {}
+
+---@private
+function mt:init()
+end
+
+---@protected
+function mt:update()
+end
+
+function mt:get()
+end
+
+---@class B: A
+---@field private x number
+local <?obj?>
+]] {
+    'local obj: B',
+    [[
+(class) B {
+    get: function,
+    update: function,
+    x: number,
+}
+    ]],
+}
+
+TEST_HOVER [[
+---@class A
 local M = {}
 
 ---@private

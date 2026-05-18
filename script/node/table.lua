@@ -600,12 +600,17 @@ function M:onView(viewer, options)
         if field.hideInView then
             goto continue
         end
-        if viewer.hidePrivate and (field.visibleType == 'private'
-                                 or  field.visibleType == 'protected') then
-            goto continue
+        if viewer.viewType then
+            local vt = viewer.viewType:queryFieldVisibility(key)
+            if vt == 'private' or vt == 'protected' then
+                goto continue
+            end
         end
-        if viewer.hideOnlyPrivate and field.visibleType == 'private' then
-            goto continue
+        if viewer.viewClass then
+            local vt, isOwn = viewer.viewClass:queryFieldVisibility(key)
+            if vt == 'private' and not isOwn then
+                goto continue
+            end
         end
         if field.optional then
             isOptional = true

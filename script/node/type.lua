@@ -260,6 +260,63 @@ M.__getter.extendsTable = function (self)
     return table, true
 end
 
+--- 查询指定 key 字段的来源和可见性。
+--- 先查自身（fieldTable + variableTable），再按 fullExtends 广度优先搜索。
+--- 返回最宽松（most permissive）的可见类型，以及是否属于自身。
+---@param key Node  # nodeKey singleton（来自 rt.nodeKey）
+---@return string?  visibleType  # nil=无标注/public; 'protected'; 'private'
+---@return boolean  isOwn        # true 表示字段定义在此类自身上
+function M:queryFieldVisibility(key)
+    -- 1. 先查自身
+    local ownField = self.fieldTable.fieldMap[key]
+                  or self.variableTable.fieldMap[key]
+    if ownField then
+        return ownField.visibleType, true
+    end
+    -- 2. 查 fullExtends，取最宽松的 visibleType
+    -- nil=未标注(中性)；'public'最宽松；只有所有来源都无标注时才视为 public
+    local best = nil  -- nil 表示尚无显式标注
+    local found = false
+    for _, ext in ipairs(self.fullExtends) do
+        local field
+        if ext.kind == 'type' then
+            ---@cast ext Node.Type
+            field = ext.fieldTable.fieldMap[key]
+                 or ext.variableTable.fieldMap[key]
+        elseif ext.kind == 'table' then
+            ---@cast ext Node.Table
+            field = ext.fieldMap[key]
+        else
+            local vv = ext.value
+            if vv and vv.kind == 'table' then
+                ---@cast vv Node.Table
+                field = vv.fieldMap[key]
+            end
+        end
+        if field then
+            found = true
+            local vt = field.visibleType
+            if vt == 'public' then
+                best = 'public'             -- 显式 public，最宽松
+            elseif vt == 'protected' then
+                if best == nil or best == 'private' then
+                    best = 'protected'      -- 比 private 宽松
+                end
+            elseif vt == 'private' then
+                if best == nil then
+                    best = 'private'        -- 暂无其他标注，先记为 private
+                end
+            end
+            -- vt == nil：无显式标注，不影响 best
+        end
+    end
+    if found then
+        if best == 'public' then best = nil end
+        return best, false  -- nil=全无显式标注=public; 'protected'; 'private'
+    end
+    return nil, false  -- 未找到字段，视为 public
+end
+
 --- 类型自身的字段合并表（一般是通过 ---@field 添加）
 ---@type Node.Table
 M.fieldTable = nil

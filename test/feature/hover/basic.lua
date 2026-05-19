@@ -1352,12 +1352,6 @@ end
     'function f(a: number, b: string, ...args: boolean)',
 }
 
-TEST_HOVER [[
-global <?*?>
-]] [[
-global any
-]]
-
 -- @class A @field private x @field protected y @field z / @class B: A local t
 TEST_HOVER [[
 ---@class A

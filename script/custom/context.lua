@@ -23,6 +23,7 @@ local M = Class 'Custom.Context.Master'
 function M:__init(node, data)
     self.node = node
     self.rt = node.scope.rt
+    self.refs = {}
     self.context = self:makeDefaultContext(data or {})
     masterMap[self.context] = self
 end
@@ -41,6 +42,7 @@ function M:makeDefaultContext(data)
     data.type = function (name)
         local t = rt.type(name)
         t:addRef(self.node)
+        self.refs[t] = true
         return t
     end
 

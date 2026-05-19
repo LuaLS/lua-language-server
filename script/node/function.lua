@@ -417,6 +417,9 @@ function M:makeView(viewer)
                     , viewer:view(v.value)
                 )
                 returnBuf[i] = '(' .. returns[i] .. ')'
+            elseif v.value.typeName == '...' then
+                returns[i] = '...: unknown'
+                returnBuf[i] = '(' .. returns[i] .. ')'
             else
                 returns[i] = viewer:view(v.value)
                 returnBuf[i] = returns[i]

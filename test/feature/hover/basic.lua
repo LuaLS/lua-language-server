@@ -1413,7 +1413,6 @@ local <?t?>
     ]],
 }
 
--- local bool narrowing hover (bool and y)
 TEST_HOVER [[
 local y
 if X then
@@ -1431,7 +1430,7 @@ end
 
 print(<?bool?>)
 ]] [[
-local bool: boolean = true|false
+local bool: true | false
 ]]
 
 -- @type 'a' local s hover
@@ -1459,12 +1458,11 @@ local <?t?>
     [[
 (class) A {
     x: integer,
-    y: boolean = true,
+    y: true,
 }
     ]],
 }
 
--- @param ... boolean @return number ... function f hover
 TEST_HOVER [[
 ---@param ... boolean
 ---@return number ...
@@ -1472,12 +1470,11 @@ local function <?f?>(...) end
 ]] {
     'local f: function',
     [[
-function f(...boolean)
-  -> ...number
+function f(...: boolean)
+  -> ...: number
 ]],
 }
 
--- @param ... boolean @return ... function f hover
 TEST_HOVER [[
 ---@param ... boolean
 ---@return ...
@@ -1485,12 +1482,11 @@ local function <?f?>(...) end
 ]] {
     'local f: function',
     [[
-function f(...boolean)
-  -> ...unknown
+function f(...: boolean)
+  -> ...: unknown
 ]],
 }
 
--- @type fun():x: number local f hover
 TEST_HOVER [[
 ---@type fun():x: number
 local <?f?>
@@ -1498,7 +1494,6 @@ local <?f?>
 local f: fun():(x: number)
 ]]
 
--- @type fun(...: boolean):...: number local f hover
 TEST_HOVER [[
 ---@type fun(...: boolean):...: number
 local <?f?>

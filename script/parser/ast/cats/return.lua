@@ -48,7 +48,7 @@ function Ast:parseCatStateReturnItem(required)
         self:skipSpace()
     end
 
-    local key = self:parseID('LuaParser.Node.CatReturnName', false, 'yes')
+    local key = self:parseID('LuaParser.Node.CatReturnName', false, 'yes', true)
     if key then
         ret.key = key
         key.parent = ret

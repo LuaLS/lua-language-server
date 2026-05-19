@@ -234,6 +234,17 @@ function W:traceUnit(unit)
         self:traceLink(unit)
         return
     end
+    if tag == 'and' or tag == 'or' then
+        -- 顶层 and/or 表达式节点（如 `x = a and b`）：
+        -- 遍历内部 ref，使其获得正确的 currentValue，避免退化到 getGuessValue 引入 nil
+        for i = 2, #unit do
+            local inner = unit[i]
+            if type(inner) == 'table' then
+                self:traceUnit(inner)
+            end
+        end
+        return
+    end
 end
 
 --- 通过逻辑变量名 funcVarId 在 idAliasMap 中找到对应的 Node.Variable

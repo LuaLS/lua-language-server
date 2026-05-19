@@ -47,6 +47,13 @@ function M:setHideInView()
     return self
 end
 
+---@return Node.Field
+function M:setBracketKey()
+    ---@type boolean?
+    self.bracketKey = true
+    return self
+end
+
 function M:simplify()
     if self.value == self then
         return self

@@ -626,8 +626,14 @@ function M:onView(viewer, options)
         ---@type Node.Key
         local k = rt.luaKey(key)
         local value = self.valueMap[k]
+        local keyStr
+        if field.bracketKey and field.key.kind == 'value' then
+            keyStr = '[' .. viewer:view(field.key) .. ']'
+        else
+            keyStr = viewer:viewAsKey(key)
+        end
         fields[#fields+1] = string.format('%s%s: %s'
-            , viewer:viewAsKey(key)
+            , keyStr
             , isOptional and '?' or ''
             , viewer:view(value)
         )

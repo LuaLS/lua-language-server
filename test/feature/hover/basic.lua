@@ -1275,7 +1275,6 @@ function ()
     ]],
 }
 
--- @class A @field x number @see A.x / @see field hover
 TEST_HOVER [[
 ---@class A
 ---@field x number
@@ -1285,19 +1284,15 @@ TEST_HOVER [[
 (field) A.x: number
 ]]
 
--- @type { [string]: string }[] local t / t.foo hover
 TEST_HOVER [[
 ---@type { [string]: string }[]
 local t
 
 print(<?t?>.foo)
-]] [[
-local t: { [string]: string }[] {
-    foo: unknown,
+]] {
+    'local t: { [string]: string }[]',
 }
-]]
 
--- local t = {['x']=1, ['y']=2} / t.y hover
 TEST_HOVER [[
 local t = {
     ['x'] = 1,
@@ -1312,7 +1307,6 @@ local t: {
 }
 ]]
 
--- local enum = {a=1,b=2} / local t = {[enum.a]=true,...} hover
 TEST_HOVER [[
 local enum = { a = 1, b = 2 }
 
@@ -1356,9 +1350,10 @@ TEST_HOVER [[
 ---@param ... boolean
 function <?f?>(a, b, ...args)
 end
-]] [[
-function f(a: number, b: string, ...args: boolean)
-]]
+]] {
+    'global f: function',
+    'function f(a: number, b: string, ...args: boolean)',
+}
 
 -- Lua 5.5 global * hover
 do
@@ -1381,12 +1376,15 @@ TEST_HOVER [[
 
 ---@class B: A
 local <?t?>
-]] [[
-local t: B {
+]] {
+    'local t: B',
+    [[
+(class) B {
     y: number,
     z: number,
 }
-]]
+    ]],
+}
 
 -- @class A @field private x @field protected y @field z / @class B: A @field private a local t
 TEST_HOVER [[
@@ -1398,13 +1396,16 @@ TEST_HOVER [[
 ---@class B: A
 ---@field private a number
 local <?t?>
-]] [[
-local t: B {
+]] {
+    'local t: B',
+    [[
+(class) B {
     a: number,
     y: number,
     z: number,
 }
-]]
+    ]],
+}
 
 -- @class A ... @class B: A @field private a @type B local t (private hidden)
 TEST_HOVER [[
@@ -1418,11 +1419,14 @@ TEST_HOVER [[
 
 ---@type B
 local <?t?>
-]] [[
-local t: B {
+]] {
+    'local t: B',
+    [[
+(class) B {
     z: number,
 }
-]]
+    ]],
+}
 
 -- local bool narrowing hover (bool and y)
 TEST_HOVER [[
@@ -1465,32 +1469,41 @@ mt.y = true
 
 ---@type A
 local <?t?>
-]] [[
-local t: A {
+]] {
+    'local t: A',
+    [[
+(class) A {
     x: integer,
     y: boolean = true,
 }
-]]
+    ]],
+}
 
 -- @param ... boolean @return number ... function f hover
 TEST_HOVER [[
 ---@param ... boolean
 ---@return number ...
 local function <?f?>(...) end
-]] [[
+]] {
+    'local f: function',
+    [[
 function f(...boolean)
   -> ...number
-]]
+]],
+}
 
 -- @param ... boolean @return ... function f hover
 TEST_HOVER [[
 ---@param ... boolean
 ---@return ...
 local function <?f?>(...) end
-]] [[
+]] {
+    'local f: function',
+    [[
 function f(...boolean)
   -> ...unknown
-]]
+]],
+}
 
 -- @type fun():x: number local f hover
 TEST_HOVER [[
@@ -1526,10 +1539,13 @@ local function f() end
 local n1 = <?f?>()
 local n2 = f(0)
 local n3 = f(0, 0)
-]] [[
+]] {
+    'local f: function',
+    [[
 function f()
   -> boolean
-]]
+]],
+}
 
 TEST_HOVER [[
 ---@overload fun(x: number, y: number):string
@@ -1540,10 +1556,13 @@ local function f() end
 local n1 = f()
 local n2 = <?f?>(0)
 local n3 = f(0, 0)
-]] [[
+]] {
+    'local f: function',
+    [[
 function f()
   -> boolean
-]]
+]],
+}
 
 TEST_HOVER [[
 ---@overload fun(x: number, y: number):string
@@ -1554,10 +1573,13 @@ local function f() end
 local n1 = f()
 local n2 = f(0)
 local n3 = <?f?>(0, 0)
-]] [[
+]] {
+    'local f: function',
+    [[
 function f()
   -> boolean
-]]
+]],
+}
 
 -- @class MyClass / MyClass:Test() self hover
 TEST_HOVER [[
@@ -1585,12 +1607,15 @@ end
 local function <?test2?>()
     return test1()
 end
-]] [[
+]] {
+    'local test2: function',
+    [[
 function test2()
   -> integer
   2. integer
   3. integer
-]]
+]],
+}
 
 -- @param x number @return boolean local function f(x) hover
 TEST_HOVER [[
@@ -1600,7 +1625,13 @@ local function <?f?>(
     x
 )
 end
-]] 'function f(x: any)\n  -> boolean'
+]] {
+    'local f: function',
+    [[
+function f(x: any)
+  -> boolean
+]],
+}
 
 -- @class A @field x string / @class B: A @field y string / @type B local t
 TEST_HOVER [[
@@ -1612,12 +1643,15 @@ TEST_HOVER [[
 
 ---@type B
 local <?t?>
-]] [[
-local t: B {
+]] {
+    'local t: B',
+    [[
+(class) B {
     x: string,
     y: string,
 }
-]]
+    ]],
+}
 
 -- @class A @field x string / @class B: A @field x integer @field y / @type B local t (field override)
 TEST_HOVER [[
@@ -1630,12 +1664,15 @@ TEST_HOVER [[
 
 ---@type B
 local <?t?>
-]] [[
-local t: B {
+]] {
+    'local t: B',
+    [[
+(class) B {
     x: integer,
     y: string,
 }
-]]
+    ]],
+}
 
 -- local x / local function f() uses x (outer scope, no upvalue marker)
 TEST_HOVER [[
@@ -1754,9 +1791,7 @@ end
 
 local t = init()
 t:<?add?>()
-]] [[
-(method) mt:add(a: any, b: any)
-]]
+]] '(method) mt:add(a: any, b: any)'
 
 -- @vararg Class / local _, <?x?> = ...
 TEST_HOVER [[
@@ -1983,11 +2018,14 @@ local m
 function m:f()
     return <?self?>
 end
-]] [[
-(self) self: E {
+]] {
+    '(self) self: E',
+    [[
+(class) E {
     f: function,
 }
-]]
+    ]],
+}
 
 -- @class Position @field x,y,z — SKIP: @class直接标注local在新框架不生效
 -- (not migrated: old-test pattern uses @class on local variable directly)
@@ -1996,18 +2034,24 @@ end
 TEST_HOVER [[
 ---@type { x: string, y: number, z: boolean }
 local <?t?>
-]] [[
-local t: { x: string, y: number, z: boolean } {
+]] {
+    'local t: { x: string, y: number, z: boolean }',
+    [[
+{
     x: string,
     y: number,
     z: boolean,
 }
-]]
+    ]],
+}
 
 -- function f1.f2.<?f3?>() end nested function
 TEST_HOVER [[
 function f1.f2.<?f3?>() end
-]] 'function f1.f2.f3()'
+]] {
+    'global f1.f2.f3: function',
+    'function f1.f2.f3()',
+}
 
 -- local t = nil / t.<?x?>() nil field
 TEST_HOVER [[

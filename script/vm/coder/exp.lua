@@ -150,6 +150,11 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
         value    = valueKey,
         location = coder:makeLocationCode(source),
     })
+    if source.subtype == 'index' then
+        coder:addLine('{field}:setBracketKey()' % {
+            field = coder:getKey(source),
+        })
+    end
     if source.subtype == 'field' then
         coder:addLine('{fieldid} = rt.index({table}, {field%q}, true)' % {
             fieldid = coder:getKey(source.key),

@@ -4,6 +4,7 @@
 ---@field index integer
 ---@field id string
 ---@field isSelf? boolean
+---@field varargName? string # Lua 5.5 named vararg: `...name`
 local Param = Class('LuaParser.Node.Param', 'LuaParser.Node.Local')
 
 Param.kind = 'param'
@@ -199,10 +200,20 @@ end
 function Ast:parseParam(required)
     local pos = self.lexer:consume '...'
     if pos then
+        local varargName, varargFinish
+        local nextToken, nextType, nextPos = self.lexer:peek()
+        ---@cast nextToken -?
+        ---@cast nextPos -?
+        if nextType == 'Word' and not self:isKeyWord(nextToken) then
+            varargName   = nextToken
+            varargFinish = nextPos + #nextToken
+            self.lexer:next()
+        end
         return self:createNode('LuaParser.Node.Param', {
-            start  = pos,
-            finish = pos + #'...',
-            id     = '...',
+            start      = pos,
+            finish     = varargFinish or (pos + #'...'),
+            id         = '...',
+            varargName = varargName,
         })
     end
     local param = self:parseID('LuaParser.Node.Param', required, 'warn')

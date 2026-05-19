@@ -113,8 +113,8 @@ ls.vm.registerCoderProvider('tablefield', function (coder, source)
 
     local key = coder:makeFieldCode(source.key)
     if not key then
-        key = 'rt.UNKNOWN'
         coder:compile(source.key)
+        key = coder:getKey(source.key)
     end
     coder:compile(source.value)
 

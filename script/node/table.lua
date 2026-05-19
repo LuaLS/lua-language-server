@@ -115,7 +115,7 @@ M.__getter.keys = function (self)
     local keys = {}
 
     for k in pairs(self.fieldMap) do
-        keys[#keys+1] = k
+        keys[#keys+1] = k:simplify()
     end
 
     local typeOrder = {

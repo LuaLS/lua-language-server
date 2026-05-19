@@ -185,10 +185,11 @@ end
 ---@param key string
 ---@param value Node
 ---@param optional? boolean
+---@param varargName? string
 ---@return Node.Function
-function M:addParamDef(key, value, optional)
+function M:addParamDef(key, value, optional, varargName)
     if key == '...' then
-        self:addVarargParamDef(value)
+        self:addVarargParamDef(value, varargName)
         return self
     end
     self.paramsDef[#self.paramsDef+1] = { key = key, value = value, optional = optional }
@@ -216,10 +217,12 @@ function M:addReturnList(list)
 end
 
 ---@param value Node
+---@param name? string
 ---@return Node.Function
-function M:addVarargParamDef(value)
+function M:addVarargParamDef(value, name)
     ---@type Node?
     self.varargParamDef = value
+    self.varargParamName = name
     return self
 end
 
@@ -395,7 +398,10 @@ function M:makeView(viewer)
     end
 
     if self.varargParamDef then
-        params[#params+1] = string.format('...: %s', viewer:view(self.varargParamDef))
+        local varargKey = self.varargParamName
+            and ('...' .. self.varargParamName)
+            or  '...'
+        params[#params+1] = string.format('%s: %s', varargKey, viewer:view(self.varargParamDef))
     end
     paramPart = table.concat(params, ', ')
 

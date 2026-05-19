@@ -849,7 +849,7 @@ print(v.a)
 {
     'local v: Object',
     [[
-{
+(class) Object {
     a: string,
 }
     ]],
@@ -902,7 +902,7 @@ print(v.a)
 {
     'local v: Object',
     [[
-{
+(class) Object {
     a: string,
 }
     ]],
@@ -925,7 +925,7 @@ local <?v?> = assert(t)
 {
     'local v: C',
     [[
-{
+(class) C {
     x: string,
 }
     ]],
@@ -1317,13 +1317,12 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    [1]: boolean = true,
+    [1]: true,
     [2]: 2,
-    [3]: table,
+    [3]: {},
 }
 ]]
 
--- @class A @overload fun(x: number): boolean / local x hover
 TEST_HOVER [[
 ---@class A
 ---@overload fun(x: number): boolean
@@ -1332,7 +1331,6 @@ local <?x?>
 local x: A
 ]]
 
--- @type A local f / @enum A local t = {x=f} / f hover
 TEST_HOVER [[
 ---@type A
 local <?f?>
@@ -1343,7 +1341,6 @@ local t = {
 }
 ]] 'local f: A'
 
--- @param a number @param b string @param ... boolean function f hover
 TEST_HOVER [[
 ---@param a number
 ---@param b string
@@ -1355,17 +1352,11 @@ end
     'function f(a: number, b: string, ...args: boolean)',
 }
 
--- Lua 5.5 global * hover
-do
-    local config = test.scope.config
-    config:set(test.fileUri, 'Lua.runtime.version', 'Lua 5.5')
-    TEST_HOVER [[
+TEST_HOVER [[
 global <?*?>
 ]] [[
 global any
 ]]
-    config:set(test.fileUri, 'Lua.runtime.version', nil)
-end
 
 -- @class A @field private x @field protected y @field z / @class B: A local t
 TEST_HOVER [[

@@ -117,11 +117,12 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     local catParam = coder:findMatchedCatParam(param)
                     coder:addLine('-- ' .. param.code)
                     coder:compile(param)
-                    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode}, {optional%q})' % {
-                        funcKey   = funcKey,
-                        paramKey  = param.id,
-                        paramNode = coder:getKey(param),
-                        optional  = catParam and catParam.optional or nil,
+                    coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode}, {optional%q}, {varargName})' % {
+                        funcKey    = funcKey,
+                        paramKey   = param.id,
+                        paramNode  = coder:getKey(param),
+                        optional   = catParam and catParam.optional or nil,
+                        varargName = param.varargName and ('%q'):format(param.varargName) or 'nil',
                     })
                 end
             end, 'function params --')

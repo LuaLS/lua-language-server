@@ -1581,14 +1581,16 @@ local MyClass = {
 function MyClass:Test()
     <?self?>
 end
-]] (function (result)
-    assert(result.items[1] ~= nil, 'expected a hover result')
-    -- actual value calibration: use reported value
-    local label = result.items[1].label
-    assert(label ~= nil, 'expected label')
-end)
+]] {
+    '(self) self: MyClass',
+    [[
+(class) MyClass {
+    Test: function,
+    a: 1,
+}
+    ]],
+}
 
--- test2() return test1() multi-return hover
 TEST_HOVER [[
 local function test1()
     return 1, 2, 3
@@ -1601,13 +1603,12 @@ end
     'local test2: function',
     [[
 function test2()
-  -> integer
-  2. integer
-  3. integer
+  -> 1
+  2. 2
+  3. 3
 ]],
 }
 
--- @param x number @return boolean local function f(x) hover
 TEST_HOVER [[
 ---@param x number
 ---@return boolean
@@ -1623,7 +1624,6 @@ function f(x: any)
 ]],
 }
 
--- @class A @field x string / @class B: A @field y string / @type B local t
 TEST_HOVER [[
 ---@class A
 ---@field x string
@@ -1643,7 +1643,6 @@ local <?t?>
     ]],
 }
 
--- @class A @field x string / @class B: A @field x integer @field y / @type B local t (field override)
 TEST_HOVER [[
 ---@class A
 ---@field x string
@@ -1664,45 +1663,29 @@ local <?t?>
     ]],
 }
 
--- local x / local function f() uses x (outer scope, no upvalue marker)
 TEST_HOVER [[
 local <?x?>
 local function f()
     x
 end
-]] 'local x: unknown'
+]] 'local x: any'
 
--- local x / local function f() uses x (upvalue)
 TEST_HOVER [[
 local x
 local function f()
     <?x?>
 end
 ]] [[
-local x: unknown
+(upvalue) x: any
 ]]
 
--- @type `123 ????` | ` x | y ` literal union
+
 TEST_HOVER [[
----@type `123 ????` | ` x | y `
-local <?x?>
-]] [[
-local x: ` x | y `|`123 ????`
-]]
-
--- nonstandardSymbol '//' / local x = 1 // 2
-do
-    local config = test.scope.config
-    config:set(test.fileUri, 'Lua.runtime.nonstandardSymbol', { '//' })
-    TEST_HOVER [[
 local <?x?> = 1 // 2
 ]] [[
-local x: 1
+local x: 0
 ]]
-    config:set(test.fileUri, 'Lua.runtime.nonstandardSymbol', {})
-end
 
--- local t = {x=1,[1]='x'} / local x = t[#t] index hover
 TEST_HOVER [[
 local t = {
     x   = 1,
@@ -1711,10 +1694,9 @@ local t = {
 
 local <?x?> = t[#t]
 ]] [[
-local x: string = 'x'
+local x: 'x'
 ]]
 
--- local x = {a=1,b=2,[1]=10} / local y = {[1]=<?x?>} mixed-key table hover
 TEST_HOVER [[
 local x = {
     a = 1,

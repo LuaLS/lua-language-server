@@ -25,11 +25,27 @@ local function getVariableType(variable, source)
             return 'global'
         end
         local loc = source.loc
-        if loc and loc.kind == 'param' then
-            if variable:isSelfLike() then
-                return '(self)'
+        if loc then
+            if loc.kind == 'param' then
+                ---@cast loc LuaParser.Node.Param
+                if loc.isSelf then
+                    return '(self)'
+                end
+                return '(parameter)'
             end
-            return '(parameter)'
+            -- upvalue: 变量声明所在的函数与使用处所在的函数不同
+            -- 当 loc.parent == loc.referFunction 时（即 local function x()），
+            -- 声明的作用域是该函数的外层
+            local locRef = loc.referFunction
+            local declFunc
+            if locRef and loc.parent == locRef then
+                declFunc = locRef.parentFunction
+            else
+                declFunc = locRef
+            end
+            if source.parentFunction ~= declFunc then
+                return '(upvalue)'
+            end
         end
         return 'local'
     end

@@ -1490,26 +1490,37 @@ function f(...: boolean)
 TEST_HOVER [[
 ---@type fun():x: number
 local <?f?>
-]] [[
-local f: fun():(x: number)
-]]
+]] {
+    'local f: function',
+    [[
+function ()
+  -> x: number
+    ]],
+}
 
 TEST_HOVER [[
 ---@type fun(...: boolean):...: number
 local <?f?>
-]] [[
-local f: fun(...boolean):...number
-]]
+]] {
+    'local f: function',
+    [[
+function (...: boolean)
+  -> ...: number
+    ]],
+}
 
--- @type fun():x: number, y: boolean local f hover
 TEST_HOVER [[
 ---@type fun():x: number, y: boolean
 local <?f?>
-]] [[
-local f: fun():(x: number, y: boolean)
-]]
+]] {
+    'local f: function',
+    [[
+function ()
+  -> x: number
+  2. y: boolean
+    ]],
+}
 
--- @overload f() @overload f(0) @overload f(0,0) hover
 TEST_HOVER [[
 ---@overload fun(x: number, y: number):string
 ---@overload fun(x: number):number

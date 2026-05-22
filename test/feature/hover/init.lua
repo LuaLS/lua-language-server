@@ -43,7 +43,7 @@ function TEST_HOVER(script)
             assert(labels[1] == expects, ('expected first label:\n%s\nactual:\n%s'):format(expects, tostring(labels[1])))
             return
         end
-        assert(#labels == #expects, ('expected %d labels, actual %d\nactual labels: %s'):format(#expects, #labels, table.concat(labels, ' | ')))
+        assert(#labels == #expects, ('expected %d labels, actual %d\nactual labels: \n%s'):format(#expects, #labels, table.concat(labels, '\n---------\n')))
         for i, label in ipairs(expects) do
             label = ls.util.trim(label)
             assert(labels[i] == label, ('expected label[%d]:\n%s\nactual:\n%s'):format(i, label, tostring(labels[i])))

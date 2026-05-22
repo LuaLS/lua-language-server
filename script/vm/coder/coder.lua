@@ -469,6 +469,11 @@ function M:makeFieldCode(source)
             return string.format('%q', source.value)
         end
     end
+    if source.kind == 'unary'
+    or source.kind == 'binary'
+    or source.kind == 'call' then
+        return self:getKey(source)
+    end
     return nil
 end
 

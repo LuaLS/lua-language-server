@@ -15,6 +15,10 @@ test.includeCodes['binary'] = [[
 ---@alias op.add<A: integer, B: integer> integer
 ]]
 
+test.includeCodes['unary'] = [[
+---@alias op.len<A: any> integer
+]]
+
 test.includeCodes['type'] = [[
 ---@overload fun(x: nil): 'nil'
 ---@overload fun(x: boolean): 'boolean'

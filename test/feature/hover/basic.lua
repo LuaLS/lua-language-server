@@ -1687,6 +1687,8 @@ local x: 0
 ]]
 
 TEST_HOVER [[
+--!include unary
+
 local t = {
     x   = 1,
     [1] = 'x',
@@ -1711,13 +1713,12 @@ local y = {
 }
 ]] [[
 local x: {
+    [1]: 10,
     a: 1,
     b: 2,
-    [1]: 10,
 }
 ]]
 
--- local x = {_x='',_y='',x='',y=''} table with underscores
 TEST_HOVER [[
 local <?x?> = {
     _x = '',
@@ -1727,22 +1728,20 @@ local <?x?> = {
 }
 ]] [[
 local x: {
-    x: string = '',
-    y: string = '',
-    _x: string = '',
-    _y: string = '',
+    x: '',
+    y: '',
+    _x: '',
+    _y: '',
 }
 ]]
 
--- @type any local x / x.y field hover
 TEST_HOVER [[
 ---@type any
 local x
 
 print(x.<?y?>)
-]] '(field) x.y: unknown'
+]] '(field) x.y: any'
 
--- @async x({}, <?function?> () end)
 TEST_HOVER [[
 ---@async
 x({}, <?function?> () end)

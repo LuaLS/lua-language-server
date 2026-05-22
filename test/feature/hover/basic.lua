@@ -1550,8 +1550,8 @@ local n3 = f(0, 0)
 ]] {
     'local f: function',
     [[
-function f()
-  -> boolean
+function f(x: number)
+  -> number
 ]],
 }
 
@@ -1567,12 +1567,11 @@ local n3 = <?f?>(0, 0)
 ]] {
     'local f: function',
     [[
-function f()
-  -> boolean
+function f(x: number, y: number)
+  -> string
 ]],
 }
 
--- @class MyClass / MyClass:Test() self hover
 TEST_HOVER [[
 ---@class MyClass
 local MyClass = {

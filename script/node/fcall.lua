@@ -103,14 +103,13 @@ local function shouldUseUnknownForAnyHead(head)
     return false
 end
 
----@param self Node.FCall
----@return Node
----@return true
-M.__getter.returns = function (self)
-    local returns = {}
-    ---@type integer?, integer|false|nil
-    local allMin, allMax
+---@type Node.Function[]
+M.matchedFuncs = nil
 
+---@param self Node.FCall
+---@return Node.Function[]
+---@return true
+M.__getter.matchedFuncs = function (self)
     local rt = self.scope.rt
     ---@type Node.Function[]
     local defs = {}
@@ -120,7 +119,7 @@ M.__getter.returns = function (self)
     args:addRef(self)
 
     if shouldUseUnknownForAnyHead(self.head) then
-        return rt.UNKNOWN, true
+        return {}, true
     end
 
     self.head:each('function', function (f)
@@ -131,32 +130,19 @@ M.__getter.returns = function (self)
     end)
 
     if #defs > 1 then
-        local matches = {}
+        local filtered = {}
         for _, def in ipairs(defs) do
             if args:canCast(def.paramsPack) then
-                matches[#matches+1] = def
+                filtered[#filtered+1] = def
             end
         end
-        if #matches > 0 then
-            defs = matches
+        if #filtered > 0 then
+            defs = filtered
         end
     end
 
     if #defs == 0 then
-        local headFinal = self.head:finalValue()
-        if headFinal.kind == 'type' then
-            ---@cast headFinal Node.Type
-            if headFinal.typeName == 'any' then
-                if shouldUseUnknownForAnyHead(self.head) then
-                    return rt.UNKNOWN, true
-                end
-                return rt.ANY, true
-            end
-            if headFinal.typeName == 'unknown' then
-                return rt.UNKNOWN, true
-            end
-        end
-        return rt.UNKNOWN, true
+        return {}, true
     end
 
     local allParams = {}
@@ -174,8 +160,43 @@ M.__getter.returns = function (self)
     end
 
     local matches = rt:getBestMatchs(allParams, #self.args)
+    local result = {}
     for _, match in ipairs(matches) do
         local f = defs[match]
+        result[#result+1] = f:resolveGeneric(f:makeGenericMap(self.args))
+    end
+    return result, true
+end
+
+---@param self Node.FCall
+---@return Node
+---@return true
+M.__getter.returns = function (self)
+    local returns = {}
+    ---@type integer?, integer|false|nil
+    local allMin, allMax
+
+    local rt = self.scope.rt
+    local matchedFuncs = self.matchedFuncs
+
+    if #matchedFuncs == 0 then
+        local headFinal = self.head:finalValue()
+        if headFinal.kind == 'type' then
+            ---@cast headFinal Node.Type
+            if headFinal.typeName == 'any' then
+                if shouldUseUnknownForAnyHead(self.head) then
+                    return rt.UNKNOWN, true
+                end
+                return rt.ANY, true
+            end
+            if headFinal.typeName == 'unknown' then
+                return rt.UNKNOWN, true
+            end
+        end
+        return rt.UNKNOWN, true
+    end
+
+    for _, f in ipairs(matchedFuncs) do
         local min, max = f:getReturnCount()
         if not allMin or allMin < min then
             allMin = min
@@ -186,9 +207,7 @@ M.__getter.returns = function (self)
             allMax = max
         end
     end
-    for _, match in ipairs(matches) do
-        local f = defs[match]
-        f = f:resolveGeneric(f:makeGenericMap(self.args))
+    for _, f in ipairs(matchedFuncs) do
         for i = 1, allMin do
             returns[i] = returns[i] | (f:getReturn(i) or rt.NIL)
         end

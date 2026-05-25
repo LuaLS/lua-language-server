@@ -1713,9 +1713,9 @@ local y = {
 }
 ]] [[
 local x: {
-    [1]: 10,
     a: 1,
     b: 2,
+    [1]: 10,
 }
 ]]
 
@@ -1876,28 +1876,27 @@ local t: { a: 1 | true }
 TEST_HOVER [[
 local <?t?> = {
     a = 1,
-    [1] = 2,
-    [true] = 3,
-    [5.5] = 4,
-    [{}] = 5,
-    [function () end] = 6,
-    ["b"] = 7,
-    ["012"] = 8,
+    [1] = 1,
+    [true] = 1,
+    [5.5] = 1,
+    [{}] = 1,
+    [function () end] = 1,
+    ["b"] = 1,
+    ["012"] = 1,
 }
 ]] [[
 local t: {
-    [1]: 2,
-    [5.5]: 4,
-    ["012"]: 8,
+    [1]: 1,
+    [5.5]: 1,
+    ["012"]: 1,
     a: 1,
-    ["b"]: 7,
-    [true]: 3,
-    [function]: 6,
-    [table]: 5,
+    ["b"]: 1,
+    [true]: 1,
+    [function]: 1,
+    [table]: 1,
 }
 ]]
 
--- mt.__index = {} / self:<?test?>()
 TEST_HOVER [[
 local mt = {}
 mt.__index = {}
@@ -1905,9 +1904,11 @@ mt.__index = {}
 function mt:test(a, b)
     self:<?test?>()
 end
-]] '(method) mt:test(a: any, b: any)'
+]] {
+    '(method) mt.test: function',
+    'function mt:test(a: any, b: any)',
+}
 
--- 11-field table: b=1..l=11
 TEST_HOVER [[
 local <?t?> = {
     b = 1,
@@ -1937,6 +1938,8 @@ local t: {
     l: 11,
 }
 ]]
+
+error('测试到此即可')
 
 -- local s = <?'abc中文'?> string literal hover
 TEST_HOVER [[

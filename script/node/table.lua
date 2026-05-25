@@ -553,6 +553,39 @@ function M:inferGeneric(other, result)
     end
 end
 
+---若所有字段值均为互不相同的整数，就地将 keys 按值从小到大排序。
+---@param fieldMap table<Node, Node.Field>
+---@param keys Node[]
+local function trySortByIntegerValue(fieldMap, keys)
+    if #keys == 0 then
+        return
+    end
+    local seen = {}
+    for _, key in ipairs(keys) do
+        local field = fieldMap[key]
+        if not field or not field.value then
+            return
+        end
+        local val = field.value:simplify()
+        if val.kind ~= 'value' then
+            return
+        end
+        local lit = val.literal
+        if type(lit) ~= 'number' or math.type(lit) ~= 'integer' then
+            return
+        end
+        if seen[lit] then
+            return
+        end
+        seen[lit] = true
+    end
+    table.sort(keys, function (a, b)
+        local va = fieldMap[a].value:simplify().literal
+        local vb = fieldMap[b].value:simplify().literal
+        return va < vb
+    end)
+end
+
 function M:onView(viewer, options)
     if #self.keys == 0 then
         return '{}'
@@ -600,7 +633,9 @@ function M:onView(viewer, options)
         return false
     end
 
-    for _, key in ipairs(self.keys) do
+    local displayKeys = table.move(self.keys, 1, #self.keys, 1, {})
+    trySortByIntegerValue(self.fieldMap, displayKeys)
+    for _, key in ipairs(displayKeys) do
         local field = self.fieldMap[key]
         local isOptional
         if field.hideInView then

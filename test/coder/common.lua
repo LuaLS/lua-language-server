@@ -160,21 +160,21 @@ do
         ---@class A
         local m = {
             x = 1,
-            y = 2,
-            ['abc'] = 3,
-            [10] = 4,
-            5,
+            y = 1,
+            ['abc'] = 1,
+            [10] = 1,
+            1,
         }
     ]]
 
     lt.assertEquals(rt.type('A'):view(), 'A')
     lt.assertEquals(rt.type('A').value:view(), [[
 {
-    [1]: 5,
-    [10]: 4,
-    ['abc']: 3,
+    [1]: 1,
+    [10]: 1,
+    ['abc']: 1,
     x: 1,
-    y: 2,
+    y: 1,
 }]])
 end
 

@@ -112,8 +112,8 @@ do
     lt.assertEquals(sec.value:view(), [[
 {
     x: 1,
-    xx: 11,
     y: 2,
+    xx: 11,
     yy: 22,
 }]])
 end

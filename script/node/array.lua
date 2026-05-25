@@ -7,6 +7,8 @@ local M = ls.node.register 'Node.Array'
 
 M.kind = 'array'
 
+M.typeName = 'table'
+
 ---@param scope Scope
 ---@param value Node
 function M:__init(scope, value)
@@ -122,4 +124,8 @@ function M:onView(viewer, options)
     return viewer:format('%s[]', self.head, {
         needParentheses = true,
     })
+end
+
+function M:onViewAsKey(viewer)
+    return '[table]'
 end

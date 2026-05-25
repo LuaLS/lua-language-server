@@ -7,6 +7,8 @@ local M = ls.node.register 'Node.Tuple'
 
 M.kind = 'tuple'
 
+M.typeName = 'table'
+
 ---@type Node[]?
 M.raw = nil
 
@@ -187,4 +189,8 @@ end
 
 function M:onView(viewer, options)
     return '[' .. viewer:viewAsList(self.values) .. ']'
+end
+
+function M:onViewAsKey(viewer)
+    return '[table]'
 end

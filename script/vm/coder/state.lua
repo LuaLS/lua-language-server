@@ -1,6 +1,20 @@
 ---@class Coder
 local M = Class 'Coder'
 
+-- 检测表字面量是否为 "{ ... }" 单 varargs 模式
+---@param value LuaParser.Node.Base
+---@return boolean
+local function isVarargTable(value)
+    if value.kind ~= 'table' then
+        return false
+    end
+    ---@cast value LuaParser.Node.Table
+    return  #value.fields == 1
+        and value.fields[1].subtype == 'exp'
+        and value.fields[1].value ~= nil
+        and value.fields[1].value.kind == 'varargs'
+end
+
 ---@param coder Coder
 ---@param var LuaParser.Node.AssignAble
 ---@param index integer
@@ -138,7 +152,7 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
     local isTable = {}
     for i, value in ipairs(source.values) do
         valueKeys[i] = coder:getKey(value)
-        isTable[i] = value.kind == 'table'
+        isTable[i] = value.kind == 'table' and not isVarargTable(value)
         coder:compile(value)
     end
 
@@ -161,7 +175,7 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
     if source.values then
         for i, value in ipairs(source.values) do
             valueKeys[i] = coder:getKey(value)
-            isTable[i] = value.kind == 'table'
+            isTable[i] = value.kind == 'table' and not isVarargTable(value)
             coder:compile(value)
         end
     end

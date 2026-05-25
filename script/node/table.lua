@@ -7,6 +7,8 @@ local M = ls.node.register 'Node.Table'
 
 M.kind = 'table'
 
+M.typeName = 'table'
+
 ---@type LinkedTable<Node.Field>?
 M.fields = nil
 
@@ -653,4 +655,8 @@ function M:onView(viewer, options)
     end
 
     return '{\n    ' .. table.concat(fields, ',\n    ') .. ',\n}'
+end
+
+function M:onViewAsKey(viewer)
+    return '[table]'
 end

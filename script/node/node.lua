@@ -1,7 +1,7 @@
 ---@class Node: Node.RefModule
 ---@field onCanCast? fun(self: Node, other: Node): boolean # 能否转换为另一个节点
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
----@field typeName? string
+---@field typeName string
 ---@field hideInUnionView? boolean
 ---@field scope Scope
 ---@operator bor(Node?): Node
@@ -500,7 +500,6 @@ end
 function M:onViewAsList(viewer, options)
     error('Cannot view variable of node kind ' .. self.kind)
 end
-
 
 ---@generic T: Node
 ---@param nodeType `T`

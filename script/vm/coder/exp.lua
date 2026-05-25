@@ -89,6 +89,21 @@ end)
 ls.vm.registerCoderProvider('table', function (coder, source)
     ---@cast source LuaParser.Node.Table
 
+    -- { ... } 模式：仅含一个无键 varargs 字段，视为数组
+    if #source.fields == 1 then
+        local onlyField = source.fields[1]
+        if  onlyField.subtype == 'exp'
+        and onlyField.value
+        and onlyField.value.kind == 'varargs' then
+            coder:compile(onlyField.value)
+            coder:addLine('{key} = rt.array(rt.select({varargs}, 1))' % {
+                key     = coder:getKey(source),
+                varargs = coder:getKey(onlyField.value),
+            })
+            return
+        end
+    end
+
     coder:addLine('{key} = rt.table()' % {
         key = coder:getKey(source),
     })
@@ -374,8 +389,9 @@ ls.vm.registerCoderProvider('varargs', function (coder, source)
         return
     end
 
-    coder:addLine('{key} = {loc}' % {
-        key   = coder:getKey(source),
-        loc   = coder:getKey(loc),
+    -- 将 vararg 参数包装成无界单元素 list，使 rt.select(varargs, N) 能正确返回元素类型
+    coder:addLine('{key} = rt.list({ {loc} }, 0, false)' % {
+        key = coder:getKey(source),
+        loc = coder:getKey(loc),
     })
 end)

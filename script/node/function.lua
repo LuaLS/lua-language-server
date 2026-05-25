@@ -7,6 +7,8 @@ local M = ls.node.register 'Node.Function'
 
 M.kind = 'function'
 
+M.typeName = 'function'
+
 ---@class Node.Function.Param
 ---@field key string
 ---@field value Node
@@ -71,7 +73,8 @@ end
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
-    if other.typeName == 'function' then
+    if  other.kind == 'type'
+    and other.typeName == 'function' then
         return true
     end
 end
@@ -160,7 +163,8 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    if other.typeName == 'function' then
+    if  other.kind == 'type'
+    and other.typeName == 'function' then
         return true
     end
     if other.kind == 'function' then

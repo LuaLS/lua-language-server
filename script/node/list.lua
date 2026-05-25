@@ -92,6 +92,10 @@ function M:select(key)
             or self.values[#self.values]
             or self.scope.rt.NIL
         if key > self.min then
+            -- 无界单元素 list（vararg 语义）：视所有位置均存在，不加可选 | NIL
+            if not self.max and #self.values == 1 then
+                return v, true
+            end
             return v | self.scope.rt.NIL, true
         end
         return v, true

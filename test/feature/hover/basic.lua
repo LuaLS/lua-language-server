@@ -1746,10 +1746,9 @@ TEST_HOVER [[
 ---@async
 x({}, <?function?> () end)
 ]] [[
-(async) function ()
+async function ()
 ]]
 
--- local mt / function mt:add / init() return mt / t:<?add?>()
 TEST_HOVER [[
 local mt = {}
 
@@ -1762,9 +1761,11 @@ end
 
 local t = init()
 t:<?add?>()
-]] '(method) mt:add(a: any, b: any)'
+]] {
+    '(method) t.add: function',
+    'function mt:add(a: any, b: any)',
+}
 
--- @vararg Class / local _, <?x?> = ...
 TEST_HOVER [[
 ---@class Class
 
@@ -1777,7 +1778,6 @@ f(1, 2, 3)
 local x: Class
 ]]
 
--- @vararg Class / local <?t?> = {...} (no call)
 TEST_HOVER [[
 ---@class Class
 
@@ -1789,7 +1789,6 @@ end
 local t: Class[]
 ]]
 
--- @vararg Class / local t = {...} / local <?v?> = t[1]
 TEST_HOVER [[
 ---@class Class
 
@@ -1802,7 +1801,6 @@ end
 local v: Class
 ]]
 
--- @vararg Class / local <?t?> = {...} (with call)
 TEST_HOVER [[
 ---@class Class
 
@@ -1815,7 +1813,6 @@ f(1, 2, 3)
 local t: Class[]
 ]]
 
--- @param ... Class / local _, <?x?> = ...
 TEST_HOVER [[
 ---@class Class
 
@@ -1828,7 +1825,6 @@ f(1, 2, 3)
 local x: Class
 ]]
 
--- @param ... Class / local t = {...} / local <?v?> = t[1]
 TEST_HOVER [[
 ---@class Class
 
@@ -1869,18 +1865,14 @@ local t: {
 }
 ]]
 
--- local t = {} / t.a = 1 / t.a = true (union field)
 TEST_HOVER [[
 local <?t?> = {}
 t.a = 1
 t.a = true
 ]] [[
-local t: {
-    a: boolean|integer = 1|true,
-}
+local t: { a: 1 | true }
 ]]
 
--- mixed-key table: a=1,[1]=2,[true]=3,[5.5]=4,[{}]=5,[function()end]=6,["b"]=7,["012"]=8
 TEST_HOVER [[
 local <?t?> = {
     a = 1,
@@ -1894,12 +1886,14 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    a: 1,
     [1]: 2,
-    [true]: 3,
     [5.5]: 4,
-    ["b"]: 7,
     ["012"]: 8,
+    a: 1,
+    ["b"]: 7,
+    [true]: 3,
+    [function]: 6,
+    [table]: 5,
 }
 ]]
 

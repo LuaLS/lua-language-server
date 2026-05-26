@@ -1,4 +1,5 @@
 require 'feature.hover.provider'
+require 'feature.hover.literal'
 require 'feature.hover.variable'
 require 'feature.hover.type'
 require 'feature.hover.tablefield'

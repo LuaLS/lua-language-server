@@ -259,18 +259,6 @@ end
 }
 
 TEST_HOVER [[
-local s = <?'abc中文'?>
-]] (nil)
-
-TEST_HOVER [[
-local n = <?0xff?>
-]] (nil)
-
-TEST_HOVER [[
-local <?x?> = '\a'
-]] [[local x: '\007']]
-
-TEST_HOVER [[
 local function <?f?>()
     return 1
     return nil
@@ -1939,25 +1927,19 @@ local t: {
 }
 ]]
 
-error('测试到此即可')
-
--- local s = <?'abc中文'?> string literal hover
 TEST_HOVER [[
 local s = <?'abc中文'?>
-]] (function (result)
-    -- actual: 'abc中文': string  (non-ASCII content, just check non-nil)
-    assert(result.items[1] ~= nil, 'expected hover result for string literal')
-end)
+]] [['9 个字节，5 个字符']]
 
--- local n = <?0xff?> integer literal hover
 TEST_HOVER [[
 local n = <?0xff?>
 ]] '255'
 
--- local x = <?'\a'?> escape sequence hover
 TEST_HOVER [[
 local <?x?> = '\a'
-]] [[local x: string = '\007']]
+]] [[local x: '\007']]
+
+error('测试到此即可')
 
 -- @generic K,V / @param t table<K,V> / local t: table<string,boolean> / next(<?t?>)
 TEST_HOVER [[

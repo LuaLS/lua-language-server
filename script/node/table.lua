@@ -633,6 +633,8 @@ function M:onView(viewer, options)
         return false
     end
 
+    local values = {}
+
     local displayKeys = table.move(self.keys, 1, #self.keys, 1, {})
     trySortByIntegerValue(self.fieldMap, displayKeys)
     for _, key in ipairs(displayKeys) do
@@ -669,27 +671,41 @@ function M:onView(viewer, options)
         else
             keyStr = viewer:viewAsKey(key)
         end
-        fields[#fields+1] = string.format('%s%s: %s'
+        fields[#fields+1] = string.format('%s%s'
             , keyStr
             , isOptional and '?' or ''
-            , viewer:view(value)
         )
+        values[#values+1] = value
         ::continue::
     end
 
-    if skipped then
-        fields[#fields+1] = '...'
+    local insideTable = viewer.insideTable
+    if insideTable then
+        for i = 2, #fields do
+            fields[i] = nil
+        end
     end
 
-    if #fields == 0 then
+    viewer.insideTable = true
+    local kv = {}
+    for i = 1, #fields do
+        kv[i] = fields[i] .. ': ' .. viewer:view(values[i])
+    end
+    viewer.insideTable = insideTable
+
+    if skipped then
+        kv[#kv+1] = '...'
+    end
+
+    if #kv == 0 then
         return '{}'
     end
 
     if #fields <= viewer.inlineMax then
-        return '{ ' .. table.concat(fields, ', ') .. ' }'
+        return '{ ' .. table.concat(kv, ', ') .. ' }'
     end
 
-    return '{\n    ' .. table.concat(fields, ',\n    ') .. ',\n}'
+    return '{\n    ' .. table.concat(kv, ',\n    ') .. ',\n}'
 end
 
 function M:onViewAsKey(viewer)

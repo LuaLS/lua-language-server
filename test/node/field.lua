@@ -113,7 +113,11 @@ do
 
     local u = a & b
 
-    lt.assertEquals(u:view(), '{ x: "x" } & { y: "y" }')
+    lt.assertEquals(u:view(), [[
+{
+    x: "x",
+    y: "y",
+}]])
     lt.assertEquals(u.kind, 'intersection')
     ---@cast u Node.Intersection
     lt.assertEquals(u.value:view(), [[
@@ -136,8 +140,8 @@ do
     local u = a & b
 
     lt.assertEquals(u:view(), [[
-{ x: "x" } & {
-    x: "y",
+{
+    x: never,
     y: "y",
 }]])
     lt.assertEquals(u.kind, 'intersection')
@@ -162,7 +166,14 @@ do
 
     local u = a & (b | c)
 
-    lt.assertEquals(u:view(), '({ x: "x" } & { y: "y" }) | ({ x: "x" } & { z: "z" })')
+    lt.assertEquals(u:view(), [[
+{
+    x: "x",
+    y: "y",
+} | {
+    x: "x",
+    z: "z",
+}]])
     lt.assertEquals(u.kind, 'intersection')
     lt.assertEquals(u:get('x'):view(), '"x"')
     lt.assertEquals(u:get('y'):view(), '"y" | nil')

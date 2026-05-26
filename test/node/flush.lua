@@ -91,7 +91,11 @@ do
     }
     local sec = t1 & t2
 
-    lt.assertEquals(sec:view(), '{ x: 1 } & { y: 2 }')
+    lt.assertEquals(sec:view(), [[
+{
+    x: 1,
+    y: 2,
+}]])
     lt.assertEquals(sec.value:view(), [[
 {
     x: 1,
@@ -104,9 +108,8 @@ do
     lt.assertEquals(sec:view(), [[
 {
     x: 1,
-    xx: 11,
-} & {
     y: 2,
+    xx: 11,
     yy: 22,
 }]])
     lt.assertEquals(sec.value:view(), [[

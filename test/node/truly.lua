@@ -65,7 +65,11 @@ do
         : addField(rt.field('y', rt.value(2)))
 
     local u = a & b
-    lt.assertEquals(u:view(), '{ x: 1 } & { y: 2 }')
+    lt.assertEquals(u:view(), [[
+{
+    x: 1,
+    y: 2,
+}]])
     lt.assertEquals(u.truly:view(), [[
 {
     x: 1,

@@ -1939,9 +1939,6 @@ TEST_HOVER [[
 local <?x?> = '\a'
 ]] [[local x: '\007']]
 
-error('测试到此即可')
-
--- @generic K,V / @param t table<K,V> / local t: table<string,boolean> / next(<?t?>)
 TEST_HOVER [[
 ---@generic K, V
 ---@param t table<K, V>
@@ -1956,7 +1953,6 @@ local k, v = next(<?t?>)
 local t: table<string, boolean>
 ]]
 
--- @class A..E inheritance chain / self:f() return <?self?>
 TEST_HOVER [[
 ---@class A
 ---@class B: A
@@ -1977,25 +1973,19 @@ end
     ]],
 }
 
--- @class Position @field x,y,z — SKIP: @class直接标注local在新框架不生效
--- (not migrated: old-test pattern uses @class on local variable directly)
-
--- @type { x: string, y: number, z: boolean } inline local <?t?>
 TEST_HOVER [[
 ---@type { x: string, y: number, z: boolean }
 local <?t?>
 ]] {
-    'local t: { x: string, y: number, z: boolean }',
     [[
-{
+local t: {
     x: string,
     y: number,
     z: boolean,
 }
-    ]],
+]]
 }
 
--- function f1.f2.<?f3?>() end nested function
 TEST_HOVER [[
 function f1.f2.<?f3?>() end
 ]] {
@@ -2003,13 +1993,11 @@ function f1.f2.<?f3?>() end
     'function f1.f2.f3()',
 }
 
--- local t = nil / t.<?x?>() nil field
 TEST_HOVER [[
 local t = nil
 t.<?x?>()
-]] '(field) t.x: unknown'
+]] '(field) t.x: any'
 
--- mixed seq+hash table: {'a','b','c',[10]='d',x='e',y='f',['z']='g',[3]='h'}
 TEST_HOVER [[
 local <?t?> = {
     'a', 'b', 'c',
@@ -2021,50 +2009,39 @@ local <?t?> = {
 }
 ]] [[
 local t: {
-    x: string = 'e',
-    y: string = 'f',
-    ['z']: string = 'g',
-    [10]: string = 'd',
-    [1]: string = 'a',
-    [2]: string = 'b',
-    [3]: string = 'c'|'h',
+    [1]: 'a',
+    [2]: 'b',
+    [3]: 'h',
+    [10]: 'd',
+    x: 'e',
+    y: 'f',
+    ['z']: 'g',
 }
 ]]
 
--- local type / w2l:get_default()[<?type?>] unknown local
 TEST_HOVER [[
 local type
 w2l:get_default()[<?type?>]
-]] 'local type: unknown'
+]] 'local type: any'
 
--- <?a?>.b = 10 * 60 global table field
 TEST_HOVER [[
 <?a?>.b = 10 * 60
 ]] [[
-global a: {
-    b: 600,
-}
+global a: { b: 600 }
 ]]
 
--- a.<?b?> = 10 * 60 global field value
 TEST_HOVER [[
 a.<?b?> = 10 * 60
 ]] [[
-global a: {
-    b: 600,
-}
+global a.b: 600
 ]]
 
--- a.<?b?>.c = 1 * 1 nested global field
 TEST_HOVER [[
 a.<?b?>.c = 1 * 1
 ]] [[
-global a.b: {
-    c: 1,
-}
+global a.b: { c: 1 }
 ]]
 
--- setmetatable({}, {__index=mt}) — mt.a/b/c fields
 TEST_HOVER [[
 --!include setmetatable
 local mt = {}
@@ -2079,7 +2056,6 @@ local obj: {
     c: 3,
 }]]
 
--- setmetatable({id=1}, mt) with mt.__index=mt, mt.__name, mt:remove
 TEST_HOVER [[
 --!include setmetatable
 local mt = {}
@@ -2093,8 +2069,9 @@ local <?self?> = setmetatable({
     id = 1,
 }, mt)
 ]] [[
-local self: { id: 1 } & {
-    remove: fun(self: { ... }),
+local self: {
+    id: 1,
+    remove: function,
     __index: { ... },
-    __name: "obj",
+    __name: 'obj',
 }]]

@@ -282,6 +282,9 @@ function M:every(callback, visited)
 end
 
 function M:onView(viewer, options)
+    if self.value ~= self then
+        return viewer:view(self.value, options)
+    end
     local values = self.values
     if #values == 0 then
         return 'never'

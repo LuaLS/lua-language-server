@@ -5,6 +5,7 @@ local M = Class 'Node.Viewer'
 ---@field skipLevel? integer
 ---@field needParentheses? boolean
 ---@field noFunctionDetail? boolean
+---@field noTableDetail? boolean
 ---@field preferMethod? boolean
 ---@field viewType? Node.Type  # 外部视角：传入被观察的类型，隐藏 private 和 protected
 ---@field viewClass? Node.Type # 子类视角：传入当前所在类，只隐藏从父类继承的 private 字段
@@ -17,6 +18,7 @@ function M:__init(options)
     ---@type integer
     self.skipLevel        = options and options.skipLevel        or 0
     self.noFunctionDetail = options and options.noFunctionDetail or false
+    self.insideTable    = options and options.noTableDetail    or false
     self.preferMethod     = options and options.preferMethod     or false
     self.viewType         = options and options.viewType         or nil
     self.viewClass        = options and options.viewClass        or nil

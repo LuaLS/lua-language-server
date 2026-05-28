@@ -1,5 +1,19 @@
 local rt = test.scope.rt
 
+-- Bug 3 回归测试：多个 ---@return 注解含行内注释时，解析器不应为同一源位置
+-- 产生重复的 cat 节点，否则 coder 会触发 "Key already exists" 错误。
+do
+    TEST_INDEX [[
+        ---@return string baseDir       -- normalized path
+        ---@return string nativeBaseDir -- original OS path
+        ---@return string pattern
+        local function parseGlob(pathGlob)
+            return './', './', pathGlob
+        end
+    ]]
+    -- 只要 vfile:index() 不抛出异常即可，无需额外断言
+end
+
 do
     TEST_INDEX [[
     do

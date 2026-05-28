@@ -318,8 +318,8 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
                 value1 = source.exp1.value,
                 value2 = source.exp2.value,
             })
+            return
         end
-        return
     end
 
     if  (source.exp1.kind == 'integer' or source.exp1.kind == 'number')

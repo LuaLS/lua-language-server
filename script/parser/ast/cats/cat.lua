@@ -181,6 +181,15 @@ function Ast:parseCat()
             cats = {}
             curBlock.cats = cats
         end
+        local parsedCats = curBlock.parsedCats
+        if not parsedCats then
+            parsedCats = {}
+            curBlock.parsedCats = parsedCats
+        end
+        if parsedCats[cat.start] then
+            return cat
+        end
+        parsedCats[cat.start] = true
         cats[#cats+1] = cat
     end
 

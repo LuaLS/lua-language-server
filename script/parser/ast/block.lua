@@ -4,6 +4,7 @@
 ---@field locals LuaParser.Node.Local[]
 ---@field labels LuaParser.Node.Label[]
 ---@field cats? (LuaParser.Node.Cat|LuaParser.Node.CatBlock)[]
+---@field parsedCats? table<integer, true>
 ---@field generics LuaParser.Node.CatGeneric[]
 ---@field isMain boolean
 ---@field localMap table<string, LuaParser.Node.Local>

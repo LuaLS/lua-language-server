@@ -53,7 +53,7 @@ function Ast:parseID(nodeType, required, canBeKeyword, includeVarargs)
     if self:isReservedWord(token) then
         self:throw('RESERVED_WORD', pos, pos + #token)
     end
-    if not self.unicodeName and token:find '[\x80-\xff]' then
+    if not self.unicodeName and self.status ~= 'Cats' and token:find '[\x80-\xff]' then
         self:throw('UNICODE_NAME', pos, pos + #token)
     end
     self.lexer:next()

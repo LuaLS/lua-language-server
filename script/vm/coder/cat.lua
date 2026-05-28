@@ -495,7 +495,7 @@ end)
 
 ls.vm.registerCoderProvider('catstatecast', function (coder, source)
     ---@cast source LuaParser.Node.CatStateCast
-    coder:compile(source.var)
+    -- coder:compile(source.var)
 
     for _, item in ipairs(source.items) do
         coder:compile(item)

@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Intersection'
 
 M.kind = 'intersection'
+M.typeName = 'intersection'
 
 ---@param scope Scope
 ---@param nodes? Node[]

@@ -126,10 +126,20 @@ end)
 ls.vm.registerCoderProvider('tablefield', function (coder, source)
     ---@cast source LuaParser.Node.TableField
 
-    local key = coder:makeFieldCode(source.key)
+    -- call/binary/unary keys: makeFieldCode returns r["key@..."] (non-nil) but the
+    -- node has not been compiled yet, so we must compile it first.
+    local keyNode = source.key
+    if keyNode then
+        local kk = keyNode.kind
+        if kk == 'call' or kk == 'binary' or kk == 'unary' then
+            coder:compile(keyNode)
+        end
+    end
+
+    local key = coder:makeFieldCode(keyNode)
     if not key then
-        coder:compile(source.key)
-        key = coder:getKey(source.key)
+        coder:compile(keyNode)
+        key = coder:getKey(keyNode)
     end
     coder:compile(source.value)
 

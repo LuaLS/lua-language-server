@@ -175,6 +175,13 @@ M.__getter.value = function (self)
     return self:select(1), true
 end
 
+---@param self Node.List
+---@return string
+---@return true
+M.__getter.typeName = function (self)
+    return self.value.typeName, true
+end
+
 function M:simplify()
     if self.value == self then
         return self

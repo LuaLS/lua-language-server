@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Class'
 
 M.kind = 'class'
+M.typeName = 'class'
 
 ---@alias Node.Class.ExtendAble Node.Type | Node.Call | Node.Table
 

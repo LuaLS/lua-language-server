@@ -76,10 +76,12 @@ function test.require(modname)
     test.loadedAnyFile = true
 end
 
--- 测试模式下屏蔽xpcall，将所有错误直接抛出，方便调试
-_G['x' .. 'pcall'] = function (f, handler, ...)
-    return true, f(...)
-end
+-- 测试模式下，将子线程/异步 worker 里的错误也打印到终端
+ls.await.setErrorHandler(function (traceback)
+    log.error(traceback)
+    io.write('\n[ASYNC ERROR]\n' .. traceback .. '\n')
+    io.flush()
+end)
 
 ---@async
 ls.await.call(function ()

@@ -2,6 +2,7 @@
 local M = ls.node.register 'Node.Variable'
 
 M.kind = 'variable'
+M.typeName = 'variable'
 
 M.hideInUnionView = true
 ---@type Node.Variable?

@@ -49,6 +49,13 @@ M.__getter.value = function (self)
     return list:slice(literal), true
 end
 
+---@param self Node.Select
+---@return string
+---@return true
+M.__getter.typeName = function (self)
+    return self.value.typeName, true
+end
+
 function M:simplify()
     if self.value == self then
         return self

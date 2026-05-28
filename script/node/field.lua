@@ -2,6 +2,7 @@
 local M = ls.node.register 'Node.Field'
 
 M.kind = 'field'
+M.typeName = 'field'
 
 ---@param scope Scope
 ---@param key Node.Key

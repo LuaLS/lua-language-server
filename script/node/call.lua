@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Call'
 
 M.kind = 'call'
+M.typeName = 'call'
 
 ---@type Node.Type
 M.head = nil

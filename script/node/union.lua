@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Union'
 
 M.kind = 'union'
+M.typeName = 'union'
 
 ---@param scope Scope
 ---@param nodes? Node[]

@@ -30,6 +30,13 @@ M.__getter.value = function (self)
     return self.returns, true
 end
 
+---@param self Node.FCall
+---@return string
+---@return true
+M.__getter.typeName = function (self)
+    return self.value.typeName, true
+end
+
 function M:simplify()
     if self.value == self then
         return self

@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Generic'
 
 M.kind = 'generic'
+M.typeName = 'generic'
 
 M.hasGeneric = true
 

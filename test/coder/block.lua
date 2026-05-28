@@ -1,5 +1,17 @@
 local rt = test.scope.rt
 
+-- 回归测试：table 构造器中 call/binary/unary 作为 [key] 时不应抛 'No such key'
+do
+    TEST_INDEX [[
+        local sb = string.byte
+        local t = {
+            [string.byte '"'] = 1,
+            [1 + 2]            = 2,
+            [not false]        = 3,
+        }
+    ]]
+end
+
 -- Bug 3 回归测试：多个 ---@return 注解含行内注释时，解析器不应为同一源位置
 -- 产生重复的 cat 节点，否则 coder 会触发 "Key already exists" 错误。
 do

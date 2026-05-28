@@ -36,6 +36,13 @@ M.__getter.value = function (self)
 end
 
 ---@param self Node.Index
+---@return string
+---@return true
+M.__getter.typeName = function (self)
+    return self.value.typeName, true
+end
+
+---@param self Node.Index
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)

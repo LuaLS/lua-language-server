@@ -90,6 +90,9 @@ function M:fillAPIs()
         if quo == '[[' then
             return self.VALUE_POOL_STR3[v]
         end
+        if type(v) == 'number' and v ~= v then
+            return self.VALUE_NAN
+        end
         return self.VALUE_POOL[v]
     end
 
@@ -353,6 +356,7 @@ function M:fillPresets()
     self.FALSY = self.FALSE | self.NIL
     self.NIL = self.type 'nil'
         : setConfig('basicType', true)
+    self.VALUE_NAN = New 'Node.Value' (self.scope, 0/0)
     self.NUMBER = self.type 'number'
         : setConfig('basicType', true)
     self.INTEGER = self.type 'integer'

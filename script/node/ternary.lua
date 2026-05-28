@@ -43,3 +43,10 @@ M.__getter.value = function (self)
 
     return self.thenNode | self.elseNode, true
 end
+
+---@param self Node.Ternary
+---@return string
+---@return true
+M.__getter.typeName = function (self)
+    return self.value.typeName, true
+end

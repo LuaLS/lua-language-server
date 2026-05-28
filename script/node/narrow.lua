@@ -7,6 +7,7 @@
 local M = ls.node.register 'Node.Narrow'
 
 M.kind = 'narrow'
+M.typeName = 'narrow'
 
 ---@alias Node.Narrow.CallParams {
 --- func: Node,

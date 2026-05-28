@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Template'
 
 M.kind = 'template'
+M.typeName = 'template'
 
 M.hasGeneric = true
 

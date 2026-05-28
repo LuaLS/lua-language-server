@@ -6,6 +6,7 @@
 local M = ls.node.register 'Node.Alias'
 
 M.kind = 'alias'
+M.typeName = 'alias'
 
 ---@param scope Scope
 ---@param name string

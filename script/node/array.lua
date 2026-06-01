@@ -16,6 +16,24 @@ function M:__init(scope, value)
     self.head = value
 end
 
+---@type Node?
+M.expectParent = nil
+
+---@param parent Node
+function M:setExpectParent(parent)
+    self.expectParent = parent
+end
+
+---@param key Node.Key
+---@return Node
+---@return boolean exists
+function M:getExpect(key)
+    if not self.expectParent then
+        return self.scope.rt.NIL, false
+    end
+    return self.expectParent:getExpect(key)
+end
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists

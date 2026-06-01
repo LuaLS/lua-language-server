@@ -83,3 +83,13 @@ function ls.fs.newMap()
         return {}
     end
 end
+
+---@param uri Uri
+---@param base Uri
+---@return Uri?
+function ls.fs.relative(uri, base)
+    if uri:sub(1, #base) == base then
+        return uri:sub(#base + 1)
+    end
+    return nil
+end

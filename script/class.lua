@@ -50,16 +50,20 @@ M._errorHandler = error
 ---@field package __config Class.Config
 
 ---@class Class.Config
----@field private name         string
+---@field package name         string
 ---@field package extendsMap   table<string, boolean>
----@field package extendsCalls Class.Extends.CallData[]
----@field package extendsKeys  table<string, boolean>
+---@field package extendsList  Class.ExtendsInfo[]
+---@field package extendsRev   table<string, boolean>
 ---@field private superCache   table<string, fun(...)>
 ---@field package superClass?  Class.Base
----@field public  getter       table<any, fun(obj: any)>
----@field package initCalls?   false|fun(...)[]
+---@field package inited?      boolean
+---@field package extendsKeys? table<string, boolean>
+---@field package initCalls?   fun(obj: Class.Base, ...)[]
 ---@field package compress     string[]
 ---@field package presize?     integer
+---@field package resetTrap    fun()
+---@field private initOrder?  Class.Config[]
+---@field private mergedCompress? string[]
 local Config = {}
 
 ---@param name string | table
@@ -72,9 +76,9 @@ function M.getConfig(name)
         M._classConfig[name] = setmetatable({
             name         = name,
             extendsMap   = {},
+            extendsList  = {},
+            extendsRev   = {},
             superCache   = {},
-            extendsCalls = {},
-            extendsKeys  = {},
             compress     = {},
         }, { __index = Config })
     end
@@ -92,12 +96,14 @@ end
 function M.declare(name, super, superInit)
     local config = M.getConfig(name)
     if M._classes[name] then
+        config:reset()
         return M._classes[name], config
     end
     local class  = {}
     local getter = {}
     local setter = {}
     local keyMap
+    local keyMapRev -- integer slot -> 原始 key，仅用于 __pairs
     class.__name   = name
     class.__getter = getter
     class.__setter = setter
@@ -107,19 +113,15 @@ function M.declare(name, super, superInit)
         if keyMap then
             return
         end
-        local used = {}
-        for _, k in ipairs(config.compress) do
-            used[k] = true
+        keyMap = {}
+        keyMapRev = {}
+        for i, k in ipairs(config:getCompress()) do
+            keyMap[k] = i
+            keyMapRev[i] = k
         end
-        local i = 1
-        keyMap = setmetatable({}, { __index = function (t, k)
-            if not used[k] then
-                t[k] = false
-                return false
-            end
-            t[k] = i
-            i = i + 1
-            return t[k]
+        setmetatable(keyMap, { __index = function (t, k)
+            t[k] = false
+            return false
         end })
     end
 
@@ -211,60 +213,72 @@ function M.declare(name, super, superInit)
         end
     end
 
-    function class:__index(k)
-        if next(class.__getter) or #config.compress > 0 then
-            if #config.compress > 0 then
-                buildKeyMap()
-                class.__index = getterFuncWithCompress
-                return getterFuncWithCompress(self, k)
-            else
-                class.__index = getterFunc
-                return getterFunc(self, k)
-            end
-        else
-            class.__index = class
-            return class[k]
-        end
-    end
+    config.resetTrap = function ()
+        keyMap = nil
+        keyMapRev = nil
 
-    function class:__newindex(k, v)
-        if next(class.__setter) or #config.compress > 0 then
-            if #config.compress > 0 then
-                buildKeyMap()
-                class.__newindex = setterFuncWithCompress
-                return setterFuncWithCompress(self, k, v)
-            else
-                class.__newindex = setterFunc
-                setterFunc(self, k, v)
-            end
-        else
-            class.__newindex = nil
-            rawset(self, k, v)
-        end
-    end
-
-    function class:__pairs()
-        if #config.compress == 0 then
-            class.__pairs = nil
-            return next, self, nil
-        end
-        buildKeyMap()
-        return function (_, k)
-            local ik
-            local tp = type(k)
-            if tp == 'number' then
-                ik = k
-                k = rawget(keyMap, k)
-            elseif tp == 'string' then
-                ik = rawget(keyMap, k)
-                if not ik then
-                    return nil, nil
+        function class:__index(k)
+            config:init()
+            local compress = config:getCompress()
+            if next(class.__getter) or #compress > 0 then
+                if #compress > 0 then
+                    buildKeyMap()
+                    class.__index = getterFuncWithCompress
+                    return getterFuncWithCompress(self, k)
+                else
+                    class.__index = getterFunc
+                    return getterFunc(self, k)
                 end
+            else
+                class.__index = class
+                return class[k]
             end
-            local nk, nv = next(self, ik)
-            return rawget(keyMap, nk) or nk, nv
-        end, self, nil
+        end
+
+        function class:__newindex(k, v)
+            local compress = config:getCompress()
+            if next(class.__setter) or #compress > 0 then
+                if #compress > 0 then
+                    buildKeyMap()
+                    class.__newindex = setterFuncWithCompress
+                    return setterFuncWithCompress(self, k, v)
+                else
+                    class.__newindex = setterFunc
+                    setterFunc(self, k, v)
+                end
+            else
+                class.__newindex = nil
+                rawset(self, k, v)
+            end
+        end
+
+        function class:__pairs()
+            if #config:getCompress() == 0 then
+                class.__pairs = nil
+                return next, self, nil
+            end
+            buildKeyMap()
+            ---@cast keyMap -?
+            ---@cast keyMapRev -?
+            return function (_, k)
+                local ik
+                if k == nil then
+                    ik = nil
+                elseif type(k) == 'string' and keyMap[k] then
+                    -- 上一次返回的是原始压缩 key，需要换回 integer slot
+                    ik = keyMap[k]
+                else
+                    ik = k
+                end
+                local nk, nv = next(self, ik)
+                if type(nk) == 'number' and keyMapRev[nk] then
+                    return keyMapRev[nk], nv
+                end
+                return nk, nv
+            end, self, nil
+        end
     end
+    config.resetTrap()
 
     function class:__encode()
         return self
@@ -275,7 +289,7 @@ function M.declare(name, super, superInit)
     end
 
     function class:__call(...)
-        M.runInit(self, name, ...)
+        config:runInit(self, ...)
         return self
     end
 
@@ -296,15 +310,12 @@ function M.declare(name, super, superInit)
     if superClass then
         if class == superClass then
             M._errorHandler(('class %q can not inherit itself'):format(name))
+        else
+            class.__super = superClass
+            config.superClass = superClass
+            config:extends(super, superInit)
         end
 
-        class.__super = superClass
-        config.superClass = superClass
-        if superInit then
-            config:extends(super, superInit)
-        else
-            config:extends(super, function () end)
-        end
     end
 
     return class, config
@@ -340,19 +351,29 @@ function M.new(name, tbl)
                 instance.__class__ = name
                 return instance
             end
+        elseif type(name) == 'table' then
+            class = name
+            name = class.__name
+        else
+            M._errorHandler(('class %q not found'):format(tostring(name)))
+            return nil
         end
-        M._errorHandler(('class %q not found'):format(name))
+    end
+
+    local config = class.__config
+    if not config.inited then
+        config:init()
     end
 
     if not tbl then
-        local presize = class.__config.presize
+        local presize = config.presize
         if presize then
             tbl = tablecreate(0, presize + 2)
         else
             tbl = tablecreate(0, 2)
         end
     end
-    tbl.__class__ = name
+    tbl.__class__ = class.__name
 
     local instance = setmetatable(tbl, class)
 
@@ -369,9 +390,11 @@ function M.delete(obj)
     local name = obj.__class__
     if not name then
         M._errorHandler('can not delete undeclared class : ' .. tostring(obj))
+        return
     end
 
-    M.runDel(obj, name)
+    local config = M.getConfig(name)
+    config:runDel(obj)
 end
 
 -- 获取类的名称
@@ -388,7 +411,7 @@ end
 ---@param obj table
 ---@return boolean
 function M.isValid(obj)
-    return obj.__class__
+    return obj.__class__ ~= nil
        and not obj.__deleted__
 end
 
@@ -402,7 +425,9 @@ function M.super(name)
     return config:super(name)
 end
 
----@alias Class.Extends.CallData { name: string, init?: fun(self: any, super: (fun(...): Class.Base), ...) }
+---@class Class.ExtendsInfo
+---@field name string
+---@field init? fun(self: any, super: (fun(...): Class.Base), ...)
 
 ---@generic Class: string
 ---@generic Extends: string
@@ -412,85 +437,6 @@ end
 function M.extends(name, extendsName, init)
     local config = M.getConfig(name)
     config:extends(extendsName, init)
-end
-
----@private
----@param obj table
----@param name string
----@param ... any
-function M.runInit(obj, name, ...)
-    local data  = M.getConfig(name)
-    if data.initCalls == false then
-        return
-    end
-    if not data.initCalls then
-        local initCalls = {}
-        local collected = {}
-
-        local function collectInitCalls(cname)
-            if collected[cname] then
-                error(('class %q has circular inheritance'):format(cname))
-            end
-            collected[cname] = true
-            local class = M._classes[cname]
-            local cdata  = M.getConfig(cname)
-            local extendsCalls = cdata.extendsCalls
-            if extendsCalls then
-                for _, call in ipairs(extendsCalls) do
-                    if call.init then
-                        initCalls[#initCalls+1] = function (cobj, ...)
-                            local firstCall = true
-                            call.init(cobj, function (...)
-                                if firstCall then
-                                    firstCall = false
-                                    M.runInit(cobj, call.name, ...)
-                                end
-                                return M._classes[call.name]
-                            end, ...)
-                        end
-                    else
-                        collectInitCalls(call.name)
-                    end
-                end
-            end
-            if class.__init then
-                initCalls[#initCalls+1] = class.__init
-            end
-        end
-
-        collectInitCalls(name)
-
-        if #initCalls == 0 then
-            data.initCalls = false
-            return
-        else
-            data.initCalls = initCalls
-        end
-    end
-
-    for i = 1, #data.initCalls do
-        data.initCalls[i](obj, ...)
-    end
-end
-
----@private
----@param obj table
----@param name string
-function M.runDel(obj, name)
-    local class = M._classes[name]
-    if not class then
-        return
-    end
-    local data  = M.getConfig(name)
-    local extendsCalls = data.extendsCalls
-    if extendsCalls then
-        for _, call in ipairs(extendsCalls) do
-            M.runDel(obj, call.name)
-        end
-    end
-    if class.__del then
-        class.__del(obj)
-    end
 end
 
 ---@param errorHandler fun(msg: string)
@@ -505,16 +451,18 @@ function Config:super(name)
         local class = M._classes[name]
         if not class then
             M._errorHandler(('class %q not found'):format(name))
+            return function () end
         end
         local super = self.superClass
         if not super then
             M._errorHandler(('class %q not inherit from any class'):format(name))
+            return function () end
         end
-        ---@cast super -?
         self.superCache[name] = function (...)
             local k, obj = debug.getlocal(2, 1)
             if k ~= 'self' then
                 M._errorHandler(('`%s()` must be called by the class'):format(name))
+                return
             end
             super.__call(obj,...)
         end
@@ -524,74 +472,277 @@ end
 
 ---@generic Extends: string
 ---@param extendsName `Extends`
----@param init? fun(self: self, super: Extends)
+---@param init? fun(self: self, super: Extends, ...)
 function Config:extends(extendsName, init)
-    local class   = M._classes[self.name]
-    local extends = M._classes[extendsName]
-    if not extends then
-        M._errorHandler(('class %q not found'):format(extendsName))
-    end
     if type(init) ~= 'nil' and type(init) ~= 'function' then
-        M._errorHandler(('init must be nil or function'))
+        M._errorHandler('init must be nil or function')
+        return
+    end
+    if self.extendsMap[extendsName] then
+        return
     end
     self.extendsMap[extendsName] = true
+    M.getConfig(extendsName).extendsRev[self.name] = true
 
-    do --复制父类的字段与 getter 和 setter
+    self.extendsList[#self.extendsList+1] = {
+        name = extendsName,
+        init = init,
+    }
+end
+
+---返回包含所有父类（按 init 顺序）合并后的 compress 列表
+---@package
+---@return string[]
+function Config:getCompress()
+    local merged = self.mergedCompress
+    if merged then
+        return merged
+    end
+    merged = {}
+    self.mergedCompress = merged
+    for _, cfg in ipairs(self:getInitOrder()) do
+        for _, k in ipairs(cfg.compress) do
+            merged[#merged+1] = k
+        end
+    end
+    return merged
+end
+
+---构建 init 调用计划。一次 DFS 完成：
+---  * initCalls：扁平化的可调用列表（每个元素 = function(obj, ...) end），按调用顺序排列
+---  * initOrder：菱形去重后的 Class.Config 顺序，供 runDel 反序使用
+---菱形继承在构建期就被去重；显式 init 钩子的 super 也提前打包好对应的子步骤
+---@private
+function Config:buildInitPlan()
+    if self.initCalls then
+        return
+    end
+
+    local initCalls = {}
+    local initOrder = {}
+    self.initCalls = initCalls
+    self.initOrder = initOrder
+
+    local visited = {}      -- name -> true，菱形去重
+    local inProgress = {}   -- name -> true，循环继承检测
+    local selfName = self.name
+
+    local function pushSelfCall(cfg)
+        initOrder[#initOrder+1] = cfg
+        local cfgName = cfg.name
+        initCalls[#initCalls+1] = function (obj, ...)
+            local class = M._classes[cfgName]
+            if class and class.__init then
+                class.__init(obj, ...)
+            end
+        end
+    end
+
+    local expand
+
+    -- 处理 cfg 的 extendsList[i]：若带 init 钩子，把对应父类链折叠成 super() 闭包
+    local function handleExtends(info)
+        local pcfg = M.getConfig(info.name)
+        if not pcfg then
+            M._errorHandler(('class %q not found'):format(info.name))
+            return
+        end
+        if not info.init then
+            expand(pcfg)
+            return
+        end
+
+        -- 显式 init 钩子：先尝试展开父类链到 initCalls 末尾
+        local userInit = info.init
+        local parentName = info.name
+        local subStart = #initCalls + 1
+        expand(pcfg)
+        local subEnd = #initCalls
+
+        if subStart > subEnd then
+            -- 父类链整条都被去重了（菱形）→ super() 必报错
+            initCalls[#initCalls+1] = function (obj, ...)
+                local superCount = 0
+                local function super(...)
+                    superCount = superCount + 1
+                    if superCount > 1 then
+                        M._errorHandler(('super can only be called once in extends of class %q'):format(selfName))
+                        return
+                    end
+                    M._errorHandler(('diamond inheritance: class %q already initialized, cannot call super explicitly in %q'):format(parentName, selfName))
+                end
+                userInit(obj, super, ...)
+                if superCount == 0 then
+                    M._errorHandler(('super must be called in extends of class %q'):format(selfName))
+                end
+            end
+            return
+        end
+
+        -- 把 subStart..subEnd 抽出来，由 super() 触发
+        local subCalls = {}
+        for i = subStart, subEnd do
+            subCalls[#subCalls+1] = initCalls[i]
+        end
+        for i = subEnd, subStart, -1 do
+            initCalls[i] = nil
+        end
+        local subN = #subCalls
+        initCalls[#initCalls+1] = function (obj, ...)
+            local superCount = 0
+            local function super(...)
+                superCount = superCount + 1
+                if superCount > 1 then
+                    M._errorHandler(('super can only be called once in extends of class %q'):format(selfName))
+                    return
+                end
+                for i = 1, subN do
+                    subCalls[i](obj, ...)
+                end
+            end
+            userInit(obj, super, ...)
+            if superCount == 0 then
+                M._errorHandler(('super must be called in extends of class %q'):format(selfName))
+            end
+        end
+    end
+
+    expand = function (cfg)
+        local cfgName = cfg.name
+        if visited[cfgName] then
+            return
+        end
+        if inProgress[cfgName] then
+            M._errorHandler(('class %q has circular inheritance'):format(selfName))
+            return
+        end
+        inProgress[cfgName] = true
+
+        for _, info in ipairs(cfg.extendsList) do
+            handleExtends(info)
+        end
+
+        inProgress[cfgName] = nil
+        visited[cfgName] = true
+        pushSelfCall(cfg)
+    end
+
+    expand(self)
+end
+
+---返回扁平的 init 调用列表
+---@private
+---@return (fun(obj: any, ...))[]
+function Config:getInitCalls()
+    self:buildInitPlan()
+    return self.initCalls
+end
+
+---返回 __init 的执行顺序（菱形已去重），供 runDel 反序使用
+---@private
+---@return Class.Config[]
+function Config:getInitOrder()
+    self:buildInitPlan()
+    return self.initOrder
+end
+
+---@package
+function Config:init()
+    if self.inited then
+        return
+    end
+    self.inited = true
+    self:getInitOrder() -- 触发循环继承检查并构建 initOrder 缓存
+    self.extendsKeys = {}
+
+    local class = M._classes[self.name]
+    for _, info in ipairs(self.extendsList) do
+        local extendsName = info.name
+        local extends = M._classes[extendsName]
+        if not extends then
+            M._errorHandler(('class %q not found'):format(extendsName))
+            goto continue
+        end
+        local extendsConfig = extends.__config
+        extendsConfig:init()
+
+        --复制父类的字段与 getter 和 setter
         for k, v in pairs(extends) do
-            if (not class[k] or self.extendsKeys[k])
-            and not k:match '^__' then
+            if not class[k] and not k:match '^__' then
                 self.extendsKeys[k] = true
                 class[k] = v
             end
         end
         for k, v in pairs(extends.__getter) do
-            if not class.__getter[k]
-            or self.extendsKeys[k] then
+            if not class.__getter[k] then
                 self.extendsKeys[k] = true
                 class.__getter[k] = v
             end
         end
         for k, v in pairs(extends.__setter) do
-            if not class.__setter[k]
-            or self.extendsKeys[k] then
+            if not class.__setter[k] then
                 self.extendsKeys[k] = true
                 class.__setter[k] = v
             end
         end
-        local config = M.getConfig(extendsName)
-        for _, k in ipairs(config.compress) do
-            self.compress[#self.compress+1] = k
+        ::continue::
+    end
+end
+
+---@package
+---@param obj table
+---@param ... any
+function Config:runInit(obj, ...)
+    local initCalls = self:getInitCalls()
+    for i = 1, #initCalls do
+        initCalls[i](obj, ...)
+    end
+end
+
+---@package
+---@param obj table
+function Config:runDel(obj)
+    -- 析构顺序：按 init 顺序的逆序执行
+    local order = self:getInitOrder()
+    for i = #order, 1, -1 do
+        local extClass = M._classes[order[i].name]
+        if extClass and extClass.__del then
+            extClass.__del(obj)
         end
     end
+end
 
-    do --记录父类的init方法
-        local rewrite
-        for i = 1, #self.extendsCalls do
-            local call = self.extendsCalls[i]
-            if call.name == extendsName then
-                call.init = init
-                rewrite = true
-                break
+---重置缓存，用于支持重载
+---@package
+---@param visited? table
+function Config:reset(visited)
+    self.initOrder = nil
+    self.initCalls = nil
+    self.mergedCompress = nil
+
+    if self.inited then
+        self.inited = nil
+        self:resetTrap()
+
+        --清除从父类复制过来的字段，子类可能重新定义自己的字段
+        local class = M._classes[self.name]
+        if class and self.extendsKeys then
+            for k in pairs(self.extendsKeys) do
+                class[k] = nil
+                class.__getter[k] = nil
+                class.__setter[k] = nil
             end
-        end
-        if not rewrite then
-            table.insert(self.extendsCalls, {
-                init = init,
-                name = extendsName,
-            })
+            self.extendsKeys = nil
         end
     end
 
-    -- 检查是否需要显性初始化
-    if not init then
-        if not extends.__init then
-            return
+    --无论本类是否 init 过，都要把缓存失效传播给已 init 的子类
+    visited = visited or {}
+    visited[self.name] = true
+    for child in pairs(self.extendsRev) do
+        if not visited[child] then
+            M.getConfig(child):reset(visited)
         end
-        local info = debug.getinfo(extends.__init, 'u')
-        if info.nparams <= 1 then
-            return
-        end
-        M._errorHandler(('must call super for extends "%s"'):format(extendsName))
     end
 end
 
@@ -644,16 +795,22 @@ function M.flush(obj)
     end
 end
 
+--- 为类启用字段压缩：将指定的 string key 映射到整数槽位，
+--- 减小实例 hash 部分的开销。
+---
+--- **注意**：启用压缩后，该类实例不能再以正整数作为 key 写入
+--- （会与压缩槽位冲突，覆盖或读到错误数据）。
 ---@param name string | table
 ---@param keys string[]
 function M.compressKeys(name, keys)
     local config = M.getConfig(name)
     config.compress = keys
+    config:reset()
 end
 
-function M.presize(name, nrec)
+function M.presize(name, nreq)
     local config = M.getConfig(name)
-    config.presize = nrec
+    config.presize = nreq
 end
 
 return M

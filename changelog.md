@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`
 * `FIX` Fix initial `nameStyle.config` not getting loaded in the appropriate workspace.
 
 ## 3.18.2

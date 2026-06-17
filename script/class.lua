@@ -213,9 +213,25 @@ function M.declare(name, super, superInit)
         end
     end
 
+    local mt = {
+        __call = function (self, ...)
+            if not self.__alloc then
+                error(('class %q can not be instantiated'):format(name))
+                return self
+            end
+            return self:__alloc(...)
+        end,
+    }
+
     config.resetTrap = function ()
         keyMap = nil
         keyMapRev = nil
+
+        function mt:__index(k)
+            config:init()
+            mt.__index = nil
+            return rawget(self, k)
+        end
 
         function class:__index(k)
             config:init()
@@ -295,15 +311,6 @@ function M.declare(name, super, superInit)
 
     M._classes[name] = class
 
-    local mt = {
-        __call = function (self, ...)
-            if not self.__alloc then
-                error(('class %q can not be instantiated'):format(name))
-                return self
-            end
-            return self:__alloc(...)
-        end,
-    }
     setmetatable(class, mt)
 
     local superClass = M._classes[super]
@@ -488,6 +495,8 @@ function Config:extends(extendsName, init)
         name = extendsName,
         init = init,
     }
+
+    self:reset()
 end
 
 ---返回包含所有父类（按 init 顺序）合并后的 compress 列表

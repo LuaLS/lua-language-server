@@ -241,7 +241,9 @@ function M:pollWatch()
             break
         end
         ---@cast nativePath -?
-        self:_onWatchEvent(eventType, nativePath)
+        ls.await.call(function ()
+            self:_onWatchEvent(eventType, nativePath)
+        end)
     end
 end
 

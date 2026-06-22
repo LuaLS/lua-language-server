@@ -59,7 +59,7 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11431",
+			"address": "127.0.0.1:11400",
 			"outputCapture": [
 			],
 			"sourceFormat": "string",

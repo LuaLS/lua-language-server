@@ -1607,4 +1607,16 @@ function m.methodCacher(f, aliveTime, getClock)
     end
 end
 
+---@param obj any
+---@param name string
+---@param value any
+function m.setMetaMethod(obj, name, value)
+    local mt = getmetatable(obj)
+    if mt then
+        mt[name] = value
+    else
+        setmetatable(obj, { [name] = value })
+    end
+end
+
 return m

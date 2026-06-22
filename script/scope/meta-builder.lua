@@ -4,16 +4,14 @@ local M = Class 'MetaBuilder'
 ---@param version 'Lua 5.1' | 'Lua 5.2' | 'Lua 5.3' | 'Lua 5.4' | 'Lua 5.5' | 'LuaJIT'
 ---@param language 'en-us' | 'zh-cn' | string
 ---@param encoding Encoder.Encoding
----@param locale { meta: table<string, string?>, script: table<string, string?> }
-function M:__init(version, language, encoding, locale)
+function M:__init(version, language, encoding)
     self.version  = version
     self.language = language
     self.encoding = encoding
-    self.locale   = locale
 end
 
 function M:getDocFormater()
-    if true then
+    if ls.server.client.params.initializationOptions['viewDocument'] then
         if self.version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
         elseif self.version == 'Lua 5.2' then
@@ -53,7 +51,8 @@ function M:convertLink(text)
             lastDot = '.'
         end
         if fmt then
-            return ('[%s](%s)'):format(name, self.locale.script(fmt, 'pdf-' .. name)) .. lastDot
+            return ('[%s](%s)' % { name, ~fmt % { 'pdf-' .. name } })
+                .. lastDot
         else
             return ('`%s`'):format(name) .. lastDot
         end
@@ -64,7 +63,7 @@ function M:convertLink(text)
             lastDot = '.'
         end
         if fmt then
-            return ('[§%s](%s)'):format(name, self.locale.script(fmt, name)) .. lastDot
+            return ('[§%s](%s)' % { name, ~fmt % { name } }) .. lastDot
         else
             return ('`%s`'):format(name) .. lastDot
         end
@@ -80,7 +79,10 @@ function M:createViewDocument(name)
     if name:sub(-1) == '.' then
         name = name:sub(1, -2)
     end
-    return ('[%s](%s)'):format(self.locale.script.HOVER_VIEW_DOCUMENTS, self.locale.script(fmt, 'pdf-' .. name))
+    return '[%s](%s)' % {
+        ~'HOVER_VIEW_DOCUMENTS',
+        ~fmt % { 'pdf-' .. name },
+    }
 end
 
 ---@param script string
@@ -112,11 +114,11 @@ function M:compileFile(script)
         PUSH    = function (text)
             compileBuf[#compileBuf+1] = text
         end,
+        ---@param name string
         DES     = function (name)
-            local des = self.locale.meta[name]
-            if not des then
-                des = ('Miss locale <%s>'):format(name)
-            end
+            ---@type string
+            ---@diagnostic disable-next-line: assign-type-mismatch
+            local des = ~name
             compileBuf[#compileBuf+1] = '---\n'
             for line in ls.util.eachLine(des) do
                 compileBuf[#compileBuf+1] = '---'
@@ -131,11 +133,11 @@ function M:compileFile(script)
             end
             compileBuf[#compileBuf+1] = '---\n'
         end,
+        ---@param name string
         DESTAIL = function (name)
-            local des = self.locale.meta[name]
-            if not des then
-                des = ('Miss locale <%s>'):format(name)
-            end
+            ---@type string
+            ---@diagnostic disable-next-line: assign-type-mismatch
+            local des = ~name
             compileBuf[#compileBuf+1] = self:convertLink(des):gsub('[\r\n]', '...')
             compileBuf[#compileBuf+1] = '\n'
         end,
@@ -166,6 +168,8 @@ function M:compileFile(script)
                 compileBuf[#compileBuf+1] = '---@deprecated\n'
             end
         end,
+        DISABLE = function ()
+        end
     }, { __index = _ENV })
 
     local suc = xpcall(function ()
@@ -209,7 +213,7 @@ function API.compile(version, language, encoding)
         return targetDir
     end
 
-    local builder = New 'MetaBuilder' (version, language, encoding, { meta = {}, script = {} })
+    local builder = New 'MetaBuilder' (version, language, encoding)
     for _, sourceFile in ipairs(sourceFiles) do
         local fileName = ls.fs.relative(sourceFile, sourceDir)
         local targetFile = targetDir / fileName

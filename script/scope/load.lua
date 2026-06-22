@@ -1,5 +1,6 @@
-local beefw = require 'bee.filewatch'
-local bfs   = require 'bee.filesystem'
+local beefw       = require 'bee.filewatch'
+local bfs         = require 'bee.filesystem'
+local metaBuilder = require 'scope.meta-builder'
 
 ---@class Scope
 local Scope = Class 'Scope'
@@ -361,6 +362,7 @@ function Scope:resolveLibraryUri(path)
     return ls.uri.normalize(self.uri / path)
 end
 
+---@async
 ---@param options Scope.Load.Options
 function Scope:buildRoots(options)
     self.roots = {}
@@ -370,8 +372,9 @@ function Scope:buildRoots(options)
         self.roots[#self.roots+1] = New 'Scope.Root' (self, 'workspace', self.uri, self.fs, self.config)
     end
 
-    if not self.uri then
-        return
+    do
+        local metaUri = metaBuilder.compile('Lua 5.5', 'en-us', 'utf-8')
+        self.roots[#self.roots+1] = New 'Scope.Root' (self, 'meta', metaUri, self.fs, self.config)
     end
 
     local libraries = self.config:get(self.uri, 'Lua.workspace.library')

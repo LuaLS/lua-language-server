@@ -23,6 +23,7 @@ ls.gc      = require 'tools.gc'
 ls.json    = require 'tools.json'
 ls.glob    = require 'tools.glob'
 ls.fw      = require 'tools.filewatch'
+ls.locale  = require 'tools.locale'
 ls.spec    = require 'lsp.spec'
 package.loaded['json'] = ls.json
 package.loaded['json-beautify'] = require 'tools.json-beautify'
@@ -44,6 +45,11 @@ ls.eventLoop     = require 'tools.event-loop'
 ls.sevent        = require 'tools.simple-event'
 
 require 'async'
+
+---@operator bnot(string):string
+ls.util.setMetaMethod('string', '__bnot', function (str)
+    return ls.locale.get(str) or str
+end)
 
 ls.await.setErrorHandler(function (traceback)
     log.error(traceback)

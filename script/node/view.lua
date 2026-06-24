@@ -15,10 +15,11 @@ local M = Class 'Node.Viewer'
 ---@param options? Node.Viewer.Options
 function M:__init(options)
     self.deep = 0
+    self.indentation = 0
     ---@type integer
     self.skipLevel        = options and options.skipLevel        or 0
     self.noFunctionDetail = options and options.noFunctionDetail or false
-    self.insideTable    = options and options.noTableDetail    or false
+    self.insideTable      = options and options.noTableDetail    or false
     self.preferMethod     = options and options.preferMethod     or false
     self.viewType         = options and options.viewType         or nil
     self.viewClass        = options and options.viewClass        or nil

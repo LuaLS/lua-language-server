@@ -11,23 +11,23 @@ function os.clock() end
 
 ---@class osdate:osdateparam
 ---#DES 'osdate.year'
----@field year  integer|string
+---@field year  integer
 ---#DES 'osdate.month'
----@field month integer|string
+---@field month integer
 ---#DES 'osdate.day'
----@field day   integer|string
+---@field day   integer
 ---#DES 'osdate.hour'
----@field hour  integer|string
+---@field hour  integer
 ---#DES 'osdate.min'
----@field min   integer|string
+---@field min   integer
 ---#DES 'osdate.sec'
----@field sec   integer|string
+---@field sec   integer
 ---#DES 'osdate.wday'
----@field wday  integer|string
+---@field wday  integer
 ---#DES 'osdate.yday'
----@field yday  integer|string
+---@field yday  integer
 ---#DES 'osdate.isdst'
----@field isdst boolean
+---@field isdst boolean?
 
 ---#DES 'os.date'
 ---@param format? string
@@ -50,7 +50,7 @@ function os.difftime(t2, t1) end
 function os.execute(command) end
 ---#else
 ---@param command? string
----@return boolean?  suc
+---@return true?     suc
 ---@return exitcode? exitcode
 ---@return integer?  code
 function os.execute(command) end
@@ -75,15 +75,17 @@ function os.getenv(varname) end
 
 ---#DES 'os.remove'
 ---@param filename string
----@return boolean suc
+---@return true? suc
 ---@return string? errmsg
+---@return integer? errcode
 function os.remove(filename) end
 
 ---#DES 'os.rename'
 ---@param oldname string
 ---@param newname string
----@return boolean suc
+---@return true? suc
 ---@return string? errmsg
+---@return integer? errcode
 function os.rename(oldname, newname) end
 
 ---@alias localecategory

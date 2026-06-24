@@ -240,7 +240,7 @@ function math.tointeger(x) end
 ---@return
 ---| '"integer"'
 ---| '"float"'
----| 'nil'
+---| nil
 ---@nodiscard
 function math.type(x) end
 

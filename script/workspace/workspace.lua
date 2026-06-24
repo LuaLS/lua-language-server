@@ -175,17 +175,16 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    for _, pathVal in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
-        local path = pathVal
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         if not addonRepositoryPathUpdated then
             addonRepositoryPathUpdated = true
             local addonRepositoryPath = config.get(scp.uri, 'Lua.addonRepositoryPath')
             files.updateAddonsPath(addonRepositoryPath)
         end
-        path = m.getAbsolutePath(scp.uri, path)
-        if path then
-            log.debug('Ignore by library:', path)
-            debug[#pattern+1] = path
+        local apath = m.getAbsolutePath(scp.uri, path)
+        if apath then
+            log.debug('Ignore by library:', apath)
+            debug[#pattern+1] = apath
         end
     end
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
@@ -223,11 +222,10 @@ function m.getLibraryMatchers(scp)
     end
 
     local librarys = {}
-    for _, pathVal in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
-        local path = pathVal
-        path = m.getAbsolutePath(scp.uri, path)
-        if path then
-            librarys[files.normalize(path)] = true
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
+        local apath = m.getAbsolutePath(scp.uri, path)
+        if apath then
+            librarys[files.normalize(apath)] = true
         end
     end
     local metaPaths = scp:get 'metaPaths'

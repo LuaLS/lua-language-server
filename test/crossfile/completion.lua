@@ -6,39 +6,14 @@ local util     = require 'utility'
 local config   = require 'config'
 local catch    = require 'catch'
 local define   = require 'proto.define'
+local compare  = require 'compare'
 
 rawset(_G, 'TEST', true)
 
 local CompletionItemKind = define.CompletionItemKind
 local NeedRemoveMeta = false
 
-local EXISTS = {}
-
-local function eq(a, b)
-    if a == EXISTS and b ~= nil then
-        return true
-    end
-    local tp1, tp2 = type(a), type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k in pairs(a) do
-            if not eq(a[k], b[k]) then
-                return false
-            end
-            mark[k] = true
-        end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
-            end
-        end
-        return true
-    end
-    return a == b
-end
+local EXISTS = compare.EXISTS
 
 local Cared = {
     ['label']    = true,
@@ -57,7 +32,7 @@ local function removeMetas(results)
 end
 
 ---@diagnostic disable: await-in-sync
-function TEST(data)
+local function TEST(data)
     local mainUri
     local pos
     for _, info in ipairs(data) do
@@ -115,7 +90,7 @@ function TEST(data)
         end
     end
     assert(result)
-    assert(eq(expect, result))
+    assert(compare.eq(expect, result))
 end
 
 local function WITH_CONFIG(cfg, f)
@@ -139,7 +114,7 @@ TEST {
             ---@class A
             ---@field f1 integer
             ---@field f2 boolean
-            
+
             ---@type A[]
             X = {}
 ]],

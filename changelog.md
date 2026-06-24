@@ -3,7 +3,34 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
+* `FIX` Deduplicate documentation bindings for parameters
+* `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`
+* `FIX` Fix initial `nameStyle.config` not getting loaded in the appropriate workspace.
+* `FIX` string.match and string.gmatch may return `string|integer?` [#3357](https://github.com/LuaLS/lua-language-server/issues/3357)
+
+## 3.18.2
+* `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed
+* `REVERT` Reverted commit 1dd194da537df432f97295ea167dfef19acd7a4e which fix for type inference in and/or idioms. The circular dependency guard introduced issues with type narrowing in if-blocks where variables are reassigned (e.g., `if x then x = 0 end` would lose type information from the if-block in subsequent code). This needs a more refined solution to balance fixing circular dependencies without breaking type narrowing.
+
+## 3.18.1
+`2026-04-08`
+* `FIX` Allow `global` to be used as an identifier in Lua 5.5 when it is not part of a `global` declaration
+
+## 3.18.0
+`2026-04-03`
+* `CHG` Always track symbol-links
 * `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
+* `CHG` Improved the output of test failures during development
+* `FIX` Fix type inference for `x == nil and "default" or x` idiom [#2236](https://github.com/LuaLS/lua-language-server/issues/2236)
+* `FIX` Fix type loss for assignments inside `if`/`for` blocks due to circular dependency in tracer [#2374](https://github.com/LuaLS/lua-language-server/issues/2374) [#2494](https://github.com/LuaLS/lua-language-server/issues/2494)
+* `FIX` Resolve generic class method return types for `@param self list<T>` pattern
+* `FIX` Fix `ipairs(self)` type resolution in generic class methods
+* `FIX` Fix double angle brackets in generic sign display (`list<<T>>` -> `list<T>`)
+* `FIX` Fix nil crash in `getParentClass` for `doc.field` without class
+* `FIX` Fix type inference for bitwise operators (`<<`, `>>`, `&`, `|`, `~`) on integer variables
+* `FIX` Fix constant value computation for chained bitwise expressions in hover tooltips
+* `FIX` Support Lua 5.5 prefix local attributes such as `local <close>x` and `local <const>x`
+* `FIX` Correct `os` and `io` meta return types.
 
 ## 3.17.1
 `2026-01-20`

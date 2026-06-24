@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`
 * `FIX` Fix initial `nameStyle.config` not getting loaded in the appropriate workspace.
 * `FIX` string.match and string.gmatch may return `string|integer?` [#3357](https://github.com/LuaLS/lua-language-server/issues/3357)

@@ -2199,6 +2199,38 @@ local function bindDocWithSources(sources, binded)
     end
 end
 
+local docsDedupe = function (sources)
+    local removeByValue = function(bindDocs, value)
+        for i = #bindDocs, 1, -1 do
+            if bindDocs[i] == value then
+                table.remove(bindDocs, i)
+                break
+            end
+        end
+    end
+    for _, source in ipairs(sources) do
+        if source.bindDocs then
+            local docs = {}
+            for i = #source.bindDocs, 1, -1 do
+                local doc = source.bindDocs[i]
+                if doc.type == 'doc.param' and doc.param[1] then
+                    local param1 = doc.param[1]
+                    if docs[param1] then
+                        local old = docs[param1]
+                        if old.virtual and not doc.virtual then
+                            removeByValue(source.bindDocs, old)
+                        elseif not old.virtual and doc.virtual then
+                            removeByValue(source.bindDocs, doc)
+                            doc = old
+                        end
+                    end
+                    docs[param1] = doc
+                end
+            end
+        end
+    end
+end
+
 local bindDocAccept = {
     'local'     , 'setlocal'  , 'setglobal',
     'setfield'  , 'setmethod' , 'setindex' ,
@@ -2253,6 +2285,7 @@ local function bindDocs(state)
             end
         end
     end
+    docsDedupe(sources)
 end
 
 local function findTouch(state, doc)

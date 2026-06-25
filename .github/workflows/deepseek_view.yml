@@ -1,0 +1,49 @@
+name: Deepseek Code Review
+on:
+  pull_request_target:
+    types:
+      - opened      # Triggers when a PR is opened
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  setup-deepseek-review:
+    if: |
+      github.event_name == 'pull_request_target' ||
+      (
+        github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request &&
+        startsWith(github.event.comment.body, '/review')
+      )
+    runs-on: ubuntu-latest
+    name: Code Review
+    steps:
+      - name: Checkout deepseek-review scripts
+        uses: actions/checkout@v4
+        with:
+          repository: hustcer/deepseek-review
+          path: .tmp/deepseek-review
+
+      - name: Setup Nu
+        uses: hustcer/setup-nu@v3.23
+        with:
+          version: 0.112.2
+
+      - name: DeepSeek Code Review
+        shell: nu {0}
+        env:
+          REVIEW_PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          REVIEW_REPO: ${{ github.repository }}
+          REVIEW_TOKEN: ${{ secrets.DEEPSEEK_CHAT_TOKEN }}
+          REVIEW_GITHUB_TOKEN: ${{ github.token }}
+          REVIEW_MODEL: deepseek-v4-flash
+        run: |
+          const NU_LIB_DIRS = [ '${{ github.workspace }}/.tmp/deepseek-review/nu' ]
+          use review.nu *
+
+          deepseek-review $env.REVIEW_TOKEN --model $env.REVIEW_MODEL --repo $env.REVIEW_REPO --pr-number $env.REVIEW_PR_NUMBER --gh-token $env.REVIEW_GITHUB_TOKEN

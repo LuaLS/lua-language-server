@@ -55,14 +55,14 @@ function string.format(s, ...) end
 ---#if VERSION <= 5.3 then
 ---@param s       string|number
 ---@param pattern string|number
----@return fun():string|integer?, ...
+---@return fun():string, ...
 ---@nodiscard
 function string.gmatch(s, pattern) end
 ---#else
 ---@param s       string|number
 ---@param pattern string|number
 ---@param init?   integer
----@return fun():string|integer?, ...
+---@return fun():string, ...
 function string.gmatch(s, pattern, init) end
 ---#end
 
@@ -91,7 +91,7 @@ function string.lower(s) end
 ---@param s       string|number
 ---@param pattern string|number
 ---@param init?   integer
----@return string|integer? ...
+---@return any ...
 ---@nodiscard
 function string.match(s, pattern, init) end
 

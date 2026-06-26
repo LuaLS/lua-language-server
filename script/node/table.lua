@@ -691,7 +691,7 @@ function M:onView(viewer, options)
     viewer.insideTable = true
     local kv = {}
     for i = 1, #fields do
-        kv[i] = indent .. fields[i] .. ': ' .. viewer:view(values[i])
+        kv[i] = fields[i] .. ': ' .. viewer:view(values[i])
     end
     viewer.insideTable = insideTable
     viewer.indentation = viewer.indentation - 1
@@ -708,7 +708,7 @@ function M:onView(viewer, options)
         return '{ ' .. table.concat(kv, ', ') .. ' }'
     end
 
-    return '{\n    ' .. table.concat(kv, ',\n    ') .. ',\n' ..  indent .. '}'
+    return '{\n    ' .. indent .. table.concat(kv, ',\n    ' .. indent) .. ',\n' ..  indent .. '}'
 end
 
 function M:onViewAsKey(viewer)

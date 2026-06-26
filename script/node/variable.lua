@@ -396,6 +396,7 @@ M.__getter.parentClassFieldValue = function (self)
     for _, cls in ipairs(masterParent.classes) do
         local masterType = cls.masterType
         if masterType then
+            masterType:addRef(self)
             for _, otherCls in ipairs(masterType.protoClasses) do
                 if otherCls.variables then
                     for _, sibVar in ipairs(otherCls.variables) do
@@ -581,11 +582,15 @@ function M:getExpect(key)
     if self._classes then
         local expectValue = rt.union(ls.util.map(self._classes, function (v)
             ---@cast v Node.Class
+            v.masterType:addRef(self)
             return v.masterType.expectValue
         end))
         return expectValue:get(key)
     end
     if self._types then
+        for _, tp in ipairs(self._types) do
+            tp:addRef(self)
+        end
         local expectValue = self.value
         return expectValue:get(key)
     end

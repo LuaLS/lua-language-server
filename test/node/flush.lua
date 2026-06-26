@@ -133,3 +133,23 @@ do
     t1:addField(rt.field('y', rt.value(2)))
     lt.assertEquals((t1 >> t2), true)
 end
+
+do
+    rt:reset()
+    local C1 = rt.class 'C'
+    local V1 = rt.variable('C')
+    C1:addVariable(V1)
+    V1:addClass(C1)
+
+    local F1 = V1:getChild('f')
+    lt.assertEquals(F1:view(), 'any')
+
+    local C2 = rt.class 'C'
+    local V2 = rt.variable('C')
+    C2:addVariable(V2)
+    V2:addClass(C2)
+
+    C2:addField(rt.field('f', rt.NUMBER))
+
+    lt.assertEquals(F1:view(), 'number')
+end

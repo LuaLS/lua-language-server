@@ -237,9 +237,9 @@ function math.tointeger(x) end
 ---#DES 'math.type'
 ---@param x any
 ---@return
----| '"integer"'
----| '"float"'
----| 'nil'
+---| "integer"
+---| "float"
+---| nil
 ---@nodiscard
 function math.type(x) end
 

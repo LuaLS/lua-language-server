@@ -87,7 +87,7 @@ function os.remove(filename) end
 function os.rename(oldname, newname) end
 
 ---@alias localecategory
----|>"all"
+---| "all"
 ---| "collate"
 ---| "ctype"
 ---| "monetary"

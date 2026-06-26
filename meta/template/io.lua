@@ -11,7 +11,7 @@
 io = {}
 
 ---@alias openmode
----|>"r"   # ---#DESTAIL 'openmode.r'
+---| "r"   # ---#DESTAIL 'openmode.r'
 ---| "w"   # ---#DESTAIL 'openmode.w'
 ---| "a"   # ---#DESTAIL 'openmode.a'
 ---| "r+"  # ---#DESTAIL 'openmode.r+'
@@ -105,12 +105,12 @@ local file = {}
 ---#if VERSION >= 5.3 then
 ---| "n"  # ---#DESTAIL 'readmode.n'
 ---| "a"  # ---#DESTAIL 'readmode.a'
----|>"l"  # ---#DESTAIL 'readmode.l'
+---| "l"  # ---#DESTAIL 'readmode.l'
 ---| "L"  # ---#DESTAIL 'readmode.L'
 ---#else
 ---| "*n" # ---#DESTAIL 'readmode.n'
 ---| "*a" # ---#DESTAIL 'readmode.a'
----|>"*l" # ---#DESTAIL 'readmode.l'
+---| "*l" # ---#DESTAIL 'readmode.l'
 ---#if JIT then
 ---| "*L" # ---#DESTAIL 'readmode.L'
 ---#end
@@ -141,7 +141,7 @@ function file:read(...) end
 
 ---@alias seekwhence
 ---| "set" # ---#DESTAIL 'seekwhence.set'
----|>"cur" # ---#DESTAIL 'seekwhence.cur'
+---| "cur" # ---#DESTAIL 'seekwhence.cur'
 ---| "end" # ---#DESTAIL 'seekwhence.end'
 
 ---#DES 'file:seek'

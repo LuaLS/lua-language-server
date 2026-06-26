@@ -375,7 +375,7 @@ function Scope:buildRoots(options)
     end
 
     do
-        local metaUri = metaBuilder.compile('Lua 5.5', 'en-us', 'utf-8')
+        local metaUri = metaBuilder.compile('Lua 5.5', 'zh-cn', 'utf-8')
         self.roots[#self.roots+1] = New 'Scope.Root' (self, 'meta', metaUri, self.fs, self.config)
     end
 

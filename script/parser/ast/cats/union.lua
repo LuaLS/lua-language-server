@@ -14,6 +14,11 @@ local Ast = Class 'LuaParser.Ast'
 ---@param required? boolean
 ---@return LuaParser.Node.CatExp?
 function Ast:parseCatUnion(required)
+    self:skipSpace()
+    if self.lexer:consume '|' then
+        self:skipSpace()
+    end
+
     local first = self:parseCatIntersection(required)
     if not first then
         return nil

@@ -14,7 +14,7 @@ arg = {}
 function assert(v, message, ...) end
 
 ---@alias gcoptions
----|>"collect"      # ---#DESTAIL 'cgopt.collect'
+---| "collect"      # ---#DESTAIL 'cgopt.collect'
 ---| "stop"         # ---#DESTAIL 'cgopt.stop'
 ---| "restart"      # ---#DESTAIL 'cgopt.restart'
 ---| "count"        # ---#DESTAIL 'cgopt.count'
@@ -80,7 +80,7 @@ function ipairs(t) end
 ---@alias loadmode
 ---| "b"  # ---#DESTAIL 'loadmode.b'
 ---| "t"  # ---#DESTAIL 'loadmode.t'
----|>"bt" # ---#DESTAIL 'loadmode.bt'
+---| "bt" # ---#DESTAIL 'loadmode.bt'
 
 ---#if VERSION <= 5.1 and not JIT then
 ---#DES 'load<5.1'

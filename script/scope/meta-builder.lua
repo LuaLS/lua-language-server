@@ -11,6 +11,9 @@ function M:__init(version, language, encoding)
 end
 
 function M:getDocFormater()
+    if not ls.server then
+        return nil
+    end
     if ls.server.client.params.initializationOptions['viewDocument'] then
         if self.version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'

@@ -260,6 +260,7 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    self.hasGeneric = false
     return self.paramsPack.hasGeneric or self.returnsPack.hasGeneric, true
 end
 

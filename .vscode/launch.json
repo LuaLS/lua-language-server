@@ -59,7 +59,7 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11400",
+			"address": "127.0.0.1:11466",
 			"outputCapture": [
 			],
 			"sourceFormat": "string",
@@ -76,9 +76,14 @@
 						"${workspaceFolder}/script/*"
 					]
 				],
+				"skipFiles": [
+					"${workspaceFolder}\\script\\class.lua",
+					"script\\class.lua",
+				]
 			},
 			"skipFiles": [
-				"${workspaceFolder}/script/class.lua"
+				"${workspaceFolder}/script/class.lua",
+				"script/class.lua",
 			]
 		},
 		{

@@ -52,3 +52,4 @@ function TEST_HOVER(script)
 end
 
 test.require 'test.feature.hover.basic'
+test.require 'test.feature.hover.manually'

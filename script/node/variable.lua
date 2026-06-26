@@ -350,73 +350,12 @@ M.__getter.parentFieldValue = function (self)
     end
     ---@cast parent Node.Variable
     parent:addRef(self)
-    if parent.assigns then
-        local result
-        for assign in parent:eachAssign() do
-            ---@cast assign Node.Field
-            if assign.value then
-                local r, e = assign.value:get(self.key)
-                if e then
-                    result = result | r
-                end
-            end
-        end
-        if result then
-            return result, true
-        end
-    end
-    return false, true
-end
 
--- 通过同名 class 的其他绑定变量找到同 key 的 child（跨变量字段共享）
----@type Node|false
-M.parentClassFieldValue = nil
+    local value, exists = parent:get(self.key)
+    if exists then
+        return value, true
+    end
 
----@param self Node.Variable
----@return Node|false
----@return true?
-M.__getter.parentClassFieldValue = function (self)
-    if self.masterVariable then
-        return self.masterVariable.parentClassFieldValue, true
-    end
-    local parent = self.parent
-    if not parent or parent.kind ~= 'variable' then
-        return false, true
-    end
-    ---@cast parent Node.Variable
-    parent:addRef(self)
-    local masterParent = parent.masterVariable or parent
-    if not masterParent.classes then
-        return false, true
-    end
-    local rt = self.scope.rt
-    local childKey = rt.luaKey(self.key)
-    local result
-    local visited = {}
-    for _, cls in ipairs(masterParent.classes) do
-        local masterType = cls.masterType
-        if masterType then
-            masterType:addRef(self)
-            for _, otherCls in ipairs(masterType.protoClasses) do
-                if otherCls.variables then
-                    for _, sibVar in ipairs(otherCls.variables) do
-                        local masterSib = sibVar.masterVariable or sibVar
-                        if masterSib ~= masterParent and not visited[masterSib] then
-                            visited[masterSib] = true
-                            masterSib:addRef(self)
-                            local sibChild = masterSib.childs and masterSib.childs[childKey]
-                            if sibChild then
-                                result = result | sibChild
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    if result then
-        return result, true
-    end
     return false, true
 end
 
@@ -686,7 +625,6 @@ function M:getGuessValue()
     master:addRef(self)
     return master.equivalentValue
         or master.parentFieldValue
-        or master.parentClassFieldValue
         or nil
 end
 

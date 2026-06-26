@@ -149,7 +149,31 @@ do
     C2:addVariable(V2)
     V2:addClass(C2)
 
-    C2:addField(rt.field('f', rt.NUMBER))
+    V2:addField(rt.field('f', rt.NUMBER))
+
+    lt.assertEquals(F1:view(), 'number')
+end
+
+do
+    rt:reset()
+    local C1 = rt.class 'C'
+    local V1 = rt.variable('C')
+    C1:addVariable(V1)
+    V1:addClass(C1)
+
+    local S1 = V1:shadow()
+
+    local F1 = S1:getChild('f')
+    lt.assertEquals(F1:view(), 'any')
+
+    local C2 = rt.class 'C'
+    local V2 = rt.variable('C')
+    C2:addVariable(V2)
+    V2:addClass(C2)
+
+    local S2 = V2:shadow()
+
+    S2:addField(rt.field('f', rt.NUMBER))
 
     lt.assertEquals(F1:view(), 'number')
 end

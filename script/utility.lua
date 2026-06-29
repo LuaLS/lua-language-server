@@ -1032,14 +1032,20 @@ m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }
 
+---@param t? table
+---@return table
 function m.weakTable(t)
     return setmetatable(t or {}, m.MODE_KV)
 end
 
+---@param t? table
+---@return table
 function m.weakKTable(t)
     return setmetatable(t or {}, m.MODE_K)
 end
 
+---@param t? table
+---@return table
 function m.weakVTable(t)
     return setmetatable(t or {}, m.MODE_V)
 end

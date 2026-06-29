@@ -9,6 +9,7 @@ require 'feature'
 
 require 'language-server.task'
 require 'language-server.capability'
+require 'language-server.status'
 
 require 'language-server.capability.lifecycle-messages.initialize'
 require 'language-server.capability.lifecycle-messages.shutdown'
@@ -23,6 +24,8 @@ require 'language-server.capability.document-synchronization.did-close-text-docu
 require 'language-server.capability.language-features.go-to-definition'
 require 'language-server.capability.language-features.hover'
 require 'language-server.capability.language-features.completion'
+
+require 'language-server.capability.private.status'
 
 local server = require 'language-server.language-server'
 

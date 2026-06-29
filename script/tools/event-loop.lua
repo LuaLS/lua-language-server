@@ -22,11 +22,11 @@ function M.start(sleeper)
         if busy then
             M.markBusy()
         end
-        local idleTime = time.monotonic() - M.busyTime
-        if idleTime < 1000 then
-        elseif idleTime < 10000 then
+        local idleTime = M.getIdleTime()
+        if idleTime < 1 then
+        elseif idleTime < 10 then
             sleeper(0.001)
-        elseif idleTime < 60000 then
+        elseif idleTime < 60 then
             sleeper(0.01)
         else
             sleeper(0.1)
@@ -86,6 +86,10 @@ end
 
 function M.markBusy()
     M.busyTime = time.monotonic()
+end
+
+function M.getIdleTime()
+    return (time.monotonic() - M.busyTime) / 1000
 end
 
 return M

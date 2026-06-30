@@ -13,6 +13,7 @@ require 'tclient.tests.hover-set-local'
 require 'tclient.tests.same-prefix'
 require 'tclient.tests.recursive-runner'
 require 'tclient.tests.modify-luarc'
+require 'tclient.tests.relative-library'
 
 require 'tclient.tests.performance-jass-common'
 require 'tclient.tests.build-meta'

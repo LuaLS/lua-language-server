@@ -66,15 +66,41 @@ local function getReceiverGenericMap(uri, source)
     return nil
 end
 
+---@param uri uri
 ---@param funcNode vm.node
+---@param callArgs parser.object[]
 ---@param i integer
----@param classGenericMap table<string, vm.node>?
----@return vm.node?
-local function getDefNode(funcNode, i, classGenericMap)
-    local defNode = vm.createNode()
+---@return parser.object[]
+local function getCheckableFunctions(uri, funcNode, callArgs, i)
+    local funcs = {}
     for src in funcNode:eachObject() do
         if src.type == 'function'
         or src.type == 'doc.type.function' then
+            funcs[#funcs+1] = src
+        end
+    end
+    if #funcs > 1 then
+        local matched = {}
+        for _, src in ipairs(funcs) do
+            if vm.isPriorArgsMatched(uri, src, callArgs, i) then
+                matched[#matched+1] = src
+            end
+        end
+        if #matched > 0 then
+            funcs = matched
+        end
+    end
+    return funcs
+end
+
+---@param funcs parser.object[]
+---@param i integer
+---@param classGenericMap table<string, vm.node>?
+---@return vm.node?
+local function getDefNode(funcs, i, classGenericMap)
+    local defNode = vm.createNode()
+    for _, src in ipairs(funcs) do
+        if src.args then
             local param = src.args and src.args[i]
             if param then
                 local paramNode = vm.compileNode(param)
@@ -108,14 +134,13 @@ local function getDefNode(funcNode, i, classGenericMap)
     return defNode
 end
 
----@param funcNode vm.node
+---@param funcs parser.object[]
 ---@param i integer
 ---@return vm.node
-local function getRawDefNode(funcNode, i)
+local function getRawDefNode(funcs, i)
     local defNode = vm.createNode()
-    for f in funcNode:eachObject() do
-        if f.type == 'function'
-        or f.type == 'doc.type.function' then
+    for _, f in ipairs(funcs) do
+        if f.args then
             local param = f.args and f.args[i]
             if param then
                 defNode:merge(vm.compileNode(param))
@@ -146,7 +171,8 @@ return function (uri, callback)
             if not refNode then
                 goto CONTINUE
             end
-            local defNode = getDefNode(funcNode, i, classGenericMap)
+            local funcs = getCheckableFunctions(uri, funcNode, source.args, i)
+            local defNode = getDefNode(funcs, i, classGenericMap)
             if not defNode then
                 goto CONTINUE
             end
@@ -159,7 +185,7 @@ return function (uri, callback)
             end
             local errs = {}
             if not vm.canCastType(uri, defNode, refNode, errs) then
-                local rawDefNode = getRawDefNode(funcNode, i)
+                local rawDefNode = getRawDefNode(funcs, i)
                 assert(errs)
                 callback {
                     start   = arg.start,

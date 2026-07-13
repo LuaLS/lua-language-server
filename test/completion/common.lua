@@ -4613,3 +4613,29 @@ print(a:<??>)
         kind  = define.CompletionItemKind.Method,
     },
 }
+
+TEST [[
+---@class A.Component
+---@class B.Component
+
+---@overload fun(c: A.Component, field: "hp"|"max_hp", value: any)
+---@overload fun(c: B.Component, field: "mana"|"cooldown", value: any)
+local function setValue(...) end
+
+---@type A.Component
+local a
+
+setValue(a, '<??>')
+]]
+{
+    {
+        label    = "'hp'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label    = "'max_hp'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+}

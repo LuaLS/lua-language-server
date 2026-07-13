@@ -395,3 +395,33 @@ f(x)
 ]]
 
 config.set(nil, 'Lua.type.checkTableShape', false)
+
+TEST [[
+---@class A.Component
+---@class B.Component
+
+---@overload fun(c: A.Component, field: "hp"|"max_hp")
+---@overload fun(c: B.Component, field: "mana"|"cooldown")
+local function setValue(...) end
+
+---@type A.Component
+local a
+
+setValue(a, 'hp')
+setValue(a, <!'mana'!>)
+]]
+
+TEST [[
+---@class A.Component
+---@class B.Component
+
+---@overload fun(c: A.Component, field: "hp")
+---@overload fun(c: B.Component, field: "mana")
+local function setValue(...) end
+
+---@type A.Component|B.Component
+local c
+
+setValue(c, 'hp')
+setValue(c, 'mana')
+]]

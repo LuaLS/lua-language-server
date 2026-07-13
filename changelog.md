@@ -2,6 +2,20 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Narrow overload candidates by the types of the preceding arguments, for completion and `param-type-mismatch`
+  ```lua
+  ---@class A.Component
+  ---@class B.Component
+
+  ---@overload fun(c: A.Component, field: "hp"|"max_hp")
+  ---@overload fun(c: B.Component, field: "mana"|"cooldown")
+  local function setValue(...) end
+
+  ---@type A.Component
+  local a
+
+  setValue(a, "mana") --> now warns (`param-type-mismatch`); completion inside the quotes only suggests "hp" and "max_hp"
+  ```
 * `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
 * `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`

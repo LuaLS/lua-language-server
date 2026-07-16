@@ -133,6 +133,7 @@ function m.pushTask(info)
     -- 找到空闲 brave，直接推送
     brave.busy = true
     brave.currentTask = info.id
+    log.debug('push task to brave:', brave.id, info.name, info.id)
     brave.taskCh:push(info.name, info.id, info.params)
     m.taskMap[info.id] = info
     return true
@@ -145,13 +146,8 @@ function m.popTask(brave, id, result)
         log.warn(('Brave pushed unknown task result: # %d => [%d]'):format(brave.id, id))
         return
     end
+    log.debug('pop task from brave:', brave.id, info.name, id)
     m.taskMap[id] = nil
-    if not info.removed then
-        info.removed = true
-        if info.callback then
-            xpcall(info.callback, log.error, result)
-        end
-    end
 
     -- 任务完成，标记为空闲
     brave.busy = false
@@ -165,8 +161,16 @@ function m.popTask(brave, id, result)
             table.remove(queue, i)
             brave.busy = true
             brave.currentTask = nextTask.id
+            log.debug('push task to brave:', brave.id, nextTask.name, nextTask.id)
             brave.taskCh:push(nextTask.name, nextTask.id, nextTask.params)
             break
+        end
+    end
+
+    if not info.removed then
+        info.removed = true
+        if info.callback then
+            xpcall(info.callback, log.error, result)
         end
     end
 end
@@ -235,16 +239,12 @@ function m.recieve(block)
         selector:wait(-1)
         -- 遍历公共组
         for _, brave in ipairs(m.publicBraves) do
-            if m.reciveFromPad(brave) then
-                return
-            end
+            m.reciveFromPad(brave)
         end
         -- 遍历所有专用组
         for _, braveList in pairs(m.privateBraves) do
             for _, brave in ipairs(braveList) do
-                if m.reciveFromPad(brave) then
-                    return
-                end
+                m.reciveFromPad(brave)
             end
         end
     else

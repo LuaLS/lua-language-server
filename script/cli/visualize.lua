@@ -1,6 +1,7 @@
 local lang   = require 'language'
 local parser = require 'parser'
 local guide  = require 'parser.guide'
+local util   = require 'utility'
 
 local function nodeId(node)
 	return node.type .. ':' .. node.start .. ':' .. node.finish
@@ -36,7 +37,9 @@ local function getTooltip(node)
 	local skipNodes = {parent = true, start = true, finish = true, type = true}
 	str = str .. getTooltipLine('start', node.start)
 	str = str .. getTooltipLine('finish', node.finish)
-	for k, v in pairs(node) do
+	for k, v in util.sortPairs(node, function (a, b)
+		return tostring(a) < tostring(b)
+	end) do
 		if type(k) ~= 'number' and not skipNodes[k] then
 			str = str .. getTooltipLine(k, v)
 		end

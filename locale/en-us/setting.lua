@@ -115,6 +115,8 @@ config.diagnostics.ignoredFiles.Opened   =
 "Only when these files are opened will it be diagnosed."
 config.diagnostics.ignoredFiles.Disable  =
 "These files are not diagnosed."
+config.diagnostics.disableScheme  =
+'Do not diagnose Lua files that use the following scheme.'
 config.diagnostics.validScheme  =
 'Enable diagnostics for Lua files that use the following scheme.'
 config.diagnostics.unusedLocalExclude =
@@ -178,6 +180,8 @@ config.completion.showWord.Disable       =
 "Do not display context words."
 config.completion.autoRequire            =
 "When the input looks like a file name, automatically `require` this file."
+config.completion.maxSuggestCount        =
+"Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
 config.completion.showParams             =
 "Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
 config.completion.requireSeparator       =

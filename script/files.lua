@@ -80,39 +80,7 @@ end
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
-    if platform.os ~= 'windows' then
-        return furi.normalize(uri)
-    end
-    if not furi.isValid(uri) then
-        return uri
-    end
-    local filename = furi.decode(uri)
-    -- normalize uri
-    uri = furi.encode(filename)
-    local path = fs.path(filename)
-    local suc, exists = pcall(fs.exists, path)
-    if not suc or not exists then
-        return uri
-    end
-    local suc, res = pcall(fs.canonical, path)
-    if not suc then
-        return uri
-    end
-    filename = res:string()
-    local ruri = furi.encode(filename)
-    if uri == ruri then
-        return ruri
-    end
-    local real = getRealParent(path:parent_path()) / res:filename()
-    ruri = furi.encode(real:string())
-    if uri == ruri then
-        return ruri
-    end
-    if not uriMap[uri] then
-        uriMap[uri] = true
-        log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
-    end
-    return ruri
+    return furi.normalize(uri)
 end
 
 --- 打开文件

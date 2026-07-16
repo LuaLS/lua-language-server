@@ -23,14 +23,15 @@ local function loadLocaleFile(filePath)
     end
     local current
     local inLongString
-    for line, lineCount in util.eachLine(fileContent) do
+    for lineVal, lineCount in util.eachLine(fileContent) do
         if inLongString then
-            current.content[#current.content+1] = line
-            if isLongStringFinish(line, inLongString) then
+            current.content[#current.content+1] = lineVal
+            if isLongStringFinish(lineVal, inLongString) then
                 inLongString = nil
             end
             goto CONTINUE
         end
+        local line = lineVal
         local comment = line:match '%s*%-%- TODO.+$'
         if comment then
             line = line:sub(1, - #comment - 1)
@@ -119,6 +120,7 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
     local lastKey
     local blocks = {}
     local currentBlock = {}
+    local usedKeys = {}
     blocks[#blocks+1] = currentBlock
     for _, key in ipairs(allKeys) do
         if needSplit(key, lastKey) then
@@ -126,7 +128,10 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
             blocks[#blocks+1] = currentBlock
         end
         lastKey = key
-        currentBlock[#currentBlock+1] = key
+        if not usedKeys[key] then
+            currentBlock[#currentBlock+1] = key
+            usedKeys[key] = true
+        end
     end
 
     if fileName == 'meta' then
@@ -172,6 +177,14 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
                 end
             else
                 data = localeMap['en-us'].map[key] or localeMap['zh-cn'].map[key]
+                if not data then
+                    for _, map in util.sortPairs(localeMap) do
+                        if map.map[key] then
+                            data = map.map[key]
+                            break
+                        end
+                    end
+                end
                 comment = ' -- TODO: need translate!'
             end
             lines[#lines+1] = key .. data.space .. '=' .. (comment or data.comment or '')

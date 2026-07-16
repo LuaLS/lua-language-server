@@ -277,11 +277,11 @@ end
 ---@param suri uri
 ---@return boolean
 local function isAlias(name, suri)
-    local global = vm.getGlobal('type', name)
-    if not global then
+    local globalVar = vm.getGlobal('type', name)
+    if not globalVar then
         return false
     end
-    for _, set in ipairs(global:getSets(suri)) do
+    for _, set in ipairs(globalVar:getSets(suri)) do
         if set.type == 'doc.alias' then
             return true
         end
@@ -366,11 +366,11 @@ function vm.isSubType(uri, child, parent, mark, errs)
     mark = mark or {}
 
     if type(child) == 'string' then
-        local global = vm.getGlobal('type', child)
-        if not global then
+        local globalVar = vm.getGlobal('type', child)
+        if not globalVar then
             return nil
         end
-        child = global
+        child = globalVar
     elseif child.type == 'vm.node' then
         if config.get(uri, 'Lua.type.weakUnionCheck') then
             local hasKnownType = 0
@@ -468,11 +468,11 @@ function vm.isSubType(uri, child, parent, mark, errs)
     end
 
     if type(parent) == 'string' then
-        local global = vm.getGlobal('type', parent)
-        if not global then
+        local globalVar = vm.getGlobal('type', parent)
+        if not globalVar then
             return false
         end
-        parent = global
+        parent = globalVar
     elseif parent.type == 'vm.node' then
         local hasKnownType = 0
         local maxUnionVariants = config.get(uri, 'Lua.type.maxUnionVariants') or 0
@@ -899,12 +899,12 @@ end
 ---@param uri uri
 ---@return parser.object[]?
 function vm.getOverloadsByTypeName(name, uri)
-    local global = vm.getGlobal('type', name)
-    if not global then
+    local globalVar = vm.getGlobal('type', name)
+    if not globalVar then
         return nil
     end
     local results
-    for _, set in ipairs(global:getSets(uri)) do
+    for _, set in ipairs(globalVar:getSets(uri)) do
         for _, doc in ipairs(set.bindGroup) do
             if doc.type == 'doc.overload' then
                 if not results then

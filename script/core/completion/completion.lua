@@ -565,8 +565,9 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     local fields = {}
     local funcs  = {}
     local count  = 0
+    local maxSuggestCount = config.get(state.uri, 'Lua.completion.maxSuggestCount')
     for _, src in ipairs(refs) do
-        if count > 100 then
+        if count > maxSuggestCount then
             results.incomplete = true
             break
         end
@@ -1925,7 +1926,7 @@ local function tryluaDocBySource(state, position, source, results)
                     kind     = define.CompletionItemKind.Enum,
                     textEdit = {
                         start   = source.start,
-                        finish  = source.start + #source.mode - 1,
+                        finish  = source.start + #source.mode,
                         newText = mode,
                     },
                 }
@@ -1940,7 +1941,7 @@ local function tryluaDocBySource(state, position, source, results)
                     kind     = define.CompletionItemKind.Value,
                     textEdit = {
                         start   = source.start,
-                        finish  = source.start + #source[1] - 1,
+                        finish  = source.start + #source[1],
                         newText = name,
                     },
                 }

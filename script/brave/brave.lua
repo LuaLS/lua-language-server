@@ -1,6 +1,5 @@
-local thread     = require 'bee.thread'
-local channelMod = require 'bee.channel'
-local selectMod  = require 'bee.select'
+local channel = require 'bee.channel'
+local epoll   = require 'bee.epoll'
 
 local reqPad
 local resPad
@@ -18,8 +17,8 @@ m.queue = {}
 function m.register(id, taskChName, replyChName)
     m.id = id
 
-    reqPad = channelMod.query(taskChName)
-    resPad = channelMod.query(replyChName)
+    reqPad = channel.query(taskChName)
+    resPad = channel.query(replyChName)
 
     assert(reqPad, 'task channel not found: ' .. taskChName)
     assert(resPad, 'reply channel not found: ' .. replyChName)
@@ -53,37 +52,32 @@ end
 
 --- 开始找工作
 function m.start()
-    local selector = selectMod.create()
-    selector:event_add(reqPad:fd(), selectMod.SELECT_READ)
+    local epfd <close> = assert(epoll.create(16))
+    epfd:event_add(reqPad:fd(), epoll.EPOLLIN)
 
     m.push('mem', collectgarbage 'count')
     while true do
-        -- 使用 select 实现阻塞等待
-        local name, id, params
-        while true do
-            local ok, n, i, p = reqPad:pop()
-            if ok then
-                name, id, params = n, i, p
-                break
+        for _, event in epfd:wait() do
+            if event & epoll.EPOLLIN ~= 0 then
+                local ok, name, id, params = reqPad:pop()
+                if ok then
+                    local ability = m.ability[name]
+                    if not ability then
+                        resPad:push(id)
+                        log.error('Brave can not handle this work: ' .. name)
+                        goto CONTINUE
+                    end
+                    local suc, res = xpcall(ability, log.error, params)
+                    if suc then
+                        resPad:push(id, res)
+                    else
+                        resPad:push(id)
+                    end
+                    m.push('mem', collectgarbage 'count')
+                    ::CONTINUE::
+                end
             end
-            selector:wait(-1)
         end
-
-        local ability = m.ability[name]
-        -- TODO
-        if not ability then
-            resPad:push(id)
-            log.error('Brave can not handle this work: ' .. name)
-            goto CONTINUE
-        end
-        local ok, res = xpcall(ability, log.error, params)
-        if ok then
-            resPad:push(id, res)
-        else
-            resPad:push(id)
-        end
-        m.push('mem', collectgarbage 'count')
-        ::CONTINUE::
     end
 end
 

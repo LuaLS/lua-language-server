@@ -523,6 +523,8 @@ local function  parseTypeUnitFunction(parent)
         args    = {},
         returns = {},
     }
+    -- Parse optional generic params: fun<T, V>(...)
+    typeUnit.signs = parseSigns(typeUnit)
     if not nextSymbolOrError('(') then
         return nil
     end
@@ -617,6 +619,51 @@ local function  parseTypeUnitFunction(parent)
         end
     end
     typeUnit.finish = getFinish()
+    -- Bind local generics from fun<T, V> to type names within this function
+    if typeUnit.signs then
+        local generics = {}
+        for _, sign in ipairs(typeUnit.signs) do
+            generics[sign[1]] = sign
+        end
+        local function bindTypeNames(obj)
+            if not obj then return end
+            if obj.type == 'doc.type.name' and generics[obj[1]] then
+                obj.type = 'doc.generic.name'
+                obj.generic = generics[obj[1]]
+            elseif obj.type == 'doc.type' and obj.types then
+                for _, t in ipairs(obj.types) do
+                    bindTypeNames(t)
+                end
+            elseif obj.type == 'doc.type.array' then
+                bindTypeNames(obj.node)
+            elseif obj.type == 'doc.type.table' and obj.fields then
+                for _, field in ipairs(obj.fields) do
+                    bindTypeNames(field.name)
+                    bindTypeNames(field.extends)
+                end
+            elseif obj.type == 'doc.type.sign' then
+                bindTypeNames(obj.node)
+                if obj.signs then
+                    for _, s in ipairs(obj.signs) do
+                        bindTypeNames(s)
+                    end
+                end
+            elseif obj.type == 'doc.type.function' then
+                for _, arg in ipairs(obj.args) do
+                    bindTypeNames(arg.extends)
+                end
+                for _, ret in ipairs(obj.returns) do
+                    bindTypeNames(ret)
+                end
+            end
+        end
+        for _, arg in ipairs(typeUnit.args) do
+            bindTypeNames(arg.extends)
+        end
+        for _, ret in ipairs(typeUnit.returns) do
+            bindTypeNames(ret)
+        end
+    end
     return typeUnit
 end
 
@@ -1029,6 +1076,12 @@ local docSwitch = util.switch()
                     finish = getFinish(),
                 }
                 return result
+            end
+            if extend.type == 'doc.extends.name' then
+                local signResult = parseTypeUnitSign(result, extend)
+                if signResult then
+                    extend = signResult
+                end
             end
             result.extends[#result.extends+1] = extend
             result.finish = getFinish()
@@ -1850,7 +1903,9 @@ local function bindGeneric(binded)
         or doc.type == 'doc.return'
         or doc.type == 'doc.type'
         or doc.type == 'doc.class'
-        or doc.type == 'doc.alias' then
+        or doc.type == 'doc.alias'
+        or doc.type == 'doc.field'
+        or doc.type == 'doc.overload' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then
@@ -2144,6 +2199,38 @@ local function bindDocWithSources(sources, binded)
     end
 end
 
+local docsDedupe = function (sources)
+    local removeByValue = function(bindDocs, value)
+        for i = #bindDocs, 1, -1 do
+            if bindDocs[i] == value then
+                table.remove(bindDocs, i)
+                break
+            end
+        end
+    end
+    for _, source in ipairs(sources) do
+        if source.bindDocs then
+            local docs = {}
+            for i = #source.bindDocs, 1, -1 do
+                local doc = source.bindDocs[i]
+                if doc.type == 'doc.param' and doc.param[1] then
+                    local param1 = doc.param[1]
+                    if docs[param1] then
+                        local old = docs[param1]
+                        if old.virtual and not doc.virtual then
+                            removeByValue(source.bindDocs, old)
+                        elseif not old.virtual and doc.virtual then
+                            removeByValue(source.bindDocs, doc)
+                            doc = old
+                        end
+                    end
+                    docs[param1] = doc
+                end
+            end
+        end
+    end
+end
+
 local bindDocAccept = {
     'local'     , 'setlocal'  , 'setglobal',
     'setfield'  , 'setmethod' , 'setindex' ,
@@ -2198,6 +2285,7 @@ local function bindDocs(state)
             end
         end
     end
+    docsDedupe(sources)
 end
 
 local function findTouch(state, doc)

@@ -74,7 +74,8 @@ return function (uri, position, includeDeclaration)
     local refs = vm.getRefs(source)
 
     local results = {}
-    for _, src in ipairs(refs) do
+    for _, ref in ipairs(refs) do
+        local src = ref
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE

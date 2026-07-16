@@ -36,7 +36,8 @@ end
 local function getTypeName(names)
     local types = {}
     names = names:gsub('%sor%s', '|')
-    for name in names:gmatch '[^|]+' do
+    for nameVal in names:gmatch '[^|]+' do
+        local name = nameVal
         name = trim(name)
         types[#types+1] = knownTypes[name] or ('love.' .. name)
     end

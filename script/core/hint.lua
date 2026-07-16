@@ -145,7 +145,7 @@ local function paramName(uri, results, start, finish)
             and (paramConfig ~= 'Literal' or guide.isLiteral(arg)) then
                 mark[arg] = true
                 local param = params[i]
-                if param and param[1] then
+                if param and param[1] and param[1] ~= arg[1] then
                     results[#results+1] = {
                         text    = param[1] .. ':',
                         offset  = arg.start,

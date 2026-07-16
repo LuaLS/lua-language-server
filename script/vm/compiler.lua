@@ -3,6 +3,7 @@ local util       = require 'utility'
 local config     = require 'config'
 local rpath      = require 'workspace.require-path'
 local files      = require 'files'
+local scope      = require 'workspace.scope'
 ---@class vm
 local vm         = require 'vm.vm'
 local plugin     = require 'plugin'
@@ -154,16 +155,16 @@ local function searchFieldByGlobalID(suri, source, key, pushResult)
             if type(key) ~= 'string' then
                 return
             end
-            local global = vm.getGlobal('variable', node.name, key)
-            if global then
-                for _, set in ipairs(global:getSets(suri)) do
+            local globalVar = vm.getGlobal('variable', node.name, key)
+            if globalVar then
+                for _, set in ipairs(globalVar:getSets(suri)) do
                     pushResult(set)
                 end
             end
         else
             local globals = vm.getGlobalFields('variable', node.name)
-            for _, global in ipairs(globals) do
-                for _, set in ipairs(global:getSets(suri)) do
+            for _, globalVar in ipairs(globals) do
+                for _, set in ipairs(globalVar:getSets(suri)) do
                     pushResult(set)
                 end
             end
@@ -231,6 +232,108 @@ local function searchLiteralFieldFromTable(source, key, callback)
             end
         end
     end
+end
+
+---@param obj parser.object
+---@return boolean
+local function containsGenericName(obj)
+    if not obj then
+        return false
+    end
+    if obj.type == 'doc.generic.name' then
+        return true
+    end
+    if obj.type == 'doc.type' and obj.types then
+        for _, t in ipairs(obj.types) do
+            if containsGenericName(t) then
+                return true
+            end
+        end
+    elseif obj.type == 'doc.type.array' then
+        return containsGenericName(obj.node)
+    elseif obj.type == 'doc.type.table' and obj.fields then
+        for _, field in ipairs(obj.fields) do
+            if containsGenericName(field.name) or containsGenericName(field.extends) then
+                return true
+            end
+        end
+    elseif obj.type == 'doc.type.sign' then
+        if obj.signs then
+            for _, s in ipairs(obj.signs) do
+                if containsGenericName(s) then
+                    return true
+                end
+            end
+        end
+    elseif obj.type == 'doc.type.function' then
+        for _, arg in ipairs(obj.args or {}) do
+            if containsGenericName(arg.extends) then
+                return true
+            end
+        end
+        for _, ret in ipairs(obj.returns or {}) do
+            if containsGenericName(ret) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+---Builds a map from generic parameter names to their concrete types
+---@param uri uri
+---@param classGlobal vm.global
+---@param signs parser.object[]
+---@return table<string, vm.node>?
+function vm.getClassGenericMap(uri, classGlobal, signs)
+    for _, set in ipairs(classGlobal:getSets(uri)) do
+        if set.type == 'doc.class' and set.signs then
+            local resolved = {}
+            for i, signName in ipairs(set.signs) do
+                local signType = signs[i]
+                if signType and signName[1] then
+                    resolved[signName[1]] = vm.compileNode(signType)
+                end
+            end
+            if next(resolved) then
+                return resolved
+            end
+            break
+        end
+    end
+    return nil
+end
+
+---@param uri uri
+---@param classGlobal vm.global
+---@param field parser.object | vm.generic
+---@param signs parser.object[]
+---@return parser.object?
+local function resolveGenericField(uri, classGlobal, field, signs)
+    if field.type ~= 'doc.field' or not field.extends then
+        return nil
+    end
+    if not containsGenericName(field.extends) then
+        return nil
+    end
+    local resolved = vm.getClassGenericMap(uri, classGlobal, signs)
+    if not resolved then
+        return nil
+    end
+    local newExtends = vm.cloneObject(field.extends, resolved)
+    if not newExtends then
+        return nil
+    end
+    return {
+        type     = field.type,
+        start    = field.start,
+        finish   = field.finish,
+        parent   = field.parent,
+        field    = field.field,
+        extends  = newExtends,
+        visible  = field.visible,
+        optional = field.optional,
+    }
 end
 
 local searchFieldSwitch = util.switch()
@@ -352,11 +455,20 @@ local searchFieldSwitch = util.switch()
         if not source.node[1] then
             return
         end
-        local global = vm.getGlobal('type', source.node[1])
-        if not global then
+        local globalVar = vm.getGlobal('type', source.node[1])
+        if not globalVar then
             return
         end
-        vm.getClassFields(suri, global, key, pushResult)
+        vm.getClassFields(suri, globalVar, key, function (field, isMark)
+            if source.signs then
+                local newField = resolveGenericField(suri, globalVar, field, source.signs)
+                if newField then
+                    pushResult(newField, isMark)
+                    return
+                end
+            end
+            pushResult(field, isMark)
+        end)
     end)
     : case 'global'
     : call(function (suri, node, key, pushResult)
@@ -365,16 +477,16 @@ local searchFieldSwitch = util.switch()
                 if type(key) ~= 'string' then
                     return
                 end
-                local global = vm.getGlobal('variable', node.name, key)
-                if global then
-                    for _, set in ipairs(global:getSets(suri)) do
+                local globalVar = vm.getGlobal('variable', node.name, key)
+                if globalVar then
+                    for _, set in ipairs(globalVar:getSets(suri)) do
                         pushResult(set)
                     end
                 end
             else
                 local globals = vm.getGlobalFields('variable', node.name)
-                for _, global in ipairs(globals) do
-                    for _, set in ipairs(global:getSets(suri)) do
+                for _, globalVar in ipairs(globals) do
+                    for _, set in ipairs(globalVar:getSets(suri)) do
                         pushResult(set)
                     end
                 end
@@ -564,7 +676,6 @@ function vm.getClassFields(suri, object, key, pushResult)
 
         for _, set in ipairs(sets) do
             if set.type == 'doc.class' then
-                -- look into extends(if field not found)
                 if not searchedFields[key] and set.extends then
                     for _, extend in ipairs(set.extends) do
                         if extend.type == 'doc.extends.name' then
@@ -572,6 +683,14 @@ function vm.getClassFields(suri, object, key, pushResult)
                             if extendType then
                                 searchClass(extendType, searchedFields)
                             end
+                        elseif extend.type == 'doc.type.sign' then
+                            searchFieldSwitch(extend.type, suri, extend, key, function (field, isMark)
+                                local fieldKey = guide.getKeyName(field)
+                                if fieldKey and not searchedFields[fieldKey] then
+                                    hasFounded[fieldKey] = true
+                                    pushResult(field, isMark)
+                                end
+                            end)
                         end
                     end
                 end
@@ -588,9 +707,9 @@ function vm.getClassFields(suri, object, key, pushResult)
                     pushResult(set)
                 end
             elseif type(key) == 'string' then
-                local global = vm.getGlobal('variable', key)
-                if global then
-                    for _, set in ipairs(global:getSets(suri)) do
+                local globalVar = vm.getGlobal('variable', key)
+                if globalVar then
+                    for _, set in ipairs(globalVar:getSets(suri)) do
                         pushResult(set)
                     end
                 end
@@ -1341,7 +1460,9 @@ local function compileFunctionParam(func, source)
                         end
                         vm.getClassFields(suri, extClass, key, function (field, _isMark)
                             for n in vm.compileNode(field):eachObject() do
-                                if n.type == 'function' and n.args[aindex] then
+                                if (n.type == 'function' or n.type == 'doc.type.function')
+                                and n.args[aindex]
+                                then
                                     local argNode = vm.compileNode(n.args[aindex])
                                     for an in argNode:eachObject() do
                                         if an.type ~= 'doc.generic.name' then
@@ -1483,18 +1604,189 @@ local function bindReturnOfFunction(source, mfunc, index, args)
     if not returnObject then
         return
     end
+
+    local resolveArgs = args
+    if source.func and source.func.type == 'getmethod' then
+        local receiver = source.func.node
+        if receiver then
+            resolveArgs = { receiver }
+            if args then
+                for i = 2, #args do
+                    resolveArgs[#resolveArgs + 1] = args[i]
+                end
+            end
+        end
+    end
+
     local returnNode = vm.compileNode(returnObject)
+
+    local selfGenericResolved = nil
+    if source.func and source.func.type == 'getmethod' and mfunc.type == 'function' and mfunc.bindDocs then
+        local receiver = source.func.node
+        if receiver then
+            local receiverNode = vm.compileNode(receiver)
+            local selfGenericName = nil
+            for _, doc in ipairs(mfunc.bindDocs) do
+                if doc.type == 'doc.param' and doc.param and doc.param[1] == 'self' then
+                    if doc.extends then
+                        for _, typeUnit in ipairs(doc.extends.types or {}) do
+                            if typeUnit.type == 'doc.generic.name' then
+                                selfGenericName = typeUnit[1]
+                                break
+                            end
+                        end
+                    end
+                    break
+                end
+            end
+            if selfGenericName then
+                local filteredNode = vm.createNode()
+                for item in receiverNode:eachObject() do
+                    if item.type == 'doc.type.sign'
+                    or (item.type == 'global' and item.cate == 'type')
+                    or item.type == 'doc.type.table'
+                    or item.type == 'doc.type.array' then
+                        filteredNode:merge(item)
+                    end
+                end
+                if not filteredNode:isEmpty() then
+                    selfGenericResolved = { [selfGenericName] = filteredNode }
+                else
+                    selfGenericResolved = { [selfGenericName] = receiverNode }
+                end
+            end
+        end
+    end
+
     for rnode in returnNode:eachObject() do
         if rnode.type == 'generic' then
-            returnNode = rnode:resolve(guide.getUri(source), args)
+            if selfGenericResolved and rnode.sign then
+                local resolved = rnode.sign:resolve(guide.getUri(source), resolveArgs) or {}
+                for k, v in pairs(selfGenericResolved) do
+                    resolved[k] = v
+                end
+                local protoNode = vm.compileNode(rnode.proto)
+                local result = vm.createNode()
+                for nd in protoNode:eachObject() do
+                    if nd.type == 'global' or nd.type == 'variable' then
+                        result:merge(nd)
+                    else
+                        local clonedObject = vm.cloneObject(nd, resolved)
+                        if clonedObject then
+                            if clonedObject.type == 'doc.generic.name'
+                            and clonedObject._resolved
+                            and vm.isResolvedToGeneric(clonedObject._resolved) then
+                                result:merge(clonedObject)
+                            else
+                                result:merge(vm.compileNode(clonedObject))
+                            end
+                        end
+                    end
+                end
+                if protoNode:isOptional() then
+                    result:addOptional()
+                end
+                returnNode = result
+            else
+                returnNode = rnode:resolve(guide.getUri(source), resolveArgs)
+            end
             break
         end
     end
+
+    if mfunc.type == 'function' or mfunc.type == 'doc.type.function' then
+        local hasUnresolvedGeneric = false
+        for rnode in returnNode:eachObject() do
+            if vm.isGenericUnsolved(rnode) then
+                hasUnresolvedGeneric = true
+                break
+            end
+            -- Also check inside doc.type.sign for unresolved generics
+            -- (e.g. list<T> where T is not yet resolved)
+            if rnode.type == 'doc.type.sign' and rnode.signs then
+                ---@cast rnode parser.object
+                guide.eachSourceType(rnode, 'doc.generic.name', function (src)
+                    if not src._resolved then
+                        hasUnresolvedGeneric = true
+                    end
+                end)
+                if hasUnresolvedGeneric then
+                    break
+                end
+            end
+        end
+        if hasUnresolvedGeneric then
+            local sign = vm.getSign(mfunc)
+            if sign and resolveArgs and #resolveArgs > 0 then
+                local resolved = sign:resolve(guide.getUri(source), resolveArgs)
+                if resolved and next(resolved) then
+                    local newReturnNode = vm.createNode()
+                    for rnode in returnNode:eachObject() do
+                        local cloned = vm.cloneObject(rnode, resolved)
+                        if cloned then
+                            newReturnNode:merge(vm.compileNode(cloned))
+                        else
+                            newReturnNode:merge(rnode)
+                        end
+                    end
+                    returnNode = newReturnNode
+                end
+            end
+        end
+    end
+
+    local call = source.parent
+    if not selfGenericResolved and call and call.type == 'call' then
+        local callNode = call.node
+        if callNode and (callNode.type == 'getmethod' or callNode.type == 'getfield') then
+            local receiver = callNode.node
+            if receiver then
+                local receiverNode = vm.compileNode(receiver)
+                for rn in receiverNode:eachObject() do
+                    if rn.type == 'doc.type.sign' and rn.signs and rn.node and rn.node[1] then
+                        local classGlobal = vm.getGlobal('type', rn.node[1])
+                        if classGlobal then
+                            local genericMap = vm.getClassGenericMap(guide.getUri(source), classGlobal, rn.signs)
+                            if genericMap and mfunc.bindDocs then
+                                for _, doc in ipairs(mfunc.bindDocs) do
+                                    if doc.type == 'doc.return' then
+                                        for _, rtn in ipairs(doc.returns) do
+                                            if rtn.returnIndex == index then
+                                                local newRtn = vm.cloneObject(rtn, genericMap)
+                                                if newRtn then
+                                                    returnNode = vm.compileNode(newRtn)
+                                                    for rnode in returnNode:eachObject() do
+                                                        if rnode.type == 'generic' then
+                                                            returnNode = rnode:resolve(guide.getUri(source), args)
+                                                            break
+                                                        end
+                                                    end
+                                                end
+                                                break
+                                            end
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     if returnNode then
         for rnode in returnNode:eachObject() do
-            -- TODO: narrow type
             if rnode.type ~= 'doc.generic.name' then
                 vm.setNode(source, rnode)
+            elseif rnode._resolved then
+                -- Allow generics that resolved to another generic type
+                -- parameter (e.g. V -> T in generic method's ipairs(self)).
+                if vm.isResolvedToGeneric(rnode._resolved) then
+                    vm.setNode(source, rnode)
+                end
             end
         end
         if returnNode:isOptional() then
@@ -2067,7 +2359,11 @@ local compilerSwitch = util.switch()
     end)
     : case 'doc.generic.name'
     : call(function (source)
-        vm.setNode(source, source)
+        if source._resolved then
+            vm.setNode(source, source._resolved)
+        else
+            vm.setNode(source, source)
+        end
     end)
     : case 'doc.type.sign'
     : call(function (source)
@@ -2076,17 +2372,20 @@ local compilerSwitch = util.switch()
         if not source.node[1] then
             return
         end
-        local global = vm.getGlobal('type', source.node[1])
-        if not global then
+        local globalVar = vm.getGlobal('type', source.node[1])
+        if not globalVar then
             return
         end
-        for _, set in ipairs(global:getSets(uri)) do
+        for _, set in ipairs(globalVar:getSets(uri)) do
             if set.type == 'doc.class' then
                 if set.extends then
                     for _, ext in ipairs(set.extends) do
                         if ext.type == 'doc.type.table' then
                             if vm.getGeneric(ext) then
                                 local resolved = vm.getGeneric(ext):resolve(uri, source.signs)
+                                for obj in resolved:eachObject() do
+                                    obj.hideView = true
+                                end
                                 vm.setNode(source, resolved)
                             end
                         end
@@ -2202,11 +2501,15 @@ local compilerSwitch = util.switch()
     : case 'globalbase'
     : call(function (source)
         ---@type vm.global
-        local global = source.global
+        local globalNode = source['global']
         local uri = guide.getUri(source)
-        vm.setNode(source, global)
-        if global.cate == 'variable' then
-            for luri, link in pairs(global.links) do
+        local scp = scope.getScope(uri)
+        vm.setNode(source, globalNode)
+        if globalNode.cate == 'variable' then
+            for luri, link in pairs(globalNode.links) do
+                if not scp:isVisible(luri) then
+                    goto continue
+                end
                 local firstSet = link.sets[1]
                 if firstSet then
                     local setNode = vm.compileNode(firstSet)
@@ -2218,10 +2521,11 @@ local compilerSwitch = util.switch()
                         end
                     end
                 end
+                ::continue::
             end
         end
-        if global.cate == 'type' then
-            for _, set in ipairs(global:getSets(uri)) do
+        if globalNode.cate == 'type' then
+            for _, set in ipairs(globalNode:getSets(uri)) do
                 if set.type == 'doc.class' then
                     if set.extends then
                         for _, ext in ipairs(set.extends) do

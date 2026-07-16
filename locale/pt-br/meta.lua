@@ -6,66 +6,103 @@ arg                 =
 assert              =
 'Emite um erro se o valor de seu argumento v for falso (i.e., `nil` ou `false`); caso contrário, devolve todos os seus argumentos. Em caso de erro, `message` é o objeto de erro que, quando ausente, por padrão é `"assertion failed!"`'
 
-cgopt.collect       =
-'Realiza um ciclo completo de coleta de lixo (i.e., garbage-collection cycle).'
-cgopt.stop          =
-'Interrompe a execução automática.'
-cgopt.restart       =
-'Reinicia a execução automática.'
-cgopt.count         =
-'Retorna, em Kbytes, a quantidade total de memória utilizada pela linguagem Lua.'
-cgopt.step          =
+collectgarbage51    =
 [[
-Executa um passo do coletor de lixo. Esta opção pode ser seguida por um inteiro `size`.
-Se `size` for um n positivo, o coletor age como se n novos bytes tivessem sido alocados; se `size` for zero, o coletor executa um passo básico.
-No modo incremental, um passo básico corresponde ao tamanho de passo atual; no modo geracional, um passo básico executa uma coleta menor completa,
-ou um passo incremental, se o coletor tiver agendado um.
-No modo incremental, a função retorna `true` se o passo terminou um ciclo de coleta; no modo geracional, retorna `true` se o passo terminou uma coleta maior.
-]]
-cgopt.setpause      =
-'Estabelece pausa. Defina via `arg` o intervalo de pausa do coletor de lixo (i.e., garbage-collection).'
-cgopt.setstepmul    =
-'Estabelece um multiplicador para etapa de coleta de lixo (i.e., garbage-collection). Defina via `arg` o valor multiplicador.'
-cgopt.incremental   =
-'Altera o modo do coletor para incremental e retorna o modo anterior (ou `"generational"` ou `"incremental"`).'
-cgopt.generational  =
-'Altera o modo do coletor para geracional e retorna o modo anterior (ou `"generational"` ou `"incremental"`).'
-cgopt.param         =
-[[
-Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras:
-o nome do parâmetro (uma string) e um novo valor opcional (um inteiro no intervalo [0,100000]).
-A chamada sempre retorna o valor anterior do parâmetro; se nenhum novo valor for dado, o valor permanece inalterado.
-O Lua armazena esses valores em um formato compactado, portanto o valor retornado como anterior pode não ser exatamente o último valor definido.
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: para o coletor de lixo.
+* `"restart"`: reinicia o coletor de lixo.
+* `"count"`: retorna a memória total em uso pelo Lua (em Kbytes).
+* `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg (valores maiores significam mais etapas) de uma maneira não especificada. Se você quiser controlar o tamanho da etapa, deve ajustar experimentalmente o valor de arg. Retorna true se a etapa terminou um ciclo de coleta.
+* `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.10). Retorna o valor anterior da pausa.
+* `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.10). Retorna o valor anterior do multiplicador de etapa.
 ]]
 
-gcparam.minormul    =
-'O multiplicador menor.'
-gcparam.majorminor  =
-'O multiplicador maior-menor.'
-gcparam.minormajor  =
-'O multiplicador menor-maior.'
-gcparam.pause       =
-'A pausa do coletor de lixo.'
-gcparam.stepmul     =
-'O multiplicador de passo.'
-gcparam.stepsize    =
-'O tamanho do passo.'
-
-cgopt.isrunning     =
-'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
-
-collectgarbage      =
+collectgarbage52    =
 [[
-Interface genérica para o coletor de lixo. De acordo com o primeiro argumento `opt`, executa:
-• `"collect"`: Executa um ciclo completo de coleta de lixo (opção padrão).
-• `"stop"`: Para a execução automática; o coletor só roda quando invocado explicitamente, até `"restart"`.
-• `"restart"`: Reinicia a execução automática.
-• `"count"`: Retorna a memória total usada pelo Lua em Kbytes (fracionário; multiplique por 1024 para bytes).
-• `"step"`: Executa um passo de coleta; inteiro opcional `size` controla comportamento e retorno (veja `cgopt.step`).
-• `"isrunning"`: Retorna se o coletor está rodando (ou seja, não parado).
-• `"incremental"`: Altera para modo incremental e retorna o modo anterior.
-• `"generational"`: Altera para modo geracional e retorna o modo anterior.
-• `"param"`: Altera/lê parâmetros do coletor (veja `gcparam.*`), sempre retorna o valor anterior.
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: reinicia a execução automática do coletor de lixo.
+* `"count"`: retorna a memória total em uso pelo Lua (em Kbytes) e um segundo valor com a memória total em bytes módulo 1024. O primeiro valor tem uma parte fracionária, então a seguinte igualdade é sempre verdadeira:
+    ```lua
+     k, b = collectgarbage("count")
+     assert(k*1024 == math.floor(k)*1024 + b)
+     ```
+    (O segundo resultado é útil quando Lua é compilado com um tipo não flutuante para números.)
+* `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg (valores maiores significam mais etapas) de uma maneira não especificada. Se você quiser controlar o tamanho da etapa, deve ajustar experimentalmente o valor de arg. Retorna true se a etapa terminou um ciclo de coleta.
+* `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.5). Retorna o valor anterior da pausa.
+* `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.5). Retorna o valor anterior do multiplicador de etapa.
+* `"isrunning"`: retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"generational"`: muda o coletor para o modo geracional. Este é um recurso experimental (ver §2.5).
+* `"incremental"`: muda o coletor para o modo incremental. Este é o modo padrão.
+]]
+
+collectgarbage53    =
+[[
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: reinicia a execução automática do coletor de lixo.
+* `"count"`: retorna a memória total em uso pelo Lua em Kbytes. O valor tem uma parte fracionária, de modo que multiplicado por 1024 fornece o número exato de bytes em uso pelo Lua (exceto por estouros).
+* `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg. Com um valor zero, o coletor executará uma etapa básica (indivisível). Para valores diferentes de zero, o coletor se comportará como se essa quantidade de memória (em KBytes) tivesse sido alocada pelo Lua. Retorna true se a etapa terminou um ciclo de coleta.
+* `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.5). Retorna o valor anterior da pausa.
+* `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.5). Retorna o valor anterior do multiplicador de etapa.
+* "isrunning"`: retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+]]
+
+collectgarbage54    =
+[[
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: Executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: Para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: Reinicia a execução automática do coletor de lixo.
+* `"count"`: Retorna a memória total em uso pelo Lua em Kbytes. O valor tem uma parte fracionária, de modo que multiplicado por 1024 fornece o número exato de bytes em uso pelo Lua.
+* `"step"`: Executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg. Com um valor zero, o coletor executará uma etapa básica (indivisível). Para valores diferentes de zero, o coletor se comportará como se essa quantidade de memória (em Kbytes) tivesse sido alocada pelo Lua. Retorna true se a etapa terminou um ciclo de coleta.
+* `"isrunning"`: Retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"incremental"`: Muda o modo do coletor para incremental. Esta opção pode ser seguida por três números: a pausa do coletor de lixo, o multiplicador de etapa e o tamanho da etapa (ver §2.5.1). Um zero significa não alterar esse valor.
+* `"generational"`: Muda o modo do coletor para geracional. Esta opção pode ser seguida por dois números: o multiplicador menor do coletor de lixo e o multiplicador maior (ver §2.5.2). Um zero significa não alterar esse valor.
+Veja §2.5 para mais detalhes sobre coleta de lixo e algumas dessas opções.
+
+Esta função não deve ser chamada por um finalizador.
+]]
+
+collectgarbage55    =
+[[
+Esta função é uma interface genérica para o coletor de lixo. Ela executa diferentes funções de acordo com seu primeiro argumento, opt:
+
+* `"collect"`: Executa um ciclo completo de coleta de lixo. Esta é a opção padrão.
+* `"stop"`: Para a execução automática do coletor de lixo. O coletor só será executado quando invocado explicitamente, até uma chamada para reiniciá-lo.
+* `"restart"`: Reinicia a execução automática do coletor de lixo.
+* `"count"`: Retorna a memória total em uso pelo Lua em Kbytes. O valor tem uma parte fracionária, de modo que multiplicado por 1024 fornece o número exato de bytes em uso pelo Lua.
+* `"step"`: Executa uma etapa de coleta de lixo. Esta opção pode ser seguida por um argumento extra, um inteiro com o tamanho da etapa.
+
+    Se o tamanho for um n positivo, o coletor age como se n novos bytes tivessem sido alocados. Se o tamanho for zero, o coletor executa uma etapa básica. No modo incremental, uma etapa básica corresponde ao tamanho de etapa atual. No modo geracional, uma etapa básica executa uma coleta menor completa ou uma etapa incremental, se o coletor tiver agendado uma.
+
+    No modo incremental, a função retorna true se a etapa terminou um ciclo de coleta. No modo geracional, a função retorna true se a etapa terminou uma coleta maior.
+
+* `"isrunning"`: Retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"incremental"`: Muda o modo do coletor para incremental e retorna o modo anterior.
+* `"generational"`: Muda o modo do coletor para geracional e retorna o modo anterior.
+* `"param"`: Altera e/ou recupera os valores de um parâmetro do coletor. Esta opção deve ser seguida por um ou dois argumentos extras: O nome do parâmetro sendo alterado ou recuperado (uma string) e um novo valor opcional para esse parâmetro, um inteiro no intervalo [0,100000]. O primeiro argumento deve ter um dos seguintes valores:
+    * `"minormul"`: O multiplicador menor.
+    * `"majorminor"`: O multiplicador maior-menor.
+    * `"minormajor"`: O multiplicador menor-maior.
+    * `"pause"`: A pausa do coletor de lixo.
+    * `"stepmul"`: O multiplicador de etapa.
+    * `"stepsize"`: O tamanho da etapa.
+
+    A chamada sempre retorna o valor anterior do parâmetro. Se a chamada não fornecer um novo valor, o valor permanece inalterado.
+
+    Lua armazena esses valores em um formato compactado, então, o valor retornado como o valor anterior pode não ser exatamente o último valor definido.
+
+Veja §2.5 para mais detalhes sobre coleta de lixo e algumas dessas opções.
+
+Esta função não deve ser chamada por um finalizador.
 ]]
 
 dofile              =
@@ -687,6 +724,10 @@ string.dump                 =
 'Retorna uma string contendo uma representação binária (i.e., *binary chunk*) da função dada.'
 string.find                 =
 'Procura a primeira correspondencia de `pattern` (veja §6.4.1) na string.'
+string.find['>5.2']         =
+'Procura a primeira correspondência de `pattern` (veja §6.4.1) na string.'
+string.find['=5.1']         =
+'Procura a primeira correspondência de `pattern` (veja §5.4.1) na string.'
 string.format               =
 'Retorna uma versão formatada de seu número variável de argumentos após a descrição dada em seu primeiro argumento.'
 string.gmatch               =
@@ -704,6 +745,36 @@ Por exemplo, o loop a seguir irá iterar em todas as palavras da string *s*, imp
 ]]
 string.gsub                 =
 'Retorna uma cópia da *s* em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
+string.gmatch['>5.2']       =
+[[
+Retorna uma função iteradora que, a cada vez que é chamada, retorna as próximas capturas de `pattern` (veja §6.4.1) sobre a string s.
+
+Por exemplo, o loop a seguir irá iterar em todas as palavras da string s, imprimindo cada palavra por linha:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gmatch['=5.1']       =
+[[
+Retorna uma função iteradora que, a cada vez que é chamada, retorna as próximas capturas de `pattern` (veja §5.4.1) sobre a string s.
+
+Por exemplo, o loop a seguir irá iterar em todas as palavras da string s, imprimindo cada palavra por linha:
+```lua
+    s =
+"hello world from Lua"
+    for w in string.gmatch(s, "%a+") do
+        print(w)
+    end
+```
+]]
+string.gsub['>5.2']         =
+'Retorna uma cópia de s em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
+string.gsub['=5.1']         =
+'Retorna uma cópia de s em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §5.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
 string.len                  =
 'Retorna o comprimento da string.'
 string.lower                =
@@ -714,6 +785,14 @@ string.pack                 =
 'Retorna uma string binária contendo os valores `V1`, `v2`, etc. empacotados (isto é, serializado de forma binário) de acordo com o formato da string `fmt` fornecida (veja §6.4.2).'
 string.packsize             =
 'Retorna o tamanho de uma string resultante de `string.pack` com o formato da string `fmt` fornecida (veja §6.4.2).'
+string.match['>5.2']        =
+'Procura a primeira ocorrência do `pattern` (veja §6.4.1) na string.'
+string.match['=5.1']        =
+'Procura a primeira ocorrência do `pattern` (veja §5.4.1) na string.'
+string.pack['>5.2']         =
+'Retorna uma string binária contendo os valores `v1`, `v2`, etc. empacotados (isto é, serializados em formato binário) de acordo com a string de formato `fmt` (veja §6.4.2).'
+string.packsize['>5.2']     =
+'Retorna o tamanho de uma string resultante de `string.pack` com a string de formato `fmt` fornecida (veja §6.4.2).'
 string.rep['>5.2']          =
 'Retorna uma string que é a concatenação de `n` cópias da string `s` separadas pela string `sep`.'
 string.rep['<5.1']          =
@@ -760,24 +839,24 @@ Retorna os elementos da lista fornecida. Esta função é equivalente a
 ```
 Por padrão, `i` é `1` e `j` é `#list`.
 ]]
-table.foreach               = -- TODO: need translate!
-'Executes the given f over all elements of table. For each element, f is called with the index and respective value as arguments. If f returns a non-nil value, then the loop is broken, and this value is returned as the final value of foreach.'
-table.foreachi              = -- TODO: need translate!
-'Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.'
-table.getn                  = -- TODO: need translate!
-'Returns the number of elements in the table. This function is equivalent to `#list`.'
-table.new                   = -- TODO: need translate!
-[[This creates a pre-sized table, just like the C API equivalent `lua_createtable()`. This is useful for big tables if the final table size is known and automatic table resizing is too expensive. `narray` parameter specifies the number of array-like items, and `nhash` parameter specifies the number of hash-like items. The function needs to be required before use.
+table.foreach               =
+'Executa a função f fornecida sobre todos os elementos da tabela. Para cada elemento, f é chamada com o índice e o valor respectivo como argumentos. Se f retornar um valor não-nil, o loop é interrompido e esse valor é retornado como valor final de foreach.'
+table.foreachi              =
+'Executa a função f fornecida sobre os índices numéricos da tabela. Para cada índice, f é chamada com o índice e o valor respectivo como argumentos. Índices são visitados em ordem sequencial, de 1 a n, onde n é o tamanho da tabela. Se f retornar um valor não-nil, o loop é interrompido e esse valor é retornado como resultado de foreachi.'
+table.getn                  =
+'Retorna o número de elementos na tabela. Esta função é equivalente a `#list`.'
+table.new                   =
+[[Cria uma tabela pré-dimensionada, assim como o equivalente da C API `lua_createtable()`. É útil para tabelas grandes se o tamanho final for conhecido e o redimensionamento automático for muito custoso. O parâmetro `narray` especifica o número de itens tipo array, e o parâmetro `nhash` especifica o número de itens tipo hash. A função precisa ser requerida antes do uso.
 ```lua
 	require("table.new")
 ```
 ]]
-table.clear                 = -- TODO: need translate!
-[[This clears all keys and values from a table, but preserves the allocated array/hash sizes. This is useful when a table, which is linked from multiple places, needs to be cleared and/or when recycling a table for use by the same context. This avoids managing backlinks, saves an allocation and the overhead of incremental array/hash part growth. The function needs to be required before use.
+table.clear                 =
+[[Limpa todas as chaves e valores de uma tabela, mas preserva os tamanhos alocados das partes array/hash. É útil quando uma tabela, que está vinculada de vários lugares, precisa ser limpa e/ou quando se recicla uma tabela para uso pelo mesmo contexto. Evita gerenciar backlinks, economiza uma alocação e o custo de crescimento incremental das partes array/hash. A função precisa ser requerida antes do uso.
 ```lua
 	require("table.clear").
 ```
-Please note this function is meant for very specific situations. In most cases it's better to replace the (usually single) link with a new table and let the GC do its work.
+Observe que esta função é destinada a situações muito específicas. Na maioria dos casos, é melhor substituir o link (único geralmente) por uma nova tabela e deixar o GC fazer seu trabalho.
 ]]
 
 utf8                        =
@@ -802,3 +881,5 @@ utf8.len                    =
 'Retorna o número de caracteres UTF-8 na string `s` que começa entre as posições `i` e `j` (ambos inclusos).'
 utf8.offset                 =
 'Retorna a posição (em bytes) onde a codificação do `n`-ésimo caractere de `s` inícia (contando a partir da posição `i`).'
+utf8.offset['55']             =
+'Retorna a posição do n-ésimo caractere de `s` (contando a partir da posição de byte `i`) como dois inteiros: o índice (em bytes) onde sua codificação começa e o índice (em bytes) onde ela termina.'

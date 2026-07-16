@@ -56,10 +56,10 @@ METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
 util.enableCloseFunction()
 util.enableFormatString()
 
----@diagnostic disable-next-line: deprecated
-debug.setcstacklimit(200)
-collectgarbage('generational', 10, 50)
+--collectgarbage('generational', 10, 50)
 --collectgarbage('incremental', 120, 120, 0)
+collectgarbage('param', 'minormul', 10)
+collectgarbage('param', 'minormajor', 50)
 
 ---@diagnostic disable-next-line: lowercase-global
 log = require 'log'

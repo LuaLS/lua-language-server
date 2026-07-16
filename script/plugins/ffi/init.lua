@@ -118,7 +118,8 @@ function builder:getType(name)
             t = t .. name.type .. "@"
             name = name.name
         end
-        for _, n in ipairs(name) do
+        for _, part in ipairs(name) do
+            local n = part
             if type(n) == 'table' then
                 n = n.full_name
             end

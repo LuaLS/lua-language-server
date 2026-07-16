@@ -134,7 +134,8 @@ return function (uri, offset)
 
     local defs = vm.getDefs(source)
 
-    for _, src in ipairs(defs) do
+    for _, def in ipairs(defs) do
+        local src = def
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE

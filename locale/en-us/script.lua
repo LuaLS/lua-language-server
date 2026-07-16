@@ -44,10 +44,13 @@ DIAG_AMBIGUITY_1        =
 'Compute `{}` first. You may need to add brackets.'
 DIAG_LOWERCASE_GLOBAL   =
 'Global variable in lowercase initial, Did you miss `local` or misspell it?'
+
 ASSIGN_CONST_GLOBAL     =
 'Cannot assign to <const> global variable `{}`.'
+
 VARIABLE_NOT_DECLARED =
 'Variable `{}` not declared (global declarations active).'
+
 DIAG_EMPTY_BLOCK        =
 'Empty block.'
 DIAG_DIAGNOSTICS        =
@@ -89,7 +92,7 @@ DIAG_COSE_NON_OBJECT    =
 DIAG_COUNT_DOWN_LOOP    =
 'Do you mean `{}` ?'
 DIAG_UNKNOWN            =
-'Can not infer type.'
+'Cannot infer type.'
 DIAG_DEPRECATED         =
 'Deprecated.'
 DIAG_DIFFERENT_REQUIRES =
@@ -393,6 +396,8 @@ HOVER_DOCUMENT_LUA53    =
 'http://www.lua.org/manual/5.3/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUA55    =
+'https://www.lua.org/manual/5.5/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
@@ -403,6 +408,8 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA55     =
+'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
@@ -678,6 +685,8 @@ CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
 CLI_CHECK_PROGRESS =
 'Found {} problems in {} files'
+CLI_CHECK_RESULTS =
+'Diagnosis complete, {} problems found, see {}'
 CLI_CHECK_RESULTS_OUTPATH =
 'Diagnosis complete, {} problems found, see {}'
 CLI_CHECK_RESULTS_PRETTY =

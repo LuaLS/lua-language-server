@@ -4,6 +4,8 @@ local guide    = require 'parser.guide'
 local vm       = require 'vm'
 local await    = require 'await'
 
+local DIAG_NAME = 'duplicate-set-field'
+
 local sourceTypes = {
     'setfield',
     'setmethod',
@@ -49,6 +51,7 @@ return function (uri, callback)
         end
         local myTopBlock = getTopFunctionOfIf(src)
         local defs = vm.getDefs(src)
+        local validDefs = {}
         for _, def in ipairs(defs) do
             if def == src then
                 goto CONTINUE
@@ -72,17 +75,27 @@ return function (uri, callback)
                 -- allow type variable to override function defined in class variable
                 goto CONTINUE
             end
-            callback {
-                start   = src.start,
-                finish  = src.finish,
-                related = {{
+            if vm.isDiagDisabledAt(guide.getUri(def), def.start, DIAG_NAME) then
+                return
+            end
+            validDefs[#validDefs+1] = def
+            ::CONTINUE::
+        end
+        if #validDefs > 0 then
+            local related = {}
+            for _, def in ipairs(validDefs) do
+                related[#related + 1] = {
                     start  = def.start,
                     finish = def.finish,
                     uri    = guide.getUri(def),
-                }},
+                }
+            end
+            callback {
+                start   = src.start,
+                finish  = src.finish,
+                related = related,
                 message = lang.script('DIAG_DUPLICATE_SET_FIELD', name),
             }
-            ::CONTINUE::
         end
     end)
 end

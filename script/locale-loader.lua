@@ -2,6 +2,7 @@ local function mergeKey(key, k)
     if not key then
         return k
     end
+    k = tostring(k)
     if k:sub(1, 1):match '%w' then
         return key .. '.' .. k
     else

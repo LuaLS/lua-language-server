@@ -72,11 +72,11 @@ function export.positionOf(rowcol)
 end
 
 function export.sortDoc(a,b)
-    if a.name ~= b.name then
+    if a.name and b.name and a.name ~= b.name then
         return a.name < b.name
     end
 
-    if a.file ~= b.file then
+    if a.file and b.file and a.file ~= b.file then
         return a.file < b.file
     end
 
@@ -274,12 +274,7 @@ end
 ---@async
 ---@return table globals
 function export.gatherGlobals()
-    local all_globals = vm.getAllGlobals()
-    local globals = {}
-    for _, g in pairs(all_globals) do
-        table.insert(globals, g)
-    end
-    return globals
+    return util.valuesOf(vm.getExportableGlobals())
 end
 
 ---builds a lua table of based on `globals` and their elements
@@ -288,8 +283,8 @@ end
 ---@param callback fun(i, max)
 function export.makeDocs(globals, callback)
     local docs = {}
-    for i, global in ipairs(globals) do
-        table.insert(docs, export.documentObject(global))
+    for i, globalVar in ipairs(globals) do
+        table.insert(docs, export.documentObject(globalVar))
         callback(i, #globals)
     end
     docs[#docs+1] = export.getLualsConfig()

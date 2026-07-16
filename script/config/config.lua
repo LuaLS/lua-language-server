@@ -205,7 +205,8 @@ function m.update(scp, ...)
     scp:set('config.raw', {})
 
     local function expand(t, left)
-        for key, value in pairs(t) do
+        for key, val in pairs(t) do
+            local value = val
             local fullKey = key
             if left then
                 fullKey = left .. '.' .. key

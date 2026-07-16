@@ -168,13 +168,7 @@ function m.eventLoop()
         end
     end
 
-    local lastNetUpdateTime = 0
     local function doSomething()
-        local now = time.monotonic()
-        if now - lastNetUpdateTime >= 100 then
-            net.update()
-            lastNetUpdateTime = now
-        end
         timer.update()
         pub.step(false)
         if await.step() then
@@ -185,17 +179,25 @@ function m.eventLoop()
     end
 
     local function sleep()
-        idle()
-        for _ = 1, 10 do
-            net.update(100)
-            if doSomething() then
-                return
+        while true do
+            idle()
+            for _ = 1, 10 do
+                net.update(100)
+                if doSomething() then
+                    return
+                end
             end
+            pub.step(true)
         end
-        pub.step(true)
     end
 
     while true do
+        net.update()
+        log.debug('net update')
+        local clock = time.monotonic()
+        while time.monotonic() - clock < 100 do
+            doSomething()
+        end
         if doSomething() then
             goto CONTINUE
         end
@@ -242,17 +244,6 @@ function m.reportStatus()
     proto.notify('$/status/report', info)
 end
 
-function m.testVersion()
-    local stack = debug.setcstacklimit(200)
-    debug.setcstacklimit(stack + 1)
-    if type(stack) == 'number' and debug.setcstacklimit(stack) == stack + 1 then
-        proto.notify('window/showMessage', {
-            type = 2,
-            message = 'It seems to be running in Lua 5.4.0 or Lua 5.4.1 . Please upgrade to Lua 5.4.2 or above. Otherwise, it may encounter weird "C stack overflow", resulting in failure to work properly',
-        })
-    end
-end
-
 function m.sayHello()
     proto.notify('$/hello', {'world'})
 end
@@ -287,7 +278,6 @@ function m.start()
         proto.listen('stdio')
     end
     m.report()
-    m.testVersion()
     m.lockCache()
 
     require 'provider'

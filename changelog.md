@@ -3,6 +3,74 @@
 ## Unreleased
 * `NEW` diagnostic: `missing-export-doc`
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
+* `FIX` Deduplicate documentation bindings for parameters
+* `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`
+* `FIX` Fix initial `nameStyle.config` not getting loaded in the appropriate workspace.
+
+## 3.18.2
+* `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed
+* `REVERT` Reverted commit 1dd194da537df432f97295ea167dfef19acd7a4e which fix for type inference in and/or idioms. The circular dependency guard introduced issues with type narrowing in if-blocks where variables are reassigned (e.g., `if x then x = 0 end` would lose type information from the if-block in subsequent code). This needs a more refined solution to balance fixing circular dependencies without breaking type narrowing.
+
+## 3.18.1
+`2026-04-08`
+* `FIX` Allow `global` to be used as an identifier in Lua 5.5 when it is not part of a `global` declaration
+
+## 3.18.0
+`2026-04-03`
+* `CHG` Always track symbol-links
+* `CHG` Modified the `ResolveRequire` function to pass the source URI as a third argument.
+* `CHG` Improved the output of test failures during development
+* `FIX` Fix type inference for `x == nil and "default" or x` idiom [#2236](https://github.com/LuaLS/lua-language-server/issues/2236)
+* `FIX` Fix type loss for assignments inside `if`/`for` blocks due to circular dependency in tracer [#2374](https://github.com/LuaLS/lua-language-server/issues/2374) [#2494](https://github.com/LuaLS/lua-language-server/issues/2494)
+* `FIX` Resolve generic class method return types for `@param self list<T>` pattern
+* `FIX` Fix `ipairs(self)` type resolution in generic class methods
+* `FIX` Fix double angle brackets in generic sign display (`list<<T>>` -> `list<T>`)
+* `FIX` Fix nil crash in `getParentClass` for `doc.field` without class
+* `FIX` Fix type inference for bitwise operators (`<<`, `>>`, `&`, `|`, `~`) on integer variables
+* `FIX` Fix constant value computation for chained bitwise expressions in hover tooltips
+* `FIX` Support Lua 5.5 prefix local attributes such as `local <close>x` and `local <const>x`
+* `FIX` Correct `os` and `io` meta return types.
+
+## 3.17.1
+`2026-01-20`
+* `FIX` Fixed a CPU usage issue again
+
+## 3.17.0
+`2026-01-19`
+* `NEW` Support `fun<T>` syntax for inline generic function types in `@field` and `@type` annotations [#1170](https://github.com/LuaLS/lua-language-server/issues/1170)
+* `FIX` Generic class inheritance with type arguments now works correctly (e.g., `class Bar: Foo<integer>`) [#1929](https://github.com/LuaLS/lua-language-server/issues/1929)
+* `FIX` Method return types on generic classes now resolve correctly (e.g., `Box<string>:getValue()` returns `string`) [#1863](https://github.com/LuaLS/lua-language-server/issues/1863)
+* `FIX` Self-referential generic classes no longer cause infinite expansion in hover display [#1853](https://github.com/LuaLS/lua-language-server/issues/1853)
+* `FIX` Generic type parameters now work in `@overload` annotations [#723](https://github.com/LuaLS/lua-language-server/issues/723)
+* `FIX` Methods with `@generic T` and `@param self T` now correctly resolve return type to the receiver's concrete type (e.g., `List<number>:identity()` returns `List<number>`) [#1000](https://github.com/LuaLS/lua-language-server/issues/1000)
+* `FIX` Fixed a CPU scheduling bug that prevented the full utilization of high-performance CPUs.
+* `FIX` convert all keys to string in `--check`
+
+## 3.16.4
+`2025-12-25`
+* `FIX` (VSCode) Broken `view document`
+* `FIX` `for .. in` should only treat the first variable as const
+
+## 3.16.3
+`2025-12-23`
+* `CHG` Upgraded to Lua 5.5, memory usage has been reduced by ~10%
+
+## 3.16.2
+`2025-12-18`
+* `NEW` Added `completion.maxSuggestCount` which lets you increase the amount of fields to analyze before requiring more specific input
+* `NEW` `view document` supports `Lua 5.5`
+* `CHG` Omit parameter hints when the argument name matches
+* `FIX` Fix a typo in `no-unknown` diagnostic message
+* `FIX` Autodoc generation so it does not include documentation for builtin Lua language features
+* `FIX` Fix incorrect version in `view document`
+* `FIX` Fix incorrect version of builtin variables
+
+## 3.16.1
+`2025-12-8`
+* `FIX` Broken in Linux
+* `FIX` Fix diagnostic completions incorrect textEdit.finish
+* `FIX` Comparison crash in doc export CLI [#3111](https://github.com/LuaLS/lua-language-server/issues/3111)
 
 ## 3.16.0
 `2025-12-2`

@@ -58,14 +58,14 @@ end
 ---@param suri? uri
 ---@param results table[]
 local function searchGlobalAndClass(key, suri, results)
-    for _, global in pairs(vm.getAllGlobals()) do
-        local name = global:getCodeName()
+    for _, globalVar in pairs(vm.getAllGlobals()) do
+        local name = globalVar:getCodeName()
         if matchKey(key, name) then
             local sets
             if suri then
-                sets = global:getSets(suri)
+                sets = globalVar:getSets(suri)
             else
-                sets = global:getAllSets()
+                sets = globalVar:getAllSets()
             end
             for _, set in ipairs(sets) do
                 local skind, ckind
@@ -98,21 +98,21 @@ local function searchClassField(key, suri, results)
     if not class then
         return
     end
-    local global = vm.getGlobal('type', class)
-    if not global then
+    local globalVar = vm.getGlobal('type', class)
+    if not globalVar then
         return
     end
     local set
     if suri then
-        set = global:getSets(suri)[1]
+        set = globalVar:getSets(suri)[1]
     else
-        set = global:getAllSets()[1]
+        set = globalVar:getAllSets()[1]
     end
     if not set then
         return
     end
     suri = suri or guide.getUri(set)
-    vm.getClassFields(suri, global, vm.ANY, function (field)
+    vm.getClassFields(suri, globalVar, vm.ANY, function (field)
         if field.type == 'generic' then
             return
         end

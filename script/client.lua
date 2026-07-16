@@ -485,7 +485,7 @@ local function tryModifyClientGlobal(finalChanges)
     end
     local changes = {}
     for _, change in ipairs(finalChanges) do
-        if change.global then
+        if change['global'] then
             changes[#changes+1] = change
         end
     end

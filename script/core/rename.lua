@@ -218,8 +218,8 @@ local function ofGlobal(source, newname, callback)
     if not key then
         return
     end
-    local global = vm.getGlobal('variable', key)
-    if not global then
+    local globalVar = vm.getGlobal('variable', key)
+    if not globalVar then
         return
     end
     local refs = vm.getRefs(source)
@@ -238,12 +238,12 @@ end
 ---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    local global = vm.getGlobal('type', oldname)
-    if not global then
+    local globalVar = vm.getGlobal('type', oldname)
+    if not globalVar then
         return
     end
     local uri = guide.getUri(source)
-    for _, doc in ipairs(global:getSets(uri)) do
+    for _, doc in ipairs(globalVar:getSets(uri)) do
         if doc.type == 'doc.class' then
             callback(doc, doc.class.start, doc.class.finish, newname)
         end

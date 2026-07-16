@@ -92,7 +92,8 @@ return function (uri, offset)
 
     local defs = vm.getRefs(source)
 
-    for _, src in ipairs(defs) do
+    for _, def in ipairs(defs) do
+        local src = def
         if not guide.isAssign(src) then
             goto CONTINUE
         end

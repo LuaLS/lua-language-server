@@ -142,8 +142,8 @@ function mt:collectGlobal()
     self.assignMap[self.source] = true
 
     local uri    = guide.getUri(self.source)
-    local global = self.source.global
-    local link   = global.links[uri]
+    local globalVar = self.source['global']
+    local link   = globalVar.links[uri]
 
     for _, set in ipairs(link.sets) do
         self.assigns[#self.assigns+1] = set
@@ -929,7 +929,7 @@ function vm.traceNode(source)
             return nil
         end
         mode = 'global'
-        name = base.global:getCodeName()
+        name = base['global']:getCodeName()
     else
         base = vm.getVariable(source)
         if not base then

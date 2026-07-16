@@ -11,7 +11,7 @@ m.loaded = false
 
 function m.nameStyleCheck(uri, text)
     if not m.loaded then
-        local value = config.get(nil, "Lua.nameStyle.config")
+        local value = config.get(uri, "Lua.nameStyle.config")
         codeFormat.update_name_style_config(value)
         m.loaded = true
     end

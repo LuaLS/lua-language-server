@@ -694,17 +694,17 @@ local function checkMissingRequire(results, uri, start, finish)
         return
     end
 
-    local function addRequires(global, endpos)
-        if not global then
+    local function addRequires(globalVar, endpos)
+        if not globalVar then
             return
         end
-        autoreq.check(state, global, endpos, function (moduleFile, _stemname, _targetSource, fullKeyPath)
+        autoreq.check(state, globalVar, endpos, function (moduleFile, _stemname, _targetSource, fullKeyPath)
             local visiblePaths = rpath.getVisiblePath(uri, furi.decode(moduleFile))
             if not visiblePaths or #visiblePaths == 0 then return end
 
             for _, target in ipairs(findRequireTargets(visiblePaths)) do
                 results[#results+1] = {
-                    title = lang.script('ACTION_AUTOREQUIRE', target .. (fullKeyPath or ''), global),
+                    title = lang.script('ACTION_AUTOREQUIRE', target .. (fullKeyPath or ''), globalVar),
                     kind = 'refactor.rewrite',
                     command = {
                         title     = 'autoRequire',
@@ -713,7 +713,7 @@ local function checkMissingRequire(results, uri, start, finish)
                             {
                                 uri         = guide.getUri(state.ast),
                                 target      = moduleFile,
-                                name        = global,
+                                name        = globalVar,
                                 requireName = target,
                                 fullKeyPath = fullKeyPath,
                             },

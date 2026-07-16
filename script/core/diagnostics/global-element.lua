@@ -57,9 +57,9 @@ return function (uri, callback)
         end
         if definedGlobal[name] == nil then
             definedGlobal[name] = false
-            local global = vm.getGlobal('variable', name)
-            if global then
-                for _, set in ipairs(global:getSets(uri)) do
+            local globalVar = vm.getGlobal('variable', name)
+            if globalVar then
+                for _, set in ipairs(globalVar:getSets(uri)) do
                     if vm.isMetaFile(guide.getUri(set)) then
                         definedGlobal[name] = true
                         return

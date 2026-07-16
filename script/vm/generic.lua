@@ -1,9 +1,10 @@
 ---@class vm
 local vm      = require 'vm.vm'
+local guide   = require 'parser.guide'
 
 ---@class parser.object
 ---@field package _generic vm.generic
----@field package _resolved vm.node
+---@field public _resolved vm.node
 
 ---@class vm.generic
 ---@field sign  vm.sign
@@ -12,7 +13,7 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param source    vm.object?
+---@param source    table?
 ---@param resolved? table<string, vm.node>
 ---@return vm.object?
 local function cloneObject(source, resolved)
@@ -33,6 +34,21 @@ local function cloneObject(source, resolved)
             newName._resolved = resolved[key]
         end
         return newName
+    end
+    if source.type == 'doc.type.name' then
+        local key = source[1]
+        if resolved[key] then
+            local newName = {
+                type   = 'doc.generic.name',
+                start  = source.start,
+                finish = source.finish,
+                parent = source.parent,
+                [1]    = source[1],
+            }
+            vm.setNode(newName, resolved[key], true)
+            newName._resolved = resolved[key]
+            return newName
+        end
     end
     if source.type == 'doc.type' then
         local newType = {
@@ -106,12 +122,60 @@ local function cloneObject(source, resolved)
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(source.returns) do
-            local newObj  = cloneObject(ret, resolved)
+            local newObj = cloneObject(ret, resolved)
             newObj.parent   = newDocFunc
             newObj.optional = ret.optional
-            newDocFunc.returns[i] = cloneObject(ret, resolved)
+            newDocFunc.returns[i] = newObj
         end
         return newDocFunc
+    end
+    if source.type == 'doc.type.sign' and source.signs then
+        local needsClone = false
+        -- Check if any sign parameter has a resolvable name with a concrete
+        -- (non-generic) resolved type. Skip cloning when the resolved value
+        -- is just another doc.generic.name (e.g. T -> T inside a method body),
+        -- which would cause double-wrapping in display (list<<T>>).
+        local function hasConcreteResolution(name)
+            local rnode = resolved[name]
+            if not rnode then
+                return false
+            end
+            for rn in rnode:eachObject() do
+                if rn.type ~= 'doc.generic.name' and rn.type ~= 'generic' then
+                    return true
+                end
+            end
+            return false
+        end
+        for _, sign in ipairs(source.signs) do
+            guide.eachSourceType(sign, 'doc.type.name', function (src)
+                if hasConcreteResolution(src[1]) then
+                    needsClone = true
+                end
+            end)
+            if not needsClone then
+                guide.eachSourceType(sign, 'doc.generic.name', function (src)
+                    if hasConcreteResolution(src[1]) then
+                        needsClone = true
+                    end
+                end)
+            end
+            if needsClone then break end
+        end
+        if needsClone then
+            local newSign = {
+                type   = source.type,
+                start  = source.start,
+                finish = source.finish,
+                parent = source.parent,
+                node   = source.node,
+                signs  = {},
+            }
+            for i, sign in ipairs(source.signs) do
+                newSign.signs[i] = cloneObject(sign, resolved)
+            end
+            return newSign
+        end
     end
     return source
 end
@@ -131,8 +195,18 @@ function mt:resolve(uri, args)
             ---@cast nd -vm.global, -vm.variable
             local clonedObject = cloneObject(nd, resolved)
             if clonedObject then
-                local clonedNode   = vm.compileNode(clonedObject)
-                result:merge(clonedNode)
+                -- When a generic resolves to another generic (e.g. V -> T
+                -- inside a generic method), keep the resolved wrapper so
+                -- the resolution chain is preserved and downstream filters
+                -- can distinguish "resolved to generic T" from "unresolved".
+                if clonedObject.type == 'doc.generic.name'
+                and clonedObject._resolved
+                and vm.isResolvedToGeneric(clonedObject._resolved) then
+                    result:merge(clonedObject)
+                else
+                    local clonedNode   = vm.compileNode(clonedObject)
+                    result:merge(clonedNode)
+                end
             end
         end
     end
@@ -149,6 +223,28 @@ function vm.getGenericResolved(source)
         return nil
     end
     return source._resolved
+end
+
+---@param source table
+function vm.isGenericUnsolved(source)
+    if source.type == 'doc.generic.name' and not source._resolved then
+        return true
+    end
+    return false
+end
+
+--- Check if a resolved node contains only generic name objects.
+--- Used to distinguish "V resolved to generic T" (preserve wrapper)
+--- from "V resolved to concrete string" (unwrap normally).
+---@param node vm.node
+---@return boolean
+function vm.isResolvedToGeneric(node)
+    for rn in node:eachObject() do
+        if rn.type ~= 'doc.generic.name' then
+            return false
+        end
+    end
+    return true
 end
 
 ---@param source parser.object
@@ -172,4 +268,11 @@ function vm.createGeneric(proto, sign)
         proto = proto,
     }, mt)
     return generic
+end
+
+---@param source    table?
+---@param resolved? table<string, vm.node>
+---@return vm.object?
+function vm.cloneObject(source, resolved)
+    return cloneObject(source, resolved)
 end

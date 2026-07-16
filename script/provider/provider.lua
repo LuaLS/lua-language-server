@@ -61,10 +61,10 @@ function m.updateConfig(uri)
     end
 
     if client.getAbility('workspace.configuration') then
-        local global = cfgLoader.loadClientConfig()
+        local globalConfig = cfgLoader.loadClientConfig()
         log.info('Load config from client', 'fallback')
-        log.info(inspect(global))
-        config.update(scope.fallback, global)
+        log.info(inspect(globalConfig))
+        config.update(scope.fallback, globalConfig)
     end
 end
 
@@ -1662,7 +1662,7 @@ files.watch(function (ev, uri)
         for id, p in pairs(proto.holdon) do
             if m.attributes[p.method].abortByFileUpdate then
                 log.debug('close proto(ContentModified):', id, p.method)
-                proto.close(id, define.ErrorCodes.ContentModified, 'Content modified.')
+                --proto.close(id, define.ErrorCodes.ContentModified, 'Content modified.')
             end
         end
     end

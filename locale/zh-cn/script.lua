@@ -44,10 +44,13 @@ DIAG_AMBIGUITY_1        =
 '会优先运算 `{}`，你可能需要加个括号。'
 DIAG_LOWERCASE_GLOBAL   =
 '首字母小写的全局变量，你是否漏了 `local` 或是有拼写错误？'
+
 ASSIGN_CONST_GLOBAL     =
 '不能赋值给 <const> 全局变量 `{}`。'
+
 VARIABLE_NOT_DECLARED =
 '未声明的变量 `{}`（当前已使用 global 语法声明作用域）。'
+
 DIAG_EMPTY_BLOCK        =
 '空代码块'
 DIAG_DIAGNOSTICS        =
@@ -374,15 +377,17 @@ SYMBOL_ANONYMOUS        =
 HOVER_VIEW_DOCUMENTS    =
 '查看文档'
 HOVER_DOCUMENT_LUA51    =
-'http://www.lua.org/manual/5.1/manual.html#{}'
+'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
-'http://www.lua.org/manual/5.2/manual.html#{}'
+'https://www.lua.org/manual/5.2/manual.html#{}'
 HOVER_DOCUMENT_LUA53    =
-'http://cloudwu.github.io/lua53doc/manual.html#{}'
+'https://cloudwu.github.io/lua53doc/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
-'http://www.lua.org/manual/5.4/manual.html#{}'
+'https://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUA55    =
+'https://www.lua.org/manual/5.5/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
-'http://www.lua.org/manual/5.1/manual.html#{}'
+'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -391,6 +396,8 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["zh-cn/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA55     =
+'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
@@ -666,6 +673,8 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_PROGRESS =
 '检测到问题 {} 在文件 {} 中'
+CLI_CHECK_RESULTS=
+'诊断完成，发现 {} 个问题，请查看 {}'
 CLI_CHECK_RESULTS_OUTPATH =
 '诊断完成，共有 {} 个问题，请查看 {}'
 CLI_CHECK_RESULTS_PRETTY =

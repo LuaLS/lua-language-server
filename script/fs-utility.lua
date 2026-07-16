@@ -20,6 +20,7 @@ function m.loadFile(path, keepBom)
         ---@diagnostic disable-next-line: undefined-field
         path = path:string()
     end
+    ---@cast path string
     local f, e = ioOpen(path, 'rb')
     if not f then
         return nil, e

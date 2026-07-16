@@ -146,6 +146,16 @@ TEST 'integer' [[
 <?x?> = 1 << 2
 ]]
 
+TEST 'integer' [[
+local a = 1 << 20
+local <?b?> = a << 1
+]]
+
+TEST 'integer' [[
+local a = 1 << 20
+local <?b?> = (a << 1) - 1
+]]
+
 TEST 'unknown' [[
 <?x?> = a .. b
 ]]
@@ -733,7 +743,7 @@ local f2 = f(1)
 local i, <?v?> = f2(true)
 ]]
 
-TEST 'fun(table: table<<K>, <V>>, index?: <K>):<K>, <V>' [[
+TEST 'fun(table: table<K, V>, index?: <K>):<K>, <V>' [[
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index?: K):K, V
@@ -911,6 +921,43 @@ local function ipairs(t) end
 local t
 
 for _, <?v?> in ipairs(t) do
+end
+]]
+
+TEST '<T>' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@class list<T>
+---@field [integer] T
+
+---@generic T
+---@param self list<T>
+function list:foo()
+    for _, <?v?> in ipairs(self) do
+    end
+end
+]]
+
+TEST '<T>' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@class listB<T>: {[integer]:T}
+
+---@generic T
+---@param self listB<T>
+function listB:foo()
+    for _, <?v?> in ipairs(self) do
+    end
 end
 ]]
 
@@ -4883,7 +4930,7 @@ local a, b, <?c?>, d = unpack(t)
 ]]
 
 -- Test for overflow in circular resolve, only pass requirement is no overflow
-TEST 'Callback<<T>>|fun():fun():fun():Success, string' [[
+TEST 'Callback<string>' [[
 --- @alias Success fun(): Success
 --- @alias Callback<T> fun(): Success, T
 
@@ -4908,4 +4955,263 @@ TEST 'table' [[
 function f(...args)
     print(<?args?>)
 end
+]]
+
+TEST 'integer' [[
+---@class Foo<T>
+---@field a T
+
+---@class Bar: Foo<integer>
+
+---@type Bar
+local x
+local <?what?> = x.a
+]]
+
+TEST 'string' [[
+---@class GenericBase<T>
+---@field value T
+
+---@class StringHolder: GenericBase<string>
+
+---@type StringHolder
+local holder
+local <?v?> = holder.value
+]]
+
+TEST 'boolean' [[
+---@class Container<K, V>
+---@field key K
+---@field val V
+
+---@class BoolContainer: Container<string, boolean>
+
+---@type BoolContainer
+local c
+local <?b?> = c.val
+]]
+
+TEST 'string' [[
+---@class Container<K, V>
+---@field key K
+---@field val V
+
+---@class BoolContainer: Container<string, boolean>
+
+---@type BoolContainer
+local c
+local <?k?> = c.key
+]]
+
+TEST 'string' [[
+---@class Box<T>
+---@field value T
+local Box = {}
+
+---@return T
+function Box:getValue()
+    return self.value
+end
+
+---@type Box<string>
+local b
+
+local <?v?> = b:getValue()
+]]
+
+TEST 'integer' [[
+---@class Wrapper<V>
+---@field item V
+local Wrapper = {}
+
+---@return V
+function Wrapper:unwrap()
+    return self.item
+end
+
+---@type Wrapper<integer>
+local w
+
+local <?result?> = w:unwrap()
+]]
+
+-- Issue #1856: Generic class display format
+-- Generic class with resolved type parameters
+TEST 'list<string>|{ [integer]: string }' [[
+---@class list<T>: {[integer]:T}
+
+---@generic T
+---@param class `T`
+---@return list<T>
+local function new_list(class)
+    return {}
+end
+
+local <?strings?> = new_list('string')
+]]
+
+-- Issue #1853: Recursive expansion on hover of generic type
+-- Self-referential generic classes should not expand infinitely
+TEST 'store<string>' [[
+---@class store<T>: {set:fun(self:store<T>, key:integer, value:T), get:fun(self:store<T>, key:integer):T}
+
+local <?string_store?> ---@type store<string>
+]]
+
+-- Test composite return types with generics (T[] should resolve to string[])
+TEST 'string[]' [[
+---@class Container<T>
+local Container = {}
+
+---@return T[]
+function Container:getAll()
+    return {}
+end
+
+---@type Container<string>
+local c
+
+local <?items?> = c:getAll()
+]]
+
+-- Test nested generic return types (Wrapper<T> should resolve to Wrapper<string>)
+TEST 'Wrapper<string>' [[
+---@class Wrapper<V>
+---@field value V
+
+---@class Factory<T>
+local Factory = {}
+
+---@return Wrapper<T>
+function Factory:wrap()
+    return {}
+end
+
+---@type Factory<string>
+local f
+
+local <?wrapped?> = f:wrap()
+]]
+
+-- Issue #723: Generics in @overload
+-- @generic should work with @overload annotations
+TEST 'string' [[
+---@generic T
+---@param x T
+---@return T
+---@overload fun(x: T): T
+local function identity(x)
+    return x
+end
+
+local <?result?> = identity("hello")
+]]
+
+-- Issue #723: Multiple generics in @overload
+TEST 'integer' [[
+---@generic K, V
+---@param k K
+---@param v V
+---@return V
+---@overload fun(k: K, v: V): V
+local function getValue(k, v)
+    return v
+end
+
+local <?result?> = getValue("key", 42)
+]]
+
+-- Issue #1170: Generics in function type format (fun<T>)
+TEST 'string' [[
+---@type fun<T>(x: T): T
+local identity
+
+local <?result?> = identity("hello")
+]]
+
+-- Issue #1170: Multiple generics in function type
+TEST 'boolean' [[
+---@type fun<K, V>(k: K, v: V): V
+local getSecond
+
+local <?result?> = getSecond("key", true)
+]]
+
+-- Issue #1170: Generic function in @field
+TEST 'integer' [[
+---@class Mapper
+---@field transform fun<T, U>(input: T, fn: fun(x: T): U): U
+
+---@type Mapper
+local m
+
+local <?result?> = m.transform("hello", function(x) return #x end)
+]]
+
+-- Issue #1532: Promise-like method chaining
+-- Method returning self-type should preserve generic param through chain
+TEST 'string' [[
+---@class Promise<T>
+---@field value T
+local Promise = {}
+
+---@return Promise<T>
+function Promise:next(fn)
+    return self
+end
+
+---@return T
+function Promise:await()
+    return self.value
+end
+
+---@type Promise<string>
+local p
+
+local <?result?> = p:next(function() end):await()
+]]
+
+-- Issue #1532: Multiple chained methods
+TEST 'number' [[
+---@class Chain<V>
+local Chain = {}
+
+---@return Chain<V>
+function Chain:map(fn)
+    return self
+end
+
+---@return Chain<V>
+function Chain:filter(fn)
+    return self
+end
+
+---@return V
+function Chain:first()
+    return nil
+end
+
+---@type Chain<number>
+local c
+
+local <?result?> = c:map(function() end):filter(function() end):first()
+]]
+
+-- Issue #1000: Generic self parameter should resolve to concrete type
+-- When @generic T and @param self T, calling on List<number> should return List<number>
+TEST 'List<number>' [[
+---@class List<V>
+local List = {}
+
+---@generic T
+---@param self T
+---@return T
+function List:identity()
+    return self
+end
+
+---@type List<number>
+local mylist
+
+local <?result?> = mylist:identity()
 ]]

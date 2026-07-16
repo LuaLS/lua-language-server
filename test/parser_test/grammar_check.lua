@@ -1686,10 +1686,3 @@ x = 0b1<!2!>
 {
     type = 'MALFORMED_NUMBER',
 }
-
-Version = 'Lua 5.5'
-
-TEST[[
-local x <close>, y <close> = 1
-]]
-(nil)

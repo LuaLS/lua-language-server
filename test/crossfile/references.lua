@@ -1,38 +1,10 @@
 ---@diagnostic disable: await-in-sync
-local files = require 'files'
-local furi  = require 'file-uri'
-local core  = require 'core.reference'
-local catch = require 'catch'
+local files    = require 'files'
+local furi     = require 'file-uri'
+local core     = require 'core.reference'
+local catch    = require 'catch'
 
 rawset(_G, 'TEST', true)
-
-local EXISTS = {}
-
-local function eq(a, b)
-    if a == EXISTS and b ~= nil then
-        return true
-    end
-    local tp1, tp2 = type(a), type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k in pairs(a) do
-            if not eq(a[k], b[k]) then
-                return false
-            end
-            mark[k] = true
-        end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
-            end
-        end
-        return true
-    end
-    return a == b
-end
 
 local function founded(targets, results)
     if #targets ~= #results then
@@ -53,7 +25,7 @@ local function founded(targets, results)
     return true
 end
 
-function TEST(datas)
+local function TEST(datas)
     local targetList = {}
     local sourceList
     local sourceUri

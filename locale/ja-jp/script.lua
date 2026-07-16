@@ -44,6 +44,13 @@ DIAG_AMBIGUITY_1        =
 '`{}` は優先的に評価されます。括弧を追加する必要があるかもしれません。'
 DIAG_LOWERCASE_GLOBAL   =
 '小文字で始まるグローバル変数です。`local` を忘れているか、スペルミスがある可能性があります。'
+
+ASSIGN_CONST_GLOBAL     =
+'定数グローバル変数 `{}` に代入できません。'
+
+VARIABLE_NOT_DECLARED =
+'変数 `{}` は宣言されていません（グローバル宣言が有効です）。'
+
 DIAG_EMPTY_BLOCK        =
 '空のコードブロックです。'
 DIAG_DIAGNOSTICS        =
@@ -377,6 +384,8 @@ HOVER_DOCUMENT_LUA53    =
 'http://www.lua.org/manual/5.3/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
+HOVER_DOCUMENT_LUA55    =
+'https://www.lua.org/manual/5.5/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
@@ -387,6 +396,8 @@ HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
+HOVER_NATIVE_DOCUMENT_LUA55     =
+'command:extension.lua.doc?["en-us/55/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
@@ -663,6 +674,8 @@ CLI_CHECK_SUCCESS =
 '診断が完了しました。問題は見つかりませんでした'
 CLI_CHECK_PROGRESS =
 '{} ファイルに渡り、{} 個の問題が発見されました'
+CLI_CHECK_RESULTS=
+'診断が完了しました。{} 個の問題が見つかりました。{} を参照してください'
 CLI_CHECK_RESULTS_OUTPATH =
 '診断が完了しました。{} 個の問題が発見されました。詳しくは {} をご確認ください'
 CLI_CHECK_RESULTS_PRETTY =
@@ -677,8 +690,8 @@ CLI_DOC_DONE      =
 元データ: {}
 Markdown(例): {}
 ]]
-CLI_DOC_WORKING   = -- TODO: need translate!
-'Building docs...'
+CLI_DOC_WORKING   =
+'ドキュメントを生成しています...'
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
 'タイプ `{child}` は `{parent}` の列挙型に一致しません'

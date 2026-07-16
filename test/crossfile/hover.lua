@@ -1,44 +1,13 @@
-local files  = require 'files'
-local furi   = require 'file-uri'
-local core   = require 'core.hover'
-local config = require 'config'
-local catch  = require 'catch'
+local files   = require 'files'
+local furi    = require 'file-uri'
+local core    = require 'core.hover'
+local catch   = require 'catch'
+local compare = require 'compare'
 
 rawset(_G, 'TEST', true)
 
-local EXISTS = {}
-
-local function eq(a, b)
-    if a == EXISTS and b ~= nil then
-        return true
-    end
-    if b == EXISTS and a ~= nil then
-        return true
-    end
-    local tp1, tp2 = type(a), type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k in pairs(a) do
-            if not eq(a[k], b[k]) then
-                return false
-            end
-            mark[k] = true
-        end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
-            end
-        end
-        return true
-    end
-    return a == b
-end
-
 ---@diagnostic disable: await-in-sync
-function TEST(expect)
+local function TEST(expect)
     local sourcePos, sourceUri
     for _, file in ipairs(expect) do
         local script, list = catch(file.content, '?')
@@ -60,7 +29,7 @@ function TEST(expect)
     local hover = core.byUri(sourceUri, sourcePos, 1)
     assert(hover)
     local content = tostring(hover):gsub('\r\n', '\n')
-    assert(eq(content, expect.hover))
+    assert(compare.eq(content, expect.hover))
 end
 
 TEST {

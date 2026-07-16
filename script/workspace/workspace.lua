@@ -389,15 +389,32 @@ end
 
 --- 查找符合指定file path的所有uri
 ---@param path string
-function m.findUrisByFilePath(path)
+---@param contextUri? uri
+---@return uri[]
+function m.findUrisByFilePath(path, contextUri)
     if type(path) ~= 'string' then
         return {}
     end
-    local myUri = furi.encode(path)
+    -- Resolve relative paths using workspace context
+    ---@type string?
+    local resolvedPath = path
+    if contextUri and fs.path(path):is_relative() then
+        -- Extract directory from the context file URI
+        local contextPath = furi.decode(contextUri)
+        local contextDir = contextPath:match('^(.+[/\\])')
+        if contextDir then
+            resolvedPath = m.getAbsolutePath(furi.encode(contextDir), path)
+        end
+        if not resolvedPath then
+            return {}
+        end
+        ---@cast resolvedPath -?
+    end
+    local myUri = furi.encode(resolvedPath)
     local vm    = require 'vm'
     local resultCache = vm.getCache 'findUrisByFilePath.result'
-    if resultCache[path] then
-        return resultCache[path]
+    if resultCache[resolvedPath] then
+        return resultCache[resolvedPath]
     end
     local results = {}
     for uri in files.eachFile() do
@@ -405,7 +422,7 @@ function m.findUrisByFilePath(path)
             results[#results+1] = uri
         end
     end
-    resultCache[path] = results
+    resultCache[resolvedPath] = results
     return results
 end
 

@@ -2260,7 +2260,8 @@ local compilerSwitch = util.switch()
             if not path or type(path) ~= 'string' then
                 return
             end
-            local uri = workspace.findUrisByFilePath(path)[1]
+            local sourceUri = guide.getUri(source)
+            local uri = workspace.findUrisByFilePath(path, sourceUri)[1]
             if not uri then
                 return
             end

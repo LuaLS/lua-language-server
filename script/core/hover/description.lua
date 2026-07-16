@@ -15,7 +15,7 @@ local function collectRequire(mode, literal, uri)
         result, searchers = rpath.findUrisByRequireName(uri, literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
-        result = ws.findUrisByFilePath(literal)
+        result = ws.findUrisByFilePath(literal, uri)
     end
     if result and #result > 0 then
         local shows = {}

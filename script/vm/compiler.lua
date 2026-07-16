@@ -1,3 +1,4 @@
+local workspace  = require 'workspace'
 local guide      = require 'parser.guide'
 local util       = require 'utility'
 local config     = require 'config'
@@ -2248,6 +2249,27 @@ local compilerSwitch = util.switch()
                 return
             end
             vm.setNode(source, vm.compileNode(ast))
+            return
+        end
+        if func.special == 'dofile' then
+            local pathArg = args[1]
+            if not pathArg or pathArg.type ~= 'string' then
+                return
+            end
+            local path = pathArg[1]
+            if not path or type(path) ~= 'string' then
+                return
+            end
+            local uri = workspace.findUrisByFilePath(path)[1]
+            if not uri then
+                return
+            end
+            local state = files.getState(uri)
+            local returns = state and state.ast and state.ast.returns and state.ast.returns[1]
+            if not returns then
+                return
+            end
+            vm.setNode(source, vm.compileNode(returns[index]))
             return
         end
         local funcNode = vm.compileNode(func)

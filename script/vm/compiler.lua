@@ -2269,7 +2269,11 @@ local compilerSwitch = util.switch()
             if not returns then
                 return
             end
-            vm.setNode(source, vm.compileNode(returns[index]))
+            local returnType = returns[index]
+            if not returnType then
+                return
+            end
+            vm.setNode(source, vm.compileNode(returnType))
             return
         end
         local funcNode = vm.compileNode(func)

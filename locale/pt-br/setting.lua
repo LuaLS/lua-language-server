@@ -133,6 +133,8 @@ config.workspace.preloadFileSize  =
 "Ignorar arquivos maiores que este valor (KB) ao pré-carregar."
 config.workspace.library          =
 "Além da workspace atual, de quais diretórios carregar arquivos. Os arquivos nesses diretórios serão tratados como bibliotecas de código externas, e alguns recursos (como renomear campos) não modificarão esses arquivos."
+config.workspace.dofileRoots          = -- TODO: need translate!
+"In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately."
 config.workspace.checkThirdParty  =
 [[
 Detecção e adaptação automáticas de bibliotecas de terceiros; atualmente suportadas:

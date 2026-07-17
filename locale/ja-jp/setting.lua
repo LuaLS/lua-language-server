@@ -133,6 +133,8 @@ config.workspace.preloadFileSize  =
 "プリロード時にこの値（KB）より大きいファイルをスキップします。"
 config.workspace.library          =
 "現在のワークスペースに加えて、どのディレクトリからファイルをロードするか。これらのディレクトリ内のファイルは外部提供のコードライブラリとして扱われ、一部の機能（フィールド名の変更など）はこれらのファイルを変更しません。"
+config.workspace.dofileRoots          = -- TODO: need translate!
+"In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately."
 config.workspace.checkThirdParty  =
 [[
 サードパーティライブラリの自動検出と適応。現在サポートされているライブラリ：

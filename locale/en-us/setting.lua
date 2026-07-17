@@ -133,6 +133,8 @@ config.workspace.preloadFileSize  =
 "Skip files larger than this value (KB) when preloading."
 config.workspace.library          =
 "In addition to the current workspace, which directories will load files from. The files in these directories will be treated as externally provided code libraries, and some features (such as renaming fields) will not modify these files."
+config.workspace.dofileRoots          =
+"In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately."
 config.workspace.checkThirdParty  =
 [[
 Automatic detection and adaptation of third-party libraries, currently supported libraries are:

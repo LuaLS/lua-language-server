@@ -132,6 +132,8 @@ config.workspace.preloadFileSize  =
 "预加载时跳过大小大于该值（KB）的文件。"
 config.workspace.library          =
 "除了当前工作区以外，还会从哪些目录中加载文件。这些目录中的文件将被视作外部提供的代码库，部分操作（如重命名字段）不会修改这些文件。"
+config.workspace.dofileRoots          = -- TODO: need translate!
+"In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately."
 config.workspace.checkThirdParty  =
 [[
 自动检测与适配第三方库，目前支持的库为：

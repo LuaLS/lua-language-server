@@ -1,6 +1,6 @@
 # addonManager.enable
 
-Whether the addon manager is enabled or not.
+是否啟用延伸模組的附加插件管理器（Addon Manager）。
 
 ## type
 
@@ -14,9 +14,9 @@ boolean
 true
 ```
 
-# addonRepositoryPath
+# addonManager.repositoryBranch
 
-Specifies the addon repository path (not related to the addon manager).
+指定插件管理器（Addon Manager）使用的git branch。
 
 ## type
 
@@ -24,9 +24,47 @@ Specifies the addon repository path (not related to the addon manager).
 string
 ```
 
+## default
+
+```jsonc
+""
+```
+
+# addonManager.repositoryPath
+
+指定插件管理器（Addon Manager）使用的git path。
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
+# addonRepositoryPath
+
+指定獨立的插件倉庫路徑（與插件管理器無關）。
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
 # codeLens.enable
 
-Enable code lens.
+啟用CodeLens。
 
 ## type
 
@@ -42,7 +80,7 @@ false
 
 # completion.autoRequire
 
-輸入內容看起來是個檔名時，自動 `require` 此檔案。
+輸入內容看起來像檔名時，自動 `require` 此檔案。
 
 ## type
 
@@ -130,6 +168,22 @@ string
 
 ```jsonc
 "Replace"
+```
+
+# completion.maxSuggestCount
+
+自動完成時最多分析的欄位數量。若物件欄位超過此上限，必須提供更精確的輸入才會顯示建議。
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+100
 ```
 
 # completion.postfix
@@ -234,6 +288,7 @@ Array<string>
 * ``"ambiguity-1"``
 * ``"ambiguous-syntax"``
 * ``"args-after-dots"``
+* ``"assign-const-global"``
 * ``"assign-type-mismatch"``
 * ``"await-in-sync"``
 * ``"block-after-else"``
@@ -255,6 +310,7 @@ Array<string>
 * ``"duplicate-index"``
 * ``"duplicate-set-field"``
 * ``"empty-block"``
+* ``"env-is-global"``
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -264,6 +320,7 @@ Array<string>
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
 * ``"exp-in-action"``
+* ``"global-close-attribute"``
 * ``"global-element"``
 * ``"global-in-nil-env"``
 * ``"incomplete-signature-doc"``
@@ -318,6 +375,7 @@ Array<string>
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
+* ``"multi-close"``
 * ``"name-style-check"``
 * ``"need-check-nil"``
 * ``"need-paren"``
@@ -347,6 +405,7 @@ Array<string>
 * ``"undefined-global"``
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
+* ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
 * ``"unicode-name"``
@@ -356,32 +415,18 @@ Array<string>
 * ``"unknown-operator"``
 * ``"unknown-symbol"``
 * ``"unreachable-code"``
+* ``"unsupport-named-vararg"``
 * ``"unsupport-symbol"``
 * ``"unused-function"``
 * ``"unused-label"``
 * ``"unused-local"``
 * ``"unused-vararg"``
+* ``"variable-not-declared"``
 
 ## default
 
 ```jsonc
 []
-```
-
-# diagnostics.disableScheme
-
-不診斷使用以下 scheme 的lua檔案。
-
-## type
-
-```ts
-Array<string>
-```
-
-## default
-
-```jsonc
-["git"]
 ```
 
 # diagnostics.enable
@@ -398,6 +443,22 @@ boolean
 
 ```jsonc
 true
+```
+
+# diagnostics.enableScheme
+
+**Missing description!!**
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+["file"]
 ```
 
 # diagnostics.globals
@@ -418,7 +479,7 @@ Array<string>
 
 # diagnostics.globalsRegex
 
-Find defined global variables using regex.
+使用正規表示式尋找全域變數。
 
 ## type
 
@@ -434,7 +495,7 @@ Array<string>
 
 # diagnostics.groupFileStatus
 
-批量修改一個組中的檔案狀態。
+批次修改一個組中的檔案狀態。
 
 * Opened:  只診斷打開的檔案
 * Any:     診斷所有檔案
@@ -567,7 +628,7 @@ object<string, string>
 
 # diagnostics.groupSeverity
 
-批量修改一個組中的診斷等級。
+批次修改一個組中的診斷等級。
 設定為 `Fallback` 意味著組中的診斷由 `diagnostics.severity` 單獨設定。
 其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
 
@@ -771,64 +832,64 @@ object<string, string>
     */
     "ambiguity-1": "Any",
     /*
-    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    賦值類型與變數類型不符合
     */
     "assign-type-mismatch": "Opened",
     /*
-    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    同步函式中呼叫非同步函式
     */
     "await-in-sync": "None",
     /*
-    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    已顯式定義變數類型不符合要定義的值的類型
     */
     "cast-local-type": "Opened",
     /*
-    Enable diagnostics for casts where the target type does not match the initial type.
+    變數被轉換為不符合其初始類型的類型
     */
     "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     /*
-    Enable diagnostics for attempts to close a variable with a non-object.
+    嘗試關閉非物件變數
     */
     "close-non-object": "Any",
     /*
-    Enable diagnostics for code placed after a break statement in a loop.
+    迴圈內break陳述式後的程式碼
     */
     "code-after-break": "Opened",
     /*
-    Enable diagnostics for incorrectly styled lines.
+    行的格式不正確
     */
     "codestyle-check": "None",
     /*
-    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    因為 `for` 迴圈是遞增而不是遞減，所以不會到達上限/極限
     */
     "count-down-loop": "Any",
     /*
-    Enable diagnostics to highlight deprecated API.
+    API已標記deprecated（棄用）但仍在使用
     */
     "deprecated": "Any",
     /*
-    Enable diagnostics for files which are required by two different paths.
+    required的同一個檔案使用了兩個不同的名字
     */
     "different-requires": "Any",
     /*
-    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    忽略了標註為 `@nodiscard` 的函式的回傳值
     */
     "discard-returns": "Any",
     /*
-    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    向沒有標註 `@class` 的類別標註 `@field` 欄位
     */
     "doc-field-no-class": "Any",
     /*
-    Enable diagnostics for a duplicated alias annotation name.
+    `@alias` 標註名字衝突
     */
     "duplicate-doc-alias": "Any",
     /*
-    Enable diagnostics for a duplicated field annotation name.
+    `@field` 標註名字衝突
     */
     "duplicate-doc-field": "Any",
     /*
-    Enable diagnostics for a duplicated param annotation name.
+    `@param` 標註名字衝突
     */
     "duplicate-doc-param": "Any",
     /*
@@ -836,7 +897,7 @@ object<string, string>
     */
     "duplicate-index": "Any",
     /*
-    Enable diagnostics for setting the same field in a class more than once.
+    在類別中多次定義相同的欄位
     */
     "duplicate-set-field": "Opened",
     /*
@@ -844,7 +905,7 @@ object<string, string>
     */
     "empty-block": "Opened",
     /*
-    Enable diagnostics to warn about global elements.
+    對全域元素的警告
     */
     "global-element": "None",
     /*
@@ -852,12 +913,12 @@ object<string, string>
     */
     "global-in-nil-env": "Any",
     /*
-    Incomplete @param or @return annotations for functions.
+    `@param` 或 `@return` 不完整
     */
     "incomplete-signature-doc": "None",
     "inject-field": "Opened",
     /*
-    Enable diagnostics for accesses to fields which are invisible.
+    嘗試存取不可見的欄位
     */
     "invisible": "Any",
     /*
@@ -866,31 +927,31 @@ object<string, string>
     "lowercase-global": "Any",
     "missing-fields": "Any",
     /*
-    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
+    全域變數缺少標註（全域函式必須為所有參數和回傳值提供標註）
     */
     "missing-global-doc": "None",
     /*
-    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
+    匯出的區域函式缺少標註（匯出的區域函式、所有的參數和回傳值都必須有標註）
     */
     "missing-local-export-doc": "None",
     /*
-    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    函式呼叫的引數數量比函式標註的參數數量少
     */
     "missing-parameter": "Any",
     /*
-    Enable diagnostics for functions with return annotations which have no return statement.
+    函式有 `@return` 標註卻沒有 `return` 陳述式
     */
     "missing-return": "Any",
     /*
-    Enable diagnostics for return statements without values although the containing function declares returns.
+    函式沒有回傳值，但使用了 `@return` 標註了回傳值
     */
     "missing-return-value": "Any",
     /*
-    Enable diagnostics for name style.
+    變數命名風格檢查
     */
     "name-style-check": "None",
     /*
-    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    變數曾被賦值為 `nil` 或可選值（可能是 `nil` ）
     */
     "need-check-nil": "Opened",
     /*
@@ -902,15 +963,15 @@ object<string, string>
     */
     "newline-call": "Any",
     /*
-    Enable diagnostics for cases in which the type cannot be inferred.
+    無法推斷變數的未知類型
     */
     "no-unknown": "None",
     /*
-    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    不允許呼叫 `coroutine.yield()`
     */
     "not-yieldable": "None",
     /*
-    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    給定參數的類型不符合函式定義所要求的類型（ `@param` ）
     */
     "param-type-mismatch": "Opened",
     /*
@@ -922,11 +983,11 @@ object<string, string>
     */
     "redundant-parameter": "Any",
     /*
-    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    放了一個不需要的 `return` 陳述式，因為函式會自行退出
     */
     "redundant-return": "Opened",
     /*
-    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    回傳了 `@return` 標註未指定的額外值
     */
     "redundant-return-value": "Any",
     /*
@@ -934,11 +995,11 @@ object<string, string>
     */
     "redundant-value": "Any",
     /*
-    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    回傳值的類型不符合 `@return` 中宣告的類型
     */
     "return-type-mismatch": "Opened",
     /*
-    Enable diagnostics for typos in strings.
+    字串拼寫檢查
     */
     "spell-check": "None",
     /*
@@ -946,19 +1007,19 @@ object<string, string>
     */
     "trailing-space": "Opened",
     /*
-    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    多重賦值時沒有賦值所有變數（如 `local x,y = 1` ）
     */
     "unbalanced-assignments": "Any",
     /*
-    Enable diagnostics for class annotations in which an undefined class is referenced.
+    在 `@class` 標註中引用未定義的類別。
     */
     "undefined-doc-class": "Any",
     /*
-    Enable diagnostics for type annotations referencing an undefined type or alias.
+    在 `@type` 標註中引用未定義的類型或 `@alias`
     */
     "undefined-doc-name": "Any",
     /*
-    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    在 `@param` 標註中引用函式定義未宣告的參數
     */
     "undefined-doc-param": "Any",
     /*
@@ -966,7 +1027,7 @@ object<string, string>
     */
     "undefined-env-child": "Any",
     /*
-    Enable diagnostics for cases in which an undefined field of a variable is read.
+    讀取變數中為定義的欄位
     */
     "undefined-field": "Opened",
     /*
@@ -974,19 +1035,19 @@ object<string, string>
     */
     "undefined-global": "Any",
     /*
-    Enable diagnostics for casts of undefined variables.
+    使用 `@cast` 對未定義的變數進行強制轉換
     */
     "unknown-cast-variable": "Any",
     /*
-    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    輸入了未知的診斷
     */
     "unknown-diag-code": "Any",
     /*
-    Enable diagnostics for unknown operators.
+    未知的運算子
     */
     "unknown-operator": "Any",
     /*
-    Enable diagnostics for unreachable code.
+    無法到達的程式碼
     */
     "unreachable-code": "Opened",
     /*
@@ -1040,64 +1101,64 @@ object<string, string>
     */
     "ambiguity-1": "Warning",
     /*
-    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    賦值類型與變數類型不符合
     */
     "assign-type-mismatch": "Warning",
     /*
-    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    同步函式中呼叫非同步函式
     */
     "await-in-sync": "Warning",
     /*
-    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    已顯式定義變數類型不符合要定義的值的類型
     */
     "cast-local-type": "Warning",
     /*
-    Enable diagnostics for casts where the target type does not match the initial type.
+    變數被轉換為不符合其初始類型的類型
     */
     "cast-type-mismatch": "Warning",
     "circle-doc-class": "Warning",
     /*
-    Enable diagnostics for attempts to close a variable with a non-object.
+    嘗試關閉非物件變數
     */
     "close-non-object": "Warning",
     /*
-    Enable diagnostics for code placed after a break statement in a loop.
+    迴圈內break陳述式後的程式碼
     */
     "code-after-break": "Hint",
     /*
-    Enable diagnostics for incorrectly styled lines.
+    行的格式不正確
     */
     "codestyle-check": "Warning",
     /*
-    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    因為 `for` 迴圈是遞增而不是遞減，所以不會到達上限/極限
     */
     "count-down-loop": "Warning",
     /*
-    Enable diagnostics to highlight deprecated API.
+    API已標記deprecated（棄用）但仍在使用
     */
     "deprecated": "Warning",
     /*
-    Enable diagnostics for files which are required by two different paths.
+    required的同一個檔案使用了兩個不同的名字
     */
     "different-requires": "Warning",
     /*
-    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    忽略了標註為 `@nodiscard` 的函式的回傳值
     */
     "discard-returns": "Warning",
     /*
-    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    向沒有標註 `@class` 的類別標註 `@field` 欄位
     */
     "doc-field-no-class": "Warning",
     /*
-    Enable diagnostics for a duplicated alias annotation name.
+    `@alias` 標註名字衝突
     */
     "duplicate-doc-alias": "Warning",
     /*
-    Enable diagnostics for a duplicated field annotation name.
+    `@field` 標註名字衝突
     */
     "duplicate-doc-field": "Warning",
     /*
-    Enable diagnostics for a duplicated param annotation name.
+    `@param` 標註名字衝突
     */
     "duplicate-doc-param": "Warning",
     /*
@@ -1105,7 +1166,7 @@ object<string, string>
     */
     "duplicate-index": "Warning",
     /*
-    Enable diagnostics for setting the same field in a class more than once.
+    在類別中多次定義相同的欄位
     */
     "duplicate-set-field": "Warning",
     /*
@@ -1113,7 +1174,7 @@ object<string, string>
     */
     "empty-block": "Hint",
     /*
-    Enable diagnostics to warn about global elements.
+    對全域元素的警告
     */
     "global-element": "Warning",
     /*
@@ -1121,12 +1182,12 @@ object<string, string>
     */
     "global-in-nil-env": "Warning",
     /*
-    Incomplete @param or @return annotations for functions.
+    `@param` 或 `@return` 不完整
     */
     "incomplete-signature-doc": "Warning",
     "inject-field": "Warning",
     /*
-    Enable diagnostics for accesses to fields which are invisible.
+    嘗試存取不可見的欄位
     */
     "invisible": "Warning",
     /*
@@ -1135,31 +1196,31 @@ object<string, string>
     "lowercase-global": "Information",
     "missing-fields": "Warning",
     /*
-    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
+    全域變數缺少標註（全域函式必須為所有參數和回傳值提供標註）
     */
     "missing-global-doc": "Warning",
     /*
-    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
+    匯出的區域函式缺少標註（匯出的區域函式、所有的參數和回傳值都必須有標註）
     */
     "missing-local-export-doc": "Warning",
     /*
-    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    函式呼叫的引數數量比函式標註的參數數量少
     */
     "missing-parameter": "Warning",
     /*
-    Enable diagnostics for functions with return annotations which have no return statement.
+    函式有 `@return` 標註卻沒有 `return` 陳述式
     */
     "missing-return": "Warning",
     /*
-    Enable diagnostics for return statements without values although the containing function declares returns.
+    函式沒有回傳值，但使用了 `@return` 標註了回傳值
     */
     "missing-return-value": "Warning",
     /*
-    Enable diagnostics for name style.
+    變數命名風格檢查
     */
     "name-style-check": "Warning",
     /*
-    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    變數曾被賦值為 `nil` 或可選值（可能是 `nil` ）
     */
     "need-check-nil": "Warning",
     /*
@@ -1171,15 +1232,15 @@ object<string, string>
     */
     "newline-call": "Warning",
     /*
-    Enable diagnostics for cases in which the type cannot be inferred.
+    無法推斷變數的未知類型
     */
     "no-unknown": "Warning",
     /*
-    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    不允許呼叫 `coroutine.yield()`
     */
     "not-yieldable": "Warning",
     /*
-    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    給定參數的類型不符合函式定義所要求的類型（ `@param` ）
     */
     "param-type-mismatch": "Warning",
     /*
@@ -1191,11 +1252,11 @@ object<string, string>
     */
     "redundant-parameter": "Warning",
     /*
-    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    放了一個不需要的 `return` 陳述式，因為函式會自行退出
     */
     "redundant-return": "Hint",
     /*
-    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    回傳了 `@return` 標註未指定的額外值
     */
     "redundant-return-value": "Warning",
     /*
@@ -1203,11 +1264,11 @@ object<string, string>
     */
     "redundant-value": "Warning",
     /*
-    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    回傳值的類型不符合 `@return` 中宣告的類型
     */
     "return-type-mismatch": "Warning",
     /*
-    Enable diagnostics for typos in strings.
+    字串拼寫檢查
     */
     "spell-check": "Information",
     /*
@@ -1215,19 +1276,19 @@ object<string, string>
     */
     "trailing-space": "Hint",
     /*
-    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    多重賦值時沒有賦值所有變數（如 `local x,y = 1` ）
     */
     "unbalanced-assignments": "Warning",
     /*
-    Enable diagnostics for class annotations in which an undefined class is referenced.
+    在 `@class` 標註中引用未定義的類別。
     */
     "undefined-doc-class": "Warning",
     /*
-    Enable diagnostics for type annotations referencing an undefined type or alias.
+    在 `@type` 標註中引用未定義的類型或 `@alias`
     */
     "undefined-doc-name": "Warning",
     /*
-    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    在 `@param` 標註中引用函式定義未宣告的參數
     */
     "undefined-doc-param": "Warning",
     /*
@@ -1235,7 +1296,7 @@ object<string, string>
     */
     "undefined-env-child": "Information",
     /*
-    Enable diagnostics for cases in which an undefined field of a variable is read.
+    讀取變數中為定義的欄位
     */
     "undefined-field": "Warning",
     /*
@@ -1243,19 +1304,19 @@ object<string, string>
     */
     "undefined-global": "Warning",
     /*
-    Enable diagnostics for casts of undefined variables.
+    使用 `@cast` 對未定義的變數進行強制轉換
     */
     "unknown-cast-variable": "Warning",
     /*
-    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    輸入了未知的診斷
     */
     "unknown-diag-code": "Warning",
     /*
-    Enable diagnostics for unknown operators.
+    未知的運算子
     */
     "unknown-operator": "Warning",
     /*
-    Enable diagnostics for unreachable code.
+    無法到達的程式碼
     */
     "unreachable-code": "Hint",
     /*
@@ -1279,7 +1340,7 @@ object<string, string>
 
 # diagnostics.unusedLocalExclude
 
-Do not diagnose `unused-local` when the variable name matches the following pattern.
+如果變數名符合以下規則，則不對其進行 `unused-local` 診斷。
 
 ## type
 
@@ -1311,7 +1372,7 @@ integer
 
 # diagnostics.workspaceEvent
 
-Set the time to trigger workspace diagnostics.
+設定觸發工作區診斷的時機。
 
 ## type
 
@@ -1321,9 +1382,9 @@ string
 
 ## enum
 
-* ``"OnChange"``: Trigger workspace diagnostics when the file is changed.
-* ``"OnSave"``: Trigger workspace diagnostics when the file is saved.
-* ``"None"``: Disable workspace diagnostics.
+* ``"OnChange"``: 當檔案發生變化時觸發工作區診斷。
+* ``"OnSave"``: 當儲存檔案時觸發工作區診斷。
+* ``"None"``: 停用工作區診斷。
 
 ## default
 
@@ -1349,7 +1410,7 @@ integer
 
 # doc.packageName
 
-Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.
+將特定名稱的欄位視為package，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 只能在定義所在的檔案內存取
 
 ## type
 
@@ -1365,7 +1426,7 @@ Array<string>
 
 # doc.privateName
 
-Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.
+將特定名稱的欄位視為private，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 會是私有層級，只能在定義所在的類別內存取
 
 ## type
 
@@ -1381,7 +1442,7 @@ Array<string>
 
 # doc.protectedName
 
-Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.
+將特定名稱的欄位視為protected，例如 `m_*` 代表 `XXX.m_id` 和 `XXX.m_type` 會是保護層級，只能在定義所在的類別和其子類別內存取
 
 ## type
 
@@ -1393,6 +1454,43 @@ Array<string>
 
 ```jsonc
 []
+```
+
+# doc.regengine
+
+用於匹配文件作用域名稱的正則表達式引擎。
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"glob"``: 預設的輕量模式語法。
+* ``"lua"``: 完整的 Lua 風格正則表達式。
+
+## default
+
+```jsonc
+"glob"
+```
+
+# docScriptPath
+
+用於匹配文件作用域名稱的正則表達式引擎。
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
 ```
 
 # format.defaultConfig
@@ -1453,7 +1551,7 @@ string
 
 # hint.await
 
-如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。
+如果呼叫的函式被標記為了 `---@async`，則在呼叫處提示 `await`。
 
 ## type
 
@@ -1465,6 +1563,22 @@ boolean
 
 ```jsonc
 true
+```
+
+# hint.awaitPropagate
+
+啟用 `await` 的傳播，當一個函式呼叫了一個 `---@async` 標記的函式時，會自動標記為 `---@async`。
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
 ```
 
 # hint.enable
@@ -1593,7 +1707,7 @@ integer
 
 # hover.expandAlias
 
-是否展開別名。例如 `---@alias myType boolean|number` 展開後顯示為 `boolean|number`，否則顯示為 `myType'。
+是否展開別名。例如 `---@alias myType boolean|number` 展開後顯示為 `boolean|number`，否則顯示為 `myType`'。
 
 
 ## type
@@ -1621,7 +1735,7 @@ integer
 ## default
 
 ```jsonc
-50
+10
 ```
 
 # hover.viewNumber
@@ -1672,9 +1786,41 @@ integer
 1000
 ```
 
+# language.completeAnnotation
+
+（僅限VSCode）在註解後換行時自動插入 "---@ "。
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
+# language.fixIndent
+
+（僅限VSCode）修復自動縮排錯誤，例如在有包含 "function" 的字串中換行時出現的錯誤縮排。
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
 # misc.executablePath
 
-Specify the executable path in VSCode.
+指定VSCode內的可執行文件
 
 ## type
 
@@ -1690,7 +1836,7 @@ string
 
 # misc.parameters
 
-VSCode中啟動語言伺服時的[命令列參數](https://luals.github.io/wiki/usage#arguments)。
+VSCode內啟動語言伺服時的[命令列參數](https://luals.github.io/wiki/usage#arguments)。
 
 ## type
 
@@ -1706,7 +1852,9 @@ Array<string>
 
 # nameStyle.config
 
-Set name style config
+設定檢查命名風格的組態。
+閱讀 [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) 了解用法。
+
 
 ## type
 
@@ -1838,6 +1986,7 @@ Array<string>
 * ``"!"``
 * ``"!="``
 * ``"continue"``
+* ``"|lambda|"``
 
 ## default
 
@@ -1848,7 +1997,7 @@ Array<string>
 # runtime.path
 
 當使用 `require` 時，如何根據輸入的名字來尋找檔案。
-此選項設定為 `?/init.lua` 意味著當你輸入 `require 'myfile'` 時，會從已載入的檔案中搜尋 `{workspace}/myfile/init.lua`。
+此選項設定為 `?/init.lua` 時，代表當你輸入 `require 'myfile'` 時，會從已載入的檔案中搜尋 `{workspace}/myfile/init.lua`。
 當 `runtime.pathStrict` 設定為 `false` 時，還會嘗試搜尋 `${workspace}/**/myfile/init.lua`。
 如果你想要載入工作區以外的檔案，你需要先設定 `Lua.workspace.library`。
 
@@ -1867,7 +2016,7 @@ Array<string>
 
 # runtime.pathStrict
 
-啟用後 `runtime.path` 將只搜尋第一層目錄，見 `runtime.path` 的説明。
+啟用後 `runtime.path` 將只搜尋第一層目錄，見 `runtime.path` 的說明。
 
 ## type
 
@@ -1888,29 +2037,29 @@ false
 ## type
 
 ```ts
-string
+string | array
 ```
 
 ## default
 
 ```jsonc
-""
+null
 ```
 
 # runtime.pluginArgs
 
-Additional arguments for the plugin.
+延伸模組的額外引數。
 
 ## type
 
 ```ts
-Array<string>
+array | object
 ```
 
 ## default
 
 ```jsonc
-[]
+null
 ```
 
 # runtime.special
@@ -1968,6 +2117,7 @@ string
 * ``"Lua 5.2"``
 * ``"Lua 5.3"``
 * ``"Lua 5.4"``
+* ``"Lua 5.5"``
 * ``"LuaJIT"``
 
 ## default
@@ -2088,11 +2238,79 @@ boolean
 true
 ```
 
+# type.checkTableShape
+
+對表的形狀進行嚴格檢查。
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.inferParamType
+
+未註解參數類型時，參數類型由函式傳入參數推斷。
+
+如果設定為 "false"，則在未註解時，參數類型為 "any"。
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.inferTableSize
+
+在類型推斷時最多分析的表欄位數。
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+10
+```
+
+# type.maxUnionVariants
+
+**Missing description!!**
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+0
+```
+
 # type.weakNilCheck
 
-When checking the type of union type, ignore the `nil` in it.
+對同位類型進行類型檢查時，忽略其中的 `nil`。
 
-When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+此設定為 `false` 時，`number|boolean` 類型無法賦值給 `number` 類型；為 `true` 時則可以。
 
 
 ## type
@@ -2111,7 +2329,7 @@ false
 
 同位類型中只要有一個子類型滿足條件，則同位類型也滿足條件。
 
-此設定為 `false` 時，`number|boolean` 類型無法賦給 `number` 類型；為 `true` 時則可以。
+此設定為 `false` 時，`number|boolean` 類型無法賦值給 `number` 類型；為 `true` 時則可以。
 
 
 ## type
@@ -2128,7 +2346,7 @@ false
 
 # typeFormat.config
 
-Configures the formatting behavior while typing Lua code.
+寫Lua程式碼時的格式化組態
 
 ## type
 
@@ -2141,15 +2359,15 @@ object<string, string>
 ```jsonc
 {
     /*
-    Controls if `end` is automatically completed at suitable positions.
+    是否在合適的位置自動完成 `end`
     */
     "auto_complete_end": "true",
     /*
-    Controls if a separator is automatically appended at the end of a table declaration.
+    是否在宣告表的結尾自動添加分隔符號
     */
     "auto_complete_table_sep": "true",
     /*
-    Controls if a line is formatted at all.
+    是否格式化某一行
     */
     "format_line": "true"
 }
@@ -2202,20 +2420,29 @@ true
 ## type
 
 ```ts
-string
+string | boolean
 ```
-
-## enum
-
-* ``"Ask"``
-* ``"Apply"``
-* ``"ApplyInMemory"``
-* ``"Disable"``
 
 ## default
 
 ```jsonc
-"Ask"
+null
+```
+
+# workspace.dofileRoots
+
+In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # workspace.ignoreDir
@@ -2268,7 +2495,7 @@ Array<string>
 
 # workspace.maxPreload
 
-最大預載入檔案數。
+最大預先載入檔案數。
 
 ## type
 
@@ -2284,7 +2511,7 @@ integer
 
 # workspace.preloadFileSize
 
-預載入時跳過大小大於該值（KB）的檔案。
+預先載入時跳過大小大於該值（KB）的檔案。
 
 ## type
 

@@ -395,16 +395,11 @@ function m.findUrisByFilePath(path, contextUri)
     if type(path) ~= 'string' then
         return {}
     end
-    -- Resolve relative paths using workspace context
+    -- Resolve relative paths using provided contextUri (should be a folder URI)
     ---@type string?
     local resolvedPath = path
     if contextUri and fs.path(path):is_relative() then
-        -- Extract directory from the context file URI
-        local contextPath = furi.decode(contextUri)
-        local contextDir = contextPath:match('^(.+[/\\])')
-        if contextDir then
-            resolvedPath = m.getAbsolutePath(furi.encode(contextDir), path)
-        end
+        resolvedPath = m.getAbsolutePath(contextUri, path)
         if not resolvedPath then
             return {}
         end

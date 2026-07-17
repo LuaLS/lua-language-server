@@ -8,6 +8,7 @@ local scope      = require 'workspace.scope'
 ---@class vm
 local vm         = require 'vm.vm'
 local plugin     = require 'plugin'
+local loading    = require 'workspace.loading'
 
 ---@class parser.object
 ---@field _compiledNodes        boolean
@@ -2260,8 +2261,7 @@ local compilerSwitch = util.switch()
             if not path or type(path) ~= 'string' then
                 return
             end
-            local ctx = workspace.rootUri
-            local uri = workspace.findUrisByFilePath(path, ctx)[1]
+            local uri = workspace.findUrisByDofile(path, guide.getUri(source))[1]
             if not uri then
                 return
             end

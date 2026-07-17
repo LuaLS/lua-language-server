@@ -79,7 +79,7 @@ local function checkRequire(source)
         return rpath.findUrisByRequireName(guide.getUri(source), literal)
     elseif libName == 'dofile'
     or     libName == 'loadfile' then
-        return workspace.findUrisByFilePath(literal, guide.getUri(source))
+        return workspace.findUrisByDofile(literal, guide.getUri(source))
     end
     return nil
 end

@@ -228,6 +228,12 @@ function m.getLibraryMatchers(scp)
             librarys[files.normalize(apath)] = true
         end
     end
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.dofileRoots')) do
+        local apath = m.getAbsolutePath(scp.uri, path)
+        if apath then
+            librarys[files.normalize(apath)] = true
+        end
+    end
     local metaPaths = scp:get 'metaPaths'
     log.debug('meta path:', inspect(metaPaths))
     if metaPaths then
@@ -389,35 +395,51 @@ end
 
 --- 查找符合指定file path的所有uri
 ---@param path string
----@param contextUri? uri
 ---@return uri[]
-function m.findUrisByFilePath(path, contextUri)
-    if type(path) ~= 'string' then
-        return {}
-    end
-    -- Resolve relative paths using provided contextUri (should be a folder URI)
-    ---@type string?
-    local resolvedPath = path
-    if contextUri and fs.path(path):is_relative() then
-        resolvedPath = m.getAbsolutePath(contextUri, path)
-        if not resolvedPath then
-            return {}
-        end
-        ---@cast resolvedPath -?
-    end
-    local myUri = furi.encode(resolvedPath)
+function m.findUrisByFilePath(path)
+    local uri = furi.encode(path)
     local vm    = require 'vm'
     local resultCache = vm.getCache 'findUrisByFilePath.result'
-    if resultCache[resolvedPath] then
-        return resultCache[resolvedPath]
+    if resultCache[path] then
+        return resultCache[path]
     end
     local results = {}
-    for uri in files.eachFile() do
-        if uri == myUri then
+    if files.exists(uri) then
+        results = { uri }
+    end
+    resultCache[path] = results
+    return results
+end
+
+
+---@param path string
+---@param sourceUri? uri
+---@return uri[]
+function m.findUrisByDofile(path, sourceUri)
+    if not fs.path(path):is_relative() then
+        return m.findUrisByFilePath(path)
+    end
+
+    ---@type string[]
+    local roots = config.get(sourceUri, 'Lua.workspace.dofileRoots')
+    local results = {}
+
+    local function addResult(absPath)
+        local uris = m.findUrisByFilePath(absPath)
+        for _, uri in ipairs(uris) do
             results[#results+1] = uri
         end
     end
-    resultCache[resolvedPath] = results
+
+    for _, root in ipairs(roots) do
+        local rootUri = furi.encode(root)
+        addResult(m.getAbsolutePath(rootUri, path))
+    end
+
+    if  m.rootUri then
+        addResult(m.getAbsolutePath(m.rootUri, path))
+    end
+
     return results
 end
 

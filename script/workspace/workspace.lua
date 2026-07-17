@@ -438,8 +438,11 @@ function m.findUrisByDofile(path, sourceUri)
     end
 
     for _, root in ipairs(roots) do
-        local rootUri = furi.encode(root)
-        addResult(m.getAbsolutePath(rootUri, path))
+        local rootPath = m.getAbsolutePath(sourceUri or m.rootUri, root)
+        if rootPath then
+            local rootUri = furi.encode(rootPath)
+            addResult(m.getAbsolutePath(rootUri, path))
+        end
     end
 
     if  m.rootUri then

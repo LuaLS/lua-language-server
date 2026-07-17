@@ -8,7 +8,6 @@ local scope      = require 'workspace.scope'
 ---@class vm
 local vm         = require 'vm.vm'
 local plugin     = require 'plugin'
-local loading    = require 'workspace.loading'
 
 ---@class parser.object
 ---@field _compiledNodes        boolean

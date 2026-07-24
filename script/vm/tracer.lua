@@ -858,19 +858,39 @@ function mt:calcNode(source)
     end
     if self.assignMap[source] then
         -- Guard against circular dependency: when this setlocal is already
-        -- being compiled (e.g. if-handler's getNode triggers calcNode for
-        -- a setlocal whose value is currently being compiled), skip
-        -- lookIntoBlock to avoid propagating incomplete types and setting
-        -- marks that would prevent later correct processing.
-        if self._compilingAssigns and self._compilingAssigns[source] then
+        -- being compiled on this coroutine (e.g. if-handler's getNode
+        -- triggers calcNode for a setlocal whose value is currently being
+        -- compiled), skip lookIntoBlock to avoid propagating incomplete
+        -- types and setting marks that would prevent later correct
+        -- processing. The outer call purges everything cached meanwhile.
+        local co = coroutine.running()
+        local compiling = self._compilingAssigns and self._compilingAssigns[co]
+        if compiling and compiling[source] then
+            self._reentered = (self._reentered or 0) + 1
             self.nodes[source] = vm.compileNode(source)
             return
         end
         if not self._compilingAssigns then
-            self._compilingAssigns = {}
+            -- weak keys so entries of dead coroutines can be collected
+            self._compilingAssigns = setmetatable({}, { __mode = 'k' })
         end
-        self._compilingAssigns[source] = true
+        if not compiling then
+            compiling = {}
+            self._compilingAssigns[co] = compiling
+        end
+        compiling[source] = true
+        local reentered = self._reentered or 0
         local node = vm.compileNode(source)
+        compiling[source] = nil
+        if (self._reentered or 0) ~= reentered then
+            -- A re-entrant calcNode happened while this assign was being
+            -- compiled: nodes cached since then may be based on its
+            -- incomplete type (e.g. an if-branch merged without this
+            -- assignment's effect, losing it for all code after the block).
+            -- Drop the caches so later lookups recompute with the final type.
+            self.nodes = {}
+            self.mark  = {}
+        end
         -- When the compiled node has no known type (only contains a 'variable'
         -- due to circular dependency), fall back to the variable's base
         -- declaration node. This prevents incomplete nodes from propagating
@@ -890,7 +910,6 @@ function mt:calcNode(source)
         if parentBlock then
             self:lookIntoBlock(parentBlock, source.finish, node)
         end
-        self._compilingAssigns[source] = nil
         return
     end
 end

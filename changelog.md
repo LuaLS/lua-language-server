@@ -2,6 +2,8 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` `@operator` declarations on generic classes now resolve class type parameters through the instantiated type: with `---@class Box<T>` and `---@operator call(): T?`, calling a `Box<string>` instance infers `string?`
+* `FIX` Generic type parameters used in `@operator` annotations are now recognized as generics (and highlighted as such) instead of being treated as undefined type names
 * `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
 * `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`

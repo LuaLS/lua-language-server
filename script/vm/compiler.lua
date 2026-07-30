@@ -2191,12 +2191,14 @@ local compilerSwitch = util.switch()
                 newArgs[#newArgs+1] = args[i]
             end
             local node = getReturn(args[1], index - 1, newArgs)
-            if node then
+            if node and not node:isEmpty() then
                 vm.setNode(source, node)
+                return
             end
-            return
-        end
-        if func.special == 'xpcall' and index > 1 then
+            -- The called function has no such return, but `pcall` still does: on failure
+            -- the second result is the error value. Fall through to its own declaration,
+            -- otherwise the result stays unknown.
+        elseif func.special == 'xpcall' and index > 1 then
             if not args then
                 return
             end
@@ -2205,10 +2207,12 @@ local compilerSwitch = util.switch()
                 newArgs[#newArgs+1] = args[i]
             end
             local node = getReturn(args[1], index - 1, newArgs)
-            if node then
+            if node and not node:isEmpty() then
                 vm.setNode(source, node)
+                return
             end
-            return
+            -- Same as `pcall`: the message handler's result comes in place of the missing
+            -- return, and its type is declared on `xpcall` itself.
         end
         if func.special == 'require' then
             if index == 2 then

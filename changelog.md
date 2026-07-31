@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Infer `pcall`/`xpcall` second result from their own declaration when the called function returns nothing [#3440](https://github.com/LuaLS/lua-language-server/pull/3440)
 * `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
 * `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`

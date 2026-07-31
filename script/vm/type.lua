@@ -589,9 +589,21 @@ function vm.isSubType(uri, child, parent, mark, errs)
             for _, set in ipairs(childClass:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
-                        if  ext.type == 'doc.extends.name'
-                        and (not isBasicType or guide.isBasicType(ext[1]))
-                        and vm.isSubType(uri, ext[1], parent, mark, errs) == true then
+                        -- A parent given with arguments (`---@class A : B<string>`) is
+                        -- parsed into `doc.type.sign`, keeping the name one level down.
+                        -- Without looking inside, such a parent is skipped entirely and
+                        -- the class is not recognized as its child.
+                        local extName
+                        if ext.type == 'doc.extends.name' then
+                            extName = ext[1]
+                        elseif ext.type == 'doc.type.sign'
+                        and    ext.node
+                        and    ext.node.type == 'doc.extends.name' then
+                            extName = ext.node[1]
+                        end
+                        if  extName
+                        and (not isBasicType or guide.isBasicType(extName))
+                        and vm.isSubType(uri, extName, parent, mark, errs) == true then
                             mark[childName] = nil
                             return true
                         end

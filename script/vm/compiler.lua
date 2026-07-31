@@ -304,20 +304,43 @@ function vm.getClassGenericMap(uri, classGlobal, signs)
     return nil
 end
 
+---Maps every declared generic parameter of a class to `any`.
+---
+---Used when a generic class is referenced without arguments (`---@type Box` instead of
+---`Box<string>`). Its fields would otherwise keep the parameter itself as their type,
+---which no value can ever have, making the field unusable and every place that mentions
+---the class without arguments a false error.
 ---@param uri uri
 ---@param classGlobal vm.global
+---@return table<string, vm.node>?
+local function getClassAnyGenericMap(uri, classGlobal)
+    for _, set in ipairs(classGlobal:getSets(uri)) do
+        if set.type == 'doc.class' and set.signs then
+            local resolved = {}
+            local anyNode = vm.createNode()
+            anyNode:merge(vm.declareGlobal('type', 'any'))
+            for _, signName in ipairs(set.signs) do
+                if signName[1] then
+                    resolved[signName[1]] = anyNode
+                end
+            end
+            if next(resolved) then
+                return resolved
+            end
+            break
+        end
+    end
+    return nil
+end
+
 ---@param field parser.object | vm.generic
----@param signs parser.object[]
+---@param resolved table<string, vm.node>
 ---@return parser.object?
-local function resolveGenericField(uri, classGlobal, field, signs)
+local function resolveFieldWithMap(field, resolved)
     if field.type ~= 'doc.field' or not field.extends then
         return nil
     end
     if not containsGenericName(field.extends) then
-        return nil
-    end
-    local resolved = vm.getClassGenericMap(uri, classGlobal, signs)
-    if not resolved then
         return nil
     end
     local newExtends = vm.cloneObject(field.extends, resolved)
@@ -334,6 +357,25 @@ local function resolveGenericField(uri, classGlobal, field, signs)
         visible  = field.visible,
         optional = field.optional,
     }
+end
+
+---@param uri uri
+---@param classGlobal vm.global
+---@param field parser.object | vm.generic
+---@param signs parser.object[]
+---@return parser.object?
+local function resolveGenericField(uri, classGlobal, field, signs)
+    if field.type ~= 'doc.field' or not field.extends then
+        return nil
+    end
+    if not containsGenericName(field.extends) then
+        return nil
+    end
+    local resolved = vm.getClassGenericMap(uri, classGlobal, signs)
+    if not resolved then
+        return nil
+    end
+    return resolveFieldWithMap(field, resolved)
 end
 
 local searchFieldSwitch = util.switch()
@@ -493,6 +535,13 @@ local searchFieldSwitch = util.switch()
             end
         end
         if node.cate == 'type' then
+            local resolved = getClassAnyGenericMap(suri, node)
+            if resolved then
+                vm.getClassFields(suri, node, key, function (field, isMark)
+                    pushResult(resolveFieldWithMap(field, resolved) or field, isMark)
+                end)
+                return
+            end
             vm.getClassFields(suri, node, key, pushResult)
         end
     end)

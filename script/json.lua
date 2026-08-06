@@ -18,6 +18,7 @@ local huge = math.huge
 local tiny = -huge
 
 local utf8_char
+local utf8_len
 local math_type
 
 if _VERSION == "Lua 5.1" or _VERSION == "Lua 5.2" then
@@ -51,6 +52,7 @@ if _VERSION == "Lua 5.1" or _VERSION == "Lua 5.2" then
     end
 else
     utf8_char = utf8.char
+    utf8_len = utf8.len
     math_type = math.type
 end
 
@@ -118,7 +120,26 @@ encode_map["nil"] = function ()
     return "null"
 end
 
+local function replace_invalid_utf8(v)
+    local result = {}
+    local start = 1
+    while true do
+        local _, invalid = utf8_len(v, start)
+        if not invalid then
+            result[#result+1] = string_sub(v, start)
+            break
+        end
+        result[#result+1] = string_sub(v, start, invalid - 1)
+        result[#result+1] = utf8_char(0xfffd)
+        start = invalid + 1
+    end
+    return table_concat(result)
+end
+
 local function encode_string(v)
+    if utf8_len and not utf8_len(v) then
+        v = replace_invalid_utf8(v)
+    end
     return string_gsub(v, '[%z\1-\31\\"]', encode_escape_map)
 end
 

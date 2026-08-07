@@ -1,0 +1,145 @@
+---
+name: luajit-syntax
+description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use when implementing LuaJIT extension syntax support (bitwise ~>>, ternary ?:, safe navigation ?., nil-coalescing ??, customary operators ! && || !=, compound assignment, continue, const declaration, short function expression, number underscores) in the Lua language server, when modifying script/parser/compile.lua, script/parser/tokens.lua, script/config/template.lua, script/files.lua, or adding tests under test/parser_test/LuaJIT/.'
+---
+
+# LuaJIT 扩展语法支持规划
+
+## 概述
+
+为 lua-language-server 增加 LuaJIT v3 反向移植到 v2.1 的扩展语法支持（对应 [LuaLS/lua-language-server#3434](https://github.com/LuaLS/lua-language-server/issues/3434)）。
+
+## 背景与参考
+
+| 主题 | 链接 |
+|------|------|
+| LuaLS 需求 issue | https://github.com/LuaLS/lua-language-server/issues/3434 |
+| LuaJIT v3 语法总览（权威文档，见 MikePall 第一条评论） | https://github.com/LuaJIT/LuaJIT/issues/1475 |
+| 反向移植到 v2.1 说明 | https://github.com/LuaJIT/LuaJIT/issues/1476 |
+| 官方测试用例 gist | https://gist.github.com/MikePall/a8372d92cb2e6380cf56e78f69ee70a4 |
+| 本地测试文件 | `test/parser_test/LuaJIT/`（已包裹为 `return [[...]]`） |
+| 语法扩展详细文档 | `references/syntax-extensions.md` |
+
+## 开关设计（新设置）
+
+新增设置：**`Lua.runtime.enableLuaJITExtensions`**（`Boolean`，默认 `false`）
+
+生效条件（**两者同时满足**才启用）：
+1. `Lua.runtime.version == 'LuaJIT'`
+2. `Lua.runtime.enableLuaJITExtensions == true`
+
+传递链路：
+```
+用户配置
+  → script/config/template.lua 注册设置
+  → script/files.lua 构造 options：enableLuaJITExtensions = config.get(uri, 'Lua.runtime.enableLuaJITExtensions')
+  → parser.compile(text, 'Lua', version, options)
+  → script/parser/compile.lua initState 中判定：
+      if version == 'LuaJIT' and options.enableLuaJITExtensions then
+          state.luaJITExtensions = true
+      end
+```
+
+要点：
+- 启用后，相关 LuaJIT 语法**直接生效**，无需用户再去 `Lua.runtime.nonstandardSymbol` 手动勾选。
+- 与 `nonstandardSymbol` 的关系：`continue`、`|lambda|`、`&&`、`||`、`!`、`!=`、复合赋值等原本由 `nonstandardSymbol` 控制；启用本开关时这些项自动视为开启。
+- `//`（注释）与反引号字符串 `` ` `` 属于 LuaLS 自身扩展，**不属于** LuaJIT 语法，保持由 `nonstandardSymbol` 独立控制。
+
+## 支持范围速览
+
+### ✅ 现有代码已支持（本次基本无需改动）
+| 语法 | 现状 |
+|------|------|
+| 位运算 `~ & \| << >>` | LuaJIT 2.1 原生，compile 已支持 |
+| 自定义运算符 `! && \|\| !=` | tokenizer 已有 token；compile 有 `UnaryAlias`/`BinaryAlias`，带 `ERR_NONSTANDARD_SYMBOL` 检查 |
+| 复合赋值 `+= -= *= /= %= &= \|= <<= >>=` | `expectAssign` 已支持（需 `nonstandardSymbol`） |
+| `continue` 语句 | `parseAction` 已支持（`nonstandardSymbol['continue']` → `parseBreak()`） |
+| 短函数 `\|x\| -> expr` | `parseLambda` 已支持（`nonstandardSymbol['\|lambda\|']`），但 `->` 尚无独立 token |
+| 数字后缀 `LL`/`ULL`/`I` | `dropNumberTail` 已支持（仅 LuaJIT） |
+
+### 🚧 待实现（本次规划核心）
+| # | 语法 | 涉及 |
+|---|------|------|
+| 1 | `~>>` 算术右移 与 `~>>=` 复合赋值 | tokenizer + `BinarySymbol` + `expectAssign` |
+| 2 | `..=` 字符串连接复合赋值 | tokenizer + `expectAssign` |
+| 3 | `??` 空值合并 | tokenizer + `BinarySymbol` + 类型语义 |
+| 4 | `?.` 安全导航（属性/索引/调用/**方法形式 `:?`**） | tokenizer + `parseSimple` |
+| 5 | `const` 声明 | `parseAction` + 局部常量语义 |
+| 6 | 数字下划线 `1_000` | tokenizer `Number` + `parseNumber*` |
+| 7 | 短函数完整形式（`x -> expr`、`\|\| -> expr`、`-> do ... end`） | tokenizer `->` + `parseLambda` 扩展 |
+
+### ⏸ 已搁置
+- **`?:` 三元条件**（`a ? b : c`）：语法上与 Lua 方法调用冒号 `:` 冲突过大（`obj:method()`），不适合当前 LuaLS parser 实现（CppCXY 在 issue #3434 评论中已说明），先不实现。未来实现时再补 `?:` token 与三目解析。
+- 未反向移植到 v2.1 的项（无需支持）：`//` 地板除、命名变参 `...name`、位运算元方法、`__add(a, b, true)` 元方法。
+
+## 实现步骤
+
+### 阶段 0：基础设施
+1. `script/config/template.lua`：注册 `Lua.runtime.enableLuaJITExtensions`。
+2. `script/files.lua`：两处（`compileStateAsync` 与 `compileState`）构造 options 时传入。
+3. `script/parser/compile.lua` `initState`：判定并设置 `state.luaJITExtensions`。
+4. 各 `locale/*/setting.lua` 补充设置说明文案。
+
+### 阶段 1：tokenizer（script/parser/tokens.lua）
+新增 token（注意顺序，长 token 在前）：
+- `->`（短函数箭头）
+- `??`、`?.`（均需排在单字符 `?` 之前）
+- `~>>`、`~>>=`（`~>>=` 排在 `~>>` 之前）
+- `..=`（排在 `..` 之前）
+- 说明：`?:` 三元已搁置，**暂不添加** `?:` token（未来实现时再加）。
+
+### 阶段 2：compile.lua 语法解析
+按依赖顺序（建议）：
+1. **`~>>`**：`BinarySymbol` 加 `['~>>'] = 7`（与 `<<`/`>>` 同级）。
+2. **复合赋值补全**：`expectAssign` 加 `..=`、`~>>=`。
+3. **数字下划线**：`parseNumber10/16/2` 允许下划线；注意 `dropNumberTail` 需放行下划线。
+4. **`??`**：`BinarySymbol` 加 `['??']`（与 `or` 同级），复用 `parseExp` 的二元循环；检查短路语义。
+5. **`?.`**：`parseSimple` 中 `token == '.'` 分支旁新增 `token == '?.'` 分支；支持 `a?.field`、`a?.[key]`、`f?.()`、`f?."str"`、`f?.{...}`、`a?.field = v`、`a?.[key] = v`；**并支持 `:?` 方法形式**：
+   - `obj?.:method(...)`（检查 obj）
+   - `obj:method?.(...)`（检查 method）
+   - `obj?.:method?.(...)`（两者都检查）
+6. **`const`**：`parseAction` 中处理 soft keyword `const`；`const x = 1` 为块级局部常量，禁止重复声明/重新赋值；`const function foo() end` 一并考虑。
+7. **短函数**：`parseExpUnit` 中识别 `->`；`parseLambda` 支持 `x -> expr`（单参数省略管道）、`|| -> expr`、`-> do ... end` 语句体。
+
+### 阶段 3：AST 与语义层
+- 新节点类型（建议在实现时定稿）：
+  - `?.` → `getfield`/`getindex`/`call`/`getmethod` 的安全导航变体（可加标记字段，如 `safe = true`），语义层需处理 nullable 访问；`obj:method?.` 的检查目标是 method，`obj?.:method` 的检查目标是 obj。
+  - `??` → 复用 `binary`（op = `??`）。
+  - `const` → 复用 `local` 结构并打 const 标记，或新节点类型。
+  - （`?:` 已搁置，无对应节点。）
+- `script/parser/guide.lua`、`script/vm/*`：让类型推断/引用/悬停等理解新节点。
+- 运算符优先级遵循 LuaJIT 官方表（见 references/syntax-extensions.md）。
+
+### 阶段 4：诊断与文案
+- 新错误码直接在 compile.lua 中 `type = 'XXX'` 定义（`script/proto/diagnostic.lua` 的 `getDiagAndErrNameMap` 会自动从源码提取注册）。
+- 需要的新错误码示例：
+  - `?.` 使用但未启用扩展 → 复用 `ERR_NONSTANDARD_SYMBOL` 或新增
+  - `const` 重新赋值 / 重复声明 → 参考测试中的 `assign to const` / `declare const`（注意现已有 `SET_CONST`、`ASSIGN_CONST_GLOBAL`）
+- 各 `locale/*/diagnostic.lua` 补充翻译。
+
+### 阶段 5：测试
+- `test/parser_test/LuaJIT/` 下的 14 个测试文件已包裹为 `return [[...]]`，可作为代码字符串测试源。
+- 需接入现有 parser_test 框架（参考 `test/parser_test/ast/` 的结构），或用语法检查断言（`syntax_check.lua` 的 `TestWith` 模式）。
+- 为开关状态各写测试：未启用时报错、启用后通过。
+
+## 关键文件地图
+
+| 文件 | 职责 |
+|------|------|
+| `script/config/template.lua` | 注册 `Lua.runtime.enableLuaJITExtensions` |
+| `script/files.lua` | 构造 compile options（两处） |
+| `script/parser/tokens.lua` | 词法：新增 token |
+| `script/parser/compile.lua` | 语法：`initState`/`parseExp`/`parseSimple`/`parseLambda`/`expectAssign`/`parseAction`/`parseNumber*`/`dropNumberTail` |
+| `script/parser/guide.lua` | AST 辅助（行号、块、子节点遍历） |
+| `script/vm/*` | 语义/类型推断 |
+| `script/proto/diagnostic.lua` | 错误码注册（自动提取） |
+| `locale/*/setting.lua`、`locale/*/diagnostic.lua` | 文案 |
+| `test/parser_test/LuaJIT/` | LuaJIT 官方测试（已包裹） |
+
+## 注意事项
+- **优先级表**：所有新增运算符的优先级必须严格遵循 LuaJIT 官方定义（见 references/syntax-extensions.md「运算符优先级」）。
+- **`?:` 已搁置**：三元运算符与 Lua 方法调用冒号 `:` 冲突过大（`obj:method()`），不适合当前 parser 实现，本次不实现（CppCXY 在 issue #3434 评论中已说明）。
+- **`?.` 与 `:` 的歧义**：实现安全导航的方法形式时需小心区分 `obj?.:method`（`?.` + `:`）与 `obj:method?.`（`:` + `?.`），以及普通方法调用 `obj:method`，三者 token 序列不同，需在 `parseSimple` 中分别处理。
+- **soft keyword**：`const` 与 `continue` 都是 soft keyword，可作变量名/字段名/函数名，解析时必须先识别上下文。
+- **短路语义**：`??`、`?.` 都有短路行为，虽然语法层不关心求值，但 AST 结构与类型推断需正确表达。
+- **`continue` 与 `repeat`**：`continue` 跳转到循环条件；在 `repeat` 中不能跳入其后声明的局部变量作用域（测试 `stmt_continue.lua` 有覆盖）。

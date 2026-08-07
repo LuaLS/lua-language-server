@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Support LuaJIT 3.0 extension syntax when `Lua.runtime.version` is `LuaJIT` and the new `Lua.runtime.enableLuaJITExtensions` setting is enabled: ternary conditional `?:`, safe navigation `?.` (including method forms `obj?.:method`, `obj:method?.`), nil-coalescing `??`, arithmetic shift `~>>` with `~>>=` compound assignment, `..=` concatenation assignment, `const` declarations, short function expressions (`x -> expr`, `|x| -> expr`, `-> do ... end`), and number underscores (`1_000`) [#3434](https://github.com/LuaLS/lua-language-server/issues/3434)
 * `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
 * `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`

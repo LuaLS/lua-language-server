@@ -11,12 +11,20 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 |------|------|------|
 | 阶段 0 | 设置 `Lua.runtime.enableLuaJITExtensions`、options 传递、initState 判定（语法处单独判断） | ✅ 完成 |
 | 阶段 1 | tokenizer 新增 `-> ?? ?. ~>> ~>>= ..=` | ✅ 完成 |
-| 阶段 2 | 语法解析（`~>>`、复合赋值、数字下划线、`??`、`?.` 全形式、`const`、短函数） | ✅ 完成 |
+| 阶段 2 | 语法解析（`~>>`、复合赋值、数字下划线、`??`、`?.` 全形式、`const`、短函数、`continue` soft keyword、`a ~= b` 异或赋值） | ✅ 完成 |
 | 阶段 3 | 语义层（`?.`→optional、`??` 类型合并、`~>>`→integer） | ✅ 完成 |
-| 阶段 4 | 诊断错误码文案（`DECLARE_CONST` 等翻译） | ⏳ 待做 |
-| 阶段 5 | 接入正式 parser_test 框架 | ⏳ 待做 |
+| 阶段 4 | 诊断文案 `PARSER_DECLARE_CONST`（6 语言） | ✅ 完成 |
+| 阶段 5 | 正式测试接入 `test/parser_test/luajit_ext.lua` | ✅ 完成 |
 
-验证：语法层 40 用例（`temp/tmp_test_luajit.lua`）、语义层 7 用例（`temp/test_luajit_semantic.lua`）通过；`parser_test`/`type_inference`/`hover` 回归通过。
+验证：
+- 语法层 40 用例（`temp/tmp_test_luajit.lua`）、语义层 7 用例（`temp/test_luajit_semantic.lua`）通过
+- `parser_test`（含 `luajit_ext`：11 个官方测试文件编译通过 + 3 个含三元文件预期报错）、`type_inference`、`hover` 回归通过
+
+实现中发现的现有问题及修复：
+- LuaJIT 下 `<<`/`>>` 误报 `UNSUPPORT_SYMBOL`（已修复：LuaJIT 支持 `<<`/`>>`，`//` 仍不支持）
+- `a ~= b` 在语句上下文应识别为异或复合赋值（已修复，与现有 `+=` 简化一致）
+- `continue` 是 soft keyword，需按后续 token 判断（`continue = 2` 是变量赋值）
+- `safe` 字段只在 `safe == true` 时设置，否则普通 AST 会多出 `safe = false`（ast 测试失败教训）
 
 ## 概述
 

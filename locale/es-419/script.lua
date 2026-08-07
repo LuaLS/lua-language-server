@@ -306,6 +306,8 @@ PARSER_MISS_SEP_IN_TABLE =
 'Falta el símbolo `,` ó `;` .'
 PARSER_SET_CONST         =
 'Asignación de valor a una variable constante.'
+PARSER_DECLARE_CONST     =
+'No se puede volver a declarar la constante `{name}`.'
 PARSER_UNICODE_NAME      =
 'Contiene caracteres Unicode.'
 PARSER_ERR_NONSTANDARD_SYMBOL =

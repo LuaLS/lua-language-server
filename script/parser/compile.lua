@@ -759,6 +759,9 @@ local function checkDeclareConst(obj)
                         type   = 'DECLARE_CONST',
                         start  = obj.start,
                         finish = obj.finish,
+                        info   = {
+                            name = obj[1],
+                        },
                     }
                     return
                 end
@@ -3267,9 +3270,11 @@ local function parseBinaryOP(asAction, level)
     if token == '//'
     or token == '<<'
     or token == '>>' then
+        -- << >>：Lua 5.3+ 与 LuaJIT 支持；//（地板除）仅 Lua 5.3+（LuaJIT 未反向移植）
         if  State.version ~= 'Lua 5.3'
         and State.version ~= 'Lua 5.4'
-        and State.version ~= 'Lua 5.5' then
+        and State.version ~= 'Lua 5.5'
+        and not (State.version == 'LuaJIT' and token ~= '//') then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
@@ -3676,6 +3681,17 @@ local function compileExpAsAction(exp)
                     }
                 }
                 return
+            end
+            -- LuaJIT：a ~= b 在语句上下文是异或复合赋值（= a ~ b）
+            if op.type == '~=' and State.luaJITExtensions then
+                local n = exp[1]
+                n.type = GetToSetMap[n.type] or n.type
+                n.value = exp[2]
+                n.vstart = op.start
+                n.range  = exp.finish
+                exp[2].parent = n
+                pushActionIntoCurrentChunk(n)
+                return n
             end
         end
     end
@@ -4826,7 +4842,19 @@ function parseAction()
     end
 
     if token == 'continue' and (State.options.nonstandardSymbol['continue'] or State.luaJITExtensions) then
-        return parseBreak()
+        -- continue 是 soft keyword：仅当其后为换行/`;`/块结束符时才视为 continue 语句，
+        -- 否则（如 `continue = 2`、`continue()`）作为变量名
+        local nextToken = Tokens[Index + 3]
+        if nextToken == nil
+        or NLMap[nextToken]
+        or nextToken == ';'
+        or nextToken == 'end'
+        or nextToken == 'else'
+        or nextToken == 'elseif'
+        or nextToken == 'until'
+        or nextToken == ')' then
+            return parseBreak()
+        end
     end
 
     if token == 'while' then

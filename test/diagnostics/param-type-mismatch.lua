@@ -394,4 +394,23 @@ local function f(y) end
 f(x)
 ]]
 
+-- A class inheriting a generic one is still a child of that generic's own parent: the
+-- parent given with arguments is parsed one level down and used to be skipped.
+TEST [[
+---@class Base
+
+---@class Middle<T> : Base
+---@field Value T
+
+---@class Child : Middle<boolean>
+
+---@param value Base
+local function f(value) end
+
+---@type Child
+local child
+
+f(child)
+]]
+
 config.set(nil, 'Lua.type.checkTableShape', false)

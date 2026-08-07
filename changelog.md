@@ -9,6 +9,7 @@
 * `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`
 * `FIX` Fix initial `nameStyle.config` not getting loaded in the appropriate workspace.
+* `FIX` Fix method-level generic return type being overwritten by receiver class generic resolution [#3438](https://github.com/LuaLS/lua-language-server/discussions/3438)
 
 ## 3.18.2
 * `CHG` `duplicate-set-field` diagnostic now supports linked suppression: when any occurrence of a duplicate field is suppressed with `---@diagnostic disable` or `---@diagnostic disable-next-line`, all warnings for that field name will be suppressed

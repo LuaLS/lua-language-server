@@ -5215,3 +5215,21 @@ local mylist
 
 local <?result?> = mylist:identity()
 ]]
+
+-- Discussion #3438: Method-level generic return type not clobbered by receiver block
+-- When a generic class method has @return R where R is method-only (not in class genericMap),
+-- the receiver block should not overwrite Round 1's correct resolution.
+TEST 'integer' [[
+---@class MyClass<T>
+local MyClass = {}
+
+---@generic R
+---@param val R
+---@return R
+function MyClass:pass(val) return val end
+
+---@type MyClass<string>
+local myClass
+
+local <?result?> = myClass:pass(42)
+]]

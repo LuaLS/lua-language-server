@@ -1223,22 +1223,40 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
         end
     end
 
+    local docFuncs = {}
     for n in callNode:eachObject() do
         if n.type == 'function' then
             ---@cast n parser.object
             dealFunction(n)
         elseif n.type == 'doc.type.function' then
             ---@cast n parser.object
-            dealDocFunc(n)
+            docFuncs[#docFuncs+1] = n
         elseif n.type == 'global' and n.cate == 'type' then
             ---@cast n vm.global
             local overloads = vm.getOverloadsByTypeName(n.name, guide.getUri(arg))
             if overloads then
                 for _, func in ipairs(overloads) do
-                    dealDocFunc(func)
+                    docFuncs[#docFuncs+1] = func
                 end
             end
         end
+    end
+
+    if #docFuncs > 1 and call.args then
+        local uri = guide.getUri(arg)
+        local matched = {}
+        for _, n in ipairs(docFuncs) do
+            if vm.isPriorArgsMatched(uri, n, call.args, myIndex, fixIndex) then
+                matched[#matched+1] = n
+            end
+        end
+        if #matched > 0 then
+            docFuncs = matched
+        end
+    end
+
+    for _, n in ipairs(docFuncs) do
+        dealDocFunc(n)
     end
 end
 

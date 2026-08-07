@@ -353,6 +353,44 @@ local function isAllParamMatched(uri, args, params)
     return true
 end
 
+---@param param parser.object
+---@return boolean
+local function isVarargParam(param)
+    return param.type == '...'
+        or (param.name and param.name[1] == '...')
+end
+
+---@param uri uri
+---@param func parser.object -- `function` or `doc.type.function`
+---@param callArgs parser.object[]
+---@param myIndex integer
+---@param fixIndex? integer
+---@return boolean
+function vm.isPriorArgsMatched(uri, func, callArgs, myIndex, fixIndex)
+    fixIndex = fixIndex or 0
+    local params = func.args
+    if not params then
+        return true
+    end
+    for i = 1, myIndex - 1 do
+        local callArg = callArgs[i + fixIndex]
+        local param   = params[i]
+        if not callArg or not param then
+            break
+        end
+        if  callArg.type ~= '...'
+        and param.type ~= 'self'
+        and not isVarargParam(param) then
+            local defNode = vm.compileNode(param)
+            local refNode = vm.compileNode(callArg)
+            if not vm.canCastType(uri, defNode, refNode) then
+                return false
+            end
+        end
+    end
+    return true
+end
+
 ---@param uri uri
 ---@param args parser.object[]
 ---@param func parser.object

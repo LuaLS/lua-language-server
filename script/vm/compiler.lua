@@ -295,6 +295,9 @@ local function containsGenericName(obj)
     return false
 end
 
+---Public alias so that other vm modules (operator.lua) can reuse the check.
+vm.containsGenericName = containsGenericName
+
 ---Builds a map from generic parameter names to their concrete types
 ---@param uri uri
 ---@param classGlobal vm.global

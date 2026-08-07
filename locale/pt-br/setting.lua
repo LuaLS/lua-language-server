@@ -32,6 +32,8 @@ config.runtime.unicodeName        =
 "Permite caracteres Unicode em nomes."
 config.runtime.nonstandardSymbol  =
 "Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos."
+config.runtime.enableLuaJITExtensions =
+"Ativa a sintaxe de extensão do LuaJIT (requer que `Lua.runtime.version` esteja definido como `LuaJIT`)."
 config.runtime.plugin             =
 "Caminho do plugin. Leia a [wiki](https://luals.github.io/wiki/plugins) para saber mais."
 config.runtime.pluginArgs         =

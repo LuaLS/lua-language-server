@@ -226,6 +226,7 @@ local template = {
                                                 'continue',
                                                 '|lambda|',
                                             }),
+    ['Lua.runtime.enableLuaJITExtensions']  = Type.Boolean >> false,
     ['Lua.runtime.plugin']                  = Type.Or(Type.String, Type.Array(Type.String)) ,
     ['Lua.runtime.pluginArgs']              = Type.Or(Type.Array(Type.String), Type.Hash(Type.String, Type.String)),
     ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8' << {

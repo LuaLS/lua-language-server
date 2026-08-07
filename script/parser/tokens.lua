@@ -18,6 +18,7 @@ local Symbol = m.P'=='
             +  m.P'>='
             +  m.P'//'
             +  m.P'...'
+            +  m.P'..='
             +  m.P'..'
             +  m.P'::'
             -- non-standard:
@@ -35,6 +36,13 @@ local Symbol = m.P'=='
             +  m.P'^='
             +  m.P'/='
             -- end non-standard
+            -- LuaJIT extensions:
+            +  m.P'->'
+            +  m.P'~>>='
+            +  m.P'~>>'
+            +  m.P'??'
+            +  m.P'?.'
+            -- end LuaJIT extensions
             -- singles
             +  m.S'+-*/!#%^&()={}[]|\\\'":;<>,.?~`'
 local Unknown = (1 - Number - Word - Symbol - Sp - Nl)^1

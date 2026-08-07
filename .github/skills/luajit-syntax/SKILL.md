@@ -122,6 +122,13 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 - 需接入现有 parser_test 框架（参考 `test/parser_test/ast/` 的结构），或用语法检查断言（`syntax_check.lua` 的 `TestWith` 模式）。
 - 为开关状态各写测试：未启用时报错、启用后通过。
 
+## 如何测试（实测方法）
+- **直接运行**：`bin/lua-language-server.exe test.lua` —— `lua-language-server.exe` 可直接作为 Lua 运行时执行脚本。
+- **限定测试范围**：`test.lua` 支持 `--name=<pattern>` 参数，`test(name)` 内部用 `name:match(TARGET_TEST_NAME)` 过滤，例如：
+  - `bin/lua-language-server.exe test.lua --name=parser_test` 只跑 `parser_test`
+- **自定义测试脚本**：可自行改造 `test.lua` 或编写独立脚本，直接 `bin/lua-language-server.exe <script>.lua` 运行（需正确设置 `package.path`，见 `test.lua` 开头）。
+- **当前进度验证脚本**：`tmp_test_luajit.lua`（临时，验证 compile 解析 LuaJIT 扩展语法，含开关开关两种状态的断言）。
+
 ## 关键文件地图
 
 | 文件 | 职责 |

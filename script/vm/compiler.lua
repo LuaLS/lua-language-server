@@ -249,7 +249,7 @@ local function searchLiteralFieldFromTable(source, key, callback)
     end
 end
 
----@param obj parser.object
+---@param obj vm.object
 ---@return boolean
 local function containsGenericName(obj)
     if not obj then

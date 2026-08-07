@@ -86,14 +86,19 @@ local function checkOperators(operators, op, value, result, uri, classGlobal, si
         or not operator.extends then
             goto CONTINUE
         end
+        -- 泛型类上声明的 @operator：按实例化类型替换类泛型参数。
+        -- @operator 的 exp/extends 运行时均为单个类型节点（extends 字段的数组
+        -- 类型注解仅供 doc.class 等使用），克隆结果可能是 vm.generic，故声明联合类型。
+        ---@type parser.object|vm.generic
         local exp     = operator.exp
+        ---@type parser.object|vm.generic
         local extends = operator.extends
         if genericMap then
             if exp and vm.containsGenericName(exp) then
-                exp = vm.cloneObject(exp, genericMap)
+                exp = vm.cloneObject(exp, genericMap) or exp
             end
             if vm.containsGenericName(extends) then
-                extends = vm.cloneObject(extends, genericMap)
+                extends = vm.cloneObject(extends, genericMap) or extends
             end
         end
         if value and exp then

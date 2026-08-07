@@ -135,6 +135,18 @@ DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM    =
 'Missing @param annotation for parameter `{}` in exported local function `{}`.'
 DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN   =
 'Missing @return annotation at index `{}` in exported local function `{}`.'
+DIAG_MISSING_EXPORTED_METHOD_DOC_COMMENT  =
+'Missing comment for exported method `{}`.'
+DIAG_MISSING_EXPORTED_METHOD_DOC_PARAM    =
+'Missing @param annotation for parameter `{}` in exported method `{}`.'
+DIAG_MISSING_EXPORTED_METHOD_DOC_RETURN   =
+'Missing @return annotation at index `{}` in exported method `{}`.'
+DIAG_MISSING_EXPORTED_FIELD_DOC_COMMENT  =
+'Missing comment for exported field `{}`.'
+DIAG_MISSING_EXPORTED_FIELD_DOC_PARAM    =
+'Missing @param annotation for parameter `{}` in exported field `{}`.'
+DIAG_MISSING_EXPORTED_FIELD_DOC_RETURN   =
+'Missing @return annotation at index `{}` in exported field `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
 'Incomplete signature. Missing @param annotation for parameter `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =

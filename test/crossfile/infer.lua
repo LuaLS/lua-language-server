@@ -35,7 +35,7 @@ local function TEST(expect)
     local sourcePos, sourceUri
     for _, file in ipairs(expect) do
         local script, list = catch(file.content, '?')
-        local uri          = furi.encode(file.path)
+        local uri          = furi.encode(TESTROOT .. file.path)
         files.setText(uri, script)
         files.compileState(uri)
         if #list['?'] > 0 then
@@ -132,4 +132,24 @@ return 1337, "string", true
 local a, b, <?c?> = require 'a
 ]], },
     infer = 'nil',
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+return 1337, "string", true
+]], },
+    { path = 'b.lua', content = [[
+local a, b, <?c?> = dofile 'a'
+]], },
+    infer = 'unknown',
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+return 1337, "string", true
+]], },
+    { path = 'b.lua', content = [[
+local <?a?>, b, c = dofile 'a.lua'
+]], },
+    infer = 'integer',
 }

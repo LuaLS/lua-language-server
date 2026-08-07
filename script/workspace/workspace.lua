@@ -222,10 +222,19 @@ function m.getLibraryMatchers(scp)
     end
 
     local librarys = {}
+    local dofileRootsSet = {}
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         local apath = m.getAbsolutePath(scp.uri, path)
         if apath then
             librarys[files.normalize(apath)] = true
+        end
+    end
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.dofileRoots')) do
+        local apath = m.getAbsolutePath(scp.uri, path)
+        if apath then
+            local norm = files.normalize(apath)
+            librarys[norm] = true
+            dofileRootsSet[norm] = true
         end
     end
     local metaPaths = scp:get 'metaPaths'
@@ -246,7 +255,8 @@ function m.getLibraryMatchers(scp)
             }, globInteferFace)
             matchers[#matchers+1] = {
                 uri     = furi.encode(nPath),
-                matcher = matcher
+                matcher = matcher,
+                isDofile = dofileRootsSet[path] or false
             }
         end
     end
@@ -365,7 +375,9 @@ function m.awaitPreload(scp)
             end
             return true
         end))
-        scp:addLink(libMatcher.uri)
+        if not libMatcher.isDofile then
+            scp:addLink(libMatcher.uri)
+        end
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
             local uri = files.getRealUri(furi.encode(path))
@@ -389,23 +401,54 @@ end
 
 --- 查找符合指定file path的所有uri
 ---@param path string
+---@return uri[]
 function m.findUrisByFilePath(path)
-    if type(path) ~= 'string' then
-        return {}
-    end
-    local myUri = furi.encode(path)
+    local uri = furi.encode(path)
     local vm    = require 'vm'
     local resultCache = vm.getCache 'findUrisByFilePath.result'
     if resultCache[path] then
         return resultCache[path]
     end
     local results = {}
-    for uri in files.eachFile() do
-        if uri == myUri then
+    if files.exists(uri) then
+        results = { uri }
+    end
+    resultCache[path] = results
+    return results
+end
+
+
+---@param path string
+---@param sourceUri? uri
+---@return uri[]
+function m.findUrisByDofile(path, sourceUri)
+    if not fs.path(path):is_relative() then
+        return m.findUrisByFilePath(path)
+    end
+
+    ---@type string[]
+    local roots = config.get(sourceUri, 'Lua.workspace.dofileRoots')
+    local results = {}
+
+    local function addResult(absPath)
+        local uris = m.findUrisByFilePath(absPath)
+        for _, uri in ipairs(uris) do
             results[#results+1] = uri
         end
     end
-    resultCache[path] = results
+
+    for _, root in ipairs(roots) do
+        local rootPath = m.getAbsolutePath(sourceUri or m.rootUri, root)
+        if rootPath then
+            local rootUri = furi.encode(rootPath)
+            addResult(m.getAbsolutePath(rootUri, path))
+        end
+    end
+
+    if  m.rootUri then
+        addResult(m.getAbsolutePath(m.rootUri, path))
+    end
+
     return results
 end
 

@@ -1,6 +1,6 @@
 # addonManager.enable
 
-Whether the addon manager is enabled or not.
+Habilita ou desabilita o gerenciador de add-ons.
 
 ## type
 
@@ -14,9 +14,9 @@ boolean
 true
 ```
 
-# addonRepositoryPath
+# addonManager.repositoryBranch
 
-Specifies the addon repository path (not related to the addon manager).
+Define o branch Git usado pelo gerenciador de add-ons.
 
 ## type
 
@@ -24,9 +24,47 @@ Specifies the addon repository path (not related to the addon manager).
 string
 ```
 
+## default
+
+```jsonc
+""
+```
+
+# addonManager.repositoryPath
+
+Define o caminho Git usado pelo gerenciador de add-ons.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
+# addonRepositoryPath
+
+Define o caminho do repositório de add-ons (não relacionado ao gerenciador de add-ons).
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
 # codeLens.enable
 
-Enable code lens.
+Habilitar code lens.
 
 ## type
 
@@ -42,7 +80,7 @@ false
 
 # completion.autoRequire
 
-When the input looks like a file name, automatically `require` this file.
+Quando a entrada se parece com um nome de arquivo, fazer `require` desse arquivo automaticamente.
 
 ## type
 
@@ -58,7 +96,7 @@ true
 
 # completion.callSnippet
 
-Shows function call snippets.
+Mostra snippets de chamada de função.
 
 ## type
 
@@ -68,9 +106,9 @@ string
 
 ## enum
 
-* ``"Disable"``: Only shows `function name`.
-* ``"Both"``: Shows `function name` and `call snippet`.
-* ``"Replace"``: Only shows `call snippet.`
+* ``"Disable"``: Mostra apenas o `nome da função`.
+* ``"Both"``: Mostra o `nome da função` e o `trecho de chamada`.
+* ``"Replace"``: Mostra apenas o `trecho de chamada`.
 
 ## default
 
@@ -80,7 +118,7 @@ string
 
 # completion.displayContext
 
-Previewing the relevant code snippet of the suggestion may help you understand the usage of the suggestion. The number set indicates the number of intercepted lines in the code fragment. If it is set to `0`, this feature can be disabled.
+Pré-visualizar o trecho de código relevante da sugestão pode ajudar a entender seu uso. O número define quantas linhas são interceptadas no fragmento; definir como `0` desabilita este recurso.
 
 ## type
 
@@ -96,7 +134,7 @@ integer
 
 # completion.enable
 
-Enable completion.
+Habilita autocompletar.
 
 ## type
 
@@ -112,7 +150,7 @@ true
 
 # completion.keywordSnippet
 
-Shows keyword syntax snippets.
+Mostra snippets de sintaxe de palavras-chave.
 
 ## type
 
@@ -122,9 +160,9 @@ string
 
 ## enum
 
-* ``"Disable"``: Only shows `keyword`.
-* ``"Both"``: Shows `keyword` and `syntax snippet`.
-* ``"Replace"``: Only shows `syntax snippet`.
+* ``"Disable"``: Mostra apenas a `palavra-chave`.
+* ``"Both"``: Mostra a `palavra-chave` e o `trecho de sintaxe`.
+* ``"Replace"``: Mostra apenas o `trecho de sintaxe`.
 
 ## default
 
@@ -132,9 +170,25 @@ string
 "Replace"
 ```
 
+# completion.maxSuggestCount
+
+Número máximo de campos analisados para autocompletar. Se um objeto tiver mais campos que esse limite, serão necessárias entradas mais específicas para que as sugestões apareçam.
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+100
+```
+
 # completion.postfix
 
-The symbol used to trigger the postfix suggestion.
+Símbolo usado para acionar sugestões de pós-fixo.
 
 ## type
 
@@ -150,7 +204,7 @@ string
 
 # completion.requireSeparator
 
-The separator used when `require`.
+Separador usado em `require`.
 
 ## type
 
@@ -166,7 +220,7 @@ string
 
 # completion.showParams
 
-Display parameters in completion list. When the function has multiple definitions, they will be displayed separately.
+Mostrar parâmetros na lista de conclusão. Se a função tiver várias definições, elas serão exibidas separadamente.
 
 ## type
 
@@ -182,7 +236,7 @@ true
 
 # completion.showWord
 
-Show contextual words in suggestions.
+Mostrar palavras de contexto nas sugestões.
 
 ## type
 
@@ -192,9 +246,9 @@ string
 
 ## enum
 
-* ``"Enable"``: Always show context words in suggestions.
-* ``"Fallback"``: Contextual words are only displayed when suggestions based on semantics cannot be provided.
-* ``"Disable"``: Do not display context words.
+* ``"Enable"``: Sempre mostrar palavras de contexto nas sugestões.
+* ``"Fallback"``: Mostrar palavras de contexto somente quando não houver sugestões baseadas em semântica.
+* ``"Disable"``: Não mostrar palavras de contexto.
 
 ## default
 
@@ -204,7 +258,7 @@ string
 
 # completion.workspaceWord
 
-Whether the displayed context word contains the content of other files in the workspace.
+Define se as palavras de contexto exibidas incluem conteúdo de outros arquivos da workspace.
 
 ## type
 
@@ -220,7 +274,7 @@ true
 
 # diagnostics.disable
 
-Disabled diagnostic (Use code in hover brackets).
+Diagnósticos desabilitados (use o código nos colchetes do hover).
 
 ## type
 
@@ -234,6 +288,7 @@ Array<string>
 * ``"ambiguity-1"``
 * ``"ambiguous-syntax"``
 * ``"args-after-dots"``
+* ``"assign-const-global"``
 * ``"assign-type-mismatch"``
 * ``"await-in-sync"``
 * ``"block-after-else"``
@@ -255,6 +310,7 @@ Array<string>
 * ``"duplicate-index"``
 * ``"duplicate-set-field"``
 * ``"empty-block"``
+* ``"env-is-global"``
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -264,6 +320,7 @@ Array<string>
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
 * ``"exp-in-action"``
+* ``"global-close-attribute"``
 * ``"global-element"``
 * ``"global-in-nil-env"``
 * ``"incomplete-signature-doc"``
@@ -318,6 +375,7 @@ Array<string>
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
+* ``"multi-close"``
 * ``"name-style-check"``
 * ``"need-check-nil"``
 * ``"need-paren"``
@@ -347,6 +405,7 @@ Array<string>
 * ``"undefined-global"``
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
+* ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
 * ``"unicode-name"``
@@ -356,11 +415,13 @@ Array<string>
 * ``"unknown-operator"``
 * ``"unknown-symbol"``
 * ``"unreachable-code"``
+* ``"unsupport-named-vararg"``
 * ``"unsupport-symbol"``
 * ``"unused-function"``
 * ``"unused-label"``
 * ``"unused-local"``
 * ``"unused-vararg"``
+* ``"variable-not-declared"``
 
 ## default
 
@@ -368,25 +429,9 @@ Array<string>
 []
 ```
 
-# diagnostics.disableScheme
-
-Do not diagnose Lua files that use the following scheme.
-
-## type
-
-```ts
-Array<string>
-```
-
-## default
-
-```jsonc
-["git"]
-```
-
 # diagnostics.enable
 
-Enable diagnostics.
+Habilita diagnósticos.
 
 ## type
 
@@ -400,9 +445,25 @@ boolean
 true
 ```
 
+# diagnostics.enableScheme
+
+**Missing description!!**
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+["file"]
+```
+
 # diagnostics.globals
 
-Defined global variables.
+Variáveis globais definidas.
 
 ## type
 
@@ -418,7 +479,7 @@ Array<string>
 
 # diagnostics.globalsRegex
 
-Find defined global variables using regex.
+Encontra variáveis globais definidas usando regex.
 
 ## type
 
@@ -434,14 +495,14 @@ Array<string>
 
 # diagnostics.groupFileStatus
 
-Modify the diagnostic needed file status in a group.
+Modifica o status de arquivo necessário para diagnóstico em um grupo.
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  diagnosticar apenas arquivos abertos
+* Any:     diagnosticar todos os arquivos
+* None:    desabilitar este diagnóstico
 
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
-Other settings will override individual settings without end of `!`.
+`Fallback` significa que os diagnósticos deste grupo são controlados por `diagnostics.neededFileStatus` separadamente.
+Outras configurações sobrescreverão configurações individuais sem terminar com `!`.
 
 
 ## type
@@ -567,9 +628,9 @@ object<string, string>
 
 # diagnostics.groupSeverity
 
-Modify the diagnostic severity in a group.
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
-Other settings will override individual settings without end of `!`.
+Modifica a gravidade do diagnóstico em um grupo.
+`Fallback` significa que os diagnósticos deste grupo são controlados por `diagnostics.severity` separadamente.
+Outras configurações sobrescreverão configurações individuais sem terminar com `!`.
 
 
 ## type
@@ -696,7 +757,7 @@ object<string, string>
 
 # diagnostics.ignoredFiles
 
-How to diagnose ignored files.
+Como diagnosticar arquivos ignorados.
 
 ## type
 
@@ -706,9 +767,9 @@ string
 
 ## enum
 
-* ``"Enable"``: Always diagnose these files.
-* ``"Opened"``: Only when these files are opened will it be diagnosed.
-* ``"Disable"``: These files are not diagnosed.
+* ``"Enable"``: Sempre diagnosticar esses arquivos.
+* ``"Opened"``: Diagnosticar esses arquivos apenas quando estiverem abertos.
+* ``"Disable"``: Esses arquivos não são diagnosticados.
 
 ## default
 
@@ -718,7 +779,7 @@ string
 
 # diagnostics.libraryFiles
 
-How to diagnose files loaded via `Lua.workspace.library`.
+Como diagnosticar arquivos carregados via `Lua.workspace.library`.
 
 ## type
 
@@ -728,9 +789,9 @@ string
 
 ## enum
 
-* ``"Enable"``: Always diagnose these files.
-* ``"Opened"``: Only when these files are opened will it be diagnosed.
-* ``"Disable"``: These files are not diagnosed.
+* ``"Enable"``: Sempre diagnosticar esses arquivos.
+* ``"Opened"``: Diagnosticar esses arquivos apenas quando estiverem abertos.
+* ``"Disable"``: Esses arquivos não são diagnosticados.
 
 ## default
 
@@ -740,11 +801,11 @@ string
 
 # diagnostics.neededFileStatus
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  diagnosticar apenas arquivos abertos
+* Any:     diagnosticar todos os arquivos
+* None:    desabilitar este diagnóstico
 
-End with `!` means override the group setting `diagnostics.groupFileStatus`.
+Terminar com `!` significa sobrescrever a configuração de grupo `diagnostics.groupFileStatus`.
 
 
 ## type
@@ -767,242 +828,242 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    Ambiguidade de precedência, por exemplo `num or 0 + 1`; supõe-se que o esperado seja `(num or 0) + 1`
     */
     "ambiguity-1": "Any",
     /*
-    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    Habilita diagnóstico para atribuições em que o tipo do valor não corresponde ao tipo da variável alvo.
     */
     "assign-type-mismatch": "Opened",
     /*
-    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    Habilita diagnóstico para chamadas de funções assíncronas dentro de uma função síncrona.
     */
     "await-in-sync": "None",
     /*
-    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    Habilita diagnóstico para coerções de variáveis locais em que o tipo alvo não corresponde ao tipo definido.
     */
     "cast-local-type": "Opened",
     /*
-    Enable diagnostics for casts where the target type does not match the initial type.
+    Habilita diagnóstico para coerções em que o tipo alvo não corresponde ao tipo inicial.
     */
     "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     /*
-    Enable diagnostics for attempts to close a variable with a non-object.
+    Habilita diagnóstico para tentativas de fechar uma variável que não é objeto.
     */
     "close-non-object": "Any",
     /*
-    Enable diagnostics for code placed after a break statement in a loop.
+    Habilita diagnóstico para código após um `break` em um loop.
     */
     "code-after-break": "Opened",
     /*
-    Enable diagnostics for incorrectly styled lines.
+    Habilita diagnóstico para linhas que violam o estilo de código.
     */
     "codestyle-check": "None",
     /*
-    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    Habilita diagnóstico para laços `for` decrescentes que nunca atingem o limite porque são incrementados.
     */
     "count-down-loop": "Any",
     /*
-    Enable diagnostics to highlight deprecated API.
+    Habilita diagnóstico para APIs obsoletas.
     */
     "deprecated": "Any",
     /*
-    Enable diagnostics for files which are required by two different paths.
+    Habilita diagnóstico para arquivos exigidos por dois caminhos diferentes.
     */
     "different-requires": "Any",
     /*
-    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    Habilita diagnóstico para chamadas de funções anotadas com `---@nodiscard` quando os retornos são ignorados.
     */
     "discard-returns": "Any",
     /*
-    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    Habilita diagnóstico para anotações de campo sem anotação de classe correspondente.
     */
     "doc-field-no-class": "Any",
     /*
-    Enable diagnostics for a duplicated alias annotation name.
+    Habilita diagnóstico para nome de alias anotado duplicado.
     */
     "duplicate-doc-alias": "Any",
     /*
-    Enable diagnostics for a duplicated field annotation name.
+    Habilita diagnóstico para nome de campo anotado duplicado.
     */
     "duplicate-doc-field": "Any",
     /*
-    Enable diagnostics for a duplicated param annotation name.
+    Habilita diagnóstico para nome de parâmetro anotado duplicado.
     */
     "duplicate-doc-param": "Any",
     /*
-    在字面量表中重复定义了索引
+    Índice duplicado em tabela literal
     */
     "duplicate-index": "Any",
     /*
-    Enable diagnostics for setting the same field in a class more than once.
+    Habilita diagnóstico para definir o mesmo campo em uma classe mais de uma vez.
     */
     "duplicate-set-field": "Opened",
     /*
-    空代码块
+    Bloco vazio
     */
     "empty-block": "Opened",
     /*
-    Enable diagnostics to warn about global elements.
+    Habilita diagnóstico para avisar sobre elementos globais.
     */
     "global-element": "None",
     /*
-    不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+    Não é possível usar variáveis globais (`_ENV` foi definido como `nil`)
     */
     "global-in-nil-env": "Any",
     /*
-    Incomplete @param or @return annotations for functions.
+    Anotações @param ou @return incompletas para funções.
     */
     "incomplete-signature-doc": "None",
     "inject-field": "Opened",
     /*
-    Enable diagnostics for accesses to fields which are invisible.
+    Habilita diagnóstico para acessos a campos invisíveis.
     */
     "invisible": "Any",
     /*
-    首字母小写的全局变量定义
+    Definição de variável global com inicial minúscula
     */
     "lowercase-global": "Any",
     "missing-fields": "Any",
     /*
-    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
+    Faltam anotações para globais! Funções globais devem ter comentário e anotações para todos os parâmetros e retornos.
     */
     "missing-global-doc": "None",
     /*
-    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
+    Faltam anotações para locais exportados! Funções locais exportadas devem ter comentário e anotações para todos os parâmetros e retornos.
     */
     "missing-local-export-doc": "None",
     /*
-    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    Habilita diagnóstico para chamadas de função com menos argumentos que os parâmetros anotados.
     */
     "missing-parameter": "Any",
     /*
-    Enable diagnostics for functions with return annotations which have no return statement.
+    Habilita diagnóstico para funções com anotação de retorno mas sem instrução return.
     */
     "missing-return": "Any",
     /*
-    Enable diagnostics for return statements without values although the containing function declares returns.
+    Habilita diagnóstico para retornos sem valores embora a função declare valores de retorno.
     */
     "missing-return-value": "Any",
     /*
-    Enable diagnostics for name style.
+    Habilita diagnóstico para estilo de nomes.
     */
     "name-style-check": "None",
     /*
-    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    Habilita diagnóstico para uso de variável após ela receber `nil` ou valor opcional.
     */
     "need-check-nil": "Opened",
     /*
-    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    Em uma tabela literal, faltou um separador entre duas linhas; foi interpretado como uma operação de índice
     */
     "newfield-call": "Any",
     /*
-    以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+    Nova linha iniciando com `(` é analisada como chamada da linha anterior
     */
     "newline-call": "Any",
     /*
-    Enable diagnostics for cases in which the type cannot be inferred.
+    Habilita diagnóstico para casos em que o tipo não pode ser inferido.
     */
     "no-unknown": "None",
     /*
-    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    Habilita diagnóstico para chamadas de `coroutine.yield()` quando não permitido.
     */
     "not-yieldable": "None",
     /*
-    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    Habilita diagnóstico para chamadas onde o tipo do parâmetro fornecido não corresponde à definição anotada.
     */
     "param-type-mismatch": "Opened",
     /*
-    重复定义的局部变量
+    Variável local redefinida
     */
     "redefined-local": "Opened",
     /*
-    函数调用时，传入了多余的参数
+    Chamada de função com parâmetros em excesso
     */
     "redundant-parameter": "Any",
     /*
-    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    Habilita diagnóstico para retornos desnecessários porque a função já terminaria.
     */
     "redundant-return": "Opened",
     /*
-    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    Habilita diagnóstico para retornos que entregam valor extra não especificado na anotação.
     */
     "redundant-return-value": "Any",
     /*
-    赋值操作时，值的数量比被赋值的对象多
+    Em uma atribuição, há mais valores que variáveis-alvo
     */
     "redundant-value": "Any",
     /*
-    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    Habilita diagnóstico para retornos cujo tipo não corresponde ao tipo declarado.
     */
     "return-type-mismatch": "Opened",
     /*
-    Enable diagnostics for typos in strings.
+    Habilita diagnóstico para erros ortográficos em strings.
     */
     "spell-check": "None",
     /*
-    后置空格
+    Espaços à direita
     */
     "trailing-space": "Opened",
     /*
-    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    Habilita diagnóstico em múltiplas atribuições se nem todas as variáveis recebem valor (ex.: `local x,y = 1`).
     */
     "unbalanced-assignments": "Any",
     /*
-    Enable diagnostics for class annotations in which an undefined class is referenced.
+    Habilita diagnóstico para anotações de classe que fazem referência a classe indefinida.
     */
     "undefined-doc-class": "Any",
     /*
-    Enable diagnostics for type annotations referencing an undefined type or alias.
+    Habilita diagnóstico para anotações de tipo que referenciam tipo ou alias indefinido.
     */
     "undefined-doc-name": "Any",
     /*
-    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    Habilita diagnóstico para anotações de parâmetro sem declaração correspondente na função.
     */
     "undefined-doc-param": "Any",
     /*
-    `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+    `_ENV` foi definido como nova tabela literal, mas a variável global acessada não está nela
     */
     "undefined-env-child": "Any",
     /*
-    Enable diagnostics for cases in which an undefined field of a variable is read.
+    Habilita diagnóstico para leitura de campo indefinido de uma variável.
     */
     "undefined-field": "Opened",
     /*
-    未定义的全局变量
+    Variável global não definida
     */
     "undefined-global": "Any",
     /*
-    Enable diagnostics for casts of undefined variables.
+    Habilita diagnóstico para coerções de variáveis indefinidas.
     */
     "unknown-cast-variable": "Any",
     /*
-    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    Habilita diagnóstico quando um código de diagnóstico desconhecido é informado.
     */
     "unknown-diag-code": "Any",
     /*
-    Enable diagnostics for unknown operators.
+    Habilita diagnóstico para operadores desconhecidos.
     */
     "unknown-operator": "Any",
     /*
-    Enable diagnostics for unreachable code.
+    Habilita diagnóstico para código inalcançável.
     */
     "unreachable-code": "Opened",
     /*
-    未使用的函数
+    Função não utilizada
     */
     "unused-function": "Opened",
     /*
-    未使用的标签
+    Rótulo não utilizado
     */
     "unused-label": "Opened",
     /*
-    未使用的局部变量
+    Variável local não utilizada
     */
     "unused-local": "Opened",
     /*
-    未使用的不定参数
+    Parâmetro vararg não utilizado
     */
     "unused-vararg": "Opened"
 }
@@ -1010,9 +1071,9 @@ object<string, string>
 
 # diagnostics.severity
 
-Modify the diagnostic severity.
+Modifica a gravidade do diagnóstico.
 
-End with `!` means override the group setting `diagnostics.groupSeverity`.
+Terminar com `!` significa sobrescrever a configuração de grupo `diagnostics.groupSeverity`.
 
 
 ## type
@@ -1037,242 +1098,242 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    Ambiguidade de precedência, por exemplo `num or 0 + 1`; supõe-se que o esperado seja `(num or 0) + 1`
     */
     "ambiguity-1": "Warning",
     /*
-    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    Habilita diagnóstico para atribuições em que o tipo do valor não corresponde ao tipo da variável alvo.
     */
     "assign-type-mismatch": "Warning",
     /*
-    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    Habilita diagnóstico para chamadas de funções assíncronas dentro de uma função síncrona.
     */
     "await-in-sync": "Warning",
     /*
-    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    Habilita diagnóstico para coerções de variáveis locais em que o tipo alvo não corresponde ao tipo definido.
     */
     "cast-local-type": "Warning",
     /*
-    Enable diagnostics for casts where the target type does not match the initial type.
+    Habilita diagnóstico para coerções em que o tipo alvo não corresponde ao tipo inicial.
     */
     "cast-type-mismatch": "Warning",
     "circle-doc-class": "Warning",
     /*
-    Enable diagnostics for attempts to close a variable with a non-object.
+    Habilita diagnóstico para tentativas de fechar uma variável que não é objeto.
     */
     "close-non-object": "Warning",
     /*
-    Enable diagnostics for code placed after a break statement in a loop.
+    Habilita diagnóstico para código após um `break` em um loop.
     */
     "code-after-break": "Hint",
     /*
-    Enable diagnostics for incorrectly styled lines.
+    Habilita diagnóstico para linhas que violam o estilo de código.
     */
     "codestyle-check": "Warning",
     /*
-    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    Habilita diagnóstico para laços `for` decrescentes que nunca atingem o limite porque são incrementados.
     */
     "count-down-loop": "Warning",
     /*
-    Enable diagnostics to highlight deprecated API.
+    Habilita diagnóstico para APIs obsoletas.
     */
     "deprecated": "Warning",
     /*
-    Enable diagnostics for files which are required by two different paths.
+    Habilita diagnóstico para arquivos exigidos por dois caminhos diferentes.
     */
     "different-requires": "Warning",
     /*
-    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    Habilita diagnóstico para chamadas de funções anotadas com `---@nodiscard` quando os retornos são ignorados.
     */
     "discard-returns": "Warning",
     /*
-    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    Habilita diagnóstico para anotações de campo sem anotação de classe correspondente.
     */
     "doc-field-no-class": "Warning",
     /*
-    Enable diagnostics for a duplicated alias annotation name.
+    Habilita diagnóstico para nome de alias anotado duplicado.
     */
     "duplicate-doc-alias": "Warning",
     /*
-    Enable diagnostics for a duplicated field annotation name.
+    Habilita diagnóstico para nome de campo anotado duplicado.
     */
     "duplicate-doc-field": "Warning",
     /*
-    Enable diagnostics for a duplicated param annotation name.
+    Habilita diagnóstico para nome de parâmetro anotado duplicado.
     */
     "duplicate-doc-param": "Warning",
     /*
-    在字面量表中重复定义了索引
+    Índice duplicado em tabela literal
     */
     "duplicate-index": "Warning",
     /*
-    Enable diagnostics for setting the same field in a class more than once.
+    Habilita diagnóstico para definir o mesmo campo em uma classe mais de uma vez.
     */
     "duplicate-set-field": "Warning",
     /*
-    空代码块
+    Bloco vazio
     */
     "empty-block": "Hint",
     /*
-    Enable diagnostics to warn about global elements.
+    Habilita diagnóstico para avisar sobre elementos globais.
     */
     "global-element": "Warning",
     /*
-    不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+    Não é possível usar variáveis globais (`_ENV` foi definido como `nil`)
     */
     "global-in-nil-env": "Warning",
     /*
-    Incomplete @param or @return annotations for functions.
+    Anotações @param ou @return incompletas para funções.
     */
     "incomplete-signature-doc": "Warning",
     "inject-field": "Warning",
     /*
-    Enable diagnostics for accesses to fields which are invisible.
+    Habilita diagnóstico para acessos a campos invisíveis.
     */
     "invisible": "Warning",
     /*
-    首字母小写的全局变量定义
+    Definição de variável global com inicial minúscula
     */
     "lowercase-global": "Information",
     "missing-fields": "Warning",
     /*
-    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
+    Faltam anotações para globais! Funções globais devem ter comentário e anotações para todos os parâmetros e retornos.
     */
     "missing-global-doc": "Warning",
     /*
-    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
+    Faltam anotações para locais exportados! Funções locais exportadas devem ter comentário e anotações para todos os parâmetros e retornos.
     */
     "missing-local-export-doc": "Warning",
     /*
-    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    Habilita diagnóstico para chamadas de função com menos argumentos que os parâmetros anotados.
     */
     "missing-parameter": "Warning",
     /*
-    Enable diagnostics for functions with return annotations which have no return statement.
+    Habilita diagnóstico para funções com anotação de retorno mas sem instrução return.
     */
     "missing-return": "Warning",
     /*
-    Enable diagnostics for return statements without values although the containing function declares returns.
+    Habilita diagnóstico para retornos sem valores embora a função declare valores de retorno.
     */
     "missing-return-value": "Warning",
     /*
-    Enable diagnostics for name style.
+    Habilita diagnóstico para estilo de nomes.
     */
     "name-style-check": "Warning",
     /*
-    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    Habilita diagnóstico para uso de variável após ela receber `nil` ou valor opcional.
     */
     "need-check-nil": "Warning",
     /*
-    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    Em uma tabela literal, faltou um separador entre duas linhas; foi interpretado como uma operação de índice
     */
     "newfield-call": "Warning",
     /*
-    以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+    Nova linha iniciando com `(` é analisada como chamada da linha anterior
     */
     "newline-call": "Warning",
     /*
-    Enable diagnostics for cases in which the type cannot be inferred.
+    Habilita diagnóstico para casos em que o tipo não pode ser inferido.
     */
     "no-unknown": "Warning",
     /*
-    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    Habilita diagnóstico para chamadas de `coroutine.yield()` quando não permitido.
     */
     "not-yieldable": "Warning",
     /*
-    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    Habilita diagnóstico para chamadas onde o tipo do parâmetro fornecido não corresponde à definição anotada.
     */
     "param-type-mismatch": "Warning",
     /*
-    重复定义的局部变量
+    Variável local redefinida
     */
     "redefined-local": "Hint",
     /*
-    函数调用时，传入了多余的参数
+    Chamada de função com parâmetros em excesso
     */
     "redundant-parameter": "Warning",
     /*
-    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    Habilita diagnóstico para retornos desnecessários porque a função já terminaria.
     */
     "redundant-return": "Hint",
     /*
-    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    Habilita diagnóstico para retornos que entregam valor extra não especificado na anotação.
     */
     "redundant-return-value": "Warning",
     /*
-    赋值操作时，值的数量比被赋值的对象多
+    Em uma atribuição, há mais valores que variáveis-alvo
     */
     "redundant-value": "Warning",
     /*
-    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    Habilita diagnóstico para retornos cujo tipo não corresponde ao tipo declarado.
     */
     "return-type-mismatch": "Warning",
     /*
-    Enable diagnostics for typos in strings.
+    Habilita diagnóstico para erros ortográficos em strings.
     */
     "spell-check": "Information",
     /*
-    后置空格
+    Espaços à direita
     */
     "trailing-space": "Hint",
     /*
-    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    Habilita diagnóstico em múltiplas atribuições se nem todas as variáveis recebem valor (ex.: `local x,y = 1`).
     */
     "unbalanced-assignments": "Warning",
     /*
-    Enable diagnostics for class annotations in which an undefined class is referenced.
+    Habilita diagnóstico para anotações de classe que fazem referência a classe indefinida.
     */
     "undefined-doc-class": "Warning",
     /*
-    Enable diagnostics for type annotations referencing an undefined type or alias.
+    Habilita diagnóstico para anotações de tipo que referenciam tipo ou alias indefinido.
     */
     "undefined-doc-name": "Warning",
     /*
-    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    Habilita diagnóstico para anotações de parâmetro sem declaração correspondente na função.
     */
     "undefined-doc-param": "Warning",
     /*
-    `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+    `_ENV` foi definido como nova tabela literal, mas a variável global acessada não está nela
     */
     "undefined-env-child": "Information",
     /*
-    Enable diagnostics for cases in which an undefined field of a variable is read.
+    Habilita diagnóstico para leitura de campo indefinido de uma variável.
     */
     "undefined-field": "Warning",
     /*
-    未定义的全局变量
+    Variável global não definida
     */
     "undefined-global": "Warning",
     /*
-    Enable diagnostics for casts of undefined variables.
+    Habilita diagnóstico para coerções de variáveis indefinidas.
     */
     "unknown-cast-variable": "Warning",
     /*
-    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    Habilita diagnóstico quando um código de diagnóstico desconhecido é informado.
     */
     "unknown-diag-code": "Warning",
     /*
-    Enable diagnostics for unknown operators.
+    Habilita diagnóstico para operadores desconhecidos.
     */
     "unknown-operator": "Warning",
     /*
-    Enable diagnostics for unreachable code.
+    Habilita diagnóstico para código inalcançável.
     */
     "unreachable-code": "Hint",
     /*
-    未使用的函数
+    Função não utilizada
     */
     "unused-function": "Hint",
     /*
-    未使用的标签
+    Rótulo não utilizado
     */
     "unused-label": "Hint",
     /*
-    未使用的局部变量
+    Variável local não utilizada
     */
     "unused-local": "Hint",
     /*
-    未使用的不定参数
+    Parâmetro vararg não utilizado
     */
     "unused-vararg": "Hint"
 }
@@ -1280,7 +1341,7 @@ object<string, string>
 
 # diagnostics.unusedLocalExclude
 
-Do not diagnose `unused-local` when the variable name matches the following pattern.
+Não diagnosticar `unused-local` quando o nome da variável corresponder ao padrão a seguir.
 
 ## type
 
@@ -1296,7 +1357,7 @@ Array<string>
 
 # diagnostics.workspaceDelay
 
-Latency (milliseconds) for workspace diagnostics.
+Latência (milissegundos) para diagnósticos da workspace.
 
 ## type
 
@@ -1312,7 +1373,7 @@ integer
 
 # diagnostics.workspaceEvent
 
-Set the time to trigger workspace diagnostics.
+Define quando acionar diagnósticos da workspace.
 
 ## type
 
@@ -1322,9 +1383,9 @@ string
 
 ## enum
 
-* ``"OnChange"``: Trigger workspace diagnostics when the file is changed.
-* ``"OnSave"``: Trigger workspace diagnostics when the file is saved.
-* ``"None"``: Disable workspace diagnostics.
+* ``"OnChange"``: Aciona diagnósticos da workspace quando o arquivo é modificado.
+* ``"OnSave"``: Aciona diagnósticos da workspace quando o arquivo é salvo.
+* ``"None"``: Desabilita diagnósticos da workspace.
 
 ## default
 
@@ -1334,7 +1395,7 @@ string
 
 # diagnostics.workspaceRate
 
-Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting.
+Taxa de execução dos diagnósticos da workspace (%). Diminuir este valor reduz o uso de CPU, mas também reduz a velocidade dos diagnósticos. O diagnóstico do arquivo que você está editando sempre é feito em velocidade total e não é afetado por esta configuração.
 
 ## type
 
@@ -1350,7 +1411,7 @@ integer
 
 # doc.packageName
 
-Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.
+Tratar nomes de campos específicos como de pacote; ex.: `m_*` significa que `XXX.m_id` e `XXX.m_type` são de pacote e só podem ser acessados no arquivo onde foram definidos.
 
 ## type
 
@@ -1366,7 +1427,7 @@ Array<string>
 
 # doc.privateName
 
-Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.
+Tratar nomes de campos específicos como privados; ex.: `m_*` significa que `XXX.m_id` e `XXX.m_type` são privados e só podem ser acessados na classe onde foram definidos.
 
 ## type
 
@@ -1382,7 +1443,7 @@ Array<string>
 
 # doc.protectedName
 
-Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.
+Tratar nomes de campos específicos como protegidos; ex.: `m_*` significa que `XXX.m_id` e `XXX.m_type` são protegidos e só podem ser acessados na classe onde foram definidos e em subclasses.
 
 ## type
 
@@ -1396,10 +1457,47 @@ Array<string>
 []
 ```
 
+# doc.regengine
+
+Mecanismo de expressão regular usado para corresponder nomes de escopo de documentação.
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"glob"``: Sintaxe de padrão leve padrão.
+* ``"lua"``: Expressões regulares completas no estilo Lua.
+
+## default
+
+```jsonc
+"glob"
+```
+
+# docScriptPath
+
+Mecanismo de expressão regular usado para corresponder nomes de escopo de documentação.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
 # format.defaultConfig
 
-The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
-Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+Configuração de formatação padrão; tem prioridade menor que o arquivo `.editorconfig` da workspace.
+Consulte a [documentação do formatador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) para uso.
 
 
 ## type
@@ -1416,7 +1514,7 @@ Object<string, string>
 
 # format.enable
 
-Enable code formatter.
+Habilitar formatador de código.
 
 ## type
 
@@ -1432,7 +1530,7 @@ true
 
 # hint.arrayIndex
 
-Show hints of array index when constructing a table.
+Mostrar dicas de índice de array ao construir uma tabela.
 
 ## type
 
@@ -1442,9 +1540,9 @@ string
 
 ## enum
 
-* ``"Enable"``: Show hints in all tables.
-* ``"Auto"``: Show hints only when the table is greater than 3 items, or the table is a mixed table.
-* ``"Disable"``: Disable hints of array index.
+* ``"Enable"``: Mostrar dicas em todas as tabelas.
+* ``"Auto"``: Mostrar dicas apenas quando a tabela tiver mais de 3 itens ou for uma tabela mista.
+* ``"Disable"``: Desativar dicas de índice de array.
 
 ## default
 
@@ -1454,7 +1552,7 @@ string
 
 # hint.await
 
-If the called function is marked `---@async`, prompt `await` at the call.
+Se a função chamada estiver marcada com `---@async`, sugerir `await` na chamada.
 
 ## type
 
@@ -1468,9 +1566,25 @@ boolean
 true
 ```
 
+# hint.awaitPropagate
+
+Habilita a propagação de `await`. Quando uma função chama outra marcada com `---@async`, ela será automaticamente marcada como `---@async`.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # hint.enable
 
-Enable inlay hint.
+Habilitar inlay hints.
 
 ## type
 
@@ -1486,7 +1600,7 @@ false
 
 # hint.paramName
 
-Show hints of parameter name at the function call.
+Mostrar dicas com o nome do parâmetro na chamada de função.
 
 ## type
 
@@ -1496,9 +1610,9 @@ string
 
 ## enum
 
-* ``"All"``: All types of parameters are shown.
-* ``"Literal"``: Only literal type parameters are shown.
-* ``"Disable"``: Disable parameter hints.
+* ``"All"``: Mostrar todos os tipos de parâmetros.
+* ``"Literal"``: Mostrar apenas parâmetros de tipo literal.
+* ``"Disable"``: Desativar dicas de nome de parâmetro.
 
 ## default
 
@@ -1508,7 +1622,7 @@ string
 
 # hint.paramType
 
-Show type hints at the parameter of the function.
+Mostrar dicas de tipo nos parâmetros da função.
 
 ## type
 
@@ -1524,7 +1638,7 @@ true
 
 # hint.semicolon
 
-If there is no semicolon at the end of the statement, display a virtual semicolon.
+Se não houver ponto e vírgula no fim da instrução, mostrar um ponto e vírgula virtual.
 
 ## type
 
@@ -1534,9 +1648,9 @@ string
 
 ## enum
 
-* ``"All"``: All statements display virtual semicolons.
-* ``"SameLine"``: When two statements are on the same line, display a semicolon between them.
-* ``"Disable"``: Disable virtual semicolons.
+* ``"All"``: Todas as instruções exibem ponto e vírgula virtual.
+* ``"SameLine"``: Quando duas instruções estiverem na mesma linha, mostrar um ponto e vírgula entre elas.
+* ``"Disable"``: Desativar pontos e vírgulas virtuais.
 
 ## default
 
@@ -1546,7 +1660,7 @@ string
 
 # hint.setType
 
-Show hints of type at assignment operation.
+Mostrar dicas de tipo em atribuições.
 
 ## type
 
@@ -1562,7 +1676,7 @@ false
 
 # hover.enable
 
-Enable hover.
+Habilitar hover.
 
 ## type
 
@@ -1578,7 +1692,7 @@ true
 
 # hover.enumsLimit
 
-When the value corresponds to multiple types, limit the number of types displaying.
+Quando um valor corresponde a vários tipos, limita quantos tipos são exibidos.
 
 ## type
 
@@ -1594,7 +1708,7 @@ integer
 
 # hover.expandAlias
 
-Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+Definir se aliases devem ser expandidos. Por exemplo, `---@alias myType boolean|number` aparecerá como `boolean|number`; caso contrário aparecerá como `myType`.
 
 
 ## type
@@ -1611,7 +1725,7 @@ true
 
 # hover.previewFields
 
-When hovering to view a table, limits the maximum number of previews for fields.
+Ao inspecionar uma tabela, limita o número máximo de campos pré-visualizados.
 
 ## type
 
@@ -1622,12 +1736,12 @@ integer
 ## default
 
 ```jsonc
-50
+10
 ```
 
 # hover.viewNumber
 
-Hover to view numeric content (only if literal is not decimal).
+No hover, mostrar conteúdo numérico (apenas se o literal não for decimal).
 
 ## type
 
@@ -1643,7 +1757,7 @@ true
 
 # hover.viewString
 
-Hover to view the contents of a string (only if the literal contains an escape character).
+No hover, mostrar o conteúdo da string (apenas se o literal tiver caracteres de escape).
 
 ## type
 
@@ -1659,7 +1773,7 @@ true
 
 # hover.viewStringMax
 
-The maximum length of a hover to view the contents of a string.
+Comprimento máximo da string exibida no hover.
 
 ## type
 
@@ -1673,9 +1787,41 @@ integer
 1000
 ```
 
+# language.completeAnnotation
+
+(Somente VSCode) Insere automaticamente "---@ " após uma quebra de linha seguinte a uma anotação.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
+# language.fixIndent
+
+(Somente VSCode) Corrige indentação automática incorreta, como quebras de linha dentro de uma string contendo a palavra "function".
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
 # misc.executablePath
 
-Specify the executable path in VSCode.
+Especifica o caminho do executável no VSCode.
 
 ## type
 
@@ -1691,7 +1837,7 @@ string
 
 # misc.parameters
 
-[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.
+[Parâmetros de linha de comando](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) ao iniciar o serviço de linguagem no VSCode.
 
 ## type
 
@@ -1707,7 +1853,9 @@ Array<string>
 
 # nameStyle.config
 
-Set name style config
+Configurações de estilo de nomes.
+Consulte a [documentação do formatador](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) para uso.
+
 
 ## type
 
@@ -1723,11 +1871,11 @@ Object<string, string | array>
 
 # runtime.builtin
 
-Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
+Ajusta o estado de habilitação das bibliotecas internas. Você pode desabilitar (ou redefinir) bibliotecas inexistentes conforme o ambiente de execução real.
 
-* `default`: Indicates that the library will be enabled or disabled according to the runtime version
-* `enable`: always enable
-* `disable`: always disable
+* `default`: a biblioteca será habilitada ou desabilitada conforme a versão do runtime
+* `enable`: sempre habilitar
+* `disable`: sempre desabilitar
 
 
 ## type
@@ -1771,7 +1919,7 @@ object<string, string>
 
 # runtime.fileEncoding
 
-File encoding. The `ansi` option is only available under the `Windows` platform.
+Codificação de arquivo. A opção `ansi` está disponível apenas na plataforma `Windows`.
 
 ## type
 
@@ -1794,7 +1942,7 @@ string
 
 # runtime.meta
 
-Format of the directory name of the meta files.
+Formato do nome do diretório dos arquivos meta.
 
 ## type
 
@@ -1810,7 +1958,7 @@ string
 
 # runtime.nonstandardSymbol
 
-Supports non-standard symbols. Make sure that your runtime environment supports these symbols.
+Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos.
 
 ## type
 
@@ -1849,10 +1997,10 @@ Array<string>
 
 # runtime.path
 
-When using `require`, how to find the file based on the input name.
-Setting this config to `?/init.lua` means that when you enter `require 'myfile'`, `${workspace}/myfile/init.lua` will be searched from the loaded files.
-if `runtime.pathStrict` is `false`, `${workspace}/**/myfile/init.lua` will also be searched.
-If you want to load files outside the workspace, you need to set `Lua.workspace.library` first.
+Ao usar `require`, define como encontrar o arquivo baseado no nome fornecido.
+Definir esta configuração como `?/init.lua` significa que ao executar `require 'myfile'`, será buscado `${workspace}/myfile/init.lua` nos arquivos carregados.
+Se `runtime.pathStrict` for `false`, `${workspace}/**/myfile/init.lua` também será buscado.
+Para carregar arquivos fora da workspace, primeiro configure `Lua.workspace.library`.
 
 
 ## type
@@ -1869,7 +2017,7 @@ Array<string>
 
 # runtime.pathStrict
 
-When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.
+Quando habilitado, `runtime.path` buscará apenas o primeiro nível de diretórios; veja a descrição de `runtime.path`.
 
 ## type
 
@@ -1885,40 +2033,40 @@ false
 
 # runtime.plugin
 
-Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more.
+Caminho do plugin. Leia a [wiki](https://luals.github.io/wiki/plugins) para saber mais.
 
 ## type
 
 ```ts
-string
+string | array
 ```
 
 ## default
 
 ```jsonc
-""
+null
 ```
 
 # runtime.pluginArgs
 
-Additional arguments for the plugin.
+Argumentos adicionais para o plugin.
 
 ## type
 
 ```ts
-Array<string>
+array | object
 ```
 
 ## default
 
 ```jsonc
-[]
+null
 ```
 
 # runtime.special
 
-The custom global variables are regarded as some special built-in variables, and the language server will provide special support
-The following example shows that 'include' is treated as' require '.
+Variáveis globais personalizadas são tratadas como variáveis especiais internas, e o servidor fornecerá suporte especial.
+O exemplo a seguir mostra que 'include' é tratado como 'require'.
 ```json
 "Lua.runtime.special" : {
     "include" : "require"
@@ -1940,7 +2088,7 @@ Object<string, string>
 
 # runtime.unicodeName
 
-Allows Unicode characters in name.
+Permite caracteres Unicode em nomes.
 
 ## type
 
@@ -1956,7 +2104,7 @@ false
 
 # runtime.version
 
-Lua runtime version.
+Versão do runtime Lua.
 
 ## type
 
@@ -1970,6 +2118,7 @@ string
 * ``"Lua 5.2"``
 * ``"Lua 5.3"``
 * ``"Lua 5.4"``
+* ``"Lua 5.5"``
 * ``"LuaJIT"``
 
 ## default
@@ -1980,7 +2129,7 @@ string
 
 # semantic.annotation
 
-Semantic coloring of type annotations.
+Colorização semântica de anotações de tipo.
 
 ## type
 
@@ -1996,7 +2145,7 @@ true
 
 # semantic.enable
 
-Enable semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect.
+Habilita colorização semântica. Pode ser necessário definir `editor.semanticHighlighting.enabled` como `true`.
 
 ## type
 
@@ -2012,7 +2161,7 @@ true
 
 # semantic.keyword
 
-Semantic coloring of keywords/literals/operators. You only need to enable this feature if your editor cannot do syntax coloring.
+Colorização semântica de palavras-chave/literais/operadores. Só habilite se seu editor não oferecer colorização sintática.
 
 ## type
 
@@ -2028,7 +2177,7 @@ false
 
 # semantic.variable
 
-Semantic coloring of variables/fields/parameters.
+Colorização semântica de variáveis/campos/parâmetros.
 
 ## type
 
@@ -2044,7 +2193,7 @@ true
 
 # signatureHelp.enable
 
-Enable signature help.
+Habilitar ajuda de assinatura.
 
 ## type
 
@@ -2060,7 +2209,7 @@ true
 
 # spell.dict
 
-Custom words for spell checking.
+Palavras personalizadas para verificação ortográfica.
 
 ## type
 
@@ -2076,7 +2225,7 @@ Array<string>
 
 # type.castNumberToInteger
 
-Allowed to assign the `number` type to the `integer` type.
+Permitir atribuir o tipo `number` ao tipo `integer`.
 
 ## type
 
@@ -2090,11 +2239,79 @@ boolean
 true
 ```
 
+# type.checkTableShape
+
+Verificação rigorosa do formato das tabelas.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.inferParamType
+
+Quando o parâmetro não tiver anotação, inferir o tipo a partir dos argumentos de chamada.
+
+Quando esta opção for `false`, o tipo do parâmetro será `any` se não houver anotação.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.inferTableSize
+
+Número máximo de campos de tabela analisados durante a inferência de tipo.
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+10
+```
+
+# type.maxUnionVariants
+
+**Missing description!!**
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+0
+```
+
 # type.weakNilCheck
 
-When checking the type of union type, ignore the `nil` in it.
+Ao verificar um tipo união, ignora o `nil` presente nele.
 
-When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+Quando esta opção for `false`, `number|nil` não pode ser atribuído a `number`; com `true`, pode.
 
 
 ## type
@@ -2111,9 +2328,9 @@ false
 
 # type.weakUnionCheck
 
-Once one subtype of a union type meets the condition, the union type also meets the condition.
+Quando um subtipo de uma união atende à condição, considera-se que a união inteira atende.
 
-When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+Quando esta opção for `false`, `number|boolean` não pode ser atribuído a `number`; com `true`, pode.
 
 
 ## type
@@ -2130,7 +2347,7 @@ false
 
 # typeFormat.config
 
-Configures the formatting behavior while typing Lua code.
+Configura o comportamento de formatação enquanto digita código Lua.
 
 ## type
 
@@ -2143,15 +2360,15 @@ object<string, string>
 ```jsonc
 {
     /*
-    Controls if `end` is automatically completed at suitable positions.
+    Controla se `end` é completado automaticamente em posições adequadas.
     */
     "auto_complete_end": "true",
     /*
-    Controls if a separator is automatically appended at the end of a table declaration.
+    Controla se um separador é adicionado automaticamente ao final de uma declaração de tabela.
     */
     "auto_complete_table_sep": "true",
     /*
-    Controls if a line is formatted at all.
+    Controla se uma linha deve ser formatada.
     */
     "format_line": "true"
 }
@@ -2159,7 +2376,7 @@ object<string, string>
 
 # window.progressBar
 
-Show progress bar in status bar.
+Mostrar barra de progresso na barra de status.
 
 ## type
 
@@ -2175,7 +2392,7 @@ true
 
 # window.statusBar
 
-Show extension status in status bar.
+Mostrar status da extensão na barra de status.
 
 ## type
 
@@ -2191,7 +2408,7 @@ true
 
 # workspace.checkThirdParty
 
-Automatic detection and adaptation of third-party libraries, currently supported libraries are:
+Detecção e adaptação automáticas de bibliotecas de terceiros; atualmente suportadas:
 
 * OpenResty
 * Cocos4.0
@@ -2204,25 +2421,34 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ## type
 
 ```ts
-string
+string | boolean
 ```
-
-## enum
-
-* ``"Ask"``
-* ``"Apply"``
-* ``"ApplyInMemory"``
-* ``"Disable"``
 
 ## default
 
 ```jsonc
-"Ask"
+null
+```
+
+# workspace.dofileRoots
+
+In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # workspace.ignoreDir
 
-Ignored files and directories (Use `.gitignore` grammar).
+Arquivos e diretórios ignorados (usa sintaxe `.gitignore`).
 
 ## type
 
@@ -2238,7 +2464,7 @@ Array<string>
 
 # workspace.ignoreSubmodules
 
-Ignore submodules.
+Ignorar submódulos.
 
 ## type
 
@@ -2254,7 +2480,7 @@ true
 
 # workspace.library
 
-In addition to the current workspace, which directories will load files from. The files in these directories will be treated as externally provided code libraries, and some features (such as renaming fields) will not modify these files.
+Além da workspace atual, de quais diretórios carregar arquivos. Os arquivos nesses diretórios serão tratados como bibliotecas de código externas, e alguns recursos (como renomear campos) não modificarão esses arquivos.
 
 ## type
 
@@ -2270,7 +2496,7 @@ Array<string>
 
 # workspace.maxPreload
 
-Max preloaded files.
+Número máximo de arquivos pré-carregados.
 
 ## type
 
@@ -2286,7 +2512,7 @@ integer
 
 # workspace.preloadFileSize
 
-Skip files larger than this value (KB) when preloading.
+Ignorar arquivos maiores que este valor (KB) ao pré-carregar.
 
 ## type
 
@@ -2302,7 +2528,7 @@ integer
 
 # workspace.useGitIgnore
 
-Ignore files list in `.gitignore` .
+Ignorar lista de arquivos em `.gitignore`.
 
 ## type
 
@@ -2318,7 +2544,7 @@ true
 
 # workspace.userThirdParty
 
-Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)
+Adicione aqui caminhos de configuração de bibliotecas de terceiros privadas; consulte o [caminho de configuração](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd) embutido.
 
 ## type
 

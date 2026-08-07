@@ -320,6 +320,20 @@ end
 _, <?y?> = xpcall(x)
 ]]
 
+-- A declared function without returns leaves nothing to take the second result from, but
+-- `pcall` still has one of its own: the error value.
+TEST 'any' [[
+---@type fun()
+local x
+_, <?y?> = pcall(x)
+]]
+
+TEST 'any' [[
+---@type fun()
+local x
+_, <?y?> = xpcall(x, debug.traceback)
+]]
+
 TEST 'A' [[
 ---@class A
 

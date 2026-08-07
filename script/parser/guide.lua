@@ -23,6 +23,7 @@ local type         = type
 ---@field effect                integer
 ---@field bstart                integer
 ---@field bfinish               integer
+---@field vstart?               integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
@@ -69,6 +70,7 @@ local type         = type
 ---@field loc                   parser.object
 ---@field keyword               integer[]
 ---@field casts                 parser.object[]
+---@field locPos?              integer
 ---@field mode?                 '+' | '-'
 ---@field hasGoTo?              true
 ---@field hasReturn?            true
@@ -80,6 +82,8 @@ local type         = type
 ---@field colon                 { type: string, start: integer, finish: integer }
 ---@field declare?              boolean
 ---@field varargRef?            boolean
+---@field const?                boolean
+---@field groups?               parser.object[]
 ---@field package _root         parser.object
 ---@field package _eachCache?   parser.object[]
 ---@field package _isGlobal?    boolean
@@ -163,6 +167,7 @@ local childMap = {
     ['list']        = {'#'},
     ['binary']      = {1, 2},
     ['unary']       = {1},
+    ['ternary']     = {1, 2, 3},
     ['...']         = {'name'},
 
     ['doc']                = {'#'},

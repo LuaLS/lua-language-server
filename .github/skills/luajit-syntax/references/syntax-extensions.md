@@ -80,7 +80,7 @@
 - compile.lua 已有 `UnaryAlias`（`!`）与 `BinaryAlias`（`&&`、`||`、`!=`）；`BinaryAlias` 带 `ERR_NONSTANDARD_SYMBOL` 检查。
 - 测试：`expr_customary.lua`。
 
-### 3. 三元条件 `?:` ⏸ 已搁置
+### 3. 三元条件 `?:`（研究完成，待实现）
 
 ```
 a ? b : c
@@ -88,9 +88,26 @@ a ? b : c
 - `a` 为条件（真值判定同 `if`）；为真求 `b`，否则求 `c`。
 - **右结合**，可嵌套：`cond1 ? a : cond2 ? b : x` = `cond1 ? a : (cond2 ? b : x)`。
 - 短路：未选中的分支不求值。
-- **语法歧义**：`b` 中不能直接包含方法调用 `obj:method()`，需加括号：`cond ? (obj:method()) : default`。
-- **本次实现已搁置**：语法上与 Lua 方法调用冒号 `:` 冲突过大（`obj:method()`），不适合当前 LuaLS parser 实现（见 issue #3434 CppCXY 评论）。保留本节仅为参考；若未来实现，需补 `?:` token 与三目解析（右结合、优先级最低）。
-- 测试：`expr_cond.lua`（本阶段不通过，属搁置范围）。
+- **语法歧义（源码确认）**：b 部分解析使用 `EXPR_F_NOCOLON` 标志（`lj_parse.c expr()`），在后缀解析中遇到 `:` 即 break，禁止方法调用；括号内方法调用需加括号：`cond ? (obj:method()) : default`。
+
+**NOCOLON 传播/重置规则**（源码 `lj_parse.c` 依据）：
+- 传播（eflags 透传）：一元操作数、二元操作数、后缀链（name/表/字符串后缀）
+- 重置（传 0）：括号 `expr(v,0)`、索引 `expr_bracket→expr(v,0)`、函数参数 `parse_args→expr_list→expr(v,0)`、表值、lambda
+- 推论：`a ? x + obj:method() : c` 也报错（操作数传播屏蔽）；`a ? f(obj:method()) : c` 合法（参数重置）
+
+**compile.lua 实现方案**：
+- `parseExp` 二元循环后处理三元（优先级最低、右结合）：b = `parseExp(nil, nil, true)`（noMethod），c = `parseExp()`
+- 加 `noMethod` 参数：`parseExp(asAction, level, noMethod)`、`parseExpUnit(noMethod)`、`parseSimple(node, funcName, noMethod)`
+- `parseSimple` 的 `:` 分支：`if noMethod then break`
+- 重置点：parseParen / parseIndex / parseExpList / parseTable 值 / parseLambda
+- tokenizer 无需改动（`?` `:` 均为单字符 token）
+- AST：`ternary` 节点（`[1]`=条件、`[2]`=b、`[3]`=c），需 guide + vm 类型推断
+- 测试：expr_cond.lua 移入正式测试
+
+**测试要点**（expr_cond.lua）：
+- `a ? obj:method() : c` → 报错 eof；`a ? (a:b()) : c` → 合法
+- `a ? a : b():c() + 30` → 合法（c 部分不屏蔽）
+- 无空格 `a?b:c` → 报错（方法调用歧义）；`a ? : c`、`a ? b :` → 报错
 
 ### 4. 安全导航 `?.`
 

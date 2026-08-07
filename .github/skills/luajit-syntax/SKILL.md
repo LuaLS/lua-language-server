@@ -15,16 +15,27 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 | 阶段 3 | 语义层（`?.`→optional、`??` 类型合并、`~>>`→integer） | ✅ 完成 |
 | 阶段 4 | 诊断文案 `PARSER_DECLARE_CONST`（6 语言） | ✅ 完成 |
 | 阶段 5 | 正式测试接入 `test/parser_test/luajit_ext.lua` | ✅ 完成 |
+| 阶段 6 | 三元 `?:`（noMethod/noTernary 机制、ternary AST 节点、vm 类型推断） | ✅ 完成 |
 
 验证：
 - 语法层 40 用例（`temp/tmp_test_luajit.lua`）、语义层 7 用例（`temp/test_luajit_semantic.lua`）通过
-- `parser_test`（含 `luajit_ext`：11 个官方测试文件编译通过 + 3 个含三元文件预期报错）、`type_inference`、`hover` 回归通过
+- 三元语法用例（`temp/tmp_test_ternary.lua`）、语义用例（`temp/test_ternary_semantic.lua`）通过
+- `parser_test`（含 `luajit_ext`：**14 个官方测试文件全部编译通过**，含 expr_cond/expr_coal/expr_nav）、`type_inference`、`hover` 回归通过
 
 实现中发现的现有问题及修复：
 - LuaJIT 下 `<<`/`>>` 误报 `UNSUPPORT_SYMBOL`（已修复：LuaJIT 支持 `<<`/`>>`，`//` 仍不支持）
 - `a ~= b` 在语句上下文应识别为异或复合赋值（已修复，与现有 `+=` 简化一致）
 - `continue` 是 soft keyword，需按后续 token 判断（`continue = 2` 是变量赋值）
 - `safe` 字段只在 `safe == true` 时设置，否则普通 AST 会多出 `safe = false`（ast 测试失败教训）
+
+三元 `?:` 实现要点（源码依据 lj_parse.c）：
+- 三元在 `expr()` 尾部（`expr_binop` 完整解析后）检查 `?`，**优先级最低、右结合**
+- b 部分用 `EXPR_F_NOCOLON`（0x02）禁止方法调用：`a ? obj:method() : c` 报错，`a ? (obj:method()) : c` 合法
+- NOCOLON 传播到一元/二元操作数与后缀链；**重置**于括号/索引/参数/表值/lambda
+- **b 部分嵌套三元非法**（`a ? b ? c : d : e` 中 `d:e` 方法调用歧义，与 LuaJIT 一致）；右结合靠 **c 部分递归**（`a ? b : c ? d : e`）
+- compile.lua：`parseExp(asAction, level, noMethod, noTernary)`；操作数位置 `noTernary=true`；`parseSimple` 的 `:` 分支 `noMethod` 时 break；`?.` 后紧跟 `:` 且 noMethod 时 break 不消费
+- AST：`type='ternary'`，`[1]`=条件、`[2]`=b、`[3]`=c；guide childMap `['ternary'] = {1,2,3}`
+- vm：`testCondition` 恒真→b、恒假→c、不确定→b|c 合并
 
 ## 概述
 
@@ -78,20 +89,20 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 | 短函数 `\|x\| -> expr` | `parseLambda` 已支持（`nonstandardSymbol['\|lambda\|']`），但 `->` 尚无独立 token |
 | 数字后缀 `LL`/`ULL`/`I` | `dropNumberTail` 已支持（仅 LuaJIT） |
 
-### 🚧 待实现（本次规划核心）
-| # | 语法 | 涉及 |
-|---|------|------|
-| 1 | `~>>` 算术右移 与 `~>>=` 复合赋值 | tokenizer + `BinarySymbol` + `expectAssign` |
-| 2 | `..=` 字符串连接复合赋值 | tokenizer + `expectAssign` |
-| 3 | `??` 空值合并 | tokenizer + `BinarySymbol` + 类型语义 |
-| 4 | `?.` 安全导航（属性/索引/调用/**方法形式 `:?`**） | tokenizer + `parseSimple` |
-| 5 | `const` 声明 | `parseAction` + 局部常量语义 |
-| 6 | 数字下划线 `1_000` | tokenizer `Number` + `parseNumber*` |
-| 7 | 短函数完整形式（`x -> expr`、`\|\| -> expr`、`-> do ... end`） | tokenizer `->` + `parseLambda` 扩展 |
+### ✅ 已实现（本次规划核心）
+| # | 语法 | 涉及 | 状态 |
+|---|------|------|------|
+| 1 | `~>>` 算术右移 与 `~>>=` 复合赋值 | tokenizer + `BinarySymbol` + `expectAssign` | ✅ |
+| 2 | `..=` 字符串连接复合赋值 | tokenizer + `expectAssign` | ✅ |
+| 3 | `??` 空值合并 | tokenizer + `BinarySymbol` + 类型语义 | ✅ |
+| 4 | `?.` 安全导航（属性/索引/调用/**方法形式 `:?`**） | tokenizer + `parseSimple` | ✅ |
+| 5 | `const` 声明 | `parseAction` + 局部常量语义 | ✅ |
+| 6 | 数字下划线 `1_000` | tokenizer `Number` + `parseNumber*` | ✅ |
+| 7 | 短函数完整形式（`x -> expr`、`\|\| -> expr`、`-> do ... end`） | tokenizer `->` + `parseLambda` 扩展 | ✅ |
+| 8 | **三元 `?:`**（`a ? b : c`，NOCOLON 屏蔽方法调用、右结合） | `parseExp` + `parseSimple` + guide + vm | ✅ |
 
-### ⏸ 已搁置
-- **`?:` 三元条件**（`a ? b : c`）：语法上与 Lua 方法调用冒号 `:` 冲突过大（`obj:method()`），不适合当前 LuaLS parser 实现（CppCXY 在 issue #3434 评论中已说明），先不实现。未来实现时再补 `?:` token 与三目解析。
-- 未反向移植到 v2.1 的项（无需支持）：`//` 地板除、命名变参 `...name`、位运算元方法、`__add(a, b, true)` 元方法。
+### ⏸ 未反向移植到 v2.1（无需支持）
+- `//` 地板除、命名变参 `...name`、位运算元方法、`__add(a, b, true)` 元方法。
 
 ## 实现步骤
 
@@ -107,7 +118,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 - `??`、`?.`（均需排在单字符 `?` 之前）
 - `~>>`、`~>>=`（`~>>=` 排在 `~>>` 之前）
 - `..=`（排在 `..` 之前）
-- 说明：`?:` 三元已搁置，**暂不添加** `?:` token（未来实现时再加）。
+- 说明：`?` 与 `:` 均为单字符 token（已存在），三元无需新 token。
 
 ### 阶段 2：compile.lua 语法解析
 按依赖顺序（建议）：
@@ -127,7 +138,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
   - `?.` → `getfield`/`getindex`/`call`/`getmethod` 的安全导航变体（可加标记字段，如 `safe = true`），语义层需处理 nullable 访问；`obj:method?.` 的检查目标是 method，`obj?.:method` 的检查目标是 obj。
   - `??` → 复用 `binary`（op = `??`）。
   - `const` → 复用 `local` 结构并打 const 标记，或新节点类型。
-  - （`?:` 已搁置，无对应节点。）
+  - `?:` → `ternary` 节点：`[1]`=条件、`[2]`=b、`[3]`=c（guide childMap 已加 `['ternary'] = {1,2,3}`）。
 - `script/parser/guide.lua`、`script/vm/*`：让类型推断/引用/悬停等理解新节点。
 - 运算符优先级遵循 LuaJIT 官方表（见 references/syntax-extensions.md）。
 
@@ -166,7 +177,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 
 ## 注意事项
 - **优先级表**：所有新增运算符的优先级必须严格遵循 LuaJIT 官方定义（见 references/syntax-extensions.md「运算符优先级」）。
-- **`?:` 已搁置**：三元运算符与 Lua 方法调用冒号 `:` 冲突过大（`obj:method()`），不适合当前 parser 实现，本次不实现（CppCXY 在 issue #3434 评论中已说明）。
+- **三元 `?:` 已实现**：见 references/syntax-extensions.md 第 3 节；b 部分禁止方法调用（NOCOLON），需括号 `(obj:method())` 绕过；b 部分嵌套三元非法（`d:e` 歧义），c 部分右结合递归合法。
 - **`?.` 与 `:` 的歧义**：实现安全导航的方法形式时需小心区分 `obj?.:method`（`?.` + `:`）与 `obj:method?.`（`:` + `?.`），以及普通方法调用 `obj:method`，三者 token 序列不同，需在 `parseSimple` 中分别处理。
 - **soft keyword**：`const` 与 `continue` 都是 soft keyword，可作变量名/字段名/函数名，解析时必须先识别上下文。
 - **短路语义**：`??`、`?.` 都有短路行为，虽然语法层不关心求值，但 AST 结构与类型推断需正确表达。

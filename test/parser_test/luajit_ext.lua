@@ -115,6 +115,18 @@ TestLuaJITExt 'local f = x -> do return x end'
 TestLuaJITExt 'local f = x -> y -> x + y'
 TestLuaJITExtDisabled 'local f = x -> x + 1'
 
+-- 三元 ?:
+TestLuaJITExt 'local a = b ? c : d'
+TestLuaJITExt 'local a = (b ? c : d) + 1'
+TestLuaJITExt 'local a = b + c ? d : e'
+TestLuaJITExt 'local a = b ? c : d + e'
+TestLuaJITExt 'local a = b ? c : d ? e : f'
+TestLuaJITExt 'local a = b ? (obj:method()) : c'
+TestLuaJITExt 'local a = b ? c : d():e()'
+TestLuaJITExt 'local a = b ? c?.field : d'
+TestLuaJITExtDisabled 'local a = b ? c : d'
+TestOtherVersion 'local a = b ? c : d'
+
 -- continue
 TestLuaJITExt 'while true do continue end'
 TestLuaJITExt 'for i = 1, 10 do continue end'
@@ -125,12 +137,13 @@ print('LuaJIT 扩展基本语法用例通过')
 
 -- ==================== LuaJIT 官方测试文件 ====================
 
--- 三元 ?: 已搁置，以下文件实际代码混用了三元运算符，编译预期报错：
--- expr_cond.lua（纯三元）、expr_coal.lua（?? 与三元混合）、expr_nav.lua（?. 与三元混合）
 local okFiles = {
     'expr_bit.lua',
     'expr_bit_bitop.lua',
+    'expr_coal.lua',
+    'expr_cond.lua',
     'expr_customary.lua',
+    'expr_nav.lua',
     'expr_shortfunc.lua',
     'ffi_expr_bit.lua',
     'ffi_expr_bit_bit64.lua',
@@ -147,21 +160,6 @@ for _, name in ipairs(okFiles) do
         error(('LuaJIT 测试文件编译出错：%s [%s]'):format(name, state.errs[1].type))
     end
     print(('LuaJIT 官方测试文件编译通过：%s'):format(name))
-end
-
--- 混用三元 ?: 的文件：预期报错（三元已搁置）
-local ternaryFiles = {
-    'expr_cond.lua',
-    'expr_coal.lua',
-    'expr_nav.lua',
-}
-for _, name in ipairs(ternaryFiles) do
-    local code = loadLuaJITFile(name)
-    local state = parser.compile(code, 'Lua', 'LuaJIT', LuaJITExtOptions)
-    if #state.errs == 0 then
-        error(('应因三元运算符报错：%s'):format(name))
-    end
-    print(('预期报错 OK（含三元 ?: 已搁置）：%s [%s]'):format(name, state.errs[1].type))
 end
 
 print('LuaJIT 扩展语法测试完成')

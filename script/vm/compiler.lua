@@ -2513,6 +2513,29 @@ local compilerSwitch = util.switch()
         end
         vm.binarySwitch(source.op.type, source)
     end)
+    : case 'ternary' -- LuaJIT 三元 ?:：条件真取 b，假取 c，不确定则合并 b|c
+    : call(function (source)
+        if vm.bindAs(source) then
+            return
+        end
+        if not source[1] or not source[2] or not source[3] then
+            return
+        end
+        local node2 = vm.compileNode(source[2])
+        local node3 = vm.compileNode(source[3])
+        local r1 = vm.testCondition(source[1])
+        if r1 == true then
+            vm.setNode(source, node2)
+        elseif r1 == false then
+            vm.setNode(source, node3)
+        else
+            local node = node2:copy()
+            if not source[3].hasExit then
+                node:merge(node3)
+            end
+            vm.setNode(source, node)
+        end
+    end)
     : case 'globalbase'
     : call(function (source)
         ---@type vm.global

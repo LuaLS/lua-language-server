@@ -2142,7 +2142,10 @@ local function bindSpecial(source, name)
     end
 end
 
-local function parseSimple(node, funcName)
+---@param node parser.object
+---@param funcName boolean
+---@param noMethod boolean? # 禁止方法调用后缀（三元 b 部分，对应 LuaJIT EXPR_F_NOCOLON）
+local function parseSimple(node, funcName, noMethod)
     local currentName
     if node.type == 'getglobal'
     or node.type == 'getlocal' then
@@ -2162,6 +2165,11 @@ local function parseSimple(node, funcName)
         local safe = false
         if token == '?.' then
             if not State.luaJITExtensions then
+                break
+            end
+            -- LuaJIT 三元 b 部分：?. 后紧跟 : 属语法错误（EXPR_F_NOCOLON + nav），
+            -- 这里 break 不消费 ?.，把 : 留给三元处理
+            if noMethod and Tokens[Index + 3] == ':' then
                 break
             end
             safe = true
@@ -2254,6 +2262,10 @@ local function parseSimple(node, funcName)
             node.next   = getfield
             node        = getfield
         elseif token == ':' then
+            if noMethod then
+                -- LuaJIT 三元 b 部分禁止方法调用（EXPR_F_NOCOLON）：停止后缀解析，: 留给三元
+                break
+            end
             local colon = {
                 type   = token,
                 start  = getPosition(Tokens[Index], 'left'),
@@ -3074,13 +3086,14 @@ local function parseLambdaSingleArg(name)
     return lambda
 end
 
-local function checkNeedParen(source)
+---@param noMethod boolean? # 禁止方法调用后缀（三元 b 部分）
+local function checkNeedParen(source, noMethod)
     local token = Tokens[Index + 1]
     if  token ~= '.'
-    and token ~= ':' then
+    and (token ~= ':' or noMethod) then
         return source
     end
-    local exp = parseSimple(source, false)
+    local exp = parseSimple(source, false, noMethod)
     if exp == source then
         return exp
     end
@@ -3105,11 +3118,12 @@ local function checkNeedParen(source)
     return exp
 end
 
-local function parseExpUnit()
+---@param noMethod boolean? # 禁止方法调用后缀（三元 b 部分）
+local function parseExpUnit(noMethod)
     local token = Tokens[Index + 1]
     if token == '(' then
         local paren = parseParen()
-        return parseSimple(paren, false)
+        return parseSimple(paren, false, noMethod)
     end
 
     if token == '...' then
@@ -3122,7 +3136,7 @@ local function parseExpUnit()
         if not table then
             return nil
         end
-        local exp = checkNeedParen(table)
+        local exp = checkNeedParen(table, noMethod)
         return exp
     end
 
@@ -3131,7 +3145,7 @@ local function parseExpUnit()
         if not string then
             return nil
         end
-        local exp = checkNeedParen(string)
+        local exp = checkNeedParen(string, noMethod)
         return exp
     end
 
@@ -3140,7 +3154,7 @@ local function parseExpUnit()
         if not string then
             return nil
         end
-        local exp = checkNeedParen(string)
+        local exp = checkNeedParen(string, noMethod)
         return exp
     end
 
@@ -3181,7 +3195,7 @@ local function parseExpUnit()
         end
         local nameNode = resolveName(node)
         if nameNode then
-            return parseSimple(nameNode, false)
+            return parseSimple(nameNode, false, noMethod)
         end
     end
 
@@ -3204,7 +3218,7 @@ local function parseUnaryOP()
     return op, myLevel
 end
 
----@param level integer # op level must greater than this level
+---@param level number? # op level must greater than this level
 local function parseBinaryOP(asAction, level)
     local token  = Tokens[Index + 1]
     local symbol = (BinarySymbol[token] and token)
@@ -3290,12 +3304,16 @@ local function parseBinaryOP(asAction, level)
     return op, myLevel
 end
 
-function parseExp(asAction, level)
+---@param asAction boolean?
+---@param level number?    # 运算符优先级（可为 0.5 的倍数，右结合处理）
+---@param noMethod boolean?  # 禁止方法调用后缀（三元 b 部分，对应 LuaJIT EXPR_F_NOCOLON）
+---@param noTernary boolean? # 禁止三元（一元/二元操作数位置，对应 LuaJIT expr_binop 不检查 ?）
+function parseExp(asAction, level, noMethod, noTernary)
     local exp
     local uop, uopLevel = parseUnaryOP()
     if uop then
         skipSpace()
-        local child = parseExp(asAction, uopLevel)
+        local child = parseExp(asAction, uopLevel, noMethod, true)
         -- 预计算负数
         if  uop.type == '-'
         and child
@@ -3318,7 +3336,7 @@ function parseExp(asAction, level)
             end
         end
     else
-        exp = parseExpUnit()
+        exp = parseExpUnit(noMethod)
         if not exp then
             return nil
         end
@@ -3334,7 +3352,7 @@ function parseExp(asAction, level)
         ::AGAIN::
         skipSpace()
         local isForward = SymbolForward[bopLevel]
-        local child = parseExp(asAction, isForward and (bopLevel + 0.5) or bopLevel)
+        local child = parseExp(asAction, isForward and (bopLevel + 0.5) or bopLevel, noMethod, true)
         if not child then
             if skipUnknownSymbol() then
                 goto AGAIN
@@ -3355,6 +3373,49 @@ function parseExp(asAction, level)
             child.parent = bin
         end
         exp = bin
+    end
+
+    -- LuaJIT 三元 ?:（右结合、优先级最低，仅在表达式根位置检查，操作数位置由 noTernary 屏蔽）
+    if State.luaJITExtensions and not noTernary then
+        skipSpace()
+        if Tokens[Index + 1] == '?' then
+            local qEnd = getPosition(Tokens[Index], 'right')
+            Index = Index + 2
+            skipSpace()
+            -- b 部分：NOCOLON，禁止方法调用（如 obj:method()），括号内可加括号绕过
+            local b = parseExp(nil, nil, true)
+            if not b then
+                missExp()
+            end
+            skipSpace()
+            local c
+            if Tokens[Index + 1] == ':' then
+                Index = Index + 2
+                skipSpace()
+                c = parseExp()
+                if not c then
+                    missExp()
+                end
+            else
+                missSymbol(':')
+            end
+            local ternary = {
+                type   = 'ternary',
+                start  = exp.start,
+                finish = c and c.finish or (b and b.finish or qEnd),
+                [1]    = exp,
+                [2]    = b,
+                [3]    = c,
+            }
+            exp.parent = ternary
+            if b then
+                b.parent = ternary
+            end
+            if c then
+                c.parent = ternary
+            end
+            exp = ternary
+        end
     end
 
     return exp

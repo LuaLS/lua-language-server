@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Reapplied the type inference fix for `and`/`or` idioms and circular dependency in tracer (reverted in 3.18.2). The tracer now drops caches populated while an assignment was still being compiled, so if-blocks that reassign a variable no longer lose the assignment's type in subsequent code [#2236](https://github.com/LuaLS/lua-language-server/issues/2236) [#2374](https://github.com/LuaLS/lua-language-server/issues/2374) [#2494](https://github.com/LuaLS/lua-language-server/issues/2494)
 * `NEW` Support type inference for `@field` and `@type` function declarations in method overrides [#3367](https://github.com/LuaLS/lua-language-server/issues/3367)
 * `FIX` Deduplicate documentation bindings for parameters
 * `FIX` Correct `math.type` meta return annotation to use `nil` instead of the string literal `'nil'`

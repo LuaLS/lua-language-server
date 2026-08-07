@@ -5,6 +5,19 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 
 # LuaJIT 扩展语法支持规划
 
+## 实施进度
+
+| 阶段 | 内容 | 状态 |
+|------|------|------|
+| 阶段 0 | 设置 `Lua.runtime.enableLuaJITExtensions`、options 传递、initState 判定（语法处单独判断） | ✅ 完成 |
+| 阶段 1 | tokenizer 新增 `-> ?? ?. ~>> ~>>= ..=` | ✅ 完成 |
+| 阶段 2 | 语法解析（`~>>`、复合赋值、数字下划线、`??`、`?.` 全形式、`const`、短函数） | ✅ 完成 |
+| 阶段 3 | 语义层（`?.`→optional、`??` 类型合并、`~>>`→integer） | ✅ 完成 |
+| 阶段 4 | 诊断错误码文案（`DECLARE_CONST` 等翻译） | ⏳ 待做 |
+| 阶段 5 | 接入正式 parser_test 框架 | ⏳ 待做 |
+
+验证：语法层 40 用例（`temp/tmp_test_luajit.lua`）、语义层 7 用例（`temp/test_luajit_semantic.lua`）通过；`parser_test`/`type_inference`/`hover` 回归通过。
+
 ## 概述
 
 为 lua-language-server 增加 LuaJIT v3 反向移植到 v2.1 的扩展语法支持（对应 [LuaLS/lua-language-server#3434](https://github.com/LuaLS/lua-language-server/issues/3434)）。
@@ -127,7 +140,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 - **限定测试范围**：`test.lua` 支持 `--name=<pattern>` 参数，`test(name)` 内部用 `name:match(TARGET_TEST_NAME)` 过滤，例如：
   - `bin/lua-language-server.exe test.lua --name=parser_test` 只跑 `parser_test`
 - **自定义测试脚本**：可自行改造 `test.lua` 或编写独立脚本，直接 `bin/lua-language-server.exe <script>.lua` 运行（需正确设置 `package.path`，见 `test.lua` 开头）。
-- **当前进度验证脚本**：`tmp_test_luajit.lua`（临时，验证 compile 解析 LuaJIT 扩展语法，含开关开关两种状态的断言）。
+- **当前进度验证脚本**：`temp/tmp_test_luajit.lua`（临时，验证 compile 解析 LuaJIT 扩展语法，含开关开关两种状态的断言）。
 
 ## 关键文件地图
 

@@ -14,9 +14,24 @@ local plugin     = require 'plugin'
 ---@field cindex                integer
 ---@field func                  parser.object
 ---@field hideView              boolean
+---@field safe?                 boolean # LuaJIT 安全导航 ?. 标记
 ---@field package _returns?     parser.object[]
 ---@field package _callReturns? parser.object[]
 ---@field package _asCache?     parser.object[]
+
+-- LuaJIT 安全导航 `?.`：读取结果为 nil 时短路，类型需标记 optional
+---@param source parser.object
+---@param node vm.node
+local function setNodeCheckSafe(source, node)
+    vm.setNode(source, node)
+    if source.safe
+    and (source.type == 'getfield'
+    or source.type == 'getindex'
+    or source.type == 'getmethod'
+    or source.type == 'call') then
+        vm.getNode(source):addOptional()
+    end
+end
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -1968,22 +1983,22 @@ local compilerSwitch = util.switch()
             local uri = guide.getUri(source)
             local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             if value then
-                vm.setNode(source, value)
+                setNodeCheckSafe(source, value)
             end
             for k in key:eachObject() do
                 if k.type == 'global' and k.cate == 'type' then
                     ---@cast k vm.global
                     vm.compileByParentNode(source.node, k, function (src)
-                        vm.setNode(source, vm.compileNode(src))
+                        setNodeCheckSafe(source, vm.compileNode(src))
                     end)
                 end
             end
         else
             ---@cast key string
             vm.compileByParentNode(source.node, key, function (src)
-                vm.setNode(source, vm.compileNode(src))
+                setNodeCheckSafe(source, vm.compileNode(src))
                 if src == source and source.value and source.value.type ~= 'nil' then
-                    vm.setNode(source, vm.compileNode(source.value))
+                    setNodeCheckSafe(source, vm.compileNode(source.value))
                 end
             end)
         end
@@ -2315,7 +2330,7 @@ local compilerSwitch = util.switch()
         if not node:isTyped() then
             node = vm.runOperator('call', source.node) or node
         end
-        vm.setNode(source, node)
+        setNodeCheckSafe(source, node)
     end)
     : case 'doc.type'
     : call(function (source)

@@ -2223,8 +2223,10 @@ local function parseSimple(node, funcName)
                 node   = node,
                 dot    = dot,
                 field  = field,
-                safe   = safe, -- LuaJIT 安全导航
             }
+            if safe then
+                getfield.safe = true -- LuaJIT 安全导航
+            end
             if field then
                 field.parent = getfield
                 field.type   = 'field'
@@ -2264,8 +2266,10 @@ local function parseSimple(node, funcName)
                 node   = node,
                 colon  = colon,
                 method = method,
-                safe   = safe, -- LuaJIT 安全导航（obj?.:method 检查 obj）
             }
+            if safe then
+                getmethod.safe = true -- LuaJIT 安全导航（obj?.:method 检查 obj）
+            end
             if method then
                 method.parent = getmethod
                 method.type   = 'method'
@@ -2292,8 +2296,10 @@ local function parseSimple(node, funcName)
                 type   = 'call',
                 start  = node.start,
                 node   = node,
-                safe   = safe, -- LuaJIT 安全导航（f?.() 检查 f）
             }
+            if safe then
+                call.safe = true -- LuaJIT 安全导航（f?.() 检查 f）
+            end
             Index = Index + 2
             local args = parseExpList()
             if Tokens[Index + 1] == ')' then
@@ -2324,8 +2330,10 @@ local function parseSimple(node, funcName)
                 start  = node.start,
                 finish = tbl.finish,
                 node   = node,
-                safe   = safe, -- LuaJIT 安全导航（f?.{...} 检查 f）
             }
+            if safe then
+                call.safe = true -- LuaJIT 安全导航（f?.{...} 检查 f）
+            end
             local args = {
                 type   = 'callargs',
                 start  = tbl.start,
@@ -2348,8 +2356,10 @@ local function parseSimple(node, funcName)
                 start  = node.start,
                 finish = str.finish,
                 node   = node,
-                safe   = safe, -- LuaJIT 安全导航（f?."str" 检查 f）
             }
+            if safe then
+                call.safe = true -- LuaJIT 安全导航（f?."str" 检查 f）
+            end
             local args = {
                 type   = 'callargs',
                 start  = str.start,
@@ -2372,9 +2382,11 @@ local function parseSimple(node, funcName)
                     type   = 'call',
                     start  = node.start,
                     finish = str.finish,
-                    safe   = safe, -- LuaJIT 安全导航（f?.[[...]] 检查 f）
                     node   = node,
                 }
+                if safe then
+                    call.safe = true -- LuaJIT 安全导航（f?.[[...]] 检查 f）
+                end
                 local args = {
                     type   = 'callargs',
                     start  = str.start,
@@ -2392,7 +2404,9 @@ local function parseSimple(node, funcName)
                 local bstart = index.start
                 index.type   = 'getindex'
                 index.start  = node.start
-                index.safe   = safe -- LuaJIT 安全导航（a?.[key] 检查 a）
+                if safe then
+                    index.safe = true -- LuaJIT 安全导航（a?.[key] 检查 a）
+                end
                 index.node   = node
                 node.next    = index
                 node.parent  = index

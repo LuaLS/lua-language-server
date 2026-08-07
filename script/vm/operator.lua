@@ -47,6 +47,7 @@ local binaryMap = {
     ['~']  = 'bxor',
     ['<<'] = 'shl',
     ['>>'] = 'shr',
+    ['~>>'] = 'sar', -- LuaJIT 算术右移
     ['..'] = 'concat',
 }
 
@@ -223,6 +224,41 @@ vm.binarySwitch = util.switch()
             vm.setNode(source, node)
         end
     end)
+    : case '??' -- LuaJIT 空值合并：仅当左侧为 nil 时取右侧（false 仍返回左侧）
+    : call(function (source)
+        local node1 = vm.compileNode(source[1])
+        local node2 = vm.compileNode(source[2])
+        -- 统计具体类型：variable/local 是引用元信息，无具体类型时视为未知（可能为 nil）
+        local count   = 0
+        local hasNil  = false
+        for c in node1:eachObject() do
+            if c.type == 'nil'
+            or (c.type == 'global' and c.cate == 'type' and c.name == 'nil') then
+                hasNil = true
+            elseif c.type ~= 'variable' and c.type ~= 'local' then
+                count = count + 1
+                if c.type == 'unknown'
+                or (c.type == 'global' and c.cate == 'type' and c.name == 'unknown') then
+                    -- 未初始化变量可能为 nil
+                    hasNil = true
+                end
+            end
+        end
+        if count == 0 then
+            -- 无具体类型（仅元信息或空）：未知，视为可能为 nil，取右侧
+            vm.setNode(source, node2)
+        elseif hasNil then
+            -- a 可能为 nil → (a 去 nil) | b
+            local node = node1:copy():removeOptional()
+            if not source[2].hasExit then
+                node:merge(node2)
+            end
+            vm.setNode(source, node)
+        else
+            -- a 必非 nil → a
+            vm.setNode(source, node1)
+        end
+    end)
     : case '=='
     : case '~='
     : call(function (source)
@@ -245,6 +281,7 @@ vm.binarySwitch = util.switch()
     end)
     : case '<<'
     : case '>>'
+    : case '~>>'
     : case '&'
     : case '|'
     : case '~'
@@ -255,6 +292,8 @@ vm.binarySwitch = util.switch()
         if a and b then
             local result = op == '<<' and a << b
                         or op == '>>' and a >> b
+                        -- LuaJIT 算术右移：Lua 5.3+ 的 >> 即算术右移
+                        or op == '~>>' and a >> b
                         or op == '&'  and a &  b
                         or op == '|'  and a |  b
                         or op == '~'  and a ~  b

@@ -14,7 +14,7 @@ end
 do
     rt:reset()
     local T = rt.generic('T')
-    local o = rt.alias('Options', { T })
+    local o = rt.alias('Partial', { T })
         : setCustomValue(function (self, args)
             local v = args[1]
             if #v.keys == 0 then
@@ -39,7 +39,7 @@ do
     y: "20",
 }]])
 
-    local t2 = rt.call('Options', { t1 })
+    local t2 = rt.call('Partial', { t1 })
 
     lt.assertEquals(t2:view(), [[
 {
@@ -54,7 +54,7 @@ do
     do
         local _ENV = playground.env
 
-        _ENV.alias('Options')
+        _ENV.alias('Partial')
             : param('T')
             : onValue(function (c)
                 local v = c.args[1]
@@ -81,7 +81,7 @@ do
     y: "20",
 }]])
 
-    local t2 = rt.call('Options', { t1 })
+    local t2 = rt.call('Partial', { t1 })
 
     lt.assertEquals(t2:view(), [[
 {
@@ -96,7 +96,7 @@ do
     do
         local _ENV = playground.env
 
-        _ENV.alias('Options')
+        _ENV.alias('Partial')
             : param('T')
             : onValue(function (c)
                 local v = c.args[1]
@@ -122,7 +122,7 @@ do
     y: "20",
 }]])
 
-    local t2 = rt.call('Options', { rt.type 'XXX' })
+    local t2 = rt.call('Partial', { rt.type 'XXX' })
 
     lt.assertEquals(t2:view(), [[
 {

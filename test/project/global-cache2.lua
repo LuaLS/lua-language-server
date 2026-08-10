@@ -40,32 +40,42 @@ foo = 2
 ]])
 
     ---@async
-    ls.await.call(function ()
-        -- 模拟真实加载：A 先索引，B 后索引
-        scope.vm:awaitIndexFile(uriA)
-        scope.vm:awaitIndexFile(uriC)
-
-        ---@async
-        local function getDefinitionUris()
-            local results = ls.feature.definition(uriC, offsetC)
-            ---@type string[]
-            local uris = {}
-            for _, r in ipairs(results) do
-                uris[#uris+1] = r.uri
-            end
-            table.sort(uris)
-            return uris
+    local function getDefinitionUris()
+        local results = ls.feature.definition(uriC, offsetC)
+        ---@type string[]
+        local uris = {}
+        for _, r in ipairs(results) do
+            uris[#uris+1] = r.uri
         end
+        table.sort(uris)
+        return uris
+    end
 
-        -- A 加载后 B 未加载：只有 A
-        lt.assertEquals(getDefinitionUris(), { uriA })
+    -- 模拟真实加载：A 先索引，B 后索引。
+    -- 用 waitAll 同步等待索引完成（而非 fire-and-forget 的 ls.await.call），
+    -- 否则异步索引让出时 do 块会先退出，<close> 的 file/scope 被销毁，
+    -- 恢复后索引不会执行（见 awaitIndex 中 getDocument 返回 nil）。
+    ls.await.waitAll {
+        ---@async
+        function ()
+            scope.vm:awaitIndexFile(uriA)
+            scope.vm:awaitIndexFile(uriC)
+        end,
+    }
 
-        -- B 加载
-        scope.vm:awaitIndexFile(uriB)
+    -- A 加载后 B 未加载：只有 A
+    lt.assertEquals(getDefinitionUris(), { uriA })
 
-        -- B 加载后：A、B 都应显示
-        lt.assertEquals(getDefinitionUris(), { uriA, uriB })
-    end)
+    -- B 加载
+    ls.await.waitAll {
+        ---@async
+        function ()
+            scope.vm:awaitIndexFile(uriB)
+        end,
+    }
+
+    -- B 加载后：A、B 都应显示
+    lt.assertEquals(getDefinitionUris(), { uriA, uriB })
 end
 
 print('[project.global-cache2] 测试完毕')

@@ -76,13 +76,21 @@ M.__getter.hasGeneric = function (self)
     return self.key.hasGeneric or self.value.hasGeneric, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
-    local key = self.key:resolveGeneric(map)
-    local value = self.value:resolveGeneric(map)
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
+    local key = self.key:resolveGeneric(map, visited)
+    local value = self.value:resolveGeneric(map, visited)
     local newField = self.scope.rt.field(key, value)
+    visited[self] = newField
     newField.location = self.location
     newField.hideInView = self.hideInView
     newField.visibleType = self.visibleType

@@ -72,14 +72,23 @@ M.__getter.hasGeneric = function (self)
     return self.head.hasGeneric or self.key.hasGeneric, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
-    local head = self.head:resolveGeneric(map)
-    local key  = self.key:resolveGeneric(map)
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
+    local head = self.head:resolveGeneric(map, visited)
+    local key  = self.key:resolveGeneric(map, visited)
     if head == self.head and key == self.key then
         return self
     end
-    return self.scope.rt.select(head, key)
+    local newSelect = self.scope.rt.select(head, key)
+    visited[self] = newSelect
+    return newSelect
 end

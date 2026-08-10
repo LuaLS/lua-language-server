@@ -223,14 +223,23 @@ M.__getter.hasGeneric = function (self)
     return false, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
     local args = ls.util.map(self.args, function (arg)
-        return arg:resolveGeneric(map)
+        return arg:resolveGeneric(map, visited)
     end)
-    return self.scope.rt.call(self.head.typeName, args)
+    local newCall = self.scope.rt.call(self.head.typeName, args)
+    visited[self] = newCall
+    return newCall
 end
 
 function M:onView(viewer, options)

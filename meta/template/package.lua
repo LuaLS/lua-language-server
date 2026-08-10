@@ -1,15 +1,68 @@
 ---@meta package
 
+--[[@@@
+-- RequireUri：modname -> uri（按 Lua require 规则解析，排除当前文件并按距离排序）
+alias 'RequireUri'
+    : param('T')
+    : onValue(function (c)
+        local modname = c.args[1]
+        if modname.kind ~= 'value' then
+            return c.type 'never'
+        end
+        local literal = modname.literal
+        if type(literal) ~= 'string' then
+            return c.type 'never'
+        end
+        local uris = c.scope:searchFiles(literal)
+        if #uris == 0 then
+            return c.type 'never'
+        end
+        return c.value(uris[1])
+    end)
+]]
+
+--[[@@@
+-- RequireValue：uri -> 该文件根 return 的第一个值
+alias 'RequireValue'
+    : param('T')
+    : onValue(function (c)
+        local uriNode = c.args[1]
+        -- 兼容嵌套 alias：取解析后的值
+        if uriNode.kind == 'call' then
+            uriNode = uriNode.value
+        end
+        if uriNode.kind ~= 'value' then
+            return c.type 'never'
+        end
+        local uri = uriNode.literal
+        if type(uri) ~= 'string' then
+            return c.type 'never'
+        end
+        -- 只复用已加载的文件；未加载返回 unknown，避免加载链递归
+        local vfile = c.scope.vm:getFile(uri)
+        if not vfile then
+            return c.type 'unknown'
+        end
+        local ret = vfile:getMainReturn()
+        if not ret then
+            return c.type 'never'
+        end
+        return ret
+    end)
+]]
+
 ---#if VERSION >=5.4 then
 ---#DES 'require>5.4'
----@param modname string
----@return unknown
+---@generic T: string
+---@param modname T
+---@return RequireValue<RequireUri<T>>
 ---@return unknown loaderdata
 function require(modname) end
 ---#else
 ---#DES 'require<5.3'
----@param modname string
----@return unknown
+---@generic T: string
+---@param modname T
+---@return RequireValue<RequireUri<T>>
 function require(modname) end
 ---#end
 

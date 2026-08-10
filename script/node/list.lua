@@ -206,15 +206,24 @@ M.__getter.hasGeneric = function (self)
     return hasGeneric, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
     local values = {}
     for i, value in ipairs(self.raw) do
-        values[i] = value:resolveGeneric(map)
+        values[i] = value:resolveGeneric(map, visited)
     end
-    return self.scope.rt.list(values, self.min, self.max)
+    local newList = self.scope.rt.list(values, self.min, self.max)
+    visited[self] = newList
+    return newList
 end
 
 ---@param other Node.List

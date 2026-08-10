@@ -473,14 +473,25 @@ M.__getter.hasGeneric = function (self)
     return hasGeneric, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
+    visited = visited or {}
+    -- 环保护：self 已在处理中则直接返回已创建的引用（环闭合）
+    if visited[self] then
+        return visited[self]
+    end
     local newTable = self.scope.rt.table()
+    visited[self] = newTable
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        newTable:addField(field:resolveGeneric(map))
+        local newField = field:resolveGeneric(map, visited)
+        ---@cast newField Node.Field
+        newTable:addField(newField)
     end
     newTable.locations = self.locations
     return newTable

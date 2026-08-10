@@ -239,18 +239,27 @@ M.__getter.hasGeneric = function (self)
     end
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if self.value ~= self then
-        return self.value:resolveGeneric(map)
+        return self.value:resolveGeneric(map, visited)
     end
     if not self.hasGeneric then
         return self
     end
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
     local newValues = {}
     for _, v in ipairs(self.rawNodes) do
-        newValues[#newValues+1] = v:resolveGeneric(map)
+        newValues[#newValues+1] = v:resolveGeneric(map, visited)
     end
-    return self.scope.rt.intersection(newValues)
+    local newInter = self.scope.rt.intersection(newValues)
+    visited[self] = newInter
+    return newInter
 end
 
 function M:inferGeneric(other, result)

@@ -10,6 +10,13 @@ test.includeCodes['setmetatable'] = [[
 function setmetatable(t, mt) end
 ]]
 
+test.includeCodes['require'] = [[
+---@generic T: string
+---@param modname T
+---@return RequireValue<RequireUri<T>>
+function require(modname) end
+]]
+
 test.includeCodes['binary'] = [[
 ---@alias op.add<A: any, B: any> number
 ---@alias op.add<A: integer, B: integer> integer

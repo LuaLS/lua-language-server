@@ -413,12 +413,13 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
 ---@return Node
-function M:resolveGeneric(map)
+function M:resolveGeneric(map, visited)
     if self.value == self then
         return self
     end
-    return self.value:resolveGeneric(map)
+    return self.value:resolveGeneric(map, visited)
 end
 
 ---@param other Node

@@ -115,15 +115,24 @@ M.__getter.hasGeneric = function (self)
     return self.head.hasGeneric, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
-    local newHead = self.head:resolveGeneric(map)
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
+    local newHead = self.head:resolveGeneric(map, visited)
     if newHead == self.head then
         return self
     end
-    return self.scope.rt.array(newHead)
+    local newArray = self.scope.rt.array(newHead)
+    visited[self] = newArray
+    return newArray
 end
 
 function M:inferGeneric(other, result)

@@ -18,6 +18,7 @@ test.require 'test.node.infer_generic'
 test.require 'test.node.call'
 test.require 'test.node.fcall'
 test.require 'test.node.flush'
+test.require 'test.node.hasgeneric'
 
 test.require 'test.node.variable'
 

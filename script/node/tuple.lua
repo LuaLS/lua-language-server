@@ -170,12 +170,21 @@ M.__getter.hasGeneric = function (self)
     return self.values.hasGeneric, true
 end
 
-function M:resolveGeneric(map)
+---@param map table<Node.Generic, Node>
+---@param visited? table<Node, Node>
+---@return Node
+function M:resolveGeneric(map, visited)
     if not self.hasGeneric then
         return self
     end
-    local values = self.values:resolveGeneric(map)
-    return self.scope.rt.tuple(values)
+    visited = visited or {}
+    if visited[self] then
+        return visited[self]
+    end
+    local values = self.values:resolveGeneric(map, visited)
+    local newTuple = self.scope.rt.tuple(values)
+    visited[self] = newTuple
+    return newTuple
 end
 
 function M:inferGeneric(other, result)

@@ -288,8 +288,9 @@ function M:findValue(kinds)
     return nil
 end
 
+---@param visited? table<Node, true>
 ---@return Node
-function M:simplify()
+function M:simplify(visited)
     return self
 end
 

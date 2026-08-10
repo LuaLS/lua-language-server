@@ -203,11 +203,18 @@ M.__getter.value = function (self)
     return self, true
 end
 
-function M:simplify()
+---@param visited? table<Node, true>
+---@return Node
+function M:simplify(visited)
     if self.value == self then
         return self
     end
-    return self.value:simplify()
+    visited = visited or {}
+    if visited[self] then
+        return self
+    end
+    visited[self] = true
+    return self.value:simplify(visited)
 end
 
 ---@param self Node.Call

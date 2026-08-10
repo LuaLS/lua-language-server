@@ -162,6 +162,8 @@ function M:loadFiles(targetUri, callback, status)
             xpcall(callback, log.error, 'finding', status, uri)
         end
     end)
+    -- 扫描完成后批量失效 require 缓存（扫描过程中 uriSet 逐渐完整）
+    self.scope:flushCache()
     xpcall(callback, log.error, 'found', status)
 
     local loadTasks = {}
@@ -317,6 +319,7 @@ end
 ---@param uri Uri
 function M:_onFileCreate(uri)
     self.uriSet[uri] = true
+    self.scope:flushCache()
     local content = self.fs.read(uri)
     if content then
         ls.file.setServerText(uri, content)
@@ -328,6 +331,7 @@ end
 ---@param uri Uri
 function M:_onFileDelete(uri)
     self.uriSet[uri] = nil
+    self.scope:flushCache()
     local file = ls.file.get(uri)
     if file then
         file:removeByServer()

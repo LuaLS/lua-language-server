@@ -55,11 +55,19 @@ function M:setBracketKey()
     return self
 end
 
-function M:simplify()
+---@param visited? table<Node, true>
+---@return Node
+function M:simplify(visited)
     if self.value == self then
         return self
     end
-    return self.value:simplify()
+    visited = visited or {}
+    if visited[self] then
+        return self
+    end
+    visited[self] = true
+    local result = self.value:simplify(visited)
+    return result
 end
 
 M.__getter.value = function (self)

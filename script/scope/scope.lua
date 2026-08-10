@@ -1,8 +1,10 @@
 local time = require 'bee.time'
 require 'file'
 
----@class Scope
+---@class Scope: Node.RefModule
 local M = Class 'Scope'
+
+Extends('Scope', 'Node.RefModule')
 
 M.ready = false
 
@@ -13,6 +15,7 @@ function M:__init(name, uri, fs)
     self.name = name
     self.uri = uri
     self.fs  = fs or ls.fs
+    self.scope = self
     table.insert(ls.scope.all, self)
 
     ---@type Uri[]

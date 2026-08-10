@@ -9,6 +9,7 @@ local masterMap = ls.util.weakKTable()
 ---如果不是类型调用，则此字段为 `nil` 。
 ---在 `onValue` 的回调中可以保证此字段存在且被填充。
 ---@field args? Node[] | table<string, Node>
+---@field node? Node 此 alias 的别名节点（rt.alias），在 onValue 回调中可用于注册依赖（如 c.scope:addRef(c.node)）
 ---@field scope Scope
 ---@field table fun(fields?: table<Node.Key, Node>): Node.Table
 ---@field field fun(name: Node.Key, value: Node, optional: boolean): Node.Field
@@ -35,6 +36,7 @@ function M:makeDefaultContext(data)
     local rt = self.rt
     data.__index = data
 
+    data.node = self.node
     data.scope = self.node.scope
     data.table = rt.table
     data.field = rt.field

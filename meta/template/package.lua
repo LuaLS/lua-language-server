@@ -14,6 +14,8 @@ alias 'RequireUri'
         if #uris == 0 then
             return c.type 'never'
         end
+        -- 解析结果依赖 Scope 的文件集合：注册 alias 节点，Scope 增删文件时刷新
+        c.scope:addRef(c.node)
         return c.value(uris[1])
     end)
 ]]

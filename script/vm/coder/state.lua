@@ -217,7 +217,7 @@ ls.vm.registerCoderProvider('return', function (coder, source)
     for _, exp in ipairs(source.exps) do
         coder:compile(exp)
     end
-    local funcKey = coder:getBlockKV('function')
+    local funcKey = coder:findBlockKV('function')
     if not funcKey then
         return
     end

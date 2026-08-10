@@ -201,6 +201,30 @@ function M:getVariable(source)
     return nil
 end
 
+--- 文件根主函数（记录文件根 return 的返回值）
+---@return Node.Function?
+function M:getMainFunc()
+    if not self.coder or not self.coder.map then
+        return nil
+    end
+    ---@type Node.Function?
+    local main = self.coder.map['@main']
+    if main and main.kind == 'function' then
+        return main
+    end
+    return nil
+end
+
+--- 文件根 return 的第一个返回值
+---@return Node?
+function M:getMainReturn()
+    local main = self:getMainFunc()
+    if not main then
+        return nil
+    end
+    return main:getReturn(1)
+end
+
 function M:remove()
     Delete(self)
 end

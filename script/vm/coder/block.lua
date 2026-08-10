@@ -1,7 +1,13 @@
 ---@param coder Coder
 ---@param block LuaParser.Node.Block
-local function parseBlock(coder, block)
+---@param blockKV? table<string, any>
+local function parseBlock(coder, block, blockKV)
     coder:pushBlock()
+    if blockKV then
+        for k, v in pairs(blockKV) do
+            coder:setBlockKV(k, v)
+        end
+    end
     -- 预编译所有尾随注解，使它们在语句编译前填充 trailingCatMap
     for _, child in ipairs(block.childs) do
         if child.kind == 'cat' and child.trailing then
@@ -27,6 +33,16 @@ ls.vm.registerCoderProvider('main', function (coder, source)
     ---@cast source LuaParser.Node.Main
 
     coder:startTracer(source)
+    -- 文件根主函数：记录文件根 return 的返回值
+    local mainKey = coder:getCustomKey('@main')
+    coder:addLine('{key} = rt.func()' % {
+        key = mainKey,
+    })
+    coder:addLine('{key}:setLocation {location}' % {
+        key      = mainKey,
+        location = coder:makeLocationCode(source),
+    })
+
     local env = source.ast:findLocal(source.ast.envMode, 0)
     assert(env)
     coder:compile(env)
@@ -41,7 +57,9 @@ ls.vm.registerCoderProvider('main', function (coder, source)
         coder:compile(varargs)
     end
 
-    parseBlock(coder, source)
+    parseBlock(coder, source, {
+        ['function'] = mainKey,
+    })
     coder:finishTracer()
 end)
 

@@ -353,6 +353,19 @@ function M:getBlockKV(k)
     end
 end
 
+--- 向上查找 block KV（嵌套 block 也生效）
+---@param k string
+---@return any
+function M:findBlockKV(k)
+    for i = #self.blockStack, 1, -1 do
+        local block = self.blockStack[i]
+        if block[k] ~= nil then
+            return block[k]
+        end
+    end
+    return nil
+end
+
 function M:clearCatGroup()
     self:setBlockKV('catGroup', nil)
 end

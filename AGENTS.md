@@ -96,6 +96,13 @@ For multi-condition `if` blocks using `and/or`, keep project-consistent aligned 
 - Before starting a new debugger run, always stop/disconnect any existing debugger session first.
 - Always stop/disconnect debugger sessions after use to avoid stale sessions affecting later tests and diagnosis.
 
+## 10) tree-sitter 预研状态（已暂停）
+
+- 2026-08-10 决定暂时搁置"用 tree-sitter 替代 lexer + parser"的预研。
+- 完整调研结论（架构盘点、社区 grammar 差距、关键障碍、动态规则方案 A/B/C、spike plan）沉淀在 `.github/skills/luals-server-dev/references/tree-sitter-pre-research.md`。
+- 若重启此方向，先读该文档，特别是第 5 节（关键障碍）与第 8 节（spike plan）。
+- 结论摘要：替换性价比低；tree-sitter 更适合前端侧（高亮/折叠/结构搜索）或给现有 parser 做定点增量。
+
 ---
 
 Maintainer note:

@@ -36,6 +36,8 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 4. 保持最小改动，遵守已有模块边界。
 5. 运行最小相关测试，再根据需要扩展验证范围。
 
+> 注：已搁置方向的调研结论见 [tree-sitter 预研记录](./references/tree-sitter-pre-research.md)（已暂停，重启前先读该文档第 5 节与第 8 节）。
+
 ## 快速路由
 - 改 parser 或语法：先看 [architecture](./references/architecture.md) 和 `script/parser/`。
 - 改类型节点或 runtime：先看 [module map](./references/module-map.md) 和 `script/node/`。

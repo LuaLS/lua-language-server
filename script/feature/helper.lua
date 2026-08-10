@@ -9,8 +9,15 @@ function ls.feature.helper.organizeResultsByRange(results)
     end)
     local organizedResults = {}
 
+    -- 不同文件的结果互不影响去重（如全局变量在多个文件都有定义）
+    local lastUri = nil
     local lastFinish = 0
     for _, result in ipairs(results) do
+        local uri = result.uri
+        if uri ~= lastUri then
+            lastUri = uri
+            lastFinish = -math.huge
+        end
         local start = result.range[1]
         if start >= lastFinish then
             organizedResults[#organizedResults+1] = result

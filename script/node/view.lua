@@ -3,6 +3,7 @@ local M = Class 'Node.Viewer'
 
 ---@class Node.Viewer.Options
 ---@field skipLevel? integer
+---@field skipDeep? boolean  # 该层不计入深度（虚拟/包装节点转发用）
 ---@field needParentheses? boolean
 ---@field noFunctionDetail? boolean
 ---@field noTableDetail? boolean
@@ -15,6 +16,7 @@ local M = Class 'Node.Viewer'
 ---@param options? Node.Viewer.Options
 function M:__init(options)
     self.deep = 0
+    self.deepLimit = 10
     self.indentation = 0
     ---@type integer
     self.skipLevel        = options and options.skipLevel        or 0
@@ -36,15 +38,20 @@ end
 function M:wrap(node, options, callback)
     local skipLevel = options and options.skipLevel or 1
     self.skipLevel = self.skipLevel + skipLevel
-    self.deep = self.deep + 1
-    if self.deep >= 100 then
-        self.deep = self.deep - 1
-        return '...'
+    local skipDeep = options and options.skipDeep
+    if not skipDeep then
+        self.deep = self.deep + 1
+        if self.deep >= self.deepLimit then
+            self.deep = self.deep - 1
+            return '...'
+        end
     end
     self.visited[node] = (self.visited[node] or 0) + 1
     local result = callback()
     self.visited[node] = self.visited[node] - 1
-    self.deep = self.deep - 1
+    if not skipDeep then
+        self.deep = self.deep - 1
+    end
     self.skipLevel = self.skipLevel - skipLevel
     return result
 end

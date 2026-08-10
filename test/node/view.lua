@@ -191,3 +191,27 @@ do
 
     lt.assertEquals(func:view(), 'fun(a: 1, b: 2):((suc: true), false)')
 end
+
+do
+    -- top 类型：只有 any 遮蔽其他成员，unknown 保留
+    local u = rt.type('any') | rt.type('nil')
+    lt.assertEquals(u:view(), 'any')
+
+    local u2 = rt.type('any') | rt.type('nil') | rt.type('string')
+    lt.assertEquals(u2:view(), 'any')
+
+    local u3 = rt.type('unknown') | rt.array(rt.type('any'))
+    lt.assertEquals(u3:view(), 'unknown | any[]')
+end
+
+do
+    -- 深度限制：深嵌套类型在 deepLimit（10）层省略为 ...
+    ---@type Node
+    local n = rt.value(0)
+    for _ = 1, 50 do
+        n = rt.call('op.add', { n, rt.call('op.len', { rt.type 'any' }) })
+    end
+    local v = n:view()
+    lt.assertEquals(v:find('%.%.%.') ~= nil, true)
+    lt.assertEquals(#v < 300, true)
+end

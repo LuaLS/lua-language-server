@@ -177,31 +177,25 @@ do
     print('去除语法树后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
 
     local count = 0
-    local okD, errD = xpcall(function ()
-        ls.util.withDuration(function ()
-            for _, uri in ipairs(result.uris) do
-                local doc = scope:getDocument(uri)
-                local vfile = scope.vm:getFile(uri)
-                ---@cast doc -?
-                ---@cast vfile -?
-                for _, nodes in pairs(doc.ast.nodesMap) do
-                    for _, src in ipairs(nodes) do
-                        local node = vfile:getNode(src)
-                        if node then
-                            local _ = node.value
-                        end
-                        count = count + 1
+    ls.util.withDuration(function ()
+        for _, uri in ipairs(result.uris) do
+            local doc = scope:getDocument(uri)
+            local vfile = scope.vm:getFile(uri)
+            ---@cast doc -?
+            ---@cast vfile -?
+            for _, nodes in pairs(doc.ast.nodesMap) do
+                for _, src in ipairs(nodes) do
+                    local node = vfile:getNode(src)
+                    if node then
+                        local _ = node.value
                     end
+                    count = count + 1
                 end
             end
-        end, function (duration)
-            print('解析 {} 个token耗时: {%.2f} 秒 ({%.2f}K/秒)' % { count, duration, count / duration / 1000})
-        end)
-    end, debug.traceback)
-    if not okD then
-        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'OVERFLOW4', tostring(errD))
-        error('parse failed')
-    end
+        end
+    end, function (duration)
+        print('解析 {} 个token耗时: {%.2f} 秒 ({%.2f}K/秒)' % { count, duration, count / duration / 1000})
+    end)
 
     collectgarbage()
     mem = collectgarbage 'count' / 1024

@@ -471,7 +471,14 @@ function M:onView(viewer, options)
     if self.value == self then
         error('Cannot view node of kind ' .. self.kind)
     end
-    return viewer:view(self.value, options)
+    -- 虚拟/包装节点转发显示 value，不计入深度
+    local opts = { skipDeep = true }
+    if options then
+        for k, v in pairs(options) do
+            opts[k] = v
+        end
+    end
+    return viewer:view(self.value, opts)
 end
 
 ---@param viewer Node.Viewer

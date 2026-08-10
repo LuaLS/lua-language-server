@@ -288,6 +288,19 @@ function M:onView(viewer, options)
     if #values == 0 then
         return 'never'
     end
+    -- any 是 top 类型（包含其他所有成员），union 里只显示 any
+    for _, value in ipairs(values) do
+        local v = value
+        if v.kind == 'variable' then
+            v = v.value
+        end
+        if v.typeName == 'any' then
+            return viewer:view(v, {
+                skipLevel = 0,
+                needParentheses = options.needParentheses,
+            })
+        end
+    end
     if #values == 1 then
         return viewer:view(values[1], {
             skipLevel = 0,

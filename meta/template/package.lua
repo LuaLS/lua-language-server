@@ -6,10 +6,7 @@ alias 'RequireUri'
     : param('T')
     : onValue(function (c)
         local modname = c.args[1]
-        if modname.kind ~= 'value' then
-            return c.type 'never'
-        end
-        local literal = modname.literal
+        local literal = modname.value.literal
         if type(literal) ~= 'string' then
             return c.type 'never'
         end
@@ -27,25 +24,21 @@ alias 'RequireValue'
     : param('T')
     : onValue(function (c)
         local uriNode = c.args[1]
-        -- 兼容嵌套 alias：取解析后的值
-        if uriNode.kind == 'call' then
-            uriNode = uriNode.value
+        if not uriNode then
+            return c.type 'any'
         end
-        if uriNode.kind ~= 'value' then
-            return c.type 'never'
-        end
-        local uri = uriNode.literal
+        local uri = uriNode.value.literal
         if type(uri) ~= 'string' then
-            return c.type 'never'
+            return c.type 'any'
         end
         -- 只复用已加载的文件；未加载返回 unknown，避免加载链递归
         local vfile = c.scope.vm:getFile(uri)
         if not vfile then
-            return c.type 'unknown'
+            return c.type 'any'
         end
         local ret = vfile:getMainReturn()
         if not ret then
-            return c.type 'never'
+            return c.type 'any'
         end
         return ret
     end)

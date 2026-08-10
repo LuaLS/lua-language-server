@@ -156,18 +156,33 @@ t.ab.<??>c
     },
 }
 
--- TODO: setmetatable + __index 场景（需要 metatable 类型推导支持）
--- TEST_COMPLETION [[
--- local mt = {}
--- mt.__index = mt
--- local t = setmetatable({}, mt)
--- t.<??>
--- ]] {
---     {
---         label = '__index',
---         kind  = ls.spec.CompletionItemKind.Field,
---     }
--- }
+-- setmetatable + __index 场景
+TEST_COMPLETION [[
+--!include setmetatable
+local mt = {}
+mt.__index = mt
+local t = setmetatable({}, mt)
+t.<??>
+]] {
+    {
+        label = '__index',
+        kind  = ls.spec.CompletionItemKind.Field,
+    },
+}
+
+-- setmetatable + __index 指向另一个表：字段来自 __index 目标
+TEST_COMPLETION [[
+--!include setmetatable
+local base = { aaa = 1, bbb = 2 }
+local mt = { __index = base }
+local t = setmetatable({}, mt)
+t.a<??>
+]] {
+    {
+        label = 'aaa',
+        kind  = ls.spec.CompletionItemKind.Field,
+    },
+}
 
 -- TODO: 全局表字段补全（需要支持 _ENV 下的全局变量字段）
 -- TEST_COMPLETION [[debug.<??>]] (EXISTS)
@@ -216,8 +231,7 @@ m.<??>
     [1] = EXISTS,
 }
 
--- setmetatable __index 字段补全
--- [SKIPPED][metatable-deduction] setmetatable + __index 场景需要 metatable 类型推导支持，暂不迁移（参见 field.lua TODO）
+-- setmetatable + __index 场景（已迁移，见上方两处 TEST_COMPLETION）
 
 -- [SKIPPED][global-method-inference] function mt:f(a,b,c) 全局表方法补全在 TEST_COMPLETION 下返回空，暂不迁移
 

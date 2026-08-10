@@ -3,6 +3,19 @@
 This file is the single project-facing summary exported from previous AI progress.
 It is intended for both human collaborators and coding agents.
 
+## 0) 强制流程（每次会话必读，最高优先级）
+
+本仓库是 **4.0.0 完全重构分支**，架构与上游 master 不同（LuaParser.Ast + node 系统 + coder/middle code）。
+在本仓库做任何 parser / node / vm / feature / completion 改动前，必须：
+
+1. **先读 skill**：`.github/skills/luals-server-dev/SKILL.md` 及其 references
+   （`architecture.md`、`module-map.md`、`workflow-and-style.md`），再动手。
+   各子系统的具体实现约束以 references 为准（例如 completion 应复用 VM/Node 语义、不要文本扫描）。
+   不要凭通用 Lua 经验直接改代码。
+2. **上游 master 只作为"期望行为"参考，不作为"实现方式"参考**：实现必须基于本仓库自己的
+   node / runtime / coder 机制，不要照搬 master 的 special / vm.compiler 等旧架构概念。
+3. 若无法确定某能力应落在哪个子系统，先读 skill 的 references，不要自行猜测。
+
 ## 1) Run and Test Rules
 
 - Run tests from the `server` root with:

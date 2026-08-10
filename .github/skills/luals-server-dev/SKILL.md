@@ -1,7 +1,7 @@
 ---
 name: luals-server-dev
-description: '用于开发 lua-language-server server 仓库的项目 skill。适用于修改 parser、LuaCats、Node runtime、VM/coder、tracer narrowing、language-server/LSP、completion provider、workspace scope、configuration 或 tests。包含项目架构、模块分工、代码风格、调试流程与验证命令。'
-argument-hint: '请描述你要修改的子系统或功能，例如 parser 语法、tracer narrowing、completion provider、LSP 请求处理。'
+description: '用于开发 lua-language-server server 仓库的项目 skill。适用于修改 parser、LuaCats、Node runtime、VM/coder、tracer narrowing、language-server/LSP、workspace scope、configuration 或 tests。也适用于 completion（补全）相关的一切：字段/成员补全、word 与关键字补全、字符串枚举补全、luadoc 补全、setmetatable/metatable/__index 推导、workspaceWord/showWord 词补全、postfix、definition、hover 等 feature 行为。包含项目架构、模块分工、代码风格、调试流程与验证命令。'
+argument-hint: '请描述你要修改的子系统或功能，例如 parser 语法、tracer narrowing、completion 补全（字段/word/metatable/luadoc/字符串枚举）、LSP 请求处理。'
 ---
 
 # LuaLS Server 开发
@@ -12,7 +12,9 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 - 需要新增或修改 parser、AST、LuaCats 相关行为。
 - 需要新增或修改 Node runtime 类型、类型推断或 narrowing。
 - 需要排查 VM coder 输出、tracer narrowing、flow 相关问题。
-- 需要实现或调整 language-server、feature 下的 LSP 功能。
+- 需要实现或调整 completion 补全：字段补全、word/关键字补全、字符串枚举、luadoc 补全、
+  setmetatable/metatable/__index 推导、workspaceWord/showWord 词补全、postfix 等。
+- 需要实现或调整 language-server、feature 下的其他 LSP 功能（definition、hover 等）。
 - 需要在 test/parser、test/node、test/coder、test/feature 中新增、迁移或修复测试。
 - 在动手编辑前，需要快速了解仓库约束、代码风格和验证命令。
 

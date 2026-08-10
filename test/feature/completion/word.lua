@@ -100,7 +100,7 @@ xxxx<??>
     },
 }
 
--- [SKIPPED][workspaceWord-dependent] 表字段作为 word 补全（kind=Text）当前无稳定结果，暂不迁移
+-- 表字段作为 word 补全已迁移到 test.feature.completion.text
 
 -- 方括号内的变量补全
 TEST_COMPLETION [[
@@ -187,7 +187,7 @@ local t = {
     },
 }
 
--- [SKIPPED][workspaceWord-dependent] `print(ff2)/local faa/local f<?>` 文字补全依赖 workspaceWord 特性，暂不迁移
+-- 声明位置的文字补全（`local f<?>`）已迁移到 test.feature.completion.text
 
 -- 局部注解函数补全（Function + Snippet 两项，insertText=EXISTS）
 TEST_COMPLETION [[

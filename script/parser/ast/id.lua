@@ -19,7 +19,10 @@ local Ast = Class 'LuaParser.Ast'
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param required? boolean
----@param canBeKeyword? 'yes' | 'no' | 'warn'
+---@param canBeKeyword?
+---| 'yes' # 可以是关键字，用于处理软关键字
+---| 'no' # 不可以是关键字，解析到此中断
+---| 'warn' # 语法上不可以是关键字，但解析时视为软关键字（保证不引发歧义）并给出诊断
 ---@param includeVarargs? boolean
 ---@return T?
 function Ast:parseID(nodeType, required, canBeKeyword, includeVarargs)

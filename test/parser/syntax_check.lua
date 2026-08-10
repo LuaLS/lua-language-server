@@ -1344,6 +1344,14 @@ TEST[[
 }
 
 TEST[[
+local log
+log.<!in!> = 1
+]]
+{
+    code = 'KEYWORD',
+}
+
+TEST[[
 local function a<!.b!>()
 end
 ]]

@@ -23,6 +23,7 @@ bin\lua-language-server.exe --test feature.completion.field
 - tracer 或 flow 失败后，先看 `tmp/LAST_CODE`、`tmp/LAST_FLOW`、`tmp/LAST_PMAP`。
 - 如果 `self.map` 报 `No such key`，优先检查 coder 输出中的读写顺序，不要直接绕过 map。
 - 临时日志和诊断产物统一留在 `tmp/`。
+- 临时调试脚本/文件必须放在 `tmp/` 下，测试完毕后清理；不要散落在 `test/` 或 `script/` 目录。
 - 如果使用 debugger，启动新会话前先停掉旧会话，用完后及时断开。
 
 ## 风格约定
@@ -41,6 +42,8 @@ end
 
 - 延续 `script/class.lua` 中已有的 class 写法，包括 `Class` 和 `New` 的使用方式。
 - 避免大范围纯格式化改动。
+- 不添加不必要的注释，代码应自解释；只在解释非显然的设计意图/踩坑时加注释。
+- 不要留下 lint / 诊断警告；改完用诊断检查确认干净。
 
 ## 实际约束
 - 日常功能开发不要运行 `PreCompile` 或 `Compile` 任务。

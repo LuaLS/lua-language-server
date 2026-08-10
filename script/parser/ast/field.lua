@@ -64,7 +64,7 @@ function Ast:parseField(last, onlyDot)
     or (token == ':' and not onlyDot) then
         self.lexer:next()
         self:skipSpace()
-        local key = self:parseID('LuaParser.Node.FieldID', true)
+        local key = self:parseID('LuaParser.Node.FieldID', true, 'warn')
         if key then
             local field = self:createNode('LuaParser.Node.Field', {
                 start      = last.start,

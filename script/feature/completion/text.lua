@@ -26,13 +26,12 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    -- `#`（长度操作符）后是完整变量位置，不做词补全（与上游 tryWord 的 '#' 过滤一致）
+    -- `#`（长度操作符）后是完整变量位置，不做词补全
     local _, wordStart = param.scanner:getWordBack()
     if wordStart > 1 and param.scanner.text:sub(wordStart - 1, wordStart - 1) == '#' then
         return
     end
 
-    -- showWord 三态：Enable / Fallback（默认）/ Disable
     local showWord = param.scope.config:get(param.uri, 'Lua.completion.showWord')
     if showWord == nil then
         showWord = 'Fallback'

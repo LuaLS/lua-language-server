@@ -46,6 +46,30 @@ TEST 'a.b'
     }
 }
 
+-- 关键字可作为字段名：`a.in` 应解析为带 key 的 field，而不是 dummy
+TEST 'a.in'
+{
+    start     = 0,
+    finish    = 4,
+    symbolPos = 1,
+    subtype   = 'field',
+    key       = {
+        start  = 2,
+        finish = 4,
+        id     = 'in',
+        parent = {},
+    },
+    last = {
+        start  = 0,
+        finish = 1,
+        id     = 'a',
+        parent = {},
+        next   = {
+            __class__ = 'LuaParser.Node.Field',
+        },
+    }
+}
+
 TEST 'a.b.c'
 {
     start     = 0,

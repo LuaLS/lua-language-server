@@ -184,6 +184,14 @@ t.a<??>
     },
 }
 
+-- 关键字字段名（`log.in` 中 `in` 是关键字）：
+-- 应解析为真实 field 并阻止 word/global 补全，而不是输出 `in` 前缀词
+TEST_COMPLETION [[
+inxx = 1
+local log
+log.in<??>
+]] (nil)
+
 -- TODO: 全局表字段补全（需要支持 _ENV 下的全局变量字段）
 -- TEST_COMPLETION [[debug.<??>]] (EXISTS)
 -- TEST_COMPLETION [[print(io.<??>)]] (EXISTS)

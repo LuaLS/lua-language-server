@@ -601,8 +601,7 @@ end
 ---@return Node
 function M:getStaticValue()
     local rt = self.scope.rt
-    return self:getNarrowedValue()
-        or self:getCurrentValue()
+    return self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
         or rt.ANY
@@ -630,29 +629,29 @@ function M:getGuessValue()
 end
 
 ---@type Node?
-M.currentValue = nil
+M.staticValue = nil
 
----@param currentValue? Node
+---@param staticValue? Node
 ---@return Node.Variable
-function M:shadow(currentValue)
+function M:shadow(staticValue)
     local rt = self.scope.rt
     local master = self.masterVariable or self
     local var = rt.variable(self.key, self.parent)
     var:setMasterVariable(master)
-    var.currentValue = currentValue
+    var.staticValue = staticValue
     return var
 end
 
 ---@param value Node
-function M:setCurrentValue(value)
-    self.currentValue = value
+function M:setStaticValue(value)
+    self.staticValue = value
     self:flushCache()
 end
 
 ---@package
 ---@return Node?
 function M:getCurrentValue()
-    local node = self.currentValue
+    local node = self.currentValue or self.staticValue
     if not node then
         return nil
     end
@@ -660,32 +659,19 @@ function M:getCurrentValue()
     return node
 end
 
--- 收窄后的临时值（Tracer 在 traceRef 中写入，见 tracer.lua）。
--- 与 currentValue（静态赋值，不可清除）职责不同：narrowedValue 是流分析
--- 产生的临时快照，注册为 getter 字段后 class.flush 会清除它，
--- 使 value getter 在 master 新增定义级联 flush 时回退到 master 实时值，
--- 避免收窄缓存残留。master / 赋值 shadow 的 narrowedValue 恒为 nil，不受影响。
+-- 收窄临时值（Tracer 写入，注册 getter 使其随 class.flush 失效）
 ---@type Node?
-M.narrowedValue = nil
+M.currentValue = nil
 
-M.__getter.narrowedValue = function (self)
+M.__getter.currentValue = function (self)
     return nil, true
 end
 
 ---@param value Node
-function M:setNarrowedValue(value)
-    self.narrowedValue = value
-end
-
----@package
----@return Node?
-function M:getNarrowedValue()
-    local node = self.narrowedValue
-    if not node then
-        return nil
-    end
-    node:addRef(self)
-    return node
+function M:setCurrentValue(value)
+    -- 先 flush 再写入：flush 清掉旧收窄值（getter 字段）并级联刷新依赖
+    self:flushCache()
+    self.currentValue = value
 end
 
 ---@type Node.Tracer?
@@ -710,8 +696,7 @@ M.__getter.value = function (self)
     if self.tracer then
         self.tracer:trace()
     end
-    return self:getNarrowedValue()
-        or self:getCurrentValue()
+    return self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
         or rt.ANY

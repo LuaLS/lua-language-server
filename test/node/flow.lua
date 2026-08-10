@@ -11,7 +11,7 @@ do
     ]]
 
     local x = rt.variable 'x'
-    x:setCurrentValue(rt.value(10))
+    x:setStaticValue(rt.value(10))
 
     local W = rt.variable 'W'
     W:addAssign(rt.field('W', x))
@@ -199,11 +199,11 @@ do
     ]]
 
     local x = rt.variable 'x'
-    x:setCurrentValue(rt.value(10))
+    x:setStaticValue(rt.value(10))
 
     local y = rt.variable 'y'
     y:addAssign(rt.field('y', x))
-    y:setCurrentValue(x)
+    y:setStaticValue(x)
 
     local x2 = x:shadow(rt.value(20))
     x2:addAssign(rt.field('x', rt.value(20)))
@@ -220,15 +220,15 @@ do
     ]]
 
     local x = rt.variable 'x'
-    x:setCurrentValue(rt.value(0))
+    x:setStaticValue(rt.value(0))
 
     local x2 = x:shadow()
-    x2:setCurrentValue(rt.call('op.add', { x, rt.value(1) }))
+    x2:setStaticValue(rt.call('op.add', { x, rt.value(1) }))
     ---@diagnostic disable-next-line: invisible
     x2:addAssign(rt.field('x', x2:getCurrentValue()))
 
     local W = rt:globalGet('W'):shadow()
-    W:setCurrentValue(x2)
+    W:setStaticValue(x2)
     W:addAssign(rt.field('W', x2))
 
     lt.assertEquals(W:view(), 'op.add<0, 1>')
@@ -598,7 +598,7 @@ do
 
     local tp = rt.variable 'tp'
     local fcall = rt.fcall(typeFunc, { x })
-    tp:setCurrentValue(rt.select(fcall, 1))
+    tp:setStaticValue(rt.select(fcall, 1))
     lt.assertEquals(tp:view(), '"string" | "number"')
 
     local tpNarrow = rt.narrow(tp):equalValue(rt.value('string'))

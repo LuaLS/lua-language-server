@@ -125,7 +125,7 @@ function M:compileAssign(var, index, valueKey, isTable)
     end
 
     if not isTable then
-        self:addLine('{varKey}:setCurrentValue({valueKey})' % {
+        self:addLine('{varKey}:setStaticValue({valueKey})' % {
             varKey   = self:getKey(var),
             valueKey = catKey or valueKey,
         })

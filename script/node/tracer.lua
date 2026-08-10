@@ -147,7 +147,7 @@ function W:traceRef(ref)
         self:setValue(id, value)
     end
     local node = self.map[alias]
-    node:setNarrowedValue(value)
+    node:setCurrentValue(value)
     return value
 end
 

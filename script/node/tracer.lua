@@ -138,8 +138,6 @@ function W:traceRef(ref)
     local value = self:getValue(id)
     if not value then
         local node = self.map[alias]
-        -- 若节点有 tracer（其 .value 会启动新 Walker，引发递归），
-        -- 则用 getCurrentValue/getExpectValue/getGuessValue 作为初始值；
         -- 普通节点（无 tracer）直接用 .value。
         if node.tracer then
             value = node:getStaticValue()
@@ -148,7 +146,8 @@ function W:traceRef(ref)
         end
         self:setValue(id, value)
     end
-    self.map[alias]:setCurrentValue(value)
+    local node = self.map[alias]
+    node:setNarrowedValue(value)
     return value
 end
 

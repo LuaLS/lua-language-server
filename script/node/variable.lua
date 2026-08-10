@@ -601,7 +601,8 @@ end
 ---@return Node
 function M:getStaticValue()
     local rt = self.scope.rt
-    return self:getCurrentValue()
+    return self:getNarrowedValue()
+        or self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
         or rt.ANY
@@ -659,6 +660,34 @@ function M:getCurrentValue()
     return node
 end
 
+-- 收窄后的临时值（Tracer 在 traceRef 中写入，见 tracer.lua）。
+-- 与 currentValue（静态赋值，不可清除）职责不同：narrowedValue 是流分析
+-- 产生的临时快照，注册为 getter 字段后 class.flush 会清除它，
+-- 使 value getter 在 master 新增定义级联 flush 时回退到 master 实时值，
+-- 避免收窄缓存残留。master / 赋值 shadow 的 narrowedValue 恒为 nil，不受影响。
+---@type Node?
+M.narrowedValue = nil
+
+M.__getter.narrowedValue = function (self)
+    return nil, true
+end
+
+---@param value Node
+function M:setNarrowedValue(value)
+    self.narrowedValue = value
+end
+
+---@package
+---@return Node?
+function M:getNarrowedValue()
+    local node = self.narrowedValue
+    if not node then
+        return nil
+    end
+    node:addRef(self)
+    return node
+end
+
 ---@type Node.Tracer?
 M.tracer = nil
 
@@ -681,7 +710,8 @@ M.__getter.value = function (self)
     if self.tracer then
         self.tracer:trace()
     end
-    return self:getCurrentValue()
+    return self:getNarrowedValue()
+        or self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
         or rt.ANY

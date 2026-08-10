@@ -39,6 +39,7 @@ print(<?foo?>)
     scope.vm:indexFile(uriA)
     scope.vm:indexFile(uriC)
 
+    ---@async
     --- 通过 definition 特性查看 foo 的定义
     local function getDefinitionUris()
         local results = ls.feature.definition(uriC, offsetC)
@@ -85,6 +86,7 @@ print(<?foo?>)
     scope.vm:indexFile(uriA)
     scope.vm:indexFile(uriC)
 
+    ---@async
     local function getDefinitionUris()
         local results = ls.feature.definition(uriC, offsetC)
         ---@type string[]

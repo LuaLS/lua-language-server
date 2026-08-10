@@ -738,3 +738,45 @@ do
     lt.assertEquals(r['t4']:view(), '[1, 2] | [2, 1] | [2, 2]')
     lt.assertEquals(r['t5']:view(), '[1, 1] | [1, 2] | [2, 1] | [2, 2]')
 end
+
+do
+    --[[
+    ---@type 1
+    local x
+    x   -- 第一次访问触发 Tracer 收窄，x1 的 currentValue 被快照为 1
+    -- 之后 master 新增定义 2（模拟新文件加入全局变量定义）
+    x   -- 收窄缓存应失效，显示 1 | 2
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.value(1))
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'ref', 'x', 'x1' },
+        { 'ref', 'x', 'x2' },
+    }
+
+    -- 第一次访问：触发 trace 收窄，x1/x2 均为 1
+    lt.assertEquals(r['x1']:view(), '1')
+    lt.assertEquals(r['x2']:view(), '1')
+
+    -- master 新增类型（模拟新定义加入，flushCache 级联到 shadow）
+    r['x0']:addType(rt.value(2))
+
+    -- 收窄缓存必须失效：x1/x2 应回退到 master 实时值 1 | 2，
+    -- 而不是残留的收窄快照 1
+    lt.assertEquals(r['x1']:view(), '1 | 2')
+    lt.assertEquals(r['x2']:view(), '1 | 2')
+    lt.assertEquals(r['x0']:view(), '1 | 2')
+end

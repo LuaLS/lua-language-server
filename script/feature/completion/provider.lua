@@ -573,14 +573,21 @@ end
 
 ---@param name string
 ---@param func Node.Function
+---@param isMethod? boolean  # 方法触发（`:`）时跳过首参 self
 ---@return string label
 ---@return string snippetText
-function util.buildFunctionSignature(name, func)
+function util.buildFunctionSignature(name, func, isMethod)
     local labels = {}
     local snippets = {}
     local index = 1
 
-    for _, p in ipairs(func.paramsDef) do
+    local params = func.paramsDef
+    local startIdx = 1
+    if isMethod and params[1] and params[1].key == 'self' then
+        startIdx = 2
+    end
+    for i = startIdx, #params do
+        local p = params[i]
         local optional = p.optional
         local labelPart = p.key
         local snippetPart = p.key .. (optional and '?' or '')

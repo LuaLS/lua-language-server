@@ -229,32 +229,128 @@ local function getTypeName(node)
 end
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 核心接口：根据对象源节点和字段前缀生成补全项列表。
---
--- @param param      Provider 上下文
--- @param source     对象表达式的 AST 源节点（Field 节点的 last 域）
--- @param key        已输入的字段名前缀（'' 表示刚输入完触发字符）
--- @param options    可选配置：
---   isMethod    boolean  是否为 ':' 触发（影响 Method/Function 偏好及 ':' 时的过滤）
---   snippetMode string   'both'（默认）同时生成普通项和 Snippet 项；
---                        'none' 只生成普通项
---   dotOffset   integer  '.' 的显示偏移，用于整数键 textEdit（key=='' 时传入）
---   objName     string?  对象标识符名称，用于可见局部变量兜底查找
+-- 兜底：快速路径无结果时扩大查找范围
+--（可见局部变量按名称匹配、具名类型 fieldTable、字符串专项）
 ---@param param any
 ---@param source any
 ---@param key string
----@param options {isMethod: boolean?, snippetMode: string?, dotOffset: integer?, objName: string?}?
----@return table[]
-local function buildFieldItems(param, source, key, options)
-    options = options or {}
-    local isMethod    = options.isMethod    or false
-    local snippetMode = options.snippetMode or 'both'
-    local trigger     = isMethod and ':' or '.'
+---@param options any
+---@param objNode Node?
+---@param objVar Node.Variable?
+---@param matches table
+---@param seen table<string, true>
+---@param intMatches table
+---@return Node.Variable? objVar
+local function collectFallbackFields(param, source, key, options, objNode, objVar, matches, seen, intMatches)
+    local textOffset = param.textOffset
+                    or util.toTextOffset(param.scanner.text, param.offset)
+    local document   = param.scope:getDocument(param.uri)
+
+    objVar = objVar or param.scope.vm:getVariable(source)
+
+    -- 通过作用域内可见局部变量按名称匹配
+    local objName = options.objName or source.id
+    if not objVar and objName then
+        local anchor = param.sources[1]
+        if not anchor then
+            -- param.sources 在隐式位置可能为空；
+            -- 用最深的包含光标的 AST block 合成一个最小作用域锚点。
+            local ast = document and document.ast
+            if ast and ast.main then
+                anchor = { parentBlock = findDeepestBlock(ast, textOffset) }
+            end
+        end
+        if anchor then
+            for _, loc in ipairs(guide.getVisibleLocals(anchor, textOffset)) do
+                if loc.id == objName then
+                    objVar = param.scope.vm:getVariable(loc)
+                    if objVar then
+                        appendFieldsFromNode(objVar.value, key, matches, seen)
+                        if not options.isMethod and key == '' then
+                            appendIntegerFieldsFromNode(objVar.value, intMatches)
+                        end
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    local objValue     = objVar and objVar.value or nil
+    local inferredType = getTypeName(objNode) or getTypeName(objValue)
+    local stringLike   = hasStringType(objNode)
+                      or hasStringType(objValue)
+                      or inferredType == 'string'
+
+    -- 具名类型补全：在 runtime 中查找该类型的 fieldTable
+    if inferredType then
+        appendFieldsFromTable(
+            param.scope.rt.type(inferredType).fieldTable, key, matches, seen)
+    end
+
+    -- 字符串专项补全，依次尝试：
+    --   1. runtime 中 'string' 类型的 fieldTable
+    --   2. 当前环境中用户自定义的 string 表
+    --   3. 硬编码的 DEFAULT_STRING_MEMBERS 兜底列表
+    if stringLike then
+        local rtStringType = param.scope.rt.type('string')
+        if rtStringType then
+            appendFieldsFromTable(rtStringType.fieldTable, key, matches, seen)
+        end
+        local envLocal    = document and guide.getEnvLocal(document.ast, textOffset)
+        local envVar      = envLocal and param.scope.vm:getVariable(envLocal) or nil
+        local childs      = envVar and envVar:getChilds() or nil
+        local stringVar   = childs and childs['string'] or nil
+        local stringValue = stringVar and stringVar.value or nil
+        local stringKeys
+        local stringMap
+        if stringValue and stringValue.kind == 'table' then
+            ---@cast stringValue Node.Table
+            stringKeys = stringValue.keys
+            stringMap  = stringValue.valueMap
+        elseif stringValue and stringValue.kind == 'type' then
+            ---@cast stringValue Node.Type
+            local ft = stringValue.fieldTable
+            if ft then
+                stringKeys = ft.keys
+                stringMap  = ft.valueMap
+            end
+        end
+        if stringKeys and stringMap then
+            for _, keyNode in ipairs(stringKeys) do
+                if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
+                    local name = keyNode.literal
+                    ---@cast name string
+                    if ls.util.stringSimilar(key, name, true) then
+                        matches[#matches+1] = { name = name, valueNode = stringMap[name] }
+                    end
+                end
+            end
+        end
+        if #matches == 0 then
+            appendDefaultStringMembers(key, matches, seen)
+        end
+    end
+
+    return objVar
+end
+
+-- 收集字段候选（快速路径 + 整数键 + 兜底）
+---@param param any
+---@param source any
+---@param key string
+---@param options any
+---@return Node? objNode
+---@return Node.Variable? objVar
+---@return table matches
+---@return table intMatches
+local function collectFieldMatches(param, source, key, options)
+    local isMethod = options.isMethod or false
 
     local objNode = param.scope.vm:getNode(source)
     local objVar  = param.scope.vm:getVariable(source)
 
-    -- ── 快速收集字符串键字段 ──────────────────────────────────────────────
+    -- 快速收集字符串键字段
     local matches = {}
     local seen    = {}
     appendFieldsFromNode(objNode, key, matches, seen)
@@ -262,7 +358,7 @@ local function buildFieldItems(param, source, key, options)
         appendFieldsFromNode(objVar.value, key, matches, seen)
     end
 
-    -- ── 整数键字段（数组下标），仅 key=='' 且 '.' 触发时有意义 ─────────────
+    -- 整数键字段（数组下标），仅 key=='' 且 '.' 触发时有意义
     local intMatches = {}
     if not isMethod and key == '' then
         local intSeen = {}
@@ -280,104 +376,136 @@ local function buildFieldItems(param, source, key, options)
         intMatches = deduped
     end
 
-    -- ── 兜底：快速路径无结果时逐步扩大查找范围 ───────────────────────────
+    -- 兜底
     if #matches == 0 then
-        local textOffset = param.textOffset
-                        or util.toTextOffset(param.scanner.text, param.offset)
-        local document   = param.scope:getDocument(param.uri)
+        objVar = collectFallbackFields(param, source, key, options, objNode, objVar, matches, seen, intMatches)
+    end
 
-        objVar = objVar or param.scope.vm:getVariable(source)
+    return objNode, objVar, matches, intMatches
+end
 
-        -- 通过作用域内可见局部变量按名称匹配
-        local objName = options.objName or source.id
-        if not objVar and objName then
-            local anchor = param.sources[1]
-            if not anchor then
-                -- param.sources 在隐式位置可能为空；
-                -- 用最深的包含光标的 AST block 合成一个最小作用域锚点。
-                local ast = document and document.ast
-                if ast and ast.main then
-                    anchor = { parentBlock = findDeepestBlock(ast, textOffset) }
+-- 解析单项字段的 Kind 与签名（类成员模式 / 运行时精化）
+---@param param any
+---@param source any
+---@param item table
+---@param trigger string
+---@param isMethod boolean
+---@return integer baseKind
+---@return integer functionKind
+---@return Node? functionValueNode
+---@return string? signatureLabel
+---@return string? snippetText
+---@return boolean hasFunction
+local function resolveFieldItem(param, source, item, trigger, isMethod)
+    local baseKind          = fieldCompletionKind(item.valueNode, trigger)
+    local functionKind      = baseKind
+    local functionValueNode = item.valueNode
+
+    -- 类成员模式：Node.Field 包裹 Node.Variable
+    -- 例：`MyClass.method = function(self, ...) end`
+    local rawValueNode = item.valueNode
+                      and item.valueNode.kind == 'field'
+                      and item.valueNode.value
+                      or nil
+
+    if rawValueNode and rawValueNode.kind == 'variable' then
+        functionValueNode = rawValueNode
+        local funcs = util.collectFunctionNodes(rawValueNode)
+        if #funcs > 0 then
+            local fp = funcs[1].paramsDef[1]
+            functionKind = (fp and fp.key == 'self')
+                and ls.spec.CompletionItemKind.Method
+                or  ls.spec.CompletionItemKind.Function
+        end
+    end
+
+    -- 运行时精化：静态无法确定 Kind 时，从子变量赋值记录中查找函数值
+    if functionKind == ls.spec.CompletionItemKind.Field then
+        local itemObjVar = param.scope.vm:getVariable(source)
+        if itemObjVar then
+            local childVar = itemObjVar:getChild(item.name)
+            if childVar:hasAssign() then
+                local childValue = childVar.value
+                if childValue and childValue.kind == 'field' then
+                    ---@cast childValue Node.Field
+                    childValue = childValue.value and childValue.value.truly or nil
                 end
-            end
-            if anchor then
-                for _, loc in ipairs(guide.getVisibleLocals(anchor, textOffset)) do
-                    if loc.id == objName then
-                        objVar = param.scope.vm:getVariable(loc)
-                        if objVar then
-                            appendFieldsFromNode(objVar.value, key, matches, seen)
-                            if not isMethod and key == '' then
-                                appendIntegerFieldsFromNode(objVar.value, intMatches)
-                            end
+                if childValue then
+                    functionValueNode = childValue
+                end
+                functionKind = runtimeFieldCompletionKind(childValue, trigger)
+                if functionKind == ls.spec.CompletionItemKind.Field then
+                    for assign in childVar:eachAssign() do
+                        ---@cast assign Node.Field
+                        if assign.value and util.hasFunctionNode(assign.value) then
+                            functionValueNode = assign.value
+                            functionKind      = isMethod
+                                and ls.spec.CompletionItemKind.Method
+                                or  ls.spec.CompletionItemKind.Function
                             break
                         end
                     end
                 end
             end
         end
+    end
 
-        local objValue     = objVar and objVar.value or nil
-        local inferredType = getTypeName(objNode) or getTypeName(objValue)
-        local stringLike   = hasStringType(objNode)
-                          or hasStringType(objValue)
-                          or inferredType == 'string'
-
-        -- 具名类型补全：在 runtime 中查找该类型的 fieldTable
-        if inferredType then
-            appendFieldsFromTable(
-                param.scope.rt.type(inferredType).fieldTable, key, matches, seen)
-        end
-
-        -- 字符串专项补全，依次尝试：
-        --   1. runtime 中 'string' 类型的 fieldTable
-        --   2. 当前环境中用户自定义的 string 表
-        --   3. 硬编码的 DEFAULT_STRING_MEMBERS 兜底列表
-        if stringLike then
-            local rtStringType = param.scope.rt.type('string')
-            if rtStringType then
-                appendFieldsFromTable(rtStringType.fieldTable, key, matches, seen)
-            end
-            local envLocal    = document and guide.getEnvLocal(document.ast, textOffset)
-            local envVar      = envLocal and param.scope.vm:getVariable(envLocal) or nil
-            local childs      = envVar and envVar:getChilds() or nil
-            local stringVar   = childs and childs['string'] or nil
-            local stringValue = stringVar and stringVar.value or nil
-            local stringKeys
-            local stringMap
-            if stringValue and stringValue.kind == 'table' then
-                ---@cast stringValue Node.Table
-                stringKeys = stringValue.keys
-                stringMap  = stringValue.valueMap
-            elseif stringValue and stringValue.kind == 'type' then
-                ---@cast stringValue Node.Type
-                local ft = stringValue.fieldTable
-                if ft then
-                    stringKeys = ft.keys
-                    stringMap  = ft.valueMap
-                end
-            end
-            if stringKeys and stringMap then
-                for _, keyNode in ipairs(stringKeys) do
-                    if keyNode.kind == 'value' and type(keyNode.literal) == 'string' then
-                        local name = keyNode.literal
-                        ---@cast name string
-                        if ls.util.stringSimilar(key, name, true) then
-                            matches[#matches+1] = { name = name, valueNode = stringMap[name] }
-                        end
-                    end
-                end
-            end
-            if #matches == 0 then
-                appendDefaultStringMembers(key, matches, seen)
+    -- 签名标签（仅类成员风格字段有）
+    local signatureLabel
+    local snippetText
+    local classMemberLike = rawValueNode and rawValueNode.kind == 'variable'
+    if classMemberLike and functionKind ~= ls.spec.CompletionItemKind.Field and functionValueNode then
+        local funcs = util.collectFunctionNodes(functionValueNode)
+        if #funcs > 0 then
+            local f = funcs[1]
+            local isMethodDef = f.paramsDef[1] and f.paramsDef[1].key == 'self'
+            if isMethod and not isMethodDef then
+                -- `:` 触发但对象不是方法定义（如 static 函数）：显示简单 name()
+                signatureLabel = item.name .. '()'
+            else
+                local label
+                label, snippetText = util.buildFunctionSignature(item.name, f, isMethod and isMethodDef)
+                signatureLabel = label
             end
         end
     end
-
-    if #matches == 0 and #intMatches == 0 then
-        return {}
+    if not snippetText and signatureLabel then
+        snippetText = signatureLabel
     end
 
-    -- ── 构建输出项 ────────────────────────────────────────────────────────
+    return baseKind, functionKind, functionValueNode, signatureLabel, snippetText, util.hasFunctionNode(item.valueNode)
+end
+
+-- 排序 rank：':' 触发 Method > Function > Field；'.' 触发 Field > Function > Method
+---@param kind integer
+---@param isMethod boolean
+---@return integer
+local function rankFieldItem(kind, isMethod)
+    if isMethod then
+        if kind == ls.spec.CompletionItemKind.Method   then return 1 end
+        if kind == ls.spec.CompletionItemKind.Function then return 2 end
+        return 3
+    end
+    if kind == ls.spec.CompletionItemKind.Field    then return 1 end
+    if kind == ls.spec.CompletionItemKind.Function then return 2 end
+    if kind == ls.spec.CompletionItemKind.Method   then return 3 end
+    return 4
+end
+
+-- 构建输出项：整数键 [N]、带点号字段名、字符串键字段
+---@param param any
+---@param source any
+---@param key string
+---@param options any
+---@param objNode Node?
+---@param objVar Node.Variable?
+---@param matches table
+---@param intMatches table
+---@return table[]
+local function buildFieldOutputs(param, source, key, options, objNode, objVar, matches, intMatches)
+    local isMethod    = options.isMethod    or false
+    local snippetMode = options.snippetMode or 'both'
+    local trigger     = isMethod and ':' or '.'
     local objTypeName = getTypeName(objNode)
                      or (objVar and getTypeName(objVar.value) or nil)
 
@@ -406,80 +534,38 @@ local function buildFieldItems(param, source, key, options)
         end
     end
 
+    -- 带点号字段名（如 ['a.b.c']）：替换 `.` 为 ['...'] 形式，并补引号 label
+    if not isMethod and options.dotOffset then
+        for _, item in ipairs(matches) do
+            if item.name:find('.', 1, true) then
+                emit {
+                    label = string.format("'%s'", item.name),
+                    kind  = ls.spec.CompletionItemKind.Field,
+                    textEdit = {
+                        start   = options.dotOffset + 1,
+                        finish  = param.offset,
+                        newText = string.format("['%s']", item.name),
+                    },
+                    additionalTextEdits = {
+                        {
+                            start   = options.dotOffset,
+                            finish  = options.dotOffset + 1,
+                            newText = '',
+                        },
+                    },
+                }
+            end
+        end
+    end
+
     -- 字符串键字段项
     for _, item in ipairs(matches) do
-        -- baseKind：从类型系统静态推断；functionKind：运行时探查后的最终 Kind
-        local baseKind          = fieldCompletionKind(item.valueNode, trigger)
-        local functionKind      = baseKind
-        local functionValueNode = item.valueNode
-
-        -- 类成员模式：Node.Field 包裹 Node.Variable
-        -- 例：`MyClass.method = function(self, ...) end`
-        local rawValueNode = item.valueNode
-                          and item.valueNode.kind == 'field'
-                          and item.valueNode.value
-                          or nil
-
-        if rawValueNode and rawValueNode.kind == 'variable' then
-            functionValueNode = rawValueNode
-            local funcs = util.collectFunctionNodes(rawValueNode)
-            if #funcs > 0 then
-                local fp = funcs[1].paramsDef[1]
-                functionKind = (fp and fp.key == 'self')
-                    and ls.spec.CompletionItemKind.Method
-                    or  ls.spec.CompletionItemKind.Function
-            end
+        if item.name:find('.', 1, true) and not isMethod and options.dotOffset then
+            goto continue
         end
 
-        -- 运行时精化：静态无法确定 Kind 时，从子变量赋值记录中查找函数值
-        -- （例如函数在其他文件中赋值的情况）
-        if functionKind == ls.spec.CompletionItemKind.Field then
-            local itemObjVar = param.scope.vm:getVariable(source)
-            if itemObjVar then
-                local childVar = itemObjVar:getChild(item.name)
-                if childVar:hasAssign() then
-                    local childValue = childVar.value
-                    if childValue and childValue.kind == 'field' then
-                        ---@cast childValue Node.Field
-                        childValue = childValue.value and childValue.value.truly or nil
-                    end
-                    if childValue then
-                        functionValueNode = childValue
-                    end
-                    functionKind = runtimeFieldCompletionKind(childValue, trigger)
-                    if functionKind == ls.spec.CompletionItemKind.Field then
-                        for assign in childVar:eachAssign() do
-                            ---@cast assign Node.Field
-                            if assign.value and util.hasFunctionNode(assign.value) then
-                                functionValueNode = assign.value
-                                functionKind      = isMethod
-                                    and ls.spec.CompletionItemKind.Method
-                                    or  ls.spec.CompletionItemKind.Function
-                                break
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        -- 签名标签（仅类成员风格字段有）
-        local signatureLabel
-        local snippetText
-        -- classMemberLike 为 true 表示该字段以变量形式声明（类成员风格），
-        -- 只有此类字段才会生成完整的签名标签。
-        local classMemberLike = rawValueNode and rawValueNode.kind == 'variable'
-        if classMemberLike and functionKind ~= ls.spec.CompletionItemKind.Field and functionValueNode then
-            local funcs = util.collectFunctionNodes(functionValueNode)
-            if #funcs > 0 then
-                local label
-                label, snippetText = util.buildFunctionSignature(item.name, funcs[1])
-                signatureLabel = isMethod and (item.name .. '()') or label
-            end
-        end
-        if not snippetText and signatureLabel then
-            snippetText = signatureLabel
-        end
+        local baseKind, functionKind, functionValueNode, signatureLabel, snippetText, hasFunction
+            = resolveFieldItem(param, source, item, trigger, isMethod)
 
         -- 是否需要额外的 Snippet 项（仅类类型且 snippetMode ~= 'none'）
         local withSnippet = snippetMode ~= 'none'
@@ -489,17 +575,25 @@ local function buildFieldItems(param, source, key, options)
         if isMethod then
             -- ':' 触发：只输出可调用项，跳过纯 Field
             if functionKind ~= ls.spec.CompletionItemKind.Field
-            or util.hasFunctionNode(item.valueNode) then
+            or hasFunction then
                 emit {
                     label      = signatureLabel or item.name,
                     kind       = functionKind,
                     insertText = functionKind ~= ls.spec.CompletionItemKind.Field
                                  and item.name or nil,
                 }
+                if snippetMode ~= 'none' and snippetText
+                and snippetText ~= (signatureLabel or item.name) then
+                    emit {
+                        label      = signatureLabel or item.name,
+                        kind       = ls.spec.CompletionItemKind.Snippet,
+                        insertText = snippetText,
+                    }
+                end
             end
         elseif baseKind == ls.spec.CompletionItemKind.Field
             and functionKind ~= ls.spec.CompletionItemKind.Field
-            and not util.hasFunctionNode(item.valueNode) then
+            and not hasFunction then
             -- '.' 触发：静态为 Field 但运行时是函数 → 同时出 Field + Function 两项
             emit { label = item.name, kind = ls.spec.CompletionItemKind.Field }
             emit {
@@ -530,30 +624,43 @@ local function buildFieldItems(param, source, key, options)
                 }
             end
         end
-    end
-
-    -- ── 排序并返回 ────────────────────────────────────────────────────────
-    -- ':' 触发：Method > Function > Field
-    -- '.' 触发：Field > Function > Method
-    local function rank(kind)
-        if isMethod then
-            if kind == ls.spec.CompletionItemKind.Method   then return 1 end
-            if kind == ls.spec.CompletionItemKind.Function then return 2 end
-            return 3
-        end
-        if kind == ls.spec.CompletionItemKind.Field    then return 1 end
-        if kind == ls.spec.CompletionItemKind.Function then return 2 end
-        if kind == ls.spec.CompletionItemKind.Method   then return 3 end
-        return 4
+        ::continue::
     end
 
     table.sort(outItems, function(a, b)
-        local ra, rb = rank(a.kind), rank(b.kind)
+        local ra, rb = rankFieldItem(a.kind, isMethod), rankFieldItem(b.kind, isMethod)
         if ra ~= rb then return ra < rb end
         return ls.util.stringLess(a.label, b.label)
     end)
 
     return outItems
+end
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 核心接口：根据对象源节点和字段前缀生成补全项列表。
+--
+-- @param param      Provider 上下文
+-- @param source     对象表达式的 AST 源节点（Field 节点的 last 域）
+-- @param key        已输入的字段名前缀（'' 表示刚输入完触发字符）
+-- @param options    可选配置：
+--   isMethod    boolean  是否为 ':' 触发（影响 Method/Function 偏好及 ':' 时的过滤）
+--   snippetMode string   'both'（默认）同时生成普通项和 Snippet 项；
+--                        'none' 只生成普通项
+--   dotOffset   integer  '.' 的显示偏移，用于整数键 textEdit（key=='' 时传入）
+--   objName     string?  对象标识符名称，用于可见局部变量兜底查找
+---@param param any
+---@param source any
+---@param key string
+---@param options {isMethod: boolean?, snippetMode: string?, dotOffset: integer?, objName: string?}?
+---@return table[]
+local function buildFieldItems(param, source, key, options)
+    options = options or {}
+    local objNode, objVar, matches, intMatches = collectFieldMatches(param, source, key, options)
+    if #matches == 0 and #intMatches == 0 then
+        return {}
+    end
+
+    return buildFieldOutputs(param, source, key, options, objNode, objVar, matches, intMatches)
 end
 
 -- ── Provider 1：刚输入完 '.' 或 ':'，word 为空 ──────────────────────────────

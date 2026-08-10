@@ -192,9 +192,17 @@ local log
 log.in<??>
 ]] (nil)
 
--- TODO: 全局表字段补全（需要支持 _ENV 下的全局变量字段）
--- TEST_COMPLETION [[debug.<??>]] (EXISTS)
--- TEST_COMPLETION [[print(io.<??>)]] (EXISTS)
+-- 全局表字段补全
+TEST_COMPLETION [[
+debug = {}
+debug.x = 1
+debug.<??>
+]] (EXISTS)
+
+TEST_COMPLETION [[
+io = { x = 1 }
+print(io.<??>)
+]] (EXISTS)
 
 TEST_COMPLETION [[
 local x
@@ -241,9 +249,43 @@ m.<??>
 
 -- setmetatable + __index 场景（已迁移，见上方两处 TEST_COMPLETION）
 
--- [SKIPPED][global-method-inference] function mt:f(a,b,c) 全局表方法补全在 TEST_COMPLETION 下返回空，暂不迁移
+-- 全局表方法补全（function mt:f）
+TEST_COMPLETION [[
+mt = {}
+function mt:f(a, b, c)
+end
+mt:f<??>
+]] {
+    {
+        label = 'f(a, b, c)',
+        kind  = ls.spec.CompletionItemKind.Method,
+        insertText = EXISTS,
+    },
+    {
+        label = 'f(a, b, c)',
+        kind  = ls.spec.CompletionItemKind.Snippet,
+        insertText = 'f(${1:a}, ${2:b}, ${3:c})',
+    },
+}
 
--- [SKIPPED][dotted-key-field] 带点号字段名（['a.b.c']）的特殊 textEdit 补全在 TEST_COMPLETION 下返回空，暂不迁移（3 个变体：t.，t.   ，t['']）
+-- 带点号字段名（['a.b.c']）：特殊 textEdit 补全
+TEST_COMPLETION [[
+local t = {
+    ['a.b.c'] = {}
+}
+t.<??>
+]] {
+    {
+        label = "'a.b.c'",
+        kind  = ls.spec.CompletionItemKind.Field,
+        textEdit = {
+            start   = 30002,
+            finish  = 30002,
+            newText = "['a.b.c']",
+        },
+        additionalTextEdits = EXISTS,
+    },
+}
 
 -- [SKIPPED][config-dependent] `_G['z.b.c']` Lua 5.4/_ENV 全局字段 textEdit 依赖 config.set(version)，暂不迁移
 -- [SKIPPED][config-dependent] `_G['z.b.c']` Lua 5.1/_G 全局字段 textEdit 依赖 config.set(version)，暂不迁移

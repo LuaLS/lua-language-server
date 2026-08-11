@@ -17,12 +17,12 @@ do
     local playground = ls.custom.playground(test.scope)
     do
         local _ENV = playground.env
-        _ENV.alias('RequireValue')
+        _ENV.alias('Module')
             : param('T')
             : onValue(function (c)
                 local arg = c.args[1]
                 if arg.kind == 'value' and type(arg.literal) == 'string' then
-                    return c.value('RV:' .. arg.literal)
+                    return c.value('M:' .. arg.literal)
                 end
                 return c.type 'never'
             end)
@@ -30,16 +30,16 @@ do
 
     -- ---@generic T: string
     -- ---@param modname T
-    -- ---@return RequireValue<T>
+    -- ---@return Module<T>
     local T = rt.generic('T', rt.STRING)
     local requireFunc = rt.func()
         : addTypeParam(T)
         : addParamDef('modname', T)
-        : addReturnDef(nil, rt.call('RequireValue', { T }))
+        : addReturnDef(nil, rt.call('Module', { T }))
 
     -- require('a.b') 调用
     local call = rt.fcall(requireFunc, { rt.value 'a.b' })
-    lt.assertEquals(call.value:view(), '"RV:a.b"')
+    lt.assertEquals(call.value:view(), '"M:a.b"')
     playground:dispose()
 end
 
@@ -53,8 +53,8 @@ do
     do
         local _ENV = playground.env
 
-        -- RequireUri：modname -> uri
-        _ENV.alias('RequireUri')
+        -- Module：modname -> 该模块文件根 return 的第一个值
+        _ENV.alias('Module')
             : param('T')
             : onValue(function (c)
                 local modname = c.args[1]
@@ -69,22 +69,7 @@ do
                 if #uris == 0 then
                     return c.type 'never'
                 end
-                return c.value(uris[1])
-            end)
-
-        -- RequireValue：uri -> 该文件根 return 的第一个值
-        _ENV.alias('RequireValue')
-            : param('T')
-            : onValue(function (c)
-                local uriNode = c.args[1]
-                if uriNode.kind ~= 'value' then
-                    return c.type 'never'
-                end
-                local uri = uriNode.literal
-                if type(uri) ~= 'string' then
-                    return c.type 'never'
-                end
-                local vfile = c.scope.vm:indexFile(uri)
+                local vfile = c.scope.vm:indexFile(uris[1])
                 local ret = vfile:getMainReturn()
                 if not ret then
                     return c.type 'never'
@@ -93,39 +78,30 @@ do
             end)
     end
 
-    local rt = scope.rt
-    -- RequireUri: modname='a' 匹配到 a.lua
-    local v = rt.call('RequireUri', { rt.value 'a' })
-    lt.assertEquals(v:view(), '"file:///root/a.lua"')
-
-    -- RequireUri: modname='a.b' 匹配到 a/b.lua
-    local v2 = rt.call('RequireUri', { rt.value 'a.b' })
-    lt.assertEquals(v2:view(), '"file:///root/a/b.lua"')
-
-    -- RequireUri: 无匹配返回 never
-    local v3 = rt.call('RequireUri', { rt.value 'zzz' })
-    lt.assertEquals(v3:view(), 'never')
-
-    -- RequireValue: uri -> main return
+    -- a.lua 返回 table
     local uriA = 'file:///root/a.lua'
     local fileA <close> = ls.file.setServerText(uriA, [[
 local t = { x = 1 }
 return t
 ]])
-    local v4 = rt.call('RequireValue', { rt.value(uriA) })
-    lt.assertEquals(v4:view(), '{ x: 1 }')
-
-    -- RequireValue: 无 return 的文件返回 never
+    -- a/b.lua 无 return
     local uriB = 'file:///root/a/b.lua'
     local fileB <close> = ls.file.setServerText(uriB, [[
 local y = 2
 ]])
-    local v5 = rt.call('RequireValue', { rt.value(uriB) })
-    lt.assertEquals(v5:view(), 'never')
 
-    -- RequireValue: 不存在的 uri 返回 never
-    local v6 = rt.call('RequireValue', { rt.value 'file:///root/zzz.lua' })
-    lt.assertEquals(v6:view(), 'never')
+    local rt = scope.rt
+    -- Module: modname='a' -> a.lua 的 main return
+    local v = rt.call('Module', { rt.value 'a' })
+    lt.assertEquals(v:view(), '{ x: 1 }')
+
+    -- Module: modname='a.b' -> a/b.lua 无 return -> never
+    local v2 = rt.call('Module', { rt.value 'a.b' })
+    lt.assertEquals(v2:view(), 'never')
+
+    -- Module: 无匹配返回 never
+    local v3 = rt.call('Module', { rt.value 'zzz' })
+    lt.assertEquals(v3:view(), 'never')
 
     playground:dispose()
 end
@@ -141,7 +117,7 @@ do
 
     local fileMeta <close> = ls.file.setServerText('file:///root/meta.lua', [==[
 --[[@@@
-alias 'RequireUri'
+alias 'Module'
     : param('T')
     : onValue(function (c)
         local modname = c.args[1]
@@ -156,24 +132,7 @@ alias 'RequireUri'
         if #uris == 0 then
             return c.type 'never'
         end
-        return c.value(uris[1])
-    end)
-
-alias 'RequireValue'
-    : param('T')
-    : onValue(function (c)
-        local uriNode = c.args[1]
-        if uriNode.kind == 'call' then
-            uriNode = uriNode.value
-        end
-        if uriNode.kind ~= 'value' then
-            return c.type 'never'
-        end
-        local uri = uriNode.literal
-        if type(uri) ~= 'string' then
-            return c.type 'never'
-        end
-        local vfile = c.scope.vm:indexFile(uri)
+        local vfile = c.scope.vm:indexFile(uris[1])
         local ret = vfile:getMainReturn()
         if not ret then
             return c.type 'never'
@@ -196,20 +155,22 @@ return a
     scope.vm:indexFile(uriA)
     scope.vm:indexFile(uriB)
 
-    lt.assertEquals(scope.rt.call('RequireUri', { scope.rt.value 'a' }):view(), '"file:///root/a.lua"')
-    lt.assertEquals(scope.rt.call('RequireUri', { scope.rt.value 'b' }):view(), '"file:///root/b.lua"')
+    -- 循环 require（a->b->a）不会导致 Module 回调无限递归
+    local ra = scope.rt.call('Module', { scope.rt.value 'a' })
+    lt.assertEquals(ra:view() ~= nil, true)
+    local rb = scope.rt.call('Module', { scope.rt.value 'b' })
+    lt.assertEquals(rb:view() ~= nil, true)
 end
 
 do
-    -- 验证 meta/template/package.lua 用 --[[@@@ cat block 定义 RequireUri/RequireValue，
+    -- 验证 meta/template/package.lua 用 --[[@@@ cat block 定义 Module，
     -- 编译后的 meta 保留该块，index 后 alias 自动注册
     local metaBuilder = require 'scope.meta-builder'
     local metaUri = metaBuilder.compile('Lua 5.5', 'zh-cn', 'utf-8')
     local content = ls.afs.read(metaUri / 'package.lua')
     assert(content)
     lt.assertEquals(content:find('--[[@@@', 1, true) ~= nil, true)
-    lt.assertEquals(content:find("alias 'RequireUri'", 1, true) ~= nil, true)
-    lt.assertEquals(content:find("alias 'RequireValue'", 1, true) ~= nil, true)
+    lt.assertEquals(content:find("alias 'Module'", 1, true) ~= nil, true)
 
     local scope <close> = ls.scope.create('require-meta-test', 'file:///root')
     local root = createRoot(scope, 'meta', metaUri)
@@ -230,7 +191,7 @@ return {
     scope.vm:indexFile(uriPackage)
     scope.vm:indexFile(uriA)
 
-    -- RequireUri/RequireValue 的 custom alias 已注册
+    -- Module 的 custom alias 已注册
     local function hasCustomAlias(name)
         local t = scope.rt.type(name)
         if t.aliases then
@@ -242,16 +203,11 @@ return {
         end
         return false
     end
-    lt.assertEquals(hasCustomAlias 'RequireUri', true)
-    lt.assertEquals(hasCustomAlias 'RequireValue', true)
+    lt.assertEquals(hasCustomAlias 'Module', true)
 
-    -- RequireUri：modname -> uri
-    local v = scope.rt.call('RequireUri', { scope.rt.value 'a' })
-    lt.assertEquals(v:view(), '"file:///root/a.lua"')
-
-    -- RequireValue：uri -> main return
-    local v2 = scope.rt.call('RequireValue', { scope.rt.value 'file:///root/a.lua' })
-    lt.assertEquals(v2:view(), '{ x: 1 }')
+    -- Module：modname -> main return
+    local v = scope.rt.call('Module', { scope.rt.value 'a' })
+    lt.assertEquals(v:view(), '{ x: 1 }')
 end
 
 print('[project.require] 测试完毕')

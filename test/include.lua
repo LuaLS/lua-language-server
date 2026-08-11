@@ -13,7 +13,7 @@ function setmetatable(t, mt) end
 test.includeCodes['require'] = [[
 ---@generic T: string
 ---@param modname T
----@return RequireValue<RequireUri<T>>
+---@return Module<T>
 function require(modname) end
 ]]
 

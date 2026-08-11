@@ -17,8 +17,8 @@ local function setupAliases(scope)
     do
         local _ENV = playground.env
 
-        -- RequireUri：modname -> uri
-        _ENV.alias('RequireUri')
+        -- Module：modname -> 该模块文件根 return 的第一个值
+        _ENV.alias('Module')
             : param('T')
             : onValue(function (c)
                 local modname = c.args[1]
@@ -35,26 +35,7 @@ local function setupAliases(scope)
                 end
                 -- 解析结果依赖 Scope 的文件集合：注册 alias 节点，Scope 增删文件时刷新
                 c.scope:addRef(c.node)
-                return c.value(uris[1])
-            end)
-
-        -- RequireValue：uri -> main return
-        _ENV.alias('RequireValue')
-            : param('T')
-            : onValue(function (c)
-                local uriNode = c.args[1]
-                -- 兼容嵌套 alias：取解析后的值
-                if uriNode.kind == 'call' then
-                    uriNode = uriNode.value
-                end
-                if uriNode.kind ~= 'value' then
-                    return c.type 'never'
-                end
-                local uri = uriNode.literal
-                if type(uri) ~= 'string' then
-                    return c.type 'never'
-                end
-                local vfile = c.scope.vm:indexFile(uri)
+                local vfile = c.scope.vm:indexFile(uris[1])
                 local ret = vfile:getMainReturn()
                 if not ret then
                     return c.type 'never'
@@ -89,7 +70,7 @@ do
     local fileMeta <close> = ls.file.setServerText(uriMeta, [[
 ---@generic T: string
 ---@param modname T
----@return RequireValue<RequireUri<T>>
+---@return Module<T>
 function require(modname) end
 ]])
     -- A 返回 'A'，B 返回 'B'

@@ -1,8 +1,9 @@
 ---@meta package
 
 --[[@@@
--- RequireUri：modname -> uri（按 Lua require 规则解析，排除当前文件并按距离排序）
-alias 'RequireUri'
+-- Module：modname -> 该模块文件根 return 的第一个值
+-- （合并 RequireUri 的 modname->uri 解析与 RequireValue 的 uri->main return）
+alias 'Module'
     : param('T')
     : onValue(function (c)
         local modname = c.args[1]
@@ -16,31 +17,14 @@ alias 'RequireUri'
         end
         -- 解析结果依赖 Scope 的文件集合：注册 alias 节点，Scope 增删文件时刷新
         c.scope:addRef(c.node)
-        return c.value(uris[1])
-    end)
-]]
-
---[[@@@
--- RequireValue：uri -> 该文件根 return 的第一个值
-alias 'RequireValue'
-    : param('T')
-    : onValue(function (c)
-        local uriNode = c.args[1]
-        if not uriNode then
-            return c.type 'any'
-        end
-        local uri = uriNode.value.literal
-        if type(uri) ~= 'string' then
-            return c.type 'any'
-        end
-        -- 只复用已加载的文件；未加载返回 unknown，避免加载链递归
-        local vfile = c.scope.vm:getFile(uri)
+        -- 只复用已加载的文件；未加载返回 never，避免加载链递归
+        local vfile = c.scope.vm:getFile(uris[1])
         if not vfile then
-            return c.type 'any'
+            return c.type 'never'
         end
         local ret = vfile:getMainReturn()
         if not ret then
-            return c.type 'any'
+            return c.type 'never'
         end
         return ret
     end)
@@ -50,14 +34,14 @@ alias 'RequireValue'
 ---#DES 'require>5.4'
 ---@generic T: string
 ---@param modname T
----@return RequireValue<RequireUri<T>>
+---@return Module<T>
 ---@return unknown loaderdata
 function require(modname) end
 ---#else
 ---#DES 'require<5.3'
 ---@generic T: string
 ---@param modname T
----@return RequireValue<RequireUri<T>>
+---@return Module<T>
 function require(modname) end
 ---#end
 

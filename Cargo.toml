@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/*",
+]
+
+[workspace.dependencies]
+emmylua_formatter = "0.25.0"
+emmylua_parser = "0.29.0"

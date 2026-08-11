@@ -1,8 +1,8 @@
-local files      = require("files")
-local log        = require("log")
+local files = require("files")
+local log = require("log")
 
-return function(uri, options)
-    local suc, codeFormat = pcall(require, "code_format")
+return function (uri, options)
+    local suc, rust = pcall(require, "rust")
     if not suc then
         return
     end
@@ -11,7 +11,7 @@ return function(uri, options)
     if not state then
         return
     end
-    local status, formattedText = codeFormat.format(uri, text, options)
+    local status, formattedText = rust.luafmt.format(text, uri, options)
 
     if not status then
         if formattedText ~= nil then
@@ -29,7 +29,7 @@ return function(uri, options)
         {
             start = state.ast.start,
             finish = state.ast.finish,
-            text = formattedText,
+            text = formattedText
         }
     }
 end

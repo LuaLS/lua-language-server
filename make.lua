@@ -62,6 +62,8 @@ lm:executable "lua-language-server" {
 local platform = require 'bee.platform'
 local exe      = platform.os == 'windows' and ".exe" or ""
 
+lm:import "make/lib_rust.lua"
+
 lm:copy "copy_lua-language-server" {
     inputs = "$bin/lua-language-server" .. exe,
     outputs = "bin/lua-language-server" .. exe,
@@ -82,6 +84,7 @@ lm:phony "all" {
         "lua-language-server",
         "copy_lua-language-server",
         "copy_bootstrap",
+        "copy_rust",
     },
     windows = {
         deps = {

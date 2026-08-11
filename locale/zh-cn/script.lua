@@ -306,6 +306,8 @@ PARSER_MISS_SEP_IN_TABLE =
 '需要用`,`或`;`进行分割。'
 PARSER_SET_CONST         =
 '不能对常量赋值。'
+PARSER_DECLARE_CONST     =
+'不能重复声明常量 `{name}`。'
 PARSER_UNICODE_NAME      =
 '包含了 Unicode 字符。'
 PARSER_ERR_NONSTANDARD_SYMBOL =

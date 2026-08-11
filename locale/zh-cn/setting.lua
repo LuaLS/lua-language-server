@@ -32,6 +32,8 @@ config.runtime.unicodeName        =
 "允许在名字中使用 Unicode 字符。"
 config.runtime.nonstandardSymbol  =
 "支持非标准的符号。请务必确认你的运行环境支持这些符号。"
+config.runtime.enableLuaJITExtensions =
+"启用 LuaJIT 扩展语法（需要将 `Lua.runtime.version` 设置为 `LuaJIT`）。"
 config.runtime.plugin             =
 "插件路径，请查阅[文档](https://luals.github.io/wiki/plugins)了解用法。"
 config.runtime.pluginArgs         =

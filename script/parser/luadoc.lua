@@ -1905,6 +1905,7 @@ local function bindGeneric(binded)
         or doc.type == 'doc.class'
         or doc.type == 'doc.alias'
         or doc.type == 'doc.field'
+        or doc.type == 'doc.operator'
         or doc.type == 'doc.overload' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]

@@ -598,9 +598,10 @@ function m.compileStateAsync(uri, callback)
 
     ---@type brave.param.compile.options
     local options = {
-        special           = config.get(uri, 'Lua.runtime.special'),
-        unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
-        nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+        special                = config.get(uri, 'Lua.runtime.special'),
+        unicodeName            = config.get(uri, 'Lua.runtime.unicodeName'),
+        nonstandardSymbol      = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+        enableLuaJITExtensions = config.get(uri, 'Lua.runtime.enableLuaJITExtensions'),
     }
 
     ---@type brave.param.compile
@@ -652,9 +653,10 @@ function m.compileState(uri)
 
     ---@type brave.param.compile.options
     local options = {
-        special           = config.get(uri, 'Lua.runtime.special'),
-        unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
-        nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+        special                = config.get(uri, 'Lua.runtime.special'),
+        unicodeName            = config.get(uri, 'Lua.runtime.unicodeName'),
+        nonstandardSymbol      = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+        enableLuaJITExtensions = config.get(uri, 'Lua.runtime.enableLuaJITExtensions'),
     }
 
     local ws     = require 'workspace'

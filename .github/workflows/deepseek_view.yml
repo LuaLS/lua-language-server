@@ -1,0 +1,20 @@
+name: Deepseek Code Review
+on:
+  pull_request_target:
+    types:
+      - opened # Triggers when a PR is opened
+
+# fix: GraphQL: Resource not accessible by integration (addComment) error
+permissions:
+  pull-requests: write
+
+jobs:
+  setup-deepseek-review:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    name: Code Review
+    steps:
+      - name: DeepSeek Code Review
+        uses: hustcer/deepseek-review@v1
+        with:
+          chat-token: ${{ secrets.DEEPSEEK_CHAT_TOKEN }}

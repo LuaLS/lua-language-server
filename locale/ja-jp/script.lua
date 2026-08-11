@@ -306,6 +306,8 @@ PARSER_MISS_SEP_IN_TABLE =
 '区切りには `,` または `;` が必要です。'
 PARSER_SET_CONST         =
 '定数に値を代入できません。'
+PARSER_DECLARE_CONST     =
+'定数 `{name}` を再宣言できません。'
 PARSER_UNICODE_NAME      =
 'Unicode 文字が含まれています。'
 PARSER_ERR_NONSTANDARD_SYMBOL =

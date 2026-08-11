@@ -32,6 +32,8 @@ config.runtime.unicodeName        =
 "名前に Unicode 文字を使用できるようにします。"
 config.runtime.nonstandardSymbol  =
 "非標準の記号をサポートします。ランタイム環境がこれらの記号をサポートしていることを確認してください。"
+config.runtime.enableLuaJITExtensions =
+"LuaJIT 拡張構文を有効にします（`Lua.runtime.version` を `LuaJIT` に設定する必要があります）。"
 config.runtime.plugin             =
 "プラグインのパス。詳細は [wiki](https://luals.github.io/wiki/plugins) を参照してください。"
 config.runtime.pluginArgs         =

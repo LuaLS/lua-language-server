@@ -15,9 +15,24 @@ local plugin     = require 'plugin'
 ---@field cindex                integer
 ---@field func                  parser.object
 ---@field hideView              boolean
+---@field safe?                 boolean # LuaJIT 安全导航 ?. 标记
 ---@field package _returns?     parser.object[]
 ---@field package _callReturns? parser.object[]
 ---@field package _asCache?     parser.object[]
+
+-- LuaJIT 安全导航 `?.`：读取结果为 nil 时短路，类型需标记 optional
+---@param source parser.object
+---@param node vm.node
+local function setNodeCheckSafe(source, node)
+    vm.setNode(source, node)
+    if source.safe
+    and (source.type == 'getfield'
+    or source.type == 'getindex'
+    or source.type == 'getmethod'
+    or source.type == 'call') then
+        vm.getNode(source):addOptional()
+    end
+end
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -235,7 +250,7 @@ local function searchLiteralFieldFromTable(source, key, callback)
     end
 end
 
----@param obj parser.object
+---@param obj vm.object
 ---@return boolean
 local function containsGenericName(obj)
     if not obj then
@@ -280,6 +295,9 @@ local function containsGenericName(obj)
     end
     return false
 end
+
+---Public alias so that other vm modules (operator.lua) can reuse the check.
+vm.containsGenericName = containsGenericName
 
 ---Builds a map from generic parameter names to their concrete types
 ---@param uri uri
@@ -1753,13 +1771,25 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                                     if doc.type == 'doc.return' then
                                         for _, rtn in ipairs(doc.returns) do
                                             if rtn.returnIndex == index then
-                                                local newRtn = vm.cloneObject(rtn, genericMap)
-                                                if newRtn then
-                                                    returnNode = vm.compileNode(newRtn)
-                                                    for rnode in returnNode:eachObject() do
-                                                        if rnode.type == 'generic' then
-                                                            returnNode = rnode:resolve(guide.getUri(source), args)
-                                                            break
+                                                -- Only clone if the return type only references class-level generics
+                                                -- (i.e. generics that exist in the genericMap from the receiver).
+                                                -- Method-level generics (e.g. V not in {T=string}) are
+                                                -- already resolved correctly in the first round above.
+                                                local onlyClassGenerics = true
+                                                guide.eachSourceType(rtn, 'doc.generic.name', function(src)
+                                                    if not genericMap[src[1]] then
+                                                        onlyClassGenerics = false
+                                                    end
+                                                end)
+                                                if onlyClassGenerics then
+                                                    local newRtn = vm.cloneObject(rtn, genericMap)
+                                                    if newRtn then
+                                                        returnNode = vm.compileNode(newRtn)
+                                                        for rnode in returnNode:eachObject() do
+                                                            if rnode.type == 'generic' then
+                                                                returnNode = rnode:resolve(guide.getUri(source), args)
+                                                                break
+                                                            end
                                                         end
                                                     end
                                                 end
@@ -1969,22 +1999,22 @@ local compilerSwitch = util.switch()
             local uri = guide.getUri(source)
             local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             if value then
-                vm.setNode(source, value)
+                setNodeCheckSafe(source, value)
             end
             for k in key:eachObject() do
                 if k.type == 'global' and k.cate == 'type' then
                     ---@cast k vm.global
                     vm.compileByParentNode(source.node, k, function (src)
-                        vm.setNode(source, vm.compileNode(src))
+                        setNodeCheckSafe(source, vm.compileNode(src))
                     end)
                 end
             end
         else
             ---@cast key string
             vm.compileByParentNode(source.node, key, function (src)
-                vm.setNode(source, vm.compileNode(src))
+                setNodeCheckSafe(source, vm.compileNode(src))
                 if src == source and source.value and source.value.type ~= 'nil' then
-                    vm.setNode(source, vm.compileNode(source.value))
+                    setNodeCheckSafe(source, vm.compileNode(source.value))
                 end
             end)
         end
@@ -2192,12 +2222,14 @@ local compilerSwitch = util.switch()
                 newArgs[#newArgs+1] = args[i]
             end
             local node = getReturn(args[1], index - 1, newArgs)
-            if node then
+            if node and not node:isEmpty() then
                 vm.setNode(source, node)
+                return
             end
-            return
-        end
-        if func.special == 'xpcall' and index > 1 then
+            -- The called function has no such return, but `pcall` still does: on failure
+            -- the second result is the error value. Fall through to its own declaration,
+            -- otherwise the result stays unknown.
+        elseif func.special == 'xpcall' and index > 1 then
             if not args then
                 return
             end
@@ -2206,10 +2238,12 @@ local compilerSwitch = util.switch()
                 newArgs[#newArgs+1] = args[i]
             end
             local node = getReturn(args[1], index - 1, newArgs)
-            if node then
+            if node and not node:isEmpty() then
                 vm.setNode(source, node)
+                return
             end
-            return
+            -- Same as `pcall`: the message handler's result comes in place of the missing
+            -- return, and its type is declared on `xpcall` itself.
         end
         if func.special == 'require' then
             if index == 2 then
@@ -2341,7 +2375,7 @@ local compilerSwitch = util.switch()
         if not node:isTyped() then
             node = vm.runOperator('call', source.node) or node
         end
-        vm.setNode(source, node)
+        setNodeCheckSafe(source, node)
     end)
     : case 'doc.type'
     : call(function (source)
@@ -2523,6 +2557,29 @@ local compilerSwitch = util.switch()
             return
         end
         vm.binarySwitch(source.op.type, source)
+    end)
+    : case 'ternary' -- LuaJIT 三元 ?:：条件真取 b，假取 c，不确定则合并 b|c
+    : call(function (source)
+        if vm.bindAs(source) then
+            return
+        end
+        if not source[1] or not source[2] or not source[3] then
+            return
+        end
+        local node2 = vm.compileNode(source[2])
+        local node3 = vm.compileNode(source[3])
+        local r1 = vm.testCondition(source[1])
+        if r1 == true then
+            vm.setNode(source, node2)
+        elseif r1 == false then
+            vm.setNode(source, node3)
+        else
+            local node = node2:copy()
+            if not source[3].hasExit then
+                node:merge(node3)
+            end
+            vm.setNode(source, node)
+        end
     end)
     : case 'globalbase'
     : call(function (source)

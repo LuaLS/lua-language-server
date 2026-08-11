@@ -57,5 +57,8 @@
         "privateName": [
             "_*"
         ]
-    }
+    },
+    "diagnostics.globals": [
+        "log"
+    ]
 }

@@ -129,8 +129,9 @@ local UnarySymbol = {
 }
 
 local BinarySymbol = {
-    ['or']  = 1,
-    ['and'] = 2,
+    ['or']   = 1,
+    ['??']   = 1, -- LuaJIT 空值合并，与 or 同级
+    ['and']  = 2,
     ['<=']  = 3,
     ['>=']  = 3,
     ['<']   = 3,
@@ -142,6 +143,7 @@ local BinarySymbol = {
     ['&']   = 6,
     ['<<']  = 7,
     ['>>']  = 7,
+    ['~>>'] = 7, -- LuaJIT 算术右移，与 << >> 同级
     ['..']  = 8,
     ['+']   = 9,
     ['-']   = 9,
@@ -641,8 +643,10 @@ local function expectAssign(isAction)
         or token == '|='
         or token == '&='
         or token == '>>='
-        or token == '<<=' then
-            if not State.options.nonstandardSymbol[token] then
+        or token == '<<='
+        or token == '~>>='
+        or token == '..=' then
+            if not (State.options.nonstandardSymbol[token] or State.luaJITExtensions) then
                 unknownSymbol()
             end
             Index = Index + 2
@@ -741,10 +745,40 @@ local function mergeLocalAttrs(attrsBefore, attrsAfter)
     return attrsBefore
 end
 
+--- LuaJIT const：检查是否有外层同名 const，有则报重复声明错误
+---@param obj table
+local function checkDeclareConst(obj)
+    for i = #Chunk, 1, -1 do
+        local chunk  = Chunk[i]
+        local locals = chunk.locals
+        if locals then
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.const and loc[1] == obj[1] then
+                    pushError {
+                        type   = 'DECLARE_CONST',
+                        start  = obj.start,
+                        finish = obj.finish,
+                        info   = {
+                            name = obj[1],
+                        },
+                    }
+                    return
+                end
+            end
+        end
+    end
+end
+
 ---@param obj table
 local function createLocal(obj, attrs)
     obj.type   = 'local'
     obj.effect = obj.finish
+
+    -- LuaJIT const：同名 const 不能在内层作用域重复声明
+    if State.luaJITExtensions then
+        checkDeclareConst(obj)
+    end
 
     if attrs then
         obj.attrs = attrs
@@ -1477,11 +1511,13 @@ end
 
 local function parseNumber10(start)
     local integer = true
-    local integerPart = smatch(Lua, '^%d*', start)
+    -- LuaJIT 扩展：数字字面量允许下划线
+    local digitPattern = State.luaJITExtensions and '[%d_]' or '%d'
+    local integerPart = smatch(Lua, '^' .. digitPattern .. '*', start)
     local offset = start + #integerPart
     -- float part
     if ssub(Lua, offset, offset) == '.' then
-        local floatPart = smatch(Lua, '^%d*', offset + 1)
+        local floatPart = smatch(Lua, '^' .. digitPattern .. '*', offset + 1)
         integer = false
         offset = offset + #floatPart + 1
     end
@@ -1494,7 +1530,7 @@ local function parseNumber10(start)
         if CharMapSign[nextChar] then
             offset = offset + 1
         end
-        local exp = smatch(Lua, '^%d*', offset)
+        local exp = smatch(Lua, '^' .. digitPattern .. '*', offset)
         offset = offset + #exp
         if #exp == 0 then
             pushError {
@@ -1504,16 +1540,22 @@ local function parseNumber10(start)
             }
         end
     end
-    return tonumber(ssub(Lua, start, offset - 1)), offset, integer
+    local numStr = ssub(Lua, start, offset - 1)
+    if State.luaJITExtensions then
+        numStr = sgsub(numStr, '_', '')
+    end
+    return tonumber(numStr), offset, integer
 end
 
-local function parseNumber16(start)
-    local integerPart = smatch(Lua, '^[%da-fA-F]*', start)
+local function parseNumber16(start, prefixStart)
+    -- LuaJIT 扩展：数字字面量允许下划线
+    local hexPattern = State.luaJITExtensions and '[%da-fA-F_]' or '[%da-fA-F]'
+    local integerPart = smatch(Lua, '^' .. hexPattern .. '*', start)
     local offset = start + #integerPart
     local integer = true
     -- float part
     if ssub(Lua, offset, offset) == '.' then
-        local floatPart = smatch(Lua, '^[%da-fA-F]*', offset + 1)
+        local floatPart = smatch(Lua, '^' .. hexPattern .. '*', offset + 1)
         integer = false
         offset = offset + #floatPart + 1
         if #integerPart == 0 and #floatPart == 0 then
@@ -1542,15 +1584,21 @@ local function parseNumber16(start)
         if CharMapSign[nextChar] then
             offset = offset + 1
         end
-        local exp = smatch(Lua, '^%d*', offset)
+        local exp = smatch(Lua, '^' .. hexPattern .. '*', offset)
         offset = offset + #exp
     end
-    local n = tonumber(ssub(Lua, start - 2, offset - 1))
+    local numStr = ssub(Lua, prefixStart, offset - 1)
+    if State.luaJITExtensions then
+        numStr = sgsub(numStr, '_', '')
+    end
+    local n = tonumber(numStr)
     return n, offset, integer
 end
 
 local function parseNumber2(start)
-    local bins = smatch(Lua, '^[01]*', start)
+    -- LuaJIT 扩展：数字字面量允许下划线
+    local binPattern = State.luaJITExtensions and '[01_]' or '[01]'
+    local bins = smatch(Lua, '^' .. binPattern .. '*', start)
     local offset = start + #bins
     if State.version ~= 'LuaJIT' then
         pushError {
@@ -1562,6 +1610,9 @@ local function parseNumber2(start)
                 version = State.version,
             }
         }
+    end
+    if State.luaJITExtensions then
+        bins = sgsub(bins, '_', '')
     end
     return tonumber(bins, 2), offset
 end
@@ -1645,10 +1696,19 @@ local function parseNumber()
         integer = false
     elseif firstChar == '0' then
         local nextChar = ssub(Lua, offset + 1, offset + 1)
+        -- LuaJIT 扩展：允许 0 与进制前缀之间存在下划线（如 0__x__1）
+        local prefixOffset = offset + 1
+        if State.luaJITExtensions then
+            local underscores = smatch(Lua, '^_*', prefixOffset)
+            if #underscores > 0 then
+                prefixOffset = prefixOffset + #underscores
+                nextChar = ssub(Lua, prefixOffset, prefixOffset)
+            end
+        end
         if CharMapN16[nextChar] then
-            number, offset, integer = parseNumber16(offset + 2)
+            number, offset, integer = parseNumber16(prefixOffset + 1, offset)
         elseif CharMapN2[nextChar] then
-            number, offset = parseNumber2(offset + 2)
+            number, offset = parseNumber2(prefixOffset + 1)
             integer = true
         else
             number, offset, integer = parseNumber10(offset)
@@ -2082,7 +2142,10 @@ local function bindSpecial(source, name)
     end
 end
 
-local function parseSimple(node, funcName)
+---@param node parser.object
+---@param funcName boolean
+---@param noMethod boolean? # 禁止方法调用后缀（三元 b 部分，对应 LuaJIT EXPR_F_NOCOLON）
+local function parseSimple(node, funcName, noMethod)
     local currentName
     if node.type == 'getglobal'
     or node.type == 'getlocal' then
@@ -2098,22 +2161,39 @@ local function parseSimple(node, funcName)
         end
         skipSpace()
         local token = Tokens[Index + 1]
-        if token == '.' then
-            local dot = {
-                type   = token,
-                start  = getPosition(Tokens[Index], 'left'),
-                finish = getPosition(Tokens[Index], 'right'),
-            }
+        -- LuaJIT 安全导航 `?.`：标记后续操作为 safe（仅启用 LuaJIT 扩展时生效）
+        local safe = false
+        if token == '?.' then
+            if not State.luaJITExtensions then
+                break
+            end
+            -- LuaJIT 三元 b 部分：?. 后紧跟 : 属语法错误（EXPR_F_NOCOLON + nav），
+            -- 这里 break 不消费 ?.，把 : 留给三元处理
+            if noMethod and Tokens[Index + 3] == ':' then
+                break
+            end
+            safe = true
             Index = Index + 2
             skipSpace()
+            token = Tokens[Index + 1]
+        end
+        -- LuaJIT 安全导航：?. 后直接跟字段名（a?.field）
+        if safe and token and not KeyWord[token]
+        and CharMapWord[ssub(token, 1, 1)] then
+            local safeDot = {
+                type   = '?.',
+                start  = getPosition(Tokens[Index] - 2, 'left'),
+                finish = getPosition(Tokens[Index] - 2, 'right'),
+            }
             local field = parseName(true)
             local getfield = {
                 type   = 'getfield',
                 start  = node.start,
                 finish = lastRightPosition(),
                 node   = node,
-                dot    = dot,
-                field  = field
+                dot    = safeDot,
+                field  = field,
+                safe   = true, -- LuaJIT 安全导航
             }
             if field then
                 field.parent = getfield
@@ -2138,7 +2218,54 @@ local function parseSimple(node, funcName)
             node.parent = getfield
             node.next   = getfield
             node        = getfield
+        elseif token == '.' then
+            local dot = {
+                type   = token,
+                start  = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index], 'right'),
+            }
+            Index = Index + 2
+            skipSpace()
+            local field = parseName(true)
+            local getfield = {
+                type   = 'getfield',
+                start  = node.start,
+                finish = lastRightPosition(),
+                node   = node,
+                dot    = dot,
+                field  = field,
+            }
+            if safe then
+                getfield.safe = true -- LuaJIT 安全导航
+            end
+            if field then
+                field.parent = getfield
+                field.type   = 'field'
+                if currentName then
+                    if node.type == 'getlocal'
+                    or node.type == 'getglobal'
+                    or node.type == 'getfield' then
+                        currentName = currentName .. '.' .. field[1]
+                        bindSpecial(getfield, currentName)
+                    else
+                        currentName = nil
+                    end
+                end
+            else
+                pushError {
+                    type   = 'MISS_FIELD',
+                    start  = lastRightPosition(),
+                    finish = lastRightPosition(),
+                }
+            end
+            node.parent = getfield
+            node.next   = getfield
+            node        = getfield
         elseif token == ':' then
+            if noMethod then
+                -- LuaJIT 三元 b 部分禁止方法调用（EXPR_F_NOCOLON）：停止后缀解析，: 留给三元
+                break
+            end
             local colon = {
                 type   = token,
                 start  = getPosition(Tokens[Index], 'left'),
@@ -2153,8 +2280,11 @@ local function parseSimple(node, funcName)
                 finish = lastRightPosition(),
                 node   = node,
                 colon  = colon,
-                method = method
+                method = method,
             }
+            if safe then
+                getmethod.safe = true -- LuaJIT 安全导航（obj?.:method 检查 obj）
+            end
             if method then
                 method.parent = getmethod
                 method.type   = 'method'
@@ -2182,6 +2312,9 @@ local function parseSimple(node, funcName)
                 start  = node.start,
                 node   = node,
             }
+            if safe then
+                call.safe = true -- LuaJIT 安全导航（f?.() 检查 f）
+            end
             Index = Index + 2
             local args = parseExpList()
             if Tokens[Index + 1] == ')' then
@@ -2213,6 +2346,9 @@ local function parseSimple(node, funcName)
                 finish = tbl.finish,
                 node   = node,
             }
+            if safe then
+                call.safe = true -- LuaJIT 安全导航（f?.{...} 检查 f）
+            end
             local args = {
                 type   = 'callargs',
                 start  = tbl.start,
@@ -2236,6 +2372,9 @@ local function parseSimple(node, funcName)
                 finish = str.finish,
                 node   = node,
             }
+            if safe then
+                call.safe = true -- LuaJIT 安全导航（f?."str" 检查 f）
+            end
             local args = {
                 type   = 'callargs',
                 start  = str.start,
@@ -2260,6 +2399,9 @@ local function parseSimple(node, funcName)
                     finish = str.finish,
                     node   = node,
                 }
+                if safe then
+                    call.safe = true -- LuaJIT 安全导航（f?.[[...]] 检查 f）
+                end
                 local args = {
                     type   = 'callargs',
                     start  = str.start,
@@ -2277,6 +2419,9 @@ local function parseSimple(node, funcName)
                 local bstart = index.start
                 index.type   = 'getindex'
                 index.start  = node.start
+                if safe then
+                    index.safe = true -- LuaJIT 安全导航（a?.[key] 检查 a）
+                end
                 index.node   = node
                 node.next    = index
                 node.parent  = index
@@ -2709,6 +2854,48 @@ local function parseFunction(declareType, isAction)
     return func
 end
 
+-- LuaJIT 短函数语句体：-> do ... end
+local function parseLambdaDoBlock(lambda)
+    local doLeft  = getPosition(Tokens[Index], 'left')
+    local doRight = getPosition(Tokens[Index] + 1, 'right')
+    local body = {
+        type   = 'do',
+        start  = doLeft,
+        finish = doRight,
+        bstart = doRight,
+        keyword = {
+            [1] = doLeft,
+            [2] = doRight,
+        },
+    }
+    Index = Index + 2
+    pushChunk(body)
+    parseActions()
+    popChunk()
+    body.bfinish = getPosition(Tokens[Index], 'left')
+    if Tokens[Index + 1] == 'end' then
+        body.finish = getPosition(Tokens[Index] + 2, 'right')
+        body.keyword[3] = getPosition(Tokens[Index], 'left')
+        body.keyword[4] = body.finish
+        Index = Index + 2
+    else
+        missEnd(doLeft, doRight)
+    end
+    if body.locals then
+        LocalCount = LocalCount - #body.locals
+    end
+    lambda[1] = body
+    body.parent   = lambda
+    lambda.finish = body.finish
+    lambda.bfinish = body.bfinish
+    lambda.keyword[3] = body.finish
+    lambda.keyword[4] = body.finish
+    if body.returns then
+        lambda.returns = body.returns
+    end
+    return body
+end
+
 local function parseLambda(isDoublePipe)
     local lambdaLeft = getPosition(Tokens[Index], 'left')
     local lambdaRight = getPosition(Tokens[Index], 'right')
@@ -2731,12 +2918,15 @@ local function parseLambda(isDoublePipe)
     local LastLocalCount = LocalCount
     -- if nonstandardSymbol for '||' is true it is possible for token to be || when there are no params
     if isDoublePipe then
+        pushChunk(lambda)
+        LocalCount = 0
         params = {
             start = pipeLeft,
             finish = pipeRight,
             parent = lambda,
             type = 'funcargs'
         }
+        lambda.args = params
     else
         -- fake chunk to store locals
         pushChunk(lambda)
@@ -2766,6 +2956,37 @@ local function parseLambda(isDoublePipe)
             missSymbol '|'
         end
     end
+    -- LuaJIT 短函数：消费 -> 箭头（LuaJIT 扩展必选，旧 |lambda| 语法可选）
+    if State.luaJITExtensions then
+        skipSpace(true)
+        if Tokens[Index + 1] == '->' then
+            Index = Index + 2
+            skipSpace(true)
+        else
+            pushError {
+                type   = 'MISS_SYMBOL',
+                start  = lastRightPosition(),
+                finish = lastRightPosition(),
+                info   = { symbol = '->' }
+            }
+        end
+    else
+        skipSpace(true)
+        if Tokens[Index + 1] == '->' then
+            Index = Index + 2
+            skipSpace(true)
+        end
+    end
+
+    -- 语句体：|x| -> do ... end
+    if Tokens[Index + 1] == 'do' then
+        parseLambdaDoBlock(lambda)
+        -- don't want popChunk logic here as this is not a real chunk
+        Chunk[#Chunk] = nil
+        LocalCount = LastLocalCount
+        return lambda
+    end
+
     local child = parseExp()
 
 
@@ -2796,13 +3017,83 @@ local function parseLambda(isDoublePipe)
     return lambda
 end
 
-local function checkNeedParen(source)
+-- LuaJIT 短函数：x -> expr（单参数省略管道）
+---@param name table # 参数名节点（type = 'name'）
+local function parseLambdaSingleArg(name)
+    local lambda = {
+        type   = 'function',
+        start  = name.start,
+        finish = name.finish,
+        bstart = name.finish,
+        keyword = {
+            [1] = name.start,
+            [2] = name.finish,
+        },
+        hasReturn = true
+    }
+    -- 消费 ->
+    Index = Index + 2
+    skipSpace(true)
+    -- 单参数
+    local params = {
+        type   = 'funcargs',
+        start  = name.start,
+        finish = name.finish,
+        parent = lambda,
+    }
+    local arg = createLocal {
+        start  = name.start,
+        finish = name.finish,
+        parent = params,
+        [1]    = name[1],
+    }
+    params[1] = arg
+    lambda.args = params
+    -- fake chunk 存储局部变量
+    pushChunk(lambda)
+    local LastLocalCount = LocalCount
+    LocalCount = 0
+    -- 语句体：x -> do ... end
+    if Tokens[Index + 1] == 'do' then
+        parseLambdaDoBlock(lambda)
+        Chunk[#Chunk] = nil
+        LocalCount = LastLocalCount
+        return lambda
+    end
+    -- 表达式体
+    local child = parseExp()
+    Chunk[#Chunk] = nil
+    if child then
+        local rtn = {
+            type   = 'return',
+            start  = child.start,
+            finish = child.finish,
+            parent = lambda,
+            [1]    = child
+        }
+        child.parent = rtn
+        lambda[1] = rtn
+        lambda.returns = {rtn}
+        lambda.finish = child.finish
+        lambda.keyword[3] = child.finish
+        lambda.keyword[4] = child.finish
+    else
+        lambda.finish = lastRightPosition()
+        missExp()
+    end
+    lambda.bfinish = getPosition(Tokens[Index], 'left')
+    LocalCount = LastLocalCount
+    return lambda
+end
+
+---@param noMethod boolean? # 禁止方法调用后缀（三元 b 部分）
+local function checkNeedParen(source, noMethod)
     local token = Tokens[Index + 1]
     if  token ~= '.'
-    and token ~= ':' then
+    and (token ~= ':' or noMethod) then
         return source
     end
-    local exp = parseSimple(source, false)
+    local exp = parseSimple(source, false, noMethod)
     if exp == source then
         return exp
     end
@@ -2827,11 +3118,12 @@ local function checkNeedParen(source)
     return exp
 end
 
-local function parseExpUnit()
+---@param noMethod boolean? # 禁止方法调用后缀（三元 b 部分）
+local function parseExpUnit(noMethod)
     local token = Tokens[Index + 1]
     if token == '(' then
         local paren = parseParen()
-        return parseSimple(paren, false)
+        return parseSimple(paren, false, noMethod)
     end
 
     if token == '...' then
@@ -2844,7 +3136,7 @@ local function parseExpUnit()
         if not table then
             return nil
         end
-        local exp = checkNeedParen(table)
+        local exp = checkNeedParen(table, noMethod)
         return exp
     end
 
@@ -2853,7 +3145,7 @@ local function parseExpUnit()
         if not string then
             return nil
         end
-        local exp = checkNeedParen(string)
+        local exp = checkNeedParen(string, noMethod)
         return exp
     end
 
@@ -2862,7 +3154,7 @@ local function parseExpUnit()
         if not string then
             return nil
         end
-        local exp = checkNeedParen(string)
+        local exp = checkNeedParen(string, noMethod)
         return exp
     end
 
@@ -2888,17 +3180,22 @@ local function parseExpUnit()
         return parseFunction()
     end
 
-    -- FIXME: Use something other than nonstandardSymbol to check for lambda support
-    if State.options.nonstandardSymbol['|lambda|'] and (token == '|'
+    -- LuaJIT 扩展（或 nonstandardSymbol['|lambda|']）开启时支持短函数
+    if (State.options.nonstandardSymbol['|lambda|'] or State.luaJITExtensions) and (token == '|'
     or token == '||') then
         return parseLambda(token == '||')
     end
 
     local node = parseName()
     if node then
+        -- LuaJIT 短函数：x -> expr（单参数省略管道）
+        skipSpace()
+        if State.luaJITExtensions and Tokens[Index + 1] == '->' then
+            return parseLambdaSingleArg(node)
+        end
         local nameNode = resolveName(node)
         if nameNode then
-            return parseSimple(nameNode, false)
+            return parseSimple(nameNode, false, noMethod)
         end
     end
 
@@ -2921,7 +3218,7 @@ local function parseUnaryOP()
     return op, myLevel
 end
 
----@param level integer # op level must greater than this level
+---@param level number? # op level must greater than this level
 local function parseBinaryOP(asAction, level)
     local token  = Tokens[Index + 1]
     local symbol = (BinarySymbol[token] and token)
@@ -2931,6 +3228,10 @@ local function parseBinaryOP(asAction, level)
         return nil
     end
     if symbol == '//' and State.options.nonstandardSymbol['//'] then
+        return nil
+    end
+    -- LuaJIT 扩展语法：??（空值合并）与 ~>>（算术右移）仅在启用 LuaJIT 扩展时可用
+    if (token == '??' or token == '~>>') and not State.luaJITExtensions then
         return nil
     end
     local myLevel = BinarySymbol[symbol]
@@ -2960,7 +3261,7 @@ local function parseBinaryOP(asAction, level)
         end
     end
     if BinaryAlias[token] then
-        if not State.options.nonstandardSymbol[token] then
+        if not (State.options.nonstandardSymbol[token] or State.luaJITExtensions) then
             pushError {
                 type   = 'ERR_NONSTANDARD_SYMBOL',
                 start  = op.start,
@@ -2983,9 +3284,11 @@ local function parseBinaryOP(asAction, level)
     if token == '//'
     or token == '<<'
     or token == '>>' then
+        -- << >>：Lua 5.3+ 与 LuaJIT 支持；//（地板除）仅 Lua 5.3+（LuaJIT 未反向移植）
         if  State.version ~= 'Lua 5.3'
         and State.version ~= 'Lua 5.4'
-        and State.version ~= 'Lua 5.5' then
+        and State.version ~= 'Lua 5.5'
+        and not (State.version == 'LuaJIT' and token ~= '//') then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
@@ -3001,12 +3304,16 @@ local function parseBinaryOP(asAction, level)
     return op, myLevel
 end
 
-function parseExp(asAction, level)
+---@param asAction boolean?
+---@param level number?    # 运算符优先级（可为 0.5 的倍数，右结合处理）
+---@param noMethod boolean?  # 禁止方法调用后缀（三元 b 部分，对应 LuaJIT EXPR_F_NOCOLON）
+---@param noTernary boolean? # 禁止三元（一元/二元操作数位置，对应 LuaJIT expr_binop 不检查 ?）
+function parseExp(asAction, level, noMethod, noTernary)
     local exp
     local uop, uopLevel = parseUnaryOP()
     if uop then
         skipSpace()
-        local child = parseExp(asAction, uopLevel)
+        local child = parseExp(asAction, uopLevel, noMethod, true)
         -- 预计算负数
         if  uop.type == '-'
         and child
@@ -3029,7 +3336,7 @@ function parseExp(asAction, level)
             end
         end
     else
-        exp = parseExpUnit()
+        exp = parseExpUnit(noMethod)
         if not exp then
             return nil
         end
@@ -3045,7 +3352,7 @@ function parseExp(asAction, level)
         ::AGAIN::
         skipSpace()
         local isForward = SymbolForward[bopLevel]
-        local child = parseExp(asAction, isForward and (bopLevel + 0.5) or bopLevel)
+        local child = parseExp(asAction, isForward and (bopLevel + 0.5) or bopLevel, noMethod, true)
         if not child then
             if skipUnknownSymbol() then
                 goto AGAIN
@@ -3066,6 +3373,49 @@ function parseExp(asAction, level)
             child.parent = bin
         end
         exp = bin
+    end
+
+    -- LuaJIT 三元 ?:（右结合、优先级最低，仅在表达式根位置检查，操作数位置由 noTernary 屏蔽）
+    if State.luaJITExtensions and not noTernary then
+        skipSpace()
+        if Tokens[Index + 1] == '?' then
+            local qEnd = getPosition(Tokens[Index], 'right')
+            Index = Index + 2
+            skipSpace()
+            -- b 部分：NOCOLON，禁止方法调用（如 obj:method()），括号内可加括号绕过
+            local b = parseExp(nil, nil, true)
+            if not b then
+                missExp()
+            end
+            skipSpace()
+            local c
+            if Tokens[Index + 1] == ':' then
+                Index = Index + 2
+                skipSpace()
+                c = parseExp()
+                if not c then
+                    missExp()
+                end
+            else
+                missSymbol(':')
+            end
+            local ternary = {
+                type   = 'ternary',
+                start  = exp.start,
+                finish = c and c.finish or (b and b.finish or qEnd),
+                [1]    = exp,
+                [2]    = b,
+                [3]    = c,
+            }
+            exp.parent = ternary
+            if b then
+                b.parent = ternary
+            end
+            if c then
+                c.parent = ternary
+            end
+            exp = ternary
+        end
     end
 
     return exp
@@ -3199,7 +3549,7 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
         n.type = GetToSetMap[n.type] or n.type
         if n.type == 'setlocal' then
             local loc = n.node
-            if loc.attrs then
+            if loc.attrs or loc.const then
                 pushError {
                     type   = 'SET_CONST',
                     start  = n.start,
@@ -3393,6 +3743,17 @@ local function compileExpAsAction(exp)
                 }
                 return
             end
+            -- LuaJIT：a ~= b 在语句上下文是异或复合赋值（= a ~ b）
+            if op.type == '~=' and State.luaJITExtensions then
+                local n = exp[1]
+                n.type = GetToSetMap[n.type] or n.type
+                n.value = exp[2]
+                n.vstart = op.start
+                n.range  = exp.finish
+                exp[2].parent = n
+                pushActionIntoCurrentChunk(n)
+                return n
+            end
         end
     end
 
@@ -3459,6 +3820,56 @@ local function parseLocal()
     local attrsAfter = parseLocalAttrs('suffix')
     local attrs = mergeLocalAttrs(attrsBefore, attrsAfter)
     local loc = createLocal(name, attrs)
+    loc.locPos = locPos
+    loc.effect = maxinteger
+    pushActionIntoCurrentChunk(loc)
+    skipSpace()
+    parseMultiVars(loc, parseName, true)
+
+    return loc
+end
+
+-- LuaJIT const 声明（const 为 soft keyword）
+local function parseConst()
+    local locPos = getPosition(Tokens[Index], 'left')
+    Index = Index + 2
+    skipSpace()
+    local word, wstart, wfinish = peekWord()
+    if not word then
+        missName()
+        return nil
+    end
+
+    -- const function foo() end
+    if word == 'function' then
+        local func = parseFunction('local', true)
+        local name = func.name
+        if name then
+            func.name    = nil
+            name.value  = func
+            name.vstart = func.start
+            name.range  = func.finish
+            name.locPos = locPos
+            func.parent  = name
+            if name.node then
+                name.node.const = true
+            end
+            pushActionIntoCurrentChunk(name)
+            return name
+        else
+            missName(func.keyword[2])
+            pushActionIntoCurrentChunk(func)
+            return func
+        end
+    end
+
+    local name = parseName(true)
+    if not name then
+        missName()
+        return nil
+    end
+    local loc = createLocal(name, nil)
+    loc.const  = true
     loc.locPos = locPos
     loc.effect = maxinteger
     pushActionIntoCurrentChunk(loc)
@@ -4451,6 +4862,17 @@ function parseAction()
         return parseLocal()
     end
 
+    -- LuaJIT const 声明（soft keyword：后跟标识符或 function 才视为声明）
+    if token == 'const' and State.luaJITExtensions then
+        local nextToken = Tokens[Index + 3]
+        if nextToken == 'function'
+        or (nextToken and nextToken ~= 'goto'
+        and not KeyWord[nextToken]
+        and CharMapWord[ssub(nextToken, 1, 1)]) then
+            return parseConst()
+        end
+    end
+
     if token == 'global' then
         local nextToken = Tokens[Index + 3]
         if isGlobalActionStart(nextToken) then
@@ -4480,8 +4902,20 @@ function parseAction()
         return parseBreak()
     end
 
-    if token == 'continue' and State.options.nonstandardSymbol['continue'] then
-        return parseBreak()
+    if token == 'continue' and (State.options.nonstandardSymbol['continue'] or State.luaJITExtensions) then
+        -- continue 是 soft keyword：仅当其后为换行/`;`/块结束符时才视为 continue 语句，
+        -- 否则（如 `continue = 2`、`continue()`）作为变量名
+        local nextToken = Tokens[Index + 3]
+        if nextToken == nil
+        or NLMap[nextToken]
+        or nextToken == ';'
+        or nextToken == 'end'
+        or nextToken == 'else'
+        or nextToken == 'elseif'
+        or nextToken == 'until'
+        or nextToken == ')' then
+            return parseBreak()
+        end
     end
 
     if token == 'while' then
@@ -4615,6 +5049,11 @@ local function initState(lua, version, options)
     }
     if not state.options.nonstandardSymbol then
         state.options.nonstandardSymbol = {}
+    end
+    -- LuaJIT 扩展语法开关：仅当版本为 LuaJIT 且显式启用时才生效
+    -- 各语法点单独判断 State.luaJITExtensions，不修改 nonstandardSymbol 表
+    if version == 'LuaJIT' and state.options.enableLuaJITExtensions then
+        state.luaJITExtensions = true
     end
     State = state
     if version == 'Lua 5.1' or version == 'LuaJIT' then

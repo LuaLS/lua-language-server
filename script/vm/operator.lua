@@ -47,6 +47,7 @@ local binaryMap = {
     ['~']  = 'bxor',
     ['<<'] = 'shl',
     ['>>'] = 'shr',
+    ['~>>'] = 'sar', -- LuaJIT 算术右移
     ['..'] = 'concat',
 }
 
@@ -68,23 +69,54 @@ end
 ---@param op string
 ---@param value? parser.object
 ---@param result? vm.node
+---@param uri? uri
+---@param classGlobal? vm.global
+---@param signs? parser.object[]
 ---@return vm.node?
-local function checkOperators(operators, op, value, result)
+local function checkOperators(operators, op, value, result, uri, classGlobal, signs)
+    -- For operators declared on a generic class and reached through an
+    -- instantiated type (`Box<string>`), substitute the class type
+    -- parameters in the operand and return annotations.
+    local genericMap
+    if uri and classGlobal and signs then
+        genericMap = vm.getClassGenericMap(uri, classGlobal, signs)
+    end
     for _, operator in ipairs(operators) do
         if operator.op[1] ~= op
         or not operator.extends then
             goto CONTINUE
         end
-        if value and operator.exp then
+        -- 泛型类上声明的 @operator：按实例化类型替换类泛型参数。
+        -- @operator 的 exp/extends 运行时均为单个类型节点（extends 字段的数组
+        -- 类型注解仅供 doc.class 等使用），克隆结果可能是 vm.generic，故声明联合类型。
+        ---@type parser.object|vm.generic
+        local exp     = operator.exp
+        ---@type parser.object|vm.generic
+        local extends = operator.extends
+        if genericMap then
+            if exp and vm.containsGenericName(exp) then
+                exp = vm.cloneObject(exp, genericMap) or exp
+            end
+            if vm.containsGenericName(extends) then
+                extends = vm.cloneObject(extends, genericMap) or extends
+            end
+        end
+        if value and exp then
             local valueNode = vm.compileNode(value)
-            local expNode   = vm.compileNode(operator.exp)
-            local uri       = guide.getUri(operator)
+            local expNode   = vm.compileNode(exp)
+            local opUri     = guide.getUri(operator)
             for vo in valueNode:eachObject() do
-                if vm.isSubType(uri, vo, expNode) then
+                local child = vo
+                -- `vm.isSubType` has no notion of `doc.type.sign`; match an
+                -- instantiated type (`Box<string>`) by its base class.
+                if child.type == 'doc.type.sign' and child.node and child.node[1] then
+                    child = vm.getGlobal('type', child.node[1]) or child
+                end
+                if vm.isSubType(opUri, child, expNode) then
                     if not result then
                         result = vm.createNode()
                     end
-                    result:merge(vm.compileNode(operator.extends))
+                    result:merge(vm.compileNode(extends))
                     return result
                 end
             end
@@ -92,7 +124,7 @@ local function checkOperators(operators, op, value, result)
             if not result then
                 result = vm.createNode()
             end
-            result:merge(vm.compileNode(operator.extends))
+            result:merge(vm.compileNode(extends))
             return result
         end
         ::CONTINUE::
@@ -119,6 +151,17 @@ function vm.runOperator(op, exp, value)
             for _, set in ipairs(c:getSets(uri)) do
                 if set.operators and #set.operators > 0 then
                     result = checkOperators(set.operators, op, value, result)
+                end
+            end
+        end
+        if c.type == 'doc.type.sign' and c.node and c.node[1] then
+            local classGlobal = vm.getGlobal('type', c.node[1])
+            if classGlobal then
+                for _, set in ipairs(classGlobal:getSets(uri)) do
+                    if set.operators and #set.operators > 0 then
+                        result = checkOperators(set.operators, op, value, result,
+                            uri, classGlobal, c.signs)
+                    end
                 end
             end
         end
@@ -223,6 +266,41 @@ vm.binarySwitch = util.switch()
             vm.setNode(source, node)
         end
     end)
+    : case '??' -- LuaJIT 空值合并：仅当左侧为 nil 时取右侧（false 仍返回左侧）
+    : call(function (source)
+        local node1 = vm.compileNode(source[1])
+        local node2 = vm.compileNode(source[2])
+        -- 统计具体类型：variable/local 是引用元信息，无具体类型时视为未知（可能为 nil）
+        local count   = 0
+        local hasNil  = false
+        for c in node1:eachObject() do
+            if c.type == 'nil'
+            or (c.type == 'global' and c.cate == 'type' and c.name == 'nil') then
+                hasNil = true
+            elseif c.type ~= 'variable' and c.type ~= 'local' then
+                count = count + 1
+                if c.type == 'unknown'
+                or (c.type == 'global' and c.cate == 'type' and c.name == 'unknown') then
+                    -- 未初始化变量可能为 nil
+                    hasNil = true
+                end
+            end
+        end
+        if count == 0 then
+            -- 无具体类型（仅元信息或空）：未知，视为可能为 nil，取右侧
+            vm.setNode(source, node2)
+        elseif hasNil then
+            -- a 可能为 nil → (a 去 nil) | b
+            local node = node1:copy():removeOptional()
+            if not source[2].hasExit then
+                node:merge(node2)
+            end
+            vm.setNode(source, node)
+        else
+            -- a 必非 nil → a
+            vm.setNode(source, node1)
+        end
+    end)
     : case '=='
     : case '~='
     : call(function (source)
@@ -245,6 +323,7 @@ vm.binarySwitch = util.switch()
     end)
     : case '<<'
     : case '>>'
+    : case '~>>'
     : case '&'
     : case '|'
     : case '~'
@@ -255,6 +334,8 @@ vm.binarySwitch = util.switch()
         if a and b then
             local result = op == '<<' and a << b
                         or op == '>>' and a >> b
+                        -- LuaJIT 算术右移：Lua 5.3+ 的 >> 即算术右移
+                        or op == '~>>' and a >> b
                         or op == '&'  and a &  b
                         or op == '|'  and a |  b
                         or op == '~'  and a ~  b

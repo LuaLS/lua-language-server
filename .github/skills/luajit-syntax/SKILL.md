@@ -180,6 +180,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 - **优先级表**：所有新增运算符的优先级必须严格遵循 LuaJIT 官方定义（见 references/syntax-extensions.md「运算符优先级」）。
 - **三元 `?:` 已实现**：见 references/syntax-extensions.md 第 3 节；b 部分禁止方法调用（NOCOLON），需括号 `(obj:method())` 绕过；b 部分嵌套三元非法（`d:e` 歧义），c 部分右结合递归合法。
 - **`?.` 与 `:` 的歧义**：实现安全导航的方法形式时需小心区分 `obj?.:method`（`?.` + `:`）与 `obj:method?.`（`:` + `?.`），以及普通方法调用 `obj:method`，三者 token 序列不同，需在 `parseSimple` 中分别处理。
+- **无点号可选链 `?(` / `?[`（2026-08-13 新增，非 LuaJIT 语法）**：`f?()` / `t?[1]` 等价于 `f?.()` / `t?.[1]`，AST 一致（`call`/`getindex` 的 `safe=true`）。仅由 `nonstandardSymbol['?(']`/`['?[']` 单独启用，**与 LuaJIT 无关**（主开关 enableLuaJITExtensions 不启用，与版本无关）；与三元 `?:` 解析冲突（`a ? (x) : c` 会被当作 `a?(x)`），template 注释与 locale 描述均有警告。
 - **soft keyword**：`const` 与 `continue` 都是 soft keyword，可作变量名/字段名/函数名，解析时必须先识别上下文。
 - **短路语义**：`??`、`?.` 都有短路行为，虽然语法层不关心求值，但 AST 结构与类型推断需正确表达。
 - **`continue` 与 `repeat`**：`continue` 跳转到循环条件；在 `repeat` 中不能跳入其后声明的局部变量作用域（测试 `stmt_continue.lua` 有覆盖）。

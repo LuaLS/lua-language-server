@@ -38,6 +38,10 @@ LuaJIT 3.0 拡張構文（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `n
 ]]
 config.runtime.nonstandardSymbol['?.'] =
 "安全ナビゲーション（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['?('] =
+"ドットなしオプショナル呼び出し（`f?()` は `f?.()` と同等。三項 `?:` の解析と競合するため併用非推奨）。"
+config.runtime.nonstandardSymbol['?['] =
+"ドットなしオプショナルインデックス（`t?[1]` は `t?.[1]` と同等。三項 `?:` の解析と競合するため併用非推奨）。"
 config.runtime.nonstandardSymbol['??'] =
 "nil 合体（`a ?? b`。左辺が nil の場合のみ右辺を返す）。"
 config.runtime.nonstandardSymbol['?:'] =

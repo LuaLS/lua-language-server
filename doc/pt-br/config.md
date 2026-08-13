@@ -2020,6 +2020,8 @@ Array<string>
 * ``"const"``: Declaração `const` (constante local de escopo de bloco; não pode ser reatribuída nem redeclarada).
 * ``"->"``: Seta de função curta (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`).
 * ``"number_underscore"``: Sublinhado em literais numéricos (ex.: `1_000`, `0x1_2`, `0b1_0`).
+* ``"?("``: Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário `?:`, não recomendado juntos).
+* ``"?["``: Índice opcional sem ponto (`t?[1]` equivale a `t?.[1]`; conflita com a análise do ternário `?:`, não recomendado juntos).
 
 ## default
 

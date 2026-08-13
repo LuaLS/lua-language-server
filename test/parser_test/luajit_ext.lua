@@ -166,6 +166,25 @@ TestIndividual('?.', 'local a = obj?.[key]')
 TestIndividual('?.', 'local a = f?.()')
 TestIndividual('?.', 'local a = obj?.:method()')
 TestIndividualDisabled('?.', 'local a = obj?.field')
+-- ?( / ?[ 无点号可选链（非 LuaJIT 语法，仅 nonstandardSymbol 单独启用）
+TestIndividual('?(', 'local a = f?()')
+TestIndividual('?(', 'local a = f?(x, y)')
+TestIndividual('?(', 'local a = f?().field')
+TestIndividual('?[', 'local a = t?[1]')
+TestIndividual('?[', 'local a = t?[key]')
+TestIndividual('?[', 'local a = t?[1].field')
+TestIndividualDisabled('?(', 'local a = f?()')
+TestIndividualDisabled('?[', 'local a = t?[1]')
+-- 无点号可选链与 LuaJIT 无关：主开关 enableLuaJITExtensions 不启用它
+---@param script string
+local function TestMasterSwitchDisabled(script)
+    local state = parser.compile(script, 'Lua', 'LuaJIT', { enableLuaJITExtensions = true })
+    if #state.errs == 0 then
+        error(('主开关不应启用无点号可选链：%s'):format(script))
+    end
+end
+TestMasterSwitchDisabled 'local a = f?()'
+TestMasterSwitchDisabled 'local a = t?[1]'
 -- ?? 空值合并
 TestIndividual('??', 'local a = b ?? c')
 TestIndividualDisabled('??', 'local a = b ?? c')

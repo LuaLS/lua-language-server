@@ -38,6 +38,10 @@ LuaJIT 3.0 擴充語法（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `n
 ]]
 config.runtime.nonstandardSymbol['?.'] =
 "安全導覽（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['?('] =
+"無點號可選鏈呼叫（`f?()` 等價於 `f?.()`；與三元 `?:` 解析衝突，不建議同時啟用）。"
+config.runtime.nonstandardSymbol['?['] =
+"無點號可選鏈索引（`t?[1]` 等價於 `t?.[1]`；與三元 `?:` 解析衝突，不建議同時啟用）。"
 config.runtime.nonstandardSymbol['??'] =
 "空值合併（`a ?? b`，僅當左側為 nil 時取右側）。"
 config.runtime.nonstandardSymbol['?:'] =

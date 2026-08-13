@@ -238,6 +238,10 @@ local template = {
                                                 'const',-- const 声明（块级局部常量，不可重新赋值/重复声明）
                                                 '->',   -- 短函数箭头（x -> expr / |x| -> expr / || -> expr / -> do ... end）
                                                 'number_underscore', -- 数字字面量下划线（如 1_000、0x1_2、0b1_0）
+                                                -- 无点号可选链（非 LuaJIT 语法，本项目独立扩展）：? 直接后跟 ( 或 [（f?() / t?[1]），相对 ?. 省略点号
+                                                -- 警告：与三元 ?: 解析冲突（如 `a ? (x) : c` 会被当作 `a?(x)`），不建议与 '?:' 同时启用
+                                                '?(',   -- f?() 无点号可选链调用
+                                                '?[',   -- t?[1] 无点号可选链索引
                                             }),
     ['Lua.runtime.enableLuaJITExtensions']  = Type.Boolean >> false,
     ['Lua.runtime.plugin']                  = Type.Or(Type.String, Type.Array(Type.String)) ,

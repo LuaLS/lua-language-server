@@ -2020,6 +2020,8 @@ Array<string>
 * ``"const"``: `const` declaration (block-scoped local constant, cannot be reassigned or redeclared).
 * ``"->"``: Short function arrow (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`).
 * ``"number_underscore"``: Underscores in number literals (e.g. `1_000`, `0x1_2`, `0b1_0`).
+* ``"?("``: No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary `?:` parsing, not recommended together).
+* ``"?["``: No-dot optional index (`t?[1]` equals `t?.[1]`; conflicts with ternary `?:` parsing, not recommended together).
 
 ## default
 

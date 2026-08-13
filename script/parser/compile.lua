@@ -2184,6 +2184,20 @@ local function parseSimple(node, funcName, noMethod)
             Index = Index + 2
             skipSpace()
             token = Tokens[Index + 1]
+        -- 无点号可选链（非 LuaJIT 语法，本项目独立扩展）：? 直接后跟 ( 或 [（f?() / t?[1]，相对 ?. 省略点号）。
+        -- 仅由 nonstandardSymbol['?('] / ['?['] 单独启用，与 LuaJIT 版本/主开关无关：
+        -- 它与三元 ?: 解析存在冲突（如 `a ? (x) : c` 会被当作 `a?(x)`）
+        elseif token == '?' then
+            local nextToken = Tokens[Index + 3]
+            if (nextToken == '(' and State.options.nonstandardSymbol['?('])
+            or (nextToken == '[' and State.options.nonstandardSymbol['?[']) then
+                safe = true
+                Index = Index + 2
+                skipSpace()
+                token = Tokens[Index + 1]
+            else
+                break
+            end
         end
         -- LuaJIT 安全导航：?. 后直接跟字段名（a?.field）
         if safe and token and not KeyWord[token]

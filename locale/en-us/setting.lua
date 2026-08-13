@@ -38,6 +38,10 @@ LuaJIT 3.0 extension syntax (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->`
 ]]
 config.runtime.nonstandardSymbol['?.'] =
 "Safe navigation (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['?('] =
+"No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary `?:` parsing, not recommended together)."
+config.runtime.nonstandardSymbol['?['] =
+"No-dot optional index (`t?[1]` equals `t?.[1]`; conflicts with ternary `?:` parsing, not recommended together)."
 config.runtime.nonstandardSymbol['??'] =
 "Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil)."
 config.runtime.nonstandardSymbol['?:'] =

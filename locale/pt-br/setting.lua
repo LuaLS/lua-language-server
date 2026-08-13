@@ -38,6 +38,10 @@ A sintaxe de extensão do LuaJIT 3.0 (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `co
 ]]
 config.runtime.nonstandardSymbol['?.'] =
 "Navegação segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['?('] =
+"Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário `?:`, não recomendado juntos)."
+config.runtime.nonstandardSymbol['?['] =
+"Índice opcional sem ponto (`t?[1]` equivale a `t?.[1]`; conflita com a análise do ternário `?:`, não recomendado juntos)."
 config.runtime.nonstandardSymbol['??'] =
 "Coalescência nula (`a ?? b`; usa o lado direito apenas quando o esquerdo é nil)."
 config.runtime.nonstandardSymbol['?:'] =

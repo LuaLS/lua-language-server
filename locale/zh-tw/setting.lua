@@ -33,7 +33,11 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.nonstandardSymbol['?.'] =
-"安全導覽（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+"安全導覽（欄位/方法：`a?.b` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['?.('] =
+"安全導覽呼叫（`f?.()` / `f?.\"str\"` / `f?.{...}` / `f?.[[...]]`）。"
+config.runtime.nonstandardSymbol['?.['] =
+"安全導覽索引（`t?.[key]`）。"
 config.runtime.nonstandardSymbol['?('] =
 "無點號可選鏈呼叫（`f?()` 等價於 `f?.()`；與三元 `?:` 解析衝突，不建議同時啟用）。"
 config.runtime.nonstandardSymbol['?['] =

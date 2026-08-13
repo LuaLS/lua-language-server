@@ -33,7 +33,11 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.nonstandardSymbol['?.'] =
-"Safe navigation (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+"Safe navigation (field/method: `a?.b` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['?.('] =
+"Safe navigation call (`f?.()` / `f?.\"str\"` / `f?.{...}` / `f?.[[...]]`)."
+config.runtime.nonstandardSymbol['?.['] =
+"Safe navigation index (`t?.[key]`)."
 config.runtime.nonstandardSymbol['?('] =
 "No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary `?:` parsing, not recommended together)."
 config.runtime.nonstandardSymbol['?['] =

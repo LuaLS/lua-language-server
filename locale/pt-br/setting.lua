@@ -33,7 +33,11 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos."
 config.runtime.nonstandardSymbol['?.'] =
-"Navegação segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+"Navegação segura (campo/método: `a?.b` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['?.('] =
+"Chamada de navegação segura (`f?.()` / `f?.\"str\"` / `f?.{...}` / `f?.[[...]]`)."
+config.runtime.nonstandardSymbol['?.['] =
+"Índice de navegação segura (`t?.[key]`)."
 config.runtime.nonstandardSymbol['?('] =
 "Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário `?:`, não recomendado juntos)."
 config.runtime.nonstandardSymbol['?['] =

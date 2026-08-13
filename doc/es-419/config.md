@@ -2028,7 +2028,9 @@ Array<string>
 * ``"!="``: Diferente (equivalente a `~=`).
 * ``"continue"``: Sentencia `continue`.
 * ``"|lambda|"``: Función corta con parámetros en pipe (`|x| expr`).
-* ``"?."``: Navegación segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`).
+* ``"?."``: Navegación segura (campo/método: `a?.b` / `obj?.:method()` / `obj:method?.()`).
+* ``"?.("``: Llamada de navegación segura (`f?.()` / `f?."str"` / `f?.{...}` / `f?.[[...]]`).
+* ``"?.["``: Índice de navegación segura (`t?.[key]`).
 * ``"??"``: Coalescencia nula (`a ?? b`; usa el lado derecho solo cuando el izquierdo es nil).
 * ``"?:"``: Condicional ternario (`a ? b : c`, asociativo a la derecha).
 * ``"~>>"``: Desplazamiento aritmético a la derecha (`a ~>> b`, específico de LuaJIT; `>>` normal es lógico).

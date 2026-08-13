@@ -2025,7 +2025,9 @@ Array<string>
 * ``"!="``: Not equal (equivalent to `~=`).
 * ``"continue"``: `continue` statement.
 * ``"|lambda|"``: Pipe-parameter short function (`|x| expr`).
-* ``"?."``: Safe navigation (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`).
+* ``"?."``: Safe navigation (field/method: `a?.b` / `obj?.:method()` / `obj:method?.()`).
+* ``"?.("``: Safe navigation call (`f?.()` / `f?."str"` / `f?.{...}` / `f?.[[...]]`).
+* ``"?.["``: Safe navigation index (`t?.[key]`).
 * ``"??"``: Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil).
 * ``"?:"``: Ternary conditional (`a ? b : c`, right-associative).
 * ``"~>>"``: Arithmetic right shift (`a ~>> b`, LuaJIT-specific; plain `>>` is logical).

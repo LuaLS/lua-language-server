@@ -33,7 +33,11 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "非標準の記号をサポートします。ランタイム環境がこれらの記号をサポートしていることを確認してください。"
 config.runtime.nonstandardSymbol['?.'] =
-"安全ナビゲーション（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+"安全ナビゲーション（フィールド/メソッド：`a?.b` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['?.('] =
+"安全ナビゲーション呼び出し（`f?.()` / `f?.\"str\"` / `f?.{...}` / `f?.[[...]]`）。"
+config.runtime.nonstandardSymbol['?.['] =
+"安全ナビゲーションインデックス（`t?.[key]`）。"
 config.runtime.nonstandardSymbol['?('] =
 "ドットなしオプショナル呼び出し（`f?()` は `f?.()` と同等。三項 `?:` の解析と競合するため併用非推奨）。"
 config.runtime.nonstandardSymbol['?['] =

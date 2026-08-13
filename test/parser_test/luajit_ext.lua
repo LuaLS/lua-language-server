@@ -160,12 +160,19 @@ local function TestIndividualDisabled(symbol, script)
     end
 end
 
--- ?. 安全导航
+-- ?. 安全导航（字段/方法）
 TestIndividual('?.', 'local a = obj?.field')
-TestIndividual('?.', 'local a = obj?.[key]')
-TestIndividual('?.', 'local a = f?.()')
 TestIndividual('?.', 'local a = obj?.:method()')
 TestIndividualDisabled('?.', 'local a = obj?.field')
+-- ?.( 安全导航调用 / ?.[ 安全导航索引
+TestIndividual('?.(', 'local a = f?.()')
+TestIndividual('?.(', 'local a = f?.{1, 2}')
+TestIndividual('?.(', 'local a = f?."str"')
+TestIndividual('?.(', 'local a = obj:method?.()')
+TestIndividual('?.[', 'local a = obj?.[key]')
+TestIndividual('?.[', 'local a = obj?.[key].field')
+TestIndividualDisabled('?.(', 'local a = f?.()')
+TestIndividualDisabled('?.[', 'local a = obj?.[key]')
 -- ?( / ?[ 无点号可选链（非 LuaJIT 语法，仅 nonstandardSymbol 单独启用）
 TestIndividual('?(', 'local a = f?()')
 TestIndividual('?(', 'local a = f?(x, y)')

@@ -34,7 +34,11 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "Soporte de símbolos no estándar. Asegúrese que la versión de Lua que se ejecuta soporte estos símbolos."
 config.runtime.nonstandardSymbol['?.'] =
-"Navegación segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+"Navegación segura (campo/método: `a?.b` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['?.('] =
+"Llamada de navegación segura (`f?.()` / `f?.\"str\"` / `f?.{...}` / `f?.[[...]]`)."
+config.runtime.nonstandardSymbol['?.['] =
+"Índice de navegación segura (`t?.[key]`)."
 config.runtime.nonstandardSymbol['?('] =
 "Llamada opcional sin punto (`f?()` equivale a `f?.()`; entra en conflicto con el análisis del ternario `?:`, no recomendado juntos)."
 config.runtime.nonstandardSymbol['?['] =

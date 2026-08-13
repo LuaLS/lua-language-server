@@ -227,7 +227,9 @@ local template = {
                                                 '|lambda|',
                                                 -- LuaJIT 3.0 扩展语法，可单独启用（不要求 Lua.runtime.version == 'LuaJIT'，
                                                 -- 也无需开启 Lua.runtime.enableLuaJITExtensions）
-                                                '?.',   -- 安全导航（a?.b / a?.[k] / f?.() / obj?.:method() / obj:method?.()）
+                                                '?.',   -- 安全导航（字段/方法：a?.b / obj?.:method() / obj:method?.()）
+                                                '?.(',  -- 安全导航调用（f?.() / f?."str" / f?.{...} / f?.[[...]]）
+                                                '?.[',  -- 安全导航索引（t?.[key]）
                                                 '??',   -- 空值合并（a ?? b）
                                                 '?:',   -- 三元条件（a ? b : c，右结合；b 部分禁止方法调用）
                                                 '~>>',  -- 算术右移（a ~>> b，LuaJIT 特有，普通 >> 为逻辑右移）

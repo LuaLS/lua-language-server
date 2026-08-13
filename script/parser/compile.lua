@@ -2172,7 +2172,26 @@ local function parseSimple(node, funcName, noMethod)
         -- LuaJIT 安全导航 `?.`：标记后续操作为 safe（仅启用 LuaJIT 扩展时生效）
         local safe = false
         if token == '?.' then
-            if not isLuaJITExt('?.') then
+            -- 根据 ?. 后的后缀决定启用哪个选项（可分别单独启用）：
+            --   ?.( -> 安全调用：f?.() / f?."str" / f?.{...} / f?.[[...]]
+            --   ?.[ -> 安全索引：t?.[key]
+            --   ?.  -> 安全字段/方法：a?.b / obj?.:method / obj:method?.
+            local suffix = Tokens[Index + 3]
+            local opt
+            if suffix == '(' or suffix == '{' or CharMapStrSH[suffix] then
+                opt = '?.('
+            elseif suffix == '[' then
+                -- 长字符串调用 f?.[[...]] 属于 ?.(，普通索引 t?.[k] 属于 ?.[
+                local next2 = Tokens[Index + 5]
+                if next2 == '[' or next2 == '=' then
+                    opt = '?.('
+                else
+                    opt = '?.['
+                end
+            else
+                opt = '?.'
+            end
+            if not isLuaJITExt(opt) then
                 break
             end
             -- LuaJIT 三元 b 部分：?. 后紧跟 : 属语法错误（EXPR_F_NOCOLON + nav），

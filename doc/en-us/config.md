@@ -284,34 +284,34 @@ Array<string>
 
 ## enum
 
-* ``"action-after-return"``
-* ``"ambiguity-1"``
-* ``"ambiguous-syntax"``
-* ``"args-after-dots"``
-* ``"assign-const-global"``
-* ``"assign-type-mismatch"``
-* ``"await-in-sync"``
-* ``"block-after-else"``
-* ``"break-outside"``
-* ``"cast-local-type"``
-* ``"cast-type-mismatch"``
-* ``"circle-doc-class"``
-* ``"close-non-object"``
-* ``"code-after-break"``
-* ``"codestyle-check"``
-* ``"count-down-loop"``
-* ``"declare-const"``
-* ``"deprecated"``
-* ``"different-requires"``
-* ``"discard-returns"``
-* ``"doc-field-no-class"``
-* ``"duplicate-doc-alias"``
-* ``"duplicate-doc-field"``
-* ``"duplicate-doc-param"``
-* ``"duplicate-index"``
-* ``"duplicate-set-field"``
-* ``"empty-block"``
-* ``"env-is-global"``
+* ``"action-after-return"``: Code after a `return` statement
+* ``"ambiguity-1"``: Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.
+* ``"ambiguous-syntax"``: Ambiguous syntax
+* ``"args-after-dots"``: Arguments after `...`
+* ``"assign-const-global"``: Assigning to a const global variable
+* ``"assign-type-mismatch"``: Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+* ``"await-in-sync"``: Enable diagnostics for calls of asynchronous functions within a synchronous function.
+* ``"block-after-else"``: Block after `else`
+* ``"break-outside"``: Using `break` outside a loop
+* ``"cast-local-type"``: Enable diagnostics for casts of local variables where the target type does not match the defined type.
+* ``"cast-type-mismatch"``: Enable diagnostics for casts where the target type does not match the initial type.
+* ``"circle-doc-class"``: Circular `@class` inheritance
+* ``"close-non-object"``: Enable diagnostics for attempts to close a variable with a non-object.
+* ``"code-after-break"``: Enable diagnostics for code placed after a break statement in a loop.
+* ``"codestyle-check"``: Enable diagnostics for incorrectly styled lines.
+* ``"count-down-loop"``: Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+* ``"declare-const"``: Redeclaring a const constant
+* ``"deprecated"``: Enable diagnostics to highlight deprecated API.
+* ``"different-requires"``: Enable diagnostics for files which are required by two different paths.
+* ``"discard-returns"``: Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+* ``"doc-field-no-class"``: Enable diagnostics to highlight a field annotation without a defining class annotation.
+* ``"duplicate-doc-alias"``: Enable diagnostics for a duplicated alias annotation name.
+* ``"duplicate-doc-field"``: Enable diagnostics for a duplicated field annotation name.
+* ``"duplicate-doc-param"``: Enable diagnostics for a duplicated param annotation name.
+* ``"duplicate-index"``: Enable duplicate table index diagnostics.
+* ``"duplicate-set-field"``: Enable diagnostics for setting the same field in a class more than once.
+* ``"empty-block"``: Enable empty code block diagnostics.
+* ``"env-is-global"``: `_ENV` used as a global variable
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -320,19 +320,19 @@ Array<string>
 * ``"err-esc"``
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
-* ``"exp-in-action"``
-* ``"global-close-attribute"``
-* ``"global-element"``
-* ``"global-in-nil-env"``
-* ``"incomplete-signature-doc"``
-* ``"index-in-func-name"``
-* ``"inject-field"``
-* ``"invisible"``
-* ``"jump-local-scope"``
-* ``"keyword"``
-* ``"local-limit"``
-* ``"lowercase-global"``
-* ``"lua-doc-miss-sign"``
+* ``"exp-in-action"``: Expression used in statement position
+* ``"global-close-attribute"``: Close attribute on a global variable
+* ``"global-element"``: Enable diagnostics to warn about global elements.
+* ``"global-in-nil-env"``: Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.
+* ``"incomplete-signature-doc"``: Incomplete @param or @return annotations for functions.
+* ``"index-in-func-name"``: Index in a function name
+* ``"inject-field"``: Injecting a field into an object
+* ``"invisible"``: Enable diagnostics for accesses to fields which are invisible.
+* ``"jump-local-scope"``: Jumping into a local variable scope
+* ``"keyword"``: Improper use of a keyword
+* ``"local-limit"``: Too many local variables
+* ``"lowercase-global"``: Enable lowercase global variable definition diagnostics.
+* ``"lua-doc-miss-sign"``: LuaDoc comment missing a sign
 * ``"luadoc-error-diag-mode"``
 * ``"luadoc-miss-alias-extends"``
 * ``"luadoc-miss-alias-name"``
@@ -357,7 +357,7 @@ Array<string>
 * ``"luadoc-miss-type-name"``
 * ``"luadoc-miss-vararg-type"``
 * ``"luadoc-miss-version"``
-* ``"malformed-number"``
+* ``"malformed-number"``: Malformed number literal
 * ``"miss-end"``
 * ``"miss-esc-x"``
 * ``"miss-exp"``
@@ -370,59 +370,59 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
-* ``"missing-fields"``
-* ``"missing-global-doc"``
-* ``"missing-local-export-doc"``
-* ``"missing-parameter"``
-* ``"missing-return"``
-* ``"missing-return-value"``
-* ``"multi-close"``
-* ``"name-style-check"``
-* ``"need-check-nil"``
-* ``"need-paren"``
-* ``"nesting-long-mark"``
-* ``"newfield-call"``
-* ``"newline-call"``
-* ``"no-unknown"``
-* ``"no-visible-label"``
-* ``"not-yieldable"``
-* ``"param-type-mismatch"``
-* ``"redefined-label"``
-* ``"redefined-local"``
-* ``"redundant-parameter"``
-* ``"redundant-return"``
-* ``"redundant-return-value"``
-* ``"redundant-value"``
-* ``"return-type-mismatch"``
-* ``"set-const"``
-* ``"spell-check"``
-* ``"trailing-space"``
-* ``"unbalanced-assignments"``
-* ``"undefined-doc-class"``
-* ``"undefined-doc-name"``
-* ``"undefined-doc-param"``
-* ``"undefined-env-child"``
-* ``"undefined-field"``
-* ``"undefined-global"``
+* ``"missing-fields"``: Missing fields
+* ``"missing-global-doc"``: Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
+* ``"missing-local-export-doc"``: Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
+* ``"missing-parameter"``: Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+* ``"missing-return"``: Enable diagnostics for functions with return annotations which have no return statement.
+* ``"missing-return-value"``: Enable diagnostics for return statements without values although the containing function declares returns.
+* ``"multi-close"``: Multiple close operations
+* ``"name-style-check"``: Enable diagnostics for name style.
+* ``"need-check-nil"``: Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+* ``"need-paren"``: Parentheses required
+* ``"nesting-long-mark"``: Nested long comment markers
+* ``"newfield-call"``: Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
+* ``"newline-call"``: Enable newline call diagnostics. It's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
+* ``"no-unknown"``: Enable diagnostics for cases in which the type cannot be inferred.
+* ``"no-visible-label"``: Invisible label
+* ``"not-yieldable"``: Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+* ``"param-type-mismatch"``: Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+* ``"redefined-label"``: Redefined label
+* ``"redefined-local"``: Enable redefined local variable diagnostics.
+* ``"redundant-parameter"``: Enable redundant function parameter diagnostics.
+* ``"redundant-return"``: Enable diagnostics for return statements which are not needed because the function would exit on its own.
+* ``"redundant-return-value"``: Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+* ``"redundant-value"``: Enable the redundant values assigned diagnostics. It's raised during assignment operation, when the number of values is higher than the number of objects being assigned.
+* ``"return-type-mismatch"``: Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+* ``"set-const"``: Assigning to a const constant
+* ``"spell-check"``: Enable diagnostics for typos in strings.
+* ``"trailing-space"``: Enable trailing space diagnostics.
+* ``"unbalanced-assignments"``: Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+* ``"undefined-doc-class"``: Enable diagnostics for class annotations in which an undefined class is referenced.
+* ``"undefined-doc-name"``: Enable diagnostics for type annotations referencing an undefined type or alias.
+* ``"undefined-doc-param"``: Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+* ``"undefined-env-child"``: Enable undefined environment variable diagnostics. It's raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.
+* ``"undefined-field"``: Enable diagnostics for cases in which an undefined field of a variable is read.
+* ``"undefined-global"``: Enable undefined global variable diagnostics.
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
 * ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
-* ``"unicode-name"``
-* ``"unknown-attribute"``
-* ``"unknown-cast-variable"``
-* ``"unknown-diag-code"``
-* ``"unknown-operator"``
-* ``"unknown-symbol"``
-* ``"unreachable-code"``
-* ``"unsupport-named-vararg"``
+* ``"unicode-name"``: Unicode name
+* ``"unknown-attribute"``: Unknown attribute
+* ``"unknown-cast-variable"``: Enable diagnostics for casts of undefined variables.
+* ``"unknown-diag-code"``: Enable diagnostics in cases in which an unknown diagnostics code is entered.
+* ``"unknown-operator"``: Enable diagnostics for unknown operators.
+* ``"unknown-symbol"``: Unknown symbol
+* ``"unreachable-code"``: Enable diagnostics for unreachable code.
+* ``"unsupport-named-vararg"``: Unsupported named vararg
 * ``"unsupport-symbol"``
-* ``"unused-function"``
-* ``"unused-label"``
-* ``"unused-local"``
-* ``"unused-vararg"``
-* ``"variable-not-declared"``
+* ``"unused-function"``: Enable unused function diagnostics.
+* ``"unused-label"``: Enable unused label diagnostics.
+* ``"unused-local"``: Enable unused local variable diagnostics.
+* ``"unused-vararg"``: Enable unused vararg diagnostics.
+* ``"variable-not-declared"``: Using an undeclared variable
 
 ## default
 
@@ -848,6 +848,9 @@ object<string, string>
     Enable diagnostics for casts where the target type does not match the initial type.
     */
     "cast-type-mismatch": "Opened",
+    /*
+    Circular `@class` inheritance
+    */
     "circle-doc-class": "Any",
     /*
     Enable diagnostics for attempts to close a variable with a non-object.
@@ -917,6 +920,9 @@ object<string, string>
     Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "None",
+    /*
+    Injecting a field into an object
+    */
     "inject-field": "Opened",
     /*
     Enable diagnostics for accesses to fields which are invisible.
@@ -926,6 +932,9 @@ object<string, string>
     Enable lowercase global variable definition diagnostics.
     */
     "lowercase-global": "Any",
+    /*
+    Missing fields
+    */
     "missing-fields": "Any",
     /*
     Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
@@ -1118,6 +1127,9 @@ object<string, string>
     Enable diagnostics for casts where the target type does not match the initial type.
     */
     "cast-type-mismatch": "Warning",
+    /*
+    Circular `@class` inheritance
+    */
     "circle-doc-class": "Warning",
     /*
     Enable diagnostics for attempts to close a variable with a non-object.
@@ -1187,6 +1199,9 @@ object<string, string>
     Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "Warning",
+    /*
+    Injecting a field into an object
+    */
     "inject-field": "Warning",
     /*
     Enable diagnostics for accesses to fields which are invisible.
@@ -1196,6 +1211,9 @@ object<string, string>
     Enable lowercase global variable definition diagnostics.
     */
     "lowercase-global": "Information",
+    /*
+    Missing fields
+    */
     "missing-fields": "Warning",
     /*
     Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
@@ -1990,26 +2008,26 @@ Array<string>
 
 ## enum
 
-* ``"//"``
-* ``"/**/"``
-* ``"`"``
-* ``"+="``
-* ``"-="``
-* ``"*="``
-* ``"/="``
-* ``"%="``
-* ``"^="``
-* ``"//="``
-* ``"|="``
-* ``"&="``
-* ``"<<="``
-* ``">>="``
-* ``"||"``
-* ``"&&"``
-* ``"!"``
-* ``"!="``
-* ``"continue"``
-* ``"|lambda|"``
+* ``"//"``: Line comment (C style).
+* ``"/**/"``: Block comment (C style).
+* ``"`"``: Backtick string literal.
+* ``"+="``: Add compound assignment.
+* ``"-="``: Subtract compound assignment.
+* ``"*="``: Multiply compound assignment.
+* ``"/="``: Divide compound assignment.
+* ``"%="``: Modulo compound assignment.
+* ``"^="``: Power compound assignment.
+* ``"//="``: Floor-divide compound assignment.
+* ``"|="``: Bitwise-or compound assignment.
+* ``"&="``: Bitwise-and compound assignment.
+* ``"<<="``: Left shift compound assignment.
+* ``">>="``: Right shift compound assignment.
+* ``"||"``: Logical or (equivalent to `or`).
+* ``"&&"``: Logical and (equivalent to `and`).
+* ``"!"``: Logical not (equivalent to `not`).
+* ``"!="``: Not equal (equivalent to `~=`).
+* ``"continue"``: `continue` statement.
+* ``"|lambda|"``: Pipe-parameter short function (`|x| expr`).
 * ``"?."``: Safe navigation (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`).
 * ``"??"``: Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil).
 * ``"?:"``: Ternary conditional (`a ? b : c`, right-associative).

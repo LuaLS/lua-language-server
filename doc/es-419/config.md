@@ -284,34 +284,34 @@ Array<string>
 
 ## enum
 
-* ``"action-after-return"``
-* ``"ambiguity-1"``
-* ``"ambiguous-syntax"``
-* ``"args-after-dots"``
-* ``"assign-const-global"``
-* ``"assign-type-mismatch"``
-* ``"await-in-sync"``
-* ``"block-after-else"``
-* ``"break-outside"``
-* ``"cast-local-type"``
-* ``"cast-type-mismatch"``
-* ``"circle-doc-class"``
-* ``"close-non-object"``
-* ``"code-after-break"``
-* ``"codestyle-check"``
-* ``"count-down-loop"``
-* ``"declare-const"``
-* ``"deprecated"``
-* ``"different-requires"``
-* ``"discard-returns"``
-* ``"doc-field-no-class"``
-* ``"duplicate-doc-alias"``
-* ``"duplicate-doc-field"``
-* ``"duplicate-doc-param"``
-* ``"duplicate-index"``
-* ``"duplicate-set-field"``
-* ``"empty-block"``
-* ``"env-is-global"``
+* ``"action-after-return"``: Código después de una sentencia `return`
+* ``"ambiguity-1"``: Habilita el diagnóstico de precedencia de operadores ambiguos. Por ejemplo, ante la expresión `num or 0 + 1` se sugerirrá `(num or 0) + 1`.
+* ``"ambiguous-syntax"``: Sintaxis ambigua
+* ``"args-after-dots"``: Argumentos después de `...`
+* ``"assign-const-global"``: Asignando a una variable global const
+* ``"assign-type-mismatch"``: Habilita el diagnóstico para asignaciones en las cuales el valor del tipo no calza con el tipo de la variable siendo asignada.
+* ``"await-in-sync"``: Habilita el diagnóstico para llamadas a funciones asíncronas dentro de una función síncrona.
+* ``"block-after-else"``: Bloque después de `else`
+* ``"break-outside"``: Usando `break` fuera de un bucle
+* ``"cast-local-type"``: Habilita el diagnóstico para conversión de tipos de variables locales donde el tipo objetivo no calza con el tipo definido.
+* ``"cast-type-mismatch"``: Habilita el diagnóstico para conversiones de tipos donde el tipo objetivo no calza con el tipo inicial.
+* ``"circle-doc-class"``: Herencia circular de `@class`
+* ``"close-non-object"``: Habilita el diagnóstico para intentos de cerra una variable con un no-objeto.
+* ``"code-after-break"``: Habilita el diagnóstico para el código que viene después de un `break` en un bucle.
+* ``"codestyle-check"``: Habilita el diagnóstico para líneas formateadas incorrectamente.
+* ``"count-down-loop"``: Habilita el diagnóstico para bucles `for` en los cuales nunca se alcanza su máximo o límite por que el bucle es incremental en vez de decremental.
+* ``"declare-const"``: Redeclarando una constante const
+* ``"deprecated"``: Habilita el diagnóstico para resaltar APIs obsoletas.
+* ``"different-requires"``: Habilita el diagnóstico para archivos que son requeridos con dos rutas distintas.
+* ``"discard-returns"``: Habilita el diagnóstico para llamadas de funciones anotadas con `---@nodiscard` en las cuales se ignore los valores retornados.
+* ``"doc-field-no-class"``: Habilita el diagnóstico para resaltar una anotación de campo sin una anotación de clase que lo defina.
+* ``"duplicate-doc-alias"``: Habilita el diagnóstico para nombres de alias duplicados en una anotación.
+* ``"duplicate-doc-field"``: Habilita el diagnóstico para nombres de campo duplicados en una anotación.
+* ``"duplicate-doc-param"``: Habilita el diagnóstico para nombres de parámetros duplicados en una anotación.
+* ``"duplicate-index"``: Habilita el diagnóstico de índices de tabla duplicados.
+* ``"duplicate-set-field"``: Habilita el diagnóstico para cuando se asigna el mismo campo en una clase más de una vez.
+* ``"empty-block"``: Habilita el diagnóstico de bloques de código vacíos.
+* ``"env-is-global"``: `_ENV` usado como variable global
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -320,19 +320,19 @@ Array<string>
 * ``"err-esc"``
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
-* ``"exp-in-action"``
-* ``"global-close-attribute"``
-* ``"global-element"``
-* ``"global-in-nil-env"``
-* ``"incomplete-signature-doc"``
-* ``"index-in-func-name"``
-* ``"inject-field"``
-* ``"invisible"``
-* ``"jump-local-scope"``
-* ``"keyword"``
-* ``"local-limit"``
-* ``"lowercase-global"``
-* ``"lua-doc-miss-sign"``
+* ``"exp-in-action"``: Expresión usada en posición de sentencia
+* ``"global-close-attribute"``: Atributo close en una variable global
+* ``"global-element"``: Habilita el diagnóstico que alerta sobre elementos globales.
+* ``"global-in-nil-env"``: Habilita el diagnóstico para la prohibición de uso de variables globales (`_ENV` se fija a `nil`).
+* ``"incomplete-signature-doc"``: Habilita el diagnóstico para anotaciones @param o @return incompletas para funciones.
+* ``"index-in-func-name"``: Índice en nombre de función
+* ``"inject-field"``: Inyectando un campo en un objeto
+* ``"invisible"``: Habilita el diagnóstico para accesos a campos que son invisibles.
+* ``"jump-local-scope"``: Saltando a un ámbito de variable local
+* ``"keyword"``: Uso inadecuado de una palabra clave
+* ``"local-limit"``: Demasiadas variables locales
+* ``"lowercase-global"``: Habilita el diagnóstico de definiciones de variables globacels con minúsculas.
+* ``"lua-doc-miss-sign"``: Comentario LuaDoc sin signo
 * ``"luadoc-error-diag-mode"``
 * ``"luadoc-miss-alias-extends"``
 * ``"luadoc-miss-alias-name"``
@@ -357,7 +357,7 @@ Array<string>
 * ``"luadoc-miss-type-name"``
 * ``"luadoc-miss-vararg-type"``
 * ``"luadoc-miss-version"``
-* ``"malformed-number"``
+* ``"malformed-number"``: Literal numérico malformado
 * ``"miss-end"``
 * ``"miss-esc-x"``
 * ``"miss-exp"``
@@ -370,59 +370,59 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
-* ``"missing-fields"``
-* ``"missing-global-doc"``
-* ``"missing-local-export-doc"``
-* ``"missing-parameter"``
-* ``"missing-return"``
-* ``"missing-return-value"``
-* ``"multi-close"``
-* ``"name-style-check"``
-* ``"need-check-nil"``
-* ``"need-paren"``
-* ``"nesting-long-mark"``
-* ``"newfield-call"``
-* ``"newline-call"``
-* ``"no-unknown"``
-* ``"no-visible-label"``
-* ``"not-yieldable"``
-* ``"param-type-mismatch"``
-* ``"redefined-label"``
-* ``"redefined-local"``
-* ``"redundant-parameter"``
-* ``"redundant-return"``
-* ``"redundant-return-value"``
-* ``"redundant-value"``
-* ``"return-type-mismatch"``
-* ``"set-const"``
-* ``"spell-check"``
-* ``"trailing-space"``
-* ``"unbalanced-assignments"``
-* ``"undefined-doc-class"``
-* ``"undefined-doc-name"``
-* ``"undefined-doc-param"``
-* ``"undefined-env-child"``
-* ``"undefined-field"``
-* ``"undefined-global"``
+* ``"missing-fields"``: Campos faltantes
+* ``"missing-global-doc"``: Habilita el diagnóstico para globales faltantes. Las funciones globales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.
+* ``"missing-local-export-doc"``: Habilita el diagnóstico para locales exportadas. Las funciones locales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.
+* ``"missing-parameter"``: Habilita el diagnóstico para llamados de funciones donde el número de argumentos es menore que el número de parámetros anotados de la función.
+* ``"missing-return"``: Habilita el diagnóstico para para funciones con anotaciones de retorno que no tienen la expresión `return …`.
+* ``"missing-return-value"``: Habilita el diagnóstico para expresiones `return …` sin valores aunque la función que la contiene declare retornos.
+* ``"multi-close"``: Múltiples operaciones close
+* ``"name-style-check"``: Habilita el diagnóstico para el estilo de nombres.
+* ``"need-check-nil"``: Habilita el diagnóstico para usos de variables si `nil` o un valor opcional (potencialmente `nil`) haya sido asignado a la variable anteriormente.
+* ``"need-paren"``: Se requieren paréntesis
+* ``"nesting-long-mark"``: Marcadores de comentario largo anidados
+* ``"newfield-call"``: Habilita el diagnóstico de campo nuevo en una llamada. Se alza un error cuando los paréntesis de una llamada a una función aparecen en la siguiente línea cuando se define un campo en una tabla.
+* ``"newline-call"``: Habilita el diagnóstico de llamadas en línea nueva. Se alza un error en las líneas que comienzan con `(`, lo que se lee sintácticamente como una llamada a la línea anterior.
+* ``"no-unknown"``: Habilita el diagnóstico para los casos en que el tipo no puede ser inferido.
+* ``"no-visible-label"``: Etiqueta invisible
+* ``"not-yieldable"``: Habilita el diagnóstico para llamadas a `coroutine.yield()` cuando no esté permitido.
+* ``"param-type-mismatch"``: Habilita el diagnóstico para llamadas a funciones donde el tipo de un parámetro provisto no calza con el tipo de la definición anotado de la función.
+* ``"redefined-label"``: Etiqueta redefinida
+* ``"redefined-local"``: Habilita el diagnóstico de variables locals redefinidas.
+* ``"redundant-parameter"``: Habilita el diagnóstico de parámetros redundantes de una función.
+* ``"redundant-return"``: Habilita el diagnóstico para sentencias de retorno que no son necesarias porque la función terminaría de igual manera.
+* ``"redundant-return-value"``: Habilita el diagnóstico para sentencias de retorno que retornan un valor extra que no fue especificado por una anotación de retorno.
+* ``"redundant-value"``: Habilita el diagnóstico de valores asignados redundantemente. Se alza un error en una asignación, cuando el número de valores es mayor que el número de objetos a los cuales se les asigna.
+* ``"return-type-mismatch"``: Habilita el diagnóstico para valores retornados cuyo tipo no calza con el tipo declarado en la anotación correspondiente de la función.
+* ``"set-const"``: Asignando a una constante const
+* ``"spell-check"``: Habilita el diagnóstico para errores tipográficos en strings.
+* ``"trailing-space"``: Habilita el diagnóstico de espacios al final de línea.
+* ``"unbalanced-assignments"``: Habilita el diagnóstico para asignaciones múltiplies si no todas las variables obtienen un valor (por ejemplo, `local x,y = 1`).
+* ``"undefined-doc-class"``: Habilita el diagnóstico para las anotaciones de clase en las cuales una clase sin definir es referenciada.
+* ``"undefined-doc-name"``: Habilita el diagnóstico para anotaciones de tipo que referencian a un tipo o alias sin definir.
+* ``"undefined-doc-param"``: Habilita el diagnóstico para casos en que una anotación de parámetro es dado sin declarar el parámetro en la definición de la función.
+* ``"undefined-env-child"``: Habilita el diagnóstico de variables de ambientes sin definir. Se alza un error cuando a la tabla `_ENV` se le asigna una tabla literal nueva, pero la variable global usada no está presente en el ambiente global.
+* ``"undefined-field"``: Habilita el diagnóstico para los casos en que se lee un campo sin definir de una variable.
+* ``"undefined-global"``: Habilita el diagnóstico de variables globales sin definir.
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
 * ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
-* ``"unicode-name"``
-* ``"unknown-attribute"``
-* ``"unknown-cast-variable"``
-* ``"unknown-diag-code"``
-* ``"unknown-operator"``
-* ``"unknown-symbol"``
-* ``"unreachable-code"``
-* ``"unsupport-named-vararg"``
+* ``"unicode-name"``: Nombre Unicode
+* ``"unknown-attribute"``: Atributo desconocido
+* ``"unknown-cast-variable"``: Habilita el diagnóstico para conversiones de tipo de variables sin definir.
+* ``"unknown-diag-code"``: Habilita el diagnóstico para los casos en que un código desconocido de diagnóstico es ingresado.
+* ``"unknown-operator"``: Habilita el diagnóstico para operadores desconocidos.
+* ``"unknown-symbol"``: Símbolo desconocido
+* ``"unreachable-code"``: Habilita el diagnóstico para código inalcanzable.
+* ``"unsupport-named-vararg"``: Vararg nombrado no soportado
 * ``"unsupport-symbol"``
-* ``"unused-function"``
-* ``"unused-label"``
-* ``"unused-local"``
-* ``"unused-vararg"``
-* ``"variable-not-declared"``
+* ``"unused-function"``: Habilita el diagnóstico funcines sin uso.
+* ``"unused-label"``: Habilita el diagnóstico de etiquetas sin uso.
+* ``"unused-local"``: Habilita el diagnóstico de variables local sin uso.
+* ``"unused-vararg"``: Habilita el diagnóstico de expresión de número variable de argumentos (vararg) sin uso.
+* ``"variable-not-declared"``: Usando una variable no declarada
 
 ## default
 
@@ -848,6 +848,9 @@ object<string, string>
     Habilita el diagnóstico para conversiones de tipos donde el tipo objetivo no calza con el tipo inicial.
     */
     "cast-type-mismatch": "Opened",
+    /*
+    Herencia circular de `@class`
+    */
     "circle-doc-class": "Any",
     /*
     Habilita el diagnóstico para intentos de cerra una variable con un no-objeto.
@@ -917,6 +920,9 @@ object<string, string>
     Habilita el diagnóstico para anotaciones @param o @return incompletas para funciones.
     */
     "incomplete-signature-doc": "None",
+    /*
+    Inyectando un campo en un objeto
+    */
     "inject-field": "Opened",
     /*
     Habilita el diagnóstico para accesos a campos que son invisibles.
@@ -926,6 +932,9 @@ object<string, string>
     Habilita el diagnóstico de definiciones de variables globacels con minúsculas.
     */
     "lowercase-global": "Any",
+    /*
+    Campos faltantes
+    */
     "missing-fields": "Any",
     /*
     Habilita el diagnóstico para globales faltantes. Las funciones globales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.
@@ -1118,6 +1127,9 @@ object<string, string>
     Habilita el diagnóstico para conversiones de tipos donde el tipo objetivo no calza con el tipo inicial.
     */
     "cast-type-mismatch": "Warning",
+    /*
+    Herencia circular de `@class`
+    */
     "circle-doc-class": "Warning",
     /*
     Habilita el diagnóstico para intentos de cerra una variable con un no-objeto.
@@ -1187,6 +1199,9 @@ object<string, string>
     Habilita el diagnóstico para anotaciones @param o @return incompletas para funciones.
     */
     "incomplete-signature-doc": "Warning",
+    /*
+    Inyectando un campo en un objeto
+    */
     "inject-field": "Warning",
     /*
     Habilita el diagnóstico para accesos a campos que son invisibles.
@@ -1196,6 +1211,9 @@ object<string, string>
     Habilita el diagnóstico de definiciones de variables globacels con minúsculas.
     */
     "lowercase-global": "Information",
+    /*
+    Campos faltantes
+    */
     "missing-fields": "Warning",
     /*
     Habilita el diagnóstico para globales faltantes. Las funciones globales deben tener un comentario y anotaciones para todos sus parámetros y valores retornados.
@@ -1993,26 +2011,26 @@ Array<string>
 
 ## enum
 
-* ``"//"``
-* ``"/**/"``
-* ``"`"``
-* ``"+="``
-* ``"-="``
-* ``"*="``
-* ``"/="``
-* ``"%="``
-* ``"^="``
-* ``"//="``
-* ``"|="``
-* ``"&="``
-* ``"<<="``
-* ``">>="``
-* ``"||"``
-* ``"&&"``
-* ``"!"``
-* ``"!="``
-* ``"continue"``
-* ``"|lambda|"``
+* ``"//"``: Comentario de línea (estilo C).
+* ``"/**/"``: Comentario de bloque (estilo C).
+* ``"`"``: Cadena literal con comilla invertida.
+* ``"+="``: Asignación compuesta de suma.
+* ``"-="``: Asignación compuesta de resta.
+* ``"*="``: Asignación compuesta de multiplicación.
+* ``"/="``: Asignación compuesta de división.
+* ``"%="``: Asignación compuesta de módulo.
+* ``"^="``: Asignación compuesta de potencia.
+* ``"//="``: Asignación compuesta de división entera.
+* ``"|="``: Asignación compuesta OR bit a bit.
+* ``"&="``: Asignación compuesta AND bit a bit.
+* ``"<<="``: Asignación compuesta de desplazamiento a la izquierda.
+* ``">>="``: Asignación compuesta de desplazamiento a la derecha.
+* ``"||"``: O lógico (equivalente a `or`).
+* ``"&&"``: Y lógico (equivalente a `and`).
+* ``"!"``: NO lógico (equivalente a `not`).
+* ``"!="``: Diferente (equivalente a `~=`).
+* ``"continue"``: Sentencia `continue`.
+* ``"|lambda|"``: Función corta con parámetros en pipe (`|x| expr`).
 * ``"?."``: Navegación segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`).
 * ``"??"``: Coalescencia nula (`a ?? b`; usa el lado derecho solo cuando el izquierdo es nil).
 * ``"?:"``: Condicional ternario (`a ? b : c`, asociativo a la derecha).

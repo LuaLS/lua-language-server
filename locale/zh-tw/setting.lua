@@ -60,6 +60,46 @@ config.runtime.nonstandardSymbol['->'] =
 "短函式箭頭（`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`）。"
 config.runtime.nonstandardSymbol['number_underscore'] =
 "數字字面量底線（如 `1_000`、`0x1_2`、`0b1_0`）。"
+config.runtime.nonstandardSymbol['//'] =
+"行註解（C 風格）。"
+config.runtime.nonstandardSymbol['/**/'] =
+"區塊註解（C 風格）。"
+config.runtime.nonstandardSymbol['`'] =
+"反引號字串字面量。"
+config.runtime.nonstandardSymbol['+='] =
+"加法複合指定。"
+config.runtime.nonstandardSymbol['-='] =
+"減法複合指定。"
+config.runtime.nonstandardSymbol['*='] =
+"乘法複合指定。"
+config.runtime.nonstandardSymbol['/='] =
+"除法複合指定。"
+config.runtime.nonstandardSymbol['%='] =
+"取模複合指定。"
+config.runtime.nonstandardSymbol['^='] =
+"冪複合指定。"
+config.runtime.nonstandardSymbol['//='] =
+"地板除複合指定。"
+config.runtime.nonstandardSymbol['|='] =
+"按位或複合指定。"
+config.runtime.nonstandardSymbol['&='] =
+"按位與複合指定。"
+config.runtime.nonstandardSymbol['<<='] =
+"左移複合指定。"
+config.runtime.nonstandardSymbol['>>='] =
+"右移複合指定。"
+config.runtime.nonstandardSymbol['||'] =
+"邏輯或（等價於 or）。"
+config.runtime.nonstandardSymbol['&&'] =
+"邏輯與（等價於 and）。"
+config.runtime.nonstandardSymbol['!'] =
+"邏輯非（等價於 not）。"
+config.runtime.nonstandardSymbol['!='] =
+"不等於（等價於 ~=）。"
+config.runtime.nonstandardSymbol['continue'] =
+"`continue` 陳述式。"
+config.runtime.nonstandardSymbol['|lambda|'] =
+"管道參數短函式（`|x| expr`）。"
 config.runtime.enableLuaJITExtensions =
 [[
 啟用 LuaJIT 擴充語法（需將 `Lua.runtime.version` 設定為 `LuaJIT`）。
@@ -494,6 +534,66 @@ config.diagnostics['unreachable-code']      =
 '無法到達的程式碼'
 config.diagnostics['global-element']       =
 '對全域元素的警告'
+config.diagnostics['action-after-return'] =
+'`return` 陳述式之後的程式碼'
+config.diagnostics['ambiguous-syntax'] =
+'存在歧義的語法'
+config.diagnostics['args-after-dots'] =
+'`...` 之後的參數'
+config.diagnostics['assign-const-global'] =
+'對 const 全域變數賦值'
+config.diagnostics['block-after-else'] =
+'`else` 之後的程式碼區塊'
+config.diagnostics['break-outside'] =
+'在迴圈外使用 `break`'
+config.diagnostics['circle-doc-class'] =
+'`@class` 繼承出現循環'
+config.diagnostics['declare-const'] =
+'重複宣告 const 常數'
+config.diagnostics['env-is-global'] =
+'`_ENV` 作為全域變數使用'
+config.diagnostics['exp-in-action'] =
+'表達式出現在陳述式位置'
+config.diagnostics['global-close-attribute'] =
+'全域變數使用 close 屬性'
+config.diagnostics['index-in-func-name'] =
+'函式名稱中包含索引'
+config.diagnostics['inject-field'] =
+'向物件注入欄位'
+config.diagnostics['jump-local-scope'] =
+'跳入區域變數作用域'
+config.diagnostics['keyword'] =
+'關鍵字使用不當'
+config.diagnostics['local-limit'] =
+'區域變數數量超過限制'
+config.diagnostics['lua-doc-miss-sign'] =
+'LuaDoc 註解缺少符號'
+config.diagnostics['malformed-number'] =
+'格式錯誤的數字字面量'
+config.diagnostics['missing-fields'] =
+'缺少欄位'
+config.diagnostics['multi-close'] =
+'多重 close 操作'
+config.diagnostics['need-paren'] =
+'需要括號'
+config.diagnostics['nesting-long-mark'] =
+'巢狀的長註解標記'
+config.diagnostics['no-visible-label'] =
+'不可見的標籤'
+config.diagnostics['redefined-label'] =
+'重複定義的標籤'
+config.diagnostics['set-const'] =
+'對 const 常數賦值'
+config.diagnostics['unicode-name'] =
+'Unicode 名稱使用'
+config.diagnostics['unknown-attribute'] =
+'未知的屬性'
+config.diagnostics['unknown-symbol'] =
+'未知的符號'
+config.diagnostics['unsupport-named-vararg'] =
+'不支援的命名變參'
+config.diagnostics['variable-not-declared'] =
+'使用未宣告的變數'
 config.typeFormat.config                    =
 '寫Lua程式碼時的格式化組態'
 config.typeFormat.config.auto_complete_end  =

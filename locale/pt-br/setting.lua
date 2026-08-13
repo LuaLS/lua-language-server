@@ -60,6 +60,46 @@ config.runtime.nonstandardSymbol['->'] =
 "Seta de função curta (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`)."
 config.runtime.nonstandardSymbol['number_underscore'] =
 "Sublinhado em literais numéricos (ex.: `1_000`, `0x1_2`, `0b1_0`)."
+config.runtime.nonstandardSymbol['//'] =
+"Comentário de linha (estilo C)."
+config.runtime.nonstandardSymbol['/**/'] =
+"Comentário de bloco (estilo C)."
+config.runtime.nonstandardSymbol['`'] =
+"String literal com crase."
+config.runtime.nonstandardSymbol['+='] =
+"Atribuição composta de adição."
+config.runtime.nonstandardSymbol['-='] =
+"Atribuição composta de subtração."
+config.runtime.nonstandardSymbol['*='] =
+"Atribuição composta de multiplicação."
+config.runtime.nonstandardSymbol['/='] =
+"Atribuição composta de divisão."
+config.runtime.nonstandardSymbol['%='] =
+"Atribuição composta de módulo."
+config.runtime.nonstandardSymbol['^='] =
+"Atribuição composta de potência."
+config.runtime.nonstandardSymbol['//='] =
+"Atribuição composta de divisão inteira."
+config.runtime.nonstandardSymbol['|='] =
+"Atribuição composta OR bit a bit."
+config.runtime.nonstandardSymbol['&='] =
+"Atribuição composta AND bit a bit."
+config.runtime.nonstandardSymbol['<<='] =
+"Atribuição composta de deslocamento à esquerda."
+config.runtime.nonstandardSymbol['>>='] =
+"Atribuição composta de deslocamento à direita."
+config.runtime.nonstandardSymbol['||'] =
+"OU lógico (equivalente a `or`)."
+config.runtime.nonstandardSymbol['&&'] =
+"E lógico (equivalente a `and`)."
+config.runtime.nonstandardSymbol['!'] =
+"NÃO lógico (equivalente a `not`)."
+config.runtime.nonstandardSymbol['!='] =
+"Diferente (equivalente a `~=`)."
+config.runtime.nonstandardSymbol['continue'] =
+"Instrução `continue`."
+config.runtime.nonstandardSymbol['|lambda|'] =
+"Função curta com parâmetros em pipe (`|x| expr`)."
 config.runtime.enableLuaJITExtensions =
 [[
 Ativa a sintaxe de extensão do LuaJIT (requer que `Lua.runtime.version` esteja definido como `LuaJIT`).
@@ -495,6 +535,66 @@ config.diagnostics['unreachable-code']      =
 'Habilita diagnóstico para código inalcançável.'
 config.diagnostics['global-element']       =
 'Habilita diagnóstico para avisar sobre elementos globais.'
+config.diagnostics['action-after-return'] =
+'Código após uma instrução `return`'
+config.diagnostics['ambiguous-syntax'] =
+'Sintaxe ambígua'
+config.diagnostics['args-after-dots'] =
+'Argumentos após `...`'
+config.diagnostics['assign-const-global'] =
+'Atribuindo a uma variável global const'
+config.diagnostics['block-after-else'] =
+'Bloco após `else`'
+config.diagnostics['break-outside'] =
+'Usando `break` fora de um loop'
+config.diagnostics['circle-doc-class'] =
+'Herança circular de `@class`'
+config.diagnostics['declare-const'] =
+'Redeclarando uma constante const'
+config.diagnostics['env-is-global'] =
+'`_ENV` usado como variável global'
+config.diagnostics['exp-in-action'] =
+'Expressão usada na posição de instrução'
+config.diagnostics['global-close-attribute'] =
+'Atributo close em variável global'
+config.diagnostics['index-in-func-name'] =
+'Índice em nome de função'
+config.diagnostics['inject-field'] =
+'Injetando um campo em um objeto'
+config.diagnostics['jump-local-scope'] =
+'Pulando para um escopo de variável local'
+config.diagnostics['keyword'] =
+'Uso impróprio de palavra-chave'
+config.diagnostics['local-limit'] =
+'Muitas variáveis locais'
+config.diagnostics['lua-doc-miss-sign'] =
+'Comentário LuaDoc sem sinal'
+config.diagnostics['malformed-number'] =
+'Literal numérico malformado'
+config.diagnostics['missing-fields'] =
+'Campos ausentes'
+config.diagnostics['multi-close'] =
+'Múltiplas operações close'
+config.diagnostics['need-paren'] =
+'Parênteses necessários'
+config.diagnostics['nesting-long-mark'] =
+'Marcadores de comentário longo aninhados'
+config.diagnostics['no-visible-label'] =
+'Rótulo invisível'
+config.diagnostics['redefined-label'] =
+'Rótulo redefinido'
+config.diagnostics['set-const'] =
+'Atribuindo a uma constante const'
+config.diagnostics['unicode-name'] =
+'Nome Unicode'
+config.diagnostics['unknown-attribute'] =
+'Atributo desconhecido'
+config.diagnostics['unknown-symbol'] =
+'Símbolo desconhecido'
+config.diagnostics['unsupport-named-vararg'] =
+'Vararg nomeado não suportado'
+config.diagnostics['variable-not-declared'] =
+'Usando uma variável não declarada'
 config.typeFormat.config                    =
 'Configura o comportamento de formatação enquanto digita código Lua.'
 config.typeFormat.config.auto_complete_end  =

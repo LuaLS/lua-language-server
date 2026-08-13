@@ -284,34 +284,34 @@ Array<string>
 
 ## enum
 
-* ``"action-after-return"``
-* ``"ambiguity-1"``
-* ``"ambiguous-syntax"``
-* ``"args-after-dots"``
-* ``"assign-const-global"``
-* ``"assign-type-mismatch"``
-* ``"await-in-sync"``
-* ``"block-after-else"``
-* ``"break-outside"``
-* ``"cast-local-type"``
-* ``"cast-type-mismatch"``
-* ``"circle-doc-class"``
-* ``"close-non-object"``
-* ``"code-after-break"``
-* ``"codestyle-check"``
-* ``"count-down-loop"``
-* ``"declare-const"``
-* ``"deprecated"``
-* ``"different-requires"``
-* ``"discard-returns"``
-* ``"doc-field-no-class"``
-* ``"duplicate-doc-alias"``
-* ``"duplicate-doc-field"``
-* ``"duplicate-doc-param"``
-* ``"duplicate-index"``
-* ``"duplicate-set-field"``
-* ``"empty-block"``
-* ``"env-is-global"``
+* ``"action-after-return"``: `return` 陳述式之後的程式碼
+* ``"ambiguity-1"``: 優先順序歧義，如： `num or 0 + 1` ，推測使用者的實際期望為 `(num or 0) + 1`
+* ``"ambiguous-syntax"``: 存在歧義的語法
+* ``"args-after-dots"``: `...` 之後的參數
+* ``"assign-const-global"``: 對 const 全域變數賦值
+* ``"assign-type-mismatch"``: 賦值類型與變數類型不符合
+* ``"await-in-sync"``: 同步函式中呼叫非同步函式
+* ``"block-after-else"``: `else` 之後的程式碼區塊
+* ``"break-outside"``: 在迴圈外使用 `break`
+* ``"cast-local-type"``: 已顯式定義變數類型不符合要定義的值的類型
+* ``"cast-type-mismatch"``: 變數被轉換為不符合其初始類型的類型
+* ``"circle-doc-class"``: `@class` 繼承出現循環
+* ``"close-non-object"``: 嘗試關閉非物件變數
+* ``"code-after-break"``: 迴圈內break陳述式後的程式碼
+* ``"codestyle-check"``: 行的格式不正確
+* ``"count-down-loop"``: 因為 `for` 迴圈是遞增而不是遞減，所以不會到達上限/極限
+* ``"declare-const"``: 重複宣告 const 常數
+* ``"deprecated"``: API已標記deprecated（棄用）但仍在使用
+* ``"different-requires"``: required的同一個檔案使用了兩個不同的名字
+* ``"discard-returns"``: 忽略了標註為 `@nodiscard` 的函式的回傳值
+* ``"doc-field-no-class"``: 向沒有標註 `@class` 的類別標註 `@field` 欄位
+* ``"duplicate-doc-alias"``: `@alias` 標註名字衝突
+* ``"duplicate-doc-field"``: `@field` 標註名字衝突
+* ``"duplicate-doc-param"``: `@param` 標註名字衝突
+* ``"duplicate-index"``: 在字面常數表中重複定義了索引
+* ``"duplicate-set-field"``: 在類別中多次定義相同的欄位
+* ``"empty-block"``: 空程式碼區塊
+* ``"env-is-global"``: `_ENV` 作為全域變數使用
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -320,19 +320,19 @@ Array<string>
 * ``"err-esc"``
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
-* ``"exp-in-action"``
-* ``"global-close-attribute"``
-* ``"global-element"``
-* ``"global-in-nil-env"``
-* ``"incomplete-signature-doc"``
-* ``"index-in-func-name"``
-* ``"inject-field"``
-* ``"invisible"``
-* ``"jump-local-scope"``
-* ``"keyword"``
-* ``"local-limit"``
-* ``"lowercase-global"``
-* ``"lua-doc-miss-sign"``
+* ``"exp-in-action"``: 表達式出現在陳述式位置
+* ``"global-close-attribute"``: 全域變數使用 close 屬性
+* ``"global-element"``: 對全域元素的警告
+* ``"global-in-nil-env"``: 不能使用全域變數（ `_ENV` 被設定為 `nil`）
+* ``"incomplete-signature-doc"``: `@param` 或 `@return` 不完整
+* ``"index-in-func-name"``: 函式名稱中包含索引
+* ``"inject-field"``: 向物件注入欄位
+* ``"invisible"``: 嘗試存取不可見的欄位
+* ``"jump-local-scope"``: 跳入區域變數作用域
+* ``"keyword"``: 關鍵字使用不當
+* ``"local-limit"``: 區域變數數量超過限制
+* ``"lowercase-global"``: 首字母小寫的全域變數定義
+* ``"lua-doc-miss-sign"``: LuaDoc 註解缺少符號
 * ``"luadoc-error-diag-mode"``
 * ``"luadoc-miss-alias-extends"``
 * ``"luadoc-miss-alias-name"``
@@ -357,7 +357,7 @@ Array<string>
 * ``"luadoc-miss-type-name"``
 * ``"luadoc-miss-vararg-type"``
 * ``"luadoc-miss-version"``
-* ``"malformed-number"``
+* ``"malformed-number"``: 格式錯誤的數字字面量
 * ``"miss-end"``
 * ``"miss-esc-x"``
 * ``"miss-exp"``
@@ -370,59 +370,59 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
-* ``"missing-fields"``
-* ``"missing-global-doc"``
-* ``"missing-local-export-doc"``
-* ``"missing-parameter"``
-* ``"missing-return"``
-* ``"missing-return-value"``
-* ``"multi-close"``
-* ``"name-style-check"``
-* ``"need-check-nil"``
-* ``"need-paren"``
-* ``"nesting-long-mark"``
-* ``"newfield-call"``
-* ``"newline-call"``
-* ``"no-unknown"``
-* ``"no-visible-label"``
-* ``"not-yieldable"``
-* ``"param-type-mismatch"``
-* ``"redefined-label"``
-* ``"redefined-local"``
-* ``"redundant-parameter"``
-* ``"redundant-return"``
-* ``"redundant-return-value"``
-* ``"redundant-value"``
-* ``"return-type-mismatch"``
-* ``"set-const"``
-* ``"spell-check"``
-* ``"trailing-space"``
-* ``"unbalanced-assignments"``
-* ``"undefined-doc-class"``
-* ``"undefined-doc-name"``
-* ``"undefined-doc-param"``
-* ``"undefined-env-child"``
-* ``"undefined-field"``
-* ``"undefined-global"``
+* ``"missing-fields"``: 缺少欄位
+* ``"missing-global-doc"``: 全域變數缺少標註（全域函式必須為所有參數和回傳值提供標註）
+* ``"missing-local-export-doc"``: 匯出的區域函式缺少標註（匯出的區域函式、所有的參數和回傳值都必須有標註）
+* ``"missing-parameter"``: 函式呼叫的引數數量比函式標註的參數數量少
+* ``"missing-return"``: 函式有 `@return` 標註卻沒有 `return` 陳述式
+* ``"missing-return-value"``: 函式沒有回傳值，但使用了 `@return` 標註了回傳值
+* ``"multi-close"``: 多重 close 操作
+* ``"name-style-check"``: 變數命名風格檢查
+* ``"need-check-nil"``: 變數曾被賦值為 `nil` 或可選值（可能是 `nil` ）
+* ``"need-paren"``: 需要括號
+* ``"nesting-long-mark"``: 巢狀的長註解標記
+* ``"newfield-call"``: 在字面常數表中，2行程式碼之間缺少分隔符，在語法上被解析為了一次索引操作
+* ``"newline-call"``: 以 `(` 開始的新行，在語法上被解析為了上一行的函式呼叫
+* ``"no-unknown"``: 無法推斷變數的未知類型
+* ``"no-visible-label"``: 不可見的標籤
+* ``"not-yieldable"``: 不允許呼叫 `coroutine.yield()`
+* ``"param-type-mismatch"``: 給定參數的類型不符合函式定義所要求的類型（ `@param` ）
+* ``"redefined-label"``: 重複定義的標籤
+* ``"redefined-local"``: 重複定義的區域變數
+* ``"redundant-parameter"``: 函式呼叫時，傳入了多餘的引數
+* ``"redundant-return"``: 放了一個不需要的 `return` 陳述式，因為函式會自行退出
+* ``"redundant-return-value"``: 回傳了 `@return` 標註未指定的額外值
+* ``"redundant-value"``: 賦值操作時，值的數量比被賦值的對象多
+* ``"return-type-mismatch"``: 回傳值的類型不符合 `@return` 中宣告的類型
+* ``"set-const"``: 對 const 常數賦值
+* ``"spell-check"``: 字串拼寫檢查
+* ``"trailing-space"``: 後置空格
+* ``"unbalanced-assignments"``: 多重賦值時沒有賦值所有變數（如 `local x,y = 1` ）
+* ``"undefined-doc-class"``: 在 `@class` 標註中引用未定義的類別。
+* ``"undefined-doc-name"``: 在 `@type` 標註中引用未定義的類型或 `@alias`
+* ``"undefined-doc-param"``: 在 `@param` 標註中引用函式定義未宣告的參數
+* ``"undefined-env-child"``: `_ENV` 被設定為了新的字面常數表，但是試圖獲取的全域變數不在這張表中
+* ``"undefined-field"``: 讀取變數中為定義的欄位
+* ``"undefined-global"``: 未定義的全域變數
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
 * ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
-* ``"unicode-name"``
-* ``"unknown-attribute"``
-* ``"unknown-cast-variable"``
-* ``"unknown-diag-code"``
-* ``"unknown-operator"``
-* ``"unknown-symbol"``
-* ``"unreachable-code"``
-* ``"unsupport-named-vararg"``
+* ``"unicode-name"``: Unicode 名稱使用
+* ``"unknown-attribute"``: 未知的屬性
+* ``"unknown-cast-variable"``: 使用 `@cast` 對未定義的變數進行強制轉換
+* ``"unknown-diag-code"``: 輸入了未知的診斷
+* ``"unknown-operator"``: 未知的運算子
+* ``"unknown-symbol"``: 未知的符號
+* ``"unreachable-code"``: 無法到達的程式碼
+* ``"unsupport-named-vararg"``: 不支援的命名變參
 * ``"unsupport-symbol"``
-* ``"unused-function"``
-* ``"unused-label"``
-* ``"unused-local"``
-* ``"unused-vararg"``
-* ``"variable-not-declared"``
+* ``"unused-function"``: 未使用的函式
+* ``"unused-label"``: 未使用的標籤
+* ``"unused-local"``: 未使用的區域變數
+* ``"unused-vararg"``: 未使用的不定引數
+* ``"variable-not-declared"``: 使用未宣告的變數
 
 ## default
 
@@ -848,6 +848,9 @@ object<string, string>
     變數被轉換為不符合其初始類型的類型
     */
     "cast-type-mismatch": "Opened",
+    /*
+    `@class` 繼承出現循環
+    */
     "circle-doc-class": "Any",
     /*
     嘗試關閉非物件變數
@@ -917,6 +920,9 @@ object<string, string>
     `@param` 或 `@return` 不完整
     */
     "incomplete-signature-doc": "None",
+    /*
+    向物件注入欄位
+    */
     "inject-field": "Opened",
     /*
     嘗試存取不可見的欄位
@@ -926,6 +932,9 @@ object<string, string>
     首字母小寫的全域變數定義
     */
     "lowercase-global": "Any",
+    /*
+    缺少欄位
+    */
     "missing-fields": "Any",
     /*
     全域變數缺少標註（全域函式必須為所有參數和回傳值提供標註）
@@ -1117,6 +1126,9 @@ object<string, string>
     變數被轉換為不符合其初始類型的類型
     */
     "cast-type-mismatch": "Warning",
+    /*
+    `@class` 繼承出現循環
+    */
     "circle-doc-class": "Warning",
     /*
     嘗試關閉非物件變數
@@ -1186,6 +1198,9 @@ object<string, string>
     `@param` 或 `@return` 不完整
     */
     "incomplete-signature-doc": "Warning",
+    /*
+    向物件注入欄位
+    */
     "inject-field": "Warning",
     /*
     嘗試存取不可見的欄位
@@ -1195,6 +1210,9 @@ object<string, string>
     首字母小寫的全域變數定義
     */
     "lowercase-global": "Information",
+    /*
+    缺少欄位
+    */
     "missing-fields": "Warning",
     /*
     全域變數缺少標註（全域函式必須為所有參數和回傳值提供標註）
@@ -1989,26 +2007,26 @@ Array<string>
 
 ## enum
 
-* ``"//"``
-* ``"/**/"``
-* ``"`"``
-* ``"+="``
-* ``"-="``
-* ``"*="``
-* ``"/="``
-* ``"%="``
-* ``"^="``
-* ``"//="``
-* ``"|="``
-* ``"&="``
-* ``"<<="``
-* ``">>="``
-* ``"||"``
-* ``"&&"``
-* ``"!"``
-* ``"!="``
-* ``"continue"``
-* ``"|lambda|"``
+* ``"//"``: 行註解（C 風格）。
+* ``"/**/"``: 區塊註解（C 風格）。
+* ``"`"``: 反引號字串字面量。
+* ``"+="``: 加法複合指定。
+* ``"-="``: 減法複合指定。
+* ``"*="``: 乘法複合指定。
+* ``"/="``: 除法複合指定。
+* ``"%="``: 取模複合指定。
+* ``"^="``: 冪複合指定。
+* ``"//="``: 地板除複合指定。
+* ``"|="``: 按位或複合指定。
+* ``"&="``: 按位與複合指定。
+* ``"<<="``: 左移複合指定。
+* ``">>="``: 右移複合指定。
+* ``"||"``: 邏輯或（等價於 or）。
+* ``"&&"``: 邏輯與（等價於 and）。
+* ``"!"``: 邏輯非（等價於 not）。
+* ``"!="``: 不等於（等價於 ~=）。
+* ``"continue"``: `continue` 陳述式。
+* ``"|lambda|"``: 管道參數短函式（`|x| expr`）。
 * ``"?."``: 安全導覽（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。
 * ``"??"``: 空值合併（`a ?? b`，僅當左側為 nil 時取右側）。
 * ``"?:"``: 三元條件（`a ? b : c`，右結合；b 部分禁止方法呼叫）。

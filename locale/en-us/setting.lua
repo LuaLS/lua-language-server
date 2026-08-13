@@ -60,6 +60,46 @@ config.runtime.nonstandardSymbol['->'] =
 "Short function arrow (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`)."
 config.runtime.nonstandardSymbol['number_underscore'] =
 "Underscores in number literals (e.g. `1_000`, `0x1_2`, `0b1_0`)."
+config.runtime.nonstandardSymbol['//'] =
+"Line comment (C style)."
+config.runtime.nonstandardSymbol['/**/'] =
+"Block comment (C style)."
+config.runtime.nonstandardSymbol['`'] =
+"Backtick string literal."
+config.runtime.nonstandardSymbol['+='] =
+"Add compound assignment."
+config.runtime.nonstandardSymbol['-='] =
+"Subtract compound assignment."
+config.runtime.nonstandardSymbol['*='] =
+"Multiply compound assignment."
+config.runtime.nonstandardSymbol['/='] =
+"Divide compound assignment."
+config.runtime.nonstandardSymbol['%='] =
+"Modulo compound assignment."
+config.runtime.nonstandardSymbol['^='] =
+"Power compound assignment."
+config.runtime.nonstandardSymbol['//='] =
+"Floor-divide compound assignment."
+config.runtime.nonstandardSymbol['|='] =
+"Bitwise-or compound assignment."
+config.runtime.nonstandardSymbol['&='] =
+"Bitwise-and compound assignment."
+config.runtime.nonstandardSymbol['<<='] =
+"Left shift compound assignment."
+config.runtime.nonstandardSymbol['>>='] =
+"Right shift compound assignment."
+config.runtime.nonstandardSymbol['||'] =
+"Logical or (equivalent to `or`)."
+config.runtime.nonstandardSymbol['&&'] =
+"Logical and (equivalent to `and`)."
+config.runtime.nonstandardSymbol['!'] =
+"Logical not (equivalent to `not`)."
+config.runtime.nonstandardSymbol['!='] =
+"Not equal (equivalent to `~=`)."
+config.runtime.nonstandardSymbol['continue'] =
+"`continue` statement."
+config.runtime.nonstandardSymbol['|lambda|'] =
+"Pipe-parameter short function (`|x| expr`)."
 config.runtime.enableLuaJITExtensions =
 [[
 Enable LuaJIT extension syntax (requires `Lua.runtime.version` to be set to `LuaJIT`).
@@ -496,6 +536,66 @@ config.diagnostics['unreachable-code']      =
 'Enable diagnostics for unreachable code.'
 config.diagnostics['global-element']       =
 'Enable diagnostics to warn about global elements.'
+config.diagnostics['action-after-return'] =
+'Code after a `return` statement'
+config.diagnostics['ambiguous-syntax'] =
+'Ambiguous syntax'
+config.diagnostics['args-after-dots'] =
+'Arguments after `...`'
+config.diagnostics['assign-const-global'] =
+'Assigning to a const global variable'
+config.diagnostics['block-after-else'] =
+'Block after `else`'
+config.diagnostics['break-outside'] =
+'Using `break` outside a loop'
+config.diagnostics['circle-doc-class'] =
+'Circular `@class` inheritance'
+config.diagnostics['declare-const'] =
+'Redeclaring a const constant'
+config.diagnostics['env-is-global'] =
+'`_ENV` used as a global variable'
+config.diagnostics['exp-in-action'] =
+'Expression used in statement position'
+config.diagnostics['global-close-attribute'] =
+'Close attribute on a global variable'
+config.diagnostics['index-in-func-name'] =
+'Index in a function name'
+config.diagnostics['inject-field'] =
+'Injecting a field into an object'
+config.diagnostics['jump-local-scope'] =
+'Jumping into a local variable scope'
+config.diagnostics['keyword'] =
+'Improper use of a keyword'
+config.diagnostics['local-limit'] =
+'Too many local variables'
+config.diagnostics['lua-doc-miss-sign'] =
+'LuaDoc comment missing a sign'
+config.diagnostics['malformed-number'] =
+'Malformed number literal'
+config.diagnostics['missing-fields'] =
+'Missing fields'
+config.diagnostics['multi-close'] =
+'Multiple close operations'
+config.diagnostics['need-paren'] =
+'Parentheses required'
+config.diagnostics['nesting-long-mark'] =
+'Nested long comment markers'
+config.diagnostics['no-visible-label'] =
+'Invisible label'
+config.diagnostics['redefined-label'] =
+'Redefined label'
+config.diagnostics['set-const'] =
+'Assigning to a const constant'
+config.diagnostics['unicode-name'] =
+'Unicode name'
+config.diagnostics['unknown-attribute'] =
+'Unknown attribute'
+config.diagnostics['unknown-symbol'] =
+'Unknown symbol'
+config.diagnostics['unsupport-named-vararg'] =
+'Unsupported named vararg'
+config.diagnostics['variable-not-declared'] =
+'Using an undeclared variable'
 config.typeFormat.config                    =
 'Configures the formatting behavior while typing Lua code.'
 config.typeFormat.config.auto_complete_end  =

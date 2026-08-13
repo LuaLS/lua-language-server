@@ -60,6 +60,46 @@ config.runtime.nonstandardSymbol['->'] =
 "短函数箭头（`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`）。"
 config.runtime.nonstandardSymbol['number_underscore'] =
 "数字字面量下划线（如 `1_000`、`0x1_2`、`0b1_0`）。"
+config.runtime.nonstandardSymbol['//'] =
+"行注释（C 风格）。"
+config.runtime.nonstandardSymbol['/**/'] =
+"块注释（C 风格）。"
+config.runtime.nonstandardSymbol['`'] =
+"反引号字符串字面量。"
+config.runtime.nonstandardSymbol['+='] =
+"加法复合赋值。"
+config.runtime.nonstandardSymbol['-='] =
+"减法复合赋值。"
+config.runtime.nonstandardSymbol['*='] =
+"乘法复合赋值。"
+config.runtime.nonstandardSymbol['/='] =
+"除法复合赋值。"
+config.runtime.nonstandardSymbol['%='] =
+"取模复合赋值。"
+config.runtime.nonstandardSymbol['^='] =
+"幂复合赋值。"
+config.runtime.nonstandardSymbol['//='] =
+"地板除复合赋值。"
+config.runtime.nonstandardSymbol['|='] =
+"按位或复合赋值。"
+config.runtime.nonstandardSymbol['&='] =
+"按位与复合赋值。"
+config.runtime.nonstandardSymbol['<<='] =
+"左移复合赋值。"
+config.runtime.nonstandardSymbol['>>='] =
+"右移复合赋值。"
+config.runtime.nonstandardSymbol['||'] =
+"逻辑或（等价于 or）。"
+config.runtime.nonstandardSymbol['&&'] =
+"逻辑与（等价于 and）。"
+config.runtime.nonstandardSymbol['!'] =
+"逻辑非（等价于 not）。"
+config.runtime.nonstandardSymbol['!='] =
+"不等于（等价于 ~=）。"
+config.runtime.nonstandardSymbol['continue'] =
+"continue 语句。"
+config.runtime.nonstandardSymbol['|lambda|'] =
+"管道参数短函数（`|x| expr`）。"
 config.runtime.enableLuaJITExtensions =
 [[
 启用 LuaJIT 扩展语法（需要将 `Lua.runtime.version` 设置为 `LuaJIT`）。
@@ -494,6 +534,66 @@ config.diagnostics['unreachable-code']      =
 '不可达的代码'
 config.diagnostics['global-element']       =
 '启用诊断以警告全局元素。'
+config.diagnostics['action-after-return'] =
+'`return` 语句之后的代码'
+config.diagnostics['ambiguous-syntax'] =
+'存在歧义的语法'
+config.diagnostics['args-after-dots'] =
+'`...` 之后的参数'
+config.diagnostics['assign-const-global'] =
+'给 const 全局变量赋值'
+config.diagnostics['block-after-else'] =
+'`else` 之后的代码块'
+config.diagnostics['break-outside'] =
+'在循环外使用 `break`'
+config.diagnostics['circle-doc-class'] =
+'`@class` 继承出现循环'
+config.diagnostics['declare-const'] =
+'重复声明 const 常量'
+config.diagnostics['env-is-global'] =
+'`_ENV` 作为全局变量使用'
+config.diagnostics['exp-in-action'] =
+'表达式出现在语句位置'
+config.diagnostics['global-close-attribute'] =
+'全局变量使用 close 属性'
+config.diagnostics['index-in-func-name'] =
+'函数名中包含索引'
+config.diagnostics['inject-field'] =
+'向对象注入字段'
+config.diagnostics['jump-local-scope'] =
+'跳入局部变量作用域'
+config.diagnostics['keyword'] =
+'关键字使用不当'
+config.diagnostics['local-limit'] =
+'局部变量数量超过限制'
+config.diagnostics['lua-doc-miss-sign'] =
+'LuaDoc 注释缺少符号'
+config.diagnostics['malformed-number'] =
+'格式错误的数字字面量'
+config.diagnostics['missing-fields'] =
+'缺少字段'
+config.diagnostics['multi-close'] =
+'多重 close 操作'
+config.diagnostics['need-paren'] =
+'需要括号'
+config.diagnostics['nesting-long-mark'] =
+'嵌套的长注释标记'
+config.diagnostics['no-visible-label'] =
+'不可见的标签'
+config.diagnostics['redefined-label'] =
+'重复定义的标签'
+config.diagnostics['set-const'] =
+'给 const 常量赋值'
+config.diagnostics['unicode-name'] =
+'Unicode 名称使用'
+config.diagnostics['unknown-attribute'] =
+'未知的属性'
+config.diagnostics['unknown-symbol'] =
+'未知的符号'
+config.diagnostics['unsupport-named-vararg'] =
+'不支持的命名变参'
+config.diagnostics['variable-not-declared'] =
+'使用未声明的变量'
 config.typeFormat.config                    =
 '配置输入Lua代码时的格式化行为'
 config.typeFormat.config.auto_complete_end  =

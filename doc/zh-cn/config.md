@@ -284,34 +284,34 @@ Array<string>
 
 ## enum
 
-* ``"action-after-return"``
-* ``"ambiguity-1"``
-* ``"ambiguous-syntax"``
-* ``"args-after-dots"``
-* ``"assign-const-global"``
-* ``"assign-type-mismatch"``
-* ``"await-in-sync"``
-* ``"block-after-else"``
-* ``"break-outside"``
-* ``"cast-local-type"``
-* ``"cast-type-mismatch"``
-* ``"circle-doc-class"``
-* ``"close-non-object"``
-* ``"code-after-break"``
-* ``"codestyle-check"``
-* ``"count-down-loop"``
-* ``"declare-const"``
-* ``"deprecated"``
-* ``"different-requires"``
-* ``"discard-returns"``
-* ``"doc-field-no-class"``
-* ``"duplicate-doc-alias"``
-* ``"duplicate-doc-field"``
-* ``"duplicate-doc-param"``
-* ``"duplicate-index"``
-* ``"duplicate-set-field"``
-* ``"empty-block"``
-* ``"env-is-global"``
+* ``"action-after-return"``: `return` 语句之后的代码
+* ``"ambiguity-1"``: 优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+* ``"ambiguous-syntax"``: 存在歧义的语法
+* ``"args-after-dots"``: `...` 之后的参数
+* ``"assign-const-global"``: 给 const 全局变量赋值
+* ``"assign-type-mismatch"``: 值类型与赋值变量类型不匹配
+* ``"await-in-sync"``: 同步函数中异步函数调用
+* ``"block-after-else"``: `else` 之后的代码块
+* ``"break-outside"``: 在循环外使用 `break`
+* ``"cast-local-type"``: 已显式定义变量类型与要定义的值的类型不匹配
+* ``"cast-type-mismatch"``: 变量被转换为与其初始类型不匹配的类型
+* ``"circle-doc-class"``: `@class` 继承出现循环
+* ``"close-non-object"``: 尝试关闭非对象变量的诊断
+* ``"code-after-break"``: 放在循环中break语句后面的代码
+* ``"codestyle-check"``: 启用对不正确样式行的诊断
+* ``"count-down-loop"``: for循环永远无法达到最大/极限值(在递减时递增)
+* ``"declare-const"``: 重复声明 const 常量
+* ``"deprecated"``: 变量已被标记为deprecated(过时)但仍在使用
+* ``"different-requires"``: required的同一个文件使用了两个不同的名字
+* ``"discard-returns"``: 函数的返回值被忽略(函数被`@nodiscard`标记时)
+* ``"doc-field-no-class"``: 为不存在的类`@class`标记`@field`字段
+* ``"duplicate-doc-alias"``: `@alias`字段的名字冲突
+* ``"duplicate-doc-field"``: `@field`字段的名字冲突
+* ``"duplicate-doc-param"``: `@param`字段的名字冲突
+* ``"duplicate-index"``: 在字面量表中重复定义了索引
+* ``"duplicate-set-field"``: 在一个类中多次定义同一字段
+* ``"empty-block"``: 空代码块
+* ``"env-is-global"``: `_ENV` 作为全局变量使用
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -320,19 +320,19 @@ Array<string>
 * ``"err-esc"``
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
-* ``"exp-in-action"``
-* ``"global-close-attribute"``
-* ``"global-element"``
-* ``"global-in-nil-env"``
-* ``"incomplete-signature-doc"``
-* ``"index-in-func-name"``
-* ``"inject-field"``
-* ``"invisible"``
-* ``"jump-local-scope"``
-* ``"keyword"``
-* ``"local-limit"``
-* ``"lowercase-global"``
-* ``"lua-doc-miss-sign"``
+* ``"exp-in-action"``: 表达式出现在语句位置
+* ``"global-close-attribute"``: 全局变量使用 close 属性
+* ``"global-element"``: 启用诊断以警告全局元素。
+* ``"global-in-nil-env"``: 不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+* ``"incomplete-signature-doc"``: `@param`或`@return`的注释不完整
+* ``"index-in-func-name"``: 函数名中包含索引
+* ``"inject-field"``: 向对象注入字段
+* ``"invisible"``: 使用不可见的值
+* ``"jump-local-scope"``: 跳入局部变量作用域
+* ``"keyword"``: 关键字使用不当
+* ``"local-limit"``: 局部变量数量超过限制
+* ``"lowercase-global"``: 首字母小写的全局变量定义
+* ``"lua-doc-miss-sign"``: LuaDoc 注释缺少符号
 * ``"luadoc-error-diag-mode"``
 * ``"luadoc-miss-alias-extends"``
 * ``"luadoc-miss-alias-name"``
@@ -357,7 +357,7 @@ Array<string>
 * ``"luadoc-miss-type-name"``
 * ``"luadoc-miss-vararg-type"``
 * ``"luadoc-miss-version"``
-* ``"malformed-number"``
+* ``"malformed-number"``: 格式错误的数字字面量
 * ``"miss-end"``
 * ``"miss-esc-x"``
 * ``"miss-exp"``
@@ -370,59 +370,59 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
-* ``"missing-fields"``
-* ``"missing-global-doc"``
-* ``"missing-local-export-doc"``
-* ``"missing-parameter"``
-* ``"missing-return"``
-* ``"missing-return-value"``
-* ``"multi-close"``
-* ``"name-style-check"``
-* ``"need-check-nil"``
-* ``"need-paren"``
-* ``"nesting-long-mark"``
-* ``"newfield-call"``
-* ``"newline-call"``
-* ``"no-unknown"``
-* ``"no-visible-label"``
-* ``"not-yieldable"``
-* ``"param-type-mismatch"``
-* ``"redefined-label"``
-* ``"redefined-local"``
-* ``"redundant-parameter"``
-* ``"redundant-return"``
-* ``"redundant-return-value"``
-* ``"redundant-value"``
-* ``"return-type-mismatch"``
-* ``"set-const"``
-* ``"spell-check"``
-* ``"trailing-space"``
-* ``"unbalanced-assignments"``
-* ``"undefined-doc-class"``
-* ``"undefined-doc-name"``
-* ``"undefined-doc-param"``
-* ``"undefined-env-child"``
-* ``"undefined-field"``
-* ``"undefined-global"``
+* ``"missing-fields"``: 缺少字段
+* ``"missing-global-doc"``: 全局变量的注释缺失(全局函数必须为所有参数和返回值提供注释和注释)
+* ``"missing-local-export-doc"``: 导出的本地函数缺少注释(导出的本地函数必须有包括本身以及所有参数和返回值的注释)
+* ``"missing-parameter"``: 函数参数数少于注释函数参数数
+* ``"missing-return"``: 函数带有返回注释而无返回语句
+* ``"missing-return-value"``: 函数无值返回但函数使用`@return`标记了返回值
+* ``"multi-close"``: 多重 close 操作
+* ``"name-style-check"``: 变量的名称样式检查
+* ``"need-check-nil"``: 变量之前被赋值为`nil`或可选值(可能为 `nil`)
+* ``"need-paren"``: 需要括号
+* ``"nesting-long-mark"``: 嵌套的长注释标记
+* ``"newfield-call"``: 在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+* ``"newline-call"``: 以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+* ``"no-unknown"``: 变量的未知类型无法推断
+* ``"no-visible-label"``: 不可见的标签
+* ``"not-yieldable"``: 不允许调用 `coroutine.yield()` 
+* ``"param-type-mismatch"``: 给定参数的类型与函数定义所要求的类型(`@param`)不匹配
+* ``"redefined-label"``: 重复定义的标签
+* ``"redefined-local"``: 重复定义的局部变量
+* ``"redundant-parameter"``: 函数调用时，传入了多余的参数
+* ``"redundant-return"``: 当放置一个不需要的返回值时触发(函数会自行退出)
+* ``"redundant-return-value"``: 返回`@return`注释未指定的额外值
+* ``"redundant-value"``: 赋值操作时，值的数量比被赋值的对象多
+* ``"return-type-mismatch"``: 返回值的类型与`@return`中声明的类型不匹配
+* ``"set-const"``: 给 const 常量赋值
+* ``"spell-check"``: 启用字符串拼写检查的诊断。
+* ``"trailing-space"``: 后置空格
+* ``"unbalanced-assignments"``: 多重赋值时没有赋值所有变量(如`local x,y = 1`)
+* ``"undefined-doc-class"``: 在`@class`注解中引用未定义的类。
+* ``"undefined-doc-name"``: 在`@type`注解中引用未定义的类型或`@alias`
+* ``"undefined-doc-param"``: 函数声明中`@param`引用了未定义的参数
+* ``"undefined-env-child"``: `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+* ``"undefined-field"``: 引用变量的未定义字段
+* ``"undefined-global"``: 未定义的全局变量
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
 * ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
-* ``"unicode-name"``
-* ``"unknown-attribute"``
-* ``"unknown-cast-variable"``
-* ``"unknown-diag-code"``
-* ``"unknown-operator"``
-* ``"unknown-symbol"``
-* ``"unreachable-code"``
-* ``"unsupport-named-vararg"``
+* ``"unicode-name"``: Unicode 名称使用
+* ``"unknown-attribute"``: 未知的属性
+* ``"unknown-cast-variable"``: 使用`@cast`对未定义变量的强制转换
+* ``"unknown-diag-code"``: 未知的诊断代码
+* ``"unknown-operator"``: 未知的运算符
+* ``"unknown-symbol"``: 未知的符号
+* ``"unreachable-code"``: 不可达的代码
+* ``"unsupport-named-vararg"``: 不支持的命名变参
 * ``"unsupport-symbol"``
-* ``"unused-function"``
-* ``"unused-label"``
-* ``"unused-local"``
-* ``"unused-vararg"``
-* ``"variable-not-declared"``
+* ``"unused-function"``: 未使用的函数
+* ``"unused-label"``: 未使用的标签
+* ``"unused-local"``: 未使用的局部变量
+* ``"unused-vararg"``: 未使用的不定参数
+* ``"variable-not-declared"``: 使用未声明的变量
 
 ## default
 
@@ -848,6 +848,9 @@ object<string, string>
     变量被转换为与其初始类型不匹配的类型
     */
     "cast-type-mismatch": "Opened",
+    /*
+    `@class` 继承出现循环
+    */
     "circle-doc-class": "Any",
     /*
     尝试关闭非对象变量的诊断
@@ -917,6 +920,9 @@ object<string, string>
     `@param`或`@return`的注释不完整
     */
     "incomplete-signature-doc": "None",
+    /*
+    向对象注入字段
+    */
     "inject-field": "Opened",
     /*
     使用不可见的值
@@ -926,6 +932,9 @@ object<string, string>
     首字母小写的全局变量定义
     */
     "lowercase-global": "Any",
+    /*
+    缺少字段
+    */
     "missing-fields": "Any",
     /*
     全局变量的注释缺失(全局函数必须为所有参数和返回值提供注释和注释)
@@ -1117,6 +1126,9 @@ object<string, string>
     变量被转换为与其初始类型不匹配的类型
     */
     "cast-type-mismatch": "Warning",
+    /*
+    `@class` 继承出现循环
+    */
     "circle-doc-class": "Warning",
     /*
     尝试关闭非对象变量的诊断
@@ -1186,6 +1198,9 @@ object<string, string>
     `@param`或`@return`的注释不完整
     */
     "incomplete-signature-doc": "Warning",
+    /*
+    向对象注入字段
+    */
     "inject-field": "Warning",
     /*
     使用不可见的值
@@ -1195,6 +1210,9 @@ object<string, string>
     首字母小写的全局变量定义
     */
     "lowercase-global": "Information",
+    /*
+    缺少字段
+    */
     "missing-fields": "Warning",
     /*
     全局变量的注释缺失(全局函数必须为所有参数和返回值提供注释和注释)
@@ -1989,26 +2007,26 @@ Array<string>
 
 ## enum
 
-* ``"//"``
-* ``"/**/"``
-* ``"`"``
-* ``"+="``
-* ``"-="``
-* ``"*="``
-* ``"/="``
-* ``"%="``
-* ``"^="``
-* ``"//="``
-* ``"|="``
-* ``"&="``
-* ``"<<="``
-* ``">>="``
-* ``"||"``
-* ``"&&"``
-* ``"!"``
-* ``"!="``
-* ``"continue"``
-* ``"|lambda|"``
+* ``"//"``: 行注释（C 风格）。
+* ``"/**/"``: 块注释（C 风格）。
+* ``"`"``: 反引号字符串字面量。
+* ``"+="``: 加法复合赋值。
+* ``"-="``: 减法复合赋值。
+* ``"*="``: 乘法复合赋值。
+* ``"/="``: 除法复合赋值。
+* ``"%="``: 取模复合赋值。
+* ``"^="``: 幂复合赋值。
+* ``"//="``: 地板除复合赋值。
+* ``"|="``: 按位或复合赋值。
+* ``"&="``: 按位与复合赋值。
+* ``"<<="``: 左移复合赋值。
+* ``">>="``: 右移复合赋值。
+* ``"||"``: 逻辑或（等价于 or）。
+* ``"&&"``: 逻辑与（等价于 and）。
+* ``"!"``: 逻辑非（等价于 not）。
+* ``"!="``: 不等于（等价于 ~=）。
+* ``"continue"``: continue 语句。
+* ``"|lambda|"``: 管道参数短函数（`|x| expr`）。
 * ``"?."``: 安全导航（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。
 * ``"??"``: 空值合并（`a ?? b`，仅当左侧为 nil 时取右侧）。
 * ``"?:"``: 三元条件（`a ? b : c`，右结合；b 部分禁止方法调用）。

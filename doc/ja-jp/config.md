@@ -284,34 +284,34 @@ Array<string>
 
 ## enum
 
-* ``"action-after-return"``
-* ``"ambiguity-1"``
-* ``"ambiguous-syntax"``
-* ``"args-after-dots"``
-* ``"assign-const-global"``
-* ``"assign-type-mismatch"``
-* ``"await-in-sync"``
-* ``"block-after-else"``
-* ``"break-outside"``
-* ``"cast-local-type"``
-* ``"cast-type-mismatch"``
-* ``"circle-doc-class"``
-* ``"close-non-object"``
-* ``"code-after-break"``
-* ``"codestyle-check"``
-* ``"count-down-loop"``
-* ``"declare-const"``
-* ``"deprecated"``
-* ``"different-requires"``
-* ``"discard-returns"``
-* ``"doc-field-no-class"``
-* ``"duplicate-doc-alias"``
-* ``"duplicate-doc-field"``
-* ``"duplicate-doc-param"``
-* ``"duplicate-index"``
-* ``"duplicate-set-field"``
-* ``"empty-block"``
-* ``"env-is-global"``
+* ``"action-after-return"``: `return` 文の後のコード
+* ``"ambiguity-1"``: 演算子優先順位のあいまいさ診断を有効にします。例: `num or 0 + 1` には `(num or 0) + 1` を推奨します。
+* ``"ambiguous-syntax"``: 曖昧な構文
+* ``"args-after-dots"``: `...` の後の引数
+* ``"assign-const-global"``: const グローバル変数への代入
+* ``"assign-type-mismatch"``: 値の型が代入先の型と一致しない代入の診断を有効にします。
+* ``"await-in-sync"``: 同期関数内で非同期関数を呼び出す場合の診断を有効にします。
+* ``"block-after-else"``: `else` の後のブロック
+* ``"break-outside"``: ループの外で `break` を使用
+* ``"cast-local-type"``: ローカル変数のキャスト先の型が定義と一致しない場合の診断を有効にします。
+* ``"cast-type-mismatch"``: キャスト先の型が元の型と一致しない場合の診断を有効にします。
+* ``"circle-doc-class"``: `@class` 継承の循環
+* ``"close-non-object"``: オブジェクト以外を閉じようとする場合の診断を有効にします。
+* ``"code-after-break"``: ループ内で`break`の後に配置されたコードの診断を有効にします。
+* ``"codestyle-check"``: スタイルに合わない行の診断を有効にします。
+* ``"count-down-loop"``: 減少しないため上限に到達しない `for` ループの診断を有効にします。
+* ``"declare-const"``: const 定数の再宣言
+* ``"deprecated"``: 非推奨APIを強調する診断を有効にします。
+* ``"different-requires"``: 異なるパスで同じファイルをrequireする場合の診断を有効にします。
+* ``"discard-returns"``: `---@nodiscard` が付いた関数の戻り値を無視した呼び出しの診断を有効にします。
+* ``"doc-field-no-class"``: クラス注釈なしでフィールド注釈がある場合の診断を有効にします。
+* ``"duplicate-doc-alias"``: エイリアス注釈名の重複診断を有効にします。
+* ``"duplicate-doc-field"``: フィールド注釈名の重複診断を有効にします。
+* ``"duplicate-doc-param"``: パラメータ注釈名の重複診断を有効にします。
+* ``"duplicate-index"``: 重複したテーブルインデックスの診断を有効にします。
+* ``"duplicate-set-field"``: クラス内で同じフィールドを複数回設定する診断を有効にします。
+* ``"empty-block"``: 空のコードブロック診断を有効にします。
+* ``"env-is-global"``: `_ENV` をグローバル変数として使用
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -320,19 +320,19 @@ Array<string>
 * ``"err-esc"``
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
-* ``"exp-in-action"``
-* ``"global-close-attribute"``
-* ``"global-element"``
-* ``"global-in-nil-env"``
-* ``"incomplete-signature-doc"``
-* ``"index-in-func-name"``
-* ``"inject-field"``
-* ``"invisible"``
-* ``"jump-local-scope"``
-* ``"keyword"``
-* ``"local-limit"``
-* ``"lowercase-global"``
-* ``"lua-doc-miss-sign"``
+* ``"exp-in-action"``: 文の位置に式が出現
+* ``"global-close-attribute"``: グローバル変数への close 属性
+* ``"global-element"``: グローバル要素に関する警告診断を有効にします。
+* ``"global-in-nil-env"``: グローバル変数を使用できない（`_ENV` が `nil`）場合の診断を有効にします。
+* ``"incomplete-signature-doc"``: 関数の @param または @return 注釈が不完全な場合の診断。
+* ``"index-in-func-name"``: 関数名にインデックスが含まれる
+* ``"inject-field"``: オブジェクトへのフィールド注入
+* ``"invisible"``: 不可視フィールドへのアクセス診断を有効にします。
+* ``"jump-local-scope"``: ローカル変数のスコープにジャンプ
+* ``"keyword"``: キーワードの不適切な使用
+* ``"local-limit"``: ローカル変数の数が上限を超える
+* ``"lowercase-global"``: 先頭小文字のグローバル変数定義の診断を有効にします。
+* ``"lua-doc-miss-sign"``: LuaDoc コメントに記号が不足
 * ``"luadoc-error-diag-mode"``
 * ``"luadoc-miss-alias-extends"``
 * ``"luadoc-miss-alias-name"``
@@ -357,7 +357,7 @@ Array<string>
 * ``"luadoc-miss-type-name"``
 * ``"luadoc-miss-vararg-type"``
 * ``"luadoc-miss-version"``
-* ``"malformed-number"``
+* ``"malformed-number"``: 不正な数値リテラル
 * ``"miss-end"``
 * ``"miss-esc-x"``
 * ``"miss-exp"``
@@ -370,59 +370,59 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
-* ``"missing-fields"``
-* ``"missing-global-doc"``
-* ``"missing-local-export-doc"``
-* ``"missing-parameter"``
-* ``"missing-return"``
-* ``"missing-return-value"``
-* ``"multi-close"``
-* ``"name-style-check"``
-* ``"need-check-nil"``
-* ``"need-paren"``
-* ``"nesting-long-mark"``
-* ``"newfield-call"``
-* ``"newline-call"``
-* ``"no-unknown"``
-* ``"no-visible-label"``
-* ``"not-yieldable"``
-* ``"param-type-mismatch"``
-* ``"redefined-label"``
-* ``"redefined-local"``
-* ``"redundant-parameter"``
-* ``"redundant-return"``
-* ``"redundant-return-value"``
-* ``"redundant-value"``
-* ``"return-type-mismatch"``
-* ``"set-const"``
-* ``"spell-check"``
-* ``"trailing-space"``
-* ``"unbalanced-assignments"``
-* ``"undefined-doc-class"``
-* ``"undefined-doc-name"``
-* ``"undefined-doc-param"``
-* ``"undefined-env-child"``
-* ``"undefined-field"``
-* ``"undefined-global"``
+* ``"missing-fields"``: フィールドが不足
+* ``"missing-global-doc"``: グローバル関数の注釈不足の診断。コメントと全パラメータ・戻り値の注釈が必要です。
+* ``"missing-local-export-doc"``: エクスポートされたローカル関数の注釈不足の診断。
+* ``"missing-parameter"``: 注釈パラメータ数より少ない引数で関数を呼び出した場合の診断を有効にします。
+* ``"missing-return"``: 戻り注釈があるのにreturn文がない場合の診断を有効にします。
+* ``"missing-return-value"``: 戻り値を宣言しているのに値を返さないreturn文の診断を有効にします。
+* ``"multi-close"``: 多重 close 操作
+* ``"name-style-check"``: 名前スタイルの診断を有効にします。
+* ``"need-check-nil"``: 以前に`nil`または任意型が代入された変数を使用する際のnilチェック診断を有効にします。
+* ``"need-paren"``: 括弧が必要
+* ``"nesting-long-mark"``: ネストした長いコメントマーカー
+* ``"newfield-call"``: newfield 呼び出しの診断を有効にします。テーブル定義中に関数呼び出しの括弧が次の行に現れる場合に発生します。
+* ``"newline-call"``: 改行呼び出しの診断を有効にします。`(` で始まる行が前の行への関数呼び出しとして構文解析される場合に発生します。
+* ``"no-unknown"``: 型を推論できない場合の診断を有効にします。
+* ``"no-visible-label"``: 見えないラベル
+* ``"not-yieldable"``: 許可されない場所での`coroutine.yield()`呼び出しの診断を有効にします。
+* ``"param-type-mismatch"``: 注釈の型と一致しない引数を渡した場合の診断を有効にします。
+* ``"redefined-label"``: 再定義されたラベル
+* ``"redefined-local"``: ローカル変数の再定義診断を有効にします。
+* ``"redundant-parameter"``: 冗長な関数パラメータの診断を有効にします。
+* ``"redundant-return"``: 不要なreturn文の診断を有効にします。
+* ``"redundant-return-value"``: 注釈にない追加の戻り値を返すreturn文の診断を有効にします。
+* ``"redundant-value"``: 代入時の余分な値の診断を有効にします。値の数が変数の数を超える場合に発生します。
+* ``"return-type-mismatch"``: 戻り値の型が注釈と一致しない場合の診断を有効にします。
+* ``"set-const"``: const 定数への代入
+* ``"spell-check"``: 文字列内のタイポ診断を有効にします。
+* ``"trailing-space"``: 行末の余分な空白の診断を有効にします。
+* ``"unbalanced-assignments"``: 多重代入で一部の変数が値を得られない場合の診断を有効にします（例: `local x,y = 1`）。
+* ``"undefined-doc-class"``: 未定義クラスを参照するクラス注釈の診断を有効にします。
+* ``"undefined-doc-name"``: 未定義の型またはエイリアスを参照する注釈の診断を有効にします。
+* ``"undefined-doc-param"``: 関数定義に存在しないパラメータへの注釈の診断を有効にします。
+* ``"undefined-env-child"``: 未定義環境変数の診断を有効にします。`_ENV` を新しいリテラルテーブルに設定した結果、使用中のグローバルが存在しない場合に発生します。
+* ``"undefined-field"``: 未定義フィールドを参照する場合の診断を有効にします。
+* ``"undefined-global"``: 未定義のグローバル変数の診断を有効にします。
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
 * ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
-* ``"unicode-name"``
-* ``"unknown-attribute"``
-* ``"unknown-cast-variable"``
-* ``"unknown-diag-code"``
-* ``"unknown-operator"``
-* ``"unknown-symbol"``
-* ``"unreachable-code"``
-* ``"unsupport-named-vararg"``
+* ``"unicode-name"``: Unicode 名
+* ``"unknown-attribute"``: 不明な属性
+* ``"unknown-cast-variable"``: 未定義変数へのキャスト診断を有効にします。
+* ``"unknown-diag-code"``: 不明な診断コードが入力された場合の診断を有効にします。
+* ``"unknown-operator"``: 不明な演算子の診断を有効にします。
+* ``"unknown-symbol"``: 不明な記号
+* ``"unreachable-code"``: 到達不能コードの診断を有効にします。
+* ``"unsupport-named-vararg"``: サポートされない名前付き可変引数
 * ``"unsupport-symbol"``
-* ``"unused-function"``
-* ``"unused-label"``
-* ``"unused-local"``
-* ``"unused-vararg"``
-* ``"variable-not-declared"``
+* ``"unused-function"``: 未使用の関数の診断を有効にします。
+* ``"unused-label"``: 未使用ラベルの診断を有効にします。
+* ``"unused-local"``: 未使用のローカル変数の診断を有効にします。
+* ``"unused-vararg"``: 未使用の可変引数の診断を有効にします。
+* ``"variable-not-declared"``: 未宣言の変数の使用
 
 ## default
 
@@ -848,6 +848,9 @@ object<string, string>
     キャスト先の型が元の型と一致しない場合の診断を有効にします。
     */
     "cast-type-mismatch": "Opened",
+    /*
+    `@class` 継承の循環
+    */
     "circle-doc-class": "Any",
     /*
     オブジェクト以外を閉じようとする場合の診断を有効にします。
@@ -917,6 +920,9 @@ object<string, string>
     関数の @param または @return 注釈が不完全な場合の診断。
     */
     "incomplete-signature-doc": "None",
+    /*
+    オブジェクトへのフィールド注入
+    */
     "inject-field": "Opened",
     /*
     不可視フィールドへのアクセス診断を有効にします。
@@ -926,6 +932,9 @@ object<string, string>
     先頭小文字のグローバル変数定義の診断を有効にします。
     */
     "lowercase-global": "Any",
+    /*
+    フィールドが不足
+    */
     "missing-fields": "Any",
     /*
     グローバル関数の注釈不足の診断。コメントと全パラメータ・戻り値の注釈が必要です。
@@ -1118,6 +1127,9 @@ object<string, string>
     キャスト先の型が元の型と一致しない場合の診断を有効にします。
     */
     "cast-type-mismatch": "Warning",
+    /*
+    `@class` 継承の循環
+    */
     "circle-doc-class": "Warning",
     /*
     オブジェクト以外を閉じようとする場合の診断を有効にします。
@@ -1187,6 +1199,9 @@ object<string, string>
     関数の @param または @return 注釈が不完全な場合の診断。
     */
     "incomplete-signature-doc": "Warning",
+    /*
+    オブジェクトへのフィールド注入
+    */
     "inject-field": "Warning",
     /*
     不可視フィールドへのアクセス診断を有効にします。
@@ -1196,6 +1211,9 @@ object<string, string>
     先頭小文字のグローバル変数定義の診断を有効にします。
     */
     "lowercase-global": "Information",
+    /*
+    フィールドが不足
+    */
     "missing-fields": "Warning",
     /*
     グローバル関数の注釈不足の診断。コメントと全パラメータ・戻り値の注釈が必要です。
@@ -1990,26 +2008,26 @@ Array<string>
 
 ## enum
 
-* ``"//"``
-* ``"/**/"``
-* ``"`"``
-* ``"+="``
-* ``"-="``
-* ``"*="``
-* ``"/="``
-* ``"%="``
-* ``"^="``
-* ``"//="``
-* ``"|="``
-* ``"&="``
-* ``"<<="``
-* ``">>="``
-* ``"||"``
-* ``"&&"``
-* ``"!"``
-* ``"!="``
-* ``"continue"``
-* ``"|lambda|"``
+* ``"//"``: 行コメント（C スタイル）。
+* ``"/**/"``: ブロックコメント（C スタイル）。
+* ``"`"``: バッククォート文字列リテラル。
+* ``"+="``: 加算複合代入。
+* ``"-="``: 減算複合代入。
+* ``"*="``: 乗算複合代入。
+* ``"/="``: 除算複合代入。
+* ``"%="``: 剰余複合代入。
+* ``"^="``: べき乗複合代入。
+* ``"//="``: 床除算複合代入。
+* ``"|="``: ビット単位 OR 複合代入。
+* ``"&="``: ビット単位 AND 複合代入。
+* ``"<<="``: 左シフト複合代入。
+* ``">>="``: 右シフト複合代入。
+* ``"||"``: 論理 OR（`or` と同等）。
+* ``"&&"``: 論理 AND（`and` と同等）。
+* ``"!"``: 論理 NOT（`not` と同等）。
+* ``"!="``: 等しくない（`~=` と同等）。
+* ``"continue"``: `continue` 文。
+* ``"|lambda|"``: パイプ引数の短い関数（`|x| expr`）。
 * ``"?."``: 安全ナビゲーション（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。
 * ``"??"``: nil 合体（`a ?? b`。左辺が nil の場合のみ右辺を返す）。
 * ``"?:"``: 三項演算子（`a ? b : c`、右結合）。

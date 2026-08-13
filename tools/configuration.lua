@@ -51,7 +51,10 @@ local function getEnumDesc(name, temp)
         return nil
     end
     local descs = {}
-    local head = name:gsub('^Lua', '%%config')
+    -- Lua.diagnostics.disable 的枚举（诊断名）复用 locale 中已有的
+    -- config.diagnostics.<诊断名> 描述，避免为 disable 单独维护一份文案
+    local head = (name == 'Lua.diagnostics.disable' and '%config.diagnostics')
+              or name:gsub('^Lua', '%%config')
 
     -- 生成的 locale 键名必须与 script/locale-loader.lua 的 mergeKey 规则一致：
     -- 字母开头的枚举用 `.` 连接，非字母开头（如 ?.、~=、->）不加点

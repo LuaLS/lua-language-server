@@ -160,6 +160,16 @@ local function TestIndividualDisabled(symbol, script)
     end
 end
 
+-- 仅启用指定 symbol（其余均未启用、无主开关）：应报错（验证一个 key 只承载一个功能）
+---@param symbol string
+---@param script string
+local function TestOnlySymbolDisabled(symbol, script)
+    local state = parser.compile(script, 'Lua', 'Lua 5.4', { nonstandardSymbol = { [symbol] = true } })
+    if #state.errs == 0 then
+        error(('仅启用 %s 不应启用该语法：%s'):format(symbol, script))
+    end
+end
+
 -- ?. 安全导航（字段/方法）
 TestIndividual('?.', 'local a = obj?.field')
 TestIndividual('?.', 'local a = obj?.:method()')
@@ -195,9 +205,16 @@ TestMasterSwitchDisabled 'local a = t?[1]'
 -- ?? 空值合并
 TestIndividual('??', 'local a = b ?? c')
 TestIndividualDisabled('??', 'local a = b ?? c')
--- ?: 三元
-TestIndividual('?:', 'local a = b ? c : d')
-TestIndividualDisabled('?:', 'local a = b ? c : d')
+-- ternary 三元 / ?: 无点号安全方法
+TestIndividual('ternary', 'local a = b ? c : d')
+TestIndividual('?:', 'local a = obj?:get()')
+TestIndividual('?:', 'local a = obj?:get().field')
+TestIndividualDisabled('ternary', 'local a = b ? c : d')
+TestIndividualDisabled('?:', 'local a = obj?:get()')
+TestMasterSwitchDisabled 'local a = obj?:get()'
+-- 拆分验证：ternary 与 ?: 相互独立（一个 key 只承载一个功能）
+TestOnlySymbolDisabled('ternary', 'local a = obj?:get()') -- 仅三元时不启用无点号安全方法
+TestOnlySymbolDisabled('?:', 'local a = b ? c : d')      -- 仅 ?: 时不启用三元
 -- ~>> 算术右移
 TestIndividual('~>>', 'local a = 3 ~>> 1')
 TestIndividualDisabled('~>>', 'local a = 3 ~>> 1')

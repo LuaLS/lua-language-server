@@ -39,13 +39,15 @@ config.runtime.nonstandardSymbol['?.('] =
 config.runtime.nonstandardSymbol['?.['] =
 "安全ナビゲーションインデックス（`t?.[key]`）。"
 config.runtime.nonstandardSymbol['?('] =
-"ドットなしオプショナル呼び出し（`f?()` は `f?.()` と同等。三項 `?:` の解析と競合するため併用非推奨）。"
+"ドットなしオプショナル呼び出し（`f?()` は `f?.()` と同等。三項（`ternary`）の解析と競合するため併用非推奨）。"
 config.runtime.nonstandardSymbol['?['] =
-"ドットなしオプショナルインデックス（`t?[1]` は `t?.[1]` と同等。三項 `?:` の解析と競合するため併用非推奨）。"
+"ドットなしオプショナルインデックス（`t?[1]` は `t?.[1]` と同等。三項（`ternary`）の解析と競合するため併用非推奨）。"
 config.runtime.nonstandardSymbol['??'] =
 "nil 合体（`a ?? b`。左辺が nil の場合のみ右辺を返す）。"
+config.runtime.nonstandardSymbol['ternary'] =
+"三項演算子（`cond ? x : y`、右結合。`x` 部分ではメソッド呼び出し禁止）。"
 config.runtime.nonstandardSymbol['?:'] =
-"三項演算子（`a ? b : c`、右結合）。"
+"ドットなし安全メソッド（`obj?:get()` は `obj?.:get()` と同等）。"
 config.runtime.nonstandardSymbol['~>>'] =
 "算術右シフト（`a ~>> b`。LuaJIT 固有。通常の `>>` は論理右シフト）。"
 config.runtime.nonstandardSymbol['~>>='] =

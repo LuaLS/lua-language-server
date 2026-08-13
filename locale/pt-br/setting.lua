@@ -39,13 +39,15 @@ config.runtime.nonstandardSymbol['?.('] =
 config.runtime.nonstandardSymbol['?.['] =
 "Índice de navegação segura (`t?.[key]`)."
 config.runtime.nonstandardSymbol['?('] =
-"Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário `?:`, não recomendado juntos)."
+"Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário (`ternary`), não recomendado juntos)."
 config.runtime.nonstandardSymbol['?['] =
-"Índice opcional sem ponto (`t?[1]` equivale a `t?.[1]`; conflita com a análise do ternário `?:`, não recomendado juntos)."
+"Índice opcional sem ponto (`t?[1]` equivale a `t?.[1]`; conflita com a análise do ternário (`ternary`), não recomendado juntos)."
 config.runtime.nonstandardSymbol['??'] =
 "Coalescência nula (`a ?? b`; usa o lado direito apenas quando o esquerdo é nil)."
+config.runtime.nonstandardSymbol['ternary'] =
+"Operador ternário (`cond ? x : y`, associativo à direita; chamadas de método proibidas na parte `x`)."
 config.runtime.nonstandardSymbol['?:'] =
-"Condicional ternário (`a ? b : c`, associativo à direita)."
+"Método seguro sem ponto (`obj?:get()` equivale a `obj?.:get()`)."
 config.runtime.nonstandardSymbol['~>>'] =
 "Deslocamento aritmético à direita (`a ~>> b`, específico do LuaJIT; `>>` normal é lógico)."
 config.runtime.nonstandardSymbol['~>>='] =

@@ -39,13 +39,15 @@ config.runtime.nonstandardSymbol['?.('] =
 config.runtime.nonstandardSymbol['?.['] =
 "安全导航索引（`t?.[key]`）。"
 config.runtime.nonstandardSymbol['?('] =
-"无点号可选链调用（`f?()` 等价于 `f?.()`；与三元 `?:` 解析冲突，不建议同时启用）。"
+"无点号可选链调用（`f?()` 等价于 `f?.()`；与三元（`ternary`）解析冲突，不建议同时启用）。"
 config.runtime.nonstandardSymbol['?['] =
-"无点号可选链索引（`t?[1]` 等价于 `t?.[1]`；与三元 `?:` 解析冲突，不建议同时启用）。"
+"无点号可选链索引（`t?[1]` 等价于 `t?.[1]`；与三元（`ternary`）解析冲突，不建议同时启用）。"
 config.runtime.nonstandardSymbol['??'] =
 "空值合并（`a ?? b`，仅当左侧为 nil 时取右侧）。"
+config.runtime.nonstandardSymbol['ternary'] =
+"三元运算（`cond ? x : y`，右结合；x 部分禁止方法调用）。"
 config.runtime.nonstandardSymbol['?:'] =
-"三元条件（`a ? b : c`，右结合；b 部分禁止方法调用）。"
+"无点号安全方法（`obj?:get()` 等价于 `obj?.:get()`）。"
 config.runtime.nonstandardSymbol['~>>'] =
 "算术右移（`a ~>> b`，LuaJIT 特有；普通 `>>` 为逻辑右移）。"
 config.runtime.nonstandardSymbol['~>>='] =

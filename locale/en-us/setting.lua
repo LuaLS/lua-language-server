@@ -39,13 +39,15 @@ config.runtime.nonstandardSymbol['?.('] =
 config.runtime.nonstandardSymbol['?.['] =
 "Safe navigation index (`t?.[key]`)."
 config.runtime.nonstandardSymbol['?('] =
-"No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary `?:` parsing, not recommended together)."
+"No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary (`ternary`) parsing, not recommended together)."
 config.runtime.nonstandardSymbol['?['] =
-"No-dot optional index (`t?[1]` equals `t?.[1]`; conflicts with ternary `?:` parsing, not recommended together)."
+"No-dot optional index (`t?[1]` equals `t?.[1]`; conflicts with ternary (`ternary`) parsing, not recommended together)."
 config.runtime.nonstandardSymbol['??'] =
 "Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil)."
+config.runtime.nonstandardSymbol['ternary'] =
+"Ternary operator (`cond ? x : y`, right-associative; method calls forbidden in the `x` part)."
 config.runtime.nonstandardSymbol['?:'] =
-"Ternary conditional (`a ? b : c`, right-associative)."
+"No-dot safe method (`obj?:get()` equals `obj?.:get()`)."
 config.runtime.nonstandardSymbol['~>>'] =
 "Arithmetic right shift (`a ~>> b`, LuaJIT-specific; plain `>>` is logical)."
 config.runtime.nonstandardSymbol['~>>='] =

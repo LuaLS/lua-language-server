@@ -2203,13 +2203,15 @@ local function parseSimple(node, funcName, noMethod)
             Index = Index + 2
             skipSpace()
             token = Tokens[Index + 1]
-        -- 无点号可选链（非 LuaJIT 语法，本项目独立扩展）：? 直接后跟 ( 或 [（f?() / t?[1]，相对 ?. 省略点号）。
-        -- 仅由 nonstandardSymbol['?('] / ['?['] 单独启用，与 LuaJIT 版本/主开关无关：
-        -- 它与三元 ?: 解析存在冲突（如 `a ? (x) : c` 会被当作 `a?(x)`）
+        -- 无点号可选链（非 LuaJIT 语法，本项目独立扩展）：? 直接后跟 ( / [ / :（f?() / t?[1] / obj?:get()，相对 ?. 省略点号）。
+        -- 仅由 nonstandardSymbol['?('] / ['?['] / ['?:'] 单独启用，与 LuaJIT 版本/主开关无关：
+        -- ?( 与 ?[ 与三元（ternary）解析存在冲突（如 `a ? (x) : c` 会被当作 `a?(x)`）；
+        -- ?: 的无点号方法形式（obj?:get()）与合法三元不冲突（三元 ? 后跟表达式而非 :）
         elseif token == '?' then
             local nextToken = Tokens[Index + 3]
             if (nextToken == '(' and State.options.nonstandardSymbol['?('])
-            or (nextToken == '[' and State.options.nonstandardSymbol['?[']) then
+            or (nextToken == '[' and State.options.nonstandardSymbol['?['])
+            or (nextToken == ':' and State.options.nonstandardSymbol['?:'] and not noMethod) then
                 safe = true
                 Index = Index + 2
                 skipSpace()
@@ -3418,8 +3420,8 @@ function parseExp(asAction, level, noMethod, noTernary)
         exp = bin
     end
 
-    -- LuaJIT 三元 ?:（右结合、优先级最低，仅在表达式根位置检查，操作数位置由 noTernary 屏蔽）
-    if isLuaJITExt('?:') and not noTernary then
+    -- LuaJIT 三元（'ternary'，符号 ?:；右结合、优先级最低，仅在表达式根位置检查，操作数位置由 noTernary 屏蔽）
+    if isLuaJITExt('ternary') and not noTernary then
         skipSpace()
         if Tokens[Index + 1] == '?' then
             local qEnd = getPosition(Tokens[Index], 'right')

@@ -2029,7 +2029,7 @@ Array<string>
 * ``"?.("``: Chamada de navegação segura (`f?.()` / `f?."str"` / `f?.{...}` / `f?.[[...]]`).
 * ``"?.["``: Índice de navegação segura (`t?.[key]`).
 * ``"??"``: Coalescência nula (`a ?? b`; usa o lado direito apenas quando o esquerdo é nil).
-* ``"?:"``: Condicional ternário (`a ? b : c`, associativo à direita).
+* ``"ternary"``: Operador ternário (`cond ? x : y`, associativo à direita; chamadas de método proibidas na parte `x`).
 * ``"~>>"``: Deslocamento aritmético à direita (`a ~>> b`, específico do LuaJIT; `>>` normal é lógico).
 * ``"~>>="``: Atribuição composta de deslocamento aritmético à direita (`a ~>>= b`).
 * ``"..="``: Atribuição composta de concatenação de strings (`a ..= b`).
@@ -2037,8 +2037,9 @@ Array<string>
 * ``"const"``: Declaração `const` (constante local de escopo de bloco; não pode ser reatribuída nem redeclarada).
 * ``"->"``: Seta de função curta (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`).
 * ``"number_underscore"``: Sublinhado em literais numéricos (ex.: `1_000`, `0x1_2`, `0b1_0`).
-* ``"?("``: Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário `?:`, não recomendado juntos).
-* ``"?["``: Índice opcional sem ponto (`t?[1]` equivale a `t?.[1]`; conflita com a análise do ternário `?:`, não recomendado juntos).
+* ``"?("``: Chamada opcional sem ponto (`f?()` equivale a `f?.()`; conflita com a análise do ternário (`ternary`), não recomendado juntos).
+* ``"?["``: Índice opcional sem ponto (`t?[1]` equivale a `t?.[1]`; conflita com a análise do ternário (`ternary`), não recomendado juntos).
+* ``"?:"``: Método seguro sem ponto (`obj?:get()` equivale a `obj?.:get()`).
 
 ## default
 

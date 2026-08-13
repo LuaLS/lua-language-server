@@ -2029,7 +2029,7 @@ Array<string>
 * ``"?.("``: Safe navigation call (`f?.()` / `f?."str"` / `f?.{...}` / `f?.[[...]]`).
 * ``"?.["``: Safe navigation index (`t?.[key]`).
 * ``"??"``: Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil).
-* ``"?:"``: Ternary conditional (`a ? b : c`, right-associative).
+* ``"ternary"``: Ternary operator (`cond ? x : y`, right-associative; method calls forbidden in the `x` part).
 * ``"~>>"``: Arithmetic right shift (`a ~>> b`, LuaJIT-specific; plain `>>` is logical).
 * ``"~>>="``: Arithmetic right shift compound assignment (`a ~>>= b`).
 * ``"..="``: String concatenation compound assignment (`a ..= b`).
@@ -2037,8 +2037,9 @@ Array<string>
 * ``"const"``: `const` declaration (block-scoped local constant, cannot be reassigned or redeclared).
 * ``"->"``: Short function arrow (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`).
 * ``"number_underscore"``: Underscores in number literals (e.g. `1_000`, `0x1_2`, `0b1_0`).
-* ``"?("``: No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary `?:` parsing, not recommended together).
-* ``"?["``: No-dot optional index (`t?[1]` equals `t?.[1]`; conflicts with ternary `?:` parsing, not recommended together).
+* ``"?("``: No-dot optional call (`f?()` equals `f?.()`; conflicts with ternary (`ternary`) parsing, not recommended together).
+* ``"?["``: No-dot optional index (`t?[1]` equals `t?.[1]`; conflicts with ternary (`ternary`) parsing, not recommended together).
+* ``"?:"``: No-dot safe method (`obj?:get()` equals `obj?.:get()`).
 
 ## default
 

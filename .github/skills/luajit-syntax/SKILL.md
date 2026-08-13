@@ -100,7 +100,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 | 5 | `const` 声明 | `parseAction` + 局部常量语义 | ✅ |
 | 6 | 数字下划线 `1_000` | tokenizer `Number` + `parseNumber*` | ✅ |
 | 7 | 短函数完整形式（`x -> expr`、`\|\| -> expr`、`-> do ... end`） | tokenizer `->` + `parseLambda` 扩展 | ✅ |
-| 8 | **三元 `?:`**（`a ? b : c`，NOCOLON 屏蔽方法调用、右结合） | `parseExp` + `parseSimple` + guide + vm | ✅ |
+| 8 | **三元 `ternary`**（符号 `?:`，`cond ? x : y`，NOCOLON 屏蔽方法调用、右结合；**key 为 `ternary`，与无点号安全方法 `?:` 拆开**） | `parseExp` + `parseSimple` + guide + vm | ✅ |
 
 ### ⏸ 未反向移植到 v2.1（无需支持）
 - `//` 地板除、命名变参 `...name`、位运算元方法、`__add(a, b, true)` 元方法。
@@ -178,10 +178,11 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 
 ## 注意事项
 - **优先级表**：所有新增运算符的优先级必须严格遵循 LuaJIT 官方定义（见 references/syntax-extensions.md「运算符优先级」）。
-- **三元 `?:` 已实现**：见 references/syntax-extensions.md 第 3 节；b 部分禁止方法调用（NOCOLON），需括号 `(obj:method())` 绕过；b 部分嵌套三元非法（`d:e` 歧义），c 部分右结合递归合法。
+- **三元 `ternary` 已实现（2026-08-13 拆分）**：见 references/syntax-extensions.md 第 3 节；b 部分禁止方法调用（NOCOLON），需括号 `(obj:method())` 绕过；b 部分嵌套三元非法（`d:e` 歧义），c 部分右结合递归合法。**一个 key 只承载一个功能**：三元从 `?:` 拆出，改用 **`ternary`** key（`isLuaJITExt('ternary')`，主开关 enableLuaJITExtensions 也启用，因三元是 LuaJIT 官方语法）；`?:` 专用于无点号安全方法 `obj?:get()`（仅 `nonstandardSymbol['?:']` 门控，主开关不启用）。
 - **`?.` 与 `:` 的歧义**：实现安全导航的方法形式时需小心区分 `obj?.:method`（`?.` + `:`）与 `obj:method?.`（`:` + `?.`），以及普通方法调用 `obj:method`，三者 token 序列不同，需在 `parseSimple` 中分别处理。
 - **`?.` 已拆分为 3 项（2026-08-13）**：`?.`（字段/方法：`a?.b` / `obj?.:method` / `obj:method?.`）、`?.(`（安全调用：`f?.()` / `f?."str"` / `f?.{...}` / `f?.[[...]]`）、`?.[`（安全索引：`t?.[key]`）。parseSimple 在 `?.` 后按后缀选择启用项：`(`/`{`/引号→`?.('`；`[`→看 `Tokens[Index+5]` 是否为 `[`/`=`（长字符串调用 vs 索引）；其他→`?.`。主开关 enableLuaJITExtensions 仍一并启用全部。
-- **无点号可选链 `?(` / `?[`（2026-08-13 新增，非 LuaJIT 语法）**：`f?()` / `t?[1]` 等价于 `f?.()` / `t?.[1]`，AST 一致（`call`/`getindex` 的 `safe=true`）。仅由 `nonstandardSymbol['?(']`/`['?[']` 单独启用，**与 LuaJIT 无关**（主开关 enableLuaJITExtensions 不启用，与版本无关）；与三元 `?:` 解析冲突（`a ? (x) : c` 会被当作 `a?(x)`），template 注释与 locale 描述均有警告。
+- **无点号可选链 `?(` / `?[`（2026-08-13 新增，非 LuaJIT 语法）**：`f?()` / `t?[1]` 等价于 `f?.()` / `t?.[1]`，AST 一致（`call`/`getindex` 的 `safe=true`）。仅由 `nonstandardSymbol['?(']`/`['?[']` 单独启用，**与 LuaJIT 无关**（主开关 enableLuaJITExtensions 不启用，与版本无关）；与三元（`ternary`）解析冲突（`a ? (x) : c` 会被当作 `a?(x)`），template 注释与 locale 描述均有警告。
+- **无点号安全方法 `obj?:get()`（2026-08-13，非 LuaJIT 语法）**：`?:` 选项只做无点号安全方法（`obj?:get()` = `obj?.:get()`），与三元拆开（三元用 `ternary`）。parseSimple 的 `?` 分支处理 `?`+`:`（需 `nonstandardSymbol['?:']` 且 `not noMethod`，三元 b 部分不消费）。合法三元 `a ? b : c` 的 `?` 后跟表达式不受影响（仅 `?`+`:` 相邻才走方法）。
 - **soft keyword**：`const` 与 `continue` 都是 soft keyword，可作变量名/字段名/函数名，解析时必须先识别上下文。
 - **短路语义**：`??`、`?.` 都有短路行为，虽然语法层不关心求值，但 AST 结构与类型推断需正确表达。
 - **`continue` 与 `repeat`**：`continue` 跳转到循环条件；在 `repeat` 中不能跳入其后声明的局部变量作用域（测试 `stmt_continue.lua` 有覆盖）。

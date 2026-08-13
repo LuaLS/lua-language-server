@@ -54,9 +54,11 @@ TestLuaJITExt 'local a = 3 ~>> 1 + 2'
 -- 复合赋值
 TestLuaJITExt 'local a = 3; a ~>>= 1'
 TestLuaJITExt 'local a = "x"; a ..= "y"'
+TestLuaJITExt 'local a = 3; a ~= 2' -- 语句上下文 ~= 是异或复合赋值
 TestLuaJITExt 'local t = {}; t.x += 1'
 TestLuaJITExt 'local t = {}; t[1] += 1'
 TestLuaJITExtDisabled 'local a = 3; a ~>>= 1'
+TestLuaJITExtDisabled 'local a = 3; a ~= 2'
 
 -- 数字下划线
 TestLuaJITExt 'local a = 1_234'
@@ -134,6 +136,73 @@ TestLuaJITExt 'repeat continue until false'
 TestLuaJITExtDisabled 'while true do continue end'
 
 print('LuaJIT 扩展基本语法用例通过')
+
+-- ==================== 单独启用（Lua.runtime.nonstandardSymbol） ====================
+-- 通过 nonstandardSymbol 单独启用某项时，即使 version 非 LuaJIT 也可用（不依赖主开关）
+
+-- 非 LuaJIT 版本下仅开启指定 symbol：应无错误
+---@param symbol string
+---@param script string
+local function TestIndividual(symbol, script)
+    local state = parser.compile(script, 'Lua', 'Lua 5.4', { nonstandardSymbol = { [symbol] = true } })
+    if #state.errs > 0 then
+        error(('单独启用 %s 仍报错：%s [%s]'):format(symbol, script, state.errs[1].type))
+    end
+end
+
+-- 非 LuaJIT 版本下未启用该 symbol（也未开主开关）：应报错
+---@param symbol string
+---@param script string
+local function TestIndividualDisabled(symbol, script)
+    local state = parser.compile(script, 'Lua', 'Lua 5.4', { nonstandardSymbol = {} })
+    if #state.errs == 0 then
+        error(('未启用 %s 应报错：%s'):format(symbol, script))
+    end
+end
+
+-- ?. 安全导航
+TestIndividual('?.', 'local a = obj?.field')
+TestIndividual('?.', 'local a = obj?.[key]')
+TestIndividual('?.', 'local a = f?.()')
+TestIndividual('?.', 'local a = obj?.:method()')
+TestIndividualDisabled('?.', 'local a = obj?.field')
+-- ?? 空值合并
+TestIndividual('??', 'local a = b ?? c')
+TestIndividualDisabled('??', 'local a = b ?? c')
+-- ?: 三元
+TestIndividual('?:', 'local a = b ? c : d')
+TestIndividualDisabled('?:', 'local a = b ? c : d')
+-- ~>> 算术右移
+TestIndividual('~>>', 'local a = 3 ~>> 1')
+TestIndividualDisabled('~>>', 'local a = 3 ~>> 1')
+-- ~>>= 复合赋值
+TestIndividual('~>>=', 'local a = 3; a ~>>= 1')
+TestIndividualDisabled('~>>=', 'local a = 3; a ~>>= 1')
+-- ..= 复合赋值
+TestIndividual('..=', 'local a = "x"; a ..= "y"')
+TestIndividualDisabled('..=', 'local a = "x"; a ..= "y"')
+-- ~= 异或复合赋值（仅语句上下文）；表达式上下文的"不等于"不受影响
+TestIndividual('~=', 'local a = 3; a ~= 2')
+TestIndividual('~=', 'local a = 3; a ~= 2; local b = (a ~= 1)')
+TestIndividualDisabled('~=', 'local a = 3; a ~= 2')
+-- const 声明
+TestIndividual('const', 'const x = 1')
+TestIndividual('const', 'const x, y = 1, 2')
+TestIndividualDisabled('const', 'const x = 1')
+-- -> 短函数
+TestIndividual('->', 'local f = x -> x + 1')
+TestIndividual('->', 'local f = |x| -> x + 1')
+TestIndividual('->', 'local f = || -> 11')
+TestIndividual('->', 'local f = x -> do return x end')
+TestIndividualDisabled('->', 'local f = x -> x + 1')
+-- number_underscore 数字下划线
+TestIndividual('number_underscore', 'local a = 1_234')
+TestIndividual('number_underscore', 'local a = 0x1_2')
+TestIndividual('number_underscore', 'local a = 1_2.3_4')
+TestIndividual('number_underscore', 'local a = 1e1_0')
+TestIndividualDisabled('number_underscore', 'local a = 1_234')
+
+print('LuaJIT 扩展单独启用用例通过')
 
 -- ==================== LuaJIT 官方测试文件 ====================
 

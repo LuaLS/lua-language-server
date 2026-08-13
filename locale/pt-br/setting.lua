@@ -31,9 +31,16 @@ O exemplo a seguir mostra que 'include' é tratado como 'require'.
 config.runtime.unicodeName        =
 "Permite caracteres Unicode em nomes."
 config.runtime.nonstandardSymbol  =
-"Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos."
+[[
+Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos.
+
+A sintaxe de extensão do LuaJIT 3.0 (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) também pode ser habilitada individualmente aqui, sem exigir que `Lua.runtime.version` seja `LuaJIT`. Nota: `~=` só atua como atribuição composta XOR em contexto de declaração (ex.: `a ~= b` em uma linha); em expressões continua sendo o operador de desigualdade.
+]]
 config.runtime.enableLuaJITExtensions =
-"Ativa a sintaxe de extensão do LuaJIT (requer que `Lua.runtime.version` esteja definido como `LuaJIT`)."
+[[
+Ativa a sintaxe de extensão do LuaJIT (requer que `Lua.runtime.version` esteja definido como `LuaJIT`).
+Cada extensão também pode ser habilitada individualmente via `Lua.runtime.nonstandardSymbol`.
+]]
 config.runtime.plugin             =
 "Caminho do plugin. Leia a [wiki](https://luals.github.io/wiki/plugins) para saber mais."
 config.runtime.pluginArgs         =

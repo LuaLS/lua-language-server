@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` LuaJIT 3.0 extension syntax can now also be enabled individually via `Lua.runtime.nonstandardSymbol` (`?.`, `??`, `?:`, `~>>`, `~>>=`, `..=`, `~=`, `const`, `->`, `number_underscore`), independent of `Lua.runtime.version` and without the `Lua.runtime.enableLuaJITExtensions` master switch. Note that `~=` enables the bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line).
 
 ## 3.19.0
 `2026-08-08`

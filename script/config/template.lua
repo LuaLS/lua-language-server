@@ -225,6 +225,19 @@ local template = {
                                                 '||', '&&', '!', '!=',
                                                 'continue',
                                                 '|lambda|',
+                                                -- LuaJIT 3.0 扩展语法，可单独启用（不要求 Lua.runtime.version == 'LuaJIT'，
+                                                -- 也无需开启 Lua.runtime.enableLuaJITExtensions）
+                                                '?.',   -- 安全导航（a?.b / a?.[k] / f?.() / obj?.:method() / obj:method?.()）
+                                                '??',   -- 空值合并（a ?? b）
+                                                '?:',   -- 三元条件（a ? b : c，右结合；b 部分禁止方法调用）
+                                                '~>>',  -- 算术右移（a ~>> b，LuaJIT 特有，普通 >> 为逻辑右移）
+                                                '~>>=', -- 算术右移复合赋值（a ~>>= b）
+                                                '..=',  -- 字符串连接复合赋值（a ..= b）
+                                                '~=',   -- 注意：仅语句上下文（如 `a ~= b` 单独成行）时是异或复合赋值（a = a ~ b）；
+                                                        -- 表达式上下文中 `a ~= b` 仍是不等于比较，不受此选项影响
+                                                'const',-- const 声明（块级局部常量，不可重新赋值/重复声明）
+                                                '->',   -- 短函数箭头（x -> expr / |x| -> expr / || -> expr / -> do ... end）
+                                                'number_underscore', -- 数字字面量下划线（如 1_000、0x1_2、0b1_0）
                                             }),
     ['Lua.runtime.enableLuaJITExtensions']  = Type.Boolean >> false,
     ['Lua.runtime.plugin']                  = Type.Or(Type.String, Type.Array(Type.String)) ,

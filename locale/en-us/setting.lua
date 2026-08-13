@@ -31,9 +31,16 @@ The following example shows that 'include' is treated as' require '.
 config.runtime.unicodeName        =
 "Allows Unicode characters in name."
 config.runtime.nonstandardSymbol  =
-"Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
+[[
+Supports non-standard symbols. Make sure that your runtime environment supports these symbols.
+
+LuaJIT 3.0 extension syntax (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) can also be enabled individually here, without requiring `Lua.runtime.version` to be `LuaJIT`. Note: `~=` acts as a bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line); in expressions it remains the not-equal operator.
+]]
 config.runtime.enableLuaJITExtensions =
-"Enable LuaJIT extension syntax (requires `Lua.runtime.version` to be set to `LuaJIT`)."
+[[
+Enable LuaJIT extension syntax (requires `Lua.runtime.version` to be set to `LuaJIT`).
+Each extension can also be enabled individually via `Lua.runtime.nonstandardSymbol`.
+]]
 config.runtime.plugin             =
 "Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
 config.runtime.pluginArgs         =

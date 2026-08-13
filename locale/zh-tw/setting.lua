@@ -31,9 +31,16 @@ config.runtime.special            =
 config.runtime.unicodeName        =
 "允許在名字中使用 Unicode 字元。"
 config.runtime.nonstandardSymbol  =
-"支援非標準的符號。請務必確認你的執行環境支援這些符號。"
+[[
+支援非標準的符號。請務必確認你的執行環境支援這些符號。
+
+LuaJIT 3.0 擴充語法（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`）也可在此單獨啟用，不要求 `Lua.runtime.version` 為 `LuaJIT`。注意：`~=` 僅在陳述式上下文（如 `a ~= b` 單獨成行）時作為互斥或複合指定，表達式中仍是不等於比較。
+]]
 config.runtime.enableLuaJITExtensions =
-"啟用 LuaJIT 擴充語法（需將 `Lua.runtime.version` 設定為 `LuaJIT`）。"
+[[
+啟用 LuaJIT 擴充語法（需將 `Lua.runtime.version` 設定為 `LuaJIT`）。
+各項擴充語法也可以單獨透過 `Lua.runtime.nonstandardSymbol` 啟用。
+]]
 config.runtime.plugin             =
 "延伸模組路徑，請查閱[文件](https://luals.github.io/wiki/plugins)瞭解用法。"
 config.runtime.pluginArgs         =

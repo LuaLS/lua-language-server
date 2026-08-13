@@ -111,6 +111,7 @@
 				"print",
 				"stderr",
 			],
+			"cwd": "${workspaceFolder}"
 		},
 		{
 			"name": "🍖cli-check",

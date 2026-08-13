@@ -1,5 +1,6 @@
-package.path = package.path .. ';script/?.lua;tools/?.lua'
+package.path = package.path .. ';script/?.lua;script/?/init.lua;tools/?.lua;tools/?/init.lua'
 
+log = require 'log'
 local fs       = require 'bee.filesystem'
 local config   = require 'configuration'
 local markdown = require 'provider.markdown'

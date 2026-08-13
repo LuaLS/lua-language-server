@@ -241,6 +241,14 @@ local LocalLimit = 200
 
 local parseExp, parseAction
 
+--- 判断某个 LuaJIT 扩展语法是否生效。
+--- 生效条件：主开关 enableLuaJITExtensions（要求 version == 'LuaJIT'）开启，
+--- 或用户在 Lua.runtime.nonstandardSymbol 中单独启用了该项（不要求 version == 'LuaJIT'）。
+---@param symbol string
+local function isLuaJITExt(symbol)
+    return State.luaJITExtensions or State.options.nonstandardSymbol[symbol]
+end
+
 ---@class parser.state.err
 ---@field type string
 ---@field start? parser.position
@@ -776,7 +784,7 @@ local function createLocal(obj, attrs)
     obj.effect = obj.finish
 
     -- LuaJIT const：同名 const 不能在内层作用域重复声明
-    if State.luaJITExtensions then
+    if isLuaJITExt('const') then
         checkDeclareConst(obj)
     end
 
@@ -1512,7 +1520,7 @@ end
 local function parseNumber10(start)
     local integer = true
     -- LuaJIT 扩展：数字字面量允许下划线
-    local digitPattern = State.luaJITExtensions and '[%d_]' or '%d'
+    local digitPattern = isLuaJITExt('number_underscore') and '[%d_]' or '%d'
     local integerPart = smatch(Lua, '^' .. digitPattern .. '*', start)
     local offset = start + #integerPart
     -- float part
@@ -1541,7 +1549,7 @@ local function parseNumber10(start)
         end
     end
     local numStr = ssub(Lua, start, offset - 1)
-    if State.luaJITExtensions then
+    if isLuaJITExt('number_underscore') then
         numStr = sgsub(numStr, '_', '')
     end
     return tonumber(numStr), offset, integer
@@ -1549,7 +1557,7 @@ end
 
 local function parseNumber16(start, prefixStart)
     -- LuaJIT 扩展：数字字面量允许下划线
-    local hexPattern = State.luaJITExtensions and '[%da-fA-F_]' or '[%da-fA-F]'
+    local hexPattern = isLuaJITExt('number_underscore') and '[%da-fA-F_]' or '[%da-fA-F]'
     local integerPart = smatch(Lua, '^' .. hexPattern .. '*', start)
     local offset = start + #integerPart
     local integer = true
@@ -1588,7 +1596,7 @@ local function parseNumber16(start, prefixStart)
         offset = offset + #exp
     end
     local numStr = ssub(Lua, prefixStart, offset - 1)
-    if State.luaJITExtensions then
+    if isLuaJITExt('number_underscore') then
         numStr = sgsub(numStr, '_', '')
     end
     local n = tonumber(numStr)
@@ -1597,7 +1605,7 @@ end
 
 local function parseNumber2(start)
     -- LuaJIT 扩展：数字字面量允许下划线
-    local binPattern = State.luaJITExtensions and '[01_]' or '[01]'
+    local binPattern = isLuaJITExt('number_underscore') and '[01_]' or '[01]'
     local bins = smatch(Lua, '^' .. binPattern .. '*', start)
     local offset = start + #bins
     if State.version ~= 'LuaJIT' then
@@ -1611,7 +1619,7 @@ local function parseNumber2(start)
             }
         }
     end
-    if State.luaJITExtensions then
+    if isLuaJITExt('number_underscore') then
         bins = sgsub(bins, '_', '')
     end
     return tonumber(bins, 2), offset
@@ -1698,7 +1706,7 @@ local function parseNumber()
         local nextChar = ssub(Lua, offset + 1, offset + 1)
         -- LuaJIT 扩展：允许 0 与进制前缀之间存在下划线（如 0__x__1）
         local prefixOffset = offset + 1
-        if State.luaJITExtensions then
+        if isLuaJITExt('number_underscore') then
             local underscores = smatch(Lua, '^_*', prefixOffset)
             if #underscores > 0 then
                 prefixOffset = prefixOffset + #underscores
@@ -2164,7 +2172,7 @@ local function parseSimple(node, funcName, noMethod)
         -- LuaJIT 安全导航 `?.`：标记后续操作为 safe（仅启用 LuaJIT 扩展时生效）
         local safe = false
         if token == '?.' then
-            if not State.luaJITExtensions then
+            if not isLuaJITExt('?.') then
                 break
             end
             -- LuaJIT 三元 b 部分：?. 后紧跟 : 属语法错误（EXPR_F_NOCOLON + nav），
@@ -2957,7 +2965,7 @@ local function parseLambda(isDoublePipe)
         end
     end
     -- LuaJIT 短函数：消费 -> 箭头（LuaJIT 扩展必选，旧 |lambda| 语法可选）
-    if State.luaJITExtensions then
+    if isLuaJITExt('->') then
         skipSpace(true)
         if Tokens[Index + 1] == '->' then
             Index = Index + 2
@@ -3180,8 +3188,8 @@ local function parseExpUnit(noMethod)
         return parseFunction()
     end
 
-    -- LuaJIT 扩展（或 nonstandardSymbol['|lambda|']）开启时支持短函数
-    if (State.options.nonstandardSymbol['|lambda|'] or State.luaJITExtensions) and (token == '|'
+    -- LuaJIT 扩展（或 nonstandardSymbol['|lambda|'] / ['->']）开启时支持短函数
+    if (State.options.nonstandardSymbol['|lambda|'] or isLuaJITExt('->')) and (token == '|'
     or token == '||') then
         return parseLambda(token == '||')
     end
@@ -3190,7 +3198,7 @@ local function parseExpUnit(noMethod)
     if node then
         -- LuaJIT 短函数：x -> expr（单参数省略管道）
         skipSpace()
-        if State.luaJITExtensions and Tokens[Index + 1] == '->' then
+        if isLuaJITExt('->') and Tokens[Index + 1] == '->' then
             return parseLambdaSingleArg(node)
         end
         local nameNode = resolveName(node)
@@ -3230,8 +3238,10 @@ local function parseBinaryOP(asAction, level)
     if symbol == '//' and State.options.nonstandardSymbol['//'] then
         return nil
     end
-    -- LuaJIT 扩展语法：??（空值合并）与 ~>>（算术右移）仅在启用 LuaJIT 扩展时可用
-    if (token == '??' or token == '~>>') and not State.luaJITExtensions then
+    -- LuaJIT 扩展语法：??（空值合并）与 ~>>（算术右移）
+    -- 可通过 enableLuaJITExtensions 主开关或 nonstandardSymbol 单独启用
+    if (token == '??' and not isLuaJITExt('??'))
+    or (token == '~>>' and not isLuaJITExt('~>>')) then
         return nil
     end
     local myLevel = BinarySymbol[symbol]
@@ -3376,7 +3386,7 @@ function parseExp(asAction, level, noMethod, noTernary)
     end
 
     -- LuaJIT 三元 ?:（右结合、优先级最低，仅在表达式根位置检查，操作数位置由 noTernary 屏蔽）
-    if State.luaJITExtensions and not noTernary then
+    if isLuaJITExt('?:') and not noTernary then
         skipSpace()
         if Tokens[Index + 1] == '?' then
             local qEnd = getPosition(Tokens[Index], 'right')
@@ -3744,7 +3754,7 @@ local function compileExpAsAction(exp)
                 return
             end
             -- LuaJIT：a ~= b 在语句上下文是异或复合赋值（= a ~ b）
-            if op.type == '~=' and State.luaJITExtensions then
+            if op.type == '~=' and isLuaJITExt('~=') then
                 local n = exp[1]
                 n.type = GetToSetMap[n.type] or n.type
                 n.value = exp[2]
@@ -4863,7 +4873,7 @@ function parseAction()
     end
 
     -- LuaJIT const 声明（soft keyword：后跟标识符或 function 才视为声明）
-    if token == 'const' and State.luaJITExtensions then
+    if token == 'const' and isLuaJITExt('const') then
         local nextToken = Tokens[Index + 3]
         if nextToken == 'function'
         or (nextToken and nextToken ~= 'goto'

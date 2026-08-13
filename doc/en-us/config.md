@@ -14,6 +14,38 @@ boolean
 true
 ```
 
+# addonManager.repositoryBranch
+
+Specifies the git branch used by the addon manager.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
+# addonManager.repositoryPath
+
+Specifies the git path used by the addon manager.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
 # addonRepositoryPath
 
 Specifies the addon repository path (not related to the addon manager).
@@ -22,6 +54,12 @@ Specifies the addon repository path (not related to the addon manager).
 
 ```ts
 string
+```
+
+## default
+
+```jsonc
+""
 ```
 
 # codeLens.enable
@@ -132,6 +170,22 @@ string
 "Replace"
 ```
 
+# completion.maxSuggestCount
+
+Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear.
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+100
+```
+
 # completion.postfix
 
 The symbol used to trigger the postfix suggestion.
@@ -234,6 +288,7 @@ Array<string>
 * ``"ambiguity-1"``
 * ``"ambiguous-syntax"``
 * ``"args-after-dots"``
+* ``"assign-const-global"``
 * ``"assign-type-mismatch"``
 * ``"await-in-sync"``
 * ``"block-after-else"``
@@ -245,6 +300,7 @@ Array<string>
 * ``"code-after-break"``
 * ``"codestyle-check"``
 * ``"count-down-loop"``
+* ``"declare-const"``
 * ``"deprecated"``
 * ``"different-requires"``
 * ``"discard-returns"``
@@ -255,6 +311,7 @@ Array<string>
 * ``"duplicate-index"``
 * ``"duplicate-set-field"``
 * ``"empty-block"``
+* ``"env-is-global"``
 * ``"err-assign-as-eq"``
 * ``"err-c-long-comment"``
 * ``"err-comment-prefix"``
@@ -264,6 +321,7 @@ Array<string>
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
 * ``"exp-in-action"``
+* ``"global-close-attribute"``
 * ``"global-element"``
 * ``"global-in-nil-env"``
 * ``"incomplete-signature-doc"``
@@ -318,6 +376,7 @@ Array<string>
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
+* ``"multi-close"``
 * ``"name-style-check"``
 * ``"need-check-nil"``
 * ``"need-paren"``
@@ -347,6 +406,7 @@ Array<string>
 * ``"undefined-global"``
 * ``"unexpect-dots"``
 * ``"unexpect-efunc-name"``
+* ``"unexpect-gfunc-name"``
 * ``"unexpect-lfunc-name"``
 * ``"unexpect-symbol"``
 * ``"unicode-name"``
@@ -356,32 +416,18 @@ Array<string>
 * ``"unknown-operator"``
 * ``"unknown-symbol"``
 * ``"unreachable-code"``
+* ``"unsupport-named-vararg"``
 * ``"unsupport-symbol"``
 * ``"unused-function"``
 * ``"unused-label"``
 * ``"unused-local"``
 * ``"unused-vararg"``
+* ``"variable-not-declared"``
 
 ## default
 
 ```jsonc
 []
-```
-
-# diagnostics.disableScheme
-
-Do not diagnose Lua files that use the following scheme.
-
-## type
-
-```ts
-Array<string>
-```
-
-## default
-
-```jsonc
-["git"]
 ```
 
 # diagnostics.enable
@@ -398,6 +444,22 @@ boolean
 
 ```jsonc
 true
+```
+
+# diagnostics.enableScheme
+
+**Missing description!!**
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+["file"]
 ```
 
 # diagnostics.globals
@@ -898,7 +960,7 @@ object<string, string>
     */
     "newfield-call": "Any",
     /*
-    Enable newline call diagnostics. Is's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
+    Enable newline call diagnostics. It's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
     */
     "newline-call": "Any",
     /*
@@ -1168,7 +1230,7 @@ object<string, string>
     */
     "newfield-call": "Warning",
     /*
-    Enable newline call diagnostics. Is's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
+    Enable newline call diagnostics. It's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
     */
     "newline-call": "Warning",
     /*
@@ -1396,6 +1458,43 @@ Array<string>
 []
 ```
 
+# doc.regengine
+
+The regular expression engine used for matching documentation scope names.
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"glob"``: The default lightweight pattern syntax.
+* ``"lua"``: Full Lua-style regular expressions.
+
+## default
+
+```jsonc
+"glob"
+```
+
+# docScriptPath
+
+The regular expression engine used for matching documentation scope names.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
 # format.defaultConfig
 
 The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
@@ -1466,6 +1565,22 @@ boolean
 
 ```jsonc
 true
+```
+
+# hint.awaitPropagate
+
+Enable the propagation of `await`. When a function calls a function marked `---@async`,it will be automatically marked as `---@async`.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
 ```
 
 # hint.enable
@@ -1622,7 +1737,7 @@ integer
 ## default
 
 ```jsonc
-50
+10
 ```
 
 # hover.viewNumber
@@ -1673,6 +1788,38 @@ integer
 1000
 ```
 
+# language.completeAnnotation
+
+(VSCode only) Automatically insert "---@ " after a line break following a annotation.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
+# language.fixIndent
+
+(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function".
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
 # misc.executablePath
 
 Specify the executable path in VSCode.
@@ -1707,7 +1854,9 @@ Array<string>
 
 # nameStyle.config
 
-Set name style config
+Set name style config.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+
 
 ## type
 
@@ -1769,6 +1918,24 @@ object<string, string>
 }
 ```
 
+# runtime.enableLuaJITExtensions
+
+Enable LuaJIT extension syntax (requires `Lua.runtime.version` to be set to `LuaJIT`).
+Each extension can also be enabled individually via `Lua.runtime.nonstandardSymbol`.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # runtime.fileEncoding
 
 File encoding. The `ansi` option is only available under the `Windows` platform.
@@ -1812,6 +1979,9 @@ string
 
 Supports non-standard symbols. Make sure that your runtime environment supports these symbols.
 
+LuaJIT 3.0 extension syntax (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) can also be enabled individually here, without requiring `Lua.runtime.version` to be `LuaJIT`. Note: `~=` acts as a bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line); in expressions it remains the not-equal operator.
+
+
 ## type
 
 ```ts
@@ -1840,6 +2010,16 @@ Array<string>
 * ``"!="``
 * ``"continue"``
 * ``"|lambda|"``
+* ``"?."``
+* ``"??"``
+* ``"?:"``
+* ``"~>>"``
+* ``"~>>="``
+* ``"..="``
+* ``"~="``
+* ``"const"``
+* ``"->"``
+* ``"number_underscore"``
 
 ## default
 
@@ -1890,13 +2070,13 @@ Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn m
 ## type
 
 ```ts
-string
+string | array
 ```
 
 ## default
 
 ```jsonc
-""
+null
 ```
 
 # runtime.pluginArgs
@@ -1906,13 +2086,13 @@ Additional arguments for the plugin.
 ## type
 
 ```ts
-Array<string>
+array | object
 ```
 
 ## default
 
 ```jsonc
-[]
+null
 ```
 
 # runtime.special
@@ -1970,6 +2150,7 @@ string
 * ``"Lua 5.2"``
 * ``"Lua 5.3"``
 * ``"Lua 5.4"``
+* ``"Lua 5.5"``
 * ``"LuaJIT"``
 
 ## default
@@ -2090,6 +2271,74 @@ boolean
 true
 ```
 
+# type.checkTableShape
+
+Strictly check the shape of the table.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.inferParamType
+
+When a parameter type is not annotated, it is inferred from the function's call sites.
+
+When this setting is `false`, the type of the parameter is `any` when it is not annotated.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.inferTableSize
+
+Maximum number of table fields analyzed during type inference.
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+10
+```
+
+# type.maxUnionVariants
+
+**Missing description!!**
+
+## type
+
+```ts
+integer
+```
+
+## default
+
+```jsonc
+0
+```
+
 # type.weakNilCheck
 
 When checking the type of union type, ignore the `nil` in it.
@@ -2204,20 +2453,13 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ## type
 
 ```ts
-string
+string | boolean
 ```
-
-## enum
-
-* ``"Ask"``
-* ``"Apply"``
-* ``"ApplyInMemory"``
-* ``"Disable"``
 
 ## default
 
 ```jsonc
-"Ask"
+null
 ```
 
 # workspace.ignoreDir

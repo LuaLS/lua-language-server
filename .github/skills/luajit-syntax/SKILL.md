@@ -75,6 +75,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
 要点：
 - 启用后，相关 LuaJIT 语法**直接生效**，无需用户再去 `Lua.runtime.nonstandardSymbol` 手动勾选。
 - 与 `nonstandardSymbol` 的关系：`continue`、`|lambda|`、`&&`、`||`、`!`、`!=`、复合赋值等原本由 `nonstandardSymbol` 控制；启用本开关时这些项自动视为开启。
+- **单独启用（2026-08-13 完成）**：10 项 LuaJIT 扩展语法也已加入 `Lua.runtime.nonstandardSymbol` 枚举（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`），可单独启用，**不要求** version == 'LuaJIT'。生效判定统一走 `compile.lua` 的 `isLuaJITExt(symbol)` helper（`State.luaJITExtensions or nonstandardSymbol[symbol]`）。
 - `//`（注释）与反引号字符串 `` ` `` 属于 LuaLS 自身扩展，**不属于** LuaJIT 语法，保持由 `nonstandardSymbol` 独立控制。
 
 ## 支持范围速览

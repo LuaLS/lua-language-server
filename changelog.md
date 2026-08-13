@@ -2,8 +2,8 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `NEW` LuaJIT 3.0 extension syntax can now also be enabled individually via `Lua.runtime.nonstandardSymbol` (`?.`, `??`, `?:`, `~>>`, `~>>=`, `..=`, `~=`, `const`, `->`, `number_underscore`), independent of `Lua.runtime.version` and without the `Lua.runtime.enableLuaJITExtensions` master switch. Note that `~=` enables the bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line).
-* `NEW` Add no-dot optional chaining `f?()` and `t?[1]` (equivalent to `f?.()` / `t?.[1]`) as new `Lua.runtime.nonstandardSymbol` entries (`?(` and `?[`). Note: enabling them together with the ternary `?:` may conflict during parsing.
+* `NEW` LuaJIT 3.0 extension syntax can now also be enabled individually via `Lua.runtime.nonstandardSymbol` (`?.`, `??`, `ternary`, `~>>`, `~>>=`, `..=`, `~=`, `const`, `->`, `number_underscore`), independent of `Lua.runtime.version` and without the `Lua.runtime.enableLuaJITExtensions` master switch. Note that `~=` enables the bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line).
+* `NEW` Add no-dot optional chaining `f?()` and `t?[1]` (equivalent to `f?.()` / `t?.[1]`) as new `Lua.runtime.nonstandardSymbol` entries (`?(` and `?[`), and the no-dot safe method `obj?:get()` (equivalent to `obj?.:get()`, entry `?:`). Note: enabling `?(` / `?[` together with the ternary (`ternary`) may conflict during parsing.
 
 ## 3.19.0
 `2026-08-08`

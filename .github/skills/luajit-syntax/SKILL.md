@@ -161,6 +161,7 @@ description: 'LuaJIT 3.0 扩展语法支持的实施规划与实现指南。Use 
   - `bin/lua-language-server.exe test.lua --name=parser_test` 只跑 `parser_test`
 - **自定义测试脚本**：可自行改造 `test.lua` 或编写独立脚本，直接 `bin/lua-language-server.exe <script>.lua` 运行（需正确设置 `package.path`，见 `test.lua` 开头）。
 - **当前进度验证脚本**：`temp/tmp_test_luajit.lua`（临时，验证 compile 解析 LuaJIT 扩展语法，含开关开关两种状态的断言）。
+- **长耗时命令必须轮询（重要）**：完整测试 / build-doc 后台运行**不会自动通知完成**。运行后须主动轮询日志：`temp/test_full*.log` 出现 `test finish.`（无 error）即通过，full 阶段耗时较长需多次轮询；build-doc 看退出码 `DOC=0`。用 `read_file`/`grep_search` 查日志末尾，不要依赖系统通知。
 
 ## 关键文件地图
 

@@ -13,3 +13,6 @@
 - 完整测试：检查 `temp/test_full*.log` 是否出现 `test finish.`（无 error 即通过；full 阶段耗时较长，需多次轮询）
 - build-doc：检查退出码 `DOC=0`
 - 轮询方式：读取日志文件末尾或 `grep` 结束标记，间隔由命令耗时决定，不要依赖系统通知
+- 推荐命令模式（Windows PowerShell + cmd 重定向，规避管道无法捕获输出的问题）：
+  - `cmd /c "cd /d <repo> && bin\lua-language-server.exe test.lua --name=<test> > temp\test_xx.log 2>&1 & echo EXIT=%ERRORLEVEL%"`
+  - 完成后用 `read_file` / `grep_search` 查日志，或用 `Select-String` 找结束标记

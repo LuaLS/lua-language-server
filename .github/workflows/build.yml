@@ -24,12 +24,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-22.04,     target: linux,   platform: linux-x64    }
-          - { os: ubuntu-24.04-arm, target: linux,   platform: linux-arm64  }
-          - { os: macos-latest,     target: darwin,  platform: darwin-x64   }
-          - { os: macos-latest,     target: darwin,  platform: darwin-arm64 }
-          - { os: windows-latest,   target: windows, platform: win32-ia32   }
-          - { os: windows-latest,   target: windows, platform: win32-x64    }
+          # rust-target is the plain triple installed via rustup; rust-build-target
+          # (linux only) pins an old glibc so cargo-zigbuild produces a dylib that
+          # runs on old distributions.
+          - { os: ubuntu-22.04,     target: linux,   platform: linux-x64,    rust-target: x86_64-unknown-linux-gnu,    rust-build-target: x86_64-unknown-linux-gnu.2.17 }
+          - { os: ubuntu-24.04-arm, target: linux,   platform: linux-arm64,  rust-target: aarch64-unknown-linux-gnu, rust-build-target: aarch64-unknown-linux-gnu.2.17 }
+          - { os: macos-latest,     target: darwin,  platform: darwin-x64,   rust-target: x86_64-apple-darwin }
+          - { os: macos-latest,     target: darwin,  platform: darwin-arm64, rust-target: aarch64-apple-darwin }
+          - { os: windows-latest,   target: windows, platform: win32-ia32,   rust-target: i686-pc-windows-msvc }
+          - { os: windows-latest,   target: windows, platform: win32-x64,    rust-target: x86_64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -38,10 +41,22 @@ jobs:
 
       - uses: actboy168/setup-luamake@master
 
+      # Install the rust toolchain (and any cross-compilation targets the rust
+      # crate is built for). cargo is invoked by the luamake build (make.lua).
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+
       - name: Install zig
         if: matrix.target == 'linux'
         run:
           sudo snap install zig --classic --beta
+
+      # Build the rust dylib with cargo-zigbuild on linux so it links against an
+      # old glibc (see rust-build-target), avoiding glibc-version issues.
+      - name: Install cargo-zigbuild
+        if: matrix.target == 'linux'
+        run: cargo install cargo-zigbuild --locked
 
       - name: Prepare zig wrapper
         if: matrix.target == 'linux'
@@ -50,6 +65,8 @@ jobs:
       - name: Build
         env:
           USE_ZIG: ${{ matrix.target == 'linux' && '1' || '0' }}
+          RUST_ZIGBUILD: ${{ matrix.target == 'linux' && '1' || '0' }}
+          RUST_TARGET: ${{ matrix.rust-build-target || matrix.rust-target }}
         run: luamake -platform ${{ matrix.platform }}
 
       - name: Setting up workflow variables

@@ -53,5 +53,7 @@ ls.args = {
     -- 命令行：测试指定外部项目路径（配合 --test 使用）
     ---@type boolean|string
     TEST_PROJECT = false,
+    -- 测试模式内存护栏上限（GB），Lua 堆超过该值强制退出
+    MEM_LIMIT = 10,
 }
 ls.util.tableMerge(ls.args, argparser.parse(arg, true))

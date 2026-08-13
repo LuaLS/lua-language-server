@@ -8,6 +8,24 @@ test = {}
 
 test.arg = {}
 
+--- 测试模式内存护栏：指令级钩子定期检查 Lua 堆，超限强制退出，防止死循环耗尽内存。
+--- debug.sethook 是单例，若已有钩子（如调试器）则跳过，避免互相占用。
+function test.enableMemoryGuard()
+    if debug.gethook() then
+        return
+    end
+    local memLimitKB = ls.args.MEM_LIMIT * 1024 * 1024
+    debug.sethook(function ()
+        local heapKB = collectgarbage('count')
+        if heapKB > memLimitKB then
+            io.write(('[MEMORY GUARD] Lua heap %.1f GB exceeded limit %.1f GB, force exit\n')
+                :format(heapKB / 1024 / 1024, memLimitKB / 1024 / 1024))
+            io.flush()
+            os.exit(1)
+        end
+    end, '', 100000)
+end
+
 require 'master'
 require 'scope'
 require 'config'
@@ -85,6 +103,8 @@ end)
 
 ---@async
 ls.await.call(function ()
+    test.enableMemoryGuard()
+
     -- 加载一些工具
     require 'test.include'
     test.catch = require 'test.catch'

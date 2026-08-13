@@ -30,6 +30,7 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 - 临时调试输出统一放到 `tmp/`。
 - narrowing 优先走 `script/node/tracer.lua`，不要把新 narrowing 逻辑加到 `script/vm/coder/flow.lua` 或 `script/vm/coder/branch.lua`。
 - 如果 tracer 报 `No such key`，先检查 middle code 和 flow 产物，不要先加防御式绕过。
+- Windows PowerShell 写入文件必须指定 `-Encoding UTF8`（默认 GBK/UTF-16 LE 会破坏源码）；项目源码统一 UTF-8 无 BOM。
 
 ## 使用步骤
 1. 先看 [architecture](./references/architecture.md)，确认你要改的能力属于哪个子系统。

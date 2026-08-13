@@ -121,6 +121,13 @@ For multi-condition `if` blocks using `and/or`, keep project-consistent aligned 
 - 本工程（含 bee.lua 解释器，由 `BEE_OPTCHAIN` 宏启用）支持 `?.` `?:` `?[` `?(` 可选链写法，可以省略判空。
 - **例外**：`script/tools/` 目录下不允许使用可选链（保持该目录语法兼容性）。
 
+## 12) PowerShell 文件编码
+
+- Windows PowerShell 默认编码为 GBK/UTF-16 LE，**严禁**写入项目文件时不指定编码（会导致 UTF8 文件乱码）。
+- `Set-Content`、`Out-File`、`echo >`、`Write-Output >` 等写入操作必须加 `-Encoding UTF8`。
+- 正确示例：`Set-Content -Path file.ts -Value "..." -Encoding UTF8`。
+- 项目所有源码文件统一 UTF-8（无 BOM），由 `.editorconfig` 和 ESLint 兜底。
+
 ---
 
 Maintainer note:

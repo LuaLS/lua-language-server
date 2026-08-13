@@ -1997,9 +1997,6 @@ string
 
 Supports non-standard symbols. Make sure that your runtime environment supports these symbols.
 
-LuaJIT 3.0 extension syntax (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) can also be enabled individually here, without requiring `Lua.runtime.version` to be `LuaJIT`. Note: `~=` acts as a bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line); in expressions it remains the not-equal operator.
-
-
 ## type
 
 ```ts

@@ -1997,9 +1997,6 @@ string
 
 Suporta símbolos não-padrão. Certifique-se de que seu ambiente de runtime suporta esses símbolos.
 
-A sintaxe de extensão do LuaJIT 3.0 (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) também pode ser habilitada individualmente aqui, sem exigir que `Lua.runtime.version` seja `LuaJIT`. Nota: `~=` só atua como atribuição composta XOR em contexto de declaração (ex.: `a ~= b` em uma linha); em expressões continua sendo o operador de desigualdade.
-
-
 ## type
 
 ```ts

@@ -31,11 +31,7 @@ config.runtime.special            =
 config.runtime.unicodeName        =
 "名前に Unicode 文字を使用できるようにします。"
 config.runtime.nonstandardSymbol  =
-[[
-非標準の記号をサポートします。ランタイム環境がこれらの記号をサポートしていることを確認してください。
-
-LuaJIT 3.0 拡張構文（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`）も個別に有効化できます。`Lua.runtime.version` を `LuaJIT` にする必要はありません。注意：`~=` は文コンテキスト（例：`a ~= b` が単独の行）でのみビット排他的論理和の複合代入として機能し、式の中では「等しくない」演算子のままです。
-]]
+"非標準の記号をサポートします。ランタイム環境がこれらの記号をサポートしていることを確認してください。"
 config.runtime.nonstandardSymbol['?.'] =
 "安全ナビゲーション（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
 config.runtime.nonstandardSymbol['?('] =

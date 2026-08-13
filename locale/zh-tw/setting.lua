@@ -31,11 +31,7 @@ config.runtime.special            =
 config.runtime.unicodeName        =
 "允許在名字中使用 Unicode 字元。"
 config.runtime.nonstandardSymbol  =
-[[
-支援非標準的符號。請務必確認你的執行環境支援這些符號。
-
-LuaJIT 3.0 擴充語法（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`）也可在此單獨啟用，不要求 `Lua.runtime.version` 為 `LuaJIT`。注意：`~=` 僅在陳述式上下文（如 `a ~= b` 單獨成行）時作為互斥或複合指定，表達式中仍是不等於比較。
-]]
+"支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.nonstandardSymbol['?.'] =
 "安全導覽（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
 config.runtime.nonstandardSymbol['?('] =

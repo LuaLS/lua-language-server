@@ -36,6 +36,26 @@ config.runtime.nonstandardSymbol  =
 
 LuaJIT 3.0 擴充語法（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`）也可在此單獨啟用，不要求 `Lua.runtime.version` 為 `LuaJIT`。注意：`~=` 僅在陳述式上下文（如 `a ~= b` 單獨成行）時作為互斥或複合指定，表達式中仍是不等於比較。
 ]]
+config.runtime.nonstandardSymbol['?.'] =
+"安全導覽（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['??'] =
+"空值合併（`a ?? b`，僅當左側為 nil 時取右側）。"
+config.runtime.nonstandardSymbol['?:'] =
+"三元條件（`a ? b : c`，右結合；b 部分禁止方法呼叫）。"
+config.runtime.nonstandardSymbol['~>>'] =
+"算術右移（`a ~>> b`，LuaJIT 特有；普通 `>>` 為邏輯右移）。"
+config.runtime.nonstandardSymbol['~>>='] =
+"算術右移複合指定（`a ~>>= b`）。"
+config.runtime.nonstandardSymbol['..='] =
+"字串連接複合指定（`a ..= b`）。"
+config.runtime.nonstandardSymbol['~='] =
+"互斥或複合指定：僅陳述式上下文（如 `a ~= b` 單獨成行）生效；表達式中仍是不等於比較。"
+config.runtime.nonstandardSymbol['const'] =
+"`const` 宣告（區塊級區域常數，不可重新賦值/重複宣告）。"
+config.runtime.nonstandardSymbol['->'] =
+"短函式箭頭（`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`）。"
+config.runtime.nonstandardSymbol['number_underscore'] =
+"數字字面量底線（如 `1_000`、`0x1_2`、`0b1_0`）。"
 config.runtime.enableLuaJITExtensions =
 [[
 啟用 LuaJIT 擴充語法（需將 `Lua.runtime.version` 設定為 `LuaJIT`）。

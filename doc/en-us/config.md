@@ -2010,16 +2010,16 @@ Array<string>
 * ``"!="``
 * ``"continue"``
 * ``"|lambda|"``
-* ``"?."``
-* ``"??"``
-* ``"?:"``
-* ``"~>>"``
-* ``"~>>="``
-* ``"..="``
-* ``"~="``
-* ``"const"``
-* ``"->"``
-* ``"number_underscore"``
+* ``"?."``: Safe navigation (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`).
+* ``"??"``: Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil).
+* ``"?:"``: Ternary conditional (`a ? b : c`, right-associative).
+* ``"~>>"``: Arithmetic right shift (`a ~>> b`, LuaJIT-specific; plain `>>` is logical).
+* ``"~>>="``: Arithmetic right shift compound assignment (`a ~>>= b`).
+* ``"..="``: String concatenation compound assignment (`a ..= b`).
+* ``"~="``: Bitwise-xor compound assignment: only in statement context (e.g. `a ~= b` on its own line); in expressions it remains the not-equal operator.
+* ``"const"``: `const` declaration (block-scoped local constant, cannot be reassigned or redeclared).
+* ``"->"``: Short function arrow (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`).
+* ``"number_underscore"``: Underscores in number literals (e.g. `1_000`, `0x1_2`, `0b1_0`).
 
 ## default
 

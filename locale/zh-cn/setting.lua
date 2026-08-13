@@ -36,6 +36,26 @@ config.runtime.nonstandardSymbol  =
 
 LuaJIT 3.0 扩展语法（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`）也可在此单独启用，不要求 `Lua.runtime.version` 为 `LuaJIT`。注意：`~=` 仅在语句上下文（如 `a ~= b` 单独成行）时作为异或复合赋值，表达式中仍是不等于比较。
 ]]
+config.runtime.nonstandardSymbol['?.'] =
+"安全导航（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['??'] =
+"空值合并（`a ?? b`，仅当左侧为 nil 时取右侧）。"
+config.runtime.nonstandardSymbol['?:'] =
+"三元条件（`a ? b : c`，右结合；b 部分禁止方法调用）。"
+config.runtime.nonstandardSymbol['~>>'] =
+"算术右移（`a ~>> b`，LuaJIT 特有；普通 `>>` 为逻辑右移）。"
+config.runtime.nonstandardSymbol['~>>='] =
+"算术右移复合赋值（`a ~>>= b`）。"
+config.runtime.nonstandardSymbol['..='] =
+"字符串连接复合赋值（`a ..= b`）。"
+config.runtime.nonstandardSymbol['~='] =
+"异或复合赋值：仅语句上下文（如 `a ~= b` 单独成行）生效；表达式中仍是不等于比较。"
+config.runtime.nonstandardSymbol['const'] =
+"`const` 声明（块级局部常量，不可重新赋值/重复声明）。"
+config.runtime.nonstandardSymbol['->'] =
+"短函数箭头（`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`）。"
+config.runtime.nonstandardSymbol['number_underscore'] =
+"数字字面量下划线（如 `1_000`、`0x1_2`、`0b1_0`）。"
 config.runtime.enableLuaJITExtensions =
 [[
 启用 LuaJIT 扩展语法（需要将 `Lua.runtime.version` 设置为 `LuaJIT`）。

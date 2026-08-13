@@ -45,13 +45,22 @@ local function getEnum(temp)
 end
 
 local function getEnumDesc(name, temp)
-    if not temp.enums then
+    -- Array 类型的枚举挂在子单元 sub.enums 上（如 Lua.runtime.nonstandardSymbol）
+    local enums = temp.enums or (temp.sub and temp.sub.enums)
+    if not enums then
         return nil
     end
     local descs = {}
+    local head = name:gsub('^Lua', '%%config')
 
-    for _, enum in ipairs(temp.enums) do
-        descs[#descs+1] = name:gsub('^Lua', '%%config') .. '.' .. enum .. '%'
+    -- 生成的 locale 键名必须与 script/locale-loader.lua 的 mergeKey 规则一致：
+    -- 字母开头的枚举用 `.` 连接，非字母开头（如 ?.、~=、->）不加点
+    for _, enum in ipairs(enums) do
+        if enum:sub(1, 1):match '%w' then
+            descs[#descs+1] = head .. '.' .. enum .. '%'
+        else
+            descs[#descs+1] = head .. enum .. '%'
+        end
     end
 
     return descs

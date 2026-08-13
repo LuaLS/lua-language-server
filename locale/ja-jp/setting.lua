@@ -36,6 +36,26 @@ config.runtime.nonstandardSymbol  =
 
 LuaJIT 3.0 拡張構文（`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`）も個別に有効化できます。`Lua.runtime.version` を `LuaJIT` にする必要はありません。注意：`~=` は文コンテキスト（例：`a ~= b` が単独の行）でのみビット排他的論理和の複合代入として機能し、式の中では「等しくない」演算子のままです。
 ]]
+config.runtime.nonstandardSymbol['?.'] =
+"安全ナビゲーション（`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`）。"
+config.runtime.nonstandardSymbol['??'] =
+"nil 合体（`a ?? b`。左辺が nil の場合のみ右辺を返す）。"
+config.runtime.nonstandardSymbol['?:'] =
+"三項演算子（`a ? b : c`、右結合）。"
+config.runtime.nonstandardSymbol['~>>'] =
+"算術右シフト（`a ~>> b`。LuaJIT 固有。通常の `>>` は論理右シフト）。"
+config.runtime.nonstandardSymbol['~>>='] =
+"算術右シフト複合代入（`a ~>>= b`）。"
+config.runtime.nonstandardSymbol['..='] =
+"文字列連結複合代入（`a ..= b`）。"
+config.runtime.nonstandardSymbol['~='] =
+"XOR 複合代入：文コンテキスト（例：`a ~= b` が単独の行）でのみ有効。式の中では「等しくない」のまま。"
+config.runtime.nonstandardSymbol['const'] =
+"`const` 宣言（ブロックスコープのローカル定数。再代入・再宣言不可）。"
+config.runtime.nonstandardSymbol['->'] =
+"短い関数の矢印（`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`）。"
+config.runtime.nonstandardSymbol['number_underscore'] =
+"数値リテラルのアンダースコア（例：`1_000`、`0x1_2`、`0b1_0`）。"
 config.runtime.enableLuaJITExtensions =
 [[
 LuaJIT 拡張構文を有効にします（`Lua.runtime.version` を `LuaJIT` に設定する必要があります）。

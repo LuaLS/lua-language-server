@@ -2010,16 +2010,16 @@ Array<string>
 * ``"!="``
 * ``"continue"``
 * ``"|lambda|"``
-* ``"?."``
-* ``"??"``
-* ``"?:"``
-* ``"~>>"``
-* ``"~>>="``
-* ``"..="``
-* ``"~="``
-* ``"const"``
-* ``"->"``
-* ``"number_underscore"``
+* ``"?."``: Navegação segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`).
+* ``"??"``: Coalescência nula (`a ?? b`; usa o lado direito apenas quando o esquerdo é nil).
+* ``"?:"``: Condicional ternário (`a ? b : c`, associativo à direita).
+* ``"~>>"``: Deslocamento aritmético à direita (`a ~>> b`, específico do LuaJIT; `>>` normal é lógico).
+* ``"~>>="``: Atribuição composta de deslocamento aritmético à direita (`a ~>>= b`).
+* ``"..="``: Atribuição composta de concatenação de strings (`a ..= b`).
+* ``"~="``: Atribuição composta XOR: apenas em contexto de declaração (ex.: `a ~= b` em uma linha); em expressões continua sendo o operador de desigualdade.
+* ``"const"``: Declaração `const` (constante local de escopo de bloco; não pode ser reatribuída nem redeclarada).
+* ``"->"``: Seta de função curta (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`).
+* ``"number_underscore"``: Sublinhado em literais numéricos (ex.: `1_000`, `0x1_2`, `0b1_0`).
 
 ## default
 

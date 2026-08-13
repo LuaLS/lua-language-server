@@ -37,6 +37,26 @@ Soporte de símbolos no estándar. Asegúrese que la versión de Lua que se ejec
 
 La sintaxis de extensión de LuaJIT 3.0 (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) también se puede habilitar individualmente aquí, sin requerir que `Lua.runtime.version` sea `LuaJIT`. Nota: `~=` solo actúa como asignación compuesta XOR en contexto de sentencia (p. ej. `a ~= b` en una línea); en expresiones sigue siendo el operador de desigualdad.
 ]]
+config.runtime.nonstandardSymbol['?.'] =
+"Navegación segura (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['??'] =
+"Coalescencia nula (`a ?? b`; usa el lado derecho solo cuando el izquierdo es nil)."
+config.runtime.nonstandardSymbol['?:'] =
+"Condicional ternario (`a ? b : c`, asociativo a la derecha)."
+config.runtime.nonstandardSymbol['~>>'] =
+"Desplazamiento aritmético a la derecha (`a ~>> b`, específico de LuaJIT; `>>` normal es lógico)."
+config.runtime.nonstandardSymbol['~>>='] =
+"Asignación compuesta de desplazamiento aritmético a la derecha (`a ~>>= b`)."
+config.runtime.nonstandardSymbol['..='] =
+"Asignación compuesta de concatenación de cadenas (`a ..= b`)."
+config.runtime.nonstandardSymbol['~='] =
+"Asignación compuesta XOR: solo en contexto de sentencia (p. ej. `a ~= b` en una línea); en expresiones sigue siendo el operador de desigualdad."
+config.runtime.nonstandardSymbol['const'] =
+"Declaración `const` (constante local de ámbito de bloque; no se puede reasignar ni redeclarar)."
+config.runtime.nonstandardSymbol['->'] =
+"Flecha de función corta (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`)."
+config.runtime.nonstandardSymbol['number_underscore'] =
+"Guiones bajos en literales numéricos (p. ej. `1_000`, `0x1_2`, `0b1_0`)."
 config.runtime.enableLuaJITExtensions =
 [[
 Activa la sintaxis de extensión de LuaJIT (requiere que `Lua.runtime.version` esté establecido en `LuaJIT`).

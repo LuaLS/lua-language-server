@@ -36,6 +36,26 @@ Supports non-standard symbols. Make sure that your runtime environment supports 
 
 LuaJIT 3.0 extension syntax (`?.` `??` `?:` `~>>` `~>>=` `..=` `~=` `const` `->` `number_underscore`) can also be enabled individually here, without requiring `Lua.runtime.version` to be `LuaJIT`. Note: `~=` acts as a bitwise-xor compound assignment only in statement context (e.g. `a ~= b` on its own line); in expressions it remains the not-equal operator.
 ]]
+config.runtime.nonstandardSymbol['?.'] =
+"Safe navigation (`a?.b` / `a?.[k]` / `f?.()` / `obj?.:method()` / `obj:method?.()`)."
+config.runtime.nonstandardSymbol['??'] =
+"Nil-coalescing (`a ?? b`; takes the right side only when the left side is nil)."
+config.runtime.nonstandardSymbol['?:'] =
+"Ternary conditional (`a ? b : c`, right-associative)."
+config.runtime.nonstandardSymbol['~>>'] =
+"Arithmetic right shift (`a ~>> b`, LuaJIT-specific; plain `>>` is logical)."
+config.runtime.nonstandardSymbol['~>>='] =
+"Arithmetic right shift compound assignment (`a ~>>= b`)."
+config.runtime.nonstandardSymbol['..='] =
+"String concatenation compound assignment (`a ..= b`)."
+config.runtime.nonstandardSymbol['~='] =
+"Bitwise-xor compound assignment: only in statement context (e.g. `a ~= b` on its own line); in expressions it remains the not-equal operator."
+config.runtime.nonstandardSymbol['const'] =
+"`const` declaration (block-scoped local constant, cannot be reassigned or redeclared)."
+config.runtime.nonstandardSymbol['->'] =
+"Short function arrow (`x -> expr` / `|x| -> expr` / `|| -> expr` / `-> do ... end`)."
+config.runtime.nonstandardSymbol['number_underscore'] =
+"Underscores in number literals (e.g. `1_000`, `0x1_2`, `0b1_0`)."
 config.runtime.enableLuaJITExtensions =
 [[
 Enable LuaJIT extension syntax (requires `Lua.runtime.version` to be set to `LuaJIT`).

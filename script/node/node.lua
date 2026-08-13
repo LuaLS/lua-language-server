@@ -45,6 +45,10 @@ ls.node.kind = {
 ---@field offset integer
 ---@field length? integer
 
+---@class Node.ResolveContext
+---@field visited table<Node, Node> 防环缓存
+---@field location? Node.Location 泛型展开的调用点
+
 ---基础分类
 ---@type Node.Kind
 M.kind = nil
@@ -414,13 +418,13 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if self.value == self then
         return self
     end
-    return self.value:resolveGeneric(map, visited)
+    return self.value:resolveGeneric(map, ctx)
 end
 
 ---@param other Node
@@ -521,6 +525,15 @@ function ls.node.register(nodeType)
     child.__shr  = M.__shr
 
     return child
+end
+
+---@param location? Node.Location
+---@return Node.ResolveContext
+function ls.node.resolveContext(location)
+    return {
+        visited = {},
+        location = location,
+    }
 end
 
 return M

@@ -33,8 +33,9 @@ end
 
 ---@param callback fun(c: Custom.Context): Node
 function M:onValue(callback)
-    self.alias:setCustomValue(function (_, args)
+    self.alias:setCustomValue(function (_, args, location)
         local data = {}
+        data.location = location
         if self.alias.params then
             local cargs = {}
             for i, param in ipairs(self.alias.params) do

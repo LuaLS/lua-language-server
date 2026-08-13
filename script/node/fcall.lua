@@ -10,6 +10,16 @@ M.kind = 'fcall'
 ---@type Node
 M.head = nil
 
+---@type Node.Location?
+M.location = nil
+
+---@param location Node.Location
+---@return Node.FCall
+function M:setLocation(location)
+    self.location = location
+    return self
+end
+
 ---@param scope Scope
 ---@param head Node
 ---@param args Node[]
@@ -174,10 +184,11 @@ M.__getter.matchedFuncs = function (self)
     end
 
     local matches = rt:getBestMatchs(allParams, #self.args)
+    local ctx = ls.node.resolveContext(self.location)
     local result = {}
     for _, match in ipairs(matches) do
         local f = defs[match]
-        result[#result+1] = f:resolveGeneric(f:makeGenericMap(self.args))
+        result[#result+1] = f:resolveGeneric(f:makeGenericMap(self.args), ctx)
     end
     return result, true
 end

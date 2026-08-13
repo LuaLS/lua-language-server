@@ -11,7 +11,8 @@ alias 'Module'
         if type(literal) ~= 'string' then
             return c.type 'never'
         end
-        local uris = c.scope:searchFiles(literal)
+        local suri = c.location and c.location.uri
+        local uris = c.scope:searchFiles(literal, suri)
         if #uris == 0 then
             return c.type 'never'
         end

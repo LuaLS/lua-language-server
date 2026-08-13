@@ -373,6 +373,10 @@ ls.vm.registerCoderProvider('catcall', function (coder, source)
         type = source.node.id,
         args = table.concat(args, ', '),
     })
+    coder:addLine('{key}:setLocation {location}' % {
+        key      = coder:getKey(source),
+        location = coder:makeLocationCode(source),
+    })
 end)
 
 ls.vm.registerCoderProvider('catfunction', function (coder, source)

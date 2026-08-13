@@ -11,6 +11,16 @@ M.typeName = 'call'
 ---@type Node.Type
 M.head = nil
 
+---@type Node.Location?
+M.location = nil
+
+---@param location Node.Location
+---@return Node.Call
+function M:setLocation(location)
+    self.location = location
+    return self
+end
+
 ---@param scope Scope
 ---@param head string
 ---@param args Node[]
@@ -195,7 +205,7 @@ M.__getter.value = function (self)
         local aliases = {}
         ---@param alias Node.Alias
         for _, alias in ipairs(self.protoAliases) do
-            aliases[#aliases+1] = alias:call(self.args)
+            aliases[#aliases+1] = alias:call(self.args, self.location)
         end
         local union = self.scope.rt.union(aliases)
         return union, true
@@ -231,21 +241,22 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if not self.hasGeneric then
         return self
     end
-    visited = visited or {}
-    if visited[self] then
-        return visited[self]
+    ctx = ctx or ls.node.resolveContext()
+    if ctx.visited[self] then
+        return ctx.visited[self]
     end
     local args = ls.util.map(self.args, function (arg)
-        return arg:resolveGeneric(map, visited)
+        return arg:resolveGeneric(map, ctx)
     end)
     local newCall = self.scope.rt.call(self.head.typeName, args)
-    visited[self] = newCall
+    newCall.location = ctx.location or self.location
+    ctx.visited[self] = newCall
     return newCall
 end
 

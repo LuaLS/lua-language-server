@@ -66,23 +66,23 @@ function M:simplify(visited)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if not self.hasGeneric then
         return self
     end
-    visited = visited or {}
-    if visited[self] then
-        return visited[self]
+    ctx = ctx or ls.node.resolveContext()
+    if ctx.visited[self] then
+        return ctx.visited[self]
     end
-    local head = self.head:resolveGeneric(map, visited)
-    local index = self.index:resolveGeneric(map, visited)
+    local head = self.head:resolveGeneric(map, ctx)
+    local index = self.index:resolveGeneric(map, ctx)
     if head == self.head and index == self.index then
         return self
     end
     local newIndex = self.scope.rt.index(head, index)
-    visited[self] = newIndex
+    ctx.visited[self] = newIndex
     return newIndex
 end
 

@@ -86,23 +86,23 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if not self.hasGeneric then
         return self
     end
-    visited = visited or {}
-    if visited[self] then
-        return visited[self]
+    ctx = ctx or ls.node.resolveContext()
+    if ctx.visited[self] then
+        return ctx.visited[self]
     end
-    local node = self.node:resolveGeneric(map, visited)
+    local node = self.node:resolveGeneric(map, ctx)
     local new = self.scope.rt.narrow(node)
-    visited[self] = new
+    ctx.visited[self] = new
     new.narrowType = self.narrowType
     new.field = self.field
     if self.nvalue then
-        new.nvalue = self.nvalue:resolveGeneric(map, visited)
+        new.nvalue = self.nvalue:resolveGeneric(map, ctx)
     end
     return new
 end

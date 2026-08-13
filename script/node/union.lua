@@ -232,25 +232,25 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if self.value ~= self then
-        return self.value:resolveGeneric(map, visited)
+        return self.value:resolveGeneric(map, ctx)
     end
     if not self.hasGeneric then
         return self
     end
-    visited = visited or {}
-    if visited[self] then
-        return visited[self]
+    ctx = ctx or ls.node.resolveContext()
+    if ctx.visited[self] then
+        return ctx.visited[self]
     end
     local newValues = {}
     for _, v in ipairs(self.rawNodes) do
-        newValues[#newValues+1] = v:resolveGeneric(map, visited)
+        newValues[#newValues+1] = v:resolveGeneric(map, ctx)
     end
     local newUnion = self.scope.rt.union(newValues)
-    visited[self] = newUnion
+    ctx.visited[self] = newUnion
     return newUnion
 end
 

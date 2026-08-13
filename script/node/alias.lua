@@ -57,7 +57,7 @@ function M:setValue(value)
     return self
 end
 
----@param callback fun(self: Node.Alias, args: Node[]): Node
+---@param callback fun(self: Node.Alias, args: Node[], location?: Node.Location): Node
 ---@return Node.Alias
 function M:setCustomValue(callback)
     self.customValue = callback
@@ -65,10 +65,11 @@ function M:setCustomValue(callback)
 end
 
 ---@param args Node[]
+---@param location? Node.Location
 ---@return Node
-function M:call(args)
+function M:call(args, location)
     if self.customValue then
-        local value = self.customValue(self, args)
+        local value = self.customValue(self, args, location)
         value:addRef(self)
         return value
     end
@@ -113,13 +114,13 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if not self.params then
         return self
     end
-    return self.value:resolveGeneric(map, visited)
+    return self.value:resolveGeneric(map, ctx)
 end
 
 ---@param args Node[]

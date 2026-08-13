@@ -210,4 +210,84 @@ return {
     lt.assertEquals(v:view(), '{ x: 1 }')
 end
 
+do
+    -- require 使用调用点过滤自身文件，并按距离优先匹配最近的同名文件
+    local scope <close> = ls.scope.create('require-location-test', 'file:///root')
+    local root = createRoot(scope, 'workspace', 'file:///root')
+    local uriA = 'file:///root/a.lua'
+    local uriSubA = 'file:///root/sub/a.lua'
+    local uriX = 'file:///root/x.lua'
+    local uriSubX = 'file:///root/sub/x.lua'
+    root.uriSet[uriA] = true
+    root.uriSet[uriSubA] = true
+    root.uriSet[uriX] = true
+    root.uriSet[uriSubX] = true
+
+    -- 同名文件返回不同值，用于区分匹配到的是哪一个
+    local fileA <close> = ls.file.setServerText(uriA, 'return 1')
+    local fileSubA <close> = ls.file.setServerText(uriSubA, 'return 2')
+    local fileX <close> = ls.file.setServerText(uriX, 'return 3')
+    local fileSubX <close> = ls.file.setServerText(uriSubX, 'return 4')
+
+    scope.vm:indexFile(uriA)
+    scope.vm:indexFile(uriSubA)
+    scope.vm:indexFile(uriX)
+    scope.vm:indexFile(uriSubX)
+
+    local playground = ls.custom.playground(scope)
+    do
+        local _ENV = playground.env
+
+        _ENV.alias('Module')
+            : param('T')
+            : onValue(function (c)
+                local modname = c.args[1]
+                if modname.kind ~= 'value' then
+                    return c.type 'never'
+                end
+                local literal = modname.literal
+                if type(literal) ~= 'string' then
+                    return c.type 'never'
+                end
+                local suri = c.location and c.location.uri
+                local uris = c.scope:searchFiles(literal, suri)
+                if #uris == 0 then
+                    return c.type 'never'
+                end
+                local vfile = c.scope.vm:getFile(uris[1])
+                if not vfile then
+                    return c.type 'never'
+                end
+                local ret = vfile:getMainReturn()
+                if not ret then
+                    return c.type 'never'
+                end
+                return ret
+            end)
+    end
+
+    local rt = scope.rt
+    local T = rt.generic('T', rt.STRING)
+    local requireFunc = rt.func()
+        : addTypeParam(T)
+        : addParamDef('modname', T)
+        : addReturnDef(nil, rt.call('Module', { T }))
+
+    local function requireAt(modname, uri)
+        local call = rt.fcall(requireFunc, { rt.value(modname) })
+        call:setLocation({ uri = uri, offset = 0, length = 0 })
+        return call
+    end
+
+    -- 不会 require 到自己所在的文件：排除自身后匹配到另一个同名文件
+    lt.assertEquals(requireAt('a', uriA).value:view(), '2')
+    lt.assertEquals(requireAt('a', uriSubA).value:view(), '1')
+
+    -- 不同文件中 require 同名模块，结果不同（最近文件优先）
+    lt.assertEquals(requireAt('x', 'file:///root/main.lua').value:view(), '3')
+    lt.assertEquals(requireAt('x', 'file:///root/sub/main.lua').value:view(), '4')
+
+    playground:dispose()
+end
+
 print('[project.require] 测试完毕')

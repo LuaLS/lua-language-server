@@ -225,6 +225,10 @@ ls.vm.registerCoderProvider('call', function (coder, source)
         func  = func,
         args  = table.concat(args, ', '),
     })
+    coder:addLine('{key}:setLocation {location}' % {
+        key      = coder:getKey(source),
+        location = coder:makeLocationCode(source),
+    })
     coder:getTracer():appendCall(source)
 end)
 

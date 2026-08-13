@@ -291,19 +291,19 @@ function M:makeGenericMap(args)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if not self.hasGeneric then
         return self
     end
-    visited = visited or {}
+    ctx = ctx or ls.node.resolveContext()
     -- 环保护：self 已在处理中则直接返回已创建的引用（环闭合）
-    if visited[self] then
-        return visited[self]
+    if ctx.visited[self] then
+        return ctx.visited[self]
     end
     local newFunc = self.scope.rt.func()
-    visited[self] = newFunc
+    ctx.visited[self] = newFunc
     if self.typeParams then
         newFunc.typeParams = ls.util.map(self.typeParams, function (v)
             return map[v] or v
@@ -311,7 +311,7 @@ function M:resolveGeneric(map, visited)
     end
     for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then
-            local newValue = param.value:resolveGeneric(map, visited)
+            local newValue = param.value:resolveGeneric(map, ctx)
             newFunc.paramsDef[i] = { key = param.key, value = newValue }
             newFunc.paramDefMap[param.key] = newValue
         else
@@ -321,7 +321,7 @@ function M:resolveGeneric(map, visited)
     end
     for i, ret in ipairs(self.returnsDef) do
         if ret.value.hasGeneric then
-            local newValue = ret.value:resolveGeneric(map, visited)
+            local newValue = ret.value:resolveGeneric(map, ctx)
             newFunc.returnsDef[i] = { key = ret.key, value = newValue }
             if ret.key then
                 newFunc.returnDefMap[ret.key] = newValue
@@ -335,13 +335,13 @@ function M:resolveGeneric(map, visited)
     end
     if self.varargParamDef then
         if self.varargParamDef.hasGeneric then
-            newFunc.varargParamDef = self.varargParamDef:resolveGeneric(map, visited)
+            newFunc.varargParamDef = self.varargParamDef:resolveGeneric(map, ctx)
         else
             newFunc.varargParamDef = self.varargParamDef
         end
     end
     for i, list in ipairs(self.returnList) do
-        local newList = list:resolveGeneric(map, visited)
+        local newList = list:resolveGeneric(map, ctx)
         ---@cast newList Node.List
         newFunc.returnList[i] = newList
     end

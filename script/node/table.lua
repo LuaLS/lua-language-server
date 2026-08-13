@@ -474,22 +474,22 @@ M.__getter.hasGeneric = function (self)
 end
 
 ---@param map table<Node.Generic, Node>
----@param visited? table<Node, Node>
+---@param ctx? Node.ResolveContext
 ---@return Node
-function M:resolveGeneric(map, visited)
+function M:resolveGeneric(map, ctx)
     if not self.hasGeneric then
         return self
     end
-    visited = visited or {}
+    ctx = ctx or ls.node.resolveContext()
     -- 环保护：self 已在处理中则直接返回已创建的引用（环闭合）
-    if visited[self] then
-        return visited[self]
+    if ctx.visited[self] then
+        return ctx.visited[self]
     end
     local newTable = self.scope.rt.table()
-    visited[self] = newTable
+    ctx.visited[self] = newTable
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        local newField = field:resolveGeneric(map, visited)
+        local newField = field:resolveGeneric(map, ctx)
         ---@cast newField Node.Field
         newTable:addField(newField)
     end

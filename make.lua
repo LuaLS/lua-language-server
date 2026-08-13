@@ -26,6 +26,9 @@ lm:conf {
     defines = 'LUAI_MAXCCALLS=1000',
 }
 
+-- 启用 bee.lua 可选链支持（BEE_OPTCHAIN，bee.lua 的 feature/optional-chaining 分支）
+lm.optchain = true
+
 lm:import "3rd/bee.lua/make.lua"
 lm:import "make/code_format.lua"
 

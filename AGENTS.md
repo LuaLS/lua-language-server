@@ -116,6 +116,11 @@ For multi-condition `if` blocks using `and/or`, keep project-consistent aligned 
 - 若重启此方向，先读该文档，特别是第 5 节（关键障碍）与第 8 节（spike plan）。
 - 结论摘要：替换性价比低；tree-sitter 更适合前端侧（高亮/折叠/结构搜索）或给现有 parser 做定点增量。
 
+## 11) 可选链语法
+
+- 本工程（含 bee.lua 解释器，由 `BEE_OPTCHAIN` 宏启用）支持 `?.` `?:` `?[` `?(` 可选链写法，可以省略判空。
+- **例外**：`script/tools/` 目录下不允许使用可选链（保持该目录语法兼容性）。
+
 ---
 
 Maintainer note:

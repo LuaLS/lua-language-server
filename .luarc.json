@@ -16,7 +16,7 @@
             "unbalanced": "Any",
             "unused": "Any"
         },
-        "ignoredFiles": "Opened",
+        "ignoredFiles": "Disable",
         "libraryFiles": "Opened"
     },
     "runtime": {

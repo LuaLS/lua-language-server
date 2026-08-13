@@ -19,8 +19,8 @@
             "unbalanced": "Any",
             "unused": "Any"
         },
-        "ignoredFiles": "Opened",
-        "libraryFiles": "Opened",
+        "ignoredFiles": "Disable",
+        "libraryFiles": "Disable",
         "unusedLocalExclude": [ "_*" ]
     },
     "runtime": {

@@ -3363,6 +3363,7 @@ function parseExp(asAction, level, noMethod, noTernary)
         if  uop.type == '-'
         and child
         and (child.type == 'number' or child.type == 'integer') then
+            ---@cast child table
             child.start = uop.start
             child[1]    = - child[1]
             exp = child

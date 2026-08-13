@@ -207,6 +207,8 @@ config.workspace.preloadFileSize  =
 "預先載入時跳過大小大於該值（KB）的檔案。"
 config.workspace.library          =
 "除了目前工作區以外，還會從哪些目錄中載入檔案。這些目錄中的檔案將被視作外部提供的程式碼庫，部分操作（如重新命名欄位）不會修改這些檔案。"
+config.workspace.dofileRoots      =
+"除了目前工作區以外，`dofile` 會把這些目錄視為可能的根目錄。這些目錄中的檔案會被立即載入。"
 config.workspace.checkThirdParty  =
 [[
 自動偵測與適應第三方庫，目前支援的庫為：

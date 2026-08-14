@@ -211,14 +211,6 @@ function M:isTableLike()
     return true
 end
 
----@type Node?
-M.expectParent = nil
-
----@param parent Node
-function M:setExpectParent(parent)
-    self.expectParent = parent
-end
-
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists

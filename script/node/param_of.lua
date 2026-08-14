@@ -75,3 +75,32 @@ M.__getter.value = function (self)
 
     return result or rt.UNKNOWN, true
 end
+
+--- 返回参数声明的期望类型（泛型约束或直接声明类型）；无注解返回 nil
+---@return Node?
+function M:getExpectValue()
+    local result
+    ---@param func Node.Function
+    self.func:each('function', function (func)
+        if result then
+            return
+        end
+        local pd = func.paramsDef and func.paramsDef[self.index]
+        if not pd or not pd.value then
+            return
+        end
+        local t = pd.value
+        -- 泛型引用（variable -> generic）
+        if t.kind == 'variable' then
+            t = t.value
+        end
+        if t and t.kind == 'generic' then
+            ---@cast t Node.Generic
+            t = t.extends
+        end
+        if t then
+            result = t
+        end
+    end)
+    return result
+end

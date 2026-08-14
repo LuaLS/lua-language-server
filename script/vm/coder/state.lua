@@ -117,12 +117,11 @@ function M:compileAssign(var, index, valueKey, isTable)
         varKey   = self:getKey(var),
         fieldKey = fieldKey,
     })
-    if isTable then
-        self:addLine('{valueKey}:setExpectParent({varKey})' % {
-            valueKey = valueKey,
-            varKey   = self:getKey(var),
-        })
-    end
+    -- 值节点关联到所属变量，供 getExpectValue 反推
+    self:addLine('{valueKey}:setExpectParent({varKey})' % {
+        valueKey = valueKey,
+        varKey   = self:getKey(var),
+    })
 
     if not isTable then
         self:addLine('{varKey}:setStaticValue({valueKey})' % {
@@ -131,7 +130,6 @@ function M:compileAssign(var, index, valueKey, isTable)
         })
     end
 end
-
 ls.vm.registerCoderProvider('assign', function (coder, source)
     ---@cast source LuaParser.Node.Assign
 

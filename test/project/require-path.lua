@@ -21,10 +21,18 @@ do
     -- 默认 searcher：?.lua 与 ?/init.lua
     lt.assertEquals(scope:searchFiles('a'), { 'file:///root/a.lua' })
     -- a.b 同时命中 a/b.lua（?.lua）与 a/b/init.lua（?/init.lua）
-    local results = scope:searchFiles('a.b')
+    local results, searchers = scope:searchFiles('a.b')
     lt.assertEquals(#results, 2)
     lt.assertEquals(ls.util.arrayHas(results, 'file:///root/a/b.lua'), true)
     lt.assertEquals(ls.util.arrayHas(results, 'file:///root/a/b/init.lua'), true)
+    -- searchers 与 uris 一一对应
+    for i, uri in ipairs(results) do
+        if uri == 'file:///root/a/b.lua' then
+            lt.assertEquals(searchers[i], '?.lua')
+        elseif uri == 'file:///root/a/b/init.lua' then
+            lt.assertEquals(searchers[i], '?/init.lua')
+        end
+    end
     lt.assertEquals(scope:searchFiles('a.b.c'), {})
 end
 
@@ -82,12 +90,16 @@ do
 
     -- 按距离当前 uri 排序：同层优先
     local suri = 'file:///root/x/y/aaa.lua'
-    local results = scope:searchFiles('aaa', suri)
+    local results, searchers = scope:searchFiles('aaa', suri)
     -- 排除自身后剩 3 个：x/aaa.lua（上 1 层）、aaa.lua（上 2 层）、x/y/z/aaa.lua（下 1 层）
     lt.assertEquals(#results, 3)
     lt.assertEquals(results[1], 'file:///root/x/aaa.lua')
     lt.assertEquals(results[2], 'file:///root/x/y/z/aaa.lua')
     lt.assertEquals(results[3], 'file:///root/aaa.lua')
+    -- 排序后 searchers 与 uris 仍一一对应（均命中默认 ?.lua）
+    for i = 1, #results do
+        lt.assertEquals(searchers[i], '?.lua')
+    end
 end
 
 do

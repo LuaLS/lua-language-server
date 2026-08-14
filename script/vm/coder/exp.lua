@@ -212,13 +212,12 @@ ls.vm.registerCoderProvider('call', function (coder, source)
     for i, arg in ipairs(source.args) do
         coder:compile(arg)
         args[i] = coder:getKey(arg)
-        if arg.kind == 'table' then
-            coder:addLine('{key}:setExpectParent(rt.paramOf({func}, {index}))' % {
-                key   = coder:getKey(arg),
-                func  = func,
-                index = i,
-            })
-        end
+        -- 参数节点关联到 paramOf(func, index)，供 getExpectValue 反推签名类型
+        coder:addLine('{key}:setExpectParent(rt.paramOf({func}, {index}))' % {
+            key   = coder:getKey(arg),
+            func  = func,
+            index = i,
+        })
     end
     coder:addLine('{key} = rt.fcall({func}, { {args} })' % {
         key   = coder:getKey(source),

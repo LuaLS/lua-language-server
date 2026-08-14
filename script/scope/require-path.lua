@@ -44,10 +44,11 @@ end
 --- 默认 searcher 为 `?.lua` 与 `?/init.lua`（与 Lua 的 require 规则一致）
 ---@param modname string
 ---@param suri? Uri 当前文件 uri，用于排除自身并按距离排序
----@return Uri[]
+---@return Uri[] uris
+---@return string[] hitSearchers 每个 uri 命中的搜索器模板，与 uris 一一对应
 function Scope:searchFiles(modname, suri)
     if type(modname) ~= 'string' then
-        return {}
+        return {}, {}
     end
 
     local configUri = suri or self.uri or ''
@@ -68,8 +69,9 @@ function Scope:searchFiles(modname, suri)
 
     local path = modname:gsub('%' .. separator, '/')
 
-    local results = {}
-    local seen    = {}
+    local results      = {}
+    local hitSearchers = {}
+    local seen         = {}
 
     for _, searcher in ipairs(searchers) do
         local escaped = path:gsub('%%', '%%%%')
@@ -86,6 +88,7 @@ function Scope:searchFiles(modname, suri)
                     or relative == '/'
                     or relative == '' then
                         results[#results+1] = uri
+                        hitSearchers[#hitSearchers+1] = searcher
                         seen[uri] = true
                     end
                 end
@@ -94,15 +97,28 @@ function Scope:searchFiles(modname, suri)
     end
 
     if suri then
-        table.sort(results, function (a, b)
-            local da = getDistance(suri, a)
-            local db = getDistance(suri, b)
+        -- 按距离排序，同时保持 hitSearchers 与 uris 一一对应
+        local order = {}
+        for i = 1, #results do
+            order[i] = i
+        end
+        table.sort(order, function (a, b)
+            local da = getDistance(suri, results[a])
+            local db = getDistance(suri, results[b])
             if da ~= db then
                 return da < db
             end
-            return a < b
+            return results[a] < results[b]
         end)
+        local sortedResults  = {}
+        local sortedSearchers = {}
+        for i, idx in ipairs(order) do
+            sortedResults[i]  = results[idx]
+            sortedSearchers[i] = hitSearchers[idx]
+        end
+        results      = sortedResults
+        hitSearchers = sortedSearchers
     end
 
-    return results
+    return results, hitSearchers
 end

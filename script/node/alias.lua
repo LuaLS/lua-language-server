@@ -64,6 +64,18 @@ function M:setCustomValue(callback)
     return self
 end
 
+---@alias Node.Alias.CustomHover fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): string | string[] | nil
+
+---@type Node.Alias.CustomHover?
+M.customHover = nil
+
+---@param callback Node.Alias.CustomHover
+---@return Node.Alias
+function M:setCustomHover(callback)
+    self.customHover = callback
+    return self
+end
+
 ---@param args Node[]
 ---@param location? Node.Location
 ---@return Node

@@ -53,3 +53,4 @@ end
 
 test.require 'test.feature.hover.basic'
 test.require 'test.feature.hover.manually'
+test.require 'test.feature.hover.custom'

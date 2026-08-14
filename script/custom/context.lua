@@ -11,6 +11,7 @@ local masterMap = ls.util.weakKTable()
 ---@field args? Node[] | table<string, Node>
 ---@field node? Node 此 alias 的别名节点（rt.alias），在 onValue 回调中可用于注册依赖（如 c.scope:addRef(c.node)）
 ---@field location? Node.Location 类型调用的调用点位置
+---@field source? LuaParser.Node.Base 触发 hover/completion 的源代码节点，仅在对应回调中填充
 ---@field scope Scope
 ---@field table fun(fields?: table<Node.Key, Node>): Node.Table
 ---@field field fun(name: Node.Key, value: Node, optional: boolean): Node.Field

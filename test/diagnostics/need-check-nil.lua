@@ -80,3 +80,68 @@ local a
 if <!a!>.b == "string1" then end
 if <!a!>.b == "string" then end
 ]]
+
+-- 安全导航（?. 等）访问可空变量：不应触发 need-check-nil
+TEST [[
+---@type string?
+local x
+
+local s = x?.upper()
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = x?.:upper()
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = x?.[1]
+]]
+
+TEST [[
+---@type fun()?
+local x
+
+x?.()
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = x?.field
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = x?.field?.sub
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = x?.upper()?.field
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = <!x!>.upper()?.field
+]]
+
+TEST [[
+---@type string?
+local x
+
+local s = x?:upper()
+]]
+

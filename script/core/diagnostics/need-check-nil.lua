@@ -22,12 +22,18 @@ return function (uri, callback)
             or nxt.type == 'getmethod'
             or nxt.type == 'getindex'
             or nxt.type == 'call' then
-                checkNil = true
+                -- 安全导航（?. / ?.( / ?.[ 等）：访问本身已判空，无需再次检查
+                if not nxt.safe then
+                    checkNil = true
+                end
             end
         end
         local call = src.parent
         if call and call.type == 'call' and call.node == src then
-            checkNil = true
+            -- 安全导航调用（f?.()）：已判空，无需再次检查
+            if not call.safe then
+                checkNil = true
+            end
         end
         local setIndex = src.parent
         if setIndex and setIndex.type == 'setindex' and setIndex.index == src then

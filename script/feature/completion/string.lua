@@ -28,6 +28,29 @@ local function collectStringLiteralsFromNode(node)
     return results
 end
 
+--- 收集枚举字符串字面量：取节点裸值（n.literal），无引号时补双引号，
+--- 与 util.extractEnumLiterals 的输出形式一致（如 `"aaa"`、`"a"`）。
+---@param node any
+---@return string[]
+local function collectEnumLiteralsFromNode(node)
+    if not node then return {} end
+    local results = {}
+    local seen    = {}
+    node:each('value', function (n)
+        if n.typeName == 'string' and n.literal ~= nil then
+            local lit = n.literal
+            if not lit:find('["\']') then
+                lit = '"' .. lit .. '"'
+            end
+            if not seen[lit] then
+                seen[lit] = true
+                results[#results+1] = lit
+            end
+        end
+    end)
+    return results
+end
+
 ---@param text string
 ---@param aliasName string
 ---@return string?
@@ -1228,6 +1251,72 @@ ls.feature.provider.completion(function (param, action)
         textEdit = makeLegacyTextEdit(editStart, editFinish, newText),
     }
 end, 17)
+
+-- 字符串枚举补全：通过 Node:getExpectValue() 反推期望类型（赋值值/函数参数等
+-- expectParent 场景），从期望类型中收集字符串字面量作为补全项。
+-- 相比文本扫描实现，支持 local 初始化位置、跨文件 alias、函数参数（如 require 'x'）。
+ls.feature.provider.completion(function (param, action)
+    if param.inComment then
+        return
+    end
+    if not param.inString then
+        return
+    end
+    local source = param.sources[1]
+    if not source or source.kind ~= 'string' then
+        return
+    end
+    ---@cast source LuaParser.Node.String
+    local node = param.scope.vm:getVariable(source) or param.scope.vm:getNode(source)
+    if not node then
+        return
+    end
+    local enums = collectEnumLiteralsFromNode(node:getExpectValue())
+    if #enums == 0 then
+        return
+    end
+
+    action.skip()
+
+    local text = param.scanner.text
+    local textOffset = param.textOffset or util.toTextOffset(text, param.offset)
+    local left = text:sub(1, textOffset)
+    local inSingleQuote = left:match("'[^'\n]*$") ~= nil
+    local inDoubleQuote = left:match('"[^"\n]*$') ~= nil
+    local word = util.getCompletionWord(param)
+    local editStartOffset = textOffset - #word
+    local editFinishOffset = textOffset
+    if word == '' and (inSingleQuote or inDoubleQuote) then
+        editStartOffset = textOffset - 1
+        editFinishOffset = textOffset + 1
+    end
+    local editStart = util.toDisplayOffset(param, editStartOffset)
+    local editFinish = util.toDisplayOffset(param, editFinishOffset)
+    local used = {}
+
+    for _, literal in ipairs(enums) do
+        local label = normalizeEnumLiteral(literal)
+        if inSingleQuote and literal:sub(1, 1) == '"' and literal:sub(-1) == '"' then
+            label = "'" .. literal:sub(2, -2) .. "'"
+        end
+        if label:match('^\'".+"\'$') then
+            goto continue
+        end
+        if label:match("^''.+''$") then
+            goto continue
+        end
+        if used[label] then
+            goto continue
+        end
+        used[label] = true
+        action.push {
+            label = label,
+            kind = ls.spec.CompletionItemKind.EnumMember,
+            textEdit = makeLegacyTextEdit(editStart, editFinish, label),
+        }
+        ::continue::
+    end
+end, 26)
 
 -- 局部变量赋值/比较时，从该变量的类型注解推断枚举字面量（文本路径，非表类型变量）
 -- e.g. `---@type "a"|"b" local x; x == <??>` 或 `x = <??>` 

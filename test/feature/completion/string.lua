@@ -673,3 +673,30 @@ local c
 
 c.on('<??>')
 ]] (EXISTS)
+
+-- local 初始化位置：通过 Node:getExpectValue() 反推期望类型（赋值值场景）
+TEST_COMPLETION [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option
+local x = '<??>'
+]] {
+	{ label = "'AAA'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
+	{ label = "'BBB'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
+	{ label = "'CCC'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
+}
+
+-- 函数参数枚举：通过 Node:getExpectValue() 反推参数签名类型（如 require 'x'）
+TEST_COMPLETION [[
+---@alias ModName "mod-a" | "mod-b"
+
+---@generic T: ModName
+---@param modname T
+---@return unknown
+function require(modname) end
+
+require '<??>'
+]] {
+	{ label = "'mod-a'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
+	{ label = "'mod-b'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
+}

@@ -39,10 +39,10 @@ local x = require 'te<??>st'
     lt.assertEquals(hover ~= nil, true)
     if hover then
         lt.assertEquals(#hover.items >= 2, true)
-        -- 第二个 item 为 ModName onHover 结果：detail 含文件路径
+        -- 第二个 item 为 ModName onHover 结果：description 含文件路径
         local second = hover.items[2]
         local desc = second and second.description
-        lt.assertEquals(desc, '+ [test.lua]({}) （搜索路径：`?.lua`）' % { uriA })
+        lt.assertEquals(desc, '* [test.lua]({}) （搜索路径：`?.lua`）' % { uriA })
     end
 end
 
@@ -95,7 +95,7 @@ require = originRequire
         lt.assertEquals(#hover.items >= 2, true)
         local second = hover.items[2]
         local desc = second and second.description
-        lt.assertEquals(desc, '+ [test.lua]({}) （搜索路径：`?.lua`）' % { uriA })
+        lt.assertEquals(desc, '* [test.lua]({}) （搜索路径：`?.lua`）' % { uriA })
     end
 end
 

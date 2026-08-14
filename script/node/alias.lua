@@ -64,7 +64,7 @@ function M:setCustomValue(callback)
     return self
 end
 
----@alias Node.Alias.CustomHover fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): string | { label?: string, detail?: string } | nil
+---@alias Node.Alias.CustomHover fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): string | { label?: string, description?: string } | nil
 
 ---@type Node.Alias.CustomHover?
 M.customHover = nil
@@ -73,6 +73,18 @@ M.customHover = nil
 ---@return Node.Alias
 function M:setCustomHover(callback)
     self.customHover = callback
+    return self
+end
+
+---@alias Node.Alias.CustomCompletion fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): { label: string, detail?: string, description?: string, kind?: LSP.CompletionItemKind }[] | nil
+
+---@type Node.Alias.CustomCompletion?
+M.customCompletion = nil
+
+---@param callback Node.Alias.CustomCompletion
+---@return Node.Alias
+function M:setCustomCompletion(callback)
+    self.customCompletion = callback
     return self
 end
 

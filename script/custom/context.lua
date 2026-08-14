@@ -19,6 +19,38 @@ local masterMap = ls.util.weakKTable()
 ---@field value fun(val: string | number | boolean): Node.Value
 ---@field array fun(value: Node): Node.Array
 
+---@class Custom.CompletionKind
+--- LSP CompletionItemKind 常量表（仅在 onCompletion 回调的 c.kind 上可用）
+---@field Text integer
+---@field Method integer
+---@field Function integer
+---@field Constructor integer
+---@field Field integer
+---@field Variable integer
+---@field Class integer
+---@field Interface integer
+---@field Module integer
+---@field Property integer
+---@field Unit integer
+---@field Value integer
+---@field Enum integer
+---@field Keyword integer
+---@field Snippet integer
+---@field Color integer
+---@field File integer
+---@field Reference integer
+---@field Folder integer
+---@field EnumMember integer
+---@field Constant integer
+---@field Struct integer
+---@field Event integer
+---@field Operator integer
+---@field TypeParameter integer
+
+---@class Custom.Context.Completion : Custom.Context
+--- 补全 kind 常量表，仅在 onCompletion 回调中可用（如 c.kind.Module = 9、c.kind.Keyword = 14）
+---@field kind Custom.CompletionKind
+
 ---@class Custom.Context.Master
 local M = Class 'Custom.Context.Master'
 

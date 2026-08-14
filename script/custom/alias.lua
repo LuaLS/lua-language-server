@@ -27,13 +27,29 @@ function M:dispose()
 end
 
 --- 注册自定义 hover：当 hover 到类型为该 alias 的字符串/数字字面量时调用。
----@param callback fun(c: Custom.Context): string | { label?: string, detail?: string } | nil
+---@param callback fun(c: Custom.Context): string | { label?: string, description?: string } | nil
 ---@return Custom.Alias
 function M:onHover(callback)
     self.alias:setCustomHover(function (_, location, source)
         local data = {}
         data.location = location
         data.source = source
+        local result = self.master:call(callback, data)
+        return result
+    end)
+    return self
+end
+
+--- 注册自定义补全：当字符串参数的期望类型为该 alias 时调用。
+--- 回调返回补全项列表（label 为插入文本，detail 为简要说明，description 为 Markdown 说明，kind 可选，可用 c.kind.XXXX 指定）。
+---@param callback fun(c: Custom.Context.Completion): { label: string, detail?: string, description?: string, kind?: LSP.CompletionItemKind }[] | nil
+---@return Custom.Alias
+function M:onCompletion(callback)
+    self.alias:setCustomCompletion(function (_, location, source)
+        local data = {}
+        data.location = location
+        data.source = source
+        data.kind = ls.spec.CompletionItemKind
         local result = self.master:call(callback, data)
         return result
     end)

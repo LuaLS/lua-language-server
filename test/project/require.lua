@@ -214,8 +214,8 @@ return {
             value = 'a',
         } --[[@as any]])
         if type(result) == 'table' then
-            local detail = result.detail
-            lt.assertEquals(detail ~= nil and detail:find('file:///root/a.lua', 1, true) ~= nil, true)
+            local description = result.description
+            lt.assertEquals(description ~= nil and description:find('file:///root/a.lua', 1, true) ~= nil, true)
         end
     end
 end

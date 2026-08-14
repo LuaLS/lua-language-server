@@ -56,11 +56,31 @@ local function setupModName(scope)
                 for i, uri in ipairs(uris) do
                     local path = c.scope:getRelativePath(uri) or uri
                     local searcher = (searchers[i] or ''):gsub('^[/\\]+', '')
-                    lines[#lines+1] = '+ [{}]({}) （搜索路径：`{}`）' % { path, uri, searcher }
+                    lines[#lines+1] = '* [{}]({}) （搜索路径：`{}`）' % { path, uri, searcher }
                 end
                 return {
-                    detail = table.concat(lines, '\n'),
+                    description = table.concat(lines, '\n'),
                 }
+            end)
+            : onCompletion(function (c)
+                local src = c.source
+                if not src or src.kind ~= 'string' then
+                    return
+                end
+                ---@cast src LuaParser.Node.String
+                local items = c.scope:searchFilesByPartial(src.value, c.location?.uri)
+                local results = {}
+                for _, item in ipairs(items) do
+                    local path = c.scope:getRelativePath(item.uri) or item.uri
+                    local searcher = (item.searcher or ''):gsub('^[/\\]+', '')
+                    results[#results+1] = {
+                        label       = item.name,
+                        detail      = path,
+                        description = '* [{}]({}) （搜索路径：`{}`）' % { path, item.uri, searcher },
+                        kind        = c.kind.Module,
+                    }
+                end
+                return results
             end)
     end
     return playground

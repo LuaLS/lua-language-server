@@ -69,7 +69,7 @@ ls.feature.provider.hover(function (param, action)
     elseif type(result) == 'table' then
         action.push {
             label       = result.label or '',
-            description = result.detail,
+            description = result.description,
         }
     end
 end)

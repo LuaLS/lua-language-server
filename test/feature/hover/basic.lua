@@ -1929,7 +1929,7 @@ local t: {
 
 TEST_HOVER [[
 local s = <?'abc中文'?>
-]] [['9 个字节，5 个字符']]
+]] [[9 个字节，5 个字符]]
 
 TEST_HOVER [[
 local n = <?0xff?>

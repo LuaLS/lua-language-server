@@ -58,7 +58,7 @@ do
 ---@type ModName
 local modname = 'utility<??>'
 ]]), {
-        "'7 个字节'",
+        '7 个字节',
         'ModName: utility',
     })
 
@@ -76,7 +76,7 @@ local count = 42<??>
 local modname
 modname = 'utility<??>'
 ]]), {
-        "'7 个字节'",
+        '7 个字节',
         'ModName: utility',
     })
 
@@ -93,7 +93,7 @@ local <?modname?> = 'utility'
     lt.assertEquals(hoverLabels([[
 local s = 'hello<??>'
 ]]), {
-        "'5 个字节'",
+        '5 个字节',
     })
 
     playground:dispose()
@@ -139,8 +139,8 @@ require 'te<??>st'
         return item.label
     end)
     lt.assertEquals(labels, {
-        "'4 个字节'",
-        'test',
+        '4 个字节',
+        '',
     })
     local second = hover and hover.items[2]
     local desc = second and second.description

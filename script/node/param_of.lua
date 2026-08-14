@@ -66,7 +66,7 @@ M.__getter.value = function (self)
     local rt = self.scope.rt
 
     ---@param func Node.Function
-    self.func:each('function', function (func)
+    self:eachFunc(function (func)
         local r = func:getParam(self.index)
         if r then
             result = result | r
@@ -76,12 +76,38 @@ M.__getter.value = function (self)
     return result or rt.UNKNOWN, true
 end
 
+--- 遍历 func 的所有 function 定义（含 master 与等价值），当前值被覆盖时也能取到全部
+---@param callback fun(func: Node.Function)
+function M:eachFunc(callback)
+    local func = self.func
+    ---@type Node[]
+    local sources = { func }
+    ---@type Node.Variable?
+    local master
+    if func.kind == 'variable' then
+        ---@cast func Node.Variable
+        master = func.masterVariable or func
+    end
+    if master then
+        if master ~= func then
+            sources[#sources+1] = master
+        end
+        local ev = master.equivalentValue
+        if ev and ev ~= master then
+            sources[#sources+1] = ev
+        end
+    end
+    for _, src in ipairs(sources) do
+        src:each('function', callback)
+    end
+end
+
 --- 返回参数声明的期望类型（泛型约束或直接声明类型）；无注解返回 nil
 ---@return Node?
 function M:getExpectValue()
     local result
     ---@param func Node.Function
-    self.func:each('function', function (func)
+    self:eachFunc(function (func)
         if result then
             return
         end
@@ -99,6 +125,10 @@ function M:getExpectValue()
             t = t.extends
         end
         if t then
+            -- 无注解参数推断为 any，跳过（不当作期望类型）
+            if t.kind == 'type' and t.typeName == 'any' then
+                return
+            end
             result = t
         end
     end)

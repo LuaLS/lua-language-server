@@ -4,13 +4,16 @@
 
 print('[hover.custom] 测试中...')
 
+local setupModName = require('test.helpers.custom-alias').modname
+
 do
     local playground = ls.custom.playground(test.scope)
-    local rt = test.scope.rt
     do
         local _ENV = playground.env
         _ENV.alias('ModName')
-            : setValue(rt.STRING)
+            : define(function (c)
+                c.setValue(c.type 'string')
+            end)
             : onHover(function (c)
                 local src = c.source
                 if not src then
@@ -25,7 +28,9 @@ do
                 end
             end)
         _ENV.alias('Count')
-            : setValue(rt.INTEGER)
+            : define(function (c)
+                c.setValue(c.type 'integer')
+            end)
             : onHover(function (c)
                 return { 'Count A', 'Count B' }
             end)
@@ -108,32 +113,7 @@ do
     root.uriSet[uriA] = true
     root.uriSet[uriB] = true
 
-    local playground = ls.custom.playground(scope)
-    local rt = scope.rt
-    do
-        local _ENV = playground.env
-        _ENV.alias('ModName')
-            : setValue(rt.STRING)
-            : onHover(function (c)
-                local src = c.source
-                if not src or src.kind ~= 'string' then
-                    return
-                end
-                ---@cast src LuaParser.Node.String
-                -- 搜索路径方式参考 Module：modname -> 文件（searchers 与 uris 一一对应）
-                local uris, searchers = c.scope:searchFiles(src.value, c.location and c.location.uri)
-                if #uris == 0 then
-                    return
-                end
-                local lines = {}
-                for i, uri in ipairs(uris) do
-                    local path = c.scope:getRelativePath(uri) or uri
-                    local searcher = (searchers[i] or ''):gsub('^[/\\]+', '')
-                    lines[#lines+1] = '+ [{}]({}) （搜索路径：`{}`）' % { path, uri, searcher }
-                end
-                return lines
-            end)
-    end
+    local playground = setupModName(scope)
 
     -- meta 定义 require 签名：参数类型约束为 ModName
     local fileMeta <close> = ls.file.setServerText(uriMeta, [[

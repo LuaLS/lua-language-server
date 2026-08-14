@@ -101,7 +101,8 @@ Known open points:
 
 ## 8) Style Note
 
-For multi-condition `if` blocks using `and/or`, keep project-consistent aligned layout.
+- For multi-condition `if` blocks using `and/or`, keep project-consistent aligned layout.
+- 禁止写任何注释；确有必要写注释时，必须先询问用户并得到同意。即便用户同意，注释也只写意图、保持简练，不暴露内部实现细节。
 
 ## 9) Debugging Workflow Rule
 

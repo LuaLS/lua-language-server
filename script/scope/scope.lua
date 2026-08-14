@@ -149,6 +149,17 @@ function M:getDocument(uri)
     return document
 end
 
+--- 文件根 return 的第一个返回值
+---@param uri Uri
+---@return Node?
+function M:getMainReturn(uri)
+    local vfile = self.vm:indexFile(uri)
+    if not vfile then
+        return nil
+    end
+    return vfile:getMainReturn()
+end
+
 --- 根据配置构建 parser 编译选项
 ---@param uri Uri
 ---@return LuaParser.CompileOptions?

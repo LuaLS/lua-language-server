@@ -1,5 +1,7 @@
 print('[project.require] 测试中...')
 
+local setupModule = require('test.helpers.custom-alias').module
+
 ---@param scope Scope
 ---@param kind string
 ---@param uri Uri
@@ -18,7 +20,9 @@ do
     do
         local _ENV = playground.env
         _ENV.alias('Module')
-            : param('T')
+            : define(function (c)
+                c.param('T')
+            end)
             : onValue(function (c)
                 local arg = c.args[1]
                 if arg.kind == 'value' and type(arg.literal) == 'string' then
@@ -49,34 +53,7 @@ do
     root.uriSet['file:///root/a.lua'] = true
     root.uriSet['file:///root/a/b.lua'] = true
 
-    local playground = ls.custom.playground(scope)
-    do
-        local _ENV = playground.env
-
-        -- Module：modname -> 该模块文件根 return 的第一个值
-        _ENV.alias('Module')
-            : param('T')
-            : onValue(function (c)
-                local modname = c.args[1]
-                if modname.kind ~= 'value' then
-                    return c.type 'never'
-                end
-                local literal = modname.literal
-                if type(literal) ~= 'string' then
-                    return c.type 'never'
-                end
-                local uris = c.scope:searchFiles(literal)
-                if #uris == 0 then
-                    return c.type 'never'
-                end
-                local vfile = c.scope.vm:indexFile(uris[1])
-                local ret = vfile:getMainReturn()
-                if not ret then
-                    return c.type 'never'
-                end
-                return ret
-            end)
-    end
+    local playground = setupModule(scope)
 
     -- a.lua 返回 table
     local uriA = 'file:///root/a.lua'
@@ -118,22 +95,22 @@ do
     local fileMeta <close> = ls.file.setServerText('file:///root/meta.lua', [==[
 --[[@@@
 alias 'Module'
-    : param('T')
+    : define(function (c)
+        c.param('T')
+        c.resetCacheOnScopeChanged()
+    end)
     : onValue(function (c)
         local modname = c.args[1]
-        if modname.kind ~= 'value' then
-            return c.type 'never'
-        end
-        local literal = modname.literal
+        local literal = modname?.value?.literal
         if type(literal) ~= 'string' then
             return c.type 'never'
         end
-        local uris = c.scope:searchFiles(literal)
+        local suri = c.location?.uri
+        local uris = c.scope:searchFiles(literal, suri)
         if #uris == 0 then
             return c.type 'never'
         end
-        local vfile = c.scope.vm:indexFile(uris[1])
-        local ret = vfile:getMainReturn()
+        local ret = c.scope:getMainReturn(uris[1])
         if not ret then
             return c.type 'never'
         end
@@ -208,6 +185,39 @@ return {
     -- Module：modname -> main return
     local v = scope.rt.call('Module', { scope.rt.value 'a' })
     lt.assertEquals(v:view(), '{ x: 1 }')
+
+    -- ModName 也已注册：继承 string，带 customHover
+    local modType = scope.rt.type('ModName')
+    lt.assertEquals(modType ~= nil, true)
+    local hasHover = false
+    if modType.aliases then
+        for _, alias in ipairs(modType.aliases) do
+            if alias.customHover then
+                hasHover = true
+            end
+        end
+    end
+    lt.assertEquals(hasHover, true)
+    -- ModName 继承 string：求值结果为 string 类型
+    local modCall = scope.rt.call('ModName', {})
+    lt.assertEquals(modCall.value:view(), 'string')
+
+    -- ModName 的 onHover：hover require 'a' 显示命中的文件路径
+    local alias = modType.aliases and modType.aliases[1]
+    if alias and alias.customHover then
+        local lines = alias.customHover(alias, {
+            uri     = 'file:///root/main.lua',
+            offset  = 0,
+            length  = 0,
+        } --[[@as Node.Location]], {
+            kind  = 'string',
+            value = 'a',
+        } --[[@as any]])
+        lt.assertEquals(#lines >= 1, true)
+        ---@cast lines string[]
+        local first = lines[1]
+        lt.assertEquals(first ~= nil and first:find('file:///root/a.lua', 1, true) ~= nil, true)
+    end
 end
 
 do
@@ -234,37 +244,7 @@ do
     scope.vm:indexFile(uriX)
     scope.vm:indexFile(uriSubX)
 
-    local playground = ls.custom.playground(scope)
-    do
-        local _ENV = playground.env
-
-        _ENV.alias('Module')
-            : param('T')
-            : onValue(function (c)
-                local modname = c.args[1]
-                if modname.kind ~= 'value' then
-                    return c.type 'never'
-                end
-                local literal = modname.literal
-                if type(literal) ~= 'string' then
-                    return c.type 'never'
-                end
-                local suri = c.location and c.location.uri
-                local uris = c.scope:searchFiles(literal, suri)
-                if #uris == 0 then
-                    return c.type 'never'
-                end
-                local vfile = c.scope.vm:getFile(uris[1])
-                if not vfile then
-                    return c.type 'never'
-                end
-                local ret = vfile:getMainReturn()
-                if not ret then
-                    return c.type 'never'
-                end
-                return ret
-            end)
-    end
+    local playground = setupModule(scope)
 
     local rt = scope.rt
     local T = rt.generic('T', rt.STRING)

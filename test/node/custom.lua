@@ -55,7 +55,9 @@ do
         local _ENV = playground.env
 
         _ENV.alias('Partial')
-            : param('T')
+            : define(function (c)
+                c.param('T')
+            end)
             : onValue(function (c)
                 local v = c.args[1]
                 if #v.keys == 0 then
@@ -97,7 +99,9 @@ do
         local _ENV = playground.env
 
         _ENV.alias('Partial')
-            : param('T')
+            : define(function (c)
+                c.param('T')
+            end)
             : onValue(function (c)
                 local v = c.args[1]
                 if #v.keys == 0 then
@@ -202,4 +206,55 @@ do
     playground:dispose()
 
     lt.assertEquals(rt.type('Test').value:view(), 'Test')
+end
+
+do
+    -- value 为 type A：求值后修改 type A（class），之前求得的 value 重新求值
+    rt:reset()
+    local playground = ls.custom.playground(test.scope)
+    do
+        local _ENV = playground.env
+        _ENV.alias('ModName')
+            : define(function (c)
+                c.setValue(c.type 'A')
+            end)
+    end
+
+    local mod = rt.call('ModName', {})
+    lt.assertEquals(mod.value:view(), 'A')
+    lt.assertEquals(mod.value.value:view(), 'A')
+
+    rt.class('A')
+        : addField(rt.field('x', rt.value(123)))
+    lt.assertEquals(mod.value.value:view(), '{ x: 123 }')
+
+    playground:dispose()
+end
+
+do
+    -- value 为 type A：求值后通过 alias 覆盖 A 的值，之前求得的 value 重新求值
+    rt:reset()
+    local playground = ls.custom.playground(test.scope)
+    do
+        local _ENV = playground.env
+        _ENV.alias('ModName')
+            : define(function (c)
+                c.setValue(c.type 'A')
+            end)
+    end
+
+    local mod = rt.call('ModName', {})
+    lt.assertEquals(mod.value:view(), 'A')
+    lt.assertEquals(mod.value.value:view(), 'A')
+
+    do
+        local aliasA <close> = rt.alias('A', nil, rt.table {
+            y = rt.value(456),
+        })
+        lt.assertEquals(mod.value.value:view(), '{ y: 456 }')
+    end
+
+    lt.assertEquals(mod.value.value:view(), 'A')
+
+    playground:dispose()
 end

@@ -4,7 +4,9 @@ do
     TEST_INDEX [=[
 --[[@@@
 alias 'Test'
-    : param('T')
+    : define(function (c)
+        c.param('T')
+    end)
     : onValue(function (c)
         return c.array(c.args[1])
     end)
@@ -20,7 +22,9 @@ do
     TEST_INDEX [=[
 --[[@@@
 alias 'Test'
-    : param('T')
+    : define(function (c)
+        c.param('T')
+    end)
     : onValue(function (c)
         return c.array(c.args[1])
     end)
@@ -36,7 +40,9 @@ do
     TEST_INDEX [=[
 --[[@@@
 alias 'Test'
-    : param('T')
+    : define(function (c)
+        c.param('T')
+    end)
     : onValue(function (c)
         return c.args[1]:every(function (node)
             return c.array(node)

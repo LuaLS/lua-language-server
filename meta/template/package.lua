@@ -4,43 +4,63 @@
 -- Module：modname -> 该模块文件根 return 的第一个值
 -- （合并 RequireUri 的 modname->uri 解析与 RequireValue 的 uri->main return）
 alias 'Module'
-    : param('T')
+    : define(function (c)
+        c.param('T')
+        c.resetCacheOnScopeChanged()
+    end)
     : onValue(function (c)
         local modname = c.args[1]
-        local literal = modname.value.literal
+        local literal = modname?.value?.literal
         if type(literal) ~= 'string' then
             return c.type 'never'
         end
-        local suri = c.location and c.location.uri
+        local suri = c.location?.uri
         local uris = c.scope:searchFiles(literal, suri)
         if #uris == 0 then
             return c.type 'never'
         end
-        -- 解析结果依赖 Scope 的文件集合：注册 alias 节点，Scope 增删文件时刷新
-        c.scope:addRef(c.node)
-        -- 只复用已加载的文件；未加载返回 never，避免加载链递归
-        local vfile = c.scope.vm:getFile(uris[1])
-        if not vfile then
-            return c.type 'never'
-        end
-        local ret = vfile:getMainReturn()
+        local ret = c.scope:getMainReturn(uris[1])
         if not ret then
             return c.type 'never'
         end
         return ret
     end)
+
+-- ModName：require 模块名（继承 string，hover 显示命中的文件路径）
+alias 'ModName'
+    : define(function (c)
+        c.setValue(c.type 'string')
+    end)
+    : onHover(function (c)
+        local src = c.source
+        if not src or src.kind ~= 'string' then
+            return
+        end
+        ---@cast src LuaParser.Node.String
+        local uris, searchers = c.scope:searchFiles(src.value, c.location?.uri)
+        if #uris == 0 then
+            return
+        end
+        local lines = {}
+        for i, uri in ipairs(uris) do
+            local path = c.scope:getRelativePath(uri) or uri
+            local searcher = (searchers[i] or ''):gsub('^[/\\]+', '')
+            lines[#lines+1] = '+ [{}]({}) （搜索路径：`{}`）' % { path, uri, searcher }
+        end
+        return lines
+    end)
 ]]
 
 ---#if VERSION >=5.4 then
 ---#DES 'require>5.4'
----@generic T: string
+---@generic T: ModName
 ---@param modname T
 ---@return Module<T>
 ---@return unknown loaderdata
 function require(modname) end
 ---#else
 ---#DES 'require<5.3'
----@generic T: string
+---@generic T: ModName
 ---@param modname T
 ---@return Module<T>
 function require(modname) end

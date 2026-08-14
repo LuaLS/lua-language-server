@@ -1,5 +1,7 @@
 print('[project.require-cache] 测试中...')
 
+local setupModule = require('test.helpers.custom-alias').module
+
 ---@param scope Scope
 ---@param kind string
 ---@param uri Uri
@@ -8,42 +10,6 @@ local function createRoot(scope, kind, uri)
     local root = New 'Scope.Root' (scope, kind, uri, scope.fs, scope.config)
     scope.roots[#scope.roots+1] = root
     return root
-end
-
----@param scope Scope
----@return table playground 需要 <close> 释放
-local function setupAliases(scope)
-    local playground = ls.custom.playground(scope)
-    do
-        local _ENV = playground.env
-
-        -- Module：modname -> 该模块文件根 return 的第一个值
-        _ENV.alias('Module')
-            : param('T')
-            : onValue(function (c)
-                local modname = c.args[1]
-                if modname.kind ~= 'value' then
-                    return c.type 'never'
-                end
-                local literal = modname.literal
-                if type(literal) ~= 'string' then
-                    return c.type 'never'
-                end
-                local uris = c.scope:searchFiles(literal)
-                if #uris == 0 then
-                    return c.type 'never'
-                end
-                -- 解析结果依赖 Scope 的文件集合：注册 alias 节点，Scope 增删文件时刷新
-                c.scope:addRef(c.node)
-                local vfile = c.scope.vm:indexFile(uris[1])
-                local ret = vfile:getMainReturn()
-                if not ret then
-                    return c.type 'never'
-                end
-                return ret
-            end)
-    end
-    return playground
 end
 
 do
@@ -64,7 +30,7 @@ do
     root.uriSet[uriA] = true
     root.uriSet[uriC] = true
 
-    local playground = setupAliases(scope)
+    local playground = setupModule(scope)
 
     -- meta 定义 require 签名
     local fileMeta <close> = ls.file.setServerText(uriMeta, [[

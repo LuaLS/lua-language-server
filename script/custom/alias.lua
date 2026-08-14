@@ -9,6 +9,9 @@ function M:__init(rt, name)
 
     self.alias = rt.alias(name)
     self.master = ls.custom.contextMaster(self.alias)
+
+    ---@type boolean
+    self.resetOnScopeChanged = false
 end
 
 function M:__del()
@@ -21,21 +24,6 @@ end
 
 function M:dispose()
     Delete(self)
-end
-
----@param name string
----@return Custom.Alias
-function M:param(name)
-    local p = self.rt.generic(name)
-    self.alias:addTypeParam(p)
-    return self
-end
-
----@param value Node
----@return Custom.Alias
-function M:setValue(value)
-    self.alias:setValue(value)
-    return self
 end
 
 --- 注册自定义 hover：当 hover 到类型为该 alias 的字符串/数字字面量时调用。
@@ -53,8 +41,52 @@ function M:onHover(callback)
     return self
 end
 
+---@class Custom.Context.Define
+--- 定义期上下文：注册 alias 时构造 Node 并设置 alias。
+---@field type fun(name: string): Node.Type
+---@field value fun(v: string | number | boolean, quo?: '"' | "'" | '[['): Node.Value
+---@field table fun(fields?: table): Node.Table
+---@field field fun(key: Node.Key, value?: Node, optional?: boolean): Node.Field
+---@field array fun(value: Node): Node.Array
+---@field generic fun(name: string, extends?: Node, default?: Node): Node.Generic
+---@field union fun(nodes?: Node[], filter?: fun(node: Node): boolean): Node
+---@field list fun(values?: Node[], min?: integer, max?: integer | false): Node.List
+---@field call fun(head: string, args: Node[]): Node.Call
+---@field setValue fun(node: Node)
+---@field param fun(name: string)
+---@field resetCacheOnScopeChanged fun() # 声明该 alias 的求值依赖工作区文件集合，文件增删后重新求值
+
+--- 注册定义期回调
+---@param callback fun(c: Custom.Context.Define)
+---@return Custom.Alias
+function M:define(callback)
+    local rt    = self.rt
+    local alias = self.alias
+    local c     = {}
+    c.type     = rt.type
+    c.value    = rt.value
+    c.table    = rt.table
+    c.field    = rt.field
+    c.array    = rt.array
+    c.generic  = rt.generic
+    c.union    = rt.union
+    c.list     = rt.list
+    c.call     = rt.call
+    c.setValue = function (node) alias:setValue(node) end
+    c.param    = function (name) alias:addTypeParam(rt.generic(name)) end
+    c.resetCacheOnScopeChanged = function ()
+        self.resetOnScopeChanged = true
+    end
+    callback(c)
+    return self
+end
+
+--- 每当要对该类求值时调用
+--- 默认情况下会将结果缓存在具体的调用点上，因此只会被调用一次
+--- 当所在文件发生变化时缓存会被清除
 ---@param callback fun(c: Custom.Context): Node
 function M:onValue(callback)
+    local alias = self.alias
     self.alias:setCustomValue(function (_, args, location)
         local data = {}
         data.location = location
@@ -67,6 +99,9 @@ function M:onValue(callback)
             data.args = cargs
         end
         local node = self.master:call(callback, data)
+        if self.resetOnScopeChanged then
+            alias.scope:addRef(alias)
+        end
         return node
     end)
 end

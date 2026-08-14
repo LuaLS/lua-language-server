@@ -29,7 +29,7 @@ local function collectStringLiteralsFromNode(node)
 end
 
 --- 收集枚举字符串字面量：取节点裸值（n.literal），无引号时补双引号，
---- 与 util.extractEnumLiterals 的输出形式一致（如 `"aaa"`、`"a"`）。
+--- 输出形式与 util.extractEnumLiterals 一致
 ---@param node any
 ---@return string[]
 local function collectEnumLiteralsFromNode(node)
@@ -1253,8 +1253,7 @@ ls.feature.provider.completion(function (param, action)
 end, 17)
 
 -- 字符串枚举补全：通过 Node:getExpectValue() 反推期望类型（赋值值/函数参数等
--- expectParent 场景），从期望类型中收集字符串字面量作为补全项。
--- 相比文本扫描实现，支持 local 初始化位置、跨文件 alias、函数参数（如 require 'x'）。
+-- expectParent 场景），从期望类型中收集字符串字面量作为补全项
 ls.feature.provider.completion(function (param, action)
     if param.inComment then
         return

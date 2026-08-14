@@ -113,4 +113,68 @@ do
     lt.assertEquals(results, { 'file:///root/x/y/a.lua', 'file:///root/x/y/z/a.lua' })
 end
 
+do
+    -- 反向推导：getRequireNameByPath
+    local scope <close> = ls.scope.create('require-path-test-7', 'file:///root')
+    createRoot(scope, 'workspace', 'file:///root')
+
+    lt.assertEquals(scope:getRequireNameByPath('a.lua', '?.lua'), 'a')
+    lt.assertEquals(scope:getRequireNameByPath('a/b.lua', '?.lua'), 'a.b')
+    lt.assertEquals(scope:getRequireNameByPath('a/b/init.lua', '?/init.lua'), 'a.b')
+    lt.assertEquals(scope:getRequireNameByPath('a/b/init.lua', '?.lua'), 'a.b.init')
+    -- 前缀不匹配返回 nil
+    lt.assertEquals(scope:getRequireNameByPath('b/a.lua', 'c/?.lua'), nil)
+end
+
+do
+    -- getVisiblePath：文件 -> 可能的 require 名（含 searcher）
+    local scope <close> = ls.scope.create('require-path-test-8', 'file:///root')
+    createRoot(scope, 'workspace', 'file:///root')
+
+    lt.assertEquals(scope:getVisiblePath('file:///root/a.lua'), {
+        { name = 'a', searcher = '?.lua' },
+    })
+    -- pathStrict=false：多级尝试
+    lt.assertEquals(scope:getVisiblePath('file:///root/Folder/a.lua'), {
+        { name = 'Folder.a', searcher = '?.lua' },
+        { name = 'a',        searcher = 'Folder/?.lua' },
+    })
+    -- pathStrict=true：只第一层
+    scope.config:set('file:///root', 'Lua.runtime.pathStrict', true)
+    lt.assertEquals(scope:getVisiblePath('file:///root/Folder/a.lua'), {
+        { name = 'Folder.a', searcher = '?.lua' },
+    })
+end
+
+do
+    -- searchFilesByPartial：部分字符 -> 匹配文件（含 searcher）
+    local scope <close> = ls.scope.create('require-path-test-9', 'file:///root')
+    local root = createRoot(scope, 'workspace', 'file:///root')
+    root.uriSet['file:///root/abc.lua'] = true
+    root.uriSet['file:///root/abc/init.lua'] = true
+    root.uriSet['file:///root/abc/bbc.lua'] = true
+    root.uriSet['file:///root/zzz.lua'] = true
+
+    local function names(results)
+        return ls.util.map(results, function (r)
+            return r.name
+        end)
+    end
+
+    lt.assertEquals(names(scope:searchFilesByPartial('abc')), {
+        'abc',      -- abc.lua（?.lua）
+        'abc.bbc',  -- abc/bbc.lua（?.lua）
+        'abc.init', -- abc/init.lua（?.lua）
+    })
+    -- 大小写不敏感
+    lt.assertEquals(names(scope:searchFilesByPartial('ABC')), {
+        'abc',
+        'abc.bbc',
+        'abc.init',
+    })
+    -- 无匹配
+    lt.assertEquals(names(scope:searchFilesByPartial('xyz')), {})
+end
+
+
 print('[project.require-path] 测试完毕')

@@ -696,11 +696,15 @@ M.__getter.value = function (self)
     if self.tracer then
         self.tracer:trace()
     end
-    return self:getCurrentValue()
+    local result = self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
         or rt.ANY
-        , true
+    -- 可选链访问（?. ?: ?[）：结果总是包含 nil
+    if self:isOptional() then
+        result = result | rt.NIL
+    end
+    return result, true
 end
 
 ---所有的等价对象（递归）
@@ -988,6 +992,10 @@ end
 ---@private
 M._hideAtHead = false
 
+--- 可选链访问标记：值总是包含 nil
+---@private
+M._optional = false
+
 ---@return Node.Variable
 function M:hideAtHead()
     self._hideAtHead = true
@@ -1031,6 +1039,18 @@ end
 
 function M:isMethod()
     return self._isMethod or false
+end
+
+--- 标记为可选链访问（?. ?: ?[），其值总是包含 nil
+---@return Node.Variable
+function M:setOptional()
+    self._optional = true
+    return self
+end
+
+---@return boolean
+function M:isOptional()
+    return self._optional or false
 end
 
 ---@param viewer Node.Viewer

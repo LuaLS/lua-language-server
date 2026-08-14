@@ -69,6 +69,13 @@ ls.vm.registerCoderProvider('field', function (coder, source)
             coder.parentMap[sourceName] = { coder:getVarName(last), keyLiteral }
         end
     end
+
+    -- 可选链访问（?. ?: ?[）：值为 nil | 字段值
+    if source.safe then
+        coder:addLine('{var}:setOptional()' % {
+            var = coder:getKey(source),
+        })
+    end
 end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)

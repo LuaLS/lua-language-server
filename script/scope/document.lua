@@ -26,8 +26,10 @@ ls.timer.loop(5, function ()
 end)
 
 ---@param file File
-function M:__init(file)
+---@param scope? Scope
+function M:__init(file, scope)
     self.file = file
+    self.scope = scope
     self.version = 1
 
     file.onDidChange:on(function ()
@@ -71,7 +73,8 @@ M.ast = nil
 ---@return LuaParser.Ast | false
 ---@return true
 M.__getter.ast = function (self)
-    local suc, ast = xpcall(parser.compile, log.error, self.text, self.file.uri)
+    local options = self.scope and self.scope:makeCompileOptions(self.file.uri)
+    local suc, ast = xpcall(parser.compile, log.error, self.text, self.file.uri, options)
     if not suc then
         return false, true
     end

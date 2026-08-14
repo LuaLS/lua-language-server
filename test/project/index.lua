@@ -1,5 +1,5 @@
 do
-    local scope <close> = ls.scope.create('test afs')
+    local scope <close> = ls.scope.create('test afs', test.rootUri)
 
     local file <close> = ls.file.setServerText(test.fileUri, [[
 GlobalA = 1

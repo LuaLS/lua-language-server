@@ -43,7 +43,7 @@ end
 ---@return Coder
 function M:awaitMakeCoder(document)
     local coder = ls.vm.createCoder()
-    coder:makeFromFile(document.file)
+    coder:makeFromFile(document.file, self.scope:makeCompileOptions(self.uri))
     return coder
 end
 

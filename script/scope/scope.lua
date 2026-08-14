@@ -9,7 +9,7 @@ Extends('Scope', 'Node.RefModule')
 M.ready = false
 
 ---@param name string
----@param uri? Uri
+---@param uri Uri
 ---@param fs? FileSystem
 function M:__init(name, uri, fs)
     self.name = name
@@ -140,13 +140,26 @@ function M:getDocument(uri)
     local document = self.documents[file.uri]
     if not document then
         ---@type Document
-        document = New 'Document' (file)
+        document = New 'Document' (file, self)
         self.documents[file.uri] = document
         document:bindGC(function ()
             self.documents[file.uri] = nil
         end)
     end
     return document
+end
+
+--- 根据配置构建 parser 编译选项
+---@param uri Uri
+---@return LuaParser.CompileOptions?
+function M:makeCompileOptions(uri)
+    local symbols = self.config:get(uri, 'Lua.runtime.nonestandardSymbols')
+    if not symbols or #symbols == 0 then
+        return nil
+    end
+    return {
+        nonestandardSymbols = symbols,
+    }
 end
 
 ---@async
@@ -189,7 +202,7 @@ end
 ls.scope.all = {}
 
 ---@param name string
----@param uri? Uri
+---@param uri Uri
 ---@param fs? FileSystem
 ---@return Scope
 function ls.scope.create(name, uri, fs)

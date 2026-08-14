@@ -138,12 +138,9 @@ function W:traceRef(ref)
     local value = self:getValue(id)
     if not value then
         local node = self.map[alias]
-        -- 普通节点（无 tracer）直接用 .value。
-        if node.tracer then
-            value = node:getStaticValue()
-        else
-            value = node.value or self.scope.rt.ANY
-        end
+        -- 统一使用 getStaticValue()（不含可选链的 nil 合并），
+        -- 避免把单次可选链访问的 nil 写入共享的 id 值，污染后续普通访问。
+        value = node:getStaticValue()
         self:setValue(id, value)
     end
     local node = self.map[alias]

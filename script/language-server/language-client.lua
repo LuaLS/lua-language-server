@@ -4,10 +4,7 @@ local M = Class 'LanguageClient'
 ---@param params LSP.InitializeParams
 function M:initialize(params)
     self.params = params
-    self.capabilities = setmetatable(params.capabilities or {}, {
-        -- `false` 是全局swallow，省的判空了
-        __index = function () return false end
-    })
+    self.capabilities = params.capabilities or {}
 
     self:notify('$/hello', { message = 'world' })
 end
@@ -20,7 +17,7 @@ end
 ---@param type LSP.MessageType | integer
 ---@param message string
 function M:logMessage(type, message)
-    if not self.capabilities.window.showMessage then
+    if not self.capabilities.window?.showMessage then
         return
     end
     self:notify('window/logMessage', {

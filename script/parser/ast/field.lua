@@ -1,6 +1,7 @@
 
 ---@class LuaParser.Node.Field: LuaParser.Node.Base
 ---@field subtype 'field' | 'method' | 'index'
+---@field safe? boolean # 是否为可选链访问（?. ?: ?[）
 ---@field key LuaParser.Node.FieldID | LuaParser.Node.Exp
 ---@field symbolPos integer
 ---@field symbolPos2? integer
@@ -60,6 +61,106 @@ local Ast = Class 'LuaParser.Ast'
 ---@return LuaParser.Node.Field?
 function Ast:parseField(last, onlyDot)
     local token, _, pos = self.lexer:peek()
+    ---@cast pos -?
+
+    -- 可选链：? 后紧跟 . : [ （?. 安全字段 / ?: 无点号安全方法 / ?[ 无点号安全索引）
+    if token == '?'
+    and not onlyDot then
+        local nextToken, _, nextPos = self.lexer:peek(1)
+
+        -- ?. 安全字段访问
+        if nextToken == '.'
+        and nextPos == pos + 1 then
+            if not self.nssymbolMap['?.'] then
+                self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + 2, {
+                    symbol = '?.',
+                })
+            end
+            self.lexer:next()
+            self.lexer:next()
+            self:skipSpace()
+            local key = self:parseID('LuaParser.Node.FieldID', true, 'warn')
+            if key then
+                local field = self:createNode('LuaParser.Node.Field', {
+                    start     = last.start,
+                    finish    = key.finish,
+                    subtype   = 'field',
+                    safe      = true,
+                    key       = key,
+                    last      = last,
+                    symbolPos = pos,
+                })
+                last.next   = field
+                last.parent = field
+                key.parent  = field
+                return field
+            end
+            return nil
+        end
+
+        -- ?: 无点号安全方法
+        if nextToken == ':'
+        and nextPos == pos + 1 then
+            if not self.nssymbolMap['?:'] then
+                self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + 2, {
+                    symbol = '?:',
+                })
+            end
+            self.lexer:next()
+            self.lexer:next()
+            self:skipSpace()
+            local key = self:parseID('LuaParser.Node.FieldID', true, 'warn')
+            if key then
+                local field = self:createNode('LuaParser.Node.Field', {
+                    start     = last.start,
+                    finish    = key.finish,
+                    subtype   = 'method',
+                    safe      = true,
+                    key       = key,
+                    last      = last,
+                    symbolPos = pos,
+                })
+                last.next   = field
+                last.parent = field
+                key.parent  = field
+                return field
+            end
+            return nil
+        end
+
+        -- ?[ 无点号安全索引
+        if nextToken == '['
+        and nextPos == pos + 1 then
+            if not self.nssymbolMap['?['] then
+                self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + 2, {
+                    symbol = '?[',
+                })
+            end
+            self.lexer:next()
+            self.lexer:next()
+            self:skipSpace()
+            local key = self:parseExp(true)
+            self:skipSpace()
+            local symbolPos2 = self:assertSymbol(']')
+            local field = self:createNode('LuaParser.Node.Field', {
+                start      = last.start,
+                finish     = self:getLastPos(),
+                subtype    = 'index',
+                safe       = true,
+                key        = key,
+                last       = last,
+                symbolPos  = pos,
+                symbolPos2 = symbolPos2,
+            })
+            last.parent = field
+            last.next   = field
+            if key then
+                key.parent = field
+            end
+            return field
+        end
+    end
+
     if token == '.'
     or (token == ':' and not onlyDot) then
         self.lexer:next()

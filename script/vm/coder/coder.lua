@@ -72,10 +72,12 @@ end
 
 ---@async
 ---@param file File
-function M:makeFromFile(file)
+---@param options? LuaParser.CompileOptions
+function M:makeFromFile(file, options)
     local result = self.coderMaster:awaitRequest('makeCode', {
         text = file:getText(),
         source = file.uri,
+        options = options,
     })
     if not result.code then
         log.error('Failed to make coder from file: ' .. file.uri)

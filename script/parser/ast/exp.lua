@@ -163,6 +163,12 @@ function Ast:parseTerm()
         end
 
         if chain then
+            -- 可选链安全性沿链传播：链上任一环节为可选链访问，
+            -- 则后续环节（字段/调用）的结果也可能为 nil
+            if current.safe then
+                chain.safe = true
+            end
+
             if chain.kind == 'call' and self.versionNum <= 51 then
                 if current.finishRow ~= self.lexer:rowcol(chain.argPos) then
                     self:throw('AMBIGUOUS_SYNTAX', chain.argPos, chain.finish)

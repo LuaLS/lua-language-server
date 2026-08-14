@@ -13,11 +13,27 @@ M.head = nil
 ---@type Node.Location?
 M.location = nil
 
+--- 可选链调用标记：值总是包含 nil
+---@private
+M._optional = false
+
 ---@param location Node.Location
 ---@return Node.FCall
 function M:setLocation(location)
     self.location = location
     return self
+end
+
+--- 标记为可选链调用（?(），其值总是包含 nil
+---@return Node.FCall
+function M:setOptional()
+    self._optional = true
+    return self
+end
+
+---@return boolean
+function M:isOptional()
+    return self._optional or false
 end
 
 ---@param scope Scope
@@ -37,7 +53,12 @@ M.value = nil
 ---@return true
 M.__getter.value = function (self)
     self.value = self.scope.rt.NEVER
-    return self.returns, true
+    local result = self.returns
+    -- 可选链调用（?(）：结果总是包含 nil
+    if self:isOptional() then
+        result = result | self.scope.rt.NIL
+    end
+    return result, true
 end
 
 ---@param self Node.FCall
@@ -65,7 +86,12 @@ end
 ---@return Node
 ---@return boolean exists
 function M:select(key)
-    return self.returns:select(key)
+    local v, exists = self.returns:select(key)
+    -- 可选链调用（?(）：所有位置的值都可能为 nil
+    if self:isOptional() then
+        v = v | self.scope.rt.NIL
+    end
+    return v, exists
 end
 
 ---@type Node

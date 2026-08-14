@@ -229,6 +229,12 @@ ls.vm.registerCoderProvider('call', function (coder, source)
         key      = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
+    -- 可选链调用（?(）：值为 nil | 返回值
+    if source.safe then
+        coder:addLine('{key}:setOptional()' % {
+            key = coder:getKey(source),
+        })
+    end
     coder:getTracer():appendCall(source)
 end)
 

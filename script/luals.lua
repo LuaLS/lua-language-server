@@ -15,7 +15,6 @@ ls.util    = require 'utility'
 ls.util.enableCloseFunction()
 ls.util.enableFormatString()
 ls.util.enableDividStringAsPath()
-ls.util.enableFalswallow()
 
 ls.fsu     = require 'tools.fs-utility'
 ls.encoder = require 'tools.encoder'

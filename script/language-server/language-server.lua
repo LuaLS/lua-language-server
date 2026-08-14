@@ -117,7 +117,7 @@ M.__getter.positionEncoding = function (self)
     if not self.client.params then
         return 'utf-16', false
     end
-    local clientEncodings =  self.client.capabilities.general.positionEncodings or {}
+    local clientEncodings =  self.client.capabilities.general?.positionEncodings or {}
     if ls.util.arrayHas(clientEncodings, 'utf-8') then
         return 'utf-8', true
     end

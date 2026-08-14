@@ -16,7 +16,8 @@ local LuaParser = Class 'LuaParser'
 ---|'+=' | '-=' | '*=' | '/=' | '%=' | '^=' | '//='
 ---|'|=' | '&=' | '<<=' | '>>='
 ---|'||' | '&&' | '!' | '!='
----|'continue',
+---|'continue'
+---|'?.' | '?:' | '?[' | '?('
 
 ---@class LuaParser.CompileOptions
 ---@field version? LuaParser.LuaVersion # Lua版本，默认为 'Lua 5.4'

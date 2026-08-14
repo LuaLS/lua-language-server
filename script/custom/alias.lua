@@ -27,8 +27,7 @@ function M:dispose()
 end
 
 --- 注册自定义 hover：当 hover 到类型为该 alias 的字符串/数字字面量时调用。
---- 回调返回单个字符串或字符串数组，作为额外的 hover 内容追加显示。
----@param callback fun(c: Custom.Context): string | string[] | nil
+---@param callback fun(c: Custom.Context): string | { label?: string, detail?: string } | nil
 ---@return Custom.Alias
 function M:onHover(callback)
     self.alias:setCustomHover(function (_, location, source)

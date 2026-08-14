@@ -67,10 +67,9 @@ ls.feature.provider.hover(function (param, action)
             action.push { label = result }
         end
     elseif type(result) == 'table' then
-        for _, label in ipairs(result) do
-            if type(label) == 'string' and label ~= '' then
-                action.push { label = label }
-            end
-        end
+        action.push {
+            label       = result.label or '',
+            description = result.detail,
+        }
     end
 end)

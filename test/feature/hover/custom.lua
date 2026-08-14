@@ -32,7 +32,7 @@ do
                 c.setValue(c.type 'integer')
             end)
             : onHover(function (c)
-                return { 'Count A', 'Count B' }
+                return { label = 'Count A', detail = 'Count B' }
             end)
     end
 
@@ -62,13 +62,12 @@ local modname = 'utility<??>'
         'ModName: utility',
     })
 
-    -- onHover 返回字符串数组：每个字符串追加为一个 item
+    -- onHover 返回 { label, detail } 对象：label 为 item 标题，detail 为附加说明
     lt.assertEquals(hoverLabels([[
 ---@type Count
 local count = 42<??>
 ]]), {
         'Count A',
-        'Count B',
     })
 
     -- assign 场景：类型注解来自变量声明，通过 getExpectValue 兜底触发
@@ -141,8 +140,11 @@ require 'te<??>st'
     end)
     lt.assertEquals(labels, {
         "'4 个字节'",
-        '+ [test.lua]({}) （搜索路径：`?.lua`）' % { uriA },
+        'test',
     })
+    local second = hover and hover.items[2]
+    local desc = second and second.description
+    lt.assertEquals(desc, '+ [test.lua]({}) （搜索路径：`?.lua`）' % { uriA })
 
     playground:dispose()
 end

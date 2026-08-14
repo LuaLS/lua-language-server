@@ -47,7 +47,9 @@ alias 'ModName'
             local searcher = (searchers[i] or ''):gsub('^[/\\]+', '')
             lines[#lines+1] = '+ [{}]({}) （搜索路径：`{}`）' % { path, uri, searcher }
         end
-        return lines
+        return {
+            detail = table.concat(lines, '\n'),
+        }
     end)
 ]]
 

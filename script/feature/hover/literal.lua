@@ -9,9 +9,9 @@ ls.feature.provider.hover(function (param, action)
     local charLen = ls.util.utf8Len(str, 1, -1)
     local label
     if len == charLen then
-        label = "'{} 个字节'" % { len }
+        label = "{} 个字节" % { len }
     else
-        label = "'{} 个字节，{} 个字符'" % { len, charLen }
+        label = "{} 个字节，{} 个字符" % { len, charLen }
     end
     action.push { label = label }
 end)

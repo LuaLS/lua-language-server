@@ -205,7 +205,7 @@ return {
     -- ModName 的 onHover：hover require 'a' 显示命中的文件路径
     local alias = modType.aliases and modType.aliases[1]
     if alias and alias.customHover then
-        local lines = alias.customHover(alias, {
+        local result = alias.customHover(alias, {
             uri     = 'file:///root/main.lua',
             offset  = 0,
             length  = 0,
@@ -213,10 +213,11 @@ return {
             kind  = 'string',
             value = 'a',
         } --[[@as any]])
-        lt.assertEquals(#lines >= 1, true)
-        ---@cast lines string[]
-        local first = lines[1]
-        lt.assertEquals(first ~= nil and first:find('file:///root/a.lua', 1, true) ~= nil, true)
+        if type(result) == 'table' then
+            lt.assertEquals(result.label ~= nil, true)
+            local detail = result.detail
+            lt.assertEquals(detail ~= nil and detail:find('file:///root/a.lua', 1, true) ~= nil, true)
+        end
     end
 end
 

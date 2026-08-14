@@ -64,7 +64,7 @@ function M:setCustomValue(callback)
     return self
 end
 
----@alias Node.Alias.CustomHover fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): string | string[] | nil
+---@alias Node.Alias.CustomHover fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): string | { label?: string, detail?: string } | nil
 
 ---@type Node.Alias.CustomHover?
 M.customHover = nil

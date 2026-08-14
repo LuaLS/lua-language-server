@@ -1,6 +1,7 @@
 # changelog
 
 ## Unreleased
+* `NEW` diagnostic: `missing-export-doc`
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` `need-check-nil` diagnostic is no longer reported on safe navigation access (e.g. `x?.field`, `f?.()`, `t?.[key]`), since the optional access itself already handles the nil check. Note that a non-safe access chained after a safe one (e.g. `x.upper()?.field`) still reports, because the safe access only protects its own result.
 

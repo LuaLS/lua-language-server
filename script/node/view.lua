@@ -26,8 +26,13 @@ function M:__init(options)
     self.viewType         = options and options.viewType         or nil
     self.viewClass        = options and options.viewClass        or nil
     self.inlineMax        = options and options.inlineMax        ~= nil and options.inlineMax or 1
-    ---@type table<Node, integer?>
+    ---@type table<Node, integer | boolean>
     self.visited = {}
+    ---@type integer
+    self.viewDepth = 0
+    ---@type Node[]
+    self.trace = {}
+    self.traceLimit = 100
 end
 
 ---@private
@@ -46,9 +51,35 @@ function M:wrap(node, options, callback)
             return '...'
         end
     end
+    if (self.visited[node] or 0) > 1 then
+        if not skipDeep then
+            self.deep = self.deep - 1
+        end
+        self.skipLevel = self.skipLevel - skipLevel
+        return '...'
+    end
     self.visited[node] = (self.visited[node] or 0) + 1
+    self.viewDepth = self.viewDepth + 1
+    self.trace[#self.trace+1] = node
+    if self.viewDepth > self.traceLimit then
+        local parts = {}
+        for _, n in ipairs(self.trace) do
+            parts[#parts+1] = string.format('%s(%s)', n.kind, tostring(n))
+        end
+        log.error('[Viewer] view recursion overflow: {}' % { table.concat(parts, ' -> ') })
+        self.trace[#self.trace] = nil
+        self.viewDepth = self.viewDepth - 1
+        self.visited[node] = (self.visited[node] or 0) - 1
+        if not skipDeep then
+            self.deep = self.deep - 1
+        end
+        self.skipLevel = self.skipLevel - skipLevel
+        return '...'
+    end
     local result = callback()
     self.visited[node] = self.visited[node] - 1
+    self.trace[#self.trace] = nil
+    self.viewDepth = self.viewDepth - 1
     if not skipDeep then
         self.deep = self.deep - 1
     end

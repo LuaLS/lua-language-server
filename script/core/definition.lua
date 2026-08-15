@@ -231,6 +231,25 @@ return function (uri, offset)
         return nil
     end
 
+    -- Drop a redundant function-value target when the owning assignment's name node is also a target.
+    -- Collapses `A.c = function() end` to a single definition at the name `c`.
+    local targetMark = {}
+    for _, res in ipairs(results) do
+        targetMark[res.target] = true
+    end
+    for i = #results, 1, -1 do
+        local target = results[i].target
+        if target.type == 'function' then
+            local parent = target.parent
+            if parent and guide.isAssign(parent) then
+                local owner = parent.field or parent.method or parent.index or parent.variable or parent
+                if targetMark[owner] then
+                    table.remove(results, i)
+                end
+            end
+        end
+    end
+
     sortResults(results)
     jumpSource(results)
 

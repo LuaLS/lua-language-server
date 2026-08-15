@@ -21,3 +21,15 @@ local t = X
 
 print(t.x.<?y?>)
 ]]
+
+TEST [[
+A = {}
+A.<!c!> = function() end
+A.<?c?>()
+]]
+
+TEST [[
+local A = {}
+A.<!c!> = function() end
+A.<?c?>()
+]]

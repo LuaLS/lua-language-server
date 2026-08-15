@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` `need-check-nil` diagnostic is no longer reported on safe navigation access (e.g. `x?.field`, `f?.()`, `t?.[key]`), since the optional access itself already handles the nil check. Note that a non-safe access chained after a safe one (e.g. `x.upper()?.field`) still reports, because the safe access only protects its own result.
+* `FIX` Go to definition on a table field assigned an anonymous function (e.g. `A.c = function() end`) now returns a single definition at the field name, instead of two candidates (the field name and the function value) [#2451](https://github.com/LuaLS/lua-language-server/issues/2451)
 
 ## 3.19.1
 `2026-08-14`

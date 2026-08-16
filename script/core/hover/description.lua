@@ -64,10 +64,11 @@ local function asStringView(source, literal)
     if  config.get(guide.getUri(source), 'Lua.hover.viewString')
     and (source[2] == '"' or source[2] == "'")
     and rawLen > #literal then
-        local view = literal
+        local view = util.escapeInvalidUtf8(literal)
         local max = config.get(guide.getUri(source), 'Lua.hover.viewStringMax')
         if #view > max then
-            view = view:sub(1, max) .. '...'
+            local nextCharacter = utf8.offset(view, 0, max + 1)
+            view = view:sub(1, nextCharacter - 1) .. '...'
         end
         local md = markdown()
         md:add('txt', view)
@@ -486,7 +487,7 @@ local function tryDocEnum(source)
                 if not key then
                     goto CONTINUE
                 end
-                keys[#keys+1] = ('%q'):format(key)
+                keys[#keys+1] = util.viewLiteral(key)
                 ::CONTINUE::
             end
         end
@@ -507,7 +508,8 @@ local function tryDocEnum(source)
                 end
                 if field.value.type == 'integer'
                 or field.value.type == 'string' then
-                    md:add('lua', ('    %s: %s = %q,'):format(key, field.value.type, field.value[1]))
+                    local value = util.viewLiteral(field.value[1])
+                    md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, value))
                 end
                 if field.value.type == 'binary'
                 or field.value.type == 'unary' then

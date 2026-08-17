@@ -35,7 +35,7 @@ function ls.feature.helper.organizeResultsByRange(results)
 end
 
 ---@param loc Node.Location
----@param source? { start: integer, finish: integer }
+---@param source? LuaParser.Node.Base
 ---@return Location
 function ls.feature.helper.convertLocation(loc, source)
     local location = {
@@ -44,6 +44,7 @@ function ls.feature.helper.convertLocation(loc, source)
     }
     if source then
         location.originRange = { source.start, source.finish }
+        location.originUri = source.ast.source
     end
     return location
 end

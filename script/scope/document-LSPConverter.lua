@@ -67,26 +67,32 @@ function M:location(rangeOrLocation)
 end
 
 ---@overload fun(self, location: Location): LSP.LocationLink
----@overload fun(self, targetRange: LSP.Range | Range, targetSelectionRange: LSP.Range | Range, originRange: LSP.Range | Range): LSP.LocationLink
-function M:locationLink(...)
-    -- fun(self, location: Location)
-    local location = ...
-    if location.uri then
-        ---@cast location Location
+---@overload fun(self, targetRange: LSP.Range | Range, targetSelectionRange: LSP.Range | Range, originRange: LSP.Range | Range, originUri?: Uri): LSP.LocationLink
+function M:locationLink(...args)
+    if #args == 1 then
+        ---@type Location
+        local location = args[1]
         assert(self.document.file.uri == location.uri)
-        return {
-            targetUri = location.uri,
-            targetRange = self:range(location.range),
-            targetSelectionRange = self:range(location.selectRange or location.range),
-            originSelectionRange = location.originRange and self:range(location.originRange) or nil,
-        }
+        return self:_locationLink(location.range, location.selectRange, location.originRange, location.originUri)
+    else
+        return self:_locationLink(args[1], args[2], args[3], args[4])
     end
-    -- fun(self, targetRange: LSP.Range | Range, targetSelectionRange: LSP.Range | Range, originRange: LSP.Range | Range)
-    local targetRange, targetSelectionRange, originRange = ...
-    return {
+end
+
+
+---@package
+function M:_locationLink(range, selectRange, originRange, originUri)
+    local link = {
         targetUri = self.document.file.uri,
-        targetRange = self:range(targetRange),
-        targetSelectionRange = self:range(targetSelectionRange),
-        originSelectionRange = self:range(originRange),
+        targetRange = self:range(range),
+        targetSelectionRange = self:range(selectRange or range),
     }
+
+    if originRange then
+        originUri = originUri or self.document.file.uri
+        local originDoc = self.document.scope?:getDocument(originUri)
+        link.originSelectionRange = originDoc?:makeLSPConverter(self.encoding):range(originRange)
+    end
+
+    return link
 end

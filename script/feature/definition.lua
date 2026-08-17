@@ -42,6 +42,84 @@ function ls.feature.provider.definition(callback, priority)
     end
 end
 
+--- 在类型节点上查找注册了 customDefinition 的 alias（递归处理 union）
+---@param node? Node
+---@return Node.Alias?
+local function findCustomDefinitionAlias(node)
+    if not node then
+        return nil
+    end
+    if node.kind == 'union' then
+        ---@cast node Node.Union
+        for _, v in ipairs(node.values) do
+            local alias = findCustomDefinitionAlias(v)
+            if alias then
+                return alias
+            end
+        end
+        return nil
+    end
+    if node.kind ~= 'type' then
+        return nil
+    end
+    ---@cast node Node.Type
+    if not node.aliases then
+        return nil
+    end
+    for _, alias in ipairs(node.aliases) do
+        if alias.customDefinition then
+            return alias
+        end
+    end
+    return nil
+end
+
+--- 查找节点的 custom definition alias：优先实际值，再兜底期望类型（rt.getExpectValue）
+---@param node Node?
+---@param source LuaParser.Node.Base?
+---@return Node.Alias?
+local function findCustomDefinitionAliasFromNode(node, source)
+    if not node then
+        return nil
+    end
+    local alias = findCustomDefinitionAlias(node.value)
+    if alias then
+        return alias
+    end
+    if source then
+        return findCustomDefinitionAlias(node.scope.rt:getExpectValue(source))
+    end
+    return nil
+end
+
+-- 自定义 alias 的跳转：光标在关联了 onDefinition 的 custom alias 上时，
+-- 追加 customDefinition 回调返回的位置。
+ls.feature.provider.definition(function (param, action)
+    local source = param.sources[1]
+    local node = param.vm:getVariable(source)
+             or param.vm:getNode(source)
+    local alias = findCustomDefinitionAliasFromNode(node, source)
+    if not alias then
+        return
+    end
+
+    local result = alias.customDefinition(alias, {
+        uri    = param.uri,
+        offset = param.offset,
+    }, source)
+    if not result then
+        return
+    end
+    if result.range then
+        ---@cast result Location
+        action.push(result)
+    else
+        for _, loc in ipairs(result) do
+            action.push(loc)
+        end
+    end
+end)
+
 -- 函数或表的位置
 ls.feature.provider.definition(function (param, action)
     local first = param.sources[1]
@@ -189,6 +267,7 @@ ls.feature.provider.definition(function (param, action)
     action.push {
         uri = label.ast.source,
         range = { label.name.start, label.name.finish },
+        originUri = source.ast.source,
         originRange = { source.name.start, source.name.finish },
     }
 end)

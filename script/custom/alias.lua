@@ -56,6 +56,21 @@ function M:onCompletion(callback)
     return self
 end
 
+--- 注册自定义跳转：当光标在类型为该 alias 的字符串/数字字面量上时调用。
+--- 回调返回跳转目标位置（可单个 Location 或 Location[]）。
+---@param callback fun(c: Custom.Context): Location | Location[] | nil
+---@return Custom.Alias
+function M:onDefinition(callback)
+    self.alias:setCustomDefinition(function (_, location, source)
+        local data = {}
+        data.location = location
+        data.source = source
+        local result = self.master:call(callback, data)
+        return result
+    end)
+    return self
+end
+
 ---@class Custom.Context.Define
 --- 定义期上下文：注册 alias 时构造 Node 并设置 alias。
 ---@field type fun(name: string): Node.Type

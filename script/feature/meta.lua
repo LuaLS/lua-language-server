@@ -7,6 +7,7 @@
 ---@class Location
 ---@field uri Uri
 ---@field range Range
+---@field originUri? Uri # originRange 所在文件
 ---@field originRange? Range
 ---@field selectRange? Range # 必须在 `range` 内部
 

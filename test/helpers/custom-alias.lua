@@ -61,6 +61,23 @@ local function setupModName(scope)
                     description = table.concat(lines, '\n'),
                 }
             end)
+            : onDefinition(function (c)
+                local src = c.source
+                if not src or src.kind ~= 'string' then
+                    return
+                end
+                ---@cast src LuaParser.Node.String
+                local uris = c.scope:searchFiles(src.value, c.location?.uri)
+                if #uris == 0 then
+                    return
+                end
+                return {
+                    uri = uris[1],
+                    range = { 0, 0 },
+                    originUri = c.location?.uri,
+                    originRange = { src.start, src.finish },
+                }
+            end)
             : onCompletion(function (c)
                 local src = c.source
                 if not src or src.kind ~= 'string' then

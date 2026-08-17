@@ -21,7 +21,12 @@ ls.capability.register('textDocument/definition', function (server, params, task
     local linkSupport = server.client.capabilities.textDocument?.definition?.linkSupport
     for _, res in ipairs(results) do
         if linkSupport then
-            locations[#locations+1] = sconverter:locationLink(res)
+            local link = sconverter:locationLink(res)
+            if link and res.originRange then
+                -- originRange 位于请求文件中，需用请求文件的 converter 转换
+                link.originSelectionRange = dconverter:range(res.originRange)
+            end
+            locations[#locations+1] = link
         else
             locations[#locations+1] = sconverter:location(res)
         end

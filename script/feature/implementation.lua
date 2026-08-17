@@ -68,6 +68,7 @@ ls.feature.provider.implementation(function (param, action)
     action.push {
         uri = loc.ast.source,
         range = { loc.start, loc.finish },
+        originUri = first.ast.source,
         originRange = originRange,
     }
 
@@ -76,6 +77,7 @@ ls.feature.provider.implementation(function (param, action)
             action.push {
                 uri = ref.ast.source,
                 range = { ref.start, ref.finish },
+                originUri = first.ast.source,
                 originRange = originRange,
             }
         end

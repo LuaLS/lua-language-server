@@ -88,6 +88,18 @@ function M:setCustomCompletion(callback)
     return self
 end
 
+---@alias Node.Alias.CustomDefinition fun(self: Node.Alias, location?: Node.Location, source?: LuaParser.Node.Base): Location | Location[] | nil
+
+---@type Node.Alias.CustomDefinition?
+M.customDefinition = nil
+
+---@param callback Node.Alias.CustomDefinition
+---@return Node.Alias
+function M:setCustomDefinition(callback)
+    self.customDefinition = callback
+    return self
+end
+
 ---@param args Node[]
 ---@param location? Node.Location
 ---@return Node

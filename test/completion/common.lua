@@ -3880,6 +3880,24 @@ f(<??>)
 }
 
 TEST [[
+---@enum(key) Enum
+local t = {
+    ["\xC2"] = 1,
+}
+
+---@param p Enum
+local function f(p) end
+
+f(<??>)
+]]
+{
+    {
+        label    = '"\\194"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
 ---@class optional
 ---@field enum enum
 

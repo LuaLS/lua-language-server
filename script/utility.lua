@@ -469,7 +469,10 @@ local esc = {
     ['\n'] = '\\\n',
 }
 
-local function escapeInvalidUtf8(str)
+function m.escapeInvalidUtf8(str)
+    if utf8Len(str) then
+        return str
+    end
     local result = {}
     local start = 1
     while true do
@@ -486,9 +489,7 @@ local function escapeInvalidUtf8(str)
 end
 
 function m.viewString(str, quo)
-    if not utf8Len(str) then
-        str = escapeInvalidUtf8(str)
-    end
+    str = m.escapeInvalidUtf8(str)
     if not quo then
         if str:find('[\r\n]') then
             quo = '[['

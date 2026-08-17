@@ -15,10 +15,12 @@ require 'feature.text-scanner'
 ---@field inLuaDoc boolean  # 光标所在行是否为 LuaCats 文档注释行（以 `---` 开头）
 ---@field inString boolean
 
+---@async
 ---@param uri Uri
 ---@param offset integer  # 字节偏移量（0-based）
 ---@return CompletionItem[]
 ls.feature.completion = function (uri, offset)
+    ls.scope.waitIndexing(uri)
     if not offset then
         return {}
     end

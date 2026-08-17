@@ -91,8 +91,8 @@ ls.feature.provider.completion(function (param, action)
     local editStartOffset = textOffset - #word
     local editFinishOffset = textOffset
     if word == '' and (inSingleQuote or inDoubleQuote) then
-        editStartOffset = textOffset - 1
-        editFinishOffset = textOffset + 1
+        editStartOffset = textOffset
+        editFinishOffset = textOffset
     end
     local editStart = util.toDisplayOffset(param, editStartOffset)
     local editFinish = util.toDisplayOffset(param, editFinishOffset)

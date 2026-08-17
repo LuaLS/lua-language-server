@@ -212,11 +212,16 @@ ls.vm.registerCoderProvider('call', function (coder, source)
     for i, arg in ipairs(source.args) do
         coder:compile(arg)
         args[i] = coder:getKey(arg)
+        -- 方法调用（obj:method(...)）隐含 self 参数，签名参数下标 +1
+        local index = i
+        if source.node and source.node.subtype == 'method' then
+            index = i + 1
+        end
         -- 参数节点关联到 paramOf(func, index)，供 getExpectValue 反推签名类型
         coder:addLine('{key}:setExpectParent(rt.paramOf({func}, {index}))' % {
             key   = coder:getKey(arg),
             func  = func,
-            index = i,
+            index = index,
         })
     end
     coder:addLine('{key} = rt.fcall({func}, { {args} })' % {

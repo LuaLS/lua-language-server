@@ -118,10 +118,12 @@ function M:compileAssign(var, index, valueKey, isTable)
         fieldKey = fieldKey,
     })
     -- 值节点关联到所属变量，供 getExpectValue 反推
-    self:addLine('{valueKey}:setExpectParent({varKey})' % {
-        valueKey = valueKey,
-        varKey   = self:getKey(var),
-    })
+    if catKey then
+        self:addLine('{valueKey}:setExpectParent({varKey})' % {
+            valueKey = valueKey,
+            varKey   = self:getKey(var),
+        })
+    end
 
     if not isTable then
         self:addLine('{varKey}:setStaticValue({valueKey})' % {

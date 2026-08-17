@@ -55,8 +55,7 @@ local function setupModName(scope)
                 local lines = {}
                 for i, uri in ipairs(uris) do
                     local path = c.scope:getRelativePath(uri) or uri
-                    local searcher = (searchers[i] or ''):gsub('^[/\\]+', '')
-                    lines[#lines+1] = '* [{}]({}) （搜索路径：`{}`）' % { path, uri, searcher }
+                    lines[#lines+1] = '* [{}]({}) （搜索路径：`{}`）' % { path, uri, searchers[i] }
                 end
                 return {
                     description = table.concat(lines, '\n'),
@@ -72,11 +71,10 @@ local function setupModName(scope)
                 local results = {}
                 for _, item in ipairs(items) do
                     local path = c.scope:getRelativePath(item.uri) or item.uri
-                    local searcher = (item.searcher or ''):gsub('^[/\\]+', '')
                     results[#results+1] = {
                         label       = item.name,
                         detail      = path,
-                        description = '* [{}]({}) （搜索路径：`{}`）' % { path, item.uri, searcher },
+                        description = '* [{}]({}) （搜索路径：`{}`）' % { path, item.uri, item.searcher },
                         kind        = c.kind.Module,
                     }
                 end

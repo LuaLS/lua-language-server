@@ -175,3 +175,82 @@ function M:findGlobalVariableFields(key, ...)
     end
     return fields
 end
+
+--- 根据 AST 节点反推期望类型：函数参数（paramOf）或赋值变量（variable）。
+--- 按位置从 source 的父上下文反推，不经过共享 value 节点的 expectParent。
+---@param source LuaParser.Node.Base
+---@return Node?
+function M:getExpectValue(source)
+    local s = source
+    while s.kind == 'paren' do
+        ---@cast s LuaParser.Node.Paren
+        s = s.value:trim()
+    end
+    local parent = s.parent
+    if not parent then
+        return nil
+    end
+    if parent.kind == 'call' then
+        ---@cast parent LuaParser.Node.Call
+        local funcNode = self.scope.vm:getVariable(parent.node)
+                     or self.scope.vm:getNode(parent.node)
+        if not funcNode then
+            return nil
+        end
+        local index
+        for i, arg in ipairs(parent.args) do
+            if arg == s then
+                index = i
+                break
+            end
+        end
+        if not index then
+            return nil
+        end
+        if parent.node and parent.node.subtype == 'method' then
+            index = index + 1
+        end
+        return self.paramOf(funcNode, index):getExpectValue()
+    elseif parent.kind == 'localdef' then
+        ---@cast parent LuaParser.Node.LocalDef
+        if not parent.values then
+            return nil
+        end
+        local index
+        for i, value in ipairs(parent.values) do
+            if value == s then
+                index = i
+                break
+            end
+        end
+        if not index or not parent.vars[index] then
+            return nil
+        end
+        local varNode = self.scope.vm:getVariable(parent.vars[index])
+        if not varNode then
+            return nil
+        end
+        return varNode:getExpectValue()
+    elseif parent.kind == 'assign' then
+        ---@cast parent LuaParser.Node.Assign
+        if not parent.values then
+            return nil
+        end
+        local index
+        for i, value in ipairs(parent.values) do
+            if value == s then
+                index = i
+                break
+            end
+        end
+        if not index or not parent.exps[index] then
+            return nil
+        end
+        local varNode = self.scope.vm:getVariable(parent.exps[index])
+        if not varNode then
+            return nil
+        end
+        return varNode:getExpectValue()
+    end
+    return nil
+end

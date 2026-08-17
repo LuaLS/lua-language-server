@@ -41,7 +41,7 @@ local function isEmptyRhsCompletionPosition(param)
 end
 
 ls.feature.provider.completion(function (param, action)
-    if param.inComment or param.inLuaDoc then
+    if param.inComment or param.inLuaDoc or param.inString then
         return
     end
 
@@ -71,7 +71,7 @@ ls.feature.provider.completion(function (param, action)
 end)
 
 ls.feature.provider.completion(function (param, action)
-    if param.inComment or param.inLuaDoc then
+    if param.inComment or param.inLuaDoc or param.inString then
         return
     end
 
@@ -169,7 +169,7 @@ ls.feature.provider.completion(function (param, action)
 end)
 
 ls.feature.provider.completion(function (param, action)
-    if param.inComment or param.inLuaDoc then
+    if param.inComment or param.inLuaDoc or param.inString then
         return
     end
 

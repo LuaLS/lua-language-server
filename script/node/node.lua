@@ -157,15 +157,6 @@ function M:setExpectParent(parent)
     self.expectParent = parent
 end
 
---- 若节点通过 expectParent 关联到赋值变量或函数参数，反推返回期望类型；否则 nil
----@return Node?
-function M:getExpectValue()
-    if self.expectParent then
-        return self.expectParent:getExpectValue()
-    end
-    return nil
-end
-
 ---@param key1 Node.Key
 ---@param key2? Node.Key
 ---@param ... Node.Key

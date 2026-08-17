@@ -34,10 +34,11 @@ local function findCustomCompletionAlias(node)
     return nil
 end
 
---- 查找节点的 custom completion alias：优先实际值，再兜底期望类型（getExpectValue）
+--- 查找节点的 custom completion alias：优先实际值，再兜底期望类型（rt.getExpectValue）
 ---@param node Node?
+---@param source LuaParser.Node.Base?
 ---@return Node.Alias?
-local function findCustomCompletionAliasFromNode(node)
+local function findCustomCompletionAliasFromNode(node, source)
     if not node then
         return nil
     end
@@ -45,7 +46,10 @@ local function findCustomCompletionAliasFromNode(node)
     if alias then
         return alias
     end
-    return findCustomCompletionAlias(node:getExpectValue())
+    if source then
+        return findCustomCompletionAlias(node.scope.rt:getExpectValue(source))
+    end
+    return nil
 end
 
 ls.feature.provider.completion(function (param, action)
@@ -64,7 +68,7 @@ ls.feature.provider.completion(function (param, action)
     if not node then
         return
     end
-    local alias = findCustomCompletionAliasFromNode(node)
+    local alias = findCustomCompletionAliasFromNode(node, source)
     if not alias then
         return
     end

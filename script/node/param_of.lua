@@ -102,15 +102,12 @@ function M:eachFunc(callback)
     end
 end
 
---- 返回参数声明的期望类型（泛型约束或直接声明类型）；无注解返回 nil
+--- 返回参数声明的期望类型（泛型约束或直接声明类型，多个重载取并集）；无注解返回 nil
 ---@return Node?
 function M:getExpectValue()
     local result
     ---@param func Node.Function
     self:eachFunc(function (func)
-        if result then
-            return
-        end
         local pd = func.paramsDef and func.paramsDef[self.index]
         if not pd or not pd.value then
             return
@@ -129,7 +126,11 @@ function M:getExpectValue()
             if t.kind == 'type' and t.typeName == 'any' then
                 return
             end
-            result = t
+            if result then
+                result = result | t
+            else
+                result = t
+            end
         end
     end)
     return result

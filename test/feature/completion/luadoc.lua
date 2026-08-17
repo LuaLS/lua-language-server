@@ -893,7 +893,7 @@ TEST_COMPLETION [[
 ---@type Foo
 local foo
 foo = {"<??>"}
-]] (EXISTS)
+]] (nil)
 
 TEST_COMPLETION [[
 ---@class c

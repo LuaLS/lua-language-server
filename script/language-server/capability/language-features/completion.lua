@@ -3,7 +3,7 @@ ls.capability.registerCapability.completionProvider = {
     completionItem = {
         labelDetailsSupport = true,
     },
-    triggerCharacters = { '.', ':', ' ', '=', },
+    triggerCharacters = { '.', ':', ' ', '=', "'", '"', },
 }
 
 ---@async

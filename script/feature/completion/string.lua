@@ -1266,11 +1266,7 @@ ls.feature.provider.completion(function (param, action)
         return
     end
     ---@cast source LuaParser.Node.String
-    local node = param.scope.vm:getVariable(source) or param.scope.vm:getNode(source)
-    if not node then
-        return
-    end
-    local enums = collectEnumLiteralsFromNode(node:getExpectValue())
+    local enums = collectEnumLiteralsFromNode(param.scope.rt:getExpectValue(source))
     if #enums == 0 then
         return
     end

@@ -33,10 +33,11 @@ local function findCustomHoverAlias(node)
     return nil
 end
 
---- 查找节点的 custom hover alias：优先实际值，再兜底期望类型（getExpectValue）
+--- 查找节点的 custom hover alias：优先实际值，再兜底期望类型（rt.getExpectValue）
 ---@param node Node?
+---@param source LuaParser.Node.Base?
 ---@return Node.Alias?
-local function findCustomHoverAliasFromNode(node)
+local function findCustomHoverAliasFromNode(node, source)
     if not node then
         return nil
     end
@@ -44,7 +45,10 @@ local function findCustomHoverAliasFromNode(node)
     if alias then
         return alias
     end
-    return findCustomHoverAlias(node:getExpectValue())
+    if source then
+        return findCustomHoverAlias(node.scope.rt:getExpectValue(source))
+    end
+    return nil
 end
 
 ls.feature.provider.hover(function (param, action)
@@ -53,7 +57,7 @@ ls.feature.provider.hover(function (param, action)
     -- 变量名取 variable 本身，其它表达式取值节点（经 expectParent 反推期望类型）
     local node = param.vm:getVariable(source)
              or param.vm:getNode(source)
-    local alias = findCustomHoverAliasFromNode(node)
+    local alias = findCustomHoverAliasFromNode(node, source)
     if not alias then
         return
     end

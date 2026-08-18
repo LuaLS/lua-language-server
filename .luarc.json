@@ -30,7 +30,13 @@
         "pathStrict": true,
         "special": {
             "test.require": "require"
-        }
+        },
+        "nonstandardSymbol": [
+            "?.",
+            "?:",
+            "?(",
+            "?["
+        ]
     },
     "workspace": {
         "maxPreload": 1600,

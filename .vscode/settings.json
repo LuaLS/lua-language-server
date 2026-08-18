@@ -12,10 +12,4 @@
         "filesystem": "cpp",
         "system_error": "cpp"
     },
-    "Lua.runtime.nonstandardSymbol": [
-        "?.",
-        "?:",
-        "?(",
-        "?["
-    ],
 }

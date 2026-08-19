@@ -1,6 +1,9 @@
 ---@type Coder?
 TEST_CODER = nil
 
+---@type VM.Vfile?
+TEST_VFILE = nil
+
 ---@param code string
 ---@return function
 function TEST_INDEX(code)
@@ -12,6 +15,7 @@ function TEST_INDEX(code)
 
     vfile:index()
     TEST_CODER = vfile.coder
+    TEST_VFILE = vfile
 
     return function ()
         if dispose then

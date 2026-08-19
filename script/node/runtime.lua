@@ -378,24 +378,24 @@ function M:fillPresets()
         : addField(self.field(self.ANY, self.ANY):setHideInView())
 
     self.ANY:addClass(anykv)
-    self.ANY.truly = self.TRULY
-    self.ANY.falsy = self.FALSY
+    class.preset(self.ANY, 'truly', self.TRULY)
+    class.preset(self.ANY, 'falsy', self.FALSY)
 
 
     self.UNKNOWN:addClass(anykv)
-    self.UNKNOWN.truly = self.TRULY
-    self.UNKNOWN.falsy = self.FALSE
+    class.preset(self.UNKNOWN, 'truly', self.TRULY)
+    class.preset(self.UNKNOWN, 'falsy', self.FALSE)
 
     self.TRULY:addClass(anykv)
 
-    self.NIL.truly = self.NEVER
-    self.NIL.falsy = self.NIL
+    class.preset(self.NIL, 'truly', self.NEVER)
+    class.preset(self.NIL, 'falsy', self.NIL)
 
-    self.BOOLEAN.truly = self.TRUE
-    self.BOOLEAN.falsy = self.FALSE
+    class.preset(self.BOOLEAN, 'truly', self.TRUE)
+    class.preset(self.BOOLEAN, 'falsy', self.FALSE)
 
-    self.FALSE.truly = self.NEVER
-    self.FALSE.falsy = self.FALSE
+    class.preset(self.FALSE, 'truly', self.NEVER)
+    class.preset(self.FALSE, 'falsy', self.FALSE)
 
     do
         local K = self.generic('K', self.ANY, self.ANY)

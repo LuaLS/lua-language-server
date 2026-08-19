@@ -46,8 +46,14 @@ M._errorHandler = error
 ---@field package __name string
 ---@field public  __getter table
 ---@field public  __setter table
+---@field package __getterKeys? any[]
+---@field package __preset__?  table<any, true>
+---@field package __keyMap?    table<any, integer>
+---@field package __keyMapRev? table<integer, any>
+---@field package __buildKeyMap? fun()
 ---@field public  __super  Class.Base
 ---@field package __config Class.Config
+---@field package __class__? string
 
 ---@class Class.Config
 ---@field package name         string
@@ -85,6 +91,37 @@ function M.getConfig(name)
     return M._classConfig[name]
 end
 
+--- 取字段的实际存储键（压缩字段为整数槽位）
+---@param class Class.Base
+---@param key any
+---@return any
+local function storageKey(class, key)
+    local config = class.__config
+    if #config:getCompress() == 0 then
+        return key
+    end
+    if class.__buildKeyMap then
+        class.__buildKeyMap()
+    end
+    return class.__keyMap and class.__keyMap[key] or key
+end
+
+--- 取（并缓存）类上所有 getter 字段的存储键
+---@param class Class.Base
+---@return any[]
+local function getterKeys(class)
+    local keys = class.__getterKeys
+    if keys then
+        return keys
+    end
+    keys = {}
+    for k in pairs(class.__getter) do
+        keys[#keys+1] = storageKey(class, k)
+    end
+    class.__getterKeys = keys
+    return keys
+end
+
 -- 定义一个类
 ---@generic T: string
 ---@generic Super: string
@@ -104,10 +141,10 @@ function M.declare(name, super, superInit)
     local setter = {}
     local keyMap
     local keyMapRev -- integer slot -> 原始 key，仅用于 __pairs
-    class.__name   = name
-    class.__getter = getter
-    class.__setter = setter
-    class.__config = config
+    class.__name        = name
+    class.__getter      = getter
+    class.__setter      = setter
+    class.__config      = config
 
     local function buildKeyMap()
         if keyMap then
@@ -123,8 +160,18 @@ function M.declare(name, super, superInit)
             t[k] = false
             return false
         end })
+        class.__keyMap    = keyMap
+        class.__keyMapRev = keyMapRev
     end
+    class.__buildKeyMap = buildKeyMap
 
+    -- __getter[k] 函数返回值约定：
+    --   res       : 计算得到的值
+    --   needCache : 是否把结果缓存到实例
+    -- 任何写入实例的值（getter 缓存、外部赋值）都可被 flush 清理；
+    -- 只有 class.preset 写入的值与类默认值不会被清理。
+
+    ---to AI: Lua 的 __index 功能已经保证字段只有在非nil时才会调用到getter
     ---@param self any
     ---@param k any
     ---@return any
@@ -137,41 +184,39 @@ function M.declare(name, super, superInit)
             end
         end
         local r = class[k]
-        if r == nil then
-            local f = getter[k]
-            if f then
-                local res, needCache = f(self)
-                if needCache then
-                    rawset(self, ik or k, res)
-                end
-                return res
-            else
-                return nil
-            end
-        else
+        if r ~= nil then
             return r
         end
+        local f = getter[k]
+        if not f then
+            return nil
+        end
+        local wk = ik or k
+        local res, needCache = f(self)
+        if needCache then
+            rawset(self, wk, res)
+        end
+        return res
     end
 
+    ---to AI: Lua 的 __index 功能已经保证字段只有在非nil时才会调用到getter
     ---@param self any
     ---@param k any
     ---@return any
     local function getterFunc(self, k)
         local r = class[k]
-        if r == nil then
-            local f = getter[k]
-            if f then
-                local res, needCache = f(self)
-                if needCache then
-                    rawset(self, k, res)
-                end
-                return res
-            else
-                return nil
-            end
-        else
+        if r ~= nil then
             return r
         end
+        local f = getter[k]
+        if not f then
+            return nil
+        end
+        local res, needCache = f(self)
+        if needCache then
+            rawset(self, k, res)
+        end
+        return res
     end
 
     ---@param self any
@@ -226,6 +271,9 @@ function M.declare(name, super, superInit)
     config.resetTrap = function ()
         keyMap = nil
         keyMapRev = nil
+        class.__keyMap    = nil
+        class.__keyMapRev = nil
+        class.__getterKeys = nil
 
         function mt:__index(k)
             config:init()
@@ -795,13 +843,50 @@ function M.isInstanceOf(obj, targetName)
     return isInstanceMap[myName][targetName]
 end
 
---- 清理一个对象的缓存数据（对应 `__getter` 的字段）
+--- 清理一个对象的临时缓存。
+--- 所有 getter 字段上的值都会被清空，下次访问时重新计算。
+--- `class.preset` 写入的值与类默认值不会被清理。
 ---@param obj Class.Base
 function M.flush(obj)
-    local getter = obj.__getter
-    for k in pairs(getter) do
-        obj[k] = nil
+    local class = getmetatable(obj)
+    if not class or not class.__getter then
+        return
     end
+    ---@cast class Class.Base
+    local keys = getterKeys(class)
+    local presets = rawget(obj, '__preset__')
+    if presets then
+        for i = 1, #keys do
+            local wk = keys[i]
+            if not presets[wk] then
+                rawset(obj, wk, nil)
+            end
+        end
+    else
+        for i = 1, #keys do
+            rawset(obj, keys[i], nil)
+        end
+    end
+end
+
+--- 写入一个固定值：该字段不会被 `flush` 清理，getter 也不会再被调用。
+--- 用于给个别实例预置答案（如常量节点的固定推导结果）。
+---@param obj Class.Base
+---@param key any # 字段名
+---@param value any
+function M.preset(obj, key, value)
+    obj[key] = value
+    local class = getmetatable(obj)
+    if not class or not class.__getter then
+        return
+    end
+    ---@cast class Class.Base
+    local presets = rawget(obj, '__preset__')
+    if not presets then
+        presets = {}
+        rawset(obj, '__preset__', presets)
+    end
+    presets[storageKey(class, key)] = true
 end
 
 --- 为类启用字段压缩：将指定的 string key 映射到整数槽位，

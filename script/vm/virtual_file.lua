@@ -225,6 +225,33 @@ function M:getMainReturn()
     return main:getReturn(1)
 end
 
+--- 调试用：遍历本文件 coder.map 中所有节点，打印其 key/kind/view（带 pcall 保护）。
+--- 便于排查节点缓存/推导异常。
+---@param filter? string  # 可选，仅打印 key 包含该子串的节点
+function M:dumpNodes(filter)
+    if not self.coder or not self.coder.map then
+        print('[dumpNodes] 无 coder.map')
+        return
+    end
+    local r = self.coder.map
+    local keys = {}
+    for k in pairs(r) do
+        keys[#keys+1] = k
+    end
+    table.sort(keys)
+    print('[dumpNodes] ===== begin (' .. tostring(#keys) .. ' nodes) =====')
+    for _, k in ipairs(keys) do
+        if not filter or k:find(filter, 1, true) then
+            local node = r[k]
+            local ok, v = pcall(function ()
+                return node:view()
+            end)
+            print(('[dumpNodes] %-42s kind=%s view=%s'):format(k, tostring(node.kind), ok and v or 'ERR'))
+        end
+    end
+    print('[dumpNodes] ===== end =====')
+end
+
 function M:remove()
     Delete(self)
 end

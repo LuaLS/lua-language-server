@@ -320,7 +320,7 @@ M.parentExpectValue = nil
 ---@return true?
 M.__getter.parentExpectValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.parentExpectValue
+        return self.masterVariable.parentExpectValue, true
     end
     local parent = self.parent
     if not parent then
@@ -342,7 +342,7 @@ M.parentFieldValue = nil
 ---@return true?
 M.__getter.parentFieldValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.parentFieldValue
+        return self.masterVariable.parentFieldValue, true
     end
     local parent = self.parent
     if not parent or parent.kind ~= 'variable' then
@@ -658,10 +658,12 @@ function M:getCurrentValue()
     return node
 end
 
--- 收窄临时值（Tracer 写入，注册 getter 使其随 class.flush 失效）
+-- 收窄临时值（Tracer 写入，随 class.flush 失效）
 ---@type Node?
 M.currentValue = nil
 
+---@return Node?
+---@return boolean
 M.__getter.currentValue = function (self)
     return nil, true
 end
@@ -813,7 +815,7 @@ M.equivalentValue = nil
 ---@return true?
 M.__getter.equivalentValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.equivalentValue
+        return self.masterVariable.equivalentValue, true
     end
     local rt = self.scope.rt
     ---@type Node[]

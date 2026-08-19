@@ -192,6 +192,16 @@ ls.vm.registerCoderProvider('catstatereturn', function (coder, source)
     coder:addToCatGroup(source.parent, true)
 end)
 
+ls.vm.registerCoderProvider('catstatenarrow', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateNarrow
+
+    if source.type then
+        coder:compile(source.type)
+    end
+
+    coder:addToCatGroup(source.parent, true)
+end)
+
 ls.vm.registerCoderProvider('catstatealias', function (coder, source)
     ---@cast source LuaParser.Node.CatStateAlias
 

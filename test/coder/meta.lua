@@ -101,3 +101,33 @@ do
 
     lt.assertEquals(rt:globalGet('type').value:view(), 'fun(o: table):string')
 end
+
+do
+    TEST_INDEX [[
+        ---@param v any
+        ---@narrow v
+        function assert(v) end
+    ]]
+
+    local f = rt:globalGet('assert').value
+    ---@cast f Node.Function
+    local defs = f:getNarrowDefs()
+    lt.assertEquals(#defs, 1)
+    lt.assertEquals(defs[1].param, 'v')
+    lt.assertEquals(defs[1].type, nil)
+end
+
+do
+    TEST_INDEX [[
+        ---@param v any
+        ---@narrow v string
+        function assertString(v) end
+    ]]
+
+    local f = rt:globalGet('assertString').value
+    ---@cast f Node.Function
+    local defs = f:getNarrowDefs()
+    lt.assertEquals(#defs, 1)
+    lt.assertEquals(defs[1].param, 'v')
+    lt.assertEquals(defs[1].type:view(), 'string')
+end

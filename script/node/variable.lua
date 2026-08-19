@@ -832,6 +832,13 @@ M.__getter.equivalentValue = function (self)
                 for assign in equivalent:eachAssign() do
                     ---@cast assign Node.Field
                     if assign.value then
+                        if assign.value.kind == 'variable' then
+                            local av = assign.value
+                            ---@cast av Node.Variable
+                            if av.tracer then
+                                av.tracer:trace()
+                            end
+                        end
                         results[#results+1] = assign.value
                     end
                 end

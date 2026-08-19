@@ -155,6 +155,21 @@ ls.vm.registerCoderProvider('function', function (coder, source)
             end, 'function returns --')
         end
 
+        ---@type LuaParser.Node.CatStateNarrow[]?
+        local narrows = coder:findNearedCats(source, 'catstatenarrow')
+        if narrows then
+            coder:withIndentation(function ()
+                for _, cat in ipairs(narrows) do
+                    coder:addLine('-- ' .. cat.code)
+                    coder:addLine('{funcKey}:addNarrowDef({paramKey%q}, {narrowType})' % {
+                        funcKey    = funcKey,
+                        paramKey   = cat.key.id,
+                        narrowType = cat.type and coder:getKey(cat.type) or 'nil',
+                    })
+                end
+            end, 'function narrows --')
+        end
+
         if #source.childs > 0 then
             coder:withIndentation(function ()
                 coder:pushBlock()

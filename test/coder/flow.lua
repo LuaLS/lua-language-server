@@ -991,3 +991,19 @@ do
     end
     ]]
 end
+
+do
+    local _ <close> = TEST_INDEX [[
+    --!include assert
+
+    ---@type string?
+    local v
+
+    assert(v)
+
+    A1 = v
+    ]]
+
+    local A1 = rt:globalGet('A1')
+    lt.assertEquals(A1.value:view(), 'string')
+end

@@ -17,6 +17,17 @@ test.includeCodes['require'] = [[
 function require(modname) end
 ]]
 
+test.includeCodes['assert'] = [[
+---@generic T
+---@param v? T
+---@param message? any
+---@param ... any
+---@return T
+---@return any ...
+---@narrow v
+function assert(v, message, ...) end
+]]
+
 test.includeCodes['binary'] = [[
 ---@alias op.add<A: any, B: any> number
 ---@alias op.add<A: integer, B: integer> integer

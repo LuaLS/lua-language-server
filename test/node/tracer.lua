@@ -780,3 +780,169 @@ do
     lt.assertEquals(r['x2']:view(), '1 | 2')
     lt.assertEquals(r['x0']:view(), '1 | 2')
 end
+
+do
+    --[[
+    ---@type string?
+    local x
+    assert(x)
+    x
+    ]]
+    -- 语句级 assert 调用后，x 收窄为 truthy（去掉 nil）
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local tracer = rt.tracer(r, p)
+
+    r['assert'] = rt.func():addParamDef('v', rt.ANY, true):addNarrowDef('v', nil)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.STRING | rt.NIL)
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'ref', 'x', 'x1' },
+        { 'call', 'call1', 'assert', { 'x1' } },
+        { 'ref', 'x', 'x2' },
+    }
+
+    lt.assertEquals(r['x0']:view(), 'string | nil')
+    lt.assertEquals(r['x1']:view(), 'string | nil')
+    lt.assertEquals(r['x2']:view(), 'string')
+end
+
+do
+    --[[
+    ---@type A | B
+    local x
+    assertIsType(x)
+    x
+    ]]
+    -- narrow 注解带类型：调用后 x 收窄为指定类型 A
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local A = rt.class('A')
+        : addField(rt.field('a', rt.value(1)))
+    local B = rt.class('B')
+        : addField(rt.field('b', rt.value(2)))
+
+    local tracer = rt.tracer(r, p)
+
+    r['assertType'] = rt.func():addParamDef('v', rt.ANY, true):addNarrowDef('v', rt.type 'A')
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.type 'A' | rt.type 'B')
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'ref', 'x', 'x1' },
+        { 'call', 'call2', 'assertType', { 'x1' } },
+        { 'ref', 'x', 'x2' },
+    }
+
+    lt.assertEquals(r['x0']:view(), 'A | B')
+    lt.assertEquals(r['x1']:view(), 'A | B')
+    lt.assertEquals(r['x2']:view(), 'A')
+end
+
+do
+    --[[
+    ---@class A
+    ---@field a string?
+
+    ---@type A
+    local x
+    assert(x.a)
+    x.a
+    ]]
+    -- 嵌套字段窄化：语句级 assert 调用后，x.a 收窄为 truthy（去掉 nil）。
+    -- 字段子变量共享 master，顺序持久收窄后该 child 后续读取均收窄。
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local A = rt.class('A')
+        : addField(rt.field('a', rt.STRING | rt.NIL))
+
+    local tracer = rt.tracer(r, p)
+
+    r['assert'] = rt.func():addParamDef('v', rt.ANY, true):addNarrowDef('v', nil)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.type 'A')
+
+    r['x.a'] = r['x0']:getChild('a')
+    r['x.a']:setTracer(tracer)
+
+    p['x.a'] = { 'x', 'a' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'ref', 'x.a', 'x.a' },
+        { 'call', 'call1', 'assert', { 'x.a' } },
+        { 'ref', 'x.a', 'x.a' },
+    }
+
+    lt.assertEquals(r['x0']:view(), 'A')
+    lt.assertEquals(r['x.a']:view(), 'string')
+end
+
+do
+    --[[
+    ---@type string?
+    local v
+
+    assert(v)
+
+    g = v
+    ]]
+    -- 全局变量引用窄化：assert(v) 收窄 v 后，g = v 的全局值应收窄。
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local tracer = rt.tracer(r, p)
+
+    r['assert'] = rt.func():addParamDef('v', rt.ANY, true):addNarrowDef('v', nil)
+
+    r['v0'] = rt.variable 'v'
+    r['v0']:addType(rt.STRING | rt.NIL)
+
+    r['v1'] = r['v0']:shadow()
+    r['v1']:setTracer(tracer)
+
+    r['g0'] = rt.variable 'g'
+    r['g1'] = r['g0']:shadow()
+    r['g1']:addAssign(rt.field('g', r['v1']))
+    r['g1']:setStaticValue(r['v1'])
+
+    p['g'] = { 'g' }
+
+    tracer:setFlow {
+        { 'var', 'v', 'v0' },
+        { 'ref', 'v', 'v1' },
+        { 'call', 'call1', 'assert', { 'v1' } },
+        { 'ref', 'v', 'v1' },
+    }
+
+    lt.assertEquals(r['v1']:view(), 'string')
+    lt.assertEquals(r['g1']:view(), 'string')
+    lt.assertEquals(r['g0']:view(), 'string')
+end

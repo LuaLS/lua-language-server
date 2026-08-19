@@ -42,6 +42,8 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 > 注：已搁置方向的调研结论见 [tree-sitter 预研记录](./references/tree-sitter-pre-research.md)（已暂停，重启前先读该文档第 5 节与第 8 节）。
 >
 > 注：已知问题见 [known-issues](./references/known-issues.md)。
+>
+> 注：assert 签名注解收窄规划见 [assert-narrow-plan](./references/assert-narrow-plan.md)。
 
 ## 快速路由
 - 改 parser 或语法：先看 [architecture](./references/architecture.md) 和 `script/parser/`。

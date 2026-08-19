@@ -34,6 +34,9 @@ function M:__init(scope)
 
     ---@type Node.List[]
     self.returnList = {}
+
+    ---@type { param: string, type: Node? }[]
+    self.narrowDefs = {}
 end
 
 function M:setAsync()
@@ -230,6 +233,19 @@ function M:addVarargParamDef(value, name)
     return self
 end
 
+---@param key string
+---@param value? Node
+---@return Node.Function
+function M:addNarrowDef(key, value)
+    self.narrowDefs[#self.narrowDefs + 1] = { param = key, type = value }
+    return self
+end
+
+---@return { param: string, type: Node? }[]
+function M:getNarrowDefs()
+    return self.narrowDefs
+end
+
 ---@param index integer
 ---@return Node?
 function M:getParam(index)
@@ -344,6 +360,13 @@ function M:resolveGeneric(map, ctx)
         local newList = list:resolveGeneric(map, ctx)
         ---@cast newList Node.List
         newFunc.returnList[i] = newList
+    end
+    for _, entry in ipairs(self.narrowDefs) do
+        local newEntry = { param = entry.param, type = entry.type }
+        if entry.type and entry.type.hasGeneric then
+            newEntry.type = entry.type:resolveGeneric(map, ctx)
+        end
+        newFunc.narrowDefs[#newFunc.narrowDefs + 1] = newEntry
     end
     return newFunc
 end

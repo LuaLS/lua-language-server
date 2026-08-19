@@ -60,7 +60,6 @@ function W:start(block)
     self:pushStack()
     self:traceBlock(block)
 end
-
 function W:pushStack()
     local stack = New 'Node.Tracer.Stack' (self:currentStack())
     self.stacks[#self.stacks+1] = stack
@@ -239,6 +238,10 @@ function W:traceUnit(unit)
                 self:traceUnit(inner)
             end
         end
+        return
+    end
+    if tag == 'call' then
+        self:traceCallNarrow(unit, false)
         return
     end
 end
@@ -604,6 +607,135 @@ function W:traceCallTruly(exp, revert)
             end
         end
         ::continue::
+    end
+end
+
+--- 语句级调用：根据函数签名注解 narrow 收窄对应实参
+--- call entry: {'call', callAlias, funcAlias, {arg1Alias, ...}}
+--- narrow 注解声明参数在调用正常返回后收窄为 truthy 或指定类型。
+function W:traceCallNarrow(exp, revert)
+    if exp[1] ~= 'call' then
+        return
+    end
+    local funcAlias  = exp[3]
+    local argAliases = exp[4]
+    local funcVar = self.map[funcAlias]
+    if not funcVar then
+        return
+    end
+    local func = funcVar.value
+    if not func then
+        return
+    end
+    local narrowDefs
+    if func.kind == 'function' then
+        ---@cast func Node.Function
+        narrowDefs = func:getNarrowDefs()
+    elseif func.kind == 'union' then
+        local collected = {}
+        func:each('function', function (f)
+            ---@cast f Node.Function
+            local defs = f:getNarrowDefs()
+            if defs and #defs > 0 then
+                collected[#collected+1] = defs
+            end
+        end)
+        if #collected > 0 then
+            narrowDefs = collected[1]
+        end
+    end
+    if not narrowDefs or #narrowDefs == 0 then
+        return
+    end
+    for _, def in ipairs(narrowDefs) do
+        local paramName = def.param
+        local narrowType = def.type
+        local funcs = {}
+        if func.kind == 'function' then
+            ---@cast func Node.Function
+            funcs[#funcs+1] = func
+        else
+            func:each('function', function (f)
+                ---@cast f Node.Function
+                if not f:isDummy() then
+                    funcs[#funcs+1] = f
+                end
+            end)
+        end
+        for _, f in ipairs(funcs) do
+            local argIndex = self:findParamIndex(f, paramName)
+            if not argIndex then
+                goto continue
+            end
+            local argAlias = argAliases[argIndex]
+            if not argAlias then
+                goto continue
+            end
+            local id = self.aliasID[argAlias]
+            if not id then
+                goto continue
+            end
+            local argValue = self:getValue(id)
+            if not argValue then
+                goto continue
+            end
+            local narrowed, otherSide
+            if narrowType then
+                narrowed, otherSide = argValue:narrow(narrowType)
+            else
+                narrowed, otherSide = argValue.truly, argValue.falsy
+            end
+            if revert then
+                narrowed, otherSide = otherSide, narrowed
+            end
+            self:setNarrowResult(id, narrowed, otherSide)
+            self:propagateNarrow(id, narrowed, otherSide, revert)
+            goto continue
+        end
+        ::continue::
+    end
+    return
+end
+
+--- 在函数定义中找到参数名对应的位置（下标从 1 开始）
+---@param func Node.Function
+---@param paramName string
+---@return integer?
+function W:findParamIndex(func, paramName)
+    for i, def in ipairs(func.paramsDef) do
+        if def.key == paramName then
+            return i
+        end
+    end
+    if func.varargParamName == paramName then
+        return #func.paramsDef + 1
+    end
+    return nil
+end
+
+--- 将收窄结果沿 parentMap 向上传播到父变量
+---@param id string
+---@param narrowed Node
+---@param otherSide Node
+---@param revert? boolean
+function W:propagateNarrow(id, narrowed, otherSide, revert)
+    local pid = id
+    while true do
+        local pdata = self.parentMap[pid]
+        if not pdata then
+            break
+        end
+        pid = pdata[1]
+        local pvalue = self:getValue(pid)
+        if pvalue then
+            local key = pdata[2]
+            local pnarrowed, potherSide = pvalue:narrowByField(key, revert and otherSide or narrowed)
+            if revert then
+                self:setNarrowResult(pid, potherSide, pnarrowed)
+            else
+                self:setNarrowResult(pid, pnarrowed, potherSide)
+            end
+        end
     end
 end
 

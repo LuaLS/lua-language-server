@@ -11,6 +11,7 @@ arg = {}
 ---@param ... any
 ---@return T
 ---@return any ...
+---@narrow v
 function assert(v, message, ...) end
 
 ---@alias gcoptions

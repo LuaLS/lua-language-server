@@ -175,6 +175,10 @@ ls.vm.registerCoderProvider('catstateparam', function (coder, source)
         coder:compile(source.value)
     end
 
+    if source.pack and not coder.compiled[source.pack] then
+        coder:compile(source.pack)
+    end
+
     coder:addToCatGroup(source.parent, true)
 end)
 

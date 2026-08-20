@@ -39,7 +39,6 @@ function table.move(a1, f, e, t, a2) end
 
 ---@version >5.2, JIT
 ---#DES 'table.pack'
----@generic T: any[]
 ---@param ...T any
 ---@return T & { n: integer }
 ---@nodiscard

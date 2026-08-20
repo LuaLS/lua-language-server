@@ -540,6 +540,36 @@ TEST [[
     }
 }
 
+TEST [[
+---@param ...T any
+---@return T & { n: integer }
+local function pack(...) end
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind  = 'catstateparam',
+                key   = { id = '...' },
+                pack  = { kind = 'catgeneric', id = { kind = 'catid', id = 'T' } },
+                value = { id = 'any' },
+            }
+        },
+        [2] = {
+            kind  = 'cat',
+            value = {
+                kind    = 'catstatereturn',
+                returns = {
+                    [1] = {
+                        value = { kind = 'catintersection' },
+                    }
+                }
+            }
+        },
+    }
+}
+
 TEST [=[
 local x
 

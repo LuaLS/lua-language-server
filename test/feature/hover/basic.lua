@@ -1532,6 +1532,33 @@ print(z<??>)
 ]] 'local z: 3'
 
 TEST_HOVER [[
+---@param ...T any
+---@return T & { n: integer }
+local function <?pack?>(...) end
+]] {
+    'local pack: function',
+    [[
+function pack(...T: any)
+  -> { n: integer } & T
+]],
+}
+
+TEST_HOVER [[
+---@param ...T any
+---@return T & { n: integer }
+local function pack(...) end
+local <?t?> = pack(1, 'a')
+]] {
+    [[
+local t: {
+    [1]: 1,
+    [2]: 'a',
+    n: integer,
+}
+]],
+}
+
+TEST_HOVER [[
 --!include tablepack
 
 local <?t?> = table.pack(1, 2, 3)

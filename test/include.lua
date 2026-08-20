@@ -13,7 +13,6 @@ function setmetatable(t, mt) end
 test.includeCodes['tablepack'] = [[
 table = {}
 
----@generic T: any[]
 ---@param ...T any
 ---@return T & { n: integer }
 function table.pack(...) end

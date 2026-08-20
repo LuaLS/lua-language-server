@@ -88,6 +88,44 @@ do
 end
 
 do
+    local T = rt.generic 'T'
+    local paramVar = rt.variable '...'
+    paramVar:addType(rt.pack(T))
+    local inter = rt.intersection { T, rt.table { n = rt.INTEGER } }
+    local f = rt.func()
+        : addVarargParamDef(paramVar)
+        : addReturnDef(nil, inter)
+
+    lt.assertEquals(inter.value.kind, 'intersection')
+
+    local map = f:makeGenericMap { rt.value(1), rt.STRING }
+    lt.assertEquals(map[T]:view(), '[1, string]')
+
+    local resolved = inter:resolveGeneric(map)
+    lt.assertEquals(resolved:view(), [[{
+    [1]: 1,
+    [2]: string,
+    n: integer,
+}]])
+end
+
+do
+    local T = rt.generic('T', rt.array(rt.ANY))
+    local paramVar = rt.variable '...'
+    paramVar:addType(rt.pack(T))
+    local f = rt.func()
+        : addVarargParamDef(paramVar)
+        : addReturnDef(nil, rt.intersection { T, rt.table { n = rt.INTEGER } })
+
+    local map = f:makeGenericMap { rt.value(1), rt.STRING }
+    lt.assertEquals(map[T]:view(), '[1, string]')
+
+    local resolved = f:resolveGeneric(map)
+    ---@cast resolved Node.Function
+    lt.assertEquals(resolved.returnsDef[1].value.kind, 'intersection')
+end
+
+do
     local T = rt.generic('T', rt.array(rt.ANY))
     local f = rt.func()
         : addTypeParam(T)

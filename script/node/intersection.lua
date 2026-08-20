@@ -106,7 +106,8 @@ M.__getter.values = function (self)
 
     for i, tbl in ipairs(tables) do
         for _, v in ipairs(values) do
-            if v >> tbl then
+            if  v.kind ~= 'generic'
+            and v >> tbl then
                 tables[i] = false
                 break
             end

@@ -33,7 +33,21 @@ function Ast:parseCatStateParam()
         if nextType == 'Word' and nextPos == key.finish then
             local generic = self.curBlock.genericMap[nextToken]
             if not generic then
-                self:throw('UNDEFINED_GENERIC', nextPos, nextPos + #nextToken)
+                local finish = nextPos + #nextToken
+                local id = self:createNode('LuaParser.Node.CatID', {
+                    id     = nextToken,
+                    start  = nextPos,
+                    finish = finish,
+                })
+                generic = self:createNode('LuaParser.Node.CatGeneric', {
+                    id     = id,
+                    start  = nextPos,
+                    finish = finish,
+                })
+                id.parent = generic
+                local block = self.curBlock
+                block.generics[#block.generics+1] = generic
+                block.genericMap[nextToken] = generic
             end
             pack = generic
             self.lexer:next()

@@ -84,6 +84,48 @@ function pcall(f, arg1, ...) end
 function xpcall(f, msgh, arg1, ...) end
 ]]
 
+test.includeCodes['tonumber'] = [[
+---@overload fun<T: number>(e: T):T
+---@overload fun(e: string, base?: integer):number?
+---@nodiscard
+function tonumber(e) end
+]]
+
+test.includeCodes['cowrap'] = [[
+coroutine = {}
+
+---@generic R: any[]
+---@param f async fun(...):...R
+---@return async fun(...):...R
+---@nodiscard
+function coroutine.wrap(f) end
+]]
+
+test.includeCodes['osdate'] = [[
+os = {}
+
+---@class osdate
+---@field year  integer|string
+
+---@overload fun(format: "*t", time?: integer):osdate
+---@overload fun(format?: string, time?: integer):string
+---@param format? string
+---@param time?   integer
+---@nodiscard
+function os.date(format, time) end
+]]
+
+test.includeCodes['tableinsert'] = [[
+table = {}
+
+---@generic T
+---@overload fun(list: T[], value: T)
+---@param list T[]
+---@param pos integer
+---@param value T
+function table.insert(list, pos, value) end
+]]
+
 test.includeCodes['tablepack'] = [[
 table = {}
 

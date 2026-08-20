@@ -949,10 +949,10 @@ do
     local Y2 = rt:globalGet('Y2')
     local YY = rt:globalGet('YY')
 
-    lt.assertEquals(X0:view(), 'true | false')
+    lt.assertEquals(X0:view(), 'boolean')
     lt.assertEquals(X1:view(), 'true')
     lt.assertEquals(X2:view(), 'false')
-    lt.assertEquals(XX:view(), 'true | false')
+    lt.assertEquals(XX:view(), 'boolean')
 
     lt.assertEquals(Y0:view(), 'string | nil')
     lt.assertEquals(Y1:view(), 'nil')

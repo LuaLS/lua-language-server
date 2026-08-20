@@ -55,8 +55,9 @@ function coroutine.running() end
 function coroutine.status(co) end
 
 ---#DES 'coroutine.wrap'
----@param f async fun(...):...
----@return fun(...):...
+---@generic R: any[]
+---@param f async fun(...):...R
+---@return async fun(...):...R
 ---@nodiscard
 function coroutine.wrap(f) end
 

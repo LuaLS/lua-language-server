@@ -87,6 +87,31 @@ M.__getter.values = function (self)
     end
 
     ls.util.arrayRemoveDuplicate(values)
+
+    local rt = self.scope.rt
+    local hasTrue, hasFalse, hasBoolean
+    for _, v in ipairs(values) do
+        if v == rt.TRUE then
+            hasTrue = true
+        elseif v == rt.FALSE then
+            hasFalse = true
+        elseif v == rt.BOOLEAN then
+            hasBoolean = true
+        end
+    end
+    if (hasTrue and hasFalse) or (hasBoolean and (hasTrue or hasFalse)) then
+        local merged = {}
+        for _, v in ipairs(values) do
+            if v ~= rt.TRUE and v ~= rt.FALSE then
+                merged[#merged+1] = v
+            end
+        end
+        if not hasBoolean then
+            merged[#merged+1] = rt.BOOLEAN
+        end
+        values = merged
+    end
+
     return values, true
 end
 

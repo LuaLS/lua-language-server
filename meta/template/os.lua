@@ -30,9 +30,10 @@ function os.clock() end
 ---@field isdst boolean
 
 ---#DES 'os.date'
+---@overload fun(format: "*t", time?: integer):osdate
+---@overload fun(format?: string, time?: integer):string
 ---@param format? string
 ---@param time?   integer
----@return string|osdate
 ---@nodiscard
 function os.date(format, time) end
 

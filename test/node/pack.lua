@@ -126,6 +126,11 @@ do
 end
 
 do
+    lt.assertEquals((rt.TRUE | rt.FALSE):view(), 'boolean')
+    lt.assertEquals((rt.FALSE | rt.BOOLEAN):view(), 'boolean')
+end
+
+do
     local R = rt.generic('R', rt.array(rt.ANY))
     local o1 = rt.func()
         : addParamDef('f', rt.func()
@@ -138,7 +143,7 @@ do
         : addReturnDef(nil, rt.STRING)
 
     local u = o1 | o2
-    print('UNION-TEST: ' .. u:view())
+    lt.assertEquals(u:view(), '(fun(f: fun():...R):(true, ...R)) | (fun(f: fun()):(false, string))')
 end
 
 do

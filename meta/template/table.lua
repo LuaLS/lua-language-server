@@ -14,10 +14,11 @@ table = {}
 function table.concat(list, sep, i, j) end
 
 ---#DES 'table.insert'
----@overload fun(list: table, value: any)
----@param list table
+---@generic T
+---@overload fun(list: T[], value: T)
+---@param list T[]
 ---@param pos integer
----@param value any
+---@param value T
 function table.insert(list, pos, value) end
 
 ---@version <5.1

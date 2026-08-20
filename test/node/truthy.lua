@@ -35,7 +35,7 @@ end
 do
     local u = rt.value(0) | rt.value(1) | rt.value(true) | rt.value(false) | rt.NIL
 
-    lt.assertEquals(u:view(), '0 | 1 | true | false | nil')
+    lt.assertEquals(u:view(), '0 | 1 | boolean | nil')
     lt.assertEquals(u.truthy:view(), '0 | 1 | true')
     lt.assertEquals(u.falsy:view(), 'false | nil')
 end

@@ -1412,7 +1412,7 @@ end
 
 print(<?bool?>)
 ]] [[
-local bool: true | false
+local bool: false | boolean
 ]]
 
 -- @type 'a' local s hover
@@ -1783,6 +1783,41 @@ local function msgh(err) end
 local ok, a, b = xpcall_(f, msgh)
 print(a<??>)
 ]] 'local a: 1'
+
+TEST_HOVER [[
+--!include tonumber
+
+local <?n?> = tonumber(3)
+]] 'local n: 3'
+
+TEST_HOVER [[
+--!include tonumber
+
+local <?n?> = tonumber('10', 16)
+]] 'local n: number | nil'
+
+TEST_HOVER [[
+--!include cowrap
+
+local function f()
+    return 1, 'a'
+end
+local co = coroutine.wrap(f)
+local x, y = co()
+print(x<??>)
+]] 'local x: 1'
+
+TEST_HOVER [[
+--!include osdate
+
+local <?d?> = os.date("*t")
+]] 'local d: osdate'
+
+TEST_HOVER [[
+--!include osdate
+
+local <?d?> = os.date("%Y")
+]] 'local d: string | nil'
 
 TEST_HOVER [[
 ---@type fun():x: number

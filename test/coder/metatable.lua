@@ -234,7 +234,7 @@ R = F(1)
     ]]
 
     local F = rt:globalGet('F')
-    lt.assertEquals(F.value:view(), 'fun<T>(x: <T>):<T>[]')
+    lt.assertEquals(F.value:view(), 'fun<T>(x: T):T[]')
     local R = rt:globalGet('R')
     lt.assertEquals(R.value:view(), '1[]')
 end

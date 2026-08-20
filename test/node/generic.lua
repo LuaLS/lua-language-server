@@ -4,21 +4,21 @@ do
     local K = rt.generic('K')
     local V = rt.generic('V')
 
-    lt.assertEquals(K:view(), '<K>')
-    lt.assertEquals(V:view(), '<V>')
+    lt.assertEquals(K:view(), 'K')
+    lt.assertEquals(V:view(), 'V')
 
     local table = rt.table { [K] = V }
 
-    lt.assertEquals(table:view(), '{ [<K>]: <V> }')
+    lt.assertEquals(table:view(), '{ [K]: V }')
 
     local t1 = table:resolveGeneric {}
-    lt.assertEquals(t1:view(), '{ [<K>]: <V> }')
+    lt.assertEquals(t1:view(), '{ [K]: V }')
 
     local t2 = table:resolveGeneric { [K] = rt.INTEGER }
-    lt.assertEquals(t2:view(), '{ [integer]: <V> }')
+    lt.assertEquals(t2:view(), '{ [integer]: V }')
 
     local t3 = table:resolveGeneric { [V] = rt.BOOLEAN }
-    lt.assertEquals(t3:view(), '{ [<K>]: boolean }')
+    lt.assertEquals(t3:view(), '{ [K]: boolean }')
 
     local t4 = table:resolveGeneric { [K] = rt.STRING, [V] = rt.NUMBER }
     lt.assertEquals(t4:view(), '{ [string]: number }')
@@ -37,23 +37,23 @@ do
     local union = N | U
     local intersection = N & U
 
-    lt.assertEquals(N:view(), '<N>')
-    lt.assertEquals(U:view(), '<U>')
+    lt.assertEquals(N:view(), 'N')
+    lt.assertEquals(U:view(), 'U')
 
-    lt.assertEquals(array:view(), '<N>[]')
+    lt.assertEquals(array:view(), 'N[]')
 
-    lt.assertEquals(tuple:view(), '[<N>, <U>]')
+    lt.assertEquals(tuple:view(), '[N, U]')
 
-    lt.assertEquals(table:view(), '{ [<N>]: <U> }')
+    lt.assertEquals(table:view(), '{ [N]: U }')
 
-    lt.assertEquals(func:view(), 'fun(a: <N>, ...: <U>):[<N>, <U>]')
+    lt.assertEquals(func:view(), 'fun(a: N, ...: U):[N, U]')
     func:addTypeParam(N)
     func:addTypeParam(U)
-    lt.assertEquals(func:view(), 'fun<N:number, U>(a: <N>, ...: <U>):[<N>, <U>]')
+    lt.assertEquals(func:view(), 'fun<N:number, U>(a: N, ...: U):[N, U]')
 
-    lt.assertEquals(union:view(), '<N> | <U>')
+    lt.assertEquals(union:view(), 'N | U')
 
-    lt.assertEquals(intersection:view(), '<N> & <U>')
+    lt.assertEquals(intersection:view(), 'N & U')
 
     local resolve = { [N] = rt.INTEGER }
 
@@ -61,19 +61,19 @@ do
     lt.assertEquals(newArray:view(), 'integer[]')
 
     local newTuple = tuple:resolveGeneric(resolve)
-    lt.assertEquals(newTuple:view(), '[integer, <U>]')
+    lt.assertEquals(newTuple:view(), '[integer, U]')
 
     local newTable = table:resolveGeneric(resolve)
-    lt.assertEquals(newTable:view(), '{ [integer]: <U> }')
+    lt.assertEquals(newTable:view(), '{ [integer]: U }')
 
     local newFunc = func:resolveGeneric(resolve)
-    lt.assertEquals(newFunc:view(), 'fun<integer, U>(a: integer, ...: <U>):[integer, <U>]')
+    lt.assertEquals(newFunc:view(), 'fun<integer, U>(a: integer, ...: U):[integer, U]')
 
     local newUnion = union:resolveGeneric(resolve)
-    lt.assertEquals(newUnion:view(), 'integer | <U>')
+    lt.assertEquals(newUnion:view(), 'integer | U')
 
     local newIntersection = intersection:resolveGeneric(resolve)
-    lt.assertEquals(newIntersection:view(), 'integer & <U>')
+    lt.assertEquals(newIntersection:view(), 'integer & U')
 end
 
 do
@@ -91,7 +91,7 @@ do
     rt.alias('Alias', { K, V }, aliasValue)
 
     lt.assertEquals(alias:view(), 'Alias')
-    lt.assertEquals(aliasValue.value:view(), '<K> | <V> | boolean')
+    lt.assertEquals(aliasValue.value:view(), 'K | V | boolean')
 
     local call = alias:call { rt.NUMBER, rt.STRING }
     lt.assertEquals(call:view(), 'number | string | boolean')
@@ -271,13 +271,13 @@ do
             ))
 
     local map1 = map:call { rt.STRING }
-    lt.assertEquals(map1.value:view(), '{ set: fun<V>(key: string, value: <V>) }')
-    lt.assertEquals(map1:get('set'):view(), 'fun<V>(key: string, value: <V>)')
-    lt.assertEquals(map1.value:get('set'):view(), 'fun<V>(key: string, value: <V>)')
+    lt.assertEquals(map1.value:view(), '{ set: fun<V>(key: string, value: V) }')
+    lt.assertEquals(map1:get('set'):view(), 'fun<V>(key: string, value: V)')
+    lt.assertEquals(map1.value:get('set'):view(), 'fun<V>(key: string, value: V)')
 
     local func = map1:get('set')
     ---@cast func Node.Function
-    lt.assertEquals(func:view(), 'fun<V>(key: string, value: <V>)')
+    lt.assertEquals(func:view(), 'fun<V>(key: string, value: V)')
     local rfunc = func:resolveGeneric { [V] = rt.INTEGER }
     lt.assertEquals(rfunc:view(), 'fun<integer>(key: string, value: integer)')
 end

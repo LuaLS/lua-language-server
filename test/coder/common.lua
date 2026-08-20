@@ -152,7 +152,7 @@ do
     ]]
 
     lt.assertEquals(rt.type('A'):view(), 'A')
-    lt.assertEquals(rt.type('A').value:view(), 'async fun<T1:table, T2>(a: <T1>, b?: string, ...: <T2>):(<T2>[], (desc: string | nil), (...: <T1>))')
+    lt.assertEquals(rt.type('A').value:view(), 'async fun<T1:table, T2>(a: T1, b?: string, ...: T2):(T2[], (desc: string | nil), (...: T1))')
 end
 
 do

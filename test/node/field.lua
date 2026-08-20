@@ -261,7 +261,7 @@ do
         rt.value 'xyz'
     )
 
-    lt.assertEquals(index:view(), '<T>["xyz"]')
+    lt.assertEquals(index:view(), 'T["xyz"]')
 end
 
 do

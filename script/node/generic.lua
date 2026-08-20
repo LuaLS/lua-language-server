@@ -51,7 +51,7 @@ function M:inferGeneric(other, result)
 end
 
 function M:onView(viewer, options)
-    return '<' .. self.name .. '>'
+    return self.name
 end
 
 function M:onViewAsParam(viewer, options)

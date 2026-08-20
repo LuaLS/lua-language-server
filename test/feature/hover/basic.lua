@@ -441,8 +441,8 @@ end
 ]] {
     'local f: function',
     [[
-function f<T>(x: <T>)
-  -> <T>
+function f<T>(x: T)
+  -> T
 ]],
 }
 
@@ -1484,7 +1484,7 @@ local function <?pack?>(...) end
     'local pack: function',
     [[
 function pack<T:any[]>(...T: any)
-  -> { n: integer } & <T>
+  -> { n: integer } & T
 ]],
 }
 

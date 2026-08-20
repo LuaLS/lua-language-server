@@ -541,6 +541,63 @@ TEST [[
 }
 
 TEST [[
+---@overload fun<R: any[]>(f: async fun(...):...R, ...any):true, ...R
+---@overload fun(f: async fun(), ...any):false, string
+local function pcall_(f, arg1, ...) end
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind    = 'catstateoverload',
+                value   = {
+                    kind     = 'catfunction',
+                    typeParams = {
+                        [1] = {
+                            kind = 'catgeneric',
+                            id   = { kind = 'catid', id = 'R' },
+                        }
+                    },
+                    params = {
+                        [1] = {
+                            name = { id = 'f' },
+                            value = {
+                                returns = {
+                                    [1] = { spread = true, value = { id = 'R', generic = {} } },
+                                    [2] = { spread = true, value = { id = 'any' } },
+                                },
+                            },
+                        },
+                    },
+                    returns = {
+                        [1] = { value = { value = true } },
+                        [2] = { spread = true, value = { id = 'R', generic = {} } },
+                    },
+                },
+            },
+        },
+        [2] = {
+            kind  = 'cat',
+            value = {
+                kind    = 'catstateoverload',
+                value   = {
+                    kind     = 'catfunction',
+                    params = {
+                        [1] = { name = { id = 'f' } },
+                        [2] = { name = { id = '...' } },
+                    },
+                    returns = {
+                        [1] = { value = { value = false } },
+                        [2] = { value = { id = 'string' } },
+                    },
+                },
+            },
+        },
+    }
+}
+
+TEST [[
 ---@param ...T any
 ---@return T & { n: integer }
 local function pack(...) end

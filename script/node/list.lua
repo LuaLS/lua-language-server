@@ -41,6 +41,10 @@ M.__getter.values = function (self)
     local values = {}
     for i, raw in ipairs(self.raw) do
         raw:addRef(self)
+        if raw.kind == 'spread' and raw.hasGeneric then
+            values[i] = raw
+            goto continue
+        end
         local value = raw:findValue(ls.node.kind['list']) or raw
         if value.kind == 'list' then
             ---@cast value Node.List
@@ -48,29 +52,32 @@ M.__getter.values = function (self)
         else
             values[i] = raw
         end
+        ::continue::
     end
     local n = #values
     local last = self.raw[n]
-    local lastValue = last and last:findValue(ls.node.kind['list']) or last
-    if lastValue and lastValue.kind == 'list' then
-        ---@cast lastValue Node.List
-        for i = 1, #lastValue.values do
-            values[n + i] = lastValue.values[i + 1]
-        end
-        if lastValue.min > 0 then
-            self.min = self.min - 1 + lastValue.min
-        elseif self.min == #values then
-            self.min = self.min - 1
-        end
-        if lastValue.max then
-            local max = n + lastValue.max - 1
-            if not self.max then
-                self.max = max
-            elseif max > self.max then
-                self.max = max
+    if last and not (last.kind == 'spread' and last.hasGeneric) then
+        local lastValue = last:findValue(ls.node.kind['list']) or last
+        if lastValue and lastValue.kind == 'list' then
+            ---@cast lastValue Node.List
+            for i = 1, #lastValue.values do
+                values[n + i] = lastValue.values[i + 1]
             end
-        else
-            self.max = nil
+            if lastValue.min > 0 then
+                self.min = self.min - 1 + lastValue.min
+            elseif self.min == #values then
+                self.min = self.min - 1
+            end
+            if lastValue.max then
+                local max = n + lastValue.max - 1
+                if not self.max then
+                    self.max = max
+                elseif max > self.max then
+                    self.max = max
+                end
+            else
+                self.max = nil
+            end
         end
     end
     return values, true
@@ -272,6 +279,12 @@ function M:inferGeneric(other, result)
         local pack = lastV:findPack()
         if pack then
             pack:inferGeneric(rt.list(ovalues), result)
+            return
+        end
+        local spread = lastV:findValue(ls.node.kind['spread'])
+        if spread then
+            ---@cast spread Node.Spread
+            spread:inferGeneric(rt.list(ovalues), result)
             return
         end
         ---@type Node

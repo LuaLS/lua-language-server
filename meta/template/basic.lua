@@ -156,16 +156,24 @@ function pairs(t) end
 
 ---#DES 'pcall'
 ---#if VERSION == 5.1 and not JIT then
----@param f     function
+---@overload fun<R: any[]>(f: fun(...):...R):true, ...R
+---@overload fun(f: fun()):false, string
+---@param f function
+---@return boolean success
+---@return any result
+---@return any ...
+function pcall(f) end
 ---#else
+---@overload fun<R: any[]>(f: async fun(...):...R, ...any):true, ...R
+---@overload fun(f: async fun(), ...any):false, string
 ---@param f     async fun(...):...
----#end
 ---@param arg1? any
 ---@param ...   any
 ---@return boolean success
 ---@return any result
 ---@return any ...
 function pcall(f, arg1, ...) end
+---#end
 
 ---#DES 'print'
 ---@param ... any
@@ -313,14 +321,18 @@ function warn(message, ...) end
 
 ---#if VERSION == 5.1 and not JIT then
 ---#DES 'xpcall=5.1'
----@param f     function
----@param err   function
+---@overload fun<R: any[]>(f: fun(...):...R, err: function):true, ...R
+---@overload fun(f: fun(), err: function):false, string
+---@param f   function
+---@param err function
 ---@return boolean success
 ---@return any result
 ---@return any ...
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
+---@overload fun<R: any[]>(f: async fun(...):...R, msgh: function, ...any):true, ...R
+---@overload fun(f: async fun(), msgh: function, ...any):false, string
 ---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any

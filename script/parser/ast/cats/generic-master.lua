@@ -53,6 +53,31 @@ function Ast:parseCatGenericList()
     return list
 end
 
+local BUILTIN_TYPE_NAMES = {
+    ['any']      = true,
+    ['boolean']  = true,
+    ['falsy']    = true,
+    ['function'] = true,
+    ['integer']  = true,
+    ['never']    = true,
+    ['nil']      = true,
+    ['number']   = true,
+    ['string']   = true,
+    ['table']    = true,
+    ['thread']   = true,
+    ['truly']    = true,
+    ['truthy']   = true,
+    ['unknown']  = true,
+    ['userdata'] = true,
+}
+
+---@private
+---@param name string
+---@return boolean
+function Ast:canFollowDotsAsPack(name)
+    return not BUILTIN_TYPE_NAMES[name]
+end
+
 ---@private
 ---@param name string
 ---@param pos integer

@@ -107,6 +107,15 @@ function M:onCanCast(other)
     return self.value:canCast(other)
 end
 
+---@param other Node
+---@return boolean?
+function M:onCanBeCast(other)
+    if self.hasGeneric then
+        return true
+    end
+    return self.value:canCast(other)
+end
+
 ---@param self Node.Spread
 ---@return boolean
 ---@return true
@@ -139,7 +148,17 @@ function M:inferGeneric(other, result)
     if not self.hasGeneric then
         return
     end
-    self.head:inferGeneric(other, result)
+    local generic = self.head:findValue(ls.node.kind['generic'])
+    ---@cast generic Node.Generic?
+    if not generic then
+        return
+    end
+    if result[generic] then
+        return
+    end
+    local rt = self.scope.rt
+    local list = other:findValue(ls.node.kind['list']) or rt.list({ other })
+    result[generic] = rt.tuple(list)
 end
 
 function M:onView(viewer, options)

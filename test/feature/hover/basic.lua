@@ -1736,6 +1736,55 @@ local <?m?> = math.max(1.5, 2)
 ]] 'local m: 1.5'
 
 TEST_HOVER [[
+---@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
+---@overload fun(f: async fun(), ...any):false, string
+local function pcall_(f, arg1, ...) end
+
+local function f()
+    return 1, 'a'
+end
+local ok, a, b = pcall_(f)
+print(ok<??>)
+]] 'local ok: true'
+
+TEST_HOVER [[
+---@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
+---@overload fun(f: async fun(), ...any):false, string
+local function pcall_(f, arg1, ...) end
+
+local function f()
+    return 1, 'a'
+end
+local ok, a, b = pcall_(f)
+print(a<??>)
+]] 'local a: 1'
+
+TEST_HOVER [[
+---@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
+---@overload fun(f: async fun(), ...any):false, string
+local function pcall_(f, arg1, ...) end
+
+local function f()
+    return 1, 'a'
+end
+local ok, a, b = pcall_(f)
+print(b<??>)
+]] 'local b: \'a\''
+
+TEST_HOVER [[
+---@overload fun<R: any[]>(f: async fun(...):(...R), msgh: function, ...any):true, ...R
+---@overload fun(f: async fun(), msgh: function, ...any):false, string
+local function xpcall_(f, msgh, ...) end
+
+local function f()
+    return 1, 'a'
+end
+local function msgh(err) end
+local ok, a, b = xpcall_(f, msgh)
+print(a<??>)
+]] 'local a: 1'
+
+TEST_HOVER [[
 ---@type fun():x: number
 local <?f?>
 ]] {

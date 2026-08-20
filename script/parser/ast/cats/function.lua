@@ -130,11 +130,16 @@ function Ast:parseCatFuncParam(required)
     end
 
     local pack
+    local tightType
     if name.id == '...' then
         local nextToken, nextType, nextPos = self.lexer:peek()
         if nextType == 'Word' and nextPos == name.finish then
-            pack = self:getOrMakeImplicitGeneric(nextToken, nextPos)
-            self.lexer:next()
+            if self:canFollowDotsAsPack(nextToken) then
+                pack = self:getOrMakeImplicitGeneric(nextToken, nextPos)
+                self.lexer:next()
+            else
+                tightType = true
+            end
         end
     end
 
@@ -152,6 +157,12 @@ function Ast:parseCatFuncParam(required)
     param.symbolPos = self.lexer:consume ':'
     if param.symbolPos then
 
+        self:skipSpace()
+        param.value = self:parseCatExp()
+        if param.value then
+            param.value.parent = param
+        end
+    elseif tightType then
         self:skipSpace()
         param.value = self:parseCatExp()
         if param.value then

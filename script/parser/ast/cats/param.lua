@@ -30,7 +30,9 @@ function Ast:parseCatStateParam()
     local pack
     if key.id == '...' then
         local nextToken, nextType, nextPos = self.lexer:peek()
-        if nextType == 'Word' and nextPos == key.finish then
+        if  nextType == 'Word'
+        and nextPos == key.finish
+        and self:canFollowDotsAsPack(nextToken) then
             pack = self:getOrMakeImplicitGeneric(nextToken, nextPos)
             self.lexer:next()
         end

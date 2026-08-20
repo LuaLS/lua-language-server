@@ -61,6 +61,29 @@ function math.max(x, ...) end
 function math.min(x, ...) end
 ]]
 
+test.includeCodes['pcallx'] = [[
+---@overload fun<R: any[]>(f: async fun(...):...R, ...any):true, ...R
+---@overload fun(f: async fun(), ...any):false, string
+---@param f     async fun(...):...
+---@param arg1? any
+---@param ...   any
+---@return boolean success
+---@return any result
+---@return any ...
+function pcall(f, arg1, ...) end
+
+---@overload fun<R: any[]>(f: async fun(...):...R, msgh: function, ...any):true, ...R
+---@overload fun(f: async fun(), msgh: function, ...any):false, string
+---@param f     async fun(...):...
+---@param msgh  function
+---@param arg1? any
+---@param ...   any
+---@return boolean success
+---@return any result
+---@return any ...
+function xpcall(f, msgh, arg1, ...) end
+]]
+
 test.includeCodes['tablepack'] = [[
 table = {}
 

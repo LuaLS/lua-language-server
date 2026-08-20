@@ -126,6 +126,41 @@ do
 end
 
 do
+    local R = rt.generic('R', rt.array(rt.ANY))
+    local o1 = rt.func()
+        : addParamDef('f', rt.func()
+            : addReturnDef(nil, rt.spread(R)))
+        : addReturnDef(nil, rt.TRUE)
+        : addReturnDef(nil, rt.spread(R))
+    local o2 = rt.func()
+        : addParamDef('f', rt.func())
+        : addReturnDef(nil, rt.FALSE)
+        : addReturnDef(nil, rt.STRING)
+
+    local u = o1 | o2
+    print('UNION-TEST: ' .. u:view())
+end
+
+do
+    local R = rt.generic('R', rt.array(rt.ANY))
+    local inner = rt.func()
+        : addReturnDef(nil, rt.INTEGER)
+        : addReturnDef(nil, rt.STRING)
+    local sig = rt.func()
+        : addParamDef('f', rt.func()
+            : addReturnDef(nil, rt.spread(R)))
+        : addReturnDef(nil, rt.TRUE)
+        : addReturnDef(nil, rt.spread(R))
+
+    local map = sig:makeGenericMap { inner }
+    lt.assertEquals(map[R]:view(), '[integer, string]')
+
+    local resolved = sig:resolveGeneric(map)
+    ---@cast resolved Node.Function
+    lt.assertEquals(resolved.returnsPack:viewAsList(), 'true, integer, string')
+end
+
+do
     local T = rt.generic('T', rt.array(rt.ANY))
     local f = rt.func()
         : addTypeParam(T)

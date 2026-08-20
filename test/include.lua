@@ -10,6 +10,57 @@ test.includeCodes['setmetatable'] = [[
 function setmetatable(t, mt) end
 ]]
 
+test.includeCodes['select'] = [[
+---@overload fun(index: "#"):integer
+---@overload fun<T: any[]>(index: integer, ...T):...T
+---@param index integer|"#"
+---@param ...   any
+---@return any
+---@nodiscard
+function select(index, ...) end
+]]
+
+test.includeCodes['tableremove'] = [[
+table = {}
+
+---@generic T
+---@param list T[]
+---@param pos? integer
+---@return T
+function table.remove(list, pos) end
+]]
+
+test.includeCodes['tablemove'] = [[
+table = {}
+
+---@generic T: table
+---@param a1  T
+---@param f   integer
+---@param e   integer
+---@param t   integer
+---@param a2? T
+---@return T a2
+function table.move(a1, f, e, t, a2) end
+]]
+
+test.includeCodes['mathmaxmin'] = [[
+math = {}
+
+---@generic Number: number
+---@param x Number
+---@param ... Number
+---@return Number
+---@nodiscard
+function math.max(x, ...) end
+
+---@generic Number: number
+---@param x Number
+---@param ... Number
+---@return Number
+---@nodiscard
+function math.min(x, ...) end
+]]
+
 test.includeCodes['tablepack'] = [[
 table = {}
 

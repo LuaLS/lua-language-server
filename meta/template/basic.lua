@@ -192,13 +192,16 @@ function rawget(table, index) end
 function rawlen(v) end
 
 ---#DES 'rawset'
----@param table table
+---@generic T: table
+---@param table T
 ---@param index any
 ---@param value any
----@return table
+---@return T
 function rawset(table, index, value) end
 
 ---#DES 'select'
+---@overload fun(index: "#"):integer
+---@overload fun<T: any[]>(index: integer, ...T):...T
 ---@param index integer|"#"
 ---@param ...   any
 ---@return any
@@ -253,9 +256,10 @@ function setfenv(f, table) end
 ---#end
 
 ---#DES 'setmetatable'
----@param table      table
----@param metatable? metatable|table
----@return table
+---@generic T: table, MT: table|nil
+---@param table      T
+---@param metatable? MT
+---@return T & MT['__index']
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
@@ -329,10 +333,10 @@ function xpcall(f, msgh, arg1, ...) end
 
 ---@version 5.1
 ---#DES 'unpack'
----@generic T
----@param list T[]
+---@generic T: any[]
+---@param list T
 ---@param i?   integer
 ---@param j?   integer
----@return T   ...
+---@return ...T
 ---@nodiscard
 function unpack(list, i, j) end

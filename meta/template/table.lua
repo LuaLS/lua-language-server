@@ -5,7 +5,7 @@
 table = {}
 
 ---#DES 'table.concat'
----@param list table
+---@param list any[]
 ---@param sep? string
 ---@param i?   integer
 ---@param j?   integer
@@ -29,12 +29,13 @@ function table.maxn(table) end
 
 ---@version >5.3
 ---#DES 'table.move'
----@param a1  table
+---@generic T: table
+---@param a1  T
 ---@param f   integer
 ---@param e   integer
 ---@param t   integer
----@param a2? table
----@return table a2
+---@param a2? T
+---@return T a2
 function table.move(a1, f, e, t, a2) end
 
 ---@version >5.2, JIT
@@ -45,9 +46,10 @@ function table.move(a1, f, e, t, a2) end
 function table.pack(...) end
 
 ---#DES 'table.remove'
----@param list table
+---@generic T
+---@param list T[]
 ---@param pos? integer
----@return any
+---@return T
 function table.remove(list, pos) end
 
 ---#DES 'table.sort'

@@ -1698,6 +1698,44 @@ print(v<??>)
 ]] 'local v: integer | string'
 
 TEST_HOVER [[
+--!include select
+
+local <?n?> = select('#', 1, 2, 3)
+]] 'local n: integer'
+
+TEST_HOVER [[
+--!include select
+
+local x, y = select(2, 'a', 'b')
+print(y<??>)
+]] 'local y: \'b\''
+
+TEST_HOVER [[
+--!include tableremove
+
+local <?v?> = table.remove({ 1, 2, 3 })
+]] 'local v: 1 | 2 | 3'
+
+TEST_HOVER [[
+--!include tablemove
+
+local t = { a = 1 }
+local <?r?> = table.move(t, 1, 2, 1)
+]] 'local r: { a: 1 }'
+
+TEST_HOVER [[
+--!include mathmaxmin
+
+local <?m?> = math.max(1, 2, 3)
+]] 'local m: 1'
+
+TEST_HOVER [[
+--!include mathmaxmin
+
+local <?m?> = math.max(1.5, 2)
+]] 'local m: 1.5'
+
+TEST_HOVER [[
 ---@type fun():x: number
 local <?f?>
 ]] {

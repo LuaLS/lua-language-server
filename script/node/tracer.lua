@@ -327,9 +327,9 @@ end
 function W:traceConditionUnit(exp, revert)
     local kind = exp[1]
     if kind == 'ref' then
-        self:traceTruly(exp, revert)
+        self:traceTruthy(exp, revert)
     elseif kind == 'call' then
-        self:traceCallTruly(exp, revert)
+        self:traceCallTruthy(exp, revert)
     elseif kind == '==' then
         -- 结构：{'==', [副作用ref...], left, right}
         -- 最后两个子节点是左右操作数，前面的是副作用 ref
@@ -431,12 +431,12 @@ function W:traceOr(exp, revert)
     ls.util.tableMerge(currentStack.otherSide, stack2.otherSide)
 end
 
-function W:traceTruly(exp, revert)
+function W:traceTruthy(exp, revert)
     if exp[1] ~= 'ref' then
         return
     end
 
-    self:traceByValue(exp, self.scope.rt.TRULY, revert)
+    self:traceByValue(exp, self.scope.rt.TRUTHY, revert)
 
     -- 间接窄化：若该 ref 的变量值来自函数调用的返回值，
     -- 通过 callLinkMap 窄化同一 call 的其他返回值
@@ -449,11 +449,11 @@ function W:traceTruly(exp, revert)
             local myRetIndex  = linkEntry[6] or 1
             local funcVar = self.map[funcKey]
             if not funcVar then
-                goto traceTruly_done
+                goto traceTruthy_done
             end
             local func = funcVar.value
             if not func then
-                goto traceTruly_done
+                goto traceTruthy_done
             end
             local rt = self.scope.rt
             local otherReturns = self.callLinkMap[callAlias]
@@ -469,7 +469,7 @@ function W:traceTruly(exp, revert)
                                 mode        = 'match',
                                 targetType  = 'return',
                                 targetIndex = myRetIndex,
-                                targetValue = rt.TRULY,
+                                targetValue = rt.TRUTHY,
                             }:narrowCall()
                             if revert then
                                 self:setNarrowResult(info.varId, otherSide, narrowed)
@@ -480,7 +480,7 @@ function W:traceTruly(exp, revert)
                     end
                 end
             end
-            ::traceTruly_done::
+            ::traceTruthy_done::
         end
     end
 end
@@ -551,7 +551,7 @@ end
 
 ---通过函数调用返回值（truthy检测）收窄参数类型
 ---call entry: {'call', callAlias, funcAlias, {arg1Alias, ...}}
-function W:traceCallTruly(exp, revert)
+function W:traceCallTruthy(exp, revert)
     if exp[1] ~= 'call' then
         return
     end
@@ -580,7 +580,7 @@ function W:traceCallTruly(exp, revert)
             mode        = 'match',
             targetType  = 'return',
             targetIndex = 1,
-            targetValue = rt.TRULY,
+            targetValue = rt.TRUTHY,
         }:narrowCall()
         if revert then
             self:setNarrowResult(id, otherSide, narrowed)
@@ -683,7 +683,7 @@ function W:traceCallNarrow(exp, revert)
             if narrowType then
                 narrowed, otherSide = argValue:narrow(narrowType)
             else
-                narrowed, otherSide = argValue.truly, argValue.falsy
+                narrowed, otherSide = argValue.truthy, argValue.falsy
             end
             if revert then
                 narrowed, otherSide = otherSide, narrowed

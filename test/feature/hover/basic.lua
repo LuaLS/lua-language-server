@@ -1,12 +1,6 @@
 local config = test.scope.config
 
 TEST_HOVER [[
----@type integer
-local x
-print(x<??>)
-]] 'local x: integer'
-
-TEST_HOVER [[
 ---@type string|integer
 local x
 print(x<??>)
@@ -1505,33 +1499,6 @@ local t: {
 }
 
 TEST_HOVER [[
---!include tablepack
---!include tableunpack
-
-local t = table.pack(1, 2, 3)
-local x, y, z = table.unpack(t)
-print(x<??>)
-]] 'local x: 1'
-
-TEST_HOVER [[
---!include tablepack
---!include tableunpack
-
-local t = table.pack(1, 2, 3)
-local x, y, z = table.unpack(t)
-print(y<??>)
-]] 'local y: 2'
-
-TEST_HOVER [[
---!include tablepack
---!include tableunpack
-
-local t = table.pack(1, 2, 3)
-local x, y, z = table.unpack(t)
-print(z<??>)
-]] 'local z: 3'
-
-TEST_HOVER [[
 ---@param ...T any
 ---@return T & { n: integer }
 local function <?pack?>(...) end
@@ -1559,6 +1526,36 @@ local t: {
 }
 
 TEST_HOVER [[
+---@generic T: any[]
+---@param t T
+---@return ...T
+local function <?unpack?>(t) end
+]] {
+    'local unpack: function',
+    [[
+function unpack<T:any[]>(t: T)
+  -> ...T
+]],
+}
+
+TEST_HOVER [[
+---@generic T: any[]
+---@param t T
+---@return ...T
+local function unpack(t) end
+local <?a?>, <?b?> = unpack(t)
+]] 'local a: any'
+
+TEST_HOVER [[
+---@generic T: any[]
+---@param t T
+---@return ...T
+local function unpack(t) end
+local a, b = unpack({ 1, 'a' })
+print(a<??>)
+]] 'local a: 1'
+
+TEST_HOVER [[
 --!include tablepack
 
 local <?t?> = table.pack(1, 2, 3)
@@ -1572,6 +1569,33 @@ local t: {
 }
 ]],
 }
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack(t)
+print(x<??>)
+]] 'local x: 1'
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack(t)
+print(y<??>)
+]] 'local y: 2'
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack(t)
+print(z<??>)
+]] 'local z: 3'
 
 TEST_HOVER [[
 --!include tablepack
@@ -1592,21 +1616,86 @@ print(y<??>)
 ]] 'local y: 2'
 
 TEST_HOVER [[
----@generic T: any[]
----@param t T
----@return ...T
-local function unpack(t) end
-local <?a?>, <?b?> = unpack(t)
-]] 'local a: any'
+---@type integer|string|nil
+local x
+print(x<??>)
+]] 'local x: integer | string | nil'
 
 TEST_HOVER [[
----@generic T: any[]
----@param t T
----@return ...T
-local function unpack(t) end
-local a, b = unpack({ 1, 'a' })
-print(a<??>)
-]] 'local a: 1'
+---@overload fun<T: truthy>(v: T): T
+---@overload fun(v: falsy): never
+local function f(v) end
+local <?x?> = f(true)
+]] 'local x: true'
+
+TEST_HOVER [[
+---@overload fun<T: truthy>(v: T): T
+---@overload fun(v: falsy): never
+local function f(v) end
+local <?x?> = f(false)
+]] 'local x: never'
+
+TEST_HOVER [[
+---@overload fun<T: truthy>(v: T): T
+---@overload fun(v: falsy): never
+local function f(v) end
+---@type boolean
+local v
+local <?x?> = f(v)
+]] 'local x: true'
+
+TEST_HOVER [[
+---@type integer|string|nil
+local v
+---@overload fun<T: truthy>(v: T): T
+---@overload fun(v: falsy): never
+local function f(v) end
+local <?x?> = f(v)
+]] 'local x: integer | string'
+
+TEST_HOVER [[
+---@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun(v: falsy, msg: any, ...): never
+local function assert_(v, ...) end
+
+local <?x?>, y, z = assert_(true, 1, 'a')
+]] 'local x: true'
+
+TEST_HOVER [[
+---@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun(v: falsy, msg: any, ...): never
+local function assert_(v, ...) end
+
+local x, <?y?>, z = assert_(true, 1, 'a')
+]] 'local y: 1'
+
+TEST_HOVER [[
+---@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun(v: falsy, msg: any, ...): never
+local function assert_(v, ...) end
+
+local x, y, <?z?> = assert_(true, 1, 'a')
+]] 'local z: \'a\''
+
+TEST_HOVER [[
+---@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun(v: falsy, msg: any, ...): never
+local function assert_(v, ...) end
+
+local <?x?> = assert_(nil)
+]] 'local x: never'
+
+TEST_HOVER [[
+---@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun(v: falsy, msg: any, ...): never
+---@narrow v
+local function assert_(v, ...) end
+
+---@type integer|string|nil
+local v
+assert_(v)
+print(v<??>)
+]] 'local v: integer | string'
 
 TEST_HOVER [[
 ---@type fun():x: number

@@ -54,6 +54,33 @@ function Ast:parseCatGenericList()
 end
 
 ---@private
+---@param name string
+---@param pos integer
+---@return LuaParser.Node.CatGeneric
+function Ast:getOrMakeImplicitGeneric(name, pos)
+    local block = self.curBlock
+    local generic = block.genericMap[name]
+    if generic then
+        return generic
+    end
+    local finish = pos + #name
+    local id = self:createNode('LuaParser.Node.CatID', {
+        id     = name,
+        start  = pos,
+        finish = finish,
+    })
+    generic = self:createNode('LuaParser.Node.CatGeneric', {
+        id     = id,
+        start  = pos,
+        finish = finish,
+    })
+    id.parent = generic
+    block.generics[#block.generics+1] = generic
+    block.genericMap[name] = generic
+    return generic
+end
+
+---@private
 ---@param node LuaParser.Node.CatGenericMaster
 ---@param block LuaParser.Node.Block?
 ---@param skipBrackets? boolean

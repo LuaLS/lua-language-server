@@ -326,17 +326,17 @@ M.__getter.value = function (self)
 end
 
 ---@type Node
-M.truly = nil
+M.truthy = nil
 
 ---@param self Node
 ---@return Node
 ---@return true
-M.__getter.truly = function (self)
-    self.truly = self
+M.__getter.truthy = function (self)
+    self.truthy = self
     if self.value == self then
         return self, true
     end
-    return self.value.truly, true
+    return self.value.truthy, true
 end
 
 ---@type Node
@@ -399,11 +399,11 @@ end
 ---@return Node otherSide
 function M:narrowEqual(other)
     local rt = self.scope.rt
-    if other == rt.TRULY then
-        return self.truly, self.falsy
+    if other == rt.TRUTHY then
+        return self.truthy, self.falsy
     end
     if other == rt.FALSY then
-        return self.falsy, self.truly
+        return self.falsy, self.truthy
     end
     local v = self:findValue(ls.node.kind['value'] | ls.node.kind['type'] | ls.node.kind['union'])
     if v then

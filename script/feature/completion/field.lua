@@ -428,7 +428,7 @@ local function resolveFieldItem(param, source, item, trigger, isMethod)
                 local childValue = childVar.value
                 if childValue and childValue.kind == 'field' then
                     ---@cast childValue Node.Field
-                    childValue = childValue.value and childValue.value.truly or nil
+                    childValue = childValue.value and childValue.value.truthy or nil
                 end
                 if childValue then
                     functionValueNode = childValue

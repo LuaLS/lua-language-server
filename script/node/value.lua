@@ -40,11 +40,11 @@ end
 
 function M:narrowEqual(other)
     local rt = self.scope.rt
-    if other == rt.TRULY then
-        return self.truly, self.falsy
+    if other == rt.TRUTHY then
+        return self.truthy, self.falsy
     end
     if other == rt.FALSY then
-        return self.falsy, self.truly
+        return self.falsy, self.truthy
     end
     local v = other:findValue(ls.node.kind['value'])
     if v and self.literal == v.literal then

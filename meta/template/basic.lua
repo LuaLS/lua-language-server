@@ -5,14 +5,10 @@
 arg = {}
 
 ---#DES 'assert'
----@generic T
----@param v? T
----@param message? any
----@param ... any
----@return T
----@return any ...
+---@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun(v: falsy, msg: any, ...): never
 ---@narrow v
-function assert(v, message, ...) end
+function assert(v, ...) end
 
 ---@alias gcoptions
 ---| "collect"      # ---#DESTAIL 'cgopt.collect'

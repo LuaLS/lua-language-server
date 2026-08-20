@@ -38,7 +38,7 @@ function M:get(key)
         end
         if typeName == 'any'
         or typeName == 'unknown'
-        or typeName == 'truly' then
+        or typeName == 'truthy' then
             return self.head, true
         end
         if key.kind == 'value' then

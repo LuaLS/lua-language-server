@@ -107,7 +107,7 @@ function M:select(key)
     end
     if typeName == 'any'
     or typeName == 'unknown'
-    or typeName == 'truly' then
+    or typeName == 'truthy' then
         if #self.values == 0 then
             return self.scope.rt.NIL, false
         end

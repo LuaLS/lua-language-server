@@ -33,8 +33,8 @@ function ParenBase.__getter.toInteger(self)
     return self.value.toInteger, true
 end
 
-function ParenBase.__getter.isTruly(self)
-    return self.value.isTruly, true
+function ParenBase.__getter.isTruthy(self)
+    return self.value.isTruthy, true
 end
 
 ---@class LuaParser.Node.Paren: LuaParser.Node.ParenBase

@@ -226,9 +226,9 @@ end
 ---@param self Node.Intersection
 ---@return Node
 ---@return true
-M.__getter.truly = function (self)
+M.__getter.truthy = function (self)
     self.value:addRef(self)
-    return self.value.truly, true
+    return self.value.truthy, true
 end
 
 ---@param self Node.Intersection

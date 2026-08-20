@@ -83,6 +83,7 @@ end
 local BUILTIN_LUADOC_TYPES = {
     ['any']      = true,
     ['boolean']  = true,
+    ['falsy']    = true,
     ['function'] = true,
     ['integer']  = true,
     ['never']    = true,
@@ -92,6 +93,7 @@ local BUILTIN_LUADOC_TYPES = {
     ['table']    = true,
     ['thread']   = true,
     ['truly']    = true,
+    ['truthy']   = true,
     ['unknown']  = true,
     ['userdata'] = true,
 }

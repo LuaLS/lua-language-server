@@ -444,13 +444,13 @@ end
 ---@param self Node.Type
 ---@return Node
 ---@return true
-M.__getter.truly = function (self)
+M.__getter.truthy = function (self)
     if self:isAliasLike() then
-        local truly = self.value.truly
-        if truly == self.value then
+        local truthy = self.value.truthy
+        if truthy == self.value then
             return self, true
         else
-            return truly, true
+            return truthy, true
         end
     end
     return self, true
@@ -569,11 +569,11 @@ function M:narrowEqual(other)
         return self, rt.NEVER
     end
 
-    if other == rt.TRULY then
-        return self.truly, self.falsy
+    if other == rt.TRUTHY then
+        return self.truthy, self.falsy
     end
     if other == rt.FALSY then
-        return self.falsy, self.truly
+        return self.falsy, self.truthy
     end
 
     if self == rt.ANY then
@@ -583,11 +583,11 @@ function M:narrowEqual(other)
         if other == rt.UNKNOWN then
             return rt.UNKNOWN, rt.NIL
         end
-        if other == rt.TRULY then
-            return rt.TRULY, rt.FALSY
+        if other == rt.TRUTHY then
+            return rt.TRUTHY, rt.FALSY
         end
         if other == rt.FALSY then
-            return rt.FALSY, rt.TRULY
+            return rt.FALSY, rt.TRUTHY
         end
         return other, self
     end
@@ -595,7 +595,7 @@ function M:narrowEqual(other)
         if other == rt.NIL then
             return rt.NEVER, self
         end
-        if other == rt.TRULY then
+        if other == rt.TRUTHY then
             return self, rt.FALSE
         end
         if other == rt.FALSY then

@@ -322,7 +322,7 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
 
     if source.op == 'or' then
         -- or: 若左侧为真则取左侧（真值），否则取右侧
-        coder:addLine('{key} = rt.ternary({value1}, rt.narrow({value1}):matchTruly(), {value2})' % {
+        coder:addLine('{key} = rt.ternary({value1}, rt.narrow({value1}):matchTruthy(), {value2})' % {
             key    = coder:getKey(source),
             value1 = coder:getKey(source.exp1),
             value2 = coder:getKey(source.exp2),

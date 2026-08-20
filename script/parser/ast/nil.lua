@@ -4,7 +4,7 @@ local Nil = Class('LuaParser.Node.Nil', 'LuaParser.Node.Literal')
 
 Nil.kind = 'nil'
 Nil.toString = 'nil'
-Nil.isTruly = false
+Nil.isTruthy = false
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'

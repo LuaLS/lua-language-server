@@ -22,6 +22,7 @@ CatFunction.kind = 'catfunction'
 ---@field optional? boolean
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatExp
+---@field pack? LuaParser.Node.CatGeneric # `...T` 泛型包绑定
 local CatFuncParam = Class('LuaParser.Node.CatFuncParam', 'LuaParser.Node.Base')
 
 CatFuncParam.kind = 'catfuncparam'
@@ -39,6 +40,7 @@ CatFuncParamName.kind = 'catfuncparamname'
 ---@field name? LuaParser.Node.CatFuncReturnName
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatExp
+---@field spread? boolean # `...T` 展开
 local CatFuncReturn = Class('LuaParser.Node.CatFuncReturn', 'LuaParser.Node.Base')
 
 CatFuncReturn.kind = 'catfuncreturn'
@@ -127,12 +129,22 @@ function Ast:parseCatFuncParam(required)
         return nil
     end
 
+    local pack
+    if name.id == '...' then
+        local nextToken, nextType, nextPos = self.lexer:peek()
+        if nextType == 'Word' and nextPos == name.finish then
+            pack = self:getOrMakeImplicitGeneric(nextToken, nextPos)
+            self.lexer:next()
+        end
+    end
+
     local optional = self.lexer:consume '?' and true or nil
 
     local param = self:createNode('LuaParser.Node.CatFuncParam', {
         start = name.start,
         name  = name,
         optional = optional,
+        pack = pack,
     })
     name.parent = param
 
@@ -165,14 +177,20 @@ end
 ---@return LuaParser.Node.CatFuncReturn?
 function Ast:parseCatFuncReturn(required)
     local name
+    local spread
 
     local pos = self.lexer:consume '...'
     if pos then
-        name = self:createNode('LuaParser.Node.CatFuncReturnName', {
-            start  = pos,
-            finish = pos + #'...',
-            id     = '...',
-        })
+        local token = self.lexer:peek()
+        if token == ':' then
+            name = self:createNode('LuaParser.Node.CatFuncReturnName', {
+                start  = pos,
+                finish = pos + #'...',
+                id     = '...',
+            })
+        else
+            spread = true
+        end
     else
         local _, curType = self.lexer:peek()
         if curType == 'Word' and self.lexer:peek(1) == ':' then
@@ -189,7 +207,17 @@ function Ast:parseCatFuncReturn(required)
     end
 
     local value
-    if not name or symbolPos then
+    if spread then
+        value = self:parseCatExp(false)
+        if not value then
+            name = self:createNode('LuaParser.Node.CatFuncReturnName', {
+                start  = pos,
+                finish = pos + #'...',
+                id     = '...',
+            })
+            spread = nil
+        end
+    elseif not name or symbolPos then
         value = self:parseCatExp()
     end
 
@@ -200,6 +228,7 @@ function Ast:parseCatFuncReturn(required)
     local ret = self:createNode('LuaParser.Node.CatFuncReturn', {
         name = name,
         value = value,
+        spread = spread,
         start = (name or value).start,
         symbolPos = symbolPos,
         finish = self:getLastPos(),

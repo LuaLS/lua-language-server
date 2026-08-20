@@ -25,7 +25,7 @@
 ---@field toNumber? number
 ---@field toString? string
 ---@field toInteger? integer
----@field isTruly? boolean
+---@field isTruthy? boolean
 ---@field dummy? boolean
 ---@field optional? boolean
 ---@field index? integer
@@ -297,6 +297,6 @@ end
 ---@param self LuaParser.Node.Literal
 ---@return boolean
 ---@return true
-function Literal.__getter.isTruly(self)
+function Literal.__getter.isTruthy(self)
     return self.value and true or false, true
 end

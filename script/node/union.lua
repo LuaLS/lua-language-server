@@ -126,16 +126,16 @@ end
 ---@param self Node.Union
 ---@return Node
 ---@return true
-M.__getter.truly = function (self)
+M.__getter.truthy = function (self)
     local rt = self.scope.rt
     local result = {}
     local changed = false
     for _, v in ipairs(self.values) do
-        if v ~= v.truly then
+        if v ~= v.truthy then
             changed = true
         end
-        if v.truly ~= rt.NEVER then
-            result[#result+1] = v.truly
+        if v.truthy ~= rt.NEVER then
+            result[#result+1] = v.truthy
         end
     end
     if not changed then
@@ -195,11 +195,11 @@ end
 
 function M:narrowEqual(other)
     local rt = self.scope.rt
-    if other == rt.TRULY then
-        return self.truly, self.falsy
+    if other == rt.TRUTHY then
+        return self.truthy, self.falsy
     end
     if other == rt.FALSY then
-        return self.falsy, self.truly
+        return self.falsy, self.truthy
     end
     local matched = {}
     for _, v in ipairs(self.values) do

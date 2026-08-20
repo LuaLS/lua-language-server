@@ -74,7 +74,7 @@ do
     local x = rt.variable 'x'
     x:addType(rt.INTEGER | rt.NIL)
 
-    local xNarrow = rt.narrow(x):matchTruly()
+    local xNarrow = rt.narrow(x):matchTruthy()
 
     local x1 = x:shadow(xNarrow)
 
@@ -107,7 +107,7 @@ do
     local x = rt.variable 'x'
     x:addType(rt.INTEGER | rt.NIL)
 
-    local xNarrow = rt.narrow(x):matchTruly()
+    local xNarrow = rt.narrow(x):matchTruthy()
 
     local x1 = x:shadow(xNarrow)
 
@@ -413,7 +413,7 @@ do
     X = x --> any
     
     if f(x) then
-        X1 = x --> truly
+        X1 = x --> truthy
     else
         X2 = x --> false | nil
     end
@@ -439,14 +439,14 @@ do
         mode = 'match',
         targetType = 'return',
         targetIndex = 1,
-        targetValue = rt.TRULY,
+        targetValue = rt.TRUTHY,
     }
     local x1 = x:shadow(xNarrow1)
 
     local x2 = x:shadow(xNarrow1:otherSide())
 
     lt.assertEquals(x:view(), 'any')
-    lt.assertEquals(x1:view(), 'truly')
+    lt.assertEquals(x1:view(), 'truthy')
     lt.assertEquals(x2:view(), 'false | nil')
 end
 

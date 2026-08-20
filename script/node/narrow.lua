@@ -1,6 +1,6 @@
 ---@class Node.Narrow: Node
 ---@field node Node
----@field narrowType? 'value' | 'field' | 'truly' | 'falsy' | 'equal' | 'call'
+---@field narrowType? 'value' | 'field' | 'truthy' | 'falsy' | 'equal' | 'call'
 ---@field nvalue? Node
 ---@field field? Node.Key
 ---@field callParams? Node.Narrow.CallParams
@@ -26,13 +26,13 @@ function M:__init(scope, node)
     self.node  = node
 end
 
-function M:matchTruly()
-    self.narrowType = 'truly'
+function M:matchTruthy()
+    self.narrowType = 'truthy'
     return self
 end
 
 function M:matchFalsy()
-    self.narrowType = 'truly'
+    self.narrowType = 'truthy'
     self.isOtherSide = true
     return self
 end
@@ -123,7 +123,7 @@ M.__getter.value = function (self)
     local narrowType = self.narrowType
     local value = self.node
     if self.isOtherSide then
-        if narrowType == 'truly' then
+        if narrowType == 'truthy' then
             return value.falsy, true
         end
         if narrowType == 'value' then
@@ -144,8 +144,8 @@ M.__getter.value = function (self)
         end
         return rt.NEVER, true
     else
-        if narrowType == 'truly' then
-            return value.truly, true
+        if narrowType == 'truthy' then
+            return value.truthy, true
         end
         if narrowType == 'value' then
             return value:narrow(self.nvalue), true
@@ -228,11 +228,11 @@ function M:narrowCallByTarget()
         end
         if mode == 'match' then
             if target.hasGeneric then
-                if targetValue ~= rt.TRULY then
+                if targetValue ~= rt.TRUTHY then
                     -- 无法处理泛型返回值，直接跳过这个原型
                     goto continue
                 end
-                -- 直接视为 等于 truly
+                -- 直接视为 等于 truthy
                 mode = 'equal'
                 -- 将 else 一方视为 falsy
                 inferAsFalsy = true
@@ -294,7 +294,7 @@ function M:narrowCallByTarget()
             if nodeValue == rt.ANY then
                 result[#result+1] = v
             elseif nodeValue == rt.UNKNOWN then
-                result[#result+1] = v.truly
+                result[#result+1] = v.truthy
             else
                 local res = self.node:narrow(v)
                 result[#result+1] = res

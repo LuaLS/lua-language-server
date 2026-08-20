@@ -82,7 +82,7 @@ do
 
     rt.alias('A', nil, rt.value(1) | rt.value(2))
 
-    local b = rt.type('A').truly
+    local b = rt.type('A').truthy
 
     lt.assertEquals(b:view(), 'A')
 end
@@ -92,7 +92,7 @@ do
 
     rt.alias('A', nil, rt.value(1) | rt.value(2) | rt.NIL)
 
-    local b = rt.type('A').truly
+    local b = rt.type('A').truthy
 
     lt.assertEquals(b:view(), '1 | 2')
 end

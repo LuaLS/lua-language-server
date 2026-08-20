@@ -41,7 +41,7 @@ M.__getter.value = function (self)
 
     local rt = self.scope.rt
 
-    if self.cond.truly == rt.NEVER then
+    if self.cond.truthy == rt.NEVER then
         return self.elseNode, true
     end
     if self.cond.falsy == rt.NEVER then

@@ -659,7 +659,7 @@ do
     X = x --> any
     
     if f(x) then
-        X1 = x --> truly
+        X1 = x --> truthy
     else
         X2 = x --> false | nil
     end
@@ -673,7 +673,7 @@ do
     local XX = rt:globalGet('XX')
 
     lt.assertEquals(X:view(), 'any')
-    lt.assertEquals(X1:view(), 'truly')
+    lt.assertEquals(X1:view(), 'truthy')
     lt.assertEquals(X2:view(), 'false | nil')
     lt.assertEquals(XX:view(), 'any')
 end

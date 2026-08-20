@@ -427,10 +427,23 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
             if param.value then
                 coder:compile(param.value)
             end
+            if param.pack and not coder.compiled[param.pack] then
+                coder:compile(param.pack)
+            end
+            local paramNode
+            if param.pack then
+                local element = param.value and coder:getKey(param.value) or 'rt.ANY'
+                paramNode = 'rt.pack({generic}, {element})' % {
+                    generic = coder:getKey(param.pack),
+                    element = element,
+                }
+            else
+                paramNode = param.value and coder:getKey(param.value) or 'rt.ANY'
+            end
             coder:addLine('{func}:addParamDef({name%q}, {param}, {optional%q})' % {
                 func     = coder:getKey(source),
                 name     = param.name.id,
-                param    = param.value and coder:getKey(param.value) or 'rt.ANY',
+                param    = paramNode,
                 optional = param.optional,
             })
         end
@@ -441,10 +454,18 @@ ls.vm.registerCoderProvider('catfunction', function (coder, source)
             coder:addLine('')
             if ret.value then
                 coder:compile(ret.value)
-                coder:addLine('{func}:addReturnDef({name%q}, {param}, {optional%q})' % {
+                local returnType
+                if ret.spread then
+                    returnType = 'rt.spread({value})' % {
+                        value = coder:getKey(ret.value),
+                    }
+                else
+                    returnType = coder:getKey(ret.value)
+                end
+                coder:addLine('{func}:addReturnDef({name%q}, {returnType}, {optional%q})' % {
                     func     = coder:getKey(source),
                     name     = ret.name and ret.name.id or nil,
-                    param    = coder:getKey(ret.value),
+                    returnType = returnType,
                     optional = ret.optional,
                 })
             end

@@ -322,6 +322,16 @@ function M:makeGenericMap(args)
     local rt = self.scope.rt
     local argList = rt.list(args)
     self.paramsPack:inferGeneric(argList, map)
+    for g, value in pairs(map) do
+        local extends = g.extends
+        if extends == rt.TRUTHY
+        or extends == rt.FALSY then
+            local narrowed = value:narrowEqual(extends)
+            if narrowed ~= value then
+                map[g] = narrowed
+            end
+        end
+    end
     return map
 end
 

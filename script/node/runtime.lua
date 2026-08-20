@@ -358,15 +358,17 @@ function M:fillPresets()
             end)
             return not hasNil
         end)
-    self.TRULY = self.type 'truly'
+    self.TRUTHY = self.type 'truthy'
         : setConfig('onCanCast', function (_, other)
-            return other.truly ~= self.NEVER
+            return other.truthy ~= self.NEVER
         end)
         : setConfig('onCanBeCast', function (_, other)
-            return other.truly ~= self.NEVER
+            return other.truthy ~= self.NEVER
         end)
         : setConfig('basicType', true)
     self.FALSY = self.FALSE | self.NIL
+    self.TYPE_POOL['truly'] = self.TRUTHY
+    self.TYPE_POOL['falsy'] = self.FALSY
     self.NIL = self.type 'nil'
         : setConfig('basicType', true)
     self.VALUE_NAN = New 'Node.Value' (self.scope, 0/0)
@@ -391,23 +393,23 @@ function M:fillPresets()
         : addField(self.field(self.ANY, self.ANY):setHideInView())
 
     self.ANY:addClass(anykv)
-    class.preset(self.ANY, 'truly', self.TRULY)
+    class.preset(self.ANY, 'truthy', self.TRUTHY)
     class.preset(self.ANY, 'falsy', self.FALSY)
 
 
     self.UNKNOWN:addClass(anykv)
-    class.preset(self.UNKNOWN, 'truly', self.TRULY)
+    class.preset(self.UNKNOWN, 'truthy', self.TRUTHY)
     class.preset(self.UNKNOWN, 'falsy', self.FALSE)
 
-    self.TRULY:addClass(anykv)
+    self.TRUTHY:addClass(anykv)
 
-    class.preset(self.NIL, 'truly', self.NEVER)
+    class.preset(self.NIL, 'truthy', self.NEVER)
     class.preset(self.NIL, 'falsy', self.NIL)
 
-    class.preset(self.BOOLEAN, 'truly', self.TRUE)
+    class.preset(self.BOOLEAN, 'truthy', self.TRUE)
     class.preset(self.BOOLEAN, 'falsy', self.FALSE)
 
-    class.preset(self.FALSE, 'truly', self.NEVER)
+    class.preset(self.FALSE, 'truthy', self.NEVER)
     class.preset(self.FALSE, 'falsy', self.FALSE)
 
     do

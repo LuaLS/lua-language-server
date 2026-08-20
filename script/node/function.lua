@@ -437,10 +437,17 @@ function M:makeView(viewer)
     end
 
     if self.varargParamDef then
-        local varargKey = self.varargParamName
-            and ('...' .. self.varargParamName)
-            or  '...'
-        params[#params+1] = string.format('%s: %s', varargKey, viewer:view(self.varargParamDef))
+        local pack = self.varargParamDef:findPack()
+        if pack then
+            local generic = pack:getGeneric()
+            local packName = generic and generic.name or ''
+            params[#params+1] = string.format('...%s: %s', packName, viewer:view(pack.element))
+        else
+            local varargKey = self.varargParamName
+                and ('...' .. self.varargParamName)
+                or  '...'
+            params[#params+1] = string.format('%s: %s', varargKey, viewer:view(self.varargParamDef))
+        end
     end
     paramPart = table.concat(params, ', ')
 

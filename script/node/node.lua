@@ -38,6 +38,8 @@ ls.node.kind = {
     ['narrow']       = 1 << 22,
     ['ternary']      = 1 << 23,
     ['tracer']       = 1 << 24,
+    ['spread']       = 1 << 25,
+    ['pack']         = 1 << 26,
 }
 
 ---@class Node.Location
@@ -442,6 +444,30 @@ function M:inferGeneric(other, result)
         return
     end
     self.value:inferGeneric(other, result)
+end
+
+---@return Node.Pack?
+function M:findPack()
+    if self.kind == 'pack' then
+        ---@cast self Node.Pack
+        return self
+    end
+    if self.kind == 'variable' then
+        ---@cast self Node.Variable
+        local types = self.types
+        if types then
+            for i = #types, 1, -1 do
+                if types[i].kind == 'pack' then
+                    return types[i]
+                end
+            end
+        end
+        return nil
+    end
+    if self.value == self then
+        return nil
+    end
+    return self.value:findPack()
 end
 
 ---@param kind string

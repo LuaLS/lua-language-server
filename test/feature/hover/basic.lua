@@ -1476,6 +1476,44 @@ function f(...: boolean)
 }
 
 TEST_HOVER [[
+---@generic T: any[]
+---@param ...T any
+---@return T & { n: integer }
+local function <?pack?>(...) end
+]] {
+    'local pack: function',
+    [[
+function pack<T:any[]>(...T: any)
+  -> { n: integer } & <T>
+]],
+}
+
+TEST_HOVER [[
+---@generic T: any[]
+---@param ...T any
+---@return T & { n: integer }
+local function pack(...) end
+local <?t?> = pack(1, 'a')
+]] 'local t: { n: integer } & [1, \'a\']'
+
+TEST_HOVER [[
+---@generic T: any[]
+---@param t T
+---@return ...T
+local function unpack(t) end
+local <?a?>, <?b?> = unpack(t)
+]] 'local a: any'
+
+TEST_HOVER [[
+---@generic T: any[]
+---@param t T
+---@return ...T
+local function unpack(t) end
+local a, b = unpack({ 1, 'a' })
+print(a<??>)
+]] 'local a: 1'
+
+TEST_HOVER [[
 ---@type fun():x: number
 local <?f?>
 ]] {

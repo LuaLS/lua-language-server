@@ -124,7 +124,7 @@ ls.feature.provider.completion(function (param, action)
 
     action.skip()
     local names = param.scope.vm:getLuaDocTypes()
-    local absWordStart = lineStart + wordStart - 1
+    local absWordStart = lineStart + (wordStart or #lineLeft + 1) - 1
     local displayWordStart = util.toDisplayOffset(param, absWordStart)
     for name, kind in pairs(names) do
         if name ~= currentClass and name:sub(1, #typePrefix) == typePrefix then

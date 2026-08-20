@@ -3,6 +3,7 @@
 ---@field key LuaParser.Node.CatParamName
 ---@field optional? boolean
 ---@field value? LuaParser.Node.CatExp
+---@field pack? LuaParser.Node.CatGeneric # `...T` 泛型包绑定
 local CatStateParam = Class('LuaParser.Node.CatStateParam', 'LuaParser.Node.Base')
 
 CatStateParam.kind = 'catstateparam'
@@ -25,12 +26,27 @@ function Ast:parseCatStateParam()
     if not key then
         return nil
     end
+
+    local pack
+    if key.id == '...' then
+        local nextToken, nextType, nextPos = self.lexer:peek()
+        if nextType == 'Word' and nextPos == key.finish then
+            local generic = self.curBlock.genericMap[nextToken]
+            if not generic then
+                self:throw('UNDEFINED_GENERIC', nextPos, nextPos + #nextToken)
+            end
+            pack = generic
+            self.lexer:next()
+        end
+    end
+
     local optional = self.lexer:consume '?' and true or nil
 
     local catParam = self:createNode('LuaParser.Node.CatStateParam', {
         key = key,
         start = key.start,
         optional = optional,
+        pack = pack,
     })
 
     key.parent = catParam

@@ -491,10 +491,52 @@ TEST [[
             kind  = 'cat',
             value = {
                 kind  = 'catstatereturn',
-                key   = { id = 'B' },
-                value = { id = '...' },
+                value = { id = 'B', generic = {} },
             }
         }
+    }
+}
+
+TEST [[
+---@generic T
+---@param ...T any
+---@return ...T
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstategeneric',
+                typeParams = {
+                    [1] = {
+                        kind = 'catgeneric',
+                        id   = { kind = 'catid', id = 'T' },
+                    }
+                }
+            }
+        },
+        [2] = {
+            kind  = 'cat',
+            value = {
+                kind  = 'catstateparam',
+                key   = { id = '...' },
+                pack  = { kind = 'catgeneric', id = { kind = 'catid', id = 'T' } },
+                value = { id = 'any' },
+            }
+        },
+        [3] = {
+            kind  = 'cat',
+            value = {
+                kind    = 'catstatereturn',
+                returns = {
+                    [1] = {
+                        spread = true,
+                        value  = { id = 'T', generic = {} },
+                    }
+                }
+            }
+        },
     }
 }
 

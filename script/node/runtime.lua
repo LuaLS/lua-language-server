@@ -188,6 +188,19 @@ function M:fillAPIs()
         return New 'Node.List' (scope, values, min, max)
     end
 
+    ---@param head Node
+    ---@return Node.Spread
+    function self.spread(head)
+        return New 'Node.Spread' (scope, head)
+    end
+
+    ---@param generic Node
+    ---@param element? Node
+    ---@return Node.Pack
+    function self.pack(generic, element)
+        return New 'Node.Pack' (scope, generic, element)
+    end
+
     ---@param head string
     ---@param args Node[]
     ---@return Node.Call

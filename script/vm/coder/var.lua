@@ -119,8 +119,17 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         return
     end
 
-    local type = 'rt.ANY'
     local cat = coder:findMatchedCatParam(source)
+    if cat and cat.pack then
+        local element = cat.value and coder:getKey(cat.value) or 'rt.ANY'
+        coder:addLine('{key}:addType(rt.pack({generic}, {element}))' % {
+            key      = coder:getKey(source),
+            generic  = coder:getKey(cat.pack),
+            element  = element,
+        })
+        return
+    end
+    local type = 'rt.ANY'
     if cat and cat.value then
         type = coder:getKey(cat.value)
     end

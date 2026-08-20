@@ -269,6 +269,11 @@ function M:inferGeneric(other, result)
         for i = #self.values, #other.values do
             ovalues[#ovalues+1] = other:select(i)
         end
+        local pack = lastV:findPack()
+        if pack then
+            pack:inferGeneric(rt.list(ovalues), result)
+            return
+        end
         ---@type Node
         local onode = rt.UNKNOWN
         if #ovalues > 0 then

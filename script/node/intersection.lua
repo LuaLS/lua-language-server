@@ -193,7 +193,24 @@ function M:get(key)
     if self.value ~= self then
         return self.value:get(key)
     end
-    return self.tablePart:get(key)
+    local result, exists = self.tablePart:get(key)
+    for _, part in ipairs(self.otherParts) do
+        if not part:isTableLike() then
+            goto continue
+        end
+        local partValue, partExists = part:get(key)
+        if not partExists then
+            goto continue
+        end
+        if exists then
+            result = result & partValue
+        else
+            result = partValue
+            exists = true
+        end
+        ::continue::
+    end
+    return result, exists
 end
 
 ---@param self Node.Intersection

@@ -137,10 +137,18 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     if returnItems and #returnItems > 0 then
                         coder:addLine('-- ' .. cat.code)
                         for _, ret in ipairs(returnItems) do
+                            local returnType
+                            if ret.spread then
+                                returnType = 'rt.spread({value})' % {
+                                    value = coder:getKey(ret.value),
+                                }
+                            else
+                                returnType = coder:getKey(ret.value)
+                            end
                             coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
                                 funcKey    = funcKey,
                                 returnKey  = ret.key and ('%q'):format(ret.key.id) or 'nil',
-                                returnType = coder:getKey(ret.value),
+                                returnType = returnType,
                             })
                         end
                     elseif cat.value then

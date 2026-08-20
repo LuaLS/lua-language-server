@@ -39,8 +39,9 @@ function table.move(a1, f, e, t, a2) end
 
 ---@version >5.2, JIT
 ---#DES 'table.pack'
----@param ... any
----@return table
+---@generic T: any[]
+---@param ...T any
+---@return T & { n: integer }
 ---@nodiscard
 function table.pack(...) end
 
@@ -58,11 +59,11 @@ function table.sort(list, comp) end
 
 ---@version >5.2, JIT
 ---#DES 'table.unpack'
----@generic T
----@param list T[]
+---@generic T: any[]
+---@param list T
 ---@param i?   integer
 ---@param j?   integer
----@return T   ...
+---@return ...T
 ---@nodiscard
 function table.unpack(list, i, j) end
 

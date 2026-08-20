@@ -18,6 +18,7 @@ CatReturnName.kind = 'catreturnname'
 ---@field parent LuaParser.Node.CatStateReturn
 ---@field key? LuaParser.Node.CatReturnName
 ---@field value LuaParser.Node.CatExp
+---@field spread? boolean # `...T` 展开
 local CatStateReturnItem = Class('LuaParser.Node.CatStateReturnItem', 'LuaParser.Node.Base')
 
 CatStateReturnItem.kind = 'catstatereturnitem'
@@ -29,13 +30,37 @@ local Ast = Class 'LuaParser.Ast'
 ---@param required? boolean
 ---@return LuaParser.Node.CatStateReturnItem?
 function Ast:parseCatStateReturnItem(required)
-    local value = self:parseCatExp(required)
+    local spread
+    local spreadPos
+    local token, _, pos = self.lexer:peek()
+    if token == '...' then
+        spreadPos = pos
+        self.lexer:next()
+        spread = true
+    end
+
+    local value
+    if spread then
+        value = self:parseCatExp(false)
+    else
+        value = self:parseCatExp(required)
+    end
     if not value then
-        return nil
+        if spread then
+            value = self:createNode('LuaParser.Node.CatID', {
+                id     = '...',
+                start  = spreadPos,
+                finish = spreadPos + #'...',
+            })
+            spread = nil
+        else
+            return nil
+        end
     end
 
     local ret = self:createNode('LuaParser.Node.CatStateReturnItem', {
         value = value,
+        spread = spread,
         start = value.start,
     })
     value.parent = ret

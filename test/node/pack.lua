@@ -75,3 +75,31 @@ do
     lt.assertEquals(t:get(2):view(), 'string')
     lt.assertEquals(t:get('n'):view(), 'integer')
 end
+
+do
+    local tbl = rt.table {
+        [rt.value(1)] = rt.INTEGER,
+        [rt.value(2)] = rt.STRING,
+        n             = rt.INTEGER,
+    }
+    local list = rt.list({ rt.spread(tbl) })
+    lt.assertEquals(list:viewAsList(), 'integer, string')
+    lt.assertEquals(list.min, 2)
+end
+
+do
+    local T = rt.generic('T', rt.array(rt.ANY))
+    local f = rt.func()
+        : addTypeParam(T)
+        : addParamDef('t', T)
+        : addReturnDef(nil, rt.spread(T))
+
+    local arg = rt.variable 't'
+    arg:setStaticValue(rt.table {
+        [rt.value(1)] = rt.INTEGER,
+        [rt.value(2)] = rt.STRING,
+    })
+
+    local fcall = rt.fcall(f, { arg })
+    lt.assertEquals(fcall.value:viewAsList(), 'integer, string')
+end

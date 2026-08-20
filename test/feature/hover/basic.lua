@@ -1506,6 +1506,33 @@ local t: {
 
 TEST_HOVER [[
 --!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack(t)
+print(x<??>)
+]] 'local x: 1'
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack(t)
+print(y<??>)
+]] 'local y: 2'
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack(t)
+print(z<??>)
+]] 'local z: 3'
+
+TEST_HOVER [[
+--!include tablepack
 
 local <?t?> = table.pack(1, 2, 3)
 ]] {
@@ -1518,6 +1545,24 @@ local t: {
 }
 ]],
 }
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack { 1, 2, 3 }
+print(x<??>)
+]] 'local x: 1'
+
+TEST_HOVER [[
+--!include tablepack
+--!include tableunpack
+
+local t = table.pack(1, 2, 3)
+local x, y, z = table.unpack({ 1, 2, 3 })
+print(y<??>)
+]] 'local y: 2'
 
 TEST_HOVER [[
 ---@generic T: any[]

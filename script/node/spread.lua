@@ -22,6 +22,18 @@ M.__getter.value = function (self)
     self.head:addRef(self)
 
     local head = self.head:simplify()
+    for _ = 1, 100 do
+        if head.kind ~= 'variable'
+        and head.kind ~= 'intersection' then
+            break
+        end
+        head:addRef(self)
+        local value = head.value
+        if value == head then
+            break
+        end
+        head = value:simplify()
+    end
     if head.kind == 'list' then
         return head, true
     end
@@ -37,12 +49,16 @@ M.__getter.value = function (self)
         ---@cast head Node.Table
         local maxn = 0
         for _, key in ipairs(head.keys) do
-            if  key.kind == 'value'
-            and math.type(key.literal) == 'integer'
-            and key.literal >= 1 then
-                if key.literal > maxn then
-                    maxn = key.literal
-                end
+            local literal
+            if type(key) == 'number' then
+                literal = key
+            elseif key.kind == 'value' then
+                literal = key.literal
+            end
+            if  math.type(literal) == 'integer'
+            and literal >= 1
+            and literal > maxn then
+                maxn = literal
             end
         end
         if maxn > 0 then

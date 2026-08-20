@@ -126,6 +126,25 @@ M.__getter.returnsPack = function (self)
             end
             return value
         end)
+        local last = returns[#returns]
+        local lastList = last:findValue(ls.node.kind['list'])
+        if lastList and lastList ~= last then
+            local base = #returns - 1
+            local innerValues = lastList.values
+            local flat = {}
+            for i = 1, base do
+                flat[i] = returns[i]
+            end
+            for i = 1, #innerValues do
+                flat[base + i] = innerValues[i]
+            end
+            local min = base + lastList.min
+            local max
+            if lastList.max then
+                max = base + lastList.max
+            end
+            return rt.list(flat, min, max or false), true
+        end
         return rt.list(returns), true
     else
         local maxReturn = 0

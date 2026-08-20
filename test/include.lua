@@ -10,6 +10,24 @@ test.includeCodes['setmetatable'] = [[
 function setmetatable(t, mt) end
 ]]
 
+test.includeCodes['tablepack'] = [[
+table = {}
+
+---@generic T: any[]
+---@param ...T any
+---@return T & { n: integer }
+function table.pack(...) end
+]]
+
+test.includeCodes['tableunpack'] = [[
+---@generic T: any[]
+---@param list T
+---@param i?   integer
+---@param j?   integer
+---@return ...T
+function table.unpack(list, i, j) end
+]]
+
 test.includeCodes['require'] = [[
 ---@generic T: string
 ---@param modname T

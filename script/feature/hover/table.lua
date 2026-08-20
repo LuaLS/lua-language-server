@@ -76,8 +76,25 @@ ls.feature.provider.hover(function (param, action)
         return
     end
 
+    if snode.kind == 'intersection' then
+        ---@cast snode Node.Intersection
+        local value = snode.value
+        if value ~= snode and value:isTableLike() then
+            return
+        end
+    end
+
     snode:each('table', function (node)
         ---@cast node Node.Table
+        if node == snode then
+            return
+        end
+
+        pushWithPrefix('', node)
+    end)
+
+    snode:each('tuple', function (node)
+        ---@cast node Node.Tuple
         if node == snode then
             return
         end

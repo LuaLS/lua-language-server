@@ -1494,7 +1494,30 @@ TEST_HOVER [[
 ---@return T & { n: integer }
 local function pack(...) end
 local <?t?> = pack(1, 'a')
-]] 'local t: { n: integer } & [1, \'a\']'
+]] {
+    [[
+local t: {
+    [1]: 1,
+    [2]: 'a',
+    n: integer,
+}
+]],
+}
+
+TEST_HOVER [[
+--!include tablepack
+
+local <?t?> = table.pack(1, 2, 3)
+]] {
+    [[
+local t: {
+    [1]: 1,
+    [2]: 2,
+    [3]: 3,
+    n: integer,
+}
+]],
+}
 
 TEST_HOVER [[
 ---@generic T: any[]

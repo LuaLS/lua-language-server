@@ -148,6 +148,15 @@ M.__getter.value = function (self)
     for _, value in ipairs(self.values) do
         if value.kind == 'table' then
             tableParts[#tableParts+1] = value
+        elseif value.kind == 'tuple' then
+            ---@cast value Node.Tuple
+            local fields = {}
+            for _, key in ipairs(value.keys) do
+                if key.kind == 'value' then
+                    fields[key] = value:get(key.literal)
+                end
+            end
+            tableParts[#tableParts+1] = rt.table(fields)
         else
             self.otherParts[#self.otherParts+1] = value
         end

@@ -54,7 +54,7 @@ function M:initGlob(options)
     self.glob:setInterface('patterns', function (uri)
         local patterns = {}
         do -- 忽略配置 `Lua.workspace.ignoreDir` 中定义的文件
-            local ignoreDirs = self.config:getRaw(uri, 'Lua.workspace.ignoreDir')
+            local ignoreDirs = self.config:get(uri, 'Lua.workspace.ignoreDir')
             if ignoreDirs then
                 ls.util.arrayMerge(patterns, ignoreDirs)
             end
@@ -256,6 +256,11 @@ end
 function M:_onWatchEvent(eventType, nativePath)
     local uri = ls.uri.encode(nativePath)
 
+    if ls.util.stringEndWith(uri, '/.luarc.json') then
+        self:_onRCEvent(eventType, nativePath, uri)
+        return
+    end
+
     if eventType == 'modify' then
         if self.uriSet[uri] then
             local content = self.fs.read(uri)
@@ -282,6 +287,27 @@ function M:_onWatchEvent(eventType, nativePath)
         else
             self:_expandDirDelete(uri)
         end
+    end
+end
+
+---处理 `.luarc.json` 变更：重新加载配置，配置变化时重建 scope
+---@package
+---@param eventType string
+---@param nativePath string
+---@param uri Uri
+function M:_onRCEvent(eventType, nativePath, uri)
+    local changed
+    if eventType == 'modify' then
+        changed = self.config:loadRC(uri)
+    else
+        if bfs.exists(bfs.path(nativePath)) then
+            changed = self.config:loadRC(uri)
+        else
+            changed = self.config:removeRC(uri)
+        end
+    end
+    if changed then
+        self.scope:reload({})
     end
 end
 
@@ -371,6 +397,9 @@ end
 ---@async
 ---@param options Scope.Load.Options
 function Scope:buildRoots(options)
+    for _, root in ipairs(self.roots) do
+        root:stopWatch()
+    end
     self.roots = {}
     self.includeUris = {}
 
@@ -379,7 +408,8 @@ function Scope:buildRoots(options)
     end
 
     do
-        local metaUri = metaBuilder.compile('Lua 5.5', 'zh-cn', 'utf-8')
+        local version = self.config:get(self.uri, 'Lua.runtime.version')
+        local metaUri = metaBuilder.compile(version, ls.args.LOCALE, 'utf-8')
         self.roots[#self.roots+1] = New 'Scope.Root' (self, 'meta', metaUri, self.fs, self.config)
     end
 

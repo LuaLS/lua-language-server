@@ -113,6 +113,7 @@ ls.await.call(function ()
     local suc, err = pcall(function ()
         print('开始测试')
         test.require 'test.tools'
+        test.require 'test.config'
         test.require 'test.parser'
         test.require 'test.node'
         test.require 'test.coder'

@@ -93,13 +93,35 @@ function M:initialized()
     assert(self.status == 'initializing', 'Invalid server state when initialized: ' .. self.status)
     self.status = 'initialized'
 
-    if self.client.params.workspaceFolders then
-        for i, folder in ipairs(self.client.params.workspaceFolders) do
-            local scope = ls.scope.create(folder.name, folder.uri, ls.afs)
-            scope:reload({})
-            self.scopes[i] = scope
+    ---@async
+    ls.await.call(function ()
+        if self.client.params.workspaceFolders then
+            for i, folder in ipairs(self.client.params.workspaceFolders) do
+                local scope = ls.scope.create(folder.name, folder.uri, ls.afs)
+                self:loadClientConfig(scope)
+                scope:reload({})
+                self.scopes[i] = scope
+            end
         end
+    end)
+end
+
+---@async
+---@param scope Scope
+function M:loadClientConfig(scope)
+    local configs = self.client:awaitRequest('workspace/configuration', {
+        items = {
+            {
+                scopeUri = scope.uri,
+                section  = 'Lua',
+            },
+        },
+    })
+    if type(configs) ~= 'table'
+    or type(configs[1]) ~= 'table' then
+        return
     end
+    scope.config:applyClientConfig(configs[1])
 end
 
 function M:shutdown()

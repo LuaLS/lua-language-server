@@ -37,6 +37,31 @@ function M:notify(protoName, params)
     return true
 end
 
+---@param method string
+---@param params? table
+---@param callback function
+---@return boolean
+function M:request(method, params, callback)
+    if not self.transport then
+        return false
+    end
+    self.transport:request(method, params, callback)
+    return true
+end
+
+---@async
+---@param method string
+---@param params? table
+---@return any
+function M:awaitRequest(method, params)
+    if not self.transport then
+        return nil
+    end
+    return ls.await.yield(function (resume)
+        self.transport:request(method, params, resume)
+    end)
+end
+
 ---@class LanguageClient.API
 local API = {}
 

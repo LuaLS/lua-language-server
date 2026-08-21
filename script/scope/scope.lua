@@ -48,7 +48,6 @@ end
 
 ---@param options Scope.Load.Options
 function M:reload(options)
-    -- TODO: 需要先读配置文件
     ---@async
     ls.await.call(function ()
         if self.uri then
@@ -164,13 +163,29 @@ end
 ---@param uri Uri
 ---@return LuaParser.CompileOptions?
 function M:makeCompileOptions(uri)
+    local options = {}
+
+    local version = self.config:get(uri, 'Lua.runtime.version')
+    if version == 'LuaJIT' then
+        options.version = 'Lua 5.1'
+        options.jit = true
+    elseif version and version ~= 'Lua 5.4' then
+        options.version = version
+    end
+
+    if self.config:get(uri, 'Lua.runtime.unicodeName') then
+        options.unicodeName = true
+    end
+
     local symbols = self.config:get(uri, 'Lua.runtime.nonstandardSymbol')
-    if not symbols or #symbols == 0 then
+    if type(symbols) == 'table' and #symbols > 0 then
+        options.nonestandardSymbols = symbols
+    end
+
+    if not next(options) then
         return nil
     end
-    return {
-        nonestandardSymbols = symbols,
-    }
+    return options
 end
 
 ---@async

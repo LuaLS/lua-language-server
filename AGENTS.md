@@ -38,6 +38,7 @@ It is intended for both human collaborators and coding agents.
   - parser: `test/parser/`
   - node/tracer: `test/node/`
   - feature: `test/feature/`
+  - config: `test/config/`（功能性断言，不要硬编码配置键数量，避免追加键时改旧测试）
 
 ## 3) Tracer and Narrowing Constraints
 

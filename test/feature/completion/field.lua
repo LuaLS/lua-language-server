@@ -354,5 +354,24 @@ do
     test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', nil)
 end
 
--- [SKIPPED][stdlib-dependent] io<?> EXISTS 依赖标准库，暂不迁移
+-- [SKIPPED][stdlib-dependent] io<?> EXISTS 依赖跨文件全局字段推断（env child value 为 field↔variable 引用循环，赋值 table 不在 value 链上），暂不迁移
+TEST_COMPLETION [[
+print(io.<??>)
+]] (EXISTS)
+
+do
+    TEST_COMPLETION [[
+GG = {}
+function GG.ff()
+end
+
+GG.<??>
+]] {
+        {
+            label      = 'ff()',
+            kind       = ls.spec.CompletionItemKind.Function,
+            insertText = 'ff',
+        },
+    }
+end
 -- [SKIPPED][stdlib-dependent] utf8.charpatter<?> detail/description 依赖标准库，暂不迁移

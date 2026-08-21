@@ -368,6 +368,7 @@ TEST_COMPLETION [[
 local function foo(a, b, c, ...) end
 foo<??>
 ]] {
+	include = true,
 	{
 		label = 'foo(a, b, c, ...)',
 		kind  = ls.spec.CompletionItemKind.Function,
@@ -388,6 +389,7 @@ TEST_COMPLETION [[
 local function foo(a, b, c, ...) end
 foo<??>
 ]] {
+	include = true,
 	{
 		label = 'foo(a, b, c, ...)',
 		kind  = ls.spec.CompletionItemKind.Function,
@@ -405,6 +407,7 @@ TEST_COMPLETION [[
 local function foo(f) end
 foo<??>
 ]] {
+	include = true,
 	{
 		label = 'foo(f)',
 		kind  = ls.spec.CompletionItemKind.Function,
@@ -910,6 +913,7 @@ f({
     end,
 })
 ]] {
+	include = true,
 	{
 		label = 'abc3',
 		kind  = ls.spec.CompletionItemKind.Variable,

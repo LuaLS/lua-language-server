@@ -3,6 +3,27 @@ local util = ls.feature.completionUtil
 
 ---@param param Feature.Completion.Param
 ---@return boolean
+local function isAfterWordPosition(param)
+    local text = param.scanner.text
+    local pos = param.scanner.offset
+    while pos >= 1 do
+        local ch = text:sub(pos, pos)
+        if ch ~= ' ' and ch ~= '\t' then
+            break
+        end
+        pos = pos - 1
+    end
+    if pos < 1 then
+        return false
+    end
+    local ch = text:sub(pos, pos)
+    return ls.guide.isWordChar(ch)
+        or ch == '.'
+        or ch == ':'
+end
+
+---@param param Feature.Completion.Param
+---@return boolean
 local function isEmptyRhsCompletionPosition(param)
     local text = param.scanner.text
     local offset = param.realTextOffset or param.textOffset or util.toTextOffset(text, param.offset)
@@ -109,6 +130,9 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local word = util.getCompletionWord(param)
+    if word == '' and isAfterWordPosition(param) then
+        return
+    end
 
     local locals = guide.getVisibleLocals(source, textOffset)
     local entries = {}
@@ -173,8 +197,16 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
+    if isEmptyRhsCompletionPosition(param) then
+        return
+    end
+
     local source = param.sources[1]
     local word = util.getCompletionWord(param)
+
+    if word == '' and isAfterWordPosition(param) then
+        return
+    end
 
     local document = param.scope:getDocument(param.uri)
     if not document then

@@ -73,11 +73,12 @@ myf<??>
     },
 }
 
--- 单个局部变量自身补全
+-- 单个局部变量自身补全（stdlib 全局可能模糊混入，断言包含）
 TEST_COMPLETION [[
 local xxxx
 xxxx<??>
 ]] {
+    include = true,
     {
         label = 'xxxx',
         kind = ls.spec.CompletionItemKind.Variable,
@@ -90,6 +91,7 @@ local xxxx
 local XXXX
 xxxx<??>
 ]] {
+    include = true,
     {
         label = 'XXXX',
         kind = ls.spec.CompletionItemKind.Variable,
@@ -127,6 +129,7 @@ local fa = 1
 local function myfunc(x) end
 myfunc(fa<??>)
 ]] {
+    include = true,
     {
         label = 'fa',
         kind = ls.spec.CompletionItemKind.Variable,
@@ -138,18 +141,26 @@ TEST_COMPLETION [[
 local fff
 local function f(ff<??>)
 end
-]] {
-    {
-        label = 'fff',
-        kind = ls.spec.CompletionItemKind.Variable,
-    },
-}
+]] (function (results)
+    local hasFFF
+    local hasFF
+    for _, item in ipairs(results) do
+        if item.label == 'fff' then
+            hasFFF = true
+        end
+        if item.label == 'ff' then
+            hasFF = true
+        end
+    end
+    assert(hasFFF and not hasFF)
+end)
 
 -- 光标位于单词中间（ab|c）时，前缀应为左侧部分 ab
 TEST_COMPLETION [[
 local abc
 ab<??>c
 ]] {
+    include = true,
     {
         label = 'abc',
         kind = ls.spec.CompletionItemKind.Variable,
@@ -163,6 +174,7 @@ return function ()
     end
 end
 ]] {
+    include = true,
     {
         label = 'xxx',
         kind  = ls.spec.CompletionItemKind.Variable,
@@ -235,13 +247,15 @@ end
 
 GGG<??>
 ]] {
+        include = true,
         {
             label = 'GGG',
             kind  = ls.spec.CompletionItemKind.Enum,
         },
         {
-            label = 'GGG()',
-            kind  = ls.spec.CompletionItemKind.Function,
+            label      = 'GGG()',
+            kind       = ls.spec.CompletionItemKind.Function,
+            insertText = 'GGG',
         },
     }
     test.scope.config:set(test.rootUri, 'Lua.completion.callSnippet', 'Both')

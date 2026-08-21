@@ -10,6 +10,10 @@ function TEST_FRAME(script, callback)
     local _ <close> = test.checkInclude(script)
     local newScript, catched = test.catch(script, '!?')
 
+    for _, uri in ipairs(test.metaUris or {}) do
+        test.scope.vm:indexFile(uri)
+    end
+
     local file <close>  = ls.file.setServerText(test.fileUri, newScript)
     local vfile <close> = test.scope.vm:indexFile(test.fileUri)
 

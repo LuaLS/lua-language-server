@@ -1213,6 +1213,13 @@ function m.stringSimilar(s1, s2, ignoreCase)
         return false, 0
     end
 
+    if s1:find '[^\x00-\x7F]' then
+        if ignoreCase then
+            return s1:upper() == s2:sub(1, #s1):upper(), 0
+        end
+        return s1 == s2:sub(1, #s1), 0
+    end
+
     if ignoreCase then
         s1 = s1:upper()
         s2 = s2:upper()

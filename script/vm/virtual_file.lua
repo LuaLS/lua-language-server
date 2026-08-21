@@ -5,6 +5,8 @@ Extends('VM.Vfile', 'GCHost')
 
 --- 已编译的版本
 M.version = -1
+--- 编译时的 runtime 代数
+M.rtGeneration = -1
 --- 正在编译中的版本
 ---@type integer?
 M.indexingVersion = nil
@@ -53,13 +55,16 @@ function M:index()
         return
     end
 
+    local rtGeneration = self.scope.rt.generation
     local version = document.version
-    if self.version >= version then
+    if self.version >= version
+    and self.rtGeneration == rtGeneration then
         return
     end
 
     local _ <close> = function ()
         self.version = version
+        self.rtGeneration = rtGeneration
         self.document = document
 
         self.onDidIndex:fire(self)
@@ -97,7 +102,8 @@ function M:awaitIndex()
     if not document then
         return
     end
-    if self.version >= document.version then
+    if self.version >= document.version
+    and self.rtGeneration == self.scope.rt.generation then
         local indexingVersion = self.indexingVersion
         if not indexingVersion then
             -- 没在编译？直接返回
@@ -133,6 +139,7 @@ function M:awaitIndex()
     local _ <close> = function ()
         self.indexingVersion = nil
         self.version = version
+        self.rtGeneration = self.scope.rt.generation
         self.document = document
 
         ls.util.arrayRemove(self.scope.vm.indexingFiles, self, true)

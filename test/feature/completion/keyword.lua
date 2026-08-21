@@ -1,9 +1,10 @@
 -- keyword 补全测试
 
--- 基础关键字前缀匹配
+-- 基础关键字前缀匹配（stdlib 全局可能模糊混入，断言包含）
 TEST_COMPLETION [[
 loc<??>
 ]] {
+    include = true,
     {
         label = 'local',
         kind  = ls.spec.CompletionItemKind.Keyword,
@@ -13,6 +14,7 @@ loc<??>
 TEST_COMPLETION [[
 do<??>
 ]] {
+    include = true,
     {
         label = 'do',
         kind  = ls.spec.CompletionItemKind.Keyword,
@@ -22,6 +24,7 @@ do<??>
 TEST_COMPLETION [[
 retu<??>
 ]] {
+    include = true,
     {
         label = 'return',
         kind  = ls.spec.CompletionItemKind.Keyword,
@@ -32,6 +35,7 @@ retu<??>
 TEST_COMPLETION [[
 els<??>
 ]] {
+    include = true,
     {
         label = 'else',
         kind  = ls.spec.CompletionItemKind.Keyword,
@@ -57,6 +61,7 @@ local function f()
     else<??>
 end
 ]] {
+    include = true,
     {
         label = 'else',
         kind  = ls.spec.CompletionItemKind.Keyword,

@@ -2,6 +2,25 @@
 
 test.scope.config:set(test.rootUri, 'Lua.completion.callSnippet', 'Both')
 
+local metaBuilder = require 'scope.meta-builder'
+local metaUri = metaBuilder.compile('Lua 5.4', 'auto', 'utf-8')
+test.metaUris = {}
+do
+    local files = ls.afs.getChilds(metaUri)
+    if files then
+        for _, uri in ipairs(files) do
+            if ls.util.stringEndWith(uri, '.lua') then
+                local text = ls.afs.read(uri)
+                if text then
+                    ls.file.setServerText(uri, text)
+                    test.metaUris[#test.metaUris+1] = uri
+                end
+            end
+        end
+    end
+    table.sort(test.metaUris)
+end
+
 -- 确保 Match / EXISTS / NIL / IGNORE_REST 等工具可用（不走过滤器，总是加载）
 require 'test.parser.ast'
 

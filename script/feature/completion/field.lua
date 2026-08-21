@@ -349,6 +349,11 @@ local function collectFieldMatches(param, source, key, options)
 
     local objNode = param.scope.vm:getNode(source)
     local objVar  = param.scope.vm:getVariable(source)
+    if not objVar
+    and source.kind == 'var'
+    and type(source.id) == 'string' then
+        objVar = param.scope.rt:globalGet(source.id)
+    end
 
     -- 快速收集字符串键字段
     local matches = {}

@@ -124,9 +124,6 @@ ls.feature.completion = function (uri, offset)
             if rightChar ~= '' and rightChar ~= ' ' and rightChar ~= '\t' and rightChar ~= '\n' and rightChar ~= '\r' then
                 goto skipAdjustScanner
             end
-            scanner = New 'Feature.TextScanner' (text, textOffset - 1)
-            word = scanner:getWordBack()
-            textOffset = textOffset - 1
         end
     end
     ::skipAdjustScanner::
@@ -402,12 +399,12 @@ function util.getCompletionWord(param)
     end
 
     local text = param.scanner.text
-    local prev = text:sub(offset - 1, offset - 1)
+    local prev = text:sub(offset, offset)
     if not ls.guide.isWordChar(prev) then
         return ''
     end
 
-    local temp = New 'Feature.TextScanner' (text, offset - 1)
+    local temp = New 'Feature.TextScanner' (text, offset)
     local w = temp:getWordBack()
     return w
 end

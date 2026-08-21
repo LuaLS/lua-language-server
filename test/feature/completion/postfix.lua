@@ -386,10 +386,14 @@ TEST_COMPLETION [[
 self.results.list[#<??>]
 ]] (EXISTS)
 
--- word=ff，无匹配局部或全局，返回 nil
+-- word=ff：不应匹配到未定义的 fff 自身（stdlib 全局可能模糊混入）
 TEST_COMPLETION [[
 fff[#ff<??>]
-]] (nil)
+]] (function (results)
+    for _, item in ipairs(results) do
+        assert(item.label ~= 'fff')
+    end
+end)
 
 -- cursor 紧跟 # 后，同 case 1
 TEST_COMPLETION [[

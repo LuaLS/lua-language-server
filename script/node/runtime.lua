@@ -1,8 +1,11 @@
 local class = require 'class'
 
 ---@class Node.Runtime: Class.Base
+---@field generation integer
 ---@overload fun(scope: Scope): Node.Runtime
 local M = Class 'Node.Runtime'
+
+M.generation = 0
 
 ---@param scope Scope
 function M:__init(scope)
@@ -443,6 +446,7 @@ function M:fillPresets()
 end
 
 function M:reset()
+    self.generation = self.generation + 1
     self:createPools()
     self:fillPresets()
     self.castCache = nil

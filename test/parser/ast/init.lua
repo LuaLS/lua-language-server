@@ -36,6 +36,28 @@ function Match(result, expect, exact)
                 if expLen ~= resLen then
                     error({exp, res})
                 end
+            elseif not thisExact and parentExact and exp[IGNORE_REST] then
+                -- 无序子集：期望数组每项在结果中存在一个匹配即可
+                for i = 1, #exp do
+                    local found = false
+                    for j = 1, (res and #res or 0) do
+                        local mark = #path
+                        local ok = pcall(eq, exp[i], res[j], true)
+                        if not ok then
+                            for k = #path, mark + 1, -1 do
+                                path[k] = nil
+                            end
+                        else
+                            found = true
+                            break
+                        end
+                    end
+                    if not found then
+                        path[#path+1] = i
+                        error({exp[i], '<missing>'})
+                    end
+                end
+                return
             end
             for k, v in pairs(exp) do
                 if k ~= IGNORE_REST then

@@ -75,11 +75,16 @@ Implemented providers:
 
 Known open points:
 
-- One known word-scan offset issue around `myfunc(fa<??>)` in completion tests
+- ~~One known word-scan offset issue around `myfunc(fa<??>)` in completion tests~~ 已修复（`util.getCompletionWord` 的"空格后回退取左词"逻辑删除，空 word 由 provider 位置守卫处理）
 - Remaining skipped cases are marked `[SKIPPED]` in each completion test file:
   - `[config-dependent]`：依赖 config.set（config 系统已接入）；`_G['z.b.c']` version、中文字段名（unicodeName）、GGG<?>（callSnippet）已迁移，剩余 require '<?>' count=9（跨文件/文件系统）
-  - `[stdlib-dependent]`：依赖标准库（TEST_COMPLETION 为裸环境），如 io.*、collectgarbage、type 枚举
+  - `[stdlib-dependent]`：跨文件全局字段推断已修复（`Node.Runtime.generation` + `VM.Vfile.rtGeneration`：`rt:reset()` 后 vfile 不再被版本短路跳过，coder 会重跑、全局绑定重建）。TEST_COMPLETION harness 已加载 meta 标准库，`io.<?>` 等跨文件补全可用（field.lua 已有一例 EXISTS）。注意：stdlib 全局参与 word 模糊匹配（`stringSimilar` 字符集近似，master 同款语义），相关用例需用 include/函数断言。剩余 SKIPPED 项可分批迁移
   - `[legacy-*-context]` / `[description]`：旧上下文行为或 description 断言，行为未定
+
+本仓库相对 master 的匹配语义修正：
+
+- `stringSimilar` 对含高位字节的 word 走前缀匹配（位掩码对 >127 字节溢出为 0 会匹配一切）
+- 空 word 位置守卫：word 后空格（表构造器键后等）不出局部/全局补全；`local x = ` 空 word rhs 不出全局（对齐 master）
 
 ## 6) Migration Workflow for Completion Tests
 

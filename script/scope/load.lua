@@ -414,9 +414,6 @@ function Scope:buildRoots(options)
     end
 
     local libraries = self.config:get(self.uri, 'Lua.workspace.library')
-    if type(libraries) ~= 'table' then
-        return
-    end
 
     local seen = {}
 

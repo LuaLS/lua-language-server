@@ -44,6 +44,10 @@ do
     assert(config:get(test.fileUri, 'Lua.workspace.ignoreDir')[1] == '.vscode')
     assert(config:get(test.fileUri, 'Lua.completion.workspaceWord') == true)
     assert(config:get(test.fileUri, 'Lua.hint.enable') == false)
+    assert(config:get('', 'Lua.runtime.path')[2] == '?/init.lua')
+    local noUri ---@type Uri?
+    assert(config:get(noUri, 'Lua.completion.requireSeparator') == '.')
+    assert(config:get('file:///other/place.lua', 'Lua.runtime.version') == nil)
 
     config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.1')
     assert(config:get(test.fileUri, 'Lua.runtime.version') == 'Lua 5.1')

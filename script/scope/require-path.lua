@@ -54,19 +54,8 @@ function Scope:searchFiles(modname, suri)
 
     local configUri = suri or self.uri or ''
     local searchers = self.config:get(configUri, 'Lua.runtime.path')
-    if type(searchers) ~= 'table' then
-        searchers = { '?.lua', '?/init.lua' }
-    end
-
-    local strict = self.config:get(configUri, 'Lua.runtime.pathStrict')
-    if strict == nil then
-        strict = false
-    end
-
+    local strict    = self.config:get(configUri, 'Lua.runtime.pathStrict')
     local separator = self.config:get(configUri, 'Lua.completion.requireSeparator')
-    if type(separator) ~= 'string' then
-        separator = '.'
-    end
 
     local path = modname:gsub('%' .. separator, '/')
 
@@ -132,9 +121,6 @@ end
 ---@return string? name
 function Scope:getRequireNameByPath(path, searcher, configUri, stemSearcher)
     local separator = self.config:get(configUri or self.uri or '', 'Lua.completion.requireSeparator')
-    if type(separator) ~= 'string' then
-        separator = '.'
-    end
     local stemPath = path
         : gsub('%.[^%.]+$', '')          -- 去掉扩展名
         : gsub('[/\\%.]+', separator)  -- 路径/点 转分隔符
@@ -218,17 +204,8 @@ function Scope:getVisiblePath(uri, suri)
     local configUri = suri or self.uri or ''
 
     local searchers = self.config:get(configUri, 'Lua.runtime.path')
-    if type(searchers) ~= 'table' then
-        searchers = { '?.lua', '?/init.lua' }
-    end
-    local strict = self.config:get(configUri, 'Lua.runtime.pathStrict')
-    if strict == nil then
-        strict = false
-    end
+    local strict    = self.config:get(configUri, 'Lua.runtime.pathStrict')
     local separator = self.config:get(configUri, 'Lua.completion.requireSeparator')
-    if type(separator) ~= 'string' then
-        separator = '.'
-    end
 
     local cache = self.visiblePathCache
     local fingerprint = table.concat(searchers, '\0') .. '\0' .. tostring(strict) .. '\0' .. separator
@@ -277,17 +254,8 @@ function Scope:searchFilesByPartial(partial, suri)
 
     local configUri = suri or self.uri or ''
     local searchers = self.config:get(configUri, 'Lua.runtime.path')
-    if type(searchers) ~= 'table' then
-        searchers = { '?.lua', '?/init.lua' }
-    end
-    local strict = self.config:get(configUri, 'Lua.runtime.pathStrict')
-    if strict == nil then
-        strict = false
-    end
+    local strict    = self.config:get(configUri, 'Lua.runtime.pathStrict')
     local separator = self.config:get(configUri, 'Lua.completion.requireSeparator')
-    if type(separator) ~= 'string' then
-        separator = '.'
-    end
     local cache = self.visiblePathCache
     local fingerprint = table.concat(searchers, '\0') .. '\0' .. tostring(strict) .. '\0' .. separator
     if cache.fingerprint ~= fingerprint then

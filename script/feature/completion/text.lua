@@ -33,9 +33,6 @@ ls.feature.provider.completion(function (param, action)
     end
 
     local showWord = param.scope.config:get(param.uri, 'Lua.completion.showWord')
-    if showWord == nil then
-        showWord = 'Fallback'
-    end
     if showWord == 'Disable' then
         return
     end

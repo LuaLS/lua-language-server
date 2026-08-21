@@ -154,20 +154,22 @@ function M:getRaw(uri, key)
     return pack[key]
 end
 
----@param uri Uri
+---@param uri Uri?
 ---@param key string
 ---@return any
 function M:get(uri, key)
-    if not ls.util.stringStartWith(uri, self.root, ls.env.IGNORE_CASE) then
-        return nil
-    end
-    local currentUri = uri
-    while #currentUri >= #self.root do
-        local value = self:getRaw(currentUri, key)
-        if value ~= nil then
-            return value
+    if uri and uri ~= '' then
+        if not ls.util.stringStartWith(uri, self.root, ls.env.IGNORE_CASE) then
+            return nil
         end
-        currentUri = ls.fs.parent(currentUri)
+        local currentUri = uri
+        while #currentUri >= #self.root do
+            local value = self:getRaw(currentUri, key)
+            if value ~= nil then
+                return value
+            end
+            currentUri = ls.fs.parent(currentUri)
+        end
     end
     local clientValue = self.clientMap[key]
     if clientValue ~= nil then

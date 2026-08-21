@@ -287,8 +287,72 @@ t.<??>
     },
 }
 
--- [SKIPPED][config-dependent] `_G['z.b.c']` Lua 5.4/_ENV 全局字段 textEdit 依赖 config.set(version)，暂不迁移
--- [SKIPPED][config-dependent] `_G['z.b.c']` Lua 5.1/_G 全局字段 textEdit 依赖 config.set(version)，暂不迁移
--- [SKIPPED][config-dependent] 中文字段名补全（unicodeName）依赖 config.set，暂不迁移
+do
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.4')
+    TEST_COMPLETION [[
+_G['z.b.c'] = {}
+
+z<??>
+]] {
+        {
+            label = "'z.b.c'",
+            kind  = ls.spec.CompletionItemKind.Field,
+            textEdit = {
+                start   = 20000,
+                finish  = 20001,
+                newText = "_ENV['z.b.c']",
+            },
+        },
+    }
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.1')
+    TEST_COMPLETION [[
+_G['z.b.c'] = {}
+
+z<??>
+]] {
+        {
+            label = "'z.b.c'",
+            kind  = ls.spec.CompletionItemKind.Field,
+            textEdit = {
+                start   = 20000,
+                finish  = 20001,
+                newText = "_G['z.b.c']",
+            },
+        },
+    }
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
+end
+
+do
+    test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', true)
+    TEST_COMPLETION [[
+中文字段 = 1
+
+中文<??>
+]] {
+        {
+            label = '中文字段',
+            kind  = ls.spec.CompletionItemKind.Enum,
+        },
+    }
+    test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', false)
+    TEST_COMPLETION [[
+中文字段 = 1
+
+中文<??>
+]] {
+        {
+            label = '中文字段',
+            kind  = ls.spec.CompletionItemKind.Enum,
+            textEdit = {
+                start   = 20000,
+                finish  = 20002,
+                newText = '_ENV["中文字段"]',
+            },
+        },
+    }
+    test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', nil)
+end
+
 -- [SKIPPED][stdlib-dependent] io<?> EXISTS 依赖标准库，暂不迁移
 -- [SKIPPED][stdlib-dependent] utf8.charpatter<?> detail/description 依赖标准库，暂不迁移

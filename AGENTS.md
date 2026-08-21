@@ -75,9 +75,11 @@ Implemented providers:
 
 Known open points:
 
-- `test/feature/completion/luadoc.lua` not implemented
-- `test/feature/completion/string.lua` not implemented
 - One known word-scan offset issue around `myfunc(fa<??>)` in completion tests
+- Remaining skipped cases are marked `[SKIPPED]` in each completion test file:
+  - `[config-dependent]`：依赖 config.set（config 系统已接入）；`_G['z.b.c']` version、中文字段名（unicodeName）、GGG<?>（callSnippet）已迁移，剩余 require '<?>' count=9（跨文件/文件系统）
+  - `[stdlib-dependent]`：依赖标准库（TEST_COMPLETION 为裸环境），如 io.*、collectgarbage、type 枚举
+  - `[legacy-*-context]` / `[description]`：旧上下文行为或 description 断言，行为未定
 
 ## 6) Migration Workflow for Completion Tests
 
@@ -86,19 +88,19 @@ Known open points:
 - Run completion tests after each migration batch before moving to the next batch.
 - `TEST_COMPLETION` uses a bare environment. If a test needs stdlib symbols, define them inside the test snippet.
 - If behavior is ambiguous, stop and confirm expected behavior before proceeding.
+- 实现老测试的期望行为不是强制义务：若测试期望不合理、或与本分支新设计冲突，可以不实现，保留 `[SKIPPED]` 标记并说明分歧，留待讨论后再定。
 
 ## 7) Completion Migration Scope Snapshot
 
-- Already migrated:
+- Already migrated and implemented:
   - keyword cases (`keyword.lua`)
   - word/local-global cases (`word.lua`)
   - field access cases (`field.lua`)
   - part of special cases (`special.lua`)
-- Not implemented yet:
   - LuaDoc completion (`luadoc.lua`)
   - string enum completion (`string.lua`)
-  - workspaceWord text completion, metatable `__index`, global stdlib table fields,
-    special dotted field names, Chinese field names, function snippet insertText
+  - workspaceWord text completion, metatable `__index`, function snippet insertText
+- Remaining skipped cases are marked `[SKIPPED]` per file（config-dependent 项可借已接入的 config 系统解锁）
 
 ## 8) Style Note
 

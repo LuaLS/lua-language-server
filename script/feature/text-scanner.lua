@@ -52,7 +52,7 @@ function M:peekBackChar()
     return self.text:sub(self.offset, self.offset)
 end
 
---- 判断一个字符是否是 Lua 标识符字符（字母、数字、下划线）。
+--- 判断一个字符是否是 Lua 标识符字符（字母、数字、下划线、高位字节）。
 ---@param ch string
 ---@return boolean
 function M.isIdentChar(ch)
@@ -60,6 +60,7 @@ function M.isIdentChar(ch)
         or (ch >= 'a' and ch <= 'z')
         or (ch >= 'A' and ch <= 'Z')
         or (ch >= '0' and ch <= '9')
+        or ch:byte() >= 0x80
 end
 
 --- 向前扫描出光标前的 Lua 标识符单词（即正在输入的前缀）。

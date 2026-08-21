@@ -225,5 +225,26 @@ AAA = 1
 
 -- [SKIPPED][stdlib-dependent] xpcal<?> insertText + xpcall 标准库补全依赖标准库，暂不迁移
 -- [SKIPPED][stdlib-dependent] collectgarbage/io.*/type 标准库枚举补全依赖标准库，暂不迁移
--- [SKIPPED][config-dependent] GGG<?> with callSnippet=Disable 依赖 config.set，暂不迁移
+
+do
+    test.scope.config:set(test.rootUri, 'Lua.completion.callSnippet', 'Disable')
+    TEST_COMPLETION [[
+GGG = 1
+GGG = function ()
+end
+
+GGG<??>
+]] {
+        {
+            label = 'GGG',
+            kind  = ls.spec.CompletionItemKind.Enum,
+        },
+        {
+            label = 'GGG()',
+            kind  = ls.spec.CompletionItemKind.Function,
+        },
+    }
+    test.scope.config:set(test.rootUri, 'Lua.completion.callSnippet', 'Both')
+end
+
 -- [SKIPPED][config-dependent] require '<?>' count=9 依赖文件系统/配置，暂不迁移

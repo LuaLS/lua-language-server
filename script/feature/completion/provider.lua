@@ -383,6 +383,19 @@ function util.isIdentChar(ch)
         or (ch >= 'a' and ch <= 'z')
         or (ch >= 'A' and ch <= 'Z')
         or (ch >= '0' and ch <= '9')
+        or ch:byte() >= 0x80
+end
+
+---@param param Feature.Completion.Param
+---@return 'Disable' | 'Replace' | 'Both'
+function util.getCallSnippetMode(param)
+    local value = param.scope.config:get(param.uri, 'Lua.completion.callSnippet')
+    if value == 'Both'
+    or value == 'Replace' then
+        ---@cast value 'Both' | 'Replace'
+        return value
+    end
+    return 'Disable'
 end
 
 ---@param param Feature.Completion.Param

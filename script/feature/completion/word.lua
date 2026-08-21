@@ -216,14 +216,67 @@ ls.feature.provider.completion(function (param, action)
         return ls.util.stringLess(a.name, b.name)
     end)
 
+    local unicodeName = param.scope.config:get(param.uri, 'Lua.runtime.unicodeName')
+
+    local function literalKindOf(value)
+        if not value then
+            return ls.spec.CompletionItemKind.Field
+        end
+        if value.kind == 'value' then
+            return ls.spec.CompletionItemKind.Enum
+        end
+        if value.kind == 'union' then
+            for _, child in ipairs(value.values) do
+                if child.kind == 'value' then
+                    return ls.spec.CompletionItemKind.Enum
+                end
+            end
+        end
+        return ls.spec.CompletionItemKind.Field
+    end
+
+    local callSnippet = util.getCallSnippetMode(param)
+
     for _, item in ipairs(matches) do
         local value = item.var.value
         local funcs = util.collectFunctionNodes(value)
 
-        action.push {
-            label = item.name,
-            kind = ls.spec.CompletionItemKind.Field,
-        }
+        local name = item.name
+        local isIdent = name:match '^[%a_][%w_]*$' ~= nil
+        local isWideIdent = not isIdent and name:match '^[_%w\x80-\xff]+$' ~= nil
+        if isIdent
+        or (isWideIdent and unicodeName) then
+            action.push {
+                label = name,
+                kind = literalKindOf(value),
+            }
+        elseif isWideIdent then
+            local version = param.scope.config:get(param.uri, 'Lua.runtime.version')
+            local envName = (version == 'Lua 5.1' or version == 'LuaJIT') and '_G' or '_ENV'
+            action.push {
+                label = name,
+                kind  = literalKindOf(value),
+                textEdit = {
+                    start   = util.toDisplayOffset(param, textOffset - #word),
+                    finish  = util.toDisplayOffset(param, textOffset),
+                    newText = ('%s[%s]'):format(envName, ('%q'):format(name)),
+                },
+            }
+        else
+            local version = param.scope.config:get(param.uri, 'Lua.runtime.version')
+            local envName = (version == 'Lua 5.1' or version == 'LuaJIT') and '_G' or '_ENV'
+            local quoted = ("'%s'"):format(name)
+            action.push {
+                label = quoted,
+                kind  = ls.spec.CompletionItemKind.Field,
+                textEdit = {
+                    start   = util.toDisplayOffset(param, textOffset - #word),
+                    finish  = util.toDisplayOffset(param, textOffset),
+                    newText = ('%s[%s]'):format(envName, quoted),
+                },
+            }
+            goto continue
+        end
 
         if #funcs == 0 then
             goto continue
@@ -238,13 +291,15 @@ ls.feature.provider.completion(function (param, action)
                 action.push {
                     label = label,
                     kind = ls.spec.CompletionItemKind.Function,
-                    insertText = item.name,
+                    insertText = callSnippet == 'Replace' and snippetText or item.name,
                 }
-                action.push {
-                    label = label,
-                    kind = ls.spec.CompletionItemKind.Snippet,
-                    insertText = snippetText,
-                }
+                if callSnippet == 'Both' then
+                    action.push {
+                        label = label,
+                        kind = ls.spec.CompletionItemKind.Snippet,
+                        insertText = snippetText,
+                    }
+                end
             end
         end
         ::continue::

@@ -1,5 +1,7 @@
 ---@diagnostic disable: await-in-sync
 
+test.scope.config:set(test.rootUri, 'Lua.completion.callSnippet', 'Both')
+
 -- 确保 Match / EXISTS / NIL / IGNORE_REST 等工具可用（不走过滤器，总是加载）
 require 'test.parser.ast'
 

@@ -1,6 +1,74 @@
 ---@class LuaParser.Guide
 local M = Class 'LuaParser.Guide'
 
+local keyWordMap = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
+
+local reservedWordMap = {
+    ['true']  = true,
+    ['false'] = true,
+    ['nil']   = true,
+}
+
+local softKeywordMap = {
+    ['continue'] = true,
+    ['goto']     = true,
+}
+
+--- 判断字符串是否为合法的 Lua 标识符。
+--- 保留字与保留字面量（true/false/nil）恒为不合法；
+--- 软关键字（`goto`、`continue`）默认合法，可通过 `softKeyword = false` 排除。
+---@param str string
+---@param utf8? boolean # 允许高位字节（UTF-8）标识符
+---@param softKeyword? boolean # 允许软关键字（goto/continue）作为标识符，默认允许
+---@return boolean
+function M.isLegalName(str, utf8, softKeyword)
+    if keyWordMap[str]
+    or reservedWordMap[str] then
+        return false
+    end
+    if softKeyword == false and softKeywordMap[str] then
+        return false
+    end
+    if utf8 then
+        return str:match '^[%a_\x80-\xff][%w_\x80-\xff]*$' ~= nil
+    end
+    return str:match '^[%a_][%w_]*$' ~= nil
+end
+
+--- 判断单个字符是否属于标识符字符集（含高位字节，供逐字符扫描使用）。
+---@param ch string
+---@return boolean
+function M.isWordChar(ch)
+    local byte = ch:byte()
+    if not byte then
+        return false
+    end
+    return ch == '_'
+        or (ch >= 'a' and ch <= 'z')
+        or (ch >= 'A' and ch <= 'Z')
+        or (ch >= '0' and ch <= '9')
+        or byte >= 0x80
+end
+
 --- 返回在指定位置（offset）可见的所有局部变量（local 和 param）。
 --- 从 source 所在的 block 开始，逐层向上遍历父 block，
 --- 收集所有 effectStart <= offset 的局部变量声明，

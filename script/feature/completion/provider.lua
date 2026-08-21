@@ -376,16 +376,6 @@ function util.isStatementPosition(param)
     return true
 end
 
----@param ch string
----@return boolean
-function util.isIdentChar(ch)
-    return ch == '_'
-        or (ch >= 'a' and ch <= 'z')
-        or (ch >= 'A' and ch <= 'Z')
-        or (ch >= '0' and ch <= '9')
-        or ch:byte() >= 0x80
-end
-
 ---@param param Feature.Completion.Param
 ---@return 'Disable' | 'Replace' | 'Both'
 function util.getCallSnippetMode(param)
@@ -413,7 +403,7 @@ function util.getCompletionWord(param)
 
     local text = param.scanner.text
     local prev = text:sub(offset - 1, offset - 1)
-    if not util.isIdentChar(prev) then
+    if not ls.guide.isWordChar(prev) then
         return ''
     end
 

@@ -242,8 +242,8 @@ ls.feature.provider.completion(function (param, action)
         local funcs = util.collectFunctionNodes(value)
 
         local name = item.name
-        local isIdent = name:match '^[%a_][%w_]*$' ~= nil
-        local isWideIdent = not isIdent and name:match '^[_%w\x80-\xff]+$' ~= nil
+        local isIdent = guide.isLegalName(name)
+        local isWideIdent = not isIdent and guide.isLegalName(name, true)
         if isIdent
         or (isWideIdent and unicodeName) then
             action.push {

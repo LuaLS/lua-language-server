@@ -24,6 +24,7 @@ ls.glob    = require 'tools.glob'
 ls.fw      = require 'tools.filewatch'
 ls.locale  = require 'tools.locale'
 ls.spec    = require 'lsp.spec'
+ls.guide   = require 'parser.guide'
 package.loaded['json'] = ls.json
 package.loaded['json-beautify'] = require 'tools.json-beautify'
 package.loaded['jsonc']         = require 'tools.jsonc'

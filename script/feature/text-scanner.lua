@@ -52,17 +52,6 @@ function M:peekBackChar()
     return self.text:sub(self.offset, self.offset)
 end
 
---- 判断一个字符是否是 Lua 标识符字符（字母、数字、下划线、高位字节）。
----@param ch string
----@return boolean
-function M.isIdentChar(ch)
-    return ch == '_'
-        or (ch >= 'a' and ch <= 'z')
-        or (ch >= 'A' and ch <= 'Z')
-        or (ch >= '0' and ch <= '9')
-        or ch:byte() >= 0x80
-end
-
 --- 向前扫描出光标前的 Lua 标识符单词（即正在输入的前缀）。
 --- 不移动 scanner 的 offset。
 ---@return string word    # 当前正在输入的单词前缀（可能为空字符串）
@@ -73,7 +62,7 @@ end
 ---   offset=4 -> word=""     （请求 a.b.???? 的补全）
 function M:getWordBack()
     local pos = self.offset
-    while pos >= 1 and M.isIdentChar(self.text:sub(pos, pos)) do
+    while pos >= 1 and ls.guide.isWordChar(self.text:sub(pos, pos)) do
         pos = pos - 1
     end
     local wordStart = pos + 1
@@ -101,7 +90,7 @@ function M:getFieldTriggerBack()
     -- 1. 扫描光标前的标识符前缀（字段名前缀）
     local pos = self.offset
     local wordStart = pos + 1
-    while pos >= 1 and M.isIdentChar(self.text:sub(pos, pos)) do
+    while pos >= 1 and ls.guide.isWordChar(self.text:sub(pos, pos)) do
         pos = pos - 1
     end
     -- pos 现在指向前缀左侧的字符

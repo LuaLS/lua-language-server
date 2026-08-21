@@ -133,6 +133,8 @@ function Ast:parseCatFuncParam(required)
     local tightType
     if name.id == '...' then
         local nextToken, nextType, nextPos = self.lexer:peek()
+        ---@cast nextToken -?
+        ---@cast nextPos -?
         if nextType == 'Word' and nextPos == name.finish then
             if self:canFollowDotsAsPack(nextToken) then
                 pack = self:getOrMakeImplicitGeneric(nextToken, nextPos)

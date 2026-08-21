@@ -1,9 +1,9 @@
 -- 可选链（?. ?: ?[ ?(）的类型语义测试
--- 需要启用 Lua.runtime.nonestandardSymbols 配置
+-- 需要启用 Lua.runtime.nonstandardSymbol 配置
 local OPT = { '?.', '?:', '?[', '?(' }
 
 -- 设置配置（测试结束后清理）
-test.scope.config:set(test.rootUri, 'Lua.runtime.nonestandardSymbols', OPT)
+test.scope.config:set(test.rootUri, 'Lua.runtime.nonstandardSymbol', OPT)
 
 do
     TEST_INDEX [[
@@ -45,4 +45,4 @@ do
 end
 
 -- 清理配置，避免影响其他测试
-test.scope.config:set(test.rootUri, 'Lua.runtime.nonestandardSymbols', nil)
+test.scope.config:set(test.rootUri, 'Lua.runtime.nonstandardSymbol', nil)

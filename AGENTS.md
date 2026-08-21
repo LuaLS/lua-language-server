@@ -121,7 +121,7 @@ Known open points:
 
 - 本工程（含 bee.lua 解释器，由 `BEE_OPTCHAIN` 宏启用）支持 `?.` `?:` `?[` `?(` 可选链写法，可以省略判空。
 - LS 的 parser / coder / node 类型系统也已支持这 4 个符号：
-  - 由 `Lua.runtime.nonestandardSymbols` 配置（`scope:makeCompileOptions` 读取）开启，未开启时解析报 `ERR_NONSTANDARD_SYMBOL`。
+  - 由 `Lua.runtime.nonstandardSymbol` 配置（`scope:makeCompileOptions` 读取）开启，未开启时解析报 `ERR_NONSTANDARD_SYMBOL`。
   - parser 在 `parseField`/`parseCall` 通过 `?` 后紧跟 `.`/`:`/`[`/`(` 识别，AST 的 `Field`/`Call` 节点带 `safe` 标记，并在 `parseTerm` 链循环中沿链传播。
   - coder 对 safe 字段/调用生成 `:setOptional()`；`Node.Variable`/`Node.FCall` 的 `value` 在 optional 时并入 `nil`。
 - **例外**：`script/tools/` 目录下不允许使用可选链（保持该目录语法兼容性）。

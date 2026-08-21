@@ -121,7 +121,7 @@ do
     local root = ls.env.ROOT_URI
     local scope <close> = ls.scope.create('test', root, ls.afs)
 
-    scope.config:set(root, 'Lua.runtime.nonestandardSymbols', { '?.', '?:', '?[', '?(' })
+    scope.config:set(root, 'Lua.runtime.nonstandardSymbol', { '?.', '?:', '?[', '?(' })
 
     collectgarbage()
     print('加载项目前的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })

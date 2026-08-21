@@ -164,7 +164,7 @@ end
 ---@param uri Uri
 ---@return LuaParser.CompileOptions?
 function M:makeCompileOptions(uri)
-    local symbols = self.config:get(uri, 'Lua.runtime.nonestandardSymbols')
+    local symbols = self.config:get(uri, 'Lua.runtime.nonstandardSymbol')
     if not symbols or #symbols == 0 then
         return nil
     end

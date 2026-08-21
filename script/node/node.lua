@@ -458,7 +458,9 @@ function M:findPack()
         if types then
             for i = #types, 1, -1 do
                 if types[i].kind == 'pack' then
-                    return types[i]
+                    local pack = types[i]
+                    ---@cast pack Node.Pack
+                    return pack
                 end
             end
         end

@@ -7,7 +7,7 @@ ls.feature.provider.hover(function (param, action)
     snode = snode:simplify()
 
     ---@param prefix string
-    ---@param node Node.Table
+    ---@param node Node.Table|Node.Tuple
     ---@param viewOptions? Node.Viewer.Options
     local function pushWithPrefix(prefix, node, viewOptions)
         local opts = { noFunctionDetail = true, inlineMax = 0 }

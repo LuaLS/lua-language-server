@@ -55,10 +55,12 @@ M.__getter.value = function (self)
             elseif key.kind == 'value' then
                 literal = key.literal
             end
-            if  math.type(literal) == 'integer'
-            and literal >= 1
-            and literal > maxn then
-                maxn = literal
+            if math.type(literal) == 'integer' then
+                ---@cast literal integer
+                if  literal >= 1
+                and literal > maxn then
+                    maxn = literal
+                end
             end
         end
         if maxn > 0 then

@@ -130,6 +130,7 @@ M.__getter.returnsPack = function (self)
         if not last.hasGeneric then
             local lastList = last:findValue(ls.node.kind['list'])
             if lastList and lastList ~= last then
+                ---@cast lastList Node.List
                 local base = #returns - 1
                 local innerValues = lastList.values
                 local flat = {}

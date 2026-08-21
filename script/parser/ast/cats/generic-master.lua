@@ -84,6 +84,7 @@ end
 ---@return LuaParser.Node.CatGeneric
 function Ast:getOrMakeImplicitGeneric(name, pos)
     local block = self.curBlock
+    ---@cast block -?
     local generic = block.genericMap[name]
     if generic then
         return generic

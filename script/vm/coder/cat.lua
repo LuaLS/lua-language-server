@@ -559,6 +559,12 @@ ls.vm.registerCoderProvider('catstatesee', function (coder, source)
     coder:addUnneeded(source)
 end)
 
+ls.vm.registerCoderProvider('catstatediagnostic', function (coder, source)
+    ---@cast source LuaParser.Node.CatStateDiagnostic
+
+    coder:addUnneeded(source)
+end)
+
 ls.vm.registerCoderProvider('catparen', function (coder, source)
     ---@cast source LuaParser.Node.CatParen
 

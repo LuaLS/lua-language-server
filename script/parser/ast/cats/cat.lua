@@ -21,6 +21,7 @@ require 'parser.ast.cats.overload'
 require 'parser.ast.cats.see'
 require 'parser.ast.cats.cast'
 require 'parser.ast.cats.narrow'
+require 'parser.ast.cats.diagnostic'
 require 'parser.ast.cats.block'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
@@ -120,6 +121,9 @@ Ast:registerCatParser('cast', {
 Ast:registerCatParser('narrow', {
     asState = true,
     parser = Ast.parseCatStateNarrow,
+})
+Ast:registerCatParser('diagnostic', {
+    parser = Ast.parseCatDiagnostic,
 })
 
 ---@private

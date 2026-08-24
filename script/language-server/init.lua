@@ -26,6 +26,7 @@ require 'language-server.capability.workspace.did-change-configuration'
 require 'language-server.capability.language-features.go-to-definition'
 require 'language-server.capability.language-features.hover'
 require 'language-server.capability.language-features.completion'
+require 'language-server.capability.language-features.diagnostic'
 
 require 'language-server.capability.private.status'
 

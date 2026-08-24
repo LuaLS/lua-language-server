@@ -23,5 +23,6 @@ end
 test.require 'test.feature.definition'
 test.require 'test.feature.hover'
 test.require 'test.feature.completion'
+test.require 'test.feature.diagnostic'
 
 print('[feature] 测试完毕')

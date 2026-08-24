@@ -34,6 +34,9 @@ It is intended for both human collaborators and coding agents.
   - Register new nodes in `script/node/init.lua`
 - VM / middle code:
   - `script/vm/coder/`
+- Diagnostics（LSP 静态分析）:
+  - `script/feature/diagnostic/`
+  - `---@diagnostic` 注解解析: `script/parser/ast/cats/diagnostic.lua`
 - Tests:
   - parser: `test/parser/`
   - node/tracer: `test/node/`
@@ -139,6 +142,35 @@ Known open points:
 - `Set-Content`、`Out-File`、`echo >`、`Write-Output >` 等写入操作必须加 `-Encoding UTF8`。
 - 正确示例：`Set-Content -Path file.ts -Value "..." -Encoding UTF8`。
 - 项目所有源码文件统一 UTF-8（无 BOM），由 `.editorconfig` 和 ESLint 兜底。
+
+## 13) Diagnostic Feature Snapshot
+
+里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
+语义规则（unused-local、undefined-global 等）属里程碑 2，尚未开始。
+
+关键文件：
+
+- `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`、provider 注册、过滤
+- `script/feature/diagnostic/providers/syntax.lua` — parser `ast.errors` → 诊断（当前唯一 provider）
+- `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析
+- `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
+- `script/feature/diagnostic/converter.lua` — `Feature.Diagnostic[]` → `LSP.Diagnostic[]`（push/pull 共用）
+- `script/feature/diagnostic/push.lua` — `publishDiagnostics`（`ls.task` reject 防抖 + 缓存去重）
+- `script/language-server/capability/language-features/diagnostic.lua` — pull `textDocument/diagnostic`
+- `script/parser/ast/cats/diagnostic.lua` — `---@diagnostic` cat 节点与解析
+
+约束与语义：
+
+- 内部诊断结构用 0-based 字节偏移（`start`/`finish`），LSP range 转换统一走 converter。
+- 语法诊断恒为 Error、不走 neededFileStatus，仅受 `Lua.diagnostics.disable` 与行内禁用注释约束（对齐 master）。
+- `---@diagnostic` 语义对齐 master：`disable`/`enable` 自下一行生效、`disable-line` 当行、`disable-next-line` 下一行；裸 `disable`（无名）不压语法错误；计数支持嵌套。
+- `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`（里程碑 1 仅单文件语法；接语义规则后改 `interFileDependencies=true`）。
+- push 暂不带 `version` 字段。
+- `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到，里程碑 1 无语义规则，属预留。
+
+测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull）。
+
+待定（里程碑 2+）：语义规则分批迁移、workspace 诊断、locale 文案、codeDescription、quickfix。
 
 ---
 

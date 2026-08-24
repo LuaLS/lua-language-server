@@ -5,6 +5,7 @@
 ---@field id string
 ---@field isSelf? boolean
 ---@field varargName? string # Lua 5.5 named vararg: `...name`
+---@field varargLocal? LuaParser.Node.Local
 local Param = Class('LuaParser.Node.Param', 'LuaParser.Node.Local')
 
 Param.kind = 'param'
@@ -147,6 +148,7 @@ function Ast:parseFunction(isLocal, isGlobal)
                     })
                     self:initLocal(vararg)
                     func.varMap[param.varargName] = vararg
+                    param.varargLocal = vararg
                 end
             end
         end

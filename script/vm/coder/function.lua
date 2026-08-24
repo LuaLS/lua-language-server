@@ -1,6 +1,74 @@
 ---@class Coder
 local M = Class 'Coder'
 
+local function makeVarargListCode(coder, overloads)
+    local params = {}
+    local min
+    local max = 0
+    for _, overload in ipairs(overloads) do
+        local value = overload.value
+        if value and value.params then
+            local count = #value.params
+            if min == nil or count < min then
+                min = count
+            end
+            if count > max then
+                max = count
+            end
+            for i, param in ipairs(value.params) do
+                if param.name.id == '...' then
+                    break
+                end
+                if param.value and not coder.compiled[param.value] then
+                    coder:compile(param.value)
+                end
+                local typeCode = param.value and coder:getKey(param.value) or 'rt.ANY'
+                params[i] = params[i] and ('%s | %s'):format(params[i], typeCode) or typeCode
+            end
+        end
+    end
+    if min == nil then
+        return nil
+    end
+    for i = 1, max do
+        params[i] = params[i] or 'rt.NIL'
+    end
+    return ('rt.list({%s}, %d, %d)'):format(table.concat(params, ', '), min, max)
+end
+
+local function makeVarargTableCode(coder, overloads)
+    local tables = {}
+    for _, overload in ipairs(overloads) do
+        local value = overload.value
+        if value and value.params then
+            local fields = {}
+            local count = #value.params
+            local valid = true
+            for i, param in ipairs(value.params) do
+                if param.name.id == '...' or param.optional then
+                    valid = false
+                    break
+                end
+                if param.value and not coder.compiled[param.value] then
+                    coder:compile(param.value)
+                end
+                fields[#fields + 1] = ('addField(rt.field(rt.value(%d), %s))'):format(
+                    i,
+                    param.value and coder:getKey(param.value) or 'rt.ANY'
+                )
+            end
+            if valid then
+                fields[#fields + 1] = ('addField(rt.field(rt.value("n"), rt.value(%d)))'):format(count)
+                tables[#tables + 1] = 'rt.table():' .. table.concat(fields, ':')
+            end
+        end
+    end
+    if #tables == 0 then
+        return nil
+    end
+    return table.concat(tables, ' | ')
+end
+
 ---@package
 ---@param source LuaParser.Node.Base
 ---@param kind string
@@ -117,6 +185,33 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     local catParam = coder:findMatchedCatParam(param)
                     coder:addLine('-- ' .. param.code)
                     coder:compile(param)
+                    if param.varargLocal then
+                        local varargLocal = assert(param.varargLocal)
+                        local varargKey = coder:getKey(varargLocal)
+                        coder:addLine('{key} = rt.variable {name%q}' % {
+                            key  = varargKey,
+                            name = varargLocal.id,
+                        })
+                        coder:addLine('{key}:setLocation {location}' % {
+                            key      = varargKey,
+                            location = coder:makeLocationCode(varargLocal),
+                        })
+                        coder:getTracer():appendVar(varargLocal)
+                        local varargTable = overloads and makeVarargTableCode(coder, overloads)
+                        coder:addLine('{key}:addType({type})' % {
+                            key  = varargKey,
+                            type = varargTable or 'rt.array(rt.ANY) & rt.table():addField(rt.field(rt.value("n"), rt.INTEGER))',
+                        })
+                    end
+                    if param.id == '...' and overloads then
+                        local varargList = makeVarargListCode(coder, overloads)
+                        if varargList then
+                            coder:addLine('{key}:setVarargList({list})' % {
+                                key  = coder:getKey(param),
+                                list = varargList,
+                            })
+                        end
+                    end
                     coder:addLine('{funcKey}:addParamDef({paramKey%q}, {paramNode}, {optional%q}, {varargName})' % {
                         funcKey    = funcKey,
                         paramKey   = param.id,

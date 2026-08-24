@@ -413,8 +413,7 @@ ls.vm.registerCoderProvider('varargs', function (coder, source)
         return
     end
 
-    -- 将 vararg 参数包装成无界单元素 list，使 rt.select(varargs, N) 能正确返回元素类型
-    coder:addLine('{key} = rt.list({ {loc} }, 0, false)' % {
+    coder:addLine('{key} = {loc}:getVarargList()' % {
         key = coder:getKey(source),
         loc = coder:getKey(loc),
     })

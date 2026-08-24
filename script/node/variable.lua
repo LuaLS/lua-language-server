@@ -76,6 +76,18 @@ function M:addType(node)
     return self
 end
 
+---@param list Node.List
+---@return Node.Variable
+function M:setVarargList(list)
+    self.varargList = list
+    return self
+end
+
+---@return Node.List?
+function M:getVarargList()
+    return self.varargList or self.scope.rt.list({ self }, 0, false)
+end
+
 ---@param node Node
 ---@return Node.Variable
 function M:removeType(node)

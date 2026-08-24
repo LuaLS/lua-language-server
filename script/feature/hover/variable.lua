@@ -30,6 +30,9 @@ local function getVariableType(variable, source)
         end
         local loc = source.loc
         if loc then
+            if loc.isVarargTable then
+                return 'local'
+            end
             if loc.kind == 'param' then
                 ---@cast loc LuaParser.Node.Param
                 if loc.isSelf then

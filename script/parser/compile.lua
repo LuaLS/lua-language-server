@@ -9,6 +9,7 @@ local LuaParser = Class 'LuaParser'
 ---| 'Lua 5.2'
 ---| 'Lua 5.3'
 ---| 'Lua 5.4'
+---| 'Lua 5.5'
 
 ---@alias LuaParser.NonestandardSymbol
 ---|'//' | '/**/'

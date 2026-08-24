@@ -4,6 +4,8 @@
 ---@field id string
 ---@field env? LuaParser.Node.Local
 ---@field loc? LuaParser.Node.Local
+---@field global? boolean
+---@field globalConst? boolean
 ---@field next? LuaParser.Node.Field
 ---@field value? LuaParser.Node.Exp
 local Var = Class('LuaParser.Node.Var', 'LuaParser.Node.Base')
@@ -27,15 +29,33 @@ function Ast:parseVar()
         return nil
     end
 
-    local loc = self:getLocal(var.id)
-    if loc then
+    local declaration = self:getVariable(var.id)
+    if self.parsingGlobalFunction then
+        declaration = nil
+    end
+    if declaration and declaration.isGlobal then
+        var.global = true
+        var.globalConst = declaration.globalConst
+        return var
+    end
+    if declaration then
+        local loc = declaration
         var.loc = loc
         loc.refs[#loc.refs+1] = var
-    else
-        local env = self:getLocal(self.envMode)
+        return var
+    end
+    if self:getGlobal(var.id, var.start) == false then
+        self:throw('GLOBAL_NOT_DECLARED', var.start, var.finish)
+        return var
+    end
+    do
+        local env = self:getVariable(self.envMode)
         if env then
             var.env = env
             env.envRefs[#env.envRefs+1] = var
+        end
+        if self:isGlobalConst(var.id) then
+            var.globalConst = true
         end
     end
 

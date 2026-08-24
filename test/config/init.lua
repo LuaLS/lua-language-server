@@ -93,6 +93,11 @@ do
     assert(options and options.version == 'Lua 5.3' and options.jit == nil)
     test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
 
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.5')
+    options = test.scope:makeCompileOptions(test.fileUri)
+    assert(options and options.version == 'Lua 5.5' and options.jit == nil)
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
+
     test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', true)
     options = test.scope:makeCompileOptions(test.fileUri)
     assert(options and options.unicodeName == true and options.version == nil)
@@ -184,6 +189,19 @@ do
     assert(metaRoot and ls.util.stringEndWith(metaPath, 'Lua 5.3 auto utf-8'), metaPath)
     test.scope.roots = {}
     test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
+
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.5')
+    test.scope:buildRoots({})
+    local lua55Root
+    for _, root in ipairs(test.scope.roots) do
+        if root.kind == 'meta' then
+            lua55Root = root
+        end
+    end
+    local lua55Path = lua55Root and tostring(ls.uri.decode(lua55Root.uri)) or 'no meta root'
+    assert(lua55Root and ls.util.stringEndWith(lua55Path, 'Lua 5.5 auto utf-8'), lua55Path)
+    test.scope.roots = {}
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
 end
 
 do
@@ -197,12 +215,10 @@ do
     test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.1')
     assert(vfile:isLegalName 'goto')
     test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'LuaJIT')
-    assert(not vfile:isLegalName('goto', nil, false))
+    assert(vfile:isLegalName 'goto')
     test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.5')
-    test.scope.config:set(test.rootUri, 'Lua.runtime.nonstandardSymbol', { 'continue' })
+    assert(vfile:isLegalName 'global')
     assert(vfile:isLegalName 'continue')
-    assert(not vfile:isLegalName('continue', nil, false))
-    test.scope.config:set(test.rootUri, 'Lua.runtime.nonstandardSymbol', nil)
     test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
     test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', true)
     assert(vfile:isLegalName '中文字段')

@@ -34,5 +34,6 @@ test.require 'test.coder.block'
 test.require 'test.coder.flow'
 test.require 'test.coder.custom'
 test.require 'test.coder.optchain'
+test.require 'test.coder.lua55'
 
 print('[coder] 测试完毕')

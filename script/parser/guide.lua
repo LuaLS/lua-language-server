@@ -38,7 +38,6 @@ local reservedWordMap = {
 
 ---@class LuaParser.Guide.Rule
 ---@field gotoKeyword? boolean          # `goto` 是否为硬关键字
----@field softKeyWords? table<string, true> # 软关键字集（语境关键字，作标识符合法）
 
 local rules = {
     ['Lua 5.1'] = {},
@@ -53,14 +52,8 @@ local rules = {
     },
     ['Lua 5.5'] = {
         gotoKeyword = true,
-        softKeyWords = {
-            ['global'] = true,
-        },
     },
     ['LuaJIT'] = {
-        softKeyWords = {
-            ['goto'] = true,
-        },
     },
 }
 
@@ -98,16 +91,11 @@ end
 --- 判断字符串是否为合法的 Lua 标识符。
 --- 保留字与保留字面量（true/false/nil）恒为不合法；
 --- `goto` 在 Lua 5.2+ 为保留字（恒不合法），Lua 5.1 / LuaJIT 中作标识符合法；
---- 软关键字（Lua 5.5 的 `global`、LuaJIT 的 `goto`）默认可作标识符（语境关键字本义），
---- 传 `allowSoft = false` 可将其排除；`extra` 用于追加自定义软关键字
---- （如 nonstandardSymbol 中的 `continue`），同样受 `allowSoft` 控制。
 ---@param str string
 ---@param rule? string # 版本规则名（见 LuaParser.Guide.RuleName），默认 'Lua 5.5'
 ---@param unicode? boolean # 允许高位字节（UTF-8）标识符
----@param allowSoft? boolean # 允许软关键字作为标识符，默认允许
----@param extra? string[] # 追加的自定义软关键字
 ---@return boolean
-function M.isLegalName(str, rule, unicode, allowSoft, extra)
+function M.isLegalName(str, rule, unicode)
     if keyWordMap[str]
     or reservedWordMap[str] then
         return false
@@ -116,18 +104,6 @@ function M.isLegalName(str, rule, unicode, allowSoft, extra)
     if str == 'goto'
     and r.gotoKeyword then
         return false
-    end
-    if allowSoft == false then
-        if r.softKeyWords and r.softKeyWords[str] then
-            return false
-        end
-        if extra then
-            for _, kw in ipairs(extra) do
-                if kw == str then
-                    return false
-                end
-            end
-        end
     end
     if unicode then
         return str:match '^[%a_\x80-\xff][%w_\x80-\xff]*$' ~= nil

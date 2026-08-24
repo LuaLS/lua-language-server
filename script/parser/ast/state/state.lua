@@ -48,6 +48,7 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.State
 ---| LuaParser.Node.LocalDef
+---| LuaParser.Node.GlobalDef
 ---| LuaParser.Node.StateStartWithExp
 ---| LuaParser.Node.Label
 ---| LuaParser.Node.Goto
@@ -77,6 +78,7 @@ function Ast:registerStateParser(token, parser)
 end
 
 Ast:registerStateParser('local'   , Ast.parseLocal)
+Ast:registerStateParser('global'  , Ast.parseGlobal)
 Ast:registerStateParser('if'      , Ast.parseIf)
 Ast:registerStateParser('do'      , Ast.parseDo)
 Ast:registerStateParser('break'   , Ast.parseBreak)

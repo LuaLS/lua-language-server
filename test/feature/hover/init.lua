@@ -52,6 +52,7 @@ function TEST_HOVER(script)
 end
 
 test.require 'test.feature.hover.basic'
+test.require 'test.feature.hover.lua55'
 test.require 'test.feature.hover.manually'
 test.require 'test.feature.hover.custom'
 test.require 'test.feature.hover.require-multi'

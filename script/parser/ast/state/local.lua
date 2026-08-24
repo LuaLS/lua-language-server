@@ -7,9 +7,17 @@ local LocalDef = Class('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
 LocalDef.kind = 'localdef'
 
+---@class LuaParser.Node.GlobalDef: LuaParser.Node.Base
+---@field vars LuaParser.Node.Local[]
+---@field symbolPos? integer
+---@field values? LuaParser.Node.Exp[]
+local GlobalDef = Class('LuaParser.Node.GlobalDef', 'LuaParser.Node.Base')
+
+GlobalDef.kind = 'globaldef'
+
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field id string
----@field parent LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
+---@field parent LuaParser.Node.GlobalDef | LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
 ---@field refs? LuaParser.Node.Var[]
@@ -17,6 +25,10 @@ LocalDef.kind = 'localdef'
 ---@field sets? LuaParser.Node.Var[]
 ---@field envRefs? LuaParser.Node.Var[]
 ---@field attr? LuaParser.Node.Attr
+---@field isGlobal? boolean
+---@field globalConst? boolean
+---@field isVarargTable? boolean
+---@field isForConst? boolean
 local Local = Class('LuaParser.Node.Local', 'LuaParser.Node.Base')
 
 Local.kind = 'local'
@@ -90,7 +102,6 @@ function Ast:parseLocal()
         return nil
     end
     self:skipSpace()
-
     if self.lexer:peek() == 'function' then
         return self:parseFunction(true)
     end
@@ -99,8 +110,21 @@ function Ast:parseLocal()
         start  = pos,
     })
 
+    local prefixAttr = self:parseLocalAttr(true)
+    self:skipSpace()
     local vars = self:parseLocalList(true)
     localdef.vars = vars
+
+    if prefixAttr then
+        for _, var in ipairs(vars) do
+            if var.attr then
+                self:throw('MULTI_ATTRIBUTE', var.attr.start, var.attr.finish)
+            else
+                var.attr = prefixAttr
+                var.finish = prefixAttr.finish
+            end
+        end
+    end
 
     self:skipSpace()
     local symbolPos = self.lexer:consume '='
@@ -134,6 +158,101 @@ function Ast:parseLocal()
     return localdef
 end
 
+---@private
+---@return LuaParser.Node.GlobalDef | LuaParser.Node.Function?, boolean?
+function Ast:parseGlobal()
+    if self.versionNum < 55 then
+        return nil, true
+    end
+    local nextToken, nextType = self.lexer:peek(1)
+    if nextToken ~= 'function'
+    and nextToken ~= '*'
+    and nextToken ~= '<'
+    and nextType ~= 'Word' then
+        return nil, true
+    end
+    local pos = self.lexer:consume 'global'
+    if not pos then
+        return nil
+    end
+    self:skipSpace()
+
+    if self.lexer:peek() == 'function' then
+        return self:parseFunction(false, true)
+    end
+
+    local globaldef = self:createNode('LuaParser.Node.GlobalDef', {
+        start = pos,
+    })
+
+    local hasConst = self.lexer:consume '<'
+    if hasConst then
+        self:skipSpace()
+        local attrName = self:parseID('LuaParser.Node.AttrName', true)
+        if attrName and attrName.id ~= 'const' then
+            self:throw('UNKNOWN_ATTRIBUTE', attrName.start, attrName.finish)
+        end
+        self:skipSpace()
+        self:assertSymbol '>'
+        self:skipSpace()
+    end
+
+    if self.lexer:consume '*' then
+        globaldef.vars = {}
+        local block = self.curBlock
+        if block then
+            block.globalMode = hasConst and 'allconst' or 'all'
+            block.globalConstDefault = hasConst ~= nil
+        end
+        globaldef.finish = self:getLastPos()
+        return globaldef
+    end
+
+    local vars = self:parseLocalList(true)
+    globaldef.vars = vars
+
+    self:skipSpace()
+    local symbolPos = self.lexer:consume '='
+    if symbolPos then
+        globaldef.symbolPos = symbolPos
+        self:skipSpace()
+        local values = self:parseExpList(true)
+        self:convertValuesToSelect(values, #vars)
+        globaldef.values = values
+        for i = 1, #values do
+            local value = values[i]
+            value.parent = globaldef
+            value.index  = i
+
+            local var = vars[i]
+            if var then
+                var.value = value
+            end
+        end
+    end
+
+    globaldef.finish = self:getLastPos()
+
+    for i = 1, #vars do
+        local var = vars[i]
+        var.parent = globaldef
+        var.index  = i
+        if var.attr and var.attr.name.id == 'close' then
+            self:throw('UNKNOWN_ATTRIBUTE', var.attr.name.start, var.attr.name.finish)
+        end
+        local block = self.curBlock
+        if block then
+            block.globalMode = 'explicit'
+            var.isGlobal = true
+            var.globalConst = hasConst ~= nil or (var.attr and var.attr.name.id == 'const') or false
+            var.effectStart = globaldef.finish
+            block.varMap[var.id] = var
+        end
+    end
+
+    return globaldef
+end
+
 ---@package
 Ast.hasThrowedLocalLimit = false
 
@@ -151,7 +270,7 @@ function Ast:initLocal(loc)
     loc.effectStart = self:getLastPos()
 
     local name = loc.id
-    block.localMap[name] = loc
+    block.varMap[name] = loc
 
     if name ~= '...' then
         if self.localCount >= 200 and not self.hasThrowedLocalLimit then
@@ -166,12 +285,63 @@ end
 ---@private
 ---@param name string
 ---@return LuaParser.Node.Local?
-function Ast:getLocal(name)
+function Ast:getVariable(name)
     local block = self.curBlock
     if not block then
         return nil
     end
-    return block.localMap[name] or nil
+    return block.varMap[name] or nil
+end
+
+Ast.getLocal = Ast.getVariable
+
+---@private
+---@param name string
+---@param pos integer
+---@return boolean
+function Ast:isGlobalAllowed(name, pos)
+    return self:getGlobal(name, pos) ~= false
+end
+
+---@private
+---@param name string
+---@param pos integer
+---@return boolean | nil
+function Ast:getGlobal(name, pos)
+    local block = self.curBlock
+    while block do
+        if block.globalMode == 'all'
+        or block.globalMode == 'allconst' then
+            return nil
+        elseif block.globalMode == 'explicit' then
+            local declaration = block.varMap[name]
+            if declaration then
+                return declaration.isGlobal or false
+            end
+            return false
+        end
+        block = block.parentBlock
+    end
+    return nil
+end
+
+---@private
+---@param name? string
+---@return boolean
+function Ast:isGlobalConst(name)
+    local block = self.curBlock
+    while block do
+        if block.globalMode == 'allconst' then
+            return true
+        elseif block.globalMode == 'all' then
+            return false
+        elseif block.globalMode == 'explicit' then
+            local declaration = block.varMap[name]
+            return declaration and declaration.isGlobal and declaration.globalConst or false
+        end
+        block = block.parentBlock
+    end
+    return false
 end
 
 ---@private
@@ -223,8 +393,9 @@ function Ast:parseLocalList(parseAttr)
 end
 
 ---@private
+---@param prefix? boolean
 ---@return LuaParser.Node.Attr?
-function Ast:parseLocalAttr()
+function Ast:parseLocalAttr(prefix)
     local pos = self.lexer:consume '<'
     if not pos then
         return nil
@@ -259,7 +430,8 @@ function Ast:parseLocalAttr()
         self:throw('MISS_SPACE_BETWEEN', ltPos, ltPos + 2)
     end
 
-    if self.versionNum <= 53 then
+    if self.versionNum <= 53
+    or prefix and self.versionNum < 55 then
         self:throw('UNSUPPORT_SYMBOL', attrNode.start, attrNode.finish)
     end
 
@@ -271,10 +443,17 @@ function Ast:checkAssignConst()
     for _, loc in ipairs(self.nodesMap['local']) do
         ---@cast loc LuaParser.Node.Local
         local attr = loc.attr and loc.attr.name and loc.attr.name.id
-        if attr == 'const' or attr == 'close' then
+        if attr == 'const' or attr == 'close' or loc.isVarargTable or loc.isForConst then
             for _, set in ipairs(loc.sets) do
                 self:throw('SET_CONST', set.start, set.finish)
             end
+        end
+    end
+    for _, var in ipairs(self.nodesMap['var']) do
+        ---@cast var LuaParser.Node.Var
+        if var.value
+        and var.globalConst then
+            self:throw('SET_CONST', var.start, var.finish)
         end
     end
 end
@@ -287,7 +466,7 @@ function Ast:findLocal(name, pos)
     if not block then
         return nil
     end
-    local loc = block.localMap[name]
+    local loc = block.varMap[name]
     do -- first try
         if not loc then
             return nil

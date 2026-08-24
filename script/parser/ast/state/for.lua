@@ -35,6 +35,7 @@ function Ast:parseFor()
         local var = vars[i]
         var.parent = forNode
         var.index  = i
+        var.isForConst = self.versionNum >= 55 and i == 1
     end
 
     self:skipSpace()

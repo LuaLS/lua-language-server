@@ -80,6 +80,17 @@ end)
 
 ls.vm.registerCoderProvider('local', function (coder, source)
     ---@cast source LuaParser.Node.Local
+    if source.isVarargTable then
+        coder:addLine('{key} = rt.table():addField(rt.field(rt.INTEGER, rt.ANY)):addField(rt.field(rt.value("n"), rt.INTEGER))' % {
+            key = coder:getKey(source),
+        })
+        coder:addLine('{varKey}:setLocation {location}' % {
+            varKey   = coder:getKey(source),
+            location = coder:makeLocationCode(source),
+        })
+        coder:getTracer():appendVar(source)
+        return
+    end
     coder:addLine('{key} = rt.variable {name%q}' % {
         key = coder:getKey(source),
         name = source.id,

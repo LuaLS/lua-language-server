@@ -5,6 +5,10 @@ local function getVariableType(variable, source)
     local kind = source.kind
 
     if kind == 'local' then
+        ---@cast source LuaParser.Node.Local
+        if source.isGlobal then
+            return 'global'
+        end
         return 'local'
     end
 

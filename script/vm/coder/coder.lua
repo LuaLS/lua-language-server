@@ -547,6 +547,8 @@ function M:makeVarKey(source)
         ---@cast source LuaParser.Node.Var
         if source.loc then
             return self:getKey(source.loc) or error('Cannot make var key')
+        elseif source.global then
+            return 'rt:globalGet({%q})' % { source.id }
         elseif source.env then
             return '{env}:getChild({field%q})' % {
                 env  = self:getKey(source.env),
@@ -567,6 +569,9 @@ function M:makeVarKey(source)
     end
     if source.kind == 'local' then
         ---@cast source LuaParser.Node.Local
+        if source.isGlobal then
+            return 'rt:globalGet({%q})' % { source.id }
+        end
         return self:getKey(source) or error('Cannot make var key')
     end
     if source.kind == 'param' then

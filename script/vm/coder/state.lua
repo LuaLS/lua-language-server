@@ -211,6 +211,28 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
     end
 end)
 
+ls.vm.registerCoderProvider('globaldef', function (coder, source)
+    ---@cast source LuaParser.Node.GlobalDef
+
+    local valueKeys = {}
+    local isTable = {}
+    if source.values then
+        for i, value in ipairs(source.values) do
+            valueKeys[i] = coder:getKey(value)
+            isTable[i] = value.kind == 'table' and not isVarargTable(value)
+            coder:compile(value)
+        end
+    end
+    for i, var in ipairs(source.vars) do
+        if valueKeys[i] then
+            coder:addLine('rt:globalGet({name%q}):addAssign(rt.field(rt.value({name%q}), {value}))' % {
+                name  = var.id,
+                value = valueKeys[i],
+            })
+        end
+    end
+end)
+
 ls.vm.registerCoderProvider('return', function (coder, source)
     ---@cast source LuaParser.Node.Return
 

@@ -192,33 +192,19 @@ function M:getNode(source)
 end
 
 --- 判断字符串是否为合法标识符（`Lua.runtime` 配置自动生效：
---- rule 取 `Lua.runtime.version`，unicode 缺省取 `Lua.runtime.unicodeName`，
---- extra 取 `Lua.runtime.nonstandardSymbol` 中的标识符形态符号）。
+--- rule 取 `Lua.runtime.version`，unicode 缺省取 `Lua.runtime.unicodeName`。
 ---@param str string
 ---@param unicode? boolean # 显式指定是否允许高位字节，缺省读配置
----@param allowSoft? boolean # 允许软关键字作为标识符，默认允许
 ---@return boolean
-function M:isLegalName(str, unicode, allowSoft)
+function M:isLegalName(str, unicode)
     local config = self.scope.config
-    local extra
-    local symbols = config:get(self.uri, 'Lua.runtime.nonstandardSymbol')
-    if type(symbols) == 'table' then
-        for _, symbol in ipairs(symbols) do
-            if symbol == 'continue' then
-                extra = { 'continue' }
-                break
-            end
-        end
-    end
     if unicode == nil then
         unicode = config:get(self.uri, 'Lua.runtime.unicodeName')
     end
     return ls.guide.isLegalName(
         str,
         config:get(self.uri, 'Lua.runtime.version'),
-        unicode,
-        allowSoft,
-        extra
+        unicode
     )
 end
 

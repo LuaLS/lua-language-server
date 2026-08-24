@@ -7,7 +7,9 @@
 ---@field parsedCats? table<integer, true>
 ---@field generics LuaParser.Node.CatGeneric[]
 ---@field isMain boolean
----@field localMap table<string, LuaParser.Node.Local>
+---@field varMap table<string, LuaParser.Node.Local>
+---@field globalMode? 'explicit' | 'all' | 'allconst'
+---@field globalConstDefault? boolean
 ---@field labelMap table<string, LuaParser.Node.Label>
 ---@field genericMap table<string, LuaParser.Node.CatGeneric>
 ---@field delayComments LuaParser.Node.Comment[]
@@ -32,15 +34,15 @@ end
 ---@param self LuaParser.Node.Block
 ---@return table
 ---@return true
-Block.__getter.localMap = function (self)
+Block.__getter.varMap = function (self)
     local parentBlock = self.parentBlock
     if not parentBlock then
         return {}, true
     end
-    local parentLocalMap = parentBlock.localMap
+    local parentVarMap = parentBlock.varMap
     return setmetatable({}, {
         __index = function (t, k)
-            local v = parentLocalMap[k] or false
+            local v = parentVarMap[k] or false
             t[k] = v
             return v
         end

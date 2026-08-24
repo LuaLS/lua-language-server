@@ -92,7 +92,7 @@ function Ast:isKeyWord(word)
         end
         return self.versionNum >= 52
     end
-    return ls.guide.isKeyWord(word)
+    return ls.guide.isKeyWord(word, self.version)
 end
 
 ---@private

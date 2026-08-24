@@ -35,8 +35,9 @@ local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param isLocal? boolean
+---@param isGlobal? boolean
 ---@return LuaParser.Node.Function?
-function Ast:parseFunction(isLocal)
+function Ast:parseFunction(isLocal, isGlobal)
     local pos = self.lexer:consume 'function'
     if not pos then
         return nil
@@ -54,7 +55,23 @@ function Ast:parseFunction(isLocal)
             self:throw('UNEXPECT_LFUNC_NAME', nextPos, endPos - 1)
         end
     else
+        self.parsingGlobalFunction = isGlobal
         name = self:parseFunctionName()
+        self.parsingGlobalFunction = nil
+        if isGlobal and name and name.kind == 'var' then
+            ---@cast name LuaParser.Node.Var
+            local block = self.curBlock
+            if block then
+                block.globalMode = 'explicit'
+                block.varMap[name.id] = self:createNode('LuaParser.Node.Local', {
+                    start    = name.start,
+                    finish   = name.finish,
+                    id       = name.id,
+                    isGlobal = true,
+                })
+            end
+            name.global = true
+        end
     end
 
     self:skipSpace()
@@ -118,7 +135,19 @@ function Ast:parseFunction(isLocal)
         self:blockStart(func)
         if params then
             for i = 1, #params do
-                self:initLocal(params[i])
+                local param = params[i]
+                self:initLocal(param)
+                if param.varargName then
+                    local vararg = self:createNode('LuaParser.Node.Local', {
+                        start      = param.start,
+                        finish     = param.finish,
+                        id         = param.varargName,
+                        parent     = func,
+                        isVarargTable = true,
+                    })
+                    self:initLocal(vararg)
+                    func.varMap[param.varargName] = vararg
+                end
             end
         end
         self:blockParseChilds(func)
@@ -208,6 +237,9 @@ function Ast:parseParam(required)
             varargName   = nextToken
             varargFinish = nextPos + #nextToken
             self.lexer:next()
+            if self.versionNum < 55 then
+                self:throw('UNSUPPORT_SYMBOL', nextPos, varargFinish)
+            end
         end
         return self:createNode('LuaParser.Node.Param', {
             start      = pos,

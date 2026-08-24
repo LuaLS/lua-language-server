@@ -79,56 +79,25 @@ function Ast:parseIDList(nodeType, atLeastOne, greedy)
     end)
 end
 
--- goto 单独处理
-Ast.keyWordMap = {
-    ['and']      = true,
-    ['break']    = true,
-    ['do']       = true,
-    ['else']     = true,
-    ['elseif']   = true,
-    ['end']      = true,
-    ['for']      = true,
-    ['function'] = true,
-    ['if']       = true,
-    ['in']       = true,
-    ['local']    = true,
-    ['not']      = true,
-    ['or']       = true,
-    ['repeat']   = true,
-    ['return']   = true,
-    ['then']     = true,
-    ['until']    = true,
-    ['while']    = true,
-}
-
-Ast.reservedWordMap = {
-    ['true']     = true,
-    ['false']    = true,
-    ['nil']      = true,
-}
-
+-- goto 单独处理（LuaJIT 中 goto 是语境关键字，仅在 `goto Word` 形态视为关键字；
+-- Lua 5.2+ goto 是保留字，Lua 5.1 中是普通标识符）
 ---@private
 ---@param word string
 ---@return boolean
 function Ast:isKeyWord(word)
-    if self.keyWordMap[word] then
-        return true
-    end
     if word == 'goto' then
         if self.jit then
-            -- LuaJIT 中只有 `goto Word` 才认为 goto 是关键字
             local _, nextType = self.lexer:peek(1)
             return nextType == 'Word'
         end
-        -- Lua 5.2 开始 goto 是关键字
         return self.versionNum >= 52
     end
-    return false
+    return ls.guide.isKeyWord(word)
 end
 
 ---@private
 ---@param word string
 ---@return boolean
 function Ast:isReservedWord(word)
-    return self.reservedWordMap[word] or false
+    return ls.guide.isReservedWord(word)
 end

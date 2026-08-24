@@ -2,7 +2,6 @@
 -- 从类型系统（Node.Table / Node.Type fieldTable）以及光标处可见的变量中收集候选项。
 
 local util = ls.feature.completionUtil
-local guide = require 'parser.guide'
 
 -- 遍历 AST，找到包含 `textOffset` 的最深层 block。
 -- 在 `param.sources` 为空时作为兜底作用域锚点使用。
@@ -261,7 +260,7 @@ local function collectFallbackFields(param, source, key, options, objNode, objVa
             end
         end
         if anchor then
-            for _, loc in ipairs(guide.getVisibleLocals(anchor, textOffset)) do
+            for _, loc in ipairs(ls.guide.getVisibleLocals(anchor, textOffset)) do
                 if loc.id == objName then
                     objVar = param.scope.vm:getVariable(loc)
                     if objVar then
@@ -297,7 +296,7 @@ local function collectFallbackFields(param, source, key, options, objNode, objVa
         if rtStringType then
             appendFieldsFromTable(rtStringType.fieldTable, key, matches, seen)
         end
-        local envLocal    = document and guide.getEnvLocal(document.ast, textOffset)
+        local envLocal    = document and ls.guide.getEnvLocal(document.ast, textOffset)
         local envVar      = envLocal and param.scope.vm:getVariable(envLocal) or nil
         local childs      = envVar and envVar:getChilds() or nil
         local stringVar   = childs and childs['string'] or nil

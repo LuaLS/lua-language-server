@@ -1,4 +1,3 @@
-local guide = require 'parser.guide'
 local util = ls.feature.completionUtil
 
 ---@param param Feature.Completion.Param
@@ -134,7 +133,7 @@ ls.feature.provider.completion(function (param, action)
         return
     end
 
-    local locals = guide.getVisibleLocals(source, textOffset)
+    local locals = ls.guide.getVisibleLocals(source, textOffset)
     local entries = {}
     for _, loc in ipairs(locals) do
         local name = loc.id
@@ -216,13 +215,13 @@ ls.feature.provider.completion(function (param, action)
     local shadowedByLocal = {}
     if source then
         local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset)
-        for _, loc in ipairs(guide.getVisibleLocals(source, textOffset)) do
+        for _, loc in ipairs(ls.guide.getVisibleLocals(source, textOffset)) do
             shadowedByLocal[loc.id] = true
         end
     end
 
     local textOffset = param.textOffset or util.toTextOffset(param.scanner.text, param.offset)
-    local envLocal = guide.getEnvLocal(document.ast, textOffset)
+    local envLocal = ls.guide.getEnvLocal(document.ast, textOffset)
     if not envLocal then
         return
     end
@@ -249,6 +248,7 @@ ls.feature.provider.completion(function (param, action)
     end)
 
     local unicodeName = param.scope.config:get(param.uri, 'Lua.runtime.unicodeName')
+    local vfile = param.scope.vm:getFile(param.uri)
 
     local function literalKindOf(value)
         if not value then
@@ -274,8 +274,9 @@ ls.feature.provider.completion(function (param, action)
         local funcs = util.collectFunctionNodes(value)
 
         local name = item.name
-        local isIdent = guide.isLegalName(name)
-        local isWideIdent = not isIdent and guide.isLegalName(name, true)
+        local isIdent = vfile and vfile:isLegalName(name, false) or false
+        local isWideIdent = not isIdent
+                       and vfile and vfile:isLegalName(name, true) or false
         if isIdent
         or (isWideIdent and unicodeName) then
             action.push {

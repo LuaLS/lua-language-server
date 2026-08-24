@@ -1,5 +1,4 @@
 local util = ls.feature.completionUtil
-local guide = require 'parser.guide'
 local findLocalTypeExpr
 
 ---@param expr string
@@ -340,7 +339,7 @@ local function findVisibleLocalVariable(param, textOffset, varName)
         return nil
     end
 
-    for _, loc in ipairs(guide.getVisibleLocals(source, textOffset)) do
+    for _, loc in ipairs(ls.guide.getVisibleLocals(source, textOffset)) do
         if loc.id == varName then
             local var = param.scope.vm:getVariable(loc)
             if var then

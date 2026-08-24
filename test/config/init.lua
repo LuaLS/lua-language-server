@@ -187,6 +187,29 @@ do
 end
 
 do
+    local vfile = test.scope.vm:indexFile(test.fileUri)
+    assert(vfile:isLegalName 'abc')
+    assert(not vfile:isLegalName 'goto')
+    assert(not vfile:isLegalName '中文字段')
+    assert(vfile:isLegalName('中文字段', true))
+    assert(vfile:isLegalName 'global')
+    assert(vfile:isLegalName 'continue')
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.1')
+    assert(vfile:isLegalName 'goto')
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'LuaJIT')
+    assert(not vfile:isLegalName('goto', nil, false))
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', 'Lua 5.5')
+    test.scope.config:set(test.rootUri, 'Lua.runtime.nonstandardSymbol', { 'continue' })
+    assert(vfile:isLegalName 'continue')
+    assert(not vfile:isLegalName('continue', nil, false))
+    test.scope.config:set(test.rootUri, 'Lua.runtime.nonstandardSymbol', nil)
+    test.scope.config:set(test.rootUri, 'Lua.runtime.version', nil)
+    test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', true)
+    assert(vfile:isLegalName '中文字段')
+    test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', nil)
+end
+
+do
     require 'language-server.capability'
     require 'language-server.capability.workspace.did-change-configuration'
     assert(ls.capability.registered['workspace/didChangeConfiguration'] ~= nil)

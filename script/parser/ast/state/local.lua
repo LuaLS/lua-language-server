@@ -121,7 +121,7 @@ function Ast:parseLocal()
                 self:throw('MULTI_ATTRIBUTE', var.attr.start, var.attr.finish)
             else
                 var.attr = prefixAttr
-                var.finish = prefixAttr.finish
+                var.start = prefixAttr.start
             end
         end
     end
@@ -202,7 +202,6 @@ function Ast:parseGlobal()
         local block = self.curBlock
         if block then
             block.globalMode = hasConst and 'allconst' or 'all'
-            block.globalConstDefault = hasConst ~= nil
         end
         globaldef.finish = self:getLastPos()
         return globaldef
@@ -294,14 +293,6 @@ function Ast:getVariable(name)
 end
 
 Ast.getLocal = Ast.getVariable
-
----@private
----@param name string
----@param pos integer
----@return boolean
-function Ast:isGlobalAllowed(name, pos)
-    return self:getGlobal(name, pos) ~= false
-end
 
 ---@private
 ---@param name string

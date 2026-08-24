@@ -125,4 +125,34 @@ assert(shadowVars[1].loc ~= nil)
 assert(shadowVars[2].global == true)
 assert(shadowVars[3].loc ~= nil)
 
+local globalFuncInExplicitAst = parser.compile([[global x
+global function f() end]], nil, {
+    version = 'Lua 5.5',
+})
+assert(#globalFuncInExplicitAst.errors == 0)
+
+local globalFuncShadowAst = parser.compile([[local f = 1
+global function f() end]], nil, {
+    version = 'Lua 5.5',
+})
+assert(#globalFuncShadowAst.errors == 0)
+
+local prefixRangeAst = parser.compile('local <const> value', nil, {
+    version = 'Lua 5.5',
+})
+assert(#prefixRangeAst.errors == 0)
+local prefixLocals = prefixRangeAst.nodesMap['local']
+---@cast prefixLocals LuaParser.Node.Local[]
+local prefixLoc
+for _, loc in ipairs(prefixLocals) do
+    if loc.id == 'value' then
+        prefixLoc = loc
+    end
+end
+assert(prefixLoc ~= nil)
+assert(prefixLoc.attr ~= nil)
+assert(prefixLoc.start <= prefixLoc.finish)
+assert(prefixLoc.start <= prefixLoc.attr.start)
+assert(prefixLoc.attr.finish <= prefixLoc.finish)
+
 print('[parser.lua55] 测试完毕')

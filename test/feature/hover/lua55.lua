@@ -38,6 +38,30 @@ end
 ]] 'local z: number | nil'
 
 TEST_HOVER [[
+---@overload fun(x: number, ...)
+function new(...)
+	local a, b = ...
+	print(<?a?>)
+end
+]] 'local a: number'
+
+TEST_HOVER [[
+---@overload fun(x: number, ...)
+function new(...)
+	local a, b = ...
+	print(<?b?>)
+end
+]] 'local b: any'
+
+TEST_HOVER [[
+---@overload fun(...)
+function new(...)
+	local a = ...
+	print(<?a?>)
+end
+]] 'local a: any'
+
+TEST_HOVER [[
 ---@overload fun(x: number, y: number, z: number)
 ---@overload fun(v: string)
 function new(...args)

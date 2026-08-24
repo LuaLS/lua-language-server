@@ -215,11 +215,9 @@ ls.vm.registerCoderProvider('globaldef', function (coder, source)
     ---@cast source LuaParser.Node.GlobalDef
 
     local valueKeys = {}
-    local isTable = {}
     if source.values then
         for i, value in ipairs(source.values) do
             valueKeys[i] = coder:getKey(value)
-            isTable[i] = value.kind == 'table' and not isVarargTable(value)
             coder:compile(value)
         end
     end

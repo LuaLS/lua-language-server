@@ -44,6 +44,10 @@ function Ast:parseVar()
         loc.refs[#loc.refs+1] = var
         return var
     end
+    if self.parsingGlobalFunction then
+        var.global = true
+        return var
+    end
     if self:getGlobal(var.id, var.start) == false then
         self:throw('GLOBAL_NOT_DECLARED', var.start, var.finish)
         return var

@@ -9,7 +9,6 @@
 ---@field isMain boolean
 ---@field varMap table<string, LuaParser.Node.Local>
 ---@field globalMode? 'explicit' | 'all' | 'allconst'
----@field globalConstDefault? boolean
 ---@field labelMap table<string, LuaParser.Node.Label>
 ---@field genericMap table<string, LuaParser.Node.CatGeneric>
 ---@field delayComments LuaParser.Node.Comment[]

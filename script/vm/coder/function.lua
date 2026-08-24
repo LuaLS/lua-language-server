@@ -5,30 +5,45 @@ local function makeVarargListCode(coder, overloads)
     local params = {}
     local min
     local max = 0
+    local hasVararg = false
+    local minVarargFixed
     for _, overload in ipairs(overloads) do
         local value = overload.value
         if value and value.params then
-            local count = #value.params
-            if min == nil or count < min then
-                min = count
-            end
-            if count > max then
-                max = count
-            end
+            local fixed = 0
             for i, param in ipairs(value.params) do
                 if param.name.id == '...' then
+                    hasVararg = true
+                    if minVarargFixed == nil or fixed < minVarargFixed then
+                        minVarargFixed = fixed
+                    end
                     break
                 end
+                fixed = i
                 if param.value and not coder.compiled[param.value] then
                     coder:compile(param.value)
                 end
                 local typeCode = param.value and coder:getKey(param.value) or 'rt.ANY'
                 params[i] = params[i] and ('%s | %s'):format(params[i], typeCode) or typeCode
             end
+            if min == nil or fixed < min then
+                min = fixed
+            end
+            if fixed > max then
+                max = fixed
+            end
         end
     end
     if min == nil then
         return nil
+    end
+    if hasVararg then
+        for i = 1, max + 1 do
+            if minVarargFixed < i then
+                params[i] = params[i] and ('%s | rt.ANY'):format(params[i]) or 'rt.ANY'
+            end
+        end
+        return ('rt.list({%s}, %d, false)'):format(table.concat(params, ', '), min)
     end
     for i = 1, max do
         params[i] = params[i] or 'rt.NIL'

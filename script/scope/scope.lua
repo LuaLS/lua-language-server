@@ -51,6 +51,7 @@ end
 
 ---@param options Scope.Load.Options
 function M:reload(options)
+    self.ready = false
     ---@async
     ls.await.call(function ()
         if self.uri then
@@ -94,9 +95,9 @@ function M:reload(options)
             end
         end)
         self.uris = result.uris
+        self.ready = true
+        ls.scope.onDidLoad:fire(self)
     end)
-
-    self.ready = true
 end
 
 ---@param uri Uri
@@ -278,6 +279,24 @@ function ls.scope.waitIndexing(uri)
     end)
 end
 
+---@async
+---@param uri Uri
+function ls.scope.waitReady(uri)
+    local scope = ls.scope.find(uri)
+    if not scope or scope.ready then
+        return
+    end
+    ls.await.yield(function (resume)
+        local unsubscribe
+        unsubscribe = ls.scope.onDidLoad:on(function (s)
+            if s == scope then
+                unsubscribe()
+                resume()
+            end
+        end)
+    end)
+end
+
 ---@param uri Uri
 ---@return Document?
 ---@return Scope?
@@ -326,6 +345,7 @@ function ls.scope.watchFiles()
         scope.wordIndex:markDirty(uri)
         ---@async
         ls.await.call(function ()
+            ls.scope.waitReady(uri)
             scope.vm:awaitIndexFile(uri)
         end)
     end)

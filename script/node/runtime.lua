@@ -445,6 +445,7 @@ function M:fillPresets()
     end
 end
 
+---应当只有单元测试使用
 function M:reset()
     self.generation = self.generation + 1
     self:createPools()

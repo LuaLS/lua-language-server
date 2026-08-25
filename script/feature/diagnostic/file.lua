@@ -24,6 +24,7 @@ end
 ---@return Feature.Diagnostic[]?
 function M:fetch()
     local vfile = self.vfile
+    ls.scope.waitReady(vfile.uri)
     vfile:awaitIndex()
     if not self.dirty and self.version == vfile.version then
         return nil

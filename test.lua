@@ -40,6 +40,7 @@ test.rootPath = ls.env.ROOT_PATH .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)
 test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 test.scope    = ls.scope.create('test', test.rootUri)
+test.scope.ready = true
 
 do
     local testTarget = ls.args.TEST

@@ -77,6 +77,11 @@ function M.watchFiles()
     ls.file.onDidRemove:on(function (uri)
         M.clear(uri)
     end)
+    ls.scope.onDidLoad:on(function (scope)
+        for uri in pairs(scope.vm.vfiles) do
+            M.refresh(uri)
+        end
+    end)
 end
 
 return M

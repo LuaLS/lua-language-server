@@ -114,6 +114,7 @@ Known open points:
 
 - For multi-condition `if` blocks using `and/or`, keep project-consistent aligned layout.
 - 禁止写任何注释；确有必要写注释时，必须先询问用户并得到同意。即便用户同意，注释也只写意图、保持简练，不暴露内部实现细节。
+- **语句不要以 `(` 开头**：Lua 的 newline-call 规则会把「上一行以函数调用结尾、下一行以 `(` 开头」连成一条链式调用（如 `print(...)` 后跟 `(g)(nil)` 会解析为 `print(...)(g)(nil)`，对 print 的返回值 nil 调用）。必要时在上一行末尾加 `;` 断句。测试用例同样遵守（`tmp/` 下诊断被屏蔽，此类问题不会被静态诊断提示）。
 
 ## 9) Debugging Workflow Rule
 
@@ -146,16 +147,18 @@ Known open points:
 ## 13) Diagnostic Feature Snapshot
 
 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
-语义规则（unused-local、undefined-global 等）属里程碑 2，尚未开始。
+里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`（provider + define 注册 + `Opened` status）。
 
 关键文件：
 
 - `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`、provider 注册、过滤
-- `script/feature/diagnostic/providers/syntax.lua` — parser `ast.errors` → 诊断（当前唯一 provider）
-- `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析
+- `script/feature/diagnostic/providers/` — 各规则 provider：`syntax`（parser `ast.errors`）、`empty-block`、`unused-local`
+- `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
-- `script/feature/diagnostic/converter.lua` — `Feature.Diagnostic[]` → `LSP.Diagnostic[]`（push/pull 共用）
-- `script/feature/diagnostic/push.lua` — `publishDiagnostics`（`ls.task` reject 防抖 + 缓存去重）
+- `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），`fetch()` 按版本/dirty 对比返回结果或 nil，`markDirty()` 强制重算
+- `script/feature/diagnostic/scope.lua` — `Feature.Diagnostic.Scope` 类（挂 `scope.diagnostic`），`fetchAll()` 批量诊断汇总（task 维护可 reject）
+- `script/feature/diagnostic/converter.lua` — `Feature.Diagnostic[]` → `LSP.Diagnostic[]`
+- `script/feature/diagnostic/push.lua` — `publishDiagnostics`（`ls.task` reject 防抖），仅 server 模式经 `main.lua` 挂载
 - `script/language-server/capability/language-features/diagnostic.lua` — pull `textDocument/diagnostic`
 - `script/parser/ast/cats/diagnostic.lua` — `---@diagnostic` cat 节点与解析
 
@@ -164,11 +167,15 @@ Known open points:
 - 内部诊断结构用 0-based 字节偏移（`start`/`finish`），LSP range 转换统一走 converter。
 - 语法诊断恒为 Error、不走 neededFileStatus，仅受 `Lua.diagnostics.disable` 与行内禁用注释约束（对齐 master）。
 - `---@diagnostic` 语义对齐 master：`disable`/`enable` 自下一行生效、`disable-line` 当行、`disable-next-line` 下一行；裸 `disable`（无名）不压语法错误；计数支持嵌套。
-- `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`（里程碑 1 仅单文件语法；接语义规则后改 `interFileDependencies=true`）。
+- `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`。
+- **状态模型（重要）**：每个文件的诊断状态存在 `vfile.diagnostic`（`Feature.Diagnostic.File`，懒创建）。push 与 pull 都调 `File.get(vfile):fetch()`：vfile 版本未变且非 dirty → 返回 nil（push 跳过 / pull 回 `unchanged`）；有变化则重算并与 `self.results` 对比，无变化仍返回 nil，有变化才返回结果（push 下发 / pull 回 `full`）。不要自维护诊断缓存表。
+- **Task 模型（重要）**：push 防抖用 `ls.task`（`refresh` 里 reject 旧 task）；`Feature.Diagnostic.Scope:fetchAll()` 批量诊断也用 task 维护，新诊断进来 reject 旧批量过程。不要用 `await.setID`/`await.close`（本分支无此 API）。
+- `unused-local` 豁免：`_`、`_ENV`、`isGlobal`、`<close>`、local function 名（parent=function）、for 循环变量（parent=for）；以 `#loc.gets==0` 判未读。
+- 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间（`TEST_DIAGNOSTIC` 自动比对 `catched['?']` 与 `start/finish`）。
 - push 暂不带 `version` 字段。
-- `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到，里程碑 1 无语义规则，属预留。
+- `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
 
-测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull）。
+测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local）。
 
 待定（里程碑 2+）：语义规则分批迁移、workspace 诊断、locale 文案、codeDescription、quickfix。
 

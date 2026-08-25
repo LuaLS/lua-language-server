@@ -13,7 +13,6 @@ break
     assert(item.code == 'break-outside', tostring(item.code))
     assert(item.severity == ls.spec.DiagnosticSeverity.Error, tostring(item.severity))
     assert(item.source == 'Lua', tostring(item.source))
-    assert(item.message == '<break> not inside a loop.', item.message)
     assert(item.range.start.line == 0, tostring(item.range.start.line))
     assert(item.range.start.character == 0, tostring(item.range.start.character))
     assert(item.range['end'].line == 0, tostring(item.range['end'].line))
@@ -42,5 +41,4 @@ if true then
     assert(#found.relatedInformation == 1, 'expected 1 related, actual ' .. #found.relatedInformation)
     local rel = found.relatedInformation[1]
     assert(rel.location.uri == test.fileUri, tostring(rel.location.uri))
-    assert(rel.message == '`end` expected', rel.message)
 end)

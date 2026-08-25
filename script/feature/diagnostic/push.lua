@@ -1,4 +1,5 @@
 local converter = require 'feature.diagnostic.converter'
+local File      = require 'feature.diagnostic.file'
 
 ---@class Feature.Diagnostic.Push
 local M = {}
@@ -6,27 +7,30 @@ local M = {}
 ---@type table<Uri, Task>
 local tasks = {}
 
----@type table<Uri, LSP.Diagnostic[]>
-local cache = {}
-
 local DELAY = 0.1
 
+---@async
 ---@param uri Uri
 local function publish(uri)
     local server = ls.server
     if not server then
         return
     end
-    local document = ls.scope.findDocument(uri)
+    local scope = ls.scope.find(uri)
+    if not scope then
+        return
+    end
+    local vfile = scope.vm:getFile(uri)
+               or scope.vm:createFile(uri)
+    local document = scope:getDocument(uri)
     if not document then
         return
     end
-    local diagnostics = ls.feature.diagnostic(uri)
-    local items = converter.convert(document, diagnostics, server.positionEncoding)
-    if ls.util.equal(cache[uri], items) then
+    local results = File.get(vfile):fetch()
+    if not results then
         return
     end
-    cache[uri] = items
+    local items = converter.convert(document, results, server.positionEncoding)
     server.client:notify('textDocument/publishDiagnostics', {
         uri         = uri,
         diagnostics = items,
@@ -56,7 +60,6 @@ function M.clear(uri)
         old:reject(ls.task.REJECT_CANCELED)
     end
     tasks[uri] = nil
-    cache[uri] = nil
     local server = ls.server
     if not server then
         return

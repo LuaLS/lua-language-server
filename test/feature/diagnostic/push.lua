@@ -22,6 +22,10 @@ end
 TEST_FRAME([[
 break
 ]], function ()
+    local vfile = test.scope.vm:getFile(test.fileUri)
+    if vfile then
+        vfile.diagnostic = nil
+    end
     local notifications = withMockServer(function ()
         push.refresh(test.fileUri)
         ---@diagnostic disable-next-line: await-in-sync

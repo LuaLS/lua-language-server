@@ -16,6 +16,9 @@ M.nextVersion = -1
 --- 当前使用的 Document
 ---@type Document?
 M.document = nil
+--- 诊断状态（懒创建，由 feature.diagnostic.file 挂载）
+---@type Feature.Diagnostic.File?
+M.diagnostic = nil
 
 M.traceMap = ls.util.weakKTable()
 

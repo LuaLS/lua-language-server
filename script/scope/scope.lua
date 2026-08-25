@@ -8,6 +8,9 @@ Extends('Scope', 'Node.RefModule')
 
 M.ready = false
 
+---@type Feature.Diagnostic.Scope?
+M.diagnostic = nil
+
 ---@param name string
 ---@param uri Uri
 ---@param fs? FileSystem

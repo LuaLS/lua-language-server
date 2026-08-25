@@ -1,5 +1,5 @@
 ---@param script string
----@return fun(expects: string[]|fun(results: Feature.Diagnostic[]))
+---@return fun(codes: string[]?): fun(callback: fun(results: Feature.Diagnostic[])?)
 function TEST_DIAGNOSTIC(script)
     script = script:gsub('\n$', '')
     local results, catched = TEST_FRAME(script, function ()
@@ -12,7 +12,18 @@ function TEST_DIAGNOSTIC(script)
     results = results or {}
     local marks = (catched and catched['?']) or {}
 
-    return function (expects)
+    return function (codes)
+        if codes ~= nil then
+            local actual = {}
+            for i, diag in ipairs(results) do
+                actual[i] = diag.code
+            end
+            assert(#actual == #codes, ('expected %d diagnostics, actual %d\nexpected codes:\n%s\nactual codes:\n%s')
+                :format(#codes, #actual, table.concat(codes, '\n'), table.concat(actual, '\n')))
+            for i, code in ipairs(codes) do
+                assert(actual[i] == code, ('expected diag[%d] code `%s`, actual `%s`'):format(i, code, tostring(actual[i])))
+            end
+        end
         if #marks > 0 then
             assert(#results == #marks, ('expected %d position marks, actual %d diagnostics'):format(#marks, #results))
             table.sort(marks, function (a, b)
@@ -28,18 +39,10 @@ function TEST_DIAGNOSTIC(script)
                         :format(i, diag.code, mark[1], mark[2], diag.start, diag.finish))
             end
         end
-        if type(expects) == 'function' then
-            expects(results)
-            return
-        end
-        local codes = {}
-        for i, diag in ipairs(results) do
-            codes[i] = diag.code
-        end
-        assert(#codes == #expects, ('expected %d diagnostics, actual %d\nexpected codes:\n%s\nactual codes:\n%s')
-            :format(#expects, #codes, table.concat(expects, '\n'), table.concat(codes, '\n')))
-        for i, code in ipairs(expects) do
-            assert(codes[i] == code, ('expected diag[%d] code `%s`, actual `%s`'):format(i, code, tostring(codes[i])))
+        return function (callback)
+            if callback then
+                callback(results)
+            end
         end
     end
 end
@@ -52,3 +55,4 @@ test.require 'test.feature.diagnostic.push'
 test.require 'test.feature.diagnostic.pull'
 test.require 'test.feature.diagnostic.empty-block'
 test.require 'test.feature.diagnostic.unused-local'
+test.require 'test.feature.diagnostic.dedupe'

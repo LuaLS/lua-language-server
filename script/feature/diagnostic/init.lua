@@ -102,12 +102,34 @@ ls.feature.diagnostic = function (uri)
     end
 
     table.sort(results, function (a, b)
+        if a.start == b.start then
+            return a.finish < b.finish
+        end
         return a.start < b.start
     end)
 
-    return results
+    local deduped = {}
+    local i = 1
+    while i <= #results do
+        local best = results[i]
+        local j = i + 1
+        while j <= #results
+        and results[j].start == best.start
+        and results[j].finish == best.finish do
+            if results[j].level < best.level then
+                best = results[j]
+            end
+            j = j + 1
+        end
+        deduped[#deduped+1] = best
+        i = j
+    end
+
+    return deduped
 end
 
 require 'feature.diagnostic.providers.syntax'
 require 'feature.diagnostic.providers.empty-block'
 require 'feature.diagnostic.providers.unused-local'
+require 'feature.diagnostic.file'
+require 'feature.diagnostic.scope'

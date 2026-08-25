@@ -1,5 +1,4 @@
-local converter = require 'feature.diagnostic.converter'
-local File      = require 'feature.diagnostic.file'
+local File = require 'feature.diagnostic.file'
 
 ls.capability.registerCapability.diagnosticProvider = {
     interFileDependencies = false,
@@ -7,7 +6,7 @@ ls.capability.registerCapability.diagnosticProvider = {
 }
 
 ---@async
-ls.capability.register('textDocument/diagnostic', function (server, params, task)
+ls.capability.register('textDocument/diagnostic', function (_, params, task)
     ---@cast params LSP.DocumentDiagnosticParams
 
     local uri = params.textDocument.uri
@@ -21,26 +20,10 @@ ls.capability.register('textDocument/diagnostic', function (server, params, task
     end
     local vfile = scope.vm:getFile(uri)
                or scope.vm:createFile(uri)
-    local document = scope:getDocument(uri)
-    if not document then
-        task:resolve {
-            kind     = ls.spec.DocumentDiagnosticReportKind.Unchanged,
-            resultId = uri,
-        }
-        return
-    end
-    local results = File.get(vfile):fetch()
-    if not results then
-        task:resolve {
-            kind     = ls.spec.DocumentDiagnosticReportKind.Unchanged,
-            resultId = uri,
-        }
-        return
-    end
-    local items = converter.convert(document, results, server.positionEncoding)
+    File.get(vfile):refresh()
+
     task:resolve {
-        kind     = ls.spec.DocumentDiagnosticReportKind.Full,
+        kind     = ls.spec.DocumentDiagnosticReportKind.Unchanged,
         resultId = uri,
-        items    = items,
     }
 end)

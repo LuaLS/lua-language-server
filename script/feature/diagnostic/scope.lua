@@ -36,9 +36,11 @@ function M:fetchAll()
         task:execute(function ()
             local results = {}
             for uri, vfile in pairs(scope.vm.vfiles) do
-                local diags = File.get(vfile):fetch()
-                if diags then
-                    results[uri] = diags
+                local file = File.get(vfile)
+                file:refresh()
+                local merged = file:merge()
+                if #merged > 0 then
+                    results[uri] = merged
                 end
             end
             task:resolve(results)

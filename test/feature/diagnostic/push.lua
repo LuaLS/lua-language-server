@@ -1,6 +1,6 @@
 require 'language-server.task'
 
-local push = require 'feature.diagnostic.push'
+local File = require 'feature.diagnostic.file'
 
 local function withMockServer(callback)
     local notifications = {}
@@ -23,11 +23,12 @@ TEST_FRAME([[
 break
 ]], function ()
     local vfile = test.scope.vm:getFile(test.fileUri)
-    if vfile then
-        vfile.diagnostic = nil
-    end
+    assert(vfile)
+    vfile.diagnostic = nil
+
     local notifications = withMockServer(function ()
-        push.refresh(test.fileUri)
+        ---@diagnostic disable-next-line: await-in-sync
+        File.get(vfile):refresh()
         ---@diagnostic disable-next-line: await-in-sync
         ls.await.sleep(0.5)
     end)
@@ -42,9 +43,14 @@ end)
 
 TEST_FRAME([[
 local x = 1
+print(x)
 ]], function ()
+    local vfile = test.scope.vm:getFile(test.fileUri)
+    assert(vfile)
+    vfile.diagnostic = nil
+
     local notifications = withMockServer(function ()
-        push.clear(test.fileUri)
+        File.get(vfile):dispose()
     end)
 
     assert(#notifications == 1, 'expected 1 notification, actual ' .. #notifications)

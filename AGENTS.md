@@ -155,7 +155,8 @@ Known open points:
 - `script/feature/diagnostic/providers/` — 各规则 provider：`syntax`（parser `ast.errors`）、`empty-block`、`unused-local`
 - `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
-- `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），`fetch()` 按版本/dirty 对比返回结果或 nil，`markDirty()` 强制重算
+- `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），贡献者模型：`contribute(items)→dispose`、`refresh()`（文件诊断）、`schedulePush()`（防抖）、`push()`（合并/对比/发布）、`dispose()`
+- `script/feature/diagnostic/merge.lua` — 诊断排序 + 同位置去重（保留最高等级），引擎与 File 合并共用
 - `script/feature/diagnostic/scope.lua` — `Feature.Diagnostic.Scope` 类（挂 `scope.diagnostic`），`fetchAll()` 批量诊断汇总（task 维护可 reject）
 - `script/feature/diagnostic/converter.lua` — `Feature.Diagnostic[]` → `LSP.Diagnostic[]`
 - `script/feature/diagnostic/push.lua` — `publishDiagnostics`（`ls.task` reject 防抖），仅 server 模式经 `main.lua` 挂载
@@ -168,10 +169,10 @@ Known open points:
 - 语法诊断恒为 Error、不走 neededFileStatus，仅受 `Lua.diagnostics.disable` 与行内禁用注释约束（对齐 master）。
 - `---@diagnostic` 语义对齐 master：`disable`/`enable` 自下一行生效、`disable-line` 当行、`disable-next-line` 下一行；裸 `disable`（无名）不压语法错误；计数支持嵌套。
 - `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`。
-- **状态模型（重要）**：每个文件的诊断状态存在 `vfile.diagnostic`（`Feature.Diagnostic.File`，懒创建）。push 与 pull 都调 `File.get(vfile):fetch()`：vfile 版本未变且非 dirty → 返回 nil（push 跳过 / pull 回 `unchanged`）；有变化则重算并与 `self.results` 对比，无变化仍返回 nil，有变化才返回结果（push 下发 / pull 回 `full`）。不要自维护诊断缓存表。
-- **Task 模型（重要）**：push 防抖用 `ls.task`（`refresh` 里 reject 旧 task）；`Feature.Diagnostic.Scope:fetchAll()` 批量诊断也用 task 维护，新诊断进来 reject 旧批量过程。不要用 `await.setID`/`await.close`（本分支无此 API）。
-- **push 触发时机（重要）**：单文件诊断无延迟，仅 0.1s 防抖（`DELAY`），不读 workspace 延迟配置（工作区诊断未实现）。文件变化/新增 → `onDidChange` → `refresh`；文件删除 → `onDidRemove` → `clear`（reject 待处理 task + 推送空 `diagnostics: {}`，诊断记录随 vfile 销毁自动清空）；`ls.scope.onDidLoad` → 对 scope 下所有 vfile 重新 `refresh`（初次加载/config 变化后兜底）。
-- **scope 就绪（重要）**：`scope.ready` 在 reload 协程真正完成时才置 true，完成时 `ls.scope.onDidLoad:fire(scope)`。`File.fetch` 与 `scope.watchFiles` 的 `onDidChange` 索引都先 `ls.scope.waitReady(uri)`，避免在 `.luarc.json`/客户端配置加载前用默认 `Lua.runtime.version` 编译（否则 Lua 5.5 语法被 5.4 规则误报）。
+- **状态模型（重要）**：每个文件的诊断状态存在 `vfile.diagnostic`（`Feature.Diagnostic.File`，懒创建）。贡献者模型：`contribute(items)` 添加一批诊断并返回 dispose 函数，`refresh()` 跑文件诊断（先 dispose 旧文件贡献，`version == vfile.version` 时跳过重跑）。push 与 pull 都经 `refresh()` 触发，`schedulePush()` 防抖后 `push()` 合并所有贡献 → 排序去重（merge.lua）→ 对比 `self.results` → 变化则更新并 `publishDiagnostics`。不要自维护诊断缓存表。
+- **Task 模型（重要）**：push 防抖用 `ls.task`（`File.schedulePush` 里 reject 旧 task）；`Feature.Diagnostic.Scope:fetchAll()` 批量诊断也用 task 维护，新诊断进来 reject 旧批量过程。不要用 `await.setID`/`await.close`（本分支无此 API）。
+- **push 触发时机（重要）**：单文件诊断无延迟，仅 0.1s 防抖（`File` 内 `DELAY`），不读 workspace 延迟配置（工作区诊断未实现）。文件变化/新增 → `onDidChange` → `File:refresh`（先 dispose 旧贡献再重跑）；文件删除 → `onDidRemove` → `File:dispose`（清贡献 + 推送空 `diagnostics: {}`）；`ls.scope.onDidLoad` → 对 scope 下所有 vfile 重新 `refresh`（初次加载/config 变化后兜底）。
+- **scope 就绪（重要）**：`scope.ready` 在 reload 协程真正完成时才置 true，完成时 `ls.scope.onDidLoad:fire(scope)`。`File.refresh` 与 `scope.watchFiles` 的 `onDidChange` 索引都先 `ls.scope.waitReady(uri)`，避免在 `.luarc.json`/客户端配置加载前用默认 `Lua.runtime.version` 编译（否则 Lua 5.5 语法被 5.4 规则误报）。
 - `unused-local` 豁免：`_`、`_ENV`、`isGlobal`、`<close>`、local function 名（parent=function）、for 循环变量（parent=for）；以 `#loc.gets==0` 判未读。
 - 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间（`TEST_DIAGNOSTIC` 自动比对 `catched['?']` 与 `start/finish`）。
 - push 暂不带 `version` 字段。

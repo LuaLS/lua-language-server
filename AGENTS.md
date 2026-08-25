@@ -170,6 +170,8 @@ Known open points:
 - `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`。
 - **状态模型（重要）**：每个文件的诊断状态存在 `vfile.diagnostic`（`Feature.Diagnostic.File`，懒创建）。push 与 pull 都调 `File.get(vfile):fetch()`：vfile 版本未变且非 dirty → 返回 nil（push 跳过 / pull 回 `unchanged`）；有变化则重算并与 `self.results` 对比，无变化仍返回 nil，有变化才返回结果（push 下发 / pull 回 `full`）。不要自维护诊断缓存表。
 - **Task 模型（重要）**：push 防抖用 `ls.task`（`refresh` 里 reject 旧 task）；`Feature.Diagnostic.Scope:fetchAll()` 批量诊断也用 task 维护，新诊断进来 reject 旧批量过程。不要用 `await.setID`/`await.close`（本分支无此 API）。
+- **push 触发时机（重要）**：单文件诊断无延迟，仅 0.1s 防抖（`DELAY`），不读 workspace 延迟配置（工作区诊断未实现）。文件变化/新增 → `onDidChange` → `refresh`；文件删除 → `onDidRemove` → `clear`（reject 待处理 task + 推送空 `diagnostics: {}`，诊断记录随 vfile 销毁自动清空）；`ls.scope.onDidLoad` → 对 scope 下所有 vfile 重新 `refresh`（初次加载/config 变化后兜底）。
+- **scope 就绪（重要）**：`scope.ready` 在 reload 协程真正完成时才置 true，完成时 `ls.scope.onDidLoad:fire(scope)`。`File.fetch` 与 `scope.watchFiles` 的 `onDidChange` 索引都先 `ls.scope.waitReady(uri)`，避免在 `.luarc.json`/客户端配置加载前用默认 `Lua.runtime.version` 编译（否则 Lua 5.5 语法被 5.4 规则误报）。
 - `unused-local` 豁免：`_`、`_ENV`、`isGlobal`、`<close>`、local function 名（parent=function）、for 循环变量（parent=for）；以 `#loc.gets==0` 判未读。
 - 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间（`TEST_DIAGNOSTIC` 自动比对 `catched['?']` 与 `start/finish`）。
 - push 暂不带 `version` 字段。

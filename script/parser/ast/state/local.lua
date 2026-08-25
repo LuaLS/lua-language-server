@@ -161,9 +161,6 @@ end
 ---@private
 ---@return LuaParser.Node.GlobalDef | LuaParser.Node.Function?, boolean?
 function Ast:parseGlobal()
-    if self.versionNum < 55 then
-        return nil, true
-    end
     local nextToken, nextType = self.lexer:peek(1)
     if nextToken ~= 'function'
     and nextToken ~= '*'
@@ -174,6 +171,9 @@ function Ast:parseGlobal()
     local pos = self.lexer:consume 'global'
     if not pos then
         return nil
+    end
+    if self.versionNum < 55 then
+        self:throw('UNSUPPORT_SYMBOL', pos, pos + #'global')
     end
     self:skipSpace()
 

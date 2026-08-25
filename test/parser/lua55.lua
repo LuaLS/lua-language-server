@@ -110,6 +110,18 @@ end]], nil, {
 })
 assert(oldSyntaxAst.errors[1].errorCode == 'UNSUPPORT_SYMBOL')
 
+local oldGlobalAst = parser.compile([[global value
+global *
+global function f() end]], nil, {
+    version = 'Lua 5.4',
+})
+for _, err in ipairs(oldGlobalAst.errors) do
+    assert(err.errorCode == 'UNSUPPORT_SYMBOL', err.errorCode)
+end
+assert(#oldGlobalAst.errors == 3)
+assert(#oldGlobalAst.nodesMap['globaldef'] == 2)
+assert(#oldGlobalAst.nodesMap['function'] == 1)
+
 local shadowAst = parser.compile([[local value
 value = 1
 global value

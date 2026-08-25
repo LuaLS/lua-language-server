@@ -8,9 +8,10 @@ function methods.makeCode(params)
     local ast = parser.compile(params.text, params.source, params.options)
     coder:makeFromAst(ast)
     return {
-        code = coder.code,
-        tracerFlowMap = coder.tracerFlowMap,
-        parentMap = coder.parentMap,
+        code           = coder.code,
+        tracerFlowMap  = coder.tracerFlowMap,
+        parentMap      = coder.parentMap,
+        errors         = coder.errors,
     }
 end
 

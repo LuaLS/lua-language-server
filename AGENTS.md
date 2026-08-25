@@ -152,7 +152,7 @@ Known open points:
 关键文件：
 
 - `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`、provider 注册、过滤
-- `script/feature/diagnostic/providers/` — 各规则 provider：`syntax`（parser `ast.errors`）、`empty-block`、`unused-local`
+- `script/feature/diagnostic/providers/` — 各规则 provider：`syntax`（语法错误，来自 `vfile.coder.errors`）、`empty-block`、`unused-local`
 - `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
 - `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），贡献者模型：`contribute(items)→dispose`、`refresh()`（文件诊断）、`schedulePush()`（防抖）、`push()`（合并/对比/发布）、`dispose()`
@@ -166,6 +166,8 @@ Known open points:
 约束与语义：
 
 - 内部诊断结构用 0-based 字节偏移（`start`/`finish`），LSP range 转换统一走 converter。
+- **语法错误来源（重要）**：语法错误由 coder 编译产物提供——`coder.makeFromAst` 序列化 `ast.errors`（`errorCode/start/finish/code/extra` plain data）到 `coder.errors`，子线程 `makeCode` 返回后 `makeFromFile` 赋给 `coder.errors`。诊断 `syntax` provider 读 `param.errors`（`vfile.coder.errors`），不再走主线程 `document.ast.errors`。语法错误同样经 `merge.merge` 去重（同位置保留最高等级）。
+- **后续目标（已记录）**：主线程只解析当前正在修改的文件；能直接通过语法分析获得的诊断都应改由子线程完成（语义规则仍依赖主线程 `nodesMap`，后续逐步迁移）。
 - 语法诊断恒为 Error、不走 neededFileStatus，仅受 `Lua.diagnostics.disable` 与行内禁用注释约束（对齐 master）。
 - `---@diagnostic` 语义对齐 master：`disable`/`enable` 自下一行生效、`disable-line` 当行、`disable-next-line` 下一行；裸 `disable`（无名）不压语法错误；计数支持嵌套。
 - `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`。

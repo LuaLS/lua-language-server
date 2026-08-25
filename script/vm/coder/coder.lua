@@ -12,6 +12,8 @@ end
 M.code = '-- Not made yet --'
 ---@type function?
 M.func = nil
+---@type table[]?
+M.errors = nil
 
 ---@alias VM.CoderProvider fun(coder: Coder, source: LuaParser.Node.Base)
 
@@ -67,6 +69,17 @@ function M:makeFromAst(ast)
     self.compiled = nil
     self.blockStack = nil
 
+    self.errors = {}
+    for i, err in ipairs(ast.errors) do
+        self.errors[i] = {
+            errorCode = err.errorCode,
+            start     = err.start,
+            finish    = err.finish,
+            code      = err.code,
+            extra     = err.extra,
+        }
+    end
+
     self.func = assert(load(self.code, self.code, 't', self.env))
 end
 
@@ -93,6 +106,7 @@ function M:makeFromFile(file, options)
     self.func = func
     self.tracerFlowMap = result.tracerFlowMap
     self.parentMap = result.parentMap
+    self.errors = result.errors
 end
 
 ---@param code string

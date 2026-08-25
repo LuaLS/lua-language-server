@@ -23,6 +23,7 @@ local merge   = require 'feature.diagnostic.merge'
 ---@field scope Scope
 ---@field document Document
 ---@field ast LuaParser.Ast
+---@field errors table[]
 
 ---@type (fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[])[]
 local providers = {}
@@ -69,6 +70,9 @@ ls.feature.diagnostic = function (uri)
         return {}
     end
 
+    local vfile = scope.vm:getFile(uri)
+    local syntaxErrors = vfile and vfile.coder and vfile.coder.errors or {}
+
     local disables = ls.util.arrayToHash(scope.config:get(uri, 'Lua.diagnostics.disable') or {})
     local opened = document.file:isOpenedByClient()
     local disableRanges = disable.buildRanges(ast)
@@ -79,6 +83,7 @@ ls.feature.diagnostic = function (uri)
         scope    = scope,
         document = document,
         ast      = ast,
+        errors   = syntaxErrors,
     }
 
     local results = {}

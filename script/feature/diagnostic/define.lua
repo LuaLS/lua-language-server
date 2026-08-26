@@ -102,8 +102,18 @@ M.register {
 
 M.register {
     'count-down-loop',
+    'newline-call',
+    'newfield-call',
 } {
     group    = 'ambiguity',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'close-non-object',
+} {
+    group    = 'strict',
     severity = 'Warning',
     status   = 'Any',
 }

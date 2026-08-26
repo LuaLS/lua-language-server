@@ -40,7 +40,7 @@ local function countDownLoopProvider(param)
         if not initNumber and maxNumber ~= 1 then
             goto continue
         end
-        local text = ast.code:sub(initExp.start, maxExp.finish)
+        local text = ast.code:sub(initExp.start + 1, maxExp.finish)
         local stepExp = exps[3]
         if not stepExp then
             results[#results+1] = {
@@ -53,7 +53,7 @@ local function countDownLoopProvider(param)
         else
             local stepNumber = getNumber(stepExp)
             if stepNumber and stepNumber > 0 then
-                local stepText = ast.code:sub(stepExp.start, stepExp.finish)
+                local stepText = ast.code:sub(stepExp.start + 1, stepExp.finish)
                 results[#results+1] = {
                     code    = 'count-down-loop',
                     level   = 0,

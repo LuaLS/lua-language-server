@@ -4,6 +4,7 @@
 ---@field node LuaParser.Node.Term
 ---@field argPos integer
 ---@field args LuaParser.Node.Exp[]
+---@field next? LuaParser.Node.Field
 local Call = Class('LuaParser.Node.Call', 'LuaParser.Node.Base')
 
 Call.kind = 'call'

@@ -147,14 +147,14 @@ Known open points:
 ## 13) Diagnostic Feature Snapshot
 
 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
-里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`（主线程计算）。
+里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`（主线程计算）。
 
 关键文件：
 
 - `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`（async）、provider 注册、过滤
 - `script/feature/diagnostic/parser-diagnostics.lua` — parser-only 规则共用纯函数（`push`、`hasStatements`、`isExcludedLocal`、`isInStringOrComment`）
 - `script/feature/diagnostic/providers/syntax.lua` — 语法错误 provider（读 `vfile.coder.errors`），末尾 `return { messages = messages }` 导出错误码→文案表，供 `unknown-diag-code` 复用合法码集合
-- `script/feature/diagnostic/providers/redundant-return.lua` / `code-after-break.lua` / `duplicate-index.lua` / `duplicate-doc-param.lua` / `unbalanced-assignments.lua` / `unknown-diag-code.lua` / `lowercase-global.lua` / `redundant-value.lua` / `count-down-loop.lua` / `undefined-doc-param.lua` — 后续新增规则（duplicate-index 带 `related` 信息 + `Unnecessary` tag 区分覆盖项；unknown-diag-code 合法码集合 = `define.diagnosticDatas` 键 + syntax.messages 键 lowercase-hyphen 化；lowercase-global 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免；duplicate-doc-param/undefined-doc-param 用 block.cats 行邻接分组关联 function，undefined-doc-param 从 function 出发反向收集 `func.startRow-1` 起连续 cat；code-after-break 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无 continue 用例））
+- `script/feature/diagnostic/providers/redundant-return.lua` / `code-after-break.lua` / `duplicate-index.lua` / `duplicate-doc-param.lua` / `unbalanced-assignments.lua` / `unknown-diag-code.lua` / `lowercase-global.lua` / `redundant-value.lua` / `count-down-loop.lua` / `undefined-doc-param.lua` / `close-non-object.lua` / `newline-call.lua` / `newfield-call.lua` — 后续新增规则（duplicate-index 带 `related` 信息 + `Unnecessary` tag 区分覆盖项；unknown-diag-code 合法码集合 = `define.diagnosticDatas` 键 + syntax.messages 键 lowercase-hyphen 化；lowercase-global 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免；duplicate-doc-param/undefined-doc-param 用 block.cats 行邻接分组关联 function，undefined-doc-param 从 function 出发反向收集 `func.startRow-1` 起连续 cat；code-after-break 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无 continue 用例）；close-non-object 仅做 `local x <close>` 无 value 部分，value 类型判断需 `vm.getInfer` 待补；newline-call 检测 5.2+ 换行调用（`call.next` 有链 + node/argPos 不同行 + 单参数）；newfield-call 检测表构造器数组元素里的换行调用（`field.subtype=='exp'` 且 value 是 call + node/argPos 不同行）——注意 parser 的 `AMBIGUOUS_SYNTAX` 只在 `versionNum <= 51`（Lua 5.1）抛，5.2+ 换行调用合法，故 newline-call/newfield-call 是 warning 非语法错）
 - `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
 - `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），贡献者模型：`contribute(items)→dispose`、`refresh()`（文件诊断）、`schedulePush()`（防抖）、`push()`（合并/对比/发布）、`dispose()`
@@ -183,7 +183,7 @@ Known open points:
 - push 暂不带 `version` 字段。
 - `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
 
-测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / semantic）。
+测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / semantic）。
 
 待定（里程碑 2+）：语义规则分批迁移、workspace 诊断、locale 文案、codeDescription、quickfix。
 

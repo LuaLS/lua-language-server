@@ -147,13 +147,14 @@ Known open points:
 ## 13) Diagnostic Feature Snapshot
 
 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
-里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`（主线程计算）。
+里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`（主线程计算）。
 
 关键文件：
 
 - `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`（async）、provider 注册、过滤
-- `script/feature/diagnostic/parser-diagnostics.lua` — 7 条 parser-only 规则纯函数
-- `script/feature/diagnostic/providers/syntax.lua` — 语法错误 provider（读 `vfile.coder.errors`）
+- `script/feature/diagnostic/parser-diagnostics.lua` — parser-only 规则共用纯函数（`push`、`hasStatements`、`isExcludedLocal`、`isInStringOrComment`）
+- `script/feature/diagnostic/providers/syntax.lua` — 语法错误 provider（读 `vfile.coder.errors`），末尾 `return { messages = messages }` 导出错误码→文案表，供 `unknown-diag-code` 复用合法码集合
+- `script/feature/diagnostic/providers/redundant-return.lua` / `code-after-break.lua` / `duplicate-index.lua` / `duplicate-doc-param.lua` / `unbalanced-assignments.lua` / `unknown-diag-code.lua` / `lowercase-global.lua` / `redundant-value.lua` / `count-down-loop.lua` / `undefined-doc-param.lua` — 后续新增规则（duplicate-index 带 `related` 信息 + `Unnecessary` tag 区分覆盖项；unknown-diag-code 合法码集合 = `define.diagnosticDatas` 键 + syntax.messages 键 lowercase-hyphen 化；lowercase-global 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免；duplicate-doc-param/undefined-doc-param 用 block.cats 行邻接分组关联 function，undefined-doc-param 从 function 出发反向收集 `func.startRow-1` 起连续 cat；code-after-break 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无 continue 用例））
 - `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
 - `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），贡献者模型：`contribute(items)→dispose`、`refresh()`（文件诊断）、`schedulePush()`（防抖）、`push()`（合并/对比/发布）、`dispose()`
@@ -168,12 +169,13 @@ Known open points:
 
 - 内部诊断结构用 0-based 字节偏移（`start`/`finish`），LSP range 转换统一走 converter。
 - **语法错误来源（重要）**：语法错误由 coder 编译产物提供——`coder.makeFromAst` 序列化 `ast.errors`（`errorCode/start/finish/code/extra` plain data）到 `coder.errors`，子线程 `makeCode` 返回后 `makeFromFile` 赋给 `coder.errors`。诊断 `syntax` provider 读 `param.errors`（`vfile.coder.errors`），不再走主线程 `document.ast.errors`。语法错误同样经 `merge.merge` 去重（同位置保留最高等级）。
-- **parser-only 诊断主线程（重要）**：`empty-block`/`unused-*`/`redefined-local`/`trailing-space` 等 7 条规则由主线程 `ls.feature.diagnostic` 计算——`document.ast`（主线程 parse）→ `parser-diagnostics.run` 算全部规则 + `disable.buildRanges`，与语法诊断合并后过滤去重。
+- **parser-only 诊断主线程（重要）**：`empty-block`/`unused-*`/`redefined-local`/`trailing-space`/`redundant-return`/`code-after-break`/`duplicate-index` 等规则由主线程 `ls.feature.diagnostic` 计算——`document.ast`（主线程 parse）→ provider 逐条计算 + `disable.buildRanges`，与语法诊断合并后过滤去重。
 - 语法诊断恒为 Error、不走 neededFileStatus，仅受 `Lua.diagnostics.disable` 与行内禁用注释约束（对齐 master）。
 - `---@diagnostic` 语义对齐 master：`disable`/`enable` 自下一行生效、`disable-line` 当行、`disable-next-line` 下一行；裸 `disable`（无名）不压语法错误；计数支持嵌套。
 - `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`。
 - **状态模型（重要）**：每个文件的诊断状态存在 `vfile.diagnostic`（`Feature.Diagnostic.File`，懒创建）。贡献者模型：`contribute(items)` 添加一批诊断并返回 dispose 函数，`refresh()` 跑文件诊断（先 dispose 旧文件贡献，`version == vfile.version` 时跳过重跑）。push 与 pull 都经 `refresh()` 触发，`schedulePush()` 防抖后 `push()` 合并所有贡献 → 排序去重（merge.lua）→ 对比 `self.results` → 变化则更新并 `publishDiagnostics`。不要自维护诊断缓存表。
 - **Task 模型（重要）**：push 防抖用 `ls.task`（`File.schedulePush` 里 reject 旧 task）；`Feature.Diagnostic.Scope:fetchAll()` 批量诊断也用 task 维护，新诊断进来 reject 旧批量过程。不要用 `await.setID`/`await.close`（本分支无此 API）。
+- **Task 让出（重要）**：`Task:delay()`（内部 `ls.await.sleep(0)`，非 yieldable 时静默 no-op）+ `ls.task.newThrottledDelayer(factor)`（计数到 factor 才真正让出一次），供耗时诊断 provider 循环内让出给其他输入响应，对齐 master `await.delay`/`newThrottledDelayer` 语义。测试模式需加载 `language-server.task`（`test.lua` 已加 `require`），否则 `ls.task` 为 nil。
 - **push 触发时机（重要）**：单文件诊断无延迟，仅 0.1s 防抖（`File` 内 `DELAY`），不读 workspace 延迟配置（工作区诊断未实现）。文件变化/新增 → `onDidChange` → `File:refresh`（先 dispose 旧贡献再重跑）；文件删除 → `onDidRemove` → `File:dispose`（清贡献 + 推送空 `diagnostics: {}`）；`ls.scope.onDidLoad` → 对 scope 下所有 vfile 重新 `refresh`（初次加载/config 变化后兜底）。
 - **scope 就绪（重要）**：`scope.ready` 在 reload 协程真正完成时才置 true，完成时 `ls.scope.onDidLoad:fire(scope)`。`File.refresh` 与 `scope.watchFiles` 的 `onDidChange` 索引都先 `ls.scope.waitReady(uri)`，避免在 `.luarc.json`/客户端配置加载前用默认 `Lua.runtime.version` 编译（否则 Lua 5.5 语法被 5.4 规则误报）。
 - `unused-local` 豁免：`_`、`_ENV`、`isGlobal`、`<close>`、local function 名（parent=function）、for 循环变量（parent=for）；以 `#loc.gets==0` 判未读。
@@ -181,7 +183,7 @@ Known open points:
 - push 暂不带 `version` 字段。
 - `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
 
-测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / semantic）。
+测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / semantic）。
 
 待定（里程碑 2+）：语义规则分批迁移、workspace 诊断、locale 文案、codeDescription、quickfix。
 

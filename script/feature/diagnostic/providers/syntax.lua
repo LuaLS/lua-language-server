@@ -45,6 +45,9 @@ local messages = {
     ERR_ESC_DEC            = 'Decimal escape must be between {min} and {max}.',
     MISS_ESC_X             = 'Should be 2 hexadecimal digits.',
     ERR_ESC                = 'Invalid escape sequence.',
+    MUST_X16               = 'Should be hexadecimal digits.',
+    UTF8_SMALL             = 'At least 1 hexadecimal digit.',
+    UTF8_MAX               = 'Should be between {min} and {max}.',
     NESTING_LONG_MARK      = 'Nesting of `[[...]]` is not allowed in Lua 5.1.',
     GLOBAL_NOT_DECLARED    = 'Variable `{code}` is not declared.',
     UNEXPECT_DOTS          = 'Cannot use `...` outside a vararg function.',
@@ -138,3 +141,7 @@ local function syntaxProvider(param)
 end
 
 ls.feature.provider.diagnostic(syntaxProvider)
+
+return {
+    messages = messages,
+}

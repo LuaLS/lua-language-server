@@ -1,11 +1,12 @@
 
 ---@class LuaParser.Node.Break: LuaParser.Node.Base
----@field breeakBlock? LuaParser.Node.Block
+---@field breakBlock? LuaParser.Node.Block
 local Break = Class('LuaParser.Node.Break', 'LuaParser.Node.Base')
 
 Break.kind = 'break'
 
 ---@class LuaParser.Node.Continue: LuaParser.Node.Base
+---@field breakBlock? LuaParser.Node.Block
 local Continue = Class('LuaParser.Node.Continue', 'LuaParser.Node.Base')
 
 Continue.kind = 'continue'

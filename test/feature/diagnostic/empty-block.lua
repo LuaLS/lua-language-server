@@ -5,7 +5,7 @@ end?>
 
 TEST_DIAGNOSTIC [[
 while true do
-    x = 1
+    print(1)
 end
 ]] {}
 
@@ -37,13 +37,13 @@ end?>
 
 TEST_DIAGNOSTIC [[
 if true then
-    x = 1
+    print(1)
 end
 ]] {}
 
 TEST_DIAGNOSTIC [[
 if true then
-    x = 1
+    print(1)
 else
 end
 ]] {}

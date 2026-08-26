@@ -49,6 +49,8 @@ M.register {
     'unused-label',
     'unused-vararg',
     'trailing-space',
+    'redundant-return',
+    'code-after-break',
 } {
     group    = 'unused',
     severity = 'Hint',
@@ -59,6 +61,49 @@ M.register {
     'redefined-local',
 } {
     group    = 'redefined',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'duplicate-index',
+} {
+    group    = 'duplicate',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'duplicate-doc-param',
+    'unknown-diag-code',
+    'undefined-doc-param',
+} {
+    group    = 'luadoc',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'unbalanced-assignments',
+    'redundant-value',
+} {
+    group    = 'unbalanced',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'lowercase-global',
+} {
+    group    = 'global',
+    severity = 'Information',
+    status   = 'Any',
+}
+
+M.register {
+    'count-down-loop',
+} {
+    group    = 'ambiguity',
     severity = 'Warning',
     status   = 'Any',
 }

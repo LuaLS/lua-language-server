@@ -163,7 +163,12 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
 
     -- 第四步：做实际赋值（exps 已编译，只需建立 field/assign 关系）
     for i, exp in ipairs(source.exps) do
-        coder:compileAssign(exp, i, valueKeys[i], isTable[i])
+        local vk = valueKeys[i]
+        if vk then
+            coder:compileAssign(exp, i, vk, isTable[i])
+        else
+            coder:compileAssign(exp, i, 'rt.NIL', false)
+        end
     end
 end)
 

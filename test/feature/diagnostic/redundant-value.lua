@@ -9,6 +9,7 @@ print(x)
 ]] {}
 
 TEST_DIAGNOSTIC [[
+local function f() end
 local x = f()
 print(x)
 ]] {}

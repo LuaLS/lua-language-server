@@ -24,6 +24,7 @@ local merge   = require 'feature.diagnostic.merge'
 ---@field document Document
 ---@field ast LuaParser.Ast
 ---@field errors table[]
+---@field vfile VM.Vfile?
 
 ---@type (async fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[])[]
 local providers = {}
@@ -88,6 +89,7 @@ ls.feature.diagnostic = function (uri)
         document = document,
         ast      = ast,
         errors   = syntaxErrors,
+        vfile    = vfile,
     }
 
     local function isDisabled(diag, isSyntax)
@@ -139,5 +141,7 @@ require 'feature.diagnostic.providers.undefined-doc-param'
 require 'feature.diagnostic.providers.close-non-object'
 require 'feature.diagnostic.providers.newline-call'
 require 'feature.diagnostic.providers.newfield-call'
+require 'feature.diagnostic.providers.undefined-field'
+require 'feature.diagnostic.providers.undefined-global'
 require 'feature.diagnostic.file'
 require 'feature.diagnostic.scope'

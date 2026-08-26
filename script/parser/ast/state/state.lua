@@ -199,6 +199,7 @@ function Ast:parseAssign(first)
         if not exp then
             break
         end
+        exp.parent = assign
         exps[#exps+1] = exp
         self:skipSpace()
     end

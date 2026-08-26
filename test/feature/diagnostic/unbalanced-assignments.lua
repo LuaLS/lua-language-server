@@ -9,6 +9,7 @@ print(x, y)
 ]] {}
 
 TEST_DIAGNOSTIC [[
+local function f() end
 local x, y = f()
 print(x, y)
 ]] {}
@@ -28,4 +29,4 @@ TEST_DIAGNOSTIC [[
 local t = {}
 t.a, <?t.b?> = 1
 print(t.a, t.b)
-]] { 'unbalanced-assignments' }
+]] { 'unbalanced-assignments', '-undefined-field' }

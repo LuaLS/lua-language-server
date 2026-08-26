@@ -137,6 +137,7 @@ Known open points:
   - parser 在 `parseField`/`parseCall` 通过 `?` 后紧跟 `.`/`:`/`[`/`(` 识别，AST 的 `Field`/`Call` 节点带 `safe` 标记，并在 `parseTerm` 链循环中沿链传播。
   - coder 对 safe 字段/调用生成 `:setOptional()`；`Node.Variable`/`Node.FCall` 的 `value` 在 optional 时并入 `nil`。
 - **例外**：`script/tools/` 目录下不允许使用可选链（保持该目录语法兼容性）。
+- **多返回值场景**：运行时支持可选链；如有必要（尤其是需要保留多返回值时），可用 `Obj?:getManyResults()` 语法——`?:` 安全方法调用会保留方法的多返回值（区别于链式取值只取第一个返回值的场景）。
 ## 12) PowerShell 文件编码
 
 - Windows PowerShell 默认编码为 GBK/UTF-16 LE，**严禁**写入项目文件时不指定编码（会导致 UTF8 文件乱码）。
@@ -147,14 +148,15 @@ Known open points:
 ## 13) Diagnostic Feature Snapshot
 
 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
-里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`（主线程计算）。
+里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`、`undefined-field`、`undefined-global`（主线程计算）。
 
 关键文件：
 
 - `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`（async）、provider 注册、过滤
 - `script/feature/diagnostic/parser-diagnostics.lua` — parser-only 规则共用纯函数（`push`、`hasStatements`、`isExcludedLocal`、`isInStringOrComment`）
 - `script/feature/diagnostic/providers/syntax.lua` — 语法错误 provider（读 `vfile.coder.errors`），末尾 `return { messages = messages }` 导出错误码→文案表，供 `unknown-diag-code` 复用合法码集合
-- `script/feature/diagnostic/providers/redundant-return.lua` / `code-after-break.lua` / `duplicate-index.lua` / `duplicate-doc-param.lua` / `unbalanced-assignments.lua` / `unknown-diag-code.lua` / `lowercase-global.lua` / `redundant-value.lua` / `count-down-loop.lua` / `undefined-doc-param.lua` / `close-non-object.lua` / `newline-call.lua` / `newfield-call.lua` — 后续新增规则（duplicate-index 带 `related` 信息 + `Unnecessary` tag 区分覆盖项；unknown-diag-code 合法码集合 = `define.diagnosticDatas` 键 + syntax.messages 键 lowercase-hyphen 化；lowercase-global 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免；duplicate-doc-param/undefined-doc-param 用 block.cats 行邻接分组关联 function，undefined-doc-param 从 function 出发反向收集 `func.startRow-1` 起连续 cat；code-after-break 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无 continue 用例）；close-non-object 仅做 `local x <close>` 无 value 部分，value 类型判断需 `vm.getInfer` 待补；newline-call 检测 5.2+ 换行调用（`call.next` 有链 + node/argPos 不同行 + 单参数）；newfield-call 检测表构造器数组元素里的换行调用（`field.subtype=='exp'` 且 value 是 call + node/argPos 不同行）——注意 parser 的 `AMBIGUOUS_SYNTAX` 只在 `versionNum <= 51`（Lua 5.1）抛，5.2+ 换行调用合法，故 newline-call/newfield-call 是 warning 非语法错）
+- `script/feature/diagnostic/providers/redundant-return.lua` / `code-after-break.lua` / `duplicate-index.lua` / `duplicate-doc-param.lua` / `unbalanced-assignments.lua` / `unknown-diag-code.lua` / `lowercase-global.lua` / `redundant-value.lua` / `count-down-loop.lua` / `undefined-doc-param.lua` / `close-non-object.lua` / `newline-call.lua` / `newfield-call.lua` / `undefined-field.lua` / `undefined-global.lua` — 后续新增规则（duplicate-index 带 `related` 信息 + `Unnecessary` tag 区分覆盖项；unknown-diag-code 合法码集合 = `define.diagnosticDatas` 键 + syntax.messages 键 lowercase-hyphen 化；lowercase-global 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免；duplicate-doc-param/undefined-doc-param 用 block.cats 行邻接分组关联 function，undefined-doc-param 从 function 出发反向收集 `func.startRow-1` 起连续 cat；code-after-break 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无 continue 用例）；close-non-object 仅做 `local x <close>` 无 value 部分，value 类型判断需 `vm.getInfer` 待补；newline-call 检测 5.2+ 换行调用（`call.next` 有链 + node/argPos 不同行 + 单参数）；newfield-call 检测表构造器数组元素里的换行调用（`field.subtype=='exp'` 且 value 是 call + node/argPos 不同行）——注意 parser 的 `AMBIGUOUS_SYNTAX` 只在 `versionNum <= 51`（Lua 5.1）抛，5.2+ 换行调用合法，故 newline-call/newfield-call 是 warning 非语法错；undefined-field 是首条 VM 语义规则：`param.vfile:getNode(field.last)` 得被访问对象推断值 → `node:get(field.key.id)` 返回 `(value, exists)`，`exists==false` 报。skip：field.value~=nil 或 parent==assign（写目标）、`type` 节点 nil/never、index 访问（`t[expr]` 暂不做 enum 检测）；undefined-global 用 `scope.rt:globalGet(name):isDefined()` 判全局是否定义，skip 写目标（var.value）与 local/显式 global。诊断测试 harness 已加载 stdlib meta（`test/feature/diagnostic/init.lua` 用 `metaBuilder.compile('Lua 5.4')` 填 `test.metaUris`），故 `print` 等 stdlib 全局 isDefined=true 不误报）
+- `script/vm/coder/state.lua` — assign coder 第四步对尾部 exp（无 valueKey）补 `rt.NIL` 赋值（`coder:compileAssign(exp, i, 'rt.NIL', false)`），使 `t.a, t.b = 1` 的尾部目标 `t.b` 也 addAssign 记录字段，对齐 master 的 setfield 语义（否则 unbalanced 尾部目标被当"读"处理，`print(t.b)` 误报 undefined-field）
 - `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
 - `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），贡献者模型：`contribute(items)→dispose`、`refresh()`（文件诊断）、`schedulePush()`（防抖）、`push()`（合并/对比/发布）、`dispose()`
@@ -179,11 +181,11 @@ Known open points:
 - **push 触发时机（重要）**：单文件诊断无延迟，仅 0.1s 防抖（`File` 内 `DELAY`），不读 workspace 延迟配置（工作区诊断未实现）。文件变化/新增 → `onDidChange` → `File:refresh`（先 dispose 旧贡献再重跑）；文件删除 → `onDidRemove` → `File:dispose`（清贡献 + 推送空 `diagnostics: {}`）；`ls.scope.onDidLoad` → 对 scope 下所有 vfile 重新 `refresh`（初次加载/config 变化后兜底）。
 - **scope 就绪（重要）**：`scope.ready` 在 reload 协程真正完成时才置 true，完成时 `ls.scope.onDidLoad:fire(scope)`。`File.refresh` 与 `scope.watchFiles` 的 `onDidChange` 索引都先 `ls.scope.waitReady(uri)`，避免在 `.luarc.json`/客户端配置加载前用默认 `Lua.runtime.version` 编译（否则 Lua 5.5 语法被 5.4 规则误报）。
 - `unused-local` 豁免：`_`、`_ENV`、`isGlobal`、`<close>`、local function 名（parent=function）、for 循环变量（parent=for）；以 `#loc.gets==0` 判未读。
-- 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间（`TEST_DIAGNOSTIC` 自动比对 `catched['?']` 与 `start/finish`）。
+- 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间（`TEST_DIAGNOSTIC` 自动比对 `catched['?']` 与 `start/finish`）。codes 数组语义：`'code'` 表示必须有该诊断（允许其他诊断）、`'-code'` 表示必须没有该诊断、`{}` 空数组表示必须 0 诊断。marks 只要求每个 mark 匹配某个诊断区间，不再要求诊断总数 == marks 数。
 - push 暂不带 `version` 字段。
 - `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
 
-测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / semantic）。
+测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / semantic）。
 
 待定（里程碑 2+）：语义规则分批迁移、workspace 诊断、locale 文案、codeDescription、quickfix。
 

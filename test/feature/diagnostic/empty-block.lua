@@ -15,7 +15,7 @@ end?>
 ]] { 'empty-block' }
 
 TEST_DIAGNOSTIC [[
-<?for k, v in pairs(t) do
+<?for k, v in pairs({}) do
 end?>
 ]] { 'empty-block' }
 

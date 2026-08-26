@@ -22,7 +22,8 @@ f()
 TEST_DIAGNOSTIC [[
 ---@param self table
 ---@param x number
-function t.m(self, x)
+T = {}
+function T.m(self, x)
 end
-t.m({}, 1)
+T.m({}, 1)
 ]] {}

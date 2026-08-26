@@ -1,22 +1,22 @@
 TEST_DIAGNOSTIC [[
 local function f(x)
-    return {}
+    return { y = 1 }
 end
 local _ = f
-(1).y
+({ y = 1 }).y
 ]] { 'newline-call' }
 
 TEST_DIAGNOSTIC [[
 local function f(x)
-    return {}
+    return { y = 1 }
 end
-local _ = f(1).y
+local _ = f({ y = 1 }).y
 ]] {}
 
 TEST_DIAGNOSTIC [[
 local function f(x)
-    return {}
+    return { y = 1 }
 end
 local _ = f
-(1)
+({ y = 1 })
 ]] {}

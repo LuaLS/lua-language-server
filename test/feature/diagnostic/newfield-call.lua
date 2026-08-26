@@ -1,19 +1,25 @@
 TEST_DIAGNOSTIC [[
+local Foo = 1
+local Bar = 1
 local _ = {
-    foo
-    (bar)
+    Foo
+    (Bar)
 }
 ]] { 'newfield-call' }
 
 TEST_DIAGNOSTIC [[
+local Foo = 1
+local Bar = 1
 local _ = {
-    foo(bar)
+    Foo(Bar)
 }
 ]] {}
 
 TEST_DIAGNOSTIC [[
+local Foo = 1
+local Bar = 1
 local _ = {
-    foo,
-    (bar)
+    Foo,
+    (Bar)
 }
 ]] {}

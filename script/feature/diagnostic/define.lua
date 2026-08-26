@@ -118,6 +118,22 @@ M.register {
     status   = 'Any',
 }
 
+M.register {
+    'undefined-field',
+} {
+    group    = 'type-check',
+    severity = 'Warning',
+    status   = 'Opened',
+}
+
+M.register {
+    'undefined-global',
+} {
+    group    = 'global',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
 ---@param scope Scope
 ---@param uri Uri
 ---@param name string

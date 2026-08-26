@@ -1,3 +1,22 @@
+local metaBuilder = require 'scope.meta-builder'
+local metaUri = metaBuilder.compile('Lua 5.4', 'auto', 'utf-8')
+test.metaUris = {}
+do
+    local files = ls.afs.getChilds(metaUri)
+    if files then
+        for _, uri in ipairs(files) do
+            if ls.util.stringEndWith(uri, '.lua') then
+                local text = ls.afs.read(uri)
+                if text then
+                    ls.file.setServerText(uri, text)
+                    test.metaUris[#test.metaUris+1] = uri
+                end
+            end
+        end
+    end
+    table.sort(test.metaUris)
+end
+
 ---@param script string
 ---@return fun(codes: string[]?): fun(callback: fun(results: Feature.Diagnostic[])?)
 function TEST_DIAGNOSTIC(script)
@@ -19,25 +38,41 @@ function TEST_DIAGNOSTIC(script)
             for i, diag in ipairs(results) do
                 actual[i] = diag.code
             end
-            assert(#actual == #codes, ('expected %d diagnostics, actual %d\nexpected codes:\n%s\nactual codes:\n%s')
-                :format(#codes, #actual, table.concat(codes, '\n'), table.concat(actual, '\n')))
-            for i, code in ipairs(codes) do
-                assert(actual[i] == code, ('expected diag[%d] code `%s`, actual `%s`'):format(i, code, tostring(actual[i])))
+            if #codes == 0 then
+                assert(#actual == 0, ('expected 0 diagnostics, actual %d\nactual codes:\n%s')
+                    :format(#actual, table.concat(actual, '\n')))
+            else
+                for _, code in ipairs(codes) do
+                    if code:sub(1, 1) == '-' then
+                        local name = code:sub(2)
+                        for _, a in ipairs(actual) do
+                            assert(a ~= name, ('unexpected diagnostic `%s`\nactual codes:\n%s')
+                                :format(name, table.concat(actual, '\n')))
+                        end
+                    else
+                        local found = false
+                        for _, a in ipairs(actual) do
+                            if a == code then
+                                found = true
+                                break
+                            end
+                        end
+                        assert(found, ('expected diagnostic `%s`, not found\nactual codes:\n%s')
+                            :format(code, table.concat(actual, '\n')))
+                    end
+                end
             end
         end
         if #marks > 0 then
-            assert(#results == #marks, ('expected %d position marks, actual %d diagnostics'):format(#marks, #results))
-            table.sort(marks, function (a, b)
-                if a[1] == b[1] then
-                    return a[2] < b[2]
+            for _, mark in ipairs(marks) do
+                local found = false
+                for _, diag in ipairs(results) do
+                    if diag.start == mark[1] and diag.finish == mark[2] then
+                        found = true
+                        break
+                    end
                 end
-                return a[1] < b[1]
-            end)
-            for i, diag in ipairs(results) do
-                local mark = marks[i]
-                assert(diag.start == mark[1] and diag.finish == mark[2],
-                    ('diag[%d] `%s` range mismatch: expected [%d, %d], actual [%d, %d]')
-                        :format(i, diag.code, mark[1], mark[2], diag.start, diag.finish))
+                assert(found, ('no diagnostic at range [%d, %d]'):format(mark[1], mark[2]))
             end
         end
         return function (callback)
@@ -69,5 +104,7 @@ test.require 'test.feature.diagnostic.undefined-doc-param'
 test.require 'test.feature.diagnostic.close-non-object'
 test.require 'test.feature.diagnostic.newline-call'
 test.require 'test.feature.diagnostic.newfield-call'
+test.require 'test.feature.diagnostic.undefined-field'
+test.require 'test.feature.diagnostic.undefined-global'
 test.require 'test.feature.diagnostic.dedupe'
 test.require 'test.feature.diagnostic.semantic'

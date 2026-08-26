@@ -51,3 +51,16 @@ end
 f(C)
 ]] { 'undefined-field' }
 
+TEST_DIAGNOSTIC [[
+local t = {}
+print(t:<?m?>())
+]] { 'undefined-field' }
+
+TEST_DIAGNOSTIC [[
+local t = {}
+function t:m()
+end
+print(t:m())
+]] {}
+
+

@@ -21,3 +21,18 @@ local function f()
 end
 f()
 ]] {}
+
+TEST_DIAGNOSTIC [[
+local function f()
+    print(1)
+end
+f()
+]] {}
+
+TEST_DIAGNOSTIC [[
+local function f()
+    return <?x?>
+end
+f()
+]] { 'undefined-global', '-undefined-field' }
+

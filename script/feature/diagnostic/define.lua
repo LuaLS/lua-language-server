@@ -86,6 +86,8 @@ M.register {
 M.register {
     'unbalanced-assignments',
     'redundant-value',
+    'redundant-parameter',
+    'missing-parameter',
 } {
     group    = 'unbalanced',
     severity = 'Warning',

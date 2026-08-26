@@ -1,0 +1,62 @@
+---@param f Node.Function
+---@return integer
+local function getRequiredParams(f)
+    local count = 0
+    for _, p in ipairs(f.paramsDef) do
+        if not p.optional then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+---@async
+---@param param Feature.Diagnostic.Param
+---@return Feature.Diagnostic[]
+local function missingParameterProvider(param)
+    local ast = param.ast
+    local vfile = param.vfile
+    if not vfile then
+        return {}
+    end
+    local results = {}
+    local delayer = ls.task.newThrottledDelayer(500)
+    for _, call in ipairs(ast.nodesMap['call']) do
+        delayer:delay()
+        ---@cast call LuaParser.Node.Call
+        local fcall = vfile:getNode(call)
+        if not fcall or fcall.kind ~= 'fcall' then
+            goto continue
+        end
+        ---@cast fcall Node.FCall
+        local matched = fcall.matchedFuncs
+        if #matched == 0 then
+            goto continue
+        end
+        local minParams
+        for _, f in ipairs(matched) do
+            local m = getRequiredParams(f)
+            if not minParams or m < minParams then
+                minParams = m
+            end
+        end
+        local callArgs = call.args and #call.args or 0
+        if call.node and call.node.kind == 'field' and call.node.subtype == 'method' then
+            callArgs = callArgs + 1
+        end
+        if callArgs >= minParams then
+            goto continue
+        end
+        results[#results+1] = {
+            code    = 'missing-parameter',
+            level   = 0,
+            start   = call.start,
+            finish  = call.finish,
+            message = ('This function requires %d argument(s) but instead it is receiving %d.'):format(minParams, callArgs),
+        }
+        ::continue::
+    end
+    return results
+end
+
+ls.feature.provider.diagnostic(missingParameterProvider)

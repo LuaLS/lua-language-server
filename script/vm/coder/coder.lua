@@ -285,6 +285,13 @@ function M:run(vfile)
         LAST_CODE = self.code
         LAST_FLOW = ls.util.dump(self.tracerFlowMap, { noArrayKey = true })
         LAST_PMAP = ls.util.dump(self.parentMap, { noArrayKey = true })
+
+        local fs = require 'bee.filesystem'
+        local tmpDir = fs.path(ls.env.ROOT_PATH) / 'tmp'
+        fs.create_directories(tmpDir)
+        ls.util.saveFile(tostring(tmpDir / 'LAST_CODE'), self.code)
+        ls.util.saveFile(tostring(tmpDir / 'LAST_FLOW'), LAST_FLOW)
+        ls.util.saveFile(tostring(tmpDir / 'LAST_PMAP'), LAST_PMAP)
     end
     if ls.args.SAVE_CODER then
         local path = vfile.scope:getRelativePath(vfile.uri)

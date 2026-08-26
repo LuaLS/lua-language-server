@@ -147,7 +147,7 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
 诊断功能完整实现约束见 `.github/skills/luals-server-dev/references/diagnostic.md`。
 
 - 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
-- 里程碑 2 进行中：已迁移 24 条规则（parser-only + VM 语义：`undefined-field`/`undefined-global`/`deprecated`/`need-check-nil`）。
+- 里程碑 2 进行中：已迁移 26 条规则（parser-only + VM 语义：`undefined-field`/`undefined-global`/`deprecated`/`need-check-nil`/`redundant-parameter`/`missing-parameter`）。
 - 核心链路：主线程 `ls.feature.diagnostic(uri)` 遍历 provider；语法错误读 `vfile.coder.errors`；VM 语义规则复用 `vfile:getNode`/`getVariable` + Node 查询（`get`→exists、`globalGet`→isDefined、`hasAnnotation`）。
 - 扩展点：`ls.feature.provider.diagnostic(callback)`，回调 `async fun(param)` 返回 `Feature.Diagnostic[]`；`param` 含 `uri/scope/document/ast/errors/vfile`。
 - 测试：`--test feature.diagnostic`；codes 语义 `'code'`=必须有、`'-code'`=必须没有、`{}`=0 诊断；诊断 harness 已加载 stdlib meta。

@@ -7,7 +7,7 @@
 - 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
 - 里程碑 2 进行中：已迁移语义规则（主线程计算）：
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
-  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`
+  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`
 
 ## 关键文件
 
@@ -46,6 +46,8 @@
 - `undefined-global`：`scope.rt:globalGet(name):isDefined()` 判全局是否定义，skip 写目标（var.value）与 local/显式 global。
 - `deprecated`：通过**注解绑定**机制——`Node.Variable:addAnnotation(name)/removeAnnotation(name)/hasAnnotation(name)` 存 subtype 集合；coder 的 `tryBindCat`（state.lua）对 `value==nil` 的通用注解（`catParserMap` 未注册）生成 `{var}:addAnnotation({subtype})`；function name 经 `function coder` 末尾 `compileAssign(source.name, ...)` 复用同链路；provider 对 var 读查 `vfile:getVariable(var):hasAnnotation('deprecated')`。
 - `need-check-nil`：可能 nil 的 local 在字段/调用/索引访问前未判空。判断"可能 nil"：`vfile:getNode(var)` 返回 `type` 节点 `typeName=='nil'`，或 `union` 节点 `values` 含 nil（union.values getter 已扁平化）。后续链判断：`var.next` 存在（字段）、`parent` 是 call 且 `node==var`（调用）、`parent` 是 field(index) 且 `key==var`（索引）。无注解 local 推断为 any 天然跳过。
+- `redundant-parameter`：调用传多余参数。**用 `vfile:getNode(call)` 直接拿 `Node.FCall`（call 节点在 coder.map 里就映射为 FCall）**，`fcall.matchedFuncs` 返回参数最匹配的函数列表（内部 `head:each('function')` + `args:canCast(paramsPack)` + `getBestMatchs` 重载匹配）。对 matched 函数取 `paramsPack.max` 的最大值；任一 max==false（变参）则不报。method 调用（`subtype=='method'`）args 计数 +1（self 占首参）。`paramsPack` 是 `Node.List`（`min`/`max`，max=false 表示无限）。**不要自己递归 union/variable 取 max**——matchedFuncs 已处理重载与参数匹配。
+- `missing-parameter`：调用缺参数，镜像规则。**注意本分支 `paramsPack.min` 含可选参数**（`function.lua` paramsPack getter 的 `min = #params` 不排除 `v.optional`），故不能用 `paramsPack.min`，要遍历 matched 函数的 `paramsDef` 数 `not p.optional` 的数量作为必需参数数。method self 偏移 +1。比较 callArgs < 必需数则报整个 call。
 
 ### coder 相关修复
 
@@ -71,7 +73,7 @@
 
 ## 测试
 
-`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / need-check-nil / semantic
+`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / need-check-nil / redundant-parameter / missing-parameter / semantic
 
 诊断测试 stdlib meta（`test/feature/diagnostic/init.lua` 用 `metaBuilder.compile('Lua 5.4')` 填 `test.metaUris`），故 `print` 等 stdlib 全局 `isDefined=true` 不误报。
 

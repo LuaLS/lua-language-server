@@ -25,10 +25,10 @@ local merge   = require 'feature.diagnostic.merge'
 ---@field ast LuaParser.Ast
 ---@field errors table[]
 
----@type (fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[])[]
+---@type (async fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[])[]
 local providers = {}
 
----@param callback fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[]
+---@param callback async fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[]
 function ls.feature.provider.diagnostic(callback)
     providers[#providers+1] = callback
 end

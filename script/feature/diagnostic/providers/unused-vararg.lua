@@ -1,11 +1,14 @@
 local pd = require 'feature.diagnostic.parser-diagnostics'
 
+---@async
 ---@param param Feature.Diagnostic.Param
 ---@return Feature.Diagnostic[]
 local function unusedVarargProvider(param)
     local ast = param.ast
     local results = {}
+    local delayer = ls.task.newThrottledDelayer(500)
     for _, p in ipairs(ast.nodesMap['param']) do
+        delayer:delay()
         ---@cast p LuaParser.Node.Param
         if p.dummy or p.id ~= '...' then
             goto continue

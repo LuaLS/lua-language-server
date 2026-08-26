@@ -1,11 +1,14 @@
 local pd = require 'feature.diagnostic.parser-diagnostics'
 
+---@async
 ---@param param Feature.Diagnostic.Param
 ---@return Feature.Diagnostic[]
 local function unusedLocalProvider(param)
     local ast = param.ast
     local results = {}
+    local delayer = ls.task.newThrottledDelayer(500)
     for _, loc in ipairs(ast.nodesMap['local']) do
+        delayer:delay()
         ---@cast loc LuaParser.Node.Local
         if pd.isExcludedLocal(loc, ast.envMode) then
             goto continue

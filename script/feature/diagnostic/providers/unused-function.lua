@@ -1,11 +1,14 @@
 local pd = require 'feature.diagnostic.parser-diagnostics'
 
+---@async
 ---@param param Feature.Diagnostic.Param
 ---@return Feature.Diagnostic[]
 local function unusedFunctionProvider(param)
     local ast = param.ast
     local results = {}
+    local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['function']) do
+        delayer:delay()
         ---@cast node LuaParser.Node.Function
         local name = node.name
         if not name or name.kind ~= 'local' then

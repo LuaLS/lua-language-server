@@ -1,11 +1,14 @@
 local pd = require 'feature.diagnostic.parser-diagnostics'
 
+---@async
 ---@param param Feature.Diagnostic.Param
 ---@return Feature.Diagnostic[]
 local function unusedLabelProvider(param)
     local ast = param.ast
     local results = {}
+    local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['label']) do
+        delayer:delay()
         ---@cast node LuaParser.Node.Label
         if #node.gotos > 0 then
             goto continue

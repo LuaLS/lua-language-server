@@ -108,6 +108,7 @@ local function buildRelated(err, uri, text)
     return related
 end
 
+---@async
 ---@param param Feature.Diagnostic.Param
 ---@return Feature.Diagnostic[]
 local function syntaxProvider(param)
@@ -120,7 +121,9 @@ local function syntaxProvider(param)
     local text = param.document.text
 
     local results = {}
+    local delayer = ls.task.newThrottledDelayer(500)
     for _, err in ipairs(errors) do
+        delayer:delay()
         results[#results+1] = {
             code    = err.errorCode:lower():gsub('_', '-'),
             level   = ls.spec.DiagnosticSeverity.Error,

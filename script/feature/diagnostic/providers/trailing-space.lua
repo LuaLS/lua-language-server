@@ -1,13 +1,16 @@
 local pd = require 'feature.diagnostic.parser-diagnostics'
 
+---@async
 ---@param param Feature.Diagnostic.Param
 ---@return Feature.Diagnostic[]
 local function trailingSpaceProvider(param)
     local ast = param.ast
     local text = ast.code
     local results = {}
+    local delayer = ls.task.newThrottledDelayer(5000)
     local pos = 1
     while pos <= #text do
+        delayer:delay()
         local lineEnd = text:find('[\r\n]', pos)
         local lineText
         if lineEnd then

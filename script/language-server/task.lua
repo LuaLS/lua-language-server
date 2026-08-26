@@ -66,6 +66,19 @@ function M:execute(func)
     end)
 end
 
+---@async
+local function yieldDelay()
+    if not coroutine.isyieldable() then
+        return
+    end
+    ls.await.sleep(0)
+end
+
+---@async
+function M:delay()
+    yieldDelay()
+end
+
 ls.task = {}
 
 ls.task.REJECT_CLOSED = { '<REJECT_CLOSED>' }
@@ -81,4 +94,28 @@ end
 ---@return Task?
 function ls.task.getCurrentTask()
     return taskMap[coroutine.running()]
+end
+
+---@class Task.ThrottledDelayer
+---@field package factor integer
+---@field package calls integer
+local throttledDelayer = {}
+throttledDelayer.__index = throttledDelayer
+
+---@async
+function throttledDelayer:delay()
+    self.calls = self.calls + 1
+    if self.calls == self.factor then
+        self.calls = 0
+        yieldDelay()
+    end
+end
+
+---@param factor integer
+---@return Task.ThrottledDelayer
+function ls.task.newThrottledDelayer(factor)
+    return setmetatable({
+        factor = factor,
+        calls  = 0,
+    }, throttledDelayer)
 end

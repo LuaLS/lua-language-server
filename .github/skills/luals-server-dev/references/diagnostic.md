@@ -7,7 +7,7 @@
 - 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
 - 里程碑 2 进行中：已迁移语义规则（主线程计算）：
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
-  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`
+  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`global-in-nil-env`
 
 ## 关键文件
 
@@ -48,6 +48,10 @@
 - `need-check-nil`：可能 nil 的 local 在字段/调用/索引访问前未判空。判断"可能 nil"：`vfile:getNode(var)` 返回 `type` 节点 `typeName=='nil'`，或 `union` 节点 `values` 含 nil（union.values getter 已扁平化）。后续链判断：`var.next` 存在（字段）、`parent` 是 call 且 `node==var`（调用）、`parent` 是 field(index) 且 `key==var`（索引）。无注解 local 推断为 any 天然跳过。
 - `redundant-parameter`：调用传多余参数。**用 `vfile:getNode(call)` 直接拿 `Node.FCall`（call 节点在 coder.map 里就映射为 FCall）**，`fcall.matchedFuncs` 返回参数最匹配的函数列表（内部 `head:each('function')` + `args:canCast(paramsPack)` + `getBestMatchs` 重载匹配）。对 matched 函数取 `paramsPack.max` 的最大值；任一 max==false（变参）则不报。method 调用（`subtype=='method'`）args 计数 +1（self 占首参）。`paramsPack` 是 `Node.List`（`min`/`max`，max=false 表示无限）。**不要自己递归 union/variable 取 max**——matchedFuncs 已处理重载与参数匹配。
 - `missing-parameter`：调用缺参数，镜像规则。**注意本分支 `paramsPack.min` 含可选参数**（`function.lua` paramsPack getter 的 `min = #params` 不排除 `v.optional`），故不能用 `paramsPack.min`，要遍历 matched 函数的 `paramsDef` 数 `not p.optional` 的数量作为必需参数数。method self 偏移 +1。比较 callArgs < 必需数则报整个 call。
+- `assign-type-mismatch`：赋值类型不兼容。`variable:getExpectValue()`（`---@type` 注解类型）vs `eachAssign()` 的 `assign.value`（实际值）。**canCast 方向**：`a >> b` 语义是「a 是 b 的子类型」（`Node:canCast` 注释），所以判断「实际值能否赋给期望类型」用 `actual >> expect`（不要写反成 `expect >> actual`）。literal（`Node.Value`）需先转 `actual.nodeType`（其 `typeName` 对应的 `Node.Type`）再 canCast。skip：expect 无/any/unknown、actual nil。设计：integer 可赋给 number（`integer >> number` true，因 integer 的 `fullExtends` 含 number），number 不可赋给 integer。**已覆盖 master 的 `cast-local-type`**（`local x` 声明后 `x = value` 赋值场景，经 `assign` 的 exps 走同一 checkAssign）；`cast-type-mismatch` 不可行——本分支 parser 不支持 `expr as Type` 表达式 cast 语法。
+- `param-type-mismatch`：调用实参类型不匹配。`FCall.matchedFuncs` + `f:getParam(i)`（method self 偏移 +1）。对每个 matched 函数，只要任一 `actual >> expect` 即不报；`getParam` 返回 nil（变参）或 any/unknown 跳过。
+- `return-type-mismatch`：函数 return 类型不匹配。`ret.parent` 是 function → `vfile:getNode(parent)` 得 `Node.Function` → `f:getReturn(i)` 比较。**注意无注解函数跳过**（`#f.returnsDef == 0` 才不查，否则 `getReturn` 会从 returnList 推断出 literal Value，与转 type 后的 actual canCast 失败导致误报）。
+- `global-in-nil-env`：`_ENV` 被赋 nil 后访问全局。遍历 var（`var.loc==nil` 且 `var.env` 存在，跳过 `var.id==var.env.id` 的 `_ENV` 自身访问），`vfile:getNode(var.env)` 得 `_ENV` 推断值，`typeName=='nil'` 则报，带 related 指向 `_ENV` local。
 
 ### coder 相关修复
 
@@ -73,7 +77,7 @@
 
 ## 测试
 
-`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / need-check-nil / redundant-parameter / missing-parameter / semantic
+`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / need-check-nil / redundant-parameter / missing-parameter / assign-type-mismatch / param-type-mismatch / return-type-mismatch / global-in-nil-env / semantic
 
 诊断测试 stdlib meta（`test/feature/diagnostic/init.lua` 用 `metaBuilder.compile('Lua 5.4')` 填 `test.metaUris`），故 `print` 等 stdlib 全局 `isDefined=true` 不误报。
 

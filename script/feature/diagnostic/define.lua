@@ -103,6 +103,14 @@ M.register {
 }
 
 M.register {
+    'global-in-nil-env',
+} {
+    group    = 'global',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
     'count-down-loop',
     'newline-call',
     'newfield-call',
@@ -123,6 +131,9 @@ M.register {
 M.register {
     'undefined-field',
     'need-check-nil',
+    'assign-type-mismatch',
+    'param-type-mismatch',
+    'return-type-mismatch',
 } {
     group    = 'type-check',
     severity = 'Warning',

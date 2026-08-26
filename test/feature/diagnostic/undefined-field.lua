@@ -25,7 +25,7 @@ f({})
 TEST_DIAGNOSTIC [[
 local t = nil
 print(t.bar)
-]] {}
+]] { '-undefined-field', 'need-check-nil' }
 
 TEST_DIAGNOSTIC [[
 ---@class C

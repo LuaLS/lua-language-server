@@ -120,6 +120,7 @@ M.register {
 
 M.register {
     'undefined-field',
+    'need-check-nil',
 } {
     group    = 'type-check',
     severity = 'Warning',

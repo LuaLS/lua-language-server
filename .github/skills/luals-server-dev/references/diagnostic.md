@@ -7,7 +7,7 @@
 - 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
 - 里程碑 2 进行中：已迁移语义规则（主线程计算）：
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
-  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`
+  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`
 
 ## 关键文件
 
@@ -45,6 +45,7 @@
 - `undefined-field`（首条 VM 语义规则）：`param.vfile:getNode(field.last)` 得被访问对象推断值 → `node:get(field.key.id)` 返回 `(value, exists)`，`exists==false` 报。skip：`field.value~=nil` 或 `parent==assign`（写目标）、`type` 节点 nil/never、index 访问（`t[expr]` 暂不做 enum 检测）。
 - `undefined-global`：`scope.rt:globalGet(name):isDefined()` 判全局是否定义，skip 写目标（var.value）与 local/显式 global。
 - `deprecated`：通过**注解绑定**机制——`Node.Variable:addAnnotation(name)/removeAnnotation(name)/hasAnnotation(name)` 存 subtype 集合；coder 的 `tryBindCat`（state.lua）对 `value==nil` 的通用注解（`catParserMap` 未注册）生成 `{var}:addAnnotation({subtype})`；function name 经 `function coder` 末尾 `compileAssign(source.name, ...)` 复用同链路；provider 对 var 读查 `vfile:getVariable(var):hasAnnotation('deprecated')`。
+- `need-check-nil`：可能 nil 的 local 在字段/调用/索引访问前未判空。判断"可能 nil"：`vfile:getNode(var)` 返回 `type` 节点 `typeName=='nil'`，或 `union` 节点 `values` 含 nil（union.values getter 已扁平化）。后续链判断：`var.next` 存在（字段）、`parent` 是 call 且 `node==var`（调用）、`parent` 是 field(index) 且 `key==var`（索引）。无注解 local 推断为 any 天然跳过。
 
 ### coder 相关修复
 
@@ -70,7 +71,7 @@
 
 ## 测试
 
-`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / semantic
+`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / need-check-nil / semantic
 
 诊断测试 stdlib meta（`test/feature/diagnostic/init.lua` 用 `metaBuilder.compile('Lua 5.4')` 填 `test.metaUris`），故 `print` 等 stdlib 全局 `isDefined=true` 不误报。
 

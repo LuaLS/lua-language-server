@@ -22,6 +22,7 @@ local function undefinedDocParamProvider(param)
         local expectRow = func.startRow - 1
         for i = #cats, 1, -1 do
             local cat = cats[i]
+            ---@cast cat LuaParser.Node.Cat
             if cat.finishRow ~= expectRow then
                 break
             end

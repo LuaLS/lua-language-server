@@ -27,6 +27,14 @@ local function tryBindCat(coder, var, index)
     for _, catState in ipairs(catGroup) do
         local cat = catState.value
         if not cat then
+            coder:addLine('{var}:addAnnotation({subtype%q})' % {
+                var     = coder:getKey(var),
+                subtype = catState.subtype,
+            })
+            coder:addDisposer('{var}:removeAnnotation({subtype%q})' % {
+                var     = coder:getKey(var),
+                subtype = catState.subtype,
+            })
             goto continue
         end
         if cat.kind == 'catstateclass' then

@@ -1,5 +1,6 @@
 
 ---@class LuaParser.Node.Return: LuaParser.Node.Base
+---@field parent LuaParser.Node.Block
 ---@field exps LuaParser.Node.Exp[]
 local Return = Class('LuaParser.Node.Return', 'LuaParser.Node.Base')
 

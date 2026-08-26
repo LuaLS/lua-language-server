@@ -134,6 +134,14 @@ M.register {
     status   = 'Any',
 }
 
+M.register {
+    'deprecated',
+} {
+    group    = 'strict',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
 ---@param scope Scope
 ---@param uri Uri
 ---@param name string

@@ -1,5 +1,6 @@
 
 ---@class LuaParser.Node.Label: LuaParser.Node.Base
+---@field parent LuaParser.Node.Block
 ---@field name? LuaParser.Node.LabelName
 ---@field symbolPos? integer # 右边标签符号的位置
 ---@field gotos LuaParser.Node.Goto[] # 关联的Goto
@@ -19,6 +20,7 @@ local LabelName = Class('LuaParser.Node.LabelName', 'LuaParser.Node.Base')
 LabelName.kind = 'labelname'
 
 ---@class LuaParser.Node.Goto: LuaParser.Node.Base
+---@field parent LuaParser.Node.Block
 ---@field name? LuaParser.Node.LabelName
 ---@field label? LuaParser.Node.Label # 关联的Label
 local Goto = Class('LuaParser.Node.Goto', 'LuaParser.Node.Base')

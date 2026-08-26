@@ -261,6 +261,45 @@ function M:removeClass(node)
     return self
 end
 
+---@type table<string, true>?
+M.annotations = nil
+
+---@param name string # 注解 subtype（如 'deprecated'）
+---@return Node.Variable
+function M:addAnnotation(name)
+    if self.masterVariable then
+        self.masterVariable:addAnnotation(name)
+        return self
+    end
+    if not self.annotations then
+        self.annotations = {}
+    end
+    self.annotations[name] = true
+    return self
+end
+
+---@param name string
+---@return Node.Variable
+function M:removeAnnotation(name)
+    if self.masterVariable then
+        self.masterVariable:removeAnnotation(name)
+        return self
+    end
+    if self.annotations then
+        self.annotations[name] = nil
+    end
+    return self
+end
+
+---@param name string
+---@return boolean
+function M:hasAnnotation(name)
+    if self.masterVariable then
+        return self.masterVariable:hasAnnotation(name)
+    end
+    return self.annotations ~= nil and self.annotations[name] == true
+end
+
 ---@param var Node.Variable
 function M:setMasterVariable(var)
     if self == var or self.masterVariable then

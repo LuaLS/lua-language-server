@@ -44,7 +44,7 @@ local _ = "a\qb"
 end)
 
 TEST_DIAGNOSTIC [[
-local function f()
+local function _()
     return 1
 end
 ]] {}

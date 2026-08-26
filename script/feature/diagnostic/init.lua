@@ -50,6 +50,7 @@ local function acceptSemantic(scope, uri, diag, opened)
     return true
 end
 
+---@async
 ---@param uri Uri
 ---@return Feature.Diagnostic[]
 ls.feature.diagnostic = function (uri)
@@ -65,17 +66,20 @@ ls.feature.diagnostic = function (uri)
     if not ls.util.arrayHas(enableScheme, scheme) then
         return {}
     end
+
+    local vfile = scope.vm:getFile(uri)
+    local syntaxErrors = vfile and vfile.coder and vfile.coder.errors or {}
+
     local ast = document.ast
     if not ast then
         return {}
     end
 
-    local vfile = scope.vm:getFile(uri)
-    local syntaxErrors = vfile and vfile.coder and vfile.coder.errors or {}
+    local disableRanges = disable.buildRanges(ast)
 
     local disables = ls.util.arrayToHash(scope.config:get(uri, 'Lua.diagnostics.disable') or {})
     local opened = document.file:isOpenedByClient()
-    local disableRanges = disable.buildRanges(ast)
+    local positionConverter = document.positionConverter
 
     ---@type Feature.Diagnostic.Param
     local param = {
@@ -86,15 +90,19 @@ ls.feature.diagnostic = function (uri)
         errors   = syntaxErrors,
     }
 
+    local function isDisabled(diag, isSyntax)
+        if disables[diag.code] then
+            return true
+        end
+        local row = positionConverter:offsetToPosition(diag.start)
+        return disable.isDisabled(disableRanges, row, diag.code, isSyntax)
+    end
+
     local results = {}
     for _, provider in ipairs(providers) do
         for _, diag in ipairs(provider(param)) do
-            if disables[diag.code] then
-                goto continue
-            end
             local isSyntax = diag.data == 'syntax'
-            local row = ast.lexer:rowcol(diag.start)
-            if disable.isDisabled(disableRanges, row, diag.code, isSyntax) then
+            if isDisabled(diag, isSyntax) then
                 goto continue
             end
             if not isSyntax then
@@ -113,5 +121,10 @@ end
 require 'feature.diagnostic.providers.syntax'
 require 'feature.diagnostic.providers.empty-block'
 require 'feature.diagnostic.providers.unused-local'
+require 'feature.diagnostic.providers.unused-function'
+require 'feature.diagnostic.providers.unused-label'
+require 'feature.diagnostic.providers.unused-vararg'
+require 'feature.diagnostic.providers.redefined-local'
+require 'feature.diagnostic.providers.trailing-space'
 require 'feature.diagnostic.file'
 require 'feature.diagnostic.scope'

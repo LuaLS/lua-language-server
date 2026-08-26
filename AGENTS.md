@@ -147,19 +147,20 @@ Known open points:
 ## 13) Diagnostic Feature Snapshot
 
 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
-里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`（provider + define 注册 + `Opened` status）。
+里程碑 2 进行中：已迁移语义规则 `empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`（主线程计算）。
 
 关键文件：
 
-- `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`、provider 注册、过滤
-- `script/feature/diagnostic/providers/` — 各规则 provider：`syntax`（语法错误，来自 `vfile.coder.errors`）、`empty-block`、`unused-local`
+- `script/feature/diagnostic/init.lua` — 引擎 `ls.feature.diagnostic(uri)`（async）、provider 注册、过滤
+- `script/feature/diagnostic/parser-diagnostics.lua` — 7 条 parser-only 规则纯函数
+- `script/feature/diagnostic/providers/syntax.lua` — 语法错误 provider（读 `vfile.coder.errors`）
 - `script/feature/diagnostic/define.lua` — 规则默认 severity/neededFileStatus/group 解析 + `M.register` 注册表
 - `script/feature/diagnostic/disable.lua` — `---@diagnostic` 行区间 + 计数判定
 - `script/feature/diagnostic/file.lua` — `Feature.Diagnostic.File` 类（挂 `vfile.diagnostic`），贡献者模型：`contribute(items)→dispose`、`refresh()`（文件诊断）、`schedulePush()`（防抖）、`push()`（合并/对比/发布）、`dispose()`
 - `script/feature/diagnostic/merge.lua` — 诊断排序 + 同位置去重（保留最高等级），引擎与 File 合并共用
 - `script/feature/diagnostic/scope.lua` — `Feature.Diagnostic.Scope` 类（挂 `scope.diagnostic`），`fetchAll()` 批量诊断汇总（task 维护可 reject）
 - `script/feature/diagnostic/converter.lua` — `Feature.Diagnostic[]` → `LSP.Diagnostic[]`
-- `script/feature/diagnostic/push.lua` — `publishDiagnostics`（`ls.task` reject 防抖），仅 server 模式经 `main.lua` 挂载
+- `script/feature/diagnostic/push.lua` — `publishDiagnostics`（监听 file 事件触发 refresh/dispose），仅 server 模式经 `main.lua` 挂载
 - `script/language-server/capability/language-features/diagnostic.lua` — pull `textDocument/diagnostic`
 - `script/parser/ast/cats/diagnostic.lua` — `---@diagnostic` cat 节点与解析
 
@@ -167,7 +168,7 @@ Known open points:
 
 - 内部诊断结构用 0-based 字节偏移（`start`/`finish`），LSP range 转换统一走 converter。
 - **语法错误来源（重要）**：语法错误由 coder 编译产物提供——`coder.makeFromAst` 序列化 `ast.errors`（`errorCode/start/finish/code/extra` plain data）到 `coder.errors`，子线程 `makeCode` 返回后 `makeFromFile` 赋给 `coder.errors`。诊断 `syntax` provider 读 `param.errors`（`vfile.coder.errors`），不再走主线程 `document.ast.errors`。语法错误同样经 `merge.merge` 去重（同位置保留最高等级）。
-- **后续目标（已记录）**：主线程只解析当前正在修改的文件；能直接通过语法分析获得的诊断都应改由子线程完成（语义规则仍依赖主线程 `nodesMap`，后续逐步迁移）。
+- **parser-only 诊断主线程（重要）**：`empty-block`/`unused-*`/`redefined-local`/`trailing-space` 等 7 条规则由主线程 `ls.feature.diagnostic` 计算——`document.ast`（主线程 parse）→ `parser-diagnostics.run` 算全部规则 + `disable.buildRanges`，与语法诊断合并后过滤去重。
 - 语法诊断恒为 Error、不走 neededFileStatus，仅受 `Lua.diagnostics.disable` 与行内禁用注释约束（对齐 master）。
 - `---@diagnostic` 语义对齐 master：`disable`/`enable` 自下一行生效、`disable-line` 当行、`disable-next-line` 下一行；裸 `disable`（无名）不压语法错误；计数支持嵌套。
 - `diagnosticProvider`：`interFileDependencies=false`、`workspaceDiagnostics=false`。
@@ -180,9 +181,17 @@ Known open points:
 - push 暂不带 `version` 字段。
 - `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
 
-测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local）。
+测试：`--test feature.diagnostic`（syntax / config / disable / converter / push / pull / empty-block / unused-local / semantic）。
 
 待定（里程碑 2+）：语义规则分批迁移、workspace 诊断、locale 文案、codeDescription、quickfix。
+
+## 13.1) 子线程诊断反向请求预研（已暂停）
+
+- 2026-08 预研「子线程向主线程请求节点语义，以在子线程算所有诊断」的方案，结论：机制可行、覆盖大部分需求，但工程量大、不确定性高，暂缓。诊断改回主线程计算。
+- **链路可行性**：`bee.channel` 命名通道可建「worker→主线程」反向 request/response；worker 侧 epoll 加反向 response 监听，主线程 `eventLoop.addTask` 轮询反向 request。节点定位用 `source.uniqueKey`（`kind@row:col-row:col` 纯字符串），主线程 `coder.map[key]` 查语义 Node（`vfile:getNode` 已实现）。
+- **语义查询真实形态**（以 `undefined-field`/`param-type-mismatch` 为例）：不是简单「查节点值」，而是主线程 VM 语义算法的 RPC 化——`vm.hasDef`（字段是否定义）、`vm.getInfer(node):eachView(uri)`（推断类型多视图）、`vm.compileNode`（编译节点类型）、`vm.canCastType(def, ref, errs)`（类型兼容+错误详情）、`vm.getGlobal(cate, name)`、`vm.getClassGenericMap`（泛型解析）。
+- **关键挑战**：① 语义结果序列化（Node 复杂对象→plain data，`view()` 是展示字符串不可用，需定义语义摘要格式）；② 查询粒度（逐个节点往返开销大，需批量发 `uniqueKey`）；③ narrowing 的 flow-sensitive 状态查询（需从 tracer flow 按位置取状态，非 map 查询）。
+- **结论**：能满足所有诊断需求，但本质是把 VM 语义算法 RPC 化，工作量在「查询 API 枚举 + 语义结果序列化」而非通道机制。重启前先补一份完整查询 API 清单 + 序列化格式设计。
 
 ---
 

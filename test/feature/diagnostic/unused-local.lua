@@ -27,7 +27,7 @@ t.x = 1
 ]] {}
 
 TEST_DIAGNOSTIC [[
-local function f()
+local function _()
 end
 ]] {}
 

@@ -5,6 +5,7 @@ break
 ]], function ()
     local document = ls.scope.findDocument(test.fileUri)
     assert(document)
+    ---@diagnostic disable-next-line: await-in-sync
     local diagnostics = ls.feature.diagnostic(test.fileUri)
     local items = converter.convert(document, diagnostics, 'utf-8')
 
@@ -26,6 +27,7 @@ if true then
 ]], function ()
     local document = ls.scope.findDocument(test.fileUri)
     assert(document)
+    ---@diagnostic disable-next-line: await-in-sync
     local diagnostics = ls.feature.diagnostic(test.fileUri)
     local items = converter.convert(document, diagnostics, 'utf-8')
 

@@ -67,7 +67,6 @@ function M:__init(code, source, options)
     ---@type table<string, LuaParser.Node.Base[]>
     self.nodesMap = util.multiTable(2)
     -- 存放所有的block
-    ---@private
     ---@type LuaParser.Node.Block[]
     self.blockList = {}
     -- 当前的局部变量计数（最大只能存在200个局部变量）

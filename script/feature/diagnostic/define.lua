@@ -45,10 +45,22 @@ end
 M.register {
     'empty-block',
     'unused-local',
+    'unused-function',
+    'unused-label',
+    'unused-vararg',
+    'trailing-space',
 } {
     group    = 'unused',
     severity = 'Hint',
     status   = 'Opened',
+}
+
+M.register {
+    'redefined-local',
+} {
+    group    = 'redefined',
+    severity = 'Warning',
+    status   = 'Any',
 }
 
 ---@param scope Scope

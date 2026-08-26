@@ -49,7 +49,7 @@ end
 ]] {}
 
 TEST_DIAGNOSTIC [[
-local function f()
+local function _()
 end
 ]] {}
 

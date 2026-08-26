@@ -7,6 +7,7 @@ function TEST_DIAGNOSTIC(script)
         if file then
             ls.file.setClientText(test.fileUri, file.serverText, file.clientVersion + 1)
         end
+        ---@diagnostic disable-next-line: await-in-sync
         return ls.feature.diagnostic(test.fileUri)
     end)
     results = results or {}
@@ -56,3 +57,4 @@ test.require 'test.feature.diagnostic.pull'
 test.require 'test.feature.diagnostic.empty-block'
 test.require 'test.feature.diagnostic.unused-local'
 test.require 'test.feature.diagnostic.dedupe'
+test.require 'test.feature.diagnostic.semantic'

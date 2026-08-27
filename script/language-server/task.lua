@@ -55,15 +55,17 @@ end
 ---@type table<thread, Task>
 local taskMap = setmetatable({}, { __mode = 'k' })
 
----@param func async fun()
+---@param func async fun(task: Task)
+---@return Task
 function M:execute(func)
     ---@async
     ls.await.call(function ()
         local co = coroutine.running()
         taskMap[co] = self
         table.insert(self.threads, co)
-        func()
+        func(self)
     end)
+    return self
 end
 
 ---@async

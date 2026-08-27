@@ -67,13 +67,15 @@ function M:schedulePush()
     if self.pushTask then
         self.pushTask:reject(ls.task.REJECT_CANCELED)
     end
-    local task = ls.task.create { uri = self.vfile.uri }
-    self.pushTask = task
+    self.pushTask = ls.task.create(nil, function (result, err)
+        if result then
+            self:push()
+        end
+    end)
     ---@async
-    task:execute(function ()
+    : execute(function (task)
         ls.await.sleep(DELAY)
-        self:push()
-        self.pushTask = nil
+        task:resolve(true)
     end)
 end
 
@@ -88,7 +90,6 @@ function M:merge()
     return merge.merge(results)
 end
 
----@async
 function M:push()
     local results = self:merge()
     if ls.util.equal(self.results, results) then

@@ -59,3 +59,40 @@ print(x)
     assert(n.params.uri == test.fileUri, tostring(n.params.uri))
     assert(#n.params.diagnostics == 0, 'expected 0 diagnostics, actual ' .. #n.params.diagnostics)
 end)
+
+TEST_FRAME([[
+local x = 1
+print(x)
+]], function ()
+    local vfile = test.scope.vm:getFile(test.fileUri)
+    assert(vfile)
+    vfile.diagnostic = nil
+
+    local notifications = withMockServer(function ()
+        local file = File.get(vfile)
+        ---@diagnostic disable-next-line: missing-fields
+        local disposeOld = file:contribute({ {
+            code    = 'old',
+            level   = 1,
+            start   = 0,
+            finish  = 1,
+            message = 'old',
+        } })
+        disposeOld()
+        ---@diagnostic disable-next-line: missing-fields
+        file:contribute({ {
+            code    = 'new',
+            level   = 1,
+            start   = 0,
+            finish  = 1,
+            message = 'new',
+        } })
+        ---@diagnostic disable-next-line: await-in-sync
+        ls.await.sleep(0.2)
+    end)
+
+    assert(#notifications == 1, 'expected 1 notification, actual ' .. #notifications)
+    local pushed = notifications[1].params.diagnostics
+    assert(#pushed == 1, 'expected 1 diagnostic, actual ' .. #pushed)
+    assert(pushed[1].code == 'new', 'expected code new, actual ' .. tostring(pushed[1].code))
+end)

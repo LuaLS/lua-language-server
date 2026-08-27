@@ -17,23 +17,16 @@ end
 ---@async
 ---@return table<Uri, Feature.Diagnostic[]>
 function M:fetchAll()
-    local scope = self.scope
-    if self.task then
-        self.task:reject(ls.task.REJECT_CANCELED)
-        self.task = nil
-    end
-    local task = ls.task.create { scope = scope }
-    self.task = task
     return ls.await.yield(function (resume)
-        task.callback = function (result, err)
-            if err then
-                resume({})
-            else
-                resume(result)
-            end
+        local scope = self.scope
+        if self.task then
+            self.task:reject(ls.task.REJECT_CANCELED)
         end
+        self.task = ls.task.create({ scope = scope }, function (result, err)
+            resume(result or {})
+        end)
         ---@async
-        task:execute(function ()
+        : execute(function (task)
             local results = {}
             for uri, vfile in pairs(scope.vm.vfiles) do
                 local file = File.get(vfile)

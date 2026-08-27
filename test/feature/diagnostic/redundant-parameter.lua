@@ -1,5 +1,3 @@
-print('[feature.diagnostic.redundant-parameter] 测试中...')
-
 TEST_DIAGNOSTIC [[
 local function f(x)
 end
@@ -31,5 +29,3 @@ local function f(x)
 end
 f(1, 2)
 ]] { '-redundant-parameter' }
-
-print('[feature.diagnostic.redundant-parameter] 测试完毕')

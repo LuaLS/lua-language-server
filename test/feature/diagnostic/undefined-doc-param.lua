@@ -1,5 +1,3 @@
-print('[feature.diagnostic.undefined-doc-param] 测试中...')
-
 TEST_DIAGNOSTIC [[
 ---@param <?y?> number
 local function f(x)
@@ -29,5 +27,3 @@ function T.m(self, x)
 end
 T.m({}, 1)
 ]] {}
-
-print('[feature.diagnostic.undefined-doc-param] 测试完毕')

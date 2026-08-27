@@ -1,6 +1,5 @@
 local parser = require 'parser'
 
-print('[parser.lua55] 测试中...')
 
 local ast = parser.compile([[global value
 global<const> readonly
@@ -166,5 +165,3 @@ assert(prefixLoc.attr ~= nil)
 assert(prefixLoc.start <= prefixLoc.finish)
 assert(prefixLoc.start <= prefixLoc.attr.start)
 assert(prefixLoc.attr.finish <= prefixLoc.finish)
-
-print('[parser.lua55] 测试完毕')

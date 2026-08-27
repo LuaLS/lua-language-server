@@ -1,5 +1,3 @@
-print('[feature.diagnostic.code-after-break] 测试中...')
-
 TEST_DIAGNOSTIC [[
 while true do
     break
@@ -36,5 +34,3 @@ for i = 1, 10 do
     <?i = i + 1?>
 end
 ]] { 'code-after-break' }
-
-print('[feature.diagnostic.code-after-break] 测试完毕')

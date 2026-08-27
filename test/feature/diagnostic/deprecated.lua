@@ -1,5 +1,3 @@
-print('[feature.diagnostic.deprecated] 测试中...')
-
 TEST_DIAGNOSTIC [[
 ---@deprecated use bar instead
 local function foo()
@@ -43,5 +41,3 @@ local function f()
 end
 f()
 ]] { 'deprecated' }
-
-print('[feature.diagnostic.deprecated] 测试完毕')

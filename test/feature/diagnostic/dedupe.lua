@@ -1,5 +1,3 @@
-print('[feature.diagnostic.dedupe] 测试中...')
-
 local function assertNoDuplicatePosition(results)
     local seen = {}
     for _, diag in ipairs(results) do
@@ -31,5 +29,3 @@ end?>
     assert(#results == 1, 'expected 1 diagnostic, actual ' .. #results)
     assert(results[1].code == 'empty-block', results[1].code)
 end)
-
-print('[feature.diagnostic.dedupe] 测试完毕')

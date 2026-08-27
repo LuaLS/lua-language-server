@@ -1,5 +1,3 @@
-print('[feature.diagnostic.missing-return-value] 测试中...')
-
 TEST_DIAGNOSTIC [[
 ---@return number
 local function f()
@@ -39,5 +37,3 @@ local function f()
 end
 f()
 ]] { '-missing-return-value' }
-
-print('[feature.diagnostic.missing-return-value] 测试完毕')

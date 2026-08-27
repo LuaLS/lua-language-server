@@ -1,5 +1,3 @@
-print('[feature] 测试中...')
-
 ---@generic T
 ---@param script string
 ---@param callback fun(catched: table<string, table[]>): T?
@@ -25,4 +23,3 @@ test.require 'test.feature.hover'
 test.require 'test.feature.completion'
 test.require 'test.feature.diagnostic'
 
-print('[feature] 测试完毕')

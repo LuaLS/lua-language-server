@@ -92,8 +92,16 @@ function test.require(modname)
             return
         end
     end
+    print(('[%s] 测试中...'):format(modname))
+    local start = os.clock()
     testRequire(modname)
     test.loadedAnyFile = true
+    local elapsed = os.clock() - start
+    if elapsed > 0.05 then
+        print(('[%s] 测试完毕 (%.2fs)'):format(modname, elapsed))
+    else
+        print(('[%s] 测试完毕'):format(modname))
+    end
 end
 
 -- 测试模式下，将子线程/异步 worker 里的错误也打印到终端

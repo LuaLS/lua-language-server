@@ -1,5 +1,3 @@
-print('[project.require-cache] 测试中...')
-
 local setupModule = require('test.helpers.custom-alias').module
 
 ---@param scope Scope
@@ -80,5 +78,3 @@ return 'B'
 
     playground:dispose()
 end
-
-print('[project.require-cache] 测试完毕')

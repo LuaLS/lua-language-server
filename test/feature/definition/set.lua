@@ -1,5 +1,3 @@
-print('[feature.definition.set] 测试中...')
-
 TEST_DEF [[
 <!x!> = 1
 <?x?>()
@@ -40,5 +38,3 @@ else
 end
 print(<?x?>)
 ]]
-
-print('[feature.definition.set] 测试完毕')

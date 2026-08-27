@@ -1,5 +1,3 @@
-print('[feature.diagnostic.discard-returns] 测试中...')
-
 TEST_DIAGNOSTIC [[
 ---@nodiscard
 local function f()
@@ -120,5 +118,3 @@ end
 
 f()
 ]] { '-discard-returns' }
-
-print('[feature.diagnostic.discard-returns] 测试完毕')

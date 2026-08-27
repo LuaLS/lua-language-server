@@ -1,6 +1,5 @@
 local template = require 'config.template'
 
-print('[config] 测试中...')
 
 do
     assert(template['Lua.runtime.version'].default == 'Lua 5.4')
@@ -233,5 +232,3 @@ do
     local languageServer = require 'language-server'
     assert(type(languageServer.create) == 'function')
 end
-
-print('[config] 测试完毕')

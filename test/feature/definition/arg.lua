@@ -1,5 +1,3 @@
-print('[feature.definition.arg] 测试中...')
-
 TEST_DEF [[
 local function xx (<!xx!>)
     <?xx?>()
@@ -20,5 +18,3 @@ function mt:x(<!self!>)
     <?self?>()
 end
 ]]
-
-print('[feature.definition.arg] 测试完毕')

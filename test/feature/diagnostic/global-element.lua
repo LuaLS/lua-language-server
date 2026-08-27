@@ -1,5 +1,3 @@
-print('[feature.diagnostic.global-element] 测试中...')
-
 test.scope.config:set(test.rootUri, 'Lua.diagnostics.neededFileStatus', { ['global-element'] = 'Any' })
 
 TEST_DIAGNOSTIC [[
@@ -42,5 +40,3 @@ TEST_DIAGNOSTIC [[
 ]] { 'global-element' }
 
 test.scope.config:set(test.rootUri, 'Lua.diagnostics.neededFileStatus', nil)
-
-print('[feature.diagnostic.global-element] 测试完毕')

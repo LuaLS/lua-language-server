@@ -2,7 +2,6 @@
 -- 定义 setValue(string/number) + onHover 的 alias，hover 字符串/数字字面量时，
 -- 除常规提示外追加 onHover 返回值。
 
-print('[feature.hover.custom] 测试中...')
 
 local setupModName = require('test.helpers.custom-alias').modname
 
@@ -148,6 +147,3 @@ require 'te<??>st'
 
     playground:dispose()
 end
-
-
-print('[feature.hover.custom] 测试完毕')

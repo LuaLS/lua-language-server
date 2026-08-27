@@ -1,5 +1,3 @@
-print('[feature.completion.text] 测试中...')
-
 -- 上下文词（workspaceWord）补全测试
 -- 对应 script/feature/completion/text.lua
 
@@ -35,5 +33,3 @@ local f<??>
     },
 }
 config:set(test.fileUri, 'Lua.completion.showWord', nil)
-
-print('[feature.completion.text] 测试完毕')

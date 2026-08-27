@@ -1,5 +1,3 @@
-print('[feature.completion.field] 测试中...')
-
 -- 无前缀的字段访问补全（t.<??>）
 TEST_COMPLETION [[
 local t = {}
@@ -377,5 +375,3 @@ GG.<??>
     }
 end
 -- [SKIPPED][stdlib-dependent] utf8.charpatter<?> detail/description 依赖标准库，暂不迁移
-
-print('[feature.completion.field] 测试完毕')

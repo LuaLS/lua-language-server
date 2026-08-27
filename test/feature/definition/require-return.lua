@@ -1,5 +1,3 @@
-print('[feature.definition.require-return] 测试中...')
-
 ---@param scope Scope
 ---@param kind string
 ---@param uri Uri
@@ -127,5 +125,3 @@ print(t.<?y?>)
 
     playground:dispose()
 end
-
-print('[feature.definition.require-return] 测试完毕')

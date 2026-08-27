@@ -1,5 +1,3 @@
-print('[feature.diagnostic.syntax] 测试中...')
-
 TEST_DIAGNOSTIC [[
 local _ = 1
 ]] {}
@@ -50,5 +48,3 @@ local function _()
     return 1
 end
 ]] {}
-
-print('[feature.diagnostic.syntax] 测试完毕')

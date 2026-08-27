@@ -1,5 +1,3 @@
-print('[node] 测试中...')
-
 test.require 'test.node.view'
 test.require 'test.node.get'
 test.require 'test.node.cast_base'
@@ -28,5 +26,3 @@ test.require 'test.node.flow'
 test.require 'test.node.tracer'
 
 test.require 'test.node.custom'
-
-print('[node] 测试完毕')

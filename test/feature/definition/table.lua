@@ -1,5 +1,3 @@
-print('[feature.definition.table] 测试中...')
-
 TEST_DEF [[
 local <!t!>
 a = {
@@ -180,5 +178,3 @@ local y
 
 t.x = y
 ]]
-
-print('[feature.definition.table] 测试完毕')

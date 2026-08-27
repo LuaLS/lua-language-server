@@ -1,5 +1,3 @@
-print('[project.global-cache2] 测试中...')
-
 ---@param scope Scope
 ---@param kind string
 ---@param uri Uri
@@ -77,5 +75,3 @@ foo = 2
     -- B 加载后：A、B 都应显示
     lt.assertEquals(getDefinitionUris(), { uriA, uriB })
 end
-
-print('[project.global-cache2] 测试完毕')

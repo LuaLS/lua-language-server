@@ -1,5 +1,3 @@
-print('[project.require] 测试中...')
-
 local setupModule = require('test.helpers.custom-alias').module
 
 ---@param scope Scope
@@ -269,5 +267,3 @@ do
 
     playground:dispose()
 end
-
-print('[project.require] 测试完毕')

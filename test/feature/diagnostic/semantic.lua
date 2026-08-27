@@ -1,5 +1,3 @@
-print('[feature.diagnostic.semantic] 测试中...')
-
 TEST_DIAGNOSTIC [[
 local function <?f?>()
 end
@@ -41,5 +39,3 @@ TEST_DIAGNOSTIC [[
 local x = 1 
 print(x)
 ]] { 'trailing-space' }
-
-print('[feature.diagnostic.semantic] 测试完毕')

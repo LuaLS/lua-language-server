@@ -1,6 +1,5 @@
 local guide = require 'parser.guide'
 
-print('[parser.guide] 测试中...')
 
 assert(guide.isLegalName 'abc')
 assert(guide.isLegalName '_abc')
@@ -68,5 +67,3 @@ assert(not guide.isWordChar ' ')
 assert(not guide.isWordChar '')
 
 assert(ls.guide == guide)
-
-print('[parser.guide] 测试完毕')

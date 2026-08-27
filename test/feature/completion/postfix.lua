@@ -1,5 +1,3 @@
-print('[feature.completion.postfix] 测试中...')
-
 -- postfix 补全测试（当前入口未加载）
 
 TEST_COMPLETION [[
@@ -405,5 +403,3 @@ local b = fff.kkk[#<??>]
 TEST_COMPLETION [[
 local c = fff.kkk[#<??>].yy
 ]] (EXISTS)
-
-print('[feature.completion.postfix] 测试完毕')

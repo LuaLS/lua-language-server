@@ -1,5 +1,3 @@
-print('[project.require-path] 测试中...')
-
 ---@param scope Scope
 ---@param kind string
 ---@param uri Uri
@@ -175,6 +173,3 @@ do
     -- 无匹配
     lt.assertEquals(names(scope:searchFilesByPartial('xyz')), {})
 end
-
-
-print('[project.require-path] 测试完毕')

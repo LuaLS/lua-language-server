@@ -25,7 +25,6 @@ function TEST_INDEX(code)
     end
 end
 
-print('[coder] 测试中...')
 
 test.require 'test.coder.meta'
 test.require 'test.coder.common'
@@ -35,5 +34,3 @@ test.require 'test.coder.flow'
 test.require 'test.coder.custom'
 test.require 'test.coder.optchain'
 test.require 'test.coder.lua55'
-
-print('[coder] 测试完毕')

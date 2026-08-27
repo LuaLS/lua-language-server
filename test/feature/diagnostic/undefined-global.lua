@@ -1,5 +1,3 @@
-print('[feature.diagnostic.undefined-global] 测试中...')
-
 TEST_DIAGNOSTIC [[
 local function f()
     return <?x?>
@@ -37,5 +35,3 @@ local function f()
 end
 f()
 ]] { 'undefined-global', '-undefined-field' }
-
-print('[feature.diagnostic.undefined-global] 测试完毕')

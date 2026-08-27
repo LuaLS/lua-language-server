@@ -1,5 +1,3 @@
-print('[feature.diagnostic.config] 测试中...')
-
 TEST_DIAGNOSTIC [[
 <?break?>
 ]] { 'break-outside' }
@@ -20,5 +18,3 @@ test.scope.config:set(test.rootUri, 'Lua.diagnostics.enable', nil)
 TEST_DIAGNOSTIC [[
 <?break?>
 ]] { 'break-outside' }
-
-print('[feature.diagnostic.config] 测试完毕')

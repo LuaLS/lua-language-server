@@ -1,5 +1,3 @@
-print('[feature.diagnostic.converter] 测试中...')
-
 local converter = require 'feature.diagnostic.converter'
 
 TEST_FRAME([[
@@ -46,5 +44,3 @@ if true then
     local rel = found.relatedInformation[1]
     assert(rel.location.uri == test.fileUri, tostring(rel.location.uri))
 end)
-
-print('[feature.diagnostic.converter] 测试完毕')

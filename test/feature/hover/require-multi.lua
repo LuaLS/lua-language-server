@@ -1,5 +1,3 @@
-print('[feature.hover.require-multi] 测试中...')
-
 do
     -- require 被用户覆盖（多定义）后，ModName 的 onHover 仍应触发
     local scope <close> = ls.scope.create('hover-require-multi', 'file:///root')
@@ -98,6 +96,3 @@ require = originRequire
         lt.assertEquals(desc, '* [test.lua]({}) （搜索路径：`?.lua`）' % { uriA })
     end
 end
-
-
-print('[feature.hover.require-multi] 测试完毕')

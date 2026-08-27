@@ -1,5 +1,3 @@
-print('[feature.definition.custom] 测试中...')
-
 local setupModName = require('test.helpers.custom-alias').modname
 
 ---@param scope Scope
@@ -118,5 +116,3 @@ require 'not-exists<??>'
 
     playground:dispose()
 end
-
-print('[feature.definition.custom] 测试完毕')

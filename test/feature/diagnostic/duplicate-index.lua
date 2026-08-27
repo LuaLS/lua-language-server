@@ -1,5 +1,3 @@
-print('[feature.diagnostic.duplicate-index] 测试中...')
-
 TEST_DIAGNOSTIC [[
 local _ = {
     <?a?> = 1,
@@ -34,5 +32,3 @@ local _ = {
     'b',
 }
 ]] {}
-
-print('[feature.diagnostic.duplicate-index] 测试完毕')

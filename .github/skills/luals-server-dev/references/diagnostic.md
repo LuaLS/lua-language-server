@@ -8,7 +8,8 @@
 - 里程碑 2 进行中：已迁移语义规则（主线程计算）：
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
   - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`missing-return-value`、`redundant-return-value`、`discard-returns`、`global-in-nil-env`
-  - parser-only：`duplicate-doc-alias`
+  - parser-only：`duplicate-doc-alias`、`unknown-cast-variable`
+  - VM 语义：`global-element`
 
 ## 关键文件
 
@@ -34,6 +35,8 @@
 | `lowercase-global` | 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免 |
 | `duplicate-doc-param` | block.cats 行邻接分组关联 function |
 | `duplicate-doc-alias` | `---@alias`/`---@class` 同名重复声明；纯 parser：遍历 `nodesMap['cat']`，取 `catstatealias.aliasID.id` / `catstateclass.classID.id`；attrs 含 `partial` 则该名豁免；只对 alias 声明报（class 只计 defCount），同名 def ≥2 时报 |
+| `global-element` | 隐式全局赋值（`assign.exps` 中 `var.loc==nil` 且 `var.global~=true`）；豁免 `Lua.diagnostics.globals`/`globalsRegex`；同名只报一次；默认 `status=None` 需 `neededFileStatus` 显式开启 |
+| `unknown-cast-variable` | `---@cast` 引用未定义变量：遍历 `nodesMap['catstatecast']`，`cast.var.kind=='var'` 且 `var.loc==nil and var.global~=true` 报 |
 | `undefined-doc-param` | 从 function 出发反向收集 `func.startRow-1` 起连续 cat |
 | `code-after-break` | 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无用例） |
 | `close-non-object` | 仅做 `local x <close>` 无 value 部分，value 类型判断需 `vm.getInfer` 待补 |

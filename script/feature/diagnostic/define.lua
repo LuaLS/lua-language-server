@@ -78,6 +78,7 @@ M.register {
     'unknown-diag-code',
     'undefined-doc-param',
     'duplicate-doc-alias',
+    'unknown-cast-variable',
 } {
     group    = 'luadoc',
     severity = 'Warning',
@@ -109,6 +110,14 @@ M.register {
     group    = 'global',
     severity = 'Warning',
     status   = 'Any',
+}
+
+M.register {
+    'global-element',
+} {
+    group    = 'conventions',
+    severity = 'Warning',
+    status   = 'None',
 }
 
 M.register {

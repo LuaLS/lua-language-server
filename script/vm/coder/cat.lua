@@ -16,6 +16,7 @@ ls.vm.registerCoderProvider('catstateclass', function (coder, source)
         qid = string.format('%q', source.classID.id),
         class = coder:getKey(source),
         location = coder:makeLocationCode(source.classID),
+        finishRow = source.finishRow,
     }
 
     coder:addLine('{class} = rt.class {qid}' % classParams)
@@ -55,6 +56,14 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
     ---@cast source LuaParser.Node.CatStateField
 
     local classParams = coder:getBlockKV('lastClass')
+    if classParams then
+        if source.startRow ~= classParams.finishRow + 1 then
+            classParams = nil
+        else
+            classParams.finishRow = source.finishRow
+            coder:setBlockKV('lastClass', classParams)
+        end
+    end
 
     local key = coder:getKey(source.key)
     coder:compile(source.key)

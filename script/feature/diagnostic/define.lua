@@ -80,6 +80,8 @@ M.register {
     'duplicate-doc-alias',
     'unknown-cast-variable',
     'undefined-doc-name',
+    'undefined-doc-class',
+    'doc-field-no-class',
 } {
     group    = 'luadoc',
     severity = 'Warning',

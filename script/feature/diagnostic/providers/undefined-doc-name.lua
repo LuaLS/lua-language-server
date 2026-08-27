@@ -35,8 +35,15 @@ local function undefinedDocNameProvider(param)
         delayer:delay()
         ---@cast id LuaParser.Node.CatID
         local pkind = id.parent and id.parent.kind
-        if pkind == 'catgeneric' then
+        if pkind == 'catgeneric' or pkind == 'catstateclass' then
             goto continue
+        end
+        local ancestor = id.parent
+        while ancestor do
+            if ancestor.kind == 'catstatefield' then
+                goto continue
+            end
+            ancestor = ancestor.parent
         end
         if defined[id] then
             goto continue

@@ -220,6 +220,20 @@ test.includeCodes['type3'] = [[
 function type(obj) end
 ]]
 
+test.includeCodes['pairs'] = [[
+---@generic K, V
+---@param t table<K, V>
+---@return fun(t: table<K, V>, k?: K): K, V
+---@return table<K, V>
+---@return K?
+function pairs(t) end
+]]
+
+test.includeCodes['print'] = [[
+---@param ... any
+function print(...) end
+]]
+
 --- 使用 `--!include setmetatable` 在测试中包含预定义代码片段。
 ---@param script string
 ---@return function?

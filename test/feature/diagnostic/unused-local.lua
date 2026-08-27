@@ -4,7 +4,7 @@ local <?x?> = 1
 
 TEST_DIAGNOSTIC [[
 local x = 1
-print(x)
+x = x
 ]] {}
 
 TEST_DIAGNOSTIC [[
@@ -33,6 +33,6 @@ end
 
 TEST_DIAGNOSTIC [[
 for i = 1, 10 do
-    print('x')
+    local _ = 1
 end
 ]] {}

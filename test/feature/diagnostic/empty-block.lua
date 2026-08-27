@@ -5,7 +5,7 @@ end?>
 
 TEST_DIAGNOSTIC [[
 while true do
-    print(1)
+    local _ = 1
 end
 ]] {}
 
@@ -15,6 +15,7 @@ end?>
 ]] { 'empty-block' }
 
 TEST_DIAGNOSTIC [[
+--!include pairs
 <?for k, v in pairs({}) do
 end?>
 ]] { 'empty-block' }
@@ -37,13 +38,13 @@ end?>
 
 TEST_DIAGNOSTIC [[
 if true then
-    print(1)
+    local _ = 1
 end
 ]] {}
 
 TEST_DIAGNOSTIC [[
 if true then
-    print(1)
+    local _ = 1
 else
 end
 ]] {}

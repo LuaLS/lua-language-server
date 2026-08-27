@@ -354,8 +354,11 @@ do
     test.scope.config:set(test.rootUri, 'Lua.runtime.unicodeName', nil)
 end
 
--- [SKIPPED][stdlib-dependent] io<?> EXISTS 依赖跨文件全局字段推断（env child value 为 field↔variable 引用循环，赋值 table 不在 value 链上），暂不迁移
+-- 全局表字段补全（io 由本文件构造，不依赖 stdlib）
 TEST_COMPLETION [[
+io = {}
+io.stdout = {}
+io.stderr = {}
 print(io.<??>)
 ]] (EXISTS)
 

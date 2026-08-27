@@ -1,26 +1,7 @@
-local metaBuilder = require 'scope.meta-builder'
-local metaUri = metaBuilder.compile('Lua 5.4', 'auto', 'utf-8')
-test.metaUris = {}
-do
-    local files = ls.afs.getChilds(metaUri)
-    if files then
-        for _, uri in ipairs(files) do
-            if ls.util.stringEndWith(uri, '.lua') then
-                local text = ls.afs.read(uri)
-                if text then
-                    ls.file.setServerText(uri, text)
-                    test.metaUris[#test.metaUris+1] = uri
-                end
-            end
-        end
-    end
-    table.sort(test.metaUris)
-end
-
 ---@param script string
 ---@return fun(codes: string[]?): fun(callback: fun(results: Feature.Diagnostic[])?)
 function TEST_DIAGNOSTIC(script)
-    script = script:gsub('\n$', '')
+    script = '--!include print\n' .. script:gsub('\n$', '')
     local results, catched = TEST_FRAME(script, function ()
         local file = ls.file.get(test.fileUri)
         if file then

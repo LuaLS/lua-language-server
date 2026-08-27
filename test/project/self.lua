@@ -143,7 +143,7 @@ do
             local ast = scope:getDocument(uri).ast
             assert(ast)
             local err = ast.errors[1]
-            assert(err == nil, err and err.where)
+            assert(err == nil, err and ('%s | %s'):format(err.errorCode, err.where))
             if status.loaded % 100 == 0 then
                 print('正在加载... 已加载 {loaded} 个文件' % status)
             end

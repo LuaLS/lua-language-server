@@ -25,6 +25,9 @@ local function writeLog(name, timeStamp, level, sourceStr, message)
         if ls.server then
             ls.server.client:logMessage('Error', message)
         end
+        if test then
+            print(message)
+        end
     end
     return log:write(fullMessage)
 end

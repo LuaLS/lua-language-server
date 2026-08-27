@@ -24,7 +24,8 @@
 				"script/class.lua"
 			],
 			"arg": [
-				"--test"
+				"--test",
+				"project.self"
 			]
 		},
 		{

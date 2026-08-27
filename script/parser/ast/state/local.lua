@@ -51,7 +51,12 @@ Local.__getter.sets = function (self)
         else
             local parent = ref.parent
             if parent and parent.kind == 'assign' then
-                sets[#sets+1] = ref
+                for _, exp in ipairs(parent.exps) do
+                    if exp == ref then
+                        sets[#sets+1] = ref
+                        break
+                    end
+                end
             end
         end
     end
@@ -66,7 +71,18 @@ Local.__getter.gets = function (self)
     local gets = {}
     for _, ref in ipairs(self.refs) do
         local parent = ref.parent
-        if parent and parent.kind ~= 'assign' then
+        if parent and parent.kind == 'assign' then
+            local isExp = false
+            for _, exp in ipairs(parent.exps) do
+                if exp == ref then
+                    isExp = true
+                    break
+                end
+            end
+            if not isExp then
+                gets[#gets+1] = ref
+            end
+        else
             gets[#gets+1] = ref
         end
     end

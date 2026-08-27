@@ -29,6 +29,14 @@ function Ast:parseVar()
         return nil
     end
 
+    local bindEnv = function ()
+        local env = self:getVariable(self.envMode)
+        if env then
+            var.env = env
+            env.envRefs[#env.envRefs+1] = var
+        end
+    end
+
     local declaration = self:getVariable(var.id)
     if self.parsingGlobalFunction then
         declaration = nil
@@ -36,6 +44,7 @@ function Ast:parseVar()
     if declaration and declaration.isGlobal then
         var.global = true
         var.globalConst = declaration.globalConst
+        bindEnv()
         return var
     end
     if declaration then
@@ -46,21 +55,16 @@ function Ast:parseVar()
     end
     if self.parsingGlobalFunction then
         var.global = true
+        bindEnv()
         return var
     end
     if self:getGlobal(var.id, var.start) == false then
         self:throw('GLOBAL_NOT_DECLARED', var.start, var.finish)
         return var
     end
-    do
-        local env = self:getVariable(self.envMode)
-        if env then
-            var.env = env
-            env.envRefs[#env.envRefs+1] = var
-        end
-        if self:isGlobalConst(var.id) then
-            var.globalConst = true
-        end
+    bindEnv()
+    if self:isGlobalConst(var.id) then
+        var.globalConst = true
     end
 
     return var

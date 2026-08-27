@@ -11,6 +11,7 @@ LocalDef.kind = 'localdef'
 ---@field vars LuaParser.Node.Local[]
 ---@field symbolPos? integer
 ---@field values? LuaParser.Node.Exp[]
+---@field env? LuaParser.Node.Local
 local GlobalDef = Class('LuaParser.Node.GlobalDef', 'LuaParser.Node.Base')
 
 GlobalDef.kind = 'globaldef'
@@ -231,6 +232,8 @@ function Ast:parseGlobal()
     end
 
     globaldef.finish = self:getLastPos()
+
+    globaldef.env = self:getVariable(self.envMode)
 
     for i = 1, #vars do
         local var = vars[i]

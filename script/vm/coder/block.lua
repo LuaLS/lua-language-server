@@ -46,7 +46,7 @@ ls.vm.registerCoderProvider('main', function (coder, source)
     local env = source.ast:findLocal(source.ast.envMode, 0)
     assert(env)
     coder:compile(env)
-    coder:addLine('{varKey}:setMasterVariable(rt.VAR_G)' % {
+    coder:addLine('{varKey}:setStaticValue(rt.VAR_G)' % {
         varKey = coder:getKey(env),
     })
     coder:addLine('')

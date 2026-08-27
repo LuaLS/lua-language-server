@@ -55,6 +55,8 @@ function W:start(block)
     end
     self.started = true
     self.aliasID = {}
+    self.assignVersion = 0
+    self.versionMap = {}
     ---@type Node.Tracer.Stack[]
     self.stacks  = {}
     self:pushStack()
@@ -118,6 +120,8 @@ function W:traceVar(var)
     -- 赋值点 shadow 的 currentValue 即是 Coder 编译时已设置好的赋值表达式值。
     local value = node:getStaticValue()
     self:setValue(id, value, true)
+    self.assignVersion = self.assignVersion + 1
+    self.versionMap[id] = self.assignVersion
 end
 
 ---@param ref ['ref', string, string]
@@ -135,6 +139,28 @@ function W:traceRef(ref)
     self.idAliasMap[id][alias] = true
 
     local value = self:getValue(id)
+    local pdata = self.parentMap[id]
+    if pdata and pdata[3] then
+        local pver = self.versionMap[pdata[1]]
+        local myver = self.versionMap[id]
+        if pver and (not myver or pver > myver) then
+            local pvalue = self:getValue(pdata[1])
+            if pvalue then
+                local r, e = pvalue:get(pdata[2])
+                if e then
+                    if r.kind == 'field' then
+                        r = r.value
+                    end
+                    if r.kind == 'variable' then
+                        r = r.value
+                    end
+                    value = r
+                elseif myver then
+                    value = self.scope.rt.NIL
+                end
+            end
+        end
+    end
     if not value then
         local node = self.map[alias]
         -- 统一使用 getStaticValue()（不含可选链的 nil 合并），

@@ -135,6 +135,16 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
   - coder 对 safe 字段/调用生成 `:setOptional()`；`Node.Variable`/`Node.FCall` 的 `value` 在 optional 时并入 `nil`。
 - **例外**：`script/tools/` 目录下不允许使用可选链（保持该目录语法兼容性）。
 - **多返回值场景**：运行时支持可选链；如有必要（尤其是需要保留多返回值时），可用 `Obj?:getManyResults()` 语法——`?:` 安全方法调用会保留方法的多返回值（区别于链式取值只取第一个返回值的场景）。
+
+## 11.1) `_ENV` flow 追踪
+
+文件开头隐含 `local _ENV = _G`，全局变量读写应使用当前可见的 `_ENV` 作为 parent（flow-sensitive）：
+
+- `coder/block.lua`：`_ENV` 用 `setStaticValue(rt.VAR_G)` 初始化（替代原 `setMasterVariable(rt.VAR_G)` 固定转发）。
+- `Variable:getChild`/`getChilds`：`masterVariable` 转发之外，增加「`currentValue`/`staticValue` 是 Variable 时转发」（动态转发），使 `_ENV = {...}` 后全局查找切到新表。
+- `coder/state.lua`：`compileAssign` 对 `_ENV`（var/local）即使 table 赋值也 `setStaticValue`（isEnv 判断）。
+- `coder/var.lua`：全局 var（`source.env`）生成 `parentMap[name] = { envName, id, true }`（第三元素标记 env 子字段）。
+- `tracer.lua`：`traceVar` 记录赋值版本号（`assignVersion`/`versionMap`）；`traceRef` 对 env 子字段，仅当 parent（`_ENV`）版本号 > 自身版本号时从 parent `get` 取字段值（field→value→variable→value 解包），实现「`_ENV` 重赋值使全局失效、全局自身重赋值不失效」。
 ## 12) PowerShell 文件编码
 
 - Windows PowerShell 默认编码为 GBK/UTF-16 LE，**严禁**写入项目文件时不指定编码（会导致 UTF8 文件乱码）。

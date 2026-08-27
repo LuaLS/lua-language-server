@@ -133,7 +133,8 @@ function M:compileAssign(var, index, valueKey, isTable)
         })
     end
 
-    if not isTable then
+    local isEnv = var.kind == 'var' and var.id == '_ENV'
+    if not isTable or isEnv then
         self:addLine('{varKey}:setStaticValue({valueKey})' % {
             varKey   = self:getKey(var),
             valueKey = catKey or valueKey,
@@ -236,7 +237,8 @@ ls.vm.registerCoderProvider('globaldef', function (coder, source)
     end
     for i, var in ipairs(source.vars) do
         if valueKeys[i] then
-            coder:addLine('rt:globalGet({name%q}):addAssign(rt.field(rt.value({name%q}), {value}))' % {
+            coder:addLine('{env}:getChild({name%q}):addAssign(rt.field(rt.value({name%q}), {value}))' % {
+                env   = coder:getKey(source.env),
                 name  = var.id,
                 value = valueKeys[i],
             })

@@ -5,6 +5,13 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         value = coder:makeVarKey(source),
     })
 
+    if source.env then
+        local sourceName = coder:getVarName(source)
+        if sourceName then
+            coder.parentMap[sourceName] = { coder:getVarName(source.env), source.id, true }
+        end
+    end
+
     if source.value then
         coder:getTracer():appendVar(source)
     else

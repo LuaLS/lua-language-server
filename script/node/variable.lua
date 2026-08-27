@@ -318,8 +318,15 @@ end
 
 ---@return table<Node.Key, Node.Variable>?
 function M:getChilds()
-    local master = self.masterVariable or self
-    return master.childs
+    if self.masterVariable then
+        return self.masterVariable:getChilds()
+    end
+    local sv = self.currentValue or self.staticValue
+    if sv and sv ~= self and sv.kind == 'variable' then
+        ---@cast sv Node.Variable
+        return sv:getChilds()
+    end
+    return self.childs
 end
 
 ---@type Node|false
@@ -452,6 +459,10 @@ M.childs = nil
 function M:getChild(key1, key2, ...)
     if self.masterVariable then
         return self.masterVariable:getChild(key1, key2, ...)
+    end
+    local sv = self.currentValue or self.staticValue
+    if sv and sv ~= self and sv.kind == 'variable' then
+        return sv:getChild(key1, key2, ...)
     end
     local rt = self.scope.rt
     local key = key1

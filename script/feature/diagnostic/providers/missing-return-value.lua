@@ -13,8 +13,13 @@ local function getRequiredReturnCount(f)
             if r.value.typeName == '...' then
                 return false
             end
+            local rt = f.scope.rt
+            if rt.NIL:canCast(r.value) then
+                goto continue
+            end
             count = count + 1
         end
+        ::continue::
     end
     return count
 end

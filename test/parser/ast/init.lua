@@ -11,20 +11,18 @@ function Match(result, expect, exact)
     local function eq(exp, res, parentExact)
         if exp == NIL then
             if res == nil then
-                return
-            else
-                error({exp, res})
+                return true
             end
+            return false, exp, res
         end
         if exp == EXISTS then
             if res ~= nil then
-                return
-            else
-                error({exp, res})
+                return true
             end
+            return false, exp, res
         end
         if type(exp) ~= type(res) then
-            error({exp, res})
+            return false, exp, res
         end
         if type(exp) == 'table' then
             -- 如果此表含 IGNORE_REST，则本层退回子集模式
@@ -34,7 +32,7 @@ function Match(result, expect, exact)
                 local expLen = #exp
                 local resLen = res and #res or 0
                 if expLen ~= resLen then
-                    error({exp, res})
+                    return false, exp, res
                 end
             elseif not thisExact and parentExact and exp[IGNORE_REST] then
                 -- 无序子集：期望数组每项在结果中存在一个匹配即可
@@ -42,7 +40,7 @@ function Match(result, expect, exact)
                     local found = false
                     for j = 1, (res and #res or 0) do
                         local mark = #path
-                        local ok = pcall(eq, exp[i], res[j], true)
+                        local ok = eq(exp[i], res[j], true)
                         if not ok then
                             for k = #path, mark + 1, -1 do
                                 path[k] = nil
@@ -54,32 +52,34 @@ function Match(result, expect, exact)
                     end
                     if not found then
                         path[#path+1] = i
-                        error({exp[i], '<missing>'})
+                        return false, exp[i], '<missing>'
                     end
                 end
-                return
+                return true
             end
             for k, v in pairs(exp) do
                 if k ~= IGNORE_REST then
                     path[#path+1] = k
-                    eq(v, res[k], thisExact)
+                    local ok = eq(v, res[k], thisExact)
                     path[#path] = nil
+                    if not ok then
+                        return false, v, res[k]
+                    end
                 end
             end
+            return true
         else
             if exp ~= res then
-                error({exp, res})
+                return false, exp, res
             end
+            return true
         end
     end
 
-    local suc, expres = pcall(eq, expect, result, exact)
-    if suc then
+    local ok, exp, res = eq(expect, result, exact)
+    if ok then
         return
     end
-
-    ---@cast expres any
-    local exp, res = expres[1], expres[2]
 
     local fullPath = {}
     for i, k in ipairs(path) do

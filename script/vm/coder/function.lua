@@ -255,20 +255,18 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                             else
                                 returnType = coder:getKey(ret.value)
                             end
-                            coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType}, {optional})' % {
+                            coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
                                 funcKey    = funcKey,
                                 returnKey  = ret.key and ('%q'):format(ret.key.id) or 'nil',
                                 returnType = returnType,
-                                optional   = ret.value and ret.value.optional,
                             })
                         end
                     elseif cat.value then
                         coder:addLine('-- ' .. cat.code)
-                        coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType}, {optional})' % {
+                        coder:addLine('{funcKey}:addReturnDef({returnKey}, {returnType})' % {
                             funcKey    = funcKey,
                             returnKey  = cat.key and ('%q'):format(cat.key.id) or 'nil',
                             returnType = coder:getKey(cat.value),
-                            optional   = cat.value.optional,
                         })
                     end
                 end

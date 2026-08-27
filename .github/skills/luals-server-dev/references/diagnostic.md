@@ -7,7 +7,8 @@
 - 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
 - 里程碑 2 进行中：已迁移语义规则（主线程计算）：
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
-  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`global-in-nil-env`
+  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`missing-return-value`、`redundant-return-value`、`discard-returns`、`global-in-nil-env`
+  - parser-only：`duplicate-doc-alias`
 
 ## 关键文件
 
@@ -32,6 +33,7 @@
 | `unknown-diag-code` | 合法码集合 = `define.diagnosticDatas` 键 + `syntax.messages` 键 lowercase-hyphen 化 |
 | `lowercase-global` | 检测 `assign.exps` 中 `var.loc==nil` 且 `var.global~=true` 的小写隐式全局赋值，读 `Lua.diagnostics.globals`/`globalsRegex` 豁免 |
 | `duplicate-doc-param` | block.cats 行邻接分组关联 function |
+| `duplicate-doc-alias` | `---@alias`/`---@class` 同名重复声明；纯 parser：遍历 `nodesMap['cat']`，取 `catstatealias.aliasID.id` / `catstateclass.classID.id`；attrs 含 `partial` 则该名豁免；只对 alias 声明报（class 只计 defCount），同名 def ≥2 时报 |
 | `undefined-doc-param` | 从 function 出发反向收集 `func.startRow-1` 起连续 cat |
 | `code-after-break` | 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无用例） |
 | `close-non-object` | 仅做 `local x <close>` 无 value 部分，value 类型判断需 `vm.getInfer` 待补 |
@@ -51,7 +53,10 @@
 - `assign-type-mismatch`：赋值类型不兼容。`variable:getExpectValue()`（`---@type` 注解类型）vs `eachAssign()` 的 `assign.value`（实际值）。**canCast 方向**：`a >> b` 语义是「a 是 b 的子类型」（`Node:canCast` 注释），所以判断「实际值能否赋给期望类型」用 `actual >> expect`（不要写反成 `expect >> actual`）。literal（`Node.Value`）需先转 `actual.nodeType`（其 `typeName` 对应的 `Node.Type`）再 canCast。skip：expect 无/any/unknown、actual nil。设计：integer 可赋给 number（`integer >> number` true，因 integer 的 `fullExtends` 含 number），number 不可赋给 integer。**已覆盖 master 的 `cast-local-type`**（`local x` 声明后 `x = value` 赋值场景，经 `assign` 的 exps 走同一 checkAssign）；`cast-type-mismatch` 不可行——本分支 parser 不支持 `expr as Type` 表达式 cast 语法。
 - `param-type-mismatch`：调用实参类型不匹配。`FCall.matchedFuncs` + `f:getParam(i)`（method self 偏移 +1）。对每个 matched 函数，只要任一 `actual >> expect` 即不报；`getParam` 返回 nil（变参）或 any/unknown 跳过。
 - `return-type-mismatch`：函数 return 类型不匹配。`ret.parent` 是 function → `vfile:getNode(parent)` 得 `Node.Function` → `f:getReturn(i)` 比较。**注意无注解函数跳过**（`#f.returnsDef == 0` 才不查，否则 `getReturn` 会从 returnList 推断出 literal Value，与转 type 后的 actual canCast 失败导致误报）。
+- `missing-return-value`：函数缺少必需返回值。**不能用 `returnsPack.min`**（与 `paramsPack.min` 同坑：`function.lua` 的 `returnsPack.min` 不排除 optional 返回）。正确做法遍历 `funcNode.returnsDef` 数 `not r.optional` 的数量；遇到 `r.value` 是 spread 或 `typeName=='...'`（变参返回）则不限 min，直接跳过不报。可变长返回（`---@return ...`）同跳过。
+- `redundant-return-value`：函数返回多余值。`funcNode:getReturnCount()` 第二个返回值 max（有限时），`#ret.exps > max` 则对 `max+1 .. #ret.exps` 每个 exp 报。max==nil（变参）跳过。
 - `global-in-nil-env`：`_ENV` 被赋 nil 后访问全局。遍历 var（`var.loc==nil` 且 `var.env` 存在，跳过 `var.id==var.env.id` 的 `_ENV` 自身访问），`vfile:getNode(var.env)` 得 `_ENV` 推断值，`typeName=='nil'` 则报，带 related 指向 `_ENV` local。
+- `discard-returns`：`@nodiscard` 函数返回值被丢弃。`vfile:getVariable(call.node):hasAnnotation('nodiscard')` 判断（`tryBindCat` 已把裸 `---@nodiscard` 绑定到变量注解）。只对 `call.parent.isBlock`（语句级调用）报；skip：`parent.condition==call`（if/while/repeat 条件）、for 循环 `parent.exps` 含 call、`f() == ...` 等 binary 内嵌（parent 非 block）。
 
 ### coder 相关修复
 
@@ -77,7 +82,7 @@
 
 ## 测试
 
-`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / need-check-nil / redundant-parameter / missing-parameter / assign-type-mismatch / param-type-mismatch / return-type-mismatch / global-in-nil-env / semantic
+`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / duplicate-doc-alias / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / discard-returns / need-check-nil / redundant-parameter / missing-parameter / assign-type-mismatch / param-type-mismatch / return-type-mismatch / missing-return-value / redundant-return-value / global-in-nil-env / semantic
 
 诊断测试 stdlib meta（`test/feature/diagnostic/init.lua` 用 `metaBuilder.compile('Lua 5.4')` 填 `test.metaUris`），故 `print` 等 stdlib 全局 `isDefined=true` 不误报。
 

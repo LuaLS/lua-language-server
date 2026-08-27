@@ -77,6 +77,7 @@ M.register {
     'duplicate-doc-param',
     'unknown-diag-code',
     'undefined-doc-param',
+    'duplicate-doc-alias',
 } {
     group    = 'luadoc',
     severity = 'Warning',
@@ -134,6 +135,8 @@ M.register {
     'assign-type-mismatch',
     'param-type-mismatch',
     'return-type-mismatch',
+    'missing-return-value',
+    'redundant-return-value',
 } {
     group    = 'type-check',
     severity = 'Warning',
@@ -150,6 +153,7 @@ M.register {
 
 M.register {
     'deprecated',
+    'discard-returns',
 } {
     group    = 'strict',
     severity = 'Warning',

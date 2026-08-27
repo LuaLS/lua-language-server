@@ -1,3 +1,5 @@
+print('[feature.diagnostic.return-type-mismatch] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@return number
 local function f()
@@ -22,3 +24,5 @@ local function f()
 end
 f()
 ]] { 'return-type-mismatch' }
+
+print('[feature.diagnostic.return-type-mismatch] 测试完毕')

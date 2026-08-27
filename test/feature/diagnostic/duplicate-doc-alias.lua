@@ -1,3 +1,5 @@
+print('[feature.diagnostic.duplicate-doc-alias] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@alias <?A?> integer
 ---@alias <?A?> integer
@@ -18,3 +20,5 @@ TEST_DIAGNOSTIC [[
 ---@alias A integer
 ---@alias B string
 ]] { '-duplicate-doc-alias' }
+
+print('[feature.diagnostic.duplicate-doc-alias] 测试完毕')

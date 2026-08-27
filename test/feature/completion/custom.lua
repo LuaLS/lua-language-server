@@ -1,3 +1,5 @@
+print('[feature.completion.custom] 测试中...')
+
 -- 自定义 alias 的补全：字符串参数的期望类型为 ModName 时，
 -- 通过 onCompletion 回调按已输入前缀枚举模块文件路径。
 local setupModName = require('test.helpers.custom-alias').modname
@@ -430,4 +432,4 @@ require '<??>'
     playground:dispose()
 end
 
-print('[completion.custom] 完毕')
+print('[feature.completion.custom] 测试完毕')

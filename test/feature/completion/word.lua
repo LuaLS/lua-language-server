@@ -1,3 +1,5 @@
+print('[feature.completion.word] 测试中...')
+
 TEST_COMPLETION [[
 local zabcdefg
 local zabcde
@@ -262,3 +264,5 @@ GGG<??>
 end
 
 -- [SKIPPED][config-dependent] require '<?>' count=9 依赖文件系统/配置，暂不迁移
+
+print('[feature.completion.word] 测试完毕')

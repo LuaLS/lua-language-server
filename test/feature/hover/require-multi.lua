@@ -1,4 +1,4 @@
-print('[hover.require-multi] 测试中...')
+print('[feature.hover.require-multi] 测试中...')
 
 do
     -- require 被用户覆盖（多定义）后，ModName 的 onHover 仍应触发
@@ -99,4 +99,5 @@ require = originRequire
     end
 end
 
-print('[hover.require-multi] 完毕')
+
+print('[feature.hover.require-multi] 测试完毕')

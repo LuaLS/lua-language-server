@@ -1,3 +1,5 @@
+print('[feature.hover.manually] 测试中...')
+
 do
     local uri1 = ls.uri.encode(test.rootPath .. '/hover_bug_vararg_class_1.lua')
     local uri2 = ls.uri.encode(test.rootPath .. '/hover_bug_vararg_class_2.lua')
@@ -24,3 +26,5 @@ M.xxx = 1
     assert(hover and hover.items and hover.items[1], 'expected hover result for M.xxx')
     assert(hover.items[1].label == '(field) M.xxx: 1', hover.items[1].label)
 end
+
+print('[feature.hover.manually] 测试完毕')

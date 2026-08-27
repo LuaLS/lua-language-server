@@ -1,3 +1,5 @@
+print('[feature.completion.keyword] 测试中...')
+
 -- keyword 补全测试
 
 -- 基础关键字前缀匹配（stdlib 全局可能模糊混入，断言包含）
@@ -120,3 +122,5 @@ end
     end
     assert(hasIn, '期望在 in<?> 补全中看到 `in` 关键字')
 end)
+
+print('[feature.completion.keyword] 测试完毕')

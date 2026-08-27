@@ -1,3 +1,5 @@
+print('[feature.diagnostic.pull] 测试中...')
+
 require 'language-server.capability'
 require 'language-server.capability.language-features.diagnostic'
 
@@ -34,3 +36,5 @@ break
     assert(r.kind == ls.spec.DocumentDiagnosticReportKind.Unchanged, tostring(r.kind))
     assert(r.resultId == test.fileUri, tostring(r.resultId))
 end)
+
+print('[feature.diagnostic.pull] 测试完毕')

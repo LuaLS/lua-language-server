@@ -1,3 +1,5 @@
+print('[feature.diagnostic.redundant-return-value] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@return number
 local function f()
@@ -29,3 +31,5 @@ local function f()
 end
 f()
 ]] { '-redundant-return-value' }
+
+print('[feature.diagnostic.redundant-return-value] 测试完毕')

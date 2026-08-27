@@ -1,3 +1,5 @@
+print('[feature.definition.field] 测试中...')
+
 TEST_DEF [[
 X.<!y!> = 1
 
@@ -34,3 +36,5 @@ local t = X
 
 print(t.x.<?y?>)
 ]]
+
+print('[feature.definition.field] 测试完毕')

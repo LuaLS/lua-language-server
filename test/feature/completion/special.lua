@@ -1,3 +1,5 @@
+print('[feature.completion.special] 测试中...')
+
 -- special 补全测试
 
 -- 字符串内部不应触发补全
@@ -35,3 +37,5 @@ end)
 -- [SKIPPED][config-dependent] require '<?>' count=9 依赖文件系统/配置，暂不迁移
 
 -- postfix 语法补全测试已迁移到 `test/feature/completion/postfix.lua`
+
+print('[feature.completion.special] 测试完毕')

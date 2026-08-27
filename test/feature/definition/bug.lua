@@ -1,3 +1,5 @@
+print('[feature.definition.bug] 测试中...')
+
 TEST_DEF [[
 local <!x!>
 function _(x)
@@ -257,3 +259,5 @@ local <!v!> = t[a]
 
 t[a] = <?v?>
 ]]
+
+print('[feature.definition.bug] 测试完毕')

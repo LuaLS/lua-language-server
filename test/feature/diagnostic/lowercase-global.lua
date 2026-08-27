@@ -1,3 +1,5 @@
+print('[feature.diagnostic.lowercase-global] 测试中...')
+
 TEST_DIAGNOSTIC [[
 <?foo?> = 1
 ]] { 'lowercase-global' }
@@ -30,3 +32,4 @@ print(foo)
 ]] { '-lowercase-global' }
 test.scope.config:set(test.rootUri, 'Lua.diagnostics.globalsRegex', nil)
 
+print('[feature.diagnostic.lowercase-global] 测试完毕')

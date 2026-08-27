@@ -1,3 +1,5 @@
+print('[feature.definition.special] 测试中...')
+
 TEST_DEF [[
 _ENV.<!x!> = 1
 print(<?x?>)
@@ -158,3 +160,5 @@ mt.yy = function (self)
     print(self.<?xx?>)
 end
 ]]
+
+print('[feature.definition.special] 测试完毕')

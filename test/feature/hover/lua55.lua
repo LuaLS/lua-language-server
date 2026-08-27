@@ -1,3 +1,5 @@
+print('[feature.hover.lua55] 测试中...')
+
 TEST_HOVER [[
 global answer
 answer = 42
@@ -76,3 +78,5 @@ end
 	assert(label:find('[1]: string', 1, true))
 	assert(label:find('n: 1', 1, true))
 end)
+
+print('[feature.hover.lua55] 测试完毕')

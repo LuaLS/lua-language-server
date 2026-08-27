@@ -1,3 +1,5 @@
+print('[feature.diagnostic.assign-type-mismatch] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@type number
 local <?x?> = 'str'
@@ -28,3 +30,5 @@ TEST_DIAGNOSTIC [[
 local x
 <?x?> = 'str'
 ]] { 'assign-type-mismatch' }
+
+print('[feature.diagnostic.assign-type-mismatch] 测试完毕')

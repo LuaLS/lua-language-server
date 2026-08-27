@@ -308,11 +308,16 @@ function M:simplify(visited)
     return self
 end
 
-function M:isTableLike()
+function M:isTableLike(visited)
     if self.value == self then
         return false
     end
-    return self.value:isTableLike()
+    visited = ls.util.visited(self, visited)
+    if not visited then
+        return false
+    end
+    local r = self.value:isTableLike(visited)
+    return r
 end
 
 ---@type Node

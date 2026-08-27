@@ -9,12 +9,14 @@ if projectPath == '' or type(projectPath) ~= 'string' then
 end
 
 do
+    test.scope:remove()
     local rootUri = ls.uri.encode(projectPath)
     local scope <close> = ls.scope.create('external', rootUri, ls.afs)
 
     collectgarbage()
+    local oldMem = collectgarbage 'count' / 1024
     print('项目路径：' .. projectPath)
-    print('加载前内存：{%.2f} MB' % { collectgarbage 'count' / 1024 })
+    print('加载前内存：{%.2f} MB' % { oldMem })
 
     local c1 = os.clock()
 
@@ -65,7 +67,8 @@ do
 
     collectgarbage()
     local mem = collectgarbage 'count' / 1024
-    print('加载后内存：{%.2f} MB (×{%.2f})' % { mem, mem / math.max(totalSize, 0.001) })
+    local delta = mem - oldMem
+    print('加载后内存：{%.2f} MB (×{%.2f})' % { mem, delta / math.max(totalSize, 0.001) })
 
     local count = 0
     ls.util.withDuration(function ()
@@ -90,5 +93,6 @@ do
 
     collectgarbage()
     mem = collectgarbage 'count' / 1024
-    print('全量解析后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / totalSize })
+    delta = mem - oldMem
+    print('全量解析后的内存为： {%.2f} MB (×{%.2f})' % { mem, delta / math.max(totalSize, 0.001) })
 end

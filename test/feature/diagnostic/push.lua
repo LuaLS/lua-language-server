@@ -1,3 +1,5 @@
+print('[feature.diagnostic.push] 测试中...')
+
 require 'language-server.task'
 
 local File = require 'feature.diagnostic.file'
@@ -96,3 +98,5 @@ print(x)
     assert(#pushed == 1, 'expected 1 diagnostic, actual ' .. #pushed)
     assert(pushed[1].code == 'new', 'expected code new, actual ' .. tostring(pushed[1].code))
 end)
+
+print('[feature.diagnostic.push] 测试完毕')

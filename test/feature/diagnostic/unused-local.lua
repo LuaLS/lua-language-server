@@ -1,3 +1,5 @@
+print('[feature.diagnostic.unused-local] 测试中...')
+
 TEST_DIAGNOSTIC [[
 local <?x?> = 1
 ]] { 'unused-local' }
@@ -36,3 +38,5 @@ for i = 1, 10 do
     print('x')
 end
 ]] {}
+
+print('[feature.diagnostic.unused-local] 测试完毕')

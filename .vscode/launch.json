@@ -25,7 +25,7 @@
 			],
 			"arg": [
 				"--test",
-				"project.self"
+				//"project.self"
 			]
 		},
 		{

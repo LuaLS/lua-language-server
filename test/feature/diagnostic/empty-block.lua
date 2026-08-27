@@ -1,3 +1,5 @@
+print('[feature.diagnostic.empty-block] 测试中...')
+
 TEST_DIAGNOSTIC [[
 <?while true do
 end?>
@@ -57,3 +59,5 @@ TEST_DIAGNOSTIC [[
 do
 end
 ]] {}
+
+print('[feature.diagnostic.empty-block] 测试完毕')

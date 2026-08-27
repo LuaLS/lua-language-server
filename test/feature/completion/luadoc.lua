@@ -1,3 +1,5 @@
+print('[feature.completion.luadoc] 测试中...')
+
 -- luadoc 补全测试
 -- TODO: 实现 luadoc 补全 provider 后补充用例
 
@@ -1783,3 +1785,5 @@ f {
 		kind  = ls.spec.CompletionItemKind.Property,
 	},
 }
+
+print('[feature.completion.luadoc] 测试完毕')

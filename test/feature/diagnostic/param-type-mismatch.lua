@@ -1,3 +1,5 @@
+print('[feature.diagnostic.param-type-mismatch] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@param x number
 local function f(x)
@@ -25,3 +27,5 @@ local function f(...)
 end
 f(1, 'str', {})
 ]] { '-param-type-mismatch' }
+
+print('[feature.diagnostic.param-type-mismatch] 测试完毕')

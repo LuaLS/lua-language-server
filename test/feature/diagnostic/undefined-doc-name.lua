@@ -1,3 +1,5 @@
+print('[feature.diagnostic.undefined-doc-name] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@type <?A?>
 ]] { 'undefined-doc-name' }
@@ -50,3 +52,5 @@ function Container:getBad()
     return {}
 end
 ]] { 'undefined-doc-name' }
+
+print('[feature.diagnostic.undefined-doc-name] 测试完毕')

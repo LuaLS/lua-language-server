@@ -1,3 +1,5 @@
+print('[feature.diagnostic.redundant-value] 测试中...')
+
 TEST_DIAGNOSTIC [[
 local x = 1, <?2?>
 print(x)
@@ -18,3 +20,5 @@ TEST_DIAGNOSTIC [[
 local x, y = 1, 2
 print(x, y)
 ]] {}
+
+print('[feature.diagnostic.redundant-value] 测试完毕')

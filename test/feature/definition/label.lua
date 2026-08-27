@@ -1,3 +1,5 @@
+print('[feature.definition.label] 测试中...')
+
 TEST_DEF [[
 ::<!LABEL!>::
 goto <?LABEL?>
@@ -27,3 +29,5 @@ TEST_DEF [[
 goto <?LABEL?>
 ::<!LABEL!>::
 ]]
+
+print('[feature.definition.label] 测试完毕')

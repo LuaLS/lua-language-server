@@ -45,14 +45,18 @@ function M:isAliasLike()
     return self.aliases ~= nil
 end
 
-function M:isTableLike()
+function M:isTableLike(visited)
     if self:isClassLike() then
         return true
     end
     if self.value == self then
         return false
     end
-    return self.value:isTableLike()
+    visited = ls.util.visited(self, visited)
+    if not visited then
+        return false
+    end
+    return self.value:isTableLike(visited)
 end
 
 ---@type Node.Class[]?
@@ -446,12 +450,12 @@ end
 ---@return true
 M.__getter.truthy = function (self)
     if self:isAliasLike() then
+        self.truthy = self
         local truthy = self.value.truthy
-        if truthy == self.value then
-            return self, true
-        else
-            return truthy, true
+        if truthy ~= self.value then
+            self.truthy = truthy
         end
+        return self.truthy, true
     end
     return self, true
 end
@@ -464,12 +468,12 @@ M.__getter.falsy = function (self)
         return self.scope.rt.NEVER, true
     end
     if self:isAliasLike() then
+        self.falsy = self.scope.rt.NEVER
         local falsy = self.value.falsy
-        if falsy == self.value then
-            return self, true
-        else
-            return falsy, true
+        if falsy ~= self.value then
+            self.falsy = falsy
         end
+        return self.falsy, true
     end
     if self:isClassLike() then
         return self.scope.rt.NEVER, true

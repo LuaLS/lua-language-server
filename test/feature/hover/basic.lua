@@ -1,3 +1,5 @@
+print('[feature.hover.basic] 测试中...')
+
 local config = test.scope.config
 
 TEST_HOVER [[
@@ -2419,3 +2421,5 @@ local self: {
     __index: { ... },
     __name: 'obj',
 }]]
+
+print('[feature.hover.basic] 测试完毕')

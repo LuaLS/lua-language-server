@@ -1,3 +1,5 @@
+print('[feature.definition.method] 测试中...')
+
 TEST_DEF [[
 function mt:<!a!>()
 end
@@ -55,3 +57,5 @@ end
 
 G.H.<?x?>
 ]]
+
+print('[feature.definition.method] 测试完毕')

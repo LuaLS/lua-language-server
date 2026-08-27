@@ -1,3 +1,5 @@
+print('[feature.diagnostic.undefined-field] 测试中...')
+
 TEST_DIAGNOSTIC [[
 local t = { foo = 1 }
 print(t.foo)
@@ -63,4 +65,4 @@ end
 print(t:m())
 ]] {}
 
-
+print('[feature.diagnostic.undefined-field] 测试完毕')

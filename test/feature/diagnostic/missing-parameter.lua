@@ -1,3 +1,5 @@
+print('[feature.diagnostic.missing-parameter] 测试中...')
+
 TEST_DIAGNOSTIC [[
 local function f(x, y)
 end
@@ -24,3 +26,5 @@ function t:m(x, y)
 end
 <?t:m(1)?>
 ]] { 'missing-parameter' }
+
+print('[feature.diagnostic.missing-parameter] 测试完毕')

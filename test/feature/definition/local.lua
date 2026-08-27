@@ -1,3 +1,5 @@
+print('[feature.definition.local] 测试中...')
+
 TEST_DEF [[
 local <!x!>
 <?x?>()
@@ -193,3 +195,5 @@ end
 TEST_DEF [[
 local <?<!x!>?>
 ]]
+
+print('[feature.definition.local] 测试完毕')

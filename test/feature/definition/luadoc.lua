@@ -1,3 +1,5 @@
+print('[feature.definition.luadoc] 测试中...')
+
 local config = test.scope.config
 config:set(test.fileUri, 'Lua.type.castNumberToInteger', false)
 TEST_DEF [[
@@ -1109,3 +1111,5 @@ TEST_DEF [[
 
 ---@alias <!<?A?>!> number
 ]]
+
+print('[feature.definition.luadoc] 测试完毕')

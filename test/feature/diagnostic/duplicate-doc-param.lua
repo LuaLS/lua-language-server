@@ -1,3 +1,5 @@
+print('[feature.diagnostic.duplicate-doc-param] 测试中...')
+
 TEST_DIAGNOSTIC [[
 ---@param x number
 ---@param <?x?> string
@@ -32,3 +34,5 @@ TEST_DIAGNOSTIC [[
 local function _(x)
 end
 ]] { 'duplicate-doc-param' }
+
+print('[feature.diagnostic.duplicate-doc-param] 测试完毕')

@@ -1,3 +1,5 @@
+print('[feature.diagnostic.unbalanced-assignments] 测试中...')
+
 TEST_DIAGNOSTIC [[
 local x, <?y?> = 1
 print(x, y)
@@ -30,3 +32,5 @@ local t = {}
 t.a, <?t.b?> = 1
 print(t.a, t.b)
 ]] { 'unbalanced-assignments', '-undefined-field' }
+
+print('[feature.diagnostic.unbalanced-assignments] 测试完毕')

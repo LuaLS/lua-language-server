@@ -1,3 +1,5 @@
+print('[feature.completion.string] 测试中...')
+
 -- string 补全测试
 -- TODO: 实现字符串枚举补全 provider 后补充用例
 
@@ -700,3 +702,5 @@ require '<??>'
 	{ label = "'mod-a'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
 	{ label = "'mod-b'", kind = ls.spec.CompletionItemKind.EnumMember, textEdit = EXISTS },
 }
+
+print('[feature.completion.string] 测试完毕')

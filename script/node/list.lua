@@ -86,6 +86,36 @@ end
 ---@type Node.Value[]
 M.keys = nil
 
+-- 用于检测 get(key) 递归调用中的循环引用
+local _getVisiting = {}
+
+---@param key Node.Key
+---@return Node
+---@return boolean exists
+function M:get(key)
+    local rt = self.scope.rt
+    if _getVisiting[self] then
+        return rt.NIL, false
+    end
+    _getVisiting[self] = true
+    local results
+    for _, v in ipairs(self.values) do
+        local r, e = v:get(key)
+        if e then
+            results = results or {}
+            results[#results+1] = r
+        end
+    end
+    _getVisiting[self] = nil
+    if not results then
+        return rt.NIL, false
+    end
+    if #results == 1 then
+        return results[1], true
+    end
+    return rt.union(results), true
+end
+
 ---@param key Node.Key
 ---@return Node
 ---@return boolean exists

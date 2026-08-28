@@ -260,6 +260,16 @@ function M:resolveGeneric(map, ctx)
     return newCall
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
+function M:get(key)
+    if not self.head:isComplex() then
+        return self.scope.rt.ANY, true
+    end
+    return self.value:get(key)
+end
+
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)

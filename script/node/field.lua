@@ -1,4 +1,5 @@
 ---@class Node.Field: Node
+---@field location? Node.Location
 local M = ls.node.register 'Node.Field'
 
 M.kind = 'field'

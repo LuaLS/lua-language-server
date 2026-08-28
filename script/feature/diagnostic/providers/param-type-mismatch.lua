@@ -31,10 +31,6 @@ local function paramTypeMismatchProvider(param)
             if not actual then
                 goto continueArg
             end
-            if actual.kind == 'value' then
-                ---@cast actual Node.Value
-                actual = actual.nodeType
-            end
             local paramIndex = isMethod and (i + 1) or i
             local ok = false
             for _, f in ipairs(matched) do

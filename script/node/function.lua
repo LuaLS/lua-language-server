@@ -359,7 +359,11 @@ function M:resolveGeneric(map, ctx)
     for i, param in ipairs(self.paramsDef) do
         if param.value.hasGeneric then
             local newValue = param.value:resolveGeneric(map, ctx)
-            newFunc.paramsDef[i] = { key = param.key, value = newValue }
+            newFunc.paramsDef[i] = {
+                key      = param.key,
+                value    = newValue,
+                optional = param.optional,
+            }
             newFunc.paramDefMap[param.key] = newValue
         else
             newFunc.paramsDef[i] = param

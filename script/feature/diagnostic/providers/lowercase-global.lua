@@ -15,6 +15,49 @@ local function lowercaseGlobalProvider(param)
     end
     local globalsRegex = scope.config:get(uri, 'Lua.diagnostics.globalsRegex') or {}
 
+    local metaUris = {}
+    for _, root in ipairs(scope.roots) do
+        if root.kind == 'meta' then
+            metaUris[root.uri] = true
+        end
+    end
+    local function isMetaUri(u)
+        for metaUri in pairs(metaUris) do
+            if u:sub(1, #metaUri) == metaUri then
+                return true
+            end
+        end
+        return false
+    end
+
+    local rt = scope.rt
+
+    local function isDefinedInMeta(name)
+        local globalVar = rt.VAR_G
+            and rt.VAR_G.childs
+            and rt.VAR_G.childs[rt.luaKey(name)]
+        if not globalVar then
+            return false
+        end
+        local sv = globalVar.staticValue
+        if sv then
+            local func = sv --[[@as Node.Function]]
+            local loc = func.location
+            if loc and loc.uri and isMetaUri(loc.uri) then
+                return true
+            end
+        end
+        for assign in globalVar:eachAssign() do
+            ---@type Node.Field
+            local field = assign
+            local loc = field.location
+            if loc and loc.uri and isMetaUri(loc.uri) then
+                return true
+            end
+        end
+        return false
+    end
+
     for _, node in ipairs(ast.nodesMap['assign']) do
         delayer:delay()
         ---@cast node LuaParser.Node.Assign
@@ -28,6 +71,9 @@ local function lowercaseGlobalProvider(param)
             end
             local name = exp.id
             if globalsSet[name] then
+                goto continueExp
+            end
+            if isDefinedInMeta(name) then
                 goto continueExp
             end
             local first = name:match '%w'

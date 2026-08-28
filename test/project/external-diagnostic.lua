@@ -129,12 +129,13 @@ do
 
     local c3 = os.clock()
     for _, uri in ipairs(result.uris) do
-        if uri:sub(1, #rootUri) == rootUri then
+        local isProjectFile = uri:sub(1, #rootUri) == rootUri
+        local doc = isProjectFile and scope:getDocument(uri) or nil
+        if doc then
             local diags = ls.feature.diagnostic(uri)
             if diags and #diags > 0 then
                 diagFileN = diagFileN + 1
-                local doc = scope:getDocument(uri)
-                local text = doc and doc.file:getText() or ''
+                local text = doc.file:getText()
                 for _, diag in ipairs(diags) do
                     diagN = diagN + 1
                     diagTotal[diag.code] = (diagTotal[diag.code] or 0) + 1

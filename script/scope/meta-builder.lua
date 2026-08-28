@@ -203,7 +203,7 @@ function API.compile(version, language, encoding)
         encoding = encoding,
     }
     local sourceDir = ls.env.ROOT_URI / 'meta' / 'template'
-    local targetDir = ls.env.META_URI / key
+    local targetDir = ls.uri.normalize(ls.env.META_URI / key)
 
     if API.compiled[key] then
         return targetDir

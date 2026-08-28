@@ -271,6 +271,7 @@ function M:resolveGeneric(map, ctx)
         return ctx.visited[self]
     end
     local newValues = {}
+    ctx.visited[self] = self
     for _, v in ipairs(self.rawNodes) do
         newValues[#newValues+1] = v:resolveGeneric(map, ctx)
     end

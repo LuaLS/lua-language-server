@@ -21,10 +21,6 @@ local function checkAssign(vfile, var, results)
         if not actual then
             goto continue
         end
-        if actual.kind == 'value' then
-            ---@cast actual Node.Value
-            actual = actual.nodeType
-        end
         if actual.kind == 'select' then
             ---@cast actual Node.Select
             actual = actual.value

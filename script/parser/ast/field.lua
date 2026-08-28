@@ -8,6 +8,7 @@
 ---@field next? LuaParser.Node.Field
 ---@field last? LuaParser.Node.Term
 ---@field value? LuaParser.Node.Exp
+---@field location? Node.Location
 local Field = Class('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
 Field.kind = 'field'

@@ -32,10 +32,6 @@ local function returnTypeMismatchProvider(param)
             if not actual then
                 goto continueExp
             end
-            if actual.kind == 'value' then
-                ---@cast actual Node.Value
-                actual = actual.nodeType
-            end
             if actual.kind == 'select' then
                 ---@cast actual Node.Select
                 actual = actual.value

@@ -359,6 +359,17 @@ M.__getter.variableTable = function (self)
             end
         end
     end
+    local rt = self.scope.rt
+    if rt.VAR_G and rt.VAR_G.childs then
+        local globalVar = rt.VAR_G.childs[rt.luaKey(self.typeName)]
+        if globalVar and globalVar.childs then
+            local t = rt.table()
+            for k, child in pairs(globalVar.childs) do
+                t:addField(rt.field(k, child))
+            end
+            variableTables[#variableTables+1] = t
+        end
+    end
     local table = self.scope.rt.mergeTables(variableTables)
     return table, true
 end

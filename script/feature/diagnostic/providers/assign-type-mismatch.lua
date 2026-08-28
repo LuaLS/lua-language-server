@@ -25,6 +25,10 @@ local function checkAssign(vfile, var, results)
             ---@cast actual Node.Value
             actual = actual.nodeType
         end
+        if actual.kind == 'select' then
+            ---@cast actual Node.Select
+            actual = actual.value
+        end
         if actual.kind == 'type' and actual.typeName == 'nil' then
             goto continue
         end

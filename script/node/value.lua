@@ -25,6 +25,13 @@ function M:__init(scope, v, quo)
     self.scope = scope
 end
 
+---@param key Node.Key
+---@return Node
+---@return boolean exists
+function M:get(key)
+    return self.nodeType:get(key)
+end
+
 function M:onCanCast(other)
     other = other:finalValue()
     if other.kind == 'value' then

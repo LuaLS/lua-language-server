@@ -116,4 +116,76 @@ do
             print('    ' .. sample)
         end
     end
+
+    local diagTotal  = {}
+    local diagFiles  = {}
+    local diagSample = {}
+    local diagN      = 0
+    local diagFileN  = 0
+
+    scope.config:set(rootUri, 'Lua.diagnostics.groupFileStatus', {
+        ['type-check'] = 'Any',
+    })
+
+    local c3 = os.clock()
+    for _, uri in ipairs(result.uris) do
+        if uri:sub(1, #rootUri) == rootUri then
+            local diags = ls.feature.diagnostic(uri)
+            if diags and #diags > 0 then
+                diagFileN = diagFileN + 1
+                local doc = scope:getDocument(uri)
+                local text = doc and doc.file:getText() or ''
+                for _, diag in ipairs(diags) do
+                    diagN = diagN + 1
+                    diagTotal[diag.code] = (diagTotal[diag.code] or 0) + 1
+                    local files = diagFiles[diag.code]
+                    if not files then
+                        files = {}
+                        diagFiles[diag.code] = files
+                    end
+                    files[uri] = true
+                    local list = diagSample[diag.code]
+                    if not list then
+                        list = {}
+                        diagSample[diag.code] = list
+                    end
+                    if #list < SAMPLE_LIMIT then
+                        local row, col = doc.positionConverter:offsetToPosition(diag.start)
+                        list[#list+1] = '{}:{}:{} | {} | {}' % {
+                            relPath(projectPath, uri),
+                            row + 1,
+                            col + 1,
+                            getSourceLine(text, diag.start),
+                            diag.message,
+                        }
+                    end
+                end
+            end
+        end
+    end
+    local c4 = os.clock()
+
+    print('语义诊断总数：{}，涉及文件：{}，耗时：{%.2f} 秒' % { diagN, diagFileN, c4 - c3 })
+
+    local diagCodes = {}
+    for code in pairs(diagTotal) do
+        diagCodes[#diagCodes+1] = code
+    end
+    table.sort(diagCodes, function (a, b)
+        if diagTotal[a] ~= diagTotal[b] then
+            return diagTotal[a] > diagTotal[b]
+        end
+        return a < b
+    end)
+
+    for _, code in ipairs(diagCodes) do
+        local fileN = 0
+        for _ in pairs(diagFiles[code]) do
+            fileN = fileN + 1
+        end
+        print('{%-24s} {%6d} 处 / {} 文件' % { code, diagTotal[code], fileN })
+        for _, sample in ipairs(diagSample[code]) do
+            print('    ' .. sample)
+        end
+    end
 end

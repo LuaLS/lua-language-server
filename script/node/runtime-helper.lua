@@ -43,12 +43,31 @@ end
 
 ---@param params (Node?)[][]
 ---@param n integer
+---@param packs? Node.List[]
 ---@return integer[]
-function M:getBestMatchs(params, n)
+function M:getBestMatchs(params, n, packs)
     local matchs = {}
-    for i = 1, #params do
-        matchs[i] = i
+    local feasible = {}
+    if packs then
+        local infeasible
+        for i = 1, #params do
+            local pack = packs[i]
+            if pack and pack.max and n > pack.max then
+                infeasible = infeasible or {}
+                infeasible[#infeasible+1] = i
+            else
+                feasible[#feasible+1] = i
+            end
+        end
+        if #feasible == 0 then
+            feasible = infeasible
+        end
+    else
+        for i = 1, #params do
+            feasible[i] = i
+        end
     end
+    matchs = feasible
 
     ---@param a Node
     ---@param b Node

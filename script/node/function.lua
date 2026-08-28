@@ -97,7 +97,12 @@ M.__getter.paramsPack = function (self)
         end
         return value
     end)
-    local min = #params
+    local min = 0
+    for _, v in ipairs(self.paramsDef) do
+        if not v.optional then
+            min = min + 1
+        end
+    end
     ---@type integer | false
     local max = #params
     if self.varargParamDef then
@@ -200,16 +205,7 @@ function M:onCanCast(other)
         if not self.paramsPack:canCast(other.paramsPack) then
             return false
         end
-        for i, oreturn in ipairs(other.returnsDef) do
-            local ret = self:getReturn(i)
-            if not ret then
-                return false
-            end
-            if not ret:canCast(oreturn.value) then
-                return false
-            end
-        end
-        return true
+        return self.returnsPack:canCast(other.returnsPack)
     end
     return false
 end

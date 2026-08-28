@@ -240,6 +240,9 @@ function M:canCast(other)
     local path = { self, other }
     local res = castCache:get(path)
     if res then
+        if res == 'unknown' then
+            return true
+        end
         return res == 'yes'
     end
     castCache:set(path, 'unknown')

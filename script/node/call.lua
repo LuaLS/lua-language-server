@@ -260,6 +260,15 @@ function M:resolveGeneric(map, ctx)
     return newCall
 end
 
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    if self.head:isComplex() then
+        return self.value:canCast(other)
+    end
+    return other.typeName ~= 'never'
+end
+
 function M:onView(viewer, options)
     if self.head:isAliasLike() and self.value ~= self then
         return viewer:view(self.value, {

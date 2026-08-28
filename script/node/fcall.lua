@@ -196,6 +196,7 @@ M.__getter.matchedFuncs = function (self)
     end
 
     local allParams = {}
+    local allPacks = {}
     for i, def in ipairs(defs) do
         local params = ls.util.map(def.paramsDef, function (v)
             local value = v.value
@@ -207,9 +208,10 @@ M.__getter.matchedFuncs = function (self)
             end
         end)
         allParams[i] = params
+        allPacks[i] = def.paramsPack
     end
 
-    local matches = rt:getBestMatchs(allParams, #self.args)
+    local matches = rt:getBestMatchs(allParams, #self.args, allPacks)
     local ctx = ls.node.resolveContext(self.location)
     local result = {}
     for _, match in ipairs(matches) do

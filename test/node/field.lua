@@ -9,6 +9,21 @@ do
 end
 
 do
+    rt:reset()
+
+    rt.class('string')
+        : addField(rt.field('sub', rt.type 'function'))
+
+    local v = rt.value 'abc'
+    local sub, exists = v:get 'sub'
+    lt.assertEquals(exists, true)
+    lt.assertNotEquals(sub, rt.NEVER)
+
+    local missing = v:get 'xxxx'
+    lt.assertEquals(missing, rt.NIL)
+end
+
+do
     local t = rt.table()
         : addField(rt.field('x', rt.type 'number'))
         : addField(rt.field('y', rt.type 'boolean'))

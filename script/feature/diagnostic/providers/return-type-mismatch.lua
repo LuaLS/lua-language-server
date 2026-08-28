@@ -36,6 +36,10 @@ local function returnTypeMismatchProvider(param)
                 ---@cast actual Node.Value
                 actual = actual.nodeType
             end
+            if actual.kind == 'select' then
+                ---@cast actual Node.Select
+                actual = actual.value
+            end
             local expect = funcNode:getReturn(i)
             if not expect then
                 goto continueExp

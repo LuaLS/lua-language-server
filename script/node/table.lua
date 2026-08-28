@@ -317,6 +317,9 @@ function M:onCanBeCast(other)
     if not other:isTableLike() then
         return false
     end
+    if other.kind == 'table' and #other.keys == 0 then
+        return true
+    end
     for _, key in ipairs(self.keys) do
         local v = other:get(key)
         local myType = self:get(key)

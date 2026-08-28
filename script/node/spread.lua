@@ -115,7 +115,7 @@ function M:onCanBeCast(other)
     if self.hasGeneric then
         return true
     end
-    return self.value:canCast(other)
+    return other:canCast(self.value)
 end
 
 ---@param self Node.Spread

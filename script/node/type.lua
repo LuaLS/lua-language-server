@@ -521,9 +521,15 @@ function M:onCanBeCast(other)
         if other.kind == 'type' then
             return
         end
+        if self.value == self then
+            return
+        end
         return other:canCast(self.value)
     end
     if self:isAliasLike() then
+        if self.value == self then
+            return
+        end
         return other:canCast(self.value)
     end
 end
@@ -538,6 +544,9 @@ function M:onCanCast(other)
         end
     end
     if self:isAliasLike() then
+        if self.value == self then
+            return false
+        end
         return self.value:canCast(other.value)
     end
     if other.kind == 'type' then
@@ -561,6 +570,9 @@ function M:onCanCast(other)
         end
     end
     if self:isClassLike() then
+        if self.value == self then
+            return false
+        end
         return self.value:canCast(other.value)
     end
     return false

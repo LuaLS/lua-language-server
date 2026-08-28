@@ -261,7 +261,34 @@ end
 ---@private
 ---@return LuaParser.Node.CatFuncReturn[]
 function Ast:parseCatReturnList()
-    local list = self:parseList(false, false, self.parseCatFuncReturn)
-
+    local list = {}
+    local first = self:parseCatFuncReturn(false)
+    list[#list+1] = first
+    local wantSep = first ~= nil
+    while true do
+        self:skipSpace()
+        local token, tp, pos = self.lexer:peek()
+        if not token then
+            break
+        end
+        ---@cast pos -?
+        if tp ~= 'Symbol' or token ~= ',' then
+            break
+        end
+        if not wantSep then
+            self:throw('UNEXPECT_SYMBOL', pos, pos + 1)
+        end
+        self.lexer:next()
+        self:skipSpace()
+        local unit = self:parseCatFuncReturn(true)
+        if not unit then
+            break
+        end
+        list[#list+1] = unit
+        if unit.spread then
+            break
+        end
+        wantSep = true
+    end
     return list
 end

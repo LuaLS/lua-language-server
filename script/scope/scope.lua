@@ -60,6 +60,8 @@ function M:reload(options)
         self:buildRoots(options)
 
         local startTime = time.monotonic()
+        local prog <close> = ls.progress.create(self.uri, ('正在加载工作区: %s'):format(self.name), 0.5)
+        local scanFinished = 0
         local result = self:load(options, function (event, status, uri)
             if event == 'start' then
                 log.info('[Scope] Start loading: {}' % { self.name })
@@ -71,6 +73,7 @@ function M:reload(options)
             end
             if event == 'found' then
                 log.info('[Scope]({}) Found {} files in {%.3f} seconds.' % { self.name, status.found, (time.monotonic() - startTime) / 1000 })
+                scanFinished = scanFinished + 1
                 return
             end
             if event == 'loading' then
@@ -83,6 +86,10 @@ function M:reload(options)
             end
             if event == 'indexing' then
                 log.debug('[Scope]({}) Indexing file({}/{}): {}' % { self.name, status.indexed, status.loaded, uri })
+                if scanFinished >= #self.roots and status.found > 0 then
+                    prog:setMessage(('%d/%d'):format(status.indexed, status.found))
+                    prog:setPercentage(status.indexed / status.found * 100)
+                end
                 return
             end
             if event == 'indexed' then

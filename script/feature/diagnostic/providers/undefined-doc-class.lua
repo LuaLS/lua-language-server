@@ -22,6 +22,7 @@ local function undefinedDocClassProvider(param)
         for _, extend in ipairs(cls.extends) do
             local id = extend
             if id.kind == 'catparen' then
+                ---@cast id LuaParser.Node.CatParen
                 id = id:trim()
             end
             if id.kind ~= 'catid' then

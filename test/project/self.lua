@@ -124,7 +124,8 @@ do
     scope.config:set(root, 'Lua.runtime.nonstandardSymbol', { '?.', '?:', '?[', '?(' })
 
     collectgarbage()
-    print('加载项目前的内存为： {%.2f} MB' % { collectgarbage 'count' / 1024 })
+    local oldMem = collectgarbage 'count' / 1024
+    print('加载项目前的内存为： {%.2f} MB' % { oldMem })
 
     local result = scope:load({
         ignores = {
@@ -167,7 +168,8 @@ do
 
     collectgarbage()
     local mem = collectgarbage 'count' / 1024
-    print('索引后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
+    local delta = mem - oldMem
+    print('索引后的内存为： {%.2f} MB (×{%.2f})' % { mem, delta / math.max(size, 0.001) })
 
     for _, uri in ipairs(result.uris) do
         local document = scope:getDocument(uri)
@@ -176,7 +178,8 @@ do
 
     collectgarbage()
     mem = collectgarbage 'count' / 1024
-    print('去除语法树后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
+    delta = mem - oldMem
+    print('去除语法树后的内存为： {%.2f} MB (×{%.2f})' % { mem, delta / math.max(size, 0.001) })
 
     local count = 0
     ls.util.withDuration(function ()
@@ -201,7 +204,8 @@ do
 
     collectgarbage()
     mem = collectgarbage 'count' / 1024
-    print('全量解析后的内存为： {%.2f} MB (×{%.2f})' % { mem, mem / size })
+    delta = mem - oldMem
+    print('全量解析后的内存为： {%.2f} MB (×{%.2f})' % { mem, delta / math.max(size, 0.001) })
 
     ls.util.withDuration(function ()
         for _, uri in ipairs(result.uris) do

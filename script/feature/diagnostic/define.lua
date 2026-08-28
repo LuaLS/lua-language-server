@@ -83,6 +83,7 @@ M.register {
     'undefined-doc-class',
     'doc-field-no-class',
     'circle-doc-class',
+    'duplicate-doc-field',
 } {
     group    = 'luadoc',
     severity = 'Warning',

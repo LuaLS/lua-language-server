@@ -22,11 +22,12 @@ local CatParen = Class('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
 
 CatParen.kind = 'catparen'
 
+---@return LuaParser.Node.CatExp
 function CatParen:trim()
     if not self.value then
         return self
     end
-    return self.value:trim()
+    return self.value:trim() --[[@as LuaParser.Node.CatExp]]
 end
 
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base

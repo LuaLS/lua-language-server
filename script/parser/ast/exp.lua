@@ -221,6 +221,7 @@ function Ast:parseParen()
     if not pos then
         return nil
     end
+    self:skipSpace(true)
     local exp = self:parseExp(true)
     local paren = self:createNode('LuaParser.Node.Paren', {
         start  = pos,

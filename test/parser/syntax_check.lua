@@ -1072,6 +1072,33 @@ ss6 = "testing unfinished string<!!>
 }
 
 TEST[[
+if a
+or (
+    b
+    and c
+) then
+    print(1)
+end
+]]
+(nil)
+
+TEST[[
+local x = (
+    b
+)
+]]
+(nil)
+
+TEST[[
+f(a
+or (
+    b
+))
+]]
+(nil)
+
+
+TEST[[
 -- short string test begin
 
 ss7 = 'testing \\<!!>

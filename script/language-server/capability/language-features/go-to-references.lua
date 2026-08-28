@@ -14,6 +14,8 @@ ls.capability.register('textDocument/references', function (server, params, task
 
     local dconverter = document:makeLSPConverter(server.positionEncoding)
 
+    local prog <close> = ls.progress.create(uri, '正在查找引用', 0.5)
+
     local results = ls.feature.references(uri, dconverter:at(params.position), params.context?.includeDeclaration)
     if #results == 0 then
         return

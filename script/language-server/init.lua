@@ -9,6 +9,7 @@ require 'feature'
 
 require 'language-server.task'
 require 'language-server.capability'
+require 'language-server.progress'
 require 'language-server.status'
 
 require 'language-server.capability.lifecycle-messages.initialize'
@@ -22,6 +23,7 @@ require 'language-server.capability.document-synchronization.did-change-text-doc
 require 'language-server.capability.document-synchronization.did-close-text-document'
 
 require 'language-server.capability.workspace.did-change-configuration'
+require 'language-server.capability.workspace.work-done-progress-cancel'
 
 require 'language-server.capability.language-features.go-to-definition'
 require 'language-server.capability.language-features.go-to-implementation'

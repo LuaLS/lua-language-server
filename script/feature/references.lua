@@ -35,7 +35,7 @@ function ls.feature.references(uri, offset, includeDeclaration)
     return ls.feature.helper.organizeResultsByRange(results)
 end
 
----@param callback fun(param: Feature.References.Param, action: Feature.ProviderActions<Location>)
+---@param callback async fun(param: Feature.References.Param, action: Feature.ProviderActions<Location>)
 ---@param priority integer? # 优先级
 ---@return fun() disposable
 function ls.feature.provider.references(callback, priority)
@@ -131,11 +131,22 @@ local function isMetaUri(uri)
     return uri:sub(1, #ls.env.META_URI) == ls.env.META_URI
 end
 
+---@async
+local function delay()
+    ls.task.getCurrentTask()?:delay()
+end
+
+---@async
 ---@param action Feature.ProviderActions<Location>
 ---@param param Feature.References.Param
 ---@param func Node.Function
 local function collectCallRefs(action, param, func)
+    local vfiles = {}
     for _, vfile in pairs(param.vm.vfiles) do
+        vfiles[#vfiles+1] = vfile
+    end
+    for _, vfile in ipairs(vfiles) do
+        delay()
         local map = vfile.coder and vfile.coder.map
         if map and not isMetaUri(vfile.uri) then
             for _, node in pairs(map) do
@@ -157,8 +168,10 @@ local function collectCallRefs(action, param, func)
     end
 end
 
--- 字段、方法与函数的引用
-ls.feature.provider.references(function (param, action)
+---@async
+---@param param Feature.References.Param
+---@param action Feature.ProviderActions<Location>
+local function fieldRefs(param, action)
     local first = param.sources[1]
     if first.kind == 'function' then
         ---@cast first LuaParser.Node.Function
@@ -188,4 +201,7 @@ ls.feature.provider.references(function (param, action)
         return
     end
     collectRefs(action, param, variable)
-end)
+end
+
+-- 字段、方法与函数的引用
+ls.feature.provider.references(fieldRefs)

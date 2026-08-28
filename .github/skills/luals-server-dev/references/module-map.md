@@ -83,6 +83,9 @@ end
 ## Language Server
 - `script/language-server/language-server.lua`：生命周期、transport loop、request resolution。
 - `script/language-server/language-client.lua`：client capability 处理。
+- `script/language-server/task.lua`：请求级 Task 与取消（`ls.task`）。
+- `script/language-server/progress.lua`：VSCode 进度条（`ls.progress`）。
+- 详细的 Task / Await / Progress 语义见 [task-await-progress](./task-await-progress.md)。
 
 适用场景：
 - request lifecycle。

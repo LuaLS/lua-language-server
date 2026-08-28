@@ -27,8 +27,19 @@ function M:fetchAll()
         end)
         ---@async
         : execute(function (task)
+            local prog <close> = ls.progress.create(scope.uri, '正在诊断工作区', 1)
+            prog:onCancel(function ()
+                task:reject(ls.task.REJECT_CANCELED)
+            end)
             local results = {}
+            local total = 0
+            for _ in pairs(scope.vm.vfiles) do
+                total = total + 1
+            end
+            local done = 0
             for uri, vfile in pairs(scope.vm.vfiles) do
+                done = done + 1
+                prog:setPercentage(done / total * 100)
                 local file = File.get(vfile)
                 file:refresh()
                 local merged = file:merge()

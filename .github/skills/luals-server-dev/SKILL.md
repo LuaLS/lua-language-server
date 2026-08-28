@@ -45,12 +45,15 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 > 注：已知问题见 [known-issues](./references/known-issues.md)。
 >
 > 注：assert 签名注解收窄规划见 [assert-narrow-plan](./references/assert-narrow-plan.md)。
+>
+> 注：Task / Await / Progress 并发系统（取消语义、让出点、进度条）见 [task-await-progress](./references/task-await-progress.md)。
 
 ## 快速路由
 - 改 parser 或语法：先看 [architecture](./references/architecture.md) 和 `script/parser/`。
 - 改类型节点或 runtime：先看 [module map](./references/module-map.md) 和 `script/node/`。
 - 改 VM、coder、tracing、flow：先看 [module map](./references/module-map.md) 和 `script/vm/`。
 - 改 LSP 请求处理：重点看 `script/language-server/` 和 `script/feature/`。
+- 改长耗时任务的让出点、取消逻辑或进度条：先看 [task-await-progress](./references/task-await-progress.md)。
 - 改 completion：重点看 `script/feature/completion/`、`script/feature/text-scanner.lua` 和 completion tests。
 - 增加测试或排查回归：先看 [workflow and style](./references/workflow-and-style.md) 和 `test/`。
 
@@ -64,3 +67,5 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 - "实现 LSP feature"
 - "增加 feature test"
 - "了解项目架构"
+- "加进度条或取消功能"
+- "长任务卡住其他请求"

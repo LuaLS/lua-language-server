@@ -473,6 +473,11 @@ function M:globalRemove(field, path)
     return self.VAR_G:removeField(field, path)
 end
 
+---@return (fun(): string?), table
+function M:eachTypeName()
+    return next, self.TYPE_POOL
+end
+
 
 ---@type PathTable
 M.castCache = nil

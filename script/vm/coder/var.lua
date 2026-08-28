@@ -16,6 +16,14 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         coder:getTracer():appendVar(source)
     else
         coder:getTracer():appendRef(source)
+        coder:addLine('{key}:addUsage {location}' % {
+            key      = coder:getKey(source),
+            location = coder:makeLocationCode(source),
+        })
+        coder:addDisposer('{key}:removeUsage {location}' % {
+            key      = coder:getKey(source),
+            location = coder:makeLocationCode(source),
+        })
     end
 end)
 
@@ -43,6 +51,14 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         coder:getTracer():appendVar(source)
     else
         coder:getTracer():appendRef(source)
+        coder:addLine('{var}:addUsage {location}' % {
+            var      = coder:getKey(source),
+            location = coder:makeLocationCode(source),
+        })
+        coder:addDisposer('{var}:removeUsage {location}' % {
+            var      = coder:getKey(source),
+            location = coder:makeLocationCode(source),
+        })
     end
 
     if source.subtype ~= 'index' then

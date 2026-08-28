@@ -16,6 +16,7 @@ end
 
 test.require 'test.feature.definition'
 test.require 'test.feature.implementation'
+test.require 'test.feature.references'
 test.require 'test.feature.hover'
 test.require 'test.feature.completion'
 test.require 'test.feature.diagnostic'

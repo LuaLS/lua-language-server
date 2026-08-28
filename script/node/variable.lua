@@ -136,7 +136,6 @@ function M:addAssign(field)
         self.assigns = {}
     end
     table.insert(self.assigns, field)
-    self.scope.rt.REF_POOL[self] = true
 
     self:flushCache()
 
@@ -157,8 +156,6 @@ function M:removeAssign(field)
 
     if #self.assigns == 0 then
         self.assigns = nil
-
-        self.scope.rt.REF_POOL[self] = nil
 
         -- local rt = self.scope.rt
         -- local parent = self.parent
@@ -212,6 +209,66 @@ function M:eachAssign()
     return function ()
         i = i + 1
         return self.assigns[i]
+    end
+end
+
+---@package
+---@type Node.Location[]?
+M.usages = nil
+
+---@param location Node.Location
+---@return Node.Variable
+function M:addUsage(location)
+    if self.masterVariable then
+        self.masterVariable:addUsage(location)
+        return self
+    end
+    if not self.usages then
+        self.usages = {}
+    end
+    table.insert(self.usages, location)
+    return self
+end
+
+---@param location Node.Location
+---@return Node.Variable
+function M:removeUsage(location)
+    if self.masterVariable then
+        self.masterVariable:removeUsage(location)
+        return self
+    end
+    local usages = self.usages
+    if not usages then
+        return self
+    end
+    for i = 1, #usages do
+        local usage = usages[i]
+        if  usage.uri    == location.uri
+        and usage.offset == location.offset
+        and usage.length == location.length then
+            usages[i] = usages[#usages]
+            usages[#usages] = nil
+            break
+        end
+    end
+    if #usages == 0 then
+        self.usages = nil
+    end
+    return self
+end
+
+---@return fun(): Node.Location?
+function M:eachUsage()
+    if self.masterVariable then
+        return self.masterVariable:eachUsage()
+    end
+    if not self.usages then
+        return function () end
+    end
+    local i = 0
+    return function ()
+        i = i + 1
+        return self.usages[i]
     end
 end
 
@@ -479,7 +536,7 @@ function M:getChild(key1, key2, ...)
             local child = current.childs and current.childs[nk]
             if not child then
                 child = rt.variable(k, current)
-                current.childs = current.childs or ls.util.weakVTable()
+                current.childs = current.childs or {}
                 current.childs[nk] = child
             end
             current = child
@@ -490,7 +547,7 @@ function M:getChild(key1, key2, ...)
     local child = current.childs and current.childs[key]
     if not child then
         child = rt.variable(origKey, current)
-        current.childs = current.childs or ls.util.weakVTable()
+        current.childs = current.childs or {}
         current.childs[key] = child
     end
     return child
@@ -507,7 +564,7 @@ function M:addField(field, path)
     local rt = self.scope.rt
     local current = self
     if not current.childs then
-        current.childs = ls.util.weakVTable()
+        current.childs = {}
     end
 
     if path then
@@ -518,7 +575,7 @@ function M:addField(field, path)
             end
             current = current.childs[nk]
             if not current.childs then
-                current.childs = ls.util.weakVTable()
+                current.childs = {}
             end
         end
     end

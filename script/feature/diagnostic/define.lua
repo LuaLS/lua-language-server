@@ -82,10 +82,20 @@ M.register {
     'undefined-doc-name',
     'undefined-doc-class',
     'doc-field-no-class',
+    'circle-doc-class',
 } {
     group    = 'luadoc',
     severity = 'Warning',
     status   = 'Any',
+}
+
+M.register {
+    'incomplete-signature-doc',
+    'missing-global-doc',
+} {
+    group    = 'luadoc',
+    severity = 'Warning',
+    status   = 'None',
 }
 
 M.register {

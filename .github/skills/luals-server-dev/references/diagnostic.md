@@ -9,6 +9,7 @@
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
   - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`missing-return-value`、`redundant-return-value`、`discard-returns`、`global-in-nil-env`
   - parser-only：`duplicate-doc-alias`、`unknown-cast-variable`
+  - VM/LuaDoc 语义：`undefined-doc-class`、`doc-field-no-class`、`incomplete-signature-doc`、`circle-doc-class`、`missing-global-doc`
   - VM 语义：`global-element`
 
 ## 关键文件
@@ -37,6 +38,9 @@
 | `duplicate-doc-alias` | `---@alias`/`---@class` 同名重复声明；纯 parser：遍历 `nodesMap['cat']`，取 `catstatealias.aliasID.id` / `catstateclass.classID.id`；attrs 含 `partial` 则该名豁免；只对 alias 声明报（class 只计 defCount），同名 def ≥2 时报 |
 | `global-element` | 隐式全局赋值（`assign.exps` 中 `var.loc==nil` 且 `var.global~=true`）；豁免 `Lua.diagnostics.globals`/`globalsRegex`；同名只报一次；默认 `status=None` 需 `neededFileStatus` 显式开启 |
 | `unknown-cast-variable` | `---@cast` 引用未定义变量：遍历 `nodesMap['catstatecast']`，`cast.var.kind=='var'` 且 `var.loc==nil and var.global~=true` 报 |
+| `undefined-doc-class` | `---@class A : B` 的 extends `B` 未定义：收集 catstateclass.classID + `rt.type` 判定豁免 basicType/classLike/aliasLike |
+| `doc-field-no-class` | `---@field` 无 class 绑定：**走语义** `vfile:getNode(catstatefield)` 为 nil 即报（coder 无 class 时 return 不生成 Node.Field）；配套 coder `catstatefield` 绑定 class 需行连续（`lastClass.finishRow` 链） |
+| `incomplete-signature-doc` | 函数有 `@param`/`@return` 注解但未覆盖全部参数/返回：遍历 function 上方连续 cat 收集 @param 名 + @return 数，对比 `func.params`（除 self/_）与 return 语句 exp index；**默认 `status='None'`**（否则与 redundant-return-value 等冲突） |
 | `undefined-doc-param` | 从 function 出发反向收集 `func.startRow-1` 起连续 cat |
 | `code-after-break` | 同时处理 `break`/`continue`（continue 需 `Lua.runtime.nonstandardSymbol` 启用，测试环境默认不启用故无用例） |
 | `close-non-object` | 仅做 `local x <close>` 无 value 部分，value 类型判断需 `vm.getInfer` 待补 |

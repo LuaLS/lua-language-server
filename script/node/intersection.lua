@@ -228,6 +228,9 @@ end
 ---@return true
 M.__getter.truthy = function (self)
     self.value:addRef(self)
+    if self.value == self then
+        return self, true
+    end
     return self.value.truthy, true
 end
 
@@ -236,6 +239,9 @@ end
 ---@return true
 M.__getter.falsy = function (self)
     self.value:addRef(self)
+    if self.value == self then
+        return self.scope.rt.NEVER, true
+    end
     return self.value.falsy, true
 end
 

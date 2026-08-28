@@ -182,6 +182,7 @@ do
     print('去除语法树后的内存为： {%.2f} MB (×{%.2f})' % { mem, delta / math.max(size, 0.001) })
 
     local count = 0
+    local overflows = 0
     ls.util.withDuration(function ()
         for _, uri in ipairs(result.uris) do
             local doc = scope:getDocument(uri)
@@ -192,14 +193,25 @@ do
                 for _, src in ipairs(nodes) do
                     local node = vfile:getNode(src)
                     if node then
-                        local _ = node.value
+                        local suc, value = xpcall(function ()
+                            return node.value
+                        end, function (err)
+                            return err
+                        end)
+                        if not suc then
+                            overflows = overflows + 1
+                        else
+                            local _ = value
+                        end
                     end
                     count = count + 1
                 end
             end
         end
     end, function (duration)
-        print('解析 {} 个token耗时: {%.2f} 秒 ({%.2f}K/秒)' % { count, duration, count / duration / 1000})
+        print('解析 {} 个token耗时: {%.2f} 秒 ({%.2f}K/秒)，求值溢出 {} 个' % {
+            count, duration, count / duration / 1000, overflows,
+        })
     end)
 
     collectgarbage()

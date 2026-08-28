@@ -125,9 +125,56 @@ ls.feature.provider.references(function (param, action)
     collectRefs(action, param, variable)
 end)
 
--- 字段与方法的引用
+---@param uri Uri
+---@return boolean
+local function isMetaUri(uri)
+    return uri:sub(1, #ls.env.META_URI) == ls.env.META_URI
+end
+
+---@param action Feature.ProviderActions<Location>
+---@param param Feature.References.Param
+---@param func Node.Function
+local function collectCallRefs(action, param, func)
+    for _, vfile in pairs(param.vm.vfiles) do
+        local map = vfile.coder and vfile.coder.map
+        if map and not isMetaUri(vfile.uri) then
+            for _, node in pairs(map) do
+                if node.kind == 'fcall' and node.location then
+                    local suc, funcs = pcall(function ()
+                        return node.matchedFuncs
+                    end)
+                    if suc then
+                        for _, f in ipairs(funcs) do
+                            if f == func then
+                                action.push(ls.feature.helper.convertLocation(node.location))
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- 字段、方法与函数的引用
 ls.feature.provider.references(function (param, action)
     local first = param.sources[1]
+    if first.kind == 'function' then
+        ---@cast first LuaParser.Node.Function
+        local func = param.vm:getNode(first)
+        if func and func.kind == 'function' then
+            ---@cast func Node.Function
+            collectCallRefs(action, param, func)
+            if first.name then
+                local variable = param.vm:getVariable(first.name)
+                if variable then
+                    collectRefs(action, param, variable)
+                end
+            end
+        end
+        return
+    end
     local field = param.sources[2]
     if not field or field.kind ~= 'field' then
         return

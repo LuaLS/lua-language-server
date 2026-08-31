@@ -371,6 +371,9 @@ local function defaultOnSameKey(a, b)
     if a == b then
         return a
     end
+    if a.value == b.value then
+        return a
+    end
     local v1 = a:findValue(ls.node.kind['type'] | ls.node.kind['table'])
     local v2 = b:findValue(ls.node.kind['type'] | ls.node.kind['table'])
     if not v1 or v1.kind == 'type' or not v2 or v2.kind == 'type' then

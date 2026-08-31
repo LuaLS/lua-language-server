@@ -213,3 +213,18 @@ do
     lt.assertEquals(a >> b, true)
     lt.assertEquals(b >> a, true)
 end
+
+do
+    rt:reset()
+
+    -- `local vm = require 'vm.vm'`：require 返回 unknown | vm，应可转换为 vm
+    local vmT = rt.type 'vm'
+    rt.class('vm')
+        : addField(rt.field('compileNode', rt.type 'function'))
+
+    local u = rt.UNKNOWN | vmT
+
+    lt.assertEquals(vmT >> vmT, true)
+    lt.assertEquals(rt.UNKNOWN >> vmT, true)
+    lt.assertEquals(u >> vmT, true)
+end

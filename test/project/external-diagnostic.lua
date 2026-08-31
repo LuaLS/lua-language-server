@@ -3,7 +3,7 @@ if projectPath == '' or type(projectPath) ~= 'string' then
     return
 end
 
-local SAMPLE_LIMIT = 15
+local SAMPLE_LIMIT = 100000
 local LINE_LIMIT   = 120
 
 local function getSourceLine(text, offset)
@@ -50,6 +50,23 @@ do
     local result = scope:load({}, function () end)
     local c2 = os.clock()
     print('文件数量：{}，加载耗时：{%.2f} 秒' % { #result.uris, c2 - c1 })
+
+    do
+        for _, uri in ipairs(result.uris) do
+            if uri:find('dotted', 1, true) then
+                local mv = scope.vm:getFile(uri)
+                if mv and mv.coder then
+                    for line in mv.coder.code:gmatch('[^\r\n]+') do
+                        if line:find('addParamDef', 1, true)
+                        or line:find('param@5:18', 1, true) then
+                            print('PARAMDEF ' .. line)
+                        end
+                    end
+                end
+                break
+            end
+        end
+    end
 
     local codeTotal  = {}
     local codeFiles  = {}

@@ -245,7 +245,17 @@ function M:canCast(other)
         end
         return res == 'yes'
     end
+    if self == other then
+        castCache:set(path, 'yes')
+        return true
+    end
     castCache:set(path, 'unknown')
+    if self.onCanCast then
+        if self:onCanCast(other) then
+            castCache:set(path, 'yes')
+            return true
+        end
+    end
     if other.onCanBeCast then
         local result = other:onCanBeCast(self)
         if result == true then
@@ -254,16 +264,6 @@ function M:canCast(other)
         elseif result == false then
             castCache:set(path, 'no')
             return false
-        end
-    end
-    if self == other then
-        castCache:set(path, 'yes')
-        return true
-    end
-    if self.onCanCast then
-        if self:onCanCast(other) then
-            castCache:set(path, 'yes')
-            return true
         end
     end
     castCache:set(path, 'no')

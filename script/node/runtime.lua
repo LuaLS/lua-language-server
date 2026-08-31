@@ -343,22 +343,24 @@ function M:fillPresets()
         : setConfig('basicType', true)
     self.UNKNOWN = self.type 'unknown'
         : setConfig('onCanCast', function (_, other)
-            local hasNil
+            local hasNilOrNever
             other:each('type', function (node)
-                if node.typeName == 'nil' then
-                    hasNil = true
+                if node.typeName == 'nil'
+                or node.typeName == 'never' then
+                    hasNilOrNever = true
                 end
             end)
-            return not hasNil
+            return not hasNilOrNever
         end)
         : setConfig('onCanBeCast', function (_, other)
-            local hasNil
+            local hasNilOrNever
             other:each('type', function (node)
-                if node.typeName == 'nil' then
-                    hasNil = true
+                if node.typeName == 'nil'
+                or node.typeName == 'never' then
+                    hasNilOrNever = true
                 end
             end)
-            return not hasNil
+            return not hasNilOrNever
         end)
     self.TRUTHY = self.type 'truthy'
         : setConfig('onCanCast', function (_, other)

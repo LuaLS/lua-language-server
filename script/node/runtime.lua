@@ -384,6 +384,9 @@ function M:fillPresets()
     self.STRING = self.type 'string'
         : setConfig('basicType', true)
     self.BOOLEAN = self.type 'boolean'
+        : setConfig('onCanBeCast', function (_, other)
+            return other.typeName == 'boolean'
+        end)
         : setConfig('basicType', true)
     self.FUNCTION = self.type 'function'
         : setConfig('basicType', true)

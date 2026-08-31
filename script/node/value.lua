@@ -40,6 +40,9 @@ function M:onCanCast(other)
     end
     if other.kind == 'type' then
         ---@cast other Node.Type
+        if self.nodeType.typeName == 'boolean' then
+            return nil
+        end
         return self.nodeType:canCast(other)
     end
     return false

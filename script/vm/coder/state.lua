@@ -49,6 +49,7 @@ local function tryBindCat(coder, var, index)
                     var   = coder:getKey(var),
                     class = coder:getKey(cat),
                 })
+                catState.binded = true
                 return 'rt.type {%q}' % { cat.classID.id }
             end
         elseif cat.kind == 'catstatetype' then
@@ -59,6 +60,7 @@ local function tryBindCat(coder, var, index)
                     var  = coder:getKey(var),
                     type = coder:getKey(cat.exp),
                 })
+                catState.binded = true
                 return coder:getKey(cat.exp)
             end
         elseif cat.kind == 'catstateparam' then
@@ -78,6 +80,7 @@ local function tryBindCat(coder, var, index)
                         var  = coder:getKey(var),
                         type = coder:getKey(cat.value),
                     })
+                    catState.binded = true
                     return coder:getKey(cat.value)
                 end
             end

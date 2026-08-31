@@ -441,6 +441,24 @@ function M:addToCatGroup(cat, nearby)
     map[cat] = group
 end
 
+---@param group LuaParser.Node.Cat[]?
+---@return LuaParser.Node.Cat[]?
+function M:filterConsumed(group)
+    if not group then
+        return nil
+    end
+    local remaining = {}
+    for _, cat in ipairs(group) do
+        if not cat.binded then
+            remaining[#remaining+1] = cat
+        end
+    end
+    if #remaining == 0 then
+        return nil
+    end
+    return remaining
+end
+
 ---@param nearbySource? LuaParser.Node.Base
 ---@return LuaParser.Node.Cat[]?
 function M:getCatGroup(nearbySource)
@@ -450,7 +468,7 @@ function M:getCatGroup(nearbySource)
         if trailingMap then
             local group = trailingMap[nearbySource.startRow]
             if group then
-                return group
+                return self:filterConsumed(group)
             end
         end
     end
@@ -470,7 +488,7 @@ function M:getCatGroup(nearbySource)
             return nil
         end
     end
-    return group
+    return self:filterConsumed(group)
 end
 
 ---@param source { start: integer, finish: integer, key?: { start: integer, finish: integer } }

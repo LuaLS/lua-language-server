@@ -330,7 +330,7 @@ end
 ---@return boolean
 function M:onCanCast(other)
     if other.kind ~= 'list' then
-        return self.value:onCanCast(other)
+        return self.value:canCast(other)
     end
     ---@cast other Node.List
 

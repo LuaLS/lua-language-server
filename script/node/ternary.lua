@@ -57,3 +57,9 @@ end
 M.__getter.typeName = function (self)
     return self.value.typeName, true
 end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    return self.value:canCast(other)
+end

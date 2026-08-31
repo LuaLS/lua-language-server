@@ -79,6 +79,12 @@ M.__getter.hasGeneric = function (self)
     return self.head.hasGeneric or self.key.hasGeneric, true
 end
 
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    return self.value:canCast(other)
+end
+
 ---@param map table<Node.Generic, Node>
 ---@param ctx? Node.ResolveContext
 ---@return Node

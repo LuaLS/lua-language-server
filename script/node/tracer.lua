@@ -191,9 +191,18 @@ function W:traceIf(ifNode)
     -- ifNode: {'if', ifchild1, ifchild2, ...}
     for i = 2, #ifNode do
         lastStack = self:traceIfChild(ifNode[i], lastStack)
-        stacks[#stacks+1] = lastStack
-        if lastStack.changed then
-            ls.util.tableMerge(changed, lastStack.changed)
+        -- 以 return 结尾的分支不可达后续流程，其流不参与合并；
+        -- 但其 otherSide（guard 收窄后的 else 流）需要参与合并
+        if lastStack.terminated then
+            for id in pairs(lastStack.otherSide) do
+                stacks[#stacks+1] = { current = { [id] = lastStack.otherSide[id] } }
+                changed[id] = true
+            end
+        else
+            stacks[#stacks+1] = lastStack
+            if lastStack.changed then
+                ls.util.tableMerge(changed, lastStack.changed)
+            end
         end
     end
 
@@ -220,16 +229,23 @@ function W:traceIfChild(ifchild, lastStack)
         stack.current = lastStack.otherSide
     end
 
-    -- ifchild 是一个数组，第一个元素若为 condition 节点则处理条件
+    -- ifchild 是一个数组，第一个元素若为 return/condition 节点则处理条件
     local bodyStart = 1
     local first = ifchild[1]
+    local terminated
+    if type(first) == 'table' and first[1] == 'return' then
+        terminated = true
+        bodyStart = 2
+        first = ifchild[2]
+    end
     if type(first) == 'table' and first[1] == 'condition' then
         self:traceCondition(first)
-        bodyStart = 2
+        bodyStart = bodyStart + 1
     end
     self:traceBlock(ifchild, bodyStart)
 
     self:popStack()
+    stack.terminated = terminated
     return stack
 end
 
@@ -844,6 +860,11 @@ function W:setNarrowResult(id, result, otherSide)
 end
 
 ---@class Node.Tracer.Stack
+---@field parent? Node.Tracer.Stack
+---@field current table<string, Node>
+---@field otherSide table<string, Node>
+---@field changed? table<string, true>
+---@field terminated? boolean # 分支以 return 结尾，流不参与合并
 local S = Class 'Node.Tracer.Stack'
 
 Presize(S, 3)

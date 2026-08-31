@@ -12,6 +12,7 @@
 ---@field labelMap table<string, LuaParser.Node.Label>
 ---@field genericMap table<string, LuaParser.Node.CatGeneric>
 ---@field delayComments LuaParser.Node.Comment[]
+---@field returns? LuaParser.Node.Return[] # 块尾的 return 语句
 local Block = Class('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.kind = 'block'

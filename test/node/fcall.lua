@@ -48,12 +48,12 @@ do
     --[[
     local y: unknown
     y()
-    --> unknown
+    --> any
     ]]
     local y = rt.variable 'y'
     y:setStaticValue(rt.UNKNOWN)
     local fcall = rt.fcall(y, {})
-    lt.assertEquals(fcall.value:view(), 'unknown')
+    lt.assertEquals(fcall.value:view(), 'any')
 end
 
 do

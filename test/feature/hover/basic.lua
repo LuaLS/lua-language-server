@@ -221,11 +221,11 @@ local function f()
     return ...
 end
 local <?n?> = f()
-]] 'local n: unknown'
+]] 'local n: any'
 
 TEST_HOVER [[
 local <?n?> = table.unpack(t)
-]] 'local n: unknown'
+]] 'local n: any'
 
 TEST_HOVER [[
 function F(a)

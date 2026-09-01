@@ -198,8 +198,8 @@ function M:simplifyMap()
 end
 
 ---@param source LuaParser.Node.Base
-function M:addUnknown(source)
-    self:addLine('{key} = rt.UNKNOWN' % {
+function M:addAny(source)
+    self:addLine('{key} = rt.ANY' % {
         key = self:getKey(source),
     })
 end

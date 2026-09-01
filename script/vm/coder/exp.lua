@@ -246,7 +246,7 @@ ls.vm.registerCoderProvider('paren', function (coder, source)
     ---@cast source LuaParser.Node.Paren
 
     if not source.value then
-        coder:addUnknown(source)
+        coder:addAny(source)
         return
     end
     coder:compile(source.value)
@@ -306,7 +306,7 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
     end
 
     if not source.op or not source.exp1 or not source.exp2 then
-        coder:addUnknown(source)
+        coder:addAny(source)
         return
     end
 
@@ -392,7 +392,7 @@ ls.vm.registerCoderProvider('unary', function (coder, source)
 
     local op = uopMap[source.op]
     if not op or not source.exp then
-        coder:addUnknown(source)
+        coder:addAny(source)
         return
     end
 
@@ -409,7 +409,7 @@ ls.vm.registerCoderProvider('varargs', function (coder, source)
 
     local loc = source.loc
     if not loc then
-        coder:addUnknown(source)
+        coder:addAny(source)
         return
     end
 

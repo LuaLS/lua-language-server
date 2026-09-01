@@ -126,8 +126,8 @@ function M:select(key)
             return self.scope.rt.NIL, false
         end
         local v = self.values[key]
-            or self.values[#self.values]
-            or self.scope.rt.NIL
+               or self.values[#self.values]
+               or self.scope.rt.NIL
         if key > self.min then
             -- 无界单元素 list（vararg 语义）：视所有位置均存在，不加可选 | NIL
             if not self.max and #self.values == 1 then

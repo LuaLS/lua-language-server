@@ -817,9 +817,9 @@ M.__getter.value = function (self)
         self.tracer:trace()
     end
     local result = self:getCurrentValue()
-        or self:getExpectValue()
-        or self:getGuessValue()
-        or rt.ANY
+                or self:getExpectValue()
+                or self:getGuessValue()
+                or rt.ANY
     -- 可选链访问（?. ?: ?[）：结果总是包含 nil
     if self:isOptional() then
         result = result | rt.NIL

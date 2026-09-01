@@ -53,64 +53,6 @@ end
 }
 
 TEST_HOVER [[
---!include setmetatable
-local mt = {}
-mt.__index = mt
-
-function mt:init(a, b, c)
-    return
-end
-
-local obj = setmetatable({}, mt)
-
-obj:<?init?>(1, '测试')
-]] {
-    '(method) obj.init: function',
-    'function mt:init(a: any, b: any, c: any)',
-}
-
-TEST_HOVER [[
---!include setmetatable
-local mt = {}
-mt.__index = mt
-
-function mt:init(a, b, c)
-    return {}
-end
-
-local obj = setmetatable({}, mt)
-
-obj:<?init?>(1, '测试')
-]] {
-    '(method) obj.init: function',
-[[
-function mt:init(a: any, b: any, c: any)
-  -> {}
-]]
-    }
-
-TEST_HOVER [[
---!include setmetatable
-local mt = {}
-mt.__index = mt
-
-function mt:init(a, b, c)
-    return {}
-end
-
-local obj = setmetatable({}, mt)
-
-obj:init(1, '测试')
-obj.<?init?>(obj, 1, '测试')
-]] {
-    '(field) obj.init: function',
-[[
-function mt:init(a: any, b: any, c: any)
-  -> {}
-]]
-    }
-
-TEST_HOVER [[
 function obj.xxx()
 end
 
@@ -1736,53 +1678,45 @@ local <?m?> = math.max(1.5, 2)
 ]] 'local m: 1.5'
 
 TEST_HOVER [[
----@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
----@overload fun(f: async fun(), ...any):false, string
-local function pcall_(f, arg1, ...) end
+--!include pcall
 
 local function f()
     return 1, 'a'
 end
-local ok, a, b = pcall_(f)
+local ok, a, b = pcall(f)
 print(ok<??>)
-]] 'local ok: true'
+]] 'local ok: boolean'
 
 TEST_HOVER [[
----@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
----@overload fun(f: async fun(), ...any):false, string
-local function pcall_(f, arg1, ...) end
+--!include pcall
 
 local function f()
     return 1, 'a'
 end
-local ok, a, b = pcall_(f)
+local ok, a, b = pcall(f)
 print(a<??>)
-]] 'local a: 1'
+]] 'local a: 1 | string'
 
 TEST_HOVER [[
----@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
----@overload fun(f: async fun(), ...any):false, string
-local function pcall_(f, arg1, ...) end
+--!include pcall
 
 local function f()
     return 1, 'a'
 end
-local ok, a, b = pcall_(f)
+local ok, a, b = pcall(f)
 print(b<??>)
-]] 'local b: \'a\''
+]] 'local b: \'a\' | nil'
 
 TEST_HOVER [[
----@overload fun<R: any[]>(f: async fun(...):(...R), msgh: function, ...any):true, ...R
----@overload fun(f: async fun(), msgh: function, ...any):false, string
-local function xpcall_(f, msgh, ...) end
+--!include pcall
 
 local function f()
     return 1, 'a'
 end
 local function msgh(err) end
-local ok, a, b = xpcall_(f, msgh)
+local ok, a, b = xpcall(f, msgh)
 print(a<??>)
-]] 'local a: 1'
+]] 'local a: 1 | string'
 
 TEST_HOVER [[
 --!include tonumber
@@ -2419,3 +2353,61 @@ local self: {
     __index: { ... },
     __name: 'obj',
 }]]
+
+TEST_HOVER [[
+--!include setmetatable
+local mt = {}
+mt.__index = mt
+
+function mt:init(a, b, c)
+    return
+end
+
+local obj = setmetatable({}, mt)
+
+obj:<?init?>(1, '测试')
+]] {
+    '(method) obj.init: function',
+    'function mt:init(a: any, b: any, c: any)',
+}
+
+TEST_HOVER [[
+--!include setmetatable
+local mt = {}
+mt.__index = mt
+
+function mt:init(a, b, c)
+    return {}
+end
+
+local obj = setmetatable({}, mt)
+
+obj:<?init?>(1, '测试')
+]] {
+    '(method) obj.init: function',
+[[
+function mt:init(a: any, b: any, c: any)
+  -> {}
+]]
+    }
+
+TEST_HOVER [[
+--!include setmetatable
+local mt = {}
+mt.__index = mt
+
+function mt:init(a, b, c)
+    return {}
+end
+
+local obj = setmetatable({}, mt)
+
+obj:init(1, '测试')
+obj.<?init?>(obj, 1, '测试')
+]] {
+    '(field) obj.init: function',
+[[
+function mt:init(a: any, b: any, c: any)
+  -> {}
+]]
+    }

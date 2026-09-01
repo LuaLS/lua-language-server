@@ -349,17 +349,10 @@ M.variableTable = nil
 ---@return true
 M.__getter.variableTable = function (self)
     local variableTables = {}
-    local seenVariables = {}
-    local function markSeen(variable)
-        seenVariables[variable] = true
-        if variable.masterVariable then
-            seenVariables[variable.masterVariable] = true
-        end
-    end
+
     for _, class in ipairs(self.protoClasses) do
         if class.variables then
             for _, variable in ipairs(class.variables) do
-                markSeen(variable)
                 variable:addRef(self)
                 if variable.fields then
                     variableTables[#variableTables+1] = variable.fields
@@ -367,19 +360,7 @@ M.__getter.variableTable = function (self)
             end
         end
     end
-    local rt = self.scope.rt
-    if rt.VAR_G and rt.VAR_G.childs then
-        local globalVar = rt.VAR_G.childs[rt.luaKey(self.typeName)]
-        if globalVar and globalVar.childs then
-            local t = rt.table()
-            for k, child in pairs(globalVar.childs) do
-                if not (seenVariables[child] or seenVariables[child.masterVariable]) then
-                    t:addField(rt.field(k, child))
-                end
-            end
-            variableTables[#variableTables+1] = t
-        end
-    end
+
     local table = self.scope.rt.mergeTables(variableTables)
     return table, true
 end

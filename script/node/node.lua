@@ -521,12 +521,7 @@ function M:onView(viewer, options)
         error('Cannot view node of kind ' .. self.kind)
     end
     -- 虚拟/包装节点转发显示 value，不计入深度
-    local opts = { skipDeep = true }
-    if options then
-        for k, v in pairs(options) do
-            opts[k] = v
-        end
-    end
+    local opts = ls.util.tableMerge({ skipDeep = true }, options)
     return viewer:view(self.value, opts)
 end
 

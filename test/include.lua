@@ -11,13 +11,10 @@ function setmetatable(t, mt) end
 ]]
 
 test.includeCodes['select'] = [[
----@overload fun(index: "#"):integer
+---@overload fun(index: "#", ...):integer
 ---@overload fun<T: any[]>(index: integer, ...T):...T
----@param index integer|"#"
----@param ...   any
----@return any
 ---@nodiscard
-function select(index, ...) end
+function select(...) end
 ]]
 
 test.includeCodes['tableremove'] = [[
@@ -61,27 +58,14 @@ function math.max(x, ...) end
 function math.min(x, ...) end
 ]]
 
-test.includeCodes['pcallx'] = [[
----@overload fun<R: any[]>(f: async fun(...):...R, ...any):true, ...R
+test.includeCodes['pcall'] = [[
+---@overload fun<R: any[]>(f: async fun(...):(...R), ...any):true, ...R
 ---@overload fun(f: async fun(), ...any):false, string
----@param f     async fun(...):...
----@param arg1? any
----@param ...   any
----@return boolean success
----@return any result
----@return any ...
-function pcall(f, arg1, ...) end
+function pcall(...) end
 
----@overload fun<R: any[]>(f: async fun(...):...R, msgh: function, ...any):true, ...R
+---@overload fun<R: any[]>(f: async fun(...):(...R), msgh: function, ...any):true, ...R
 ---@overload fun(f: async fun(), msgh: function, ...any):false, string
----@param f     async fun(...):...
----@param msgh  function
----@param arg1? any
----@param ...   any
----@return boolean success
----@return any result
----@return any ...
-function xpcall(f, msgh, arg1, ...) end
+function xpcall(...) end
 ]]
 
 test.includeCodes['tonumber'] = [[

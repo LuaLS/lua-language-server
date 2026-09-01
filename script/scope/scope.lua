@@ -1,10 +1,11 @@
 local time = require 'bee.time'
 require 'file'
 
----@class Scope: Node.RefModule
+---@class Scope: Node.RefModule, GCHost
 local M = Class 'Scope'
 
 Extends('Scope', 'Node.RefModule')
+Extends('Scope', 'GCHost')
 
 M.ready = false
 
@@ -39,6 +40,7 @@ function M:__init(name, uri, fs)
     self.wordIndex = New 'Scope.WordIndex' (self)
 
     self.vm = ls.vm.create(self)
+    self.diagnostic = self:bindGC(New 'Feature.Diagnostic.Scope' (self))
 end
 
 function M:__del()
@@ -61,7 +63,6 @@ function M:reload(options)
 
         local startTime = time.monotonic()
         local prog <close> = ls.progress.create(self.uri, ('正在加载工作区: %s'):format(self.name), 0.5)
-        local scanFinished = 0
         local result = self:load(options, function (event, status, uri)
             if event == 'start' then
                 log.info('[Scope] Start loading: {}' % { self.name })
@@ -73,7 +74,7 @@ function M:reload(options)
             end
             if event == 'found' then
                 log.info('[Scope]({}) Found {} files in {%.3f} seconds.' % { self.name, status.found, (time.monotonic() - startTime) / 1000 })
-                scanFinished = scanFinished + 1
+                prog:setMessage(('%d/%d'):format(status.indexed, status.found))
                 return
             end
             if event == 'loading' then
@@ -86,18 +87,16 @@ function M:reload(options)
             end
             if event == 'indexing' then
                 log.debug('[Scope]({}) Indexing file({}/{}): {}' % { self.name, status.indexed, status.loaded, uri })
-                if scanFinished >= #self.roots and status.found > 0 then
-                    prog:setMessage(('%d/%d'):format(status.indexed, status.found))
-                    prog:setPercentage(status.indexed / status.found * 100)
-                end
                 return
             end
             if event == 'indexed' then
                 log.info('[Scope]({}) Indexed {} files in {%.3f} seconds.' % { self.name, status.indexed, (time.monotonic() - startTime) / 1000 })
+                prog:setMessage(('%d/%d'):format(status.indexed, status.found))
                 return
             end
             if event == 'finish' then
                 log.info('[Scope] Finished loading: {} in {%.3f} seconds.' % { self.name, (time.monotonic() - startTime) / 1000 })
+                prog:remove()
                 return
             end
         end)
@@ -265,25 +264,6 @@ function ls.scope.findVfile(uri)
         return nil
     end
     return scope.vm:getFile(uri)
-end
-
----@async
----@param uri Uri
-function ls.scope.waitIndexing(uri)
-    local scope = ls.scope.find(uri)
-    if not scope then
-        return
-    end
-    if #scope.vm.indexingFiles == 0 then
-        return
-    end
-    ls.await.yield(function (resume)
-        scope.vm.onDidIndex:on(function ()
-            if #scope.vm.indexingFiles == 0 then
-                resume()
-            end
-        end)
-    end)
 end
 
 ---@async

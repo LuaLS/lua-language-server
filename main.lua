@@ -32,7 +32,6 @@ ls.scope.watchFiles()
 
 local languageServer = require 'language-server'
 ls.server = languageServer.create()
-require 'feature.diagnostic.push'.watchFiles()
 ls.server:start()
 
-ls.eventLoop.start()
+ls.eventLoop.start(nil, log.error)

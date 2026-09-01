@@ -1,6 +1,5 @@
 local define  = require 'feature.diagnostic.define'
 local disable = require 'feature.diagnostic.disable'
-local merge   = require 'feature.diagnostic.merge'
 
 ---@class Feature.Diagnostic.Related
 ---@field uri Uri
@@ -26,10 +25,12 @@ local merge   = require 'feature.diagnostic.merge'
 ---@field errors table[]
 ---@field vfile VM.Vfile?
 
----@type (async fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[])[]
+---@alias Feature.Diagnostic.Provider async fun(param: Feature.Diagnostic.Param, callback: fun(diag: Feature.Diagnostic))
+
+---@type Feature.Diagnostic.Provider[]
 local providers = {}
 
----@param callback async fun(param: Feature.Diagnostic.Param): Feature.Diagnostic[]
+---@param callback async Feature.Diagnostic.Provider
 function ls.feature.provider.diagnostic(callback)
     providers[#providers+1] = callback
 end
@@ -53,8 +54,9 @@ end
 
 ---@async
 ---@param uri Uri
+---@param partialPush? fun(item: Feature.Diagnostic)
 ---@return Feature.Diagnostic[]
-ls.feature.diagnostic = function (uri)
+function ls.feature.diagnostic(uri, partialPush)
     local document, scope = ls.scope.findDocument(uri)
     if not document or not scope then
         return {}
@@ -69,7 +71,7 @@ ls.feature.diagnostic = function (uri)
     end
 
     local vfile = scope.vm:getFile(uri)
-    local syntaxErrors = vfile and vfile.coder and vfile.coder.errors or {}
+    local syntaxErrors = vfile?.coder?.errors or {}
 
     local ast = document.ast
     if not ast then
@@ -102,23 +104,39 @@ ls.feature.diagnostic = function (uri)
 
     local results = {}
     for _, provider in ipairs(providers) do
-        for _, diag in ipairs(provider(param)) do
+        provider(param, function (diag)
             local isSyntax = diag.data == 'syntax'
             if isDisabled(diag, isSyntax) then
-                goto continue
+                return
             end
             if not isSyntax then
                 if not acceptSemantic(scope, uri, diag, opened) then
-                    goto continue
+                    return
                 end
             end
             results[#results+1] = diag
-            ::continue::
-        end
+            partialPush?(diag)
+        end)
     end
 
-    return merge.merge(results)
+    return results
 end
+
+ls.file.onDidChange:on(function (uri)
+    local scope = ls.scope.find(uri)
+    if scope?.ready then
+        ---@cast scope -?
+        ls.scope.findVfile(uri)?.diagnostic:refresh()
+        scope.diagnostic:refreshAfter(1)
+    end
+end)
+ls.scope.onDidLoad:on(function (scope)
+    scope.diagnostic:refreshNow()
+end)
+
+
+require 'feature.diagnostic.file'
+require 'feature.diagnostic.scope'
 
 require 'feature.diagnostic.providers.syntax'
 require 'feature.diagnostic.providers.empty-block'
@@ -164,5 +182,3 @@ require 'feature.diagnostic.providers.return-type-mismatch'
 require 'feature.diagnostic.providers.missing-return-value'
 require 'feature.diagnostic.providers.redundant-return-value'
 require 'feature.diagnostic.providers.global-in-nil-env'
-require 'feature.diagnostic.file'
-require 'feature.diagnostic.scope'

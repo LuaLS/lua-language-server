@@ -13,7 +13,7 @@ local providers = ls.feature.helper.providers()
 ---@param offset integer
 ---@return Location[]
 function ls.feature.definition(uri, offset)
-    ls.scope.waitIndexing(uri)
+    ls.scope.waitReady(uri)
     local sources, scope = ls.scope.findSources(uri, offset)
     if not sources or #sources == 0 or not scope then
         return {}

@@ -1,5 +1,3 @@
-local merge = require 'feature.diagnostic.merge'
-
 local messages = {
     UNKNOWN_SYMBOL         = 'Unexpected symbol `{code}`.',
     ERR_EQ_AS_ASSIGN       = 'Should use `==` for equal.',
@@ -137,7 +135,7 @@ local function syntaxProvider(param)
             related = buildRelated(err, uri, text),
         }
     end
-    return merge.merge(results)
+    return results
 end
 
 ls.feature.provider.diagnostic(syntaxProvider)

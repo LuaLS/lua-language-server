@@ -15,7 +15,7 @@ local providers = ls.feature.helper.providers()
 ---@param includeDeclaration boolean?
 ---@return Location[]
 function ls.feature.references(uri, offset, includeDeclaration)
-    ls.scope.waitIndexing(uri)
+    ls.scope.waitReady(uri)
     local sources, scope = ls.scope.findSources(uri, offset)
     if not sources or #sources == 0 or not scope then
         return {}

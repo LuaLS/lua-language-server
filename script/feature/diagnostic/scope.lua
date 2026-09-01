@@ -1,5 +1,3 @@
-local File = require 'feature.diagnostic.file'
-
 ---@class Feature.Diagnostic.Scope: Class.Base
 ---@field scope Scope
 local M = Class 'Feature.Diagnostic.Scope'
@@ -14,54 +12,50 @@ function M:__init(scope)
     self.scope = scope
 end
 
----@async
----@return table<Uri, Feature.Diagnostic[]>
-function M:fetchAll()
-    return ls.await.yield(function (resume)
-        local scope = self.scope
-        if self.task then
-            self.task:reject(ls.task.REJECT_CANCELED)
-        end
-        self.task = ls.task.create({ scope = scope }, function (result, err)
-            resume(result or {})
-        end)
-        ---@async
-        : execute(function (task)
-            ls.scope.waitReady(scope.uri)
-            local prog <close> = ls.progress.create(scope.uri, ('正在诊断工作区: %s'):format(scope.name), 1)
-            prog:onCancel(function ()
-                task:reject(ls.task.REJECT_CANCELED)
-            end)
-            local results = {}
-            local vfiles = {}
-            for uri, vfile in pairs(scope.vm.vfiles) do
-                vfiles[#vfiles+1] = { uri = uri, vfile = vfile }
-            end
-            local total = #vfiles
-            local done = 0
-            for _, item in ipairs(vfiles) do
-                done = done + 1
-                prog:setMessage(('%d/%d'):format(done, total))
-                prog:setPercentage(done / total * 100)
-                local file = File.get(item.vfile)
-                file:refresh()
-                local merged = file:merge()
-                if #merged > 0 then
-                    results[item.uri] = merged
-                end
-            end
-            task:resolve(results)
-        end)
+---@package
+---@type Timer?
+M.refreshTimer = nil
+
+---@param sec number
+function M:refreshAfter(sec)
+    self.refreshTimer?:remove()
+    self.refreshTimer = ls.timer.wait(sec, function ()
+        self:refreshNow()
     end)
 end
 
----@param scope Scope
----@return Feature.Diagnostic.Scope
-function M.get(scope)
-    if not scope.diagnostic then
-        scope.diagnostic = New 'Feature.Diagnostic.Scope' (scope)
-    end
-    return scope.diagnostic
-end
+---@return Task
+function M:refreshNow()
+    self.refreshTimer?:remove()
+    self.task?.reject(ls.task.REJECT_CANCELED)
 
-return M
+    local scope = self.scope
+    self.task = ls.task.create()
+        ---@async
+        : execute(function (task)
+            ls.scope.waitReady(scope.uri)
+            local prog <close> = ls.progress.create(scope.uri, ('正在诊断工作区: %s'):format(scope.name), 0.1)
+            prog:onCancel(function ()
+                task:reject(ls.task.REJECT_CANCELED)
+            end)
+
+            local vfiles = scope.vm.vfiles
+            local total = #vfiles
+            prog:setMessage('%d/%d' % { 0, total })
+
+            ---@type table<Uri, Feature.Diagnostic[]>
+            local results = {}
+
+            for i, vfile in ipairs(vfiles) do
+                results[vfile.uri] = vfile.diagnostic:refresh():await()
+
+                prog:setMessage(('%d/%d'):format(i, total))
+                prog:setPercentage(i / total * 100)
+                task:delay()
+            end
+
+            task:resolve(results)
+        end)
+
+    return self.task
+end

@@ -1,9 +1,4 @@
 local converter = require 'feature.diagnostic.converter'
-local merge     = require 'feature.diagnostic.merge'
-
----@class Feature.Diagnostic.Contribution
----@field items Feature.Diagnostic[]
----@field disposed boolean
 
 ---@class Feature.Diagnostic.File: Class.Base
 ---@field vfile VM.Vfile
@@ -11,14 +6,10 @@ local M = Class 'Feature.Diagnostic.File'
 
 ---@type VM.Vfile
 M.vfile = nil
----@type Feature.Diagnostic.Contribution[]
+---@type Feature.Diagnostic[]
 M.contributions = nil
 ---@type Feature.Diagnostic[]?
-M.results = nil
----@type Task?
-M.pushTask = nil
----@type fun()?
-M.fileDispose = nil
+M.lastResults = nil
 ---@type integer
 M.version = -1
 
@@ -30,72 +21,103 @@ function M:__init(vfile)
     self.contributions = {}
 end
 
----@param items Feature.Diagnostic[]
----@return fun()
-function M:contribute(items)
-    local contribution = { items = items }
-    self.contributions[#self.contributions+1] = contribution
-    self:schedulePush()
-    return function ()
-        if contribution.disposed then
-            return
-        end
-        contribution.disposed = true
-        ls.util.arrayRemove(self.contributions, contribution, true)
-        self:schedulePush()
-    end
+function M:__del()
+    self:stop()
+    self.contributions = {}
+    self:pushNow()
 end
 
----@async
-function M:refresh()
-    local vfile = self.vfile
-    ls.scope.waitReady(vfile.uri)
-    vfile:awaitIndex()
-    if self.fileDispose and self.version == vfile.version then
-        return
-    end
-    if self.fileDispose then
-        self.fileDispose()
-        self.fileDispose = nil
-    end
-    self.version = vfile.version
-    local results = ls.feature.diagnostic(vfile.uri)
-    self.fileDispose = self:contribute(results)
+function M:stop()
+    self.pushTimer?:remove()
+    self.pushTimer = nil
 end
+
+---@param item Feature.Diagnostic
+function M:contribute(item)
+    self.contributions[#self.contributions+1] = item
+    self:schedulePush()
+end
+
+---@param callback? fun(results: Feature.Diagnostic[])
+---@return Task
+function M:refresh(callback)
+    self.refreshTask?.reject(ls.task.REJECT_CANCELED)
+    self.refreshTask = ls.task.create({}, function (result, err)
+        self:pushNow()
+        if callback then
+            callback(result)
+        end
+    end)
+        ---@async
+        : execute(function (task)
+            ls.await.sleep(DELAY)
+            local vfile = self.vfile
+            ls.scope.waitReady(vfile.uri)
+            if self.version == vfile.version then
+                return
+            end
+            self:stop()
+            self.contributions = {}
+            self.version = vfile.version
+            local results = ls.feature.diagnostic(vfile.uri, function (item)
+                self:contribute(item)
+            end)
+
+            task:resolve(results)
+        end)
+
+    return self.refreshTask
+end
+
+---@package
+M.pushTimer = nil
 
 function M:schedulePush()
-    if self.pushTask then
-        self.pushTask:reject(ls.task.REJECT_CANCELED)
-    end
-    self.pushTask = ls.task.create(nil, function (result, err)
-        if result then
-            self:push()
-        end
-    end)
-    ---@async
-    : execute(function (task)
-        ls.await.sleep(DELAY)
-        task:resolve(true)
-    end)
-end
-
----@return Feature.Diagnostic[]
-function M:merge()
-    local results = {}
-    for _, contribution in ipairs(self.contributions) do
-        for _, item in ipairs(contribution.items) do
-            results[#results+1] = item
-        end
-    end
-    return merge.merge(results)
-end
-
-function M:push()
-    local results = self:merge()
-    if ls.util.equal(self.results, results) then
+    if self.pushTimer then
         return
     end
-    self.results = results
+    self.pushTimer = ls.timer.wait(DELAY, function ()
+        self.pushTimer = nil
+        self:pushNow()
+    end)
+end
+
+---@param results Feature.Diagnostic[]
+---@return Feature.Diagnostic[]
+local function organize(results)
+    table.sort(results, function (a, b)
+        if a.start == b.start then
+            return a.finish < b.finish
+        end
+        return a.start < b.start
+    end)
+
+    local deduped = {}
+    local i = 1
+    while i <= #results do
+        local best = results[i]
+        local j = i + 1
+        while j <= #results
+        and results[j].start == best.start
+        and results[j].finish == best.finish do
+            if results[j].level < best.level then
+                best = results[j]
+            end
+            j = j + 1
+        end
+        deduped[#deduped+1] = best
+        i = j
+    end
+    return deduped
+end
+
+function M:pushNow()
+    self.pushTimer?:remove()
+    local results = organize(self.contributions)
+    if ls.util.equal(self.lastResults, results) then
+        return
+    end
+    self.lastResults = results
 
     local server = ls.server
     if not server then
@@ -112,32 +134,6 @@ function M:push()
     })
 end
 
-function M:dispose()
-    self.contributions = {}
-    self.fileDispose = nil
-    self.results = nil
-    self.version = -1
-    if self.pushTask then
-        self.pushTask:reject(ls.task.REJECT_CANCELED)
-        self.pushTask = nil
-    end
-
-    local server = ls.server
-    if server then
-        server.client:notify('textDocument/publishDiagnostics', {
-            uri         = self.vfile.uri,
-            diagnostics = {},
-        })
-    end
+function M:remove()
+    Delete(self)
 end
-
----@param vfile VM.Vfile
----@return Feature.Diagnostic.File
-function M.get(vfile)
-    if not vfile.diagnostic then
-        vfile.diagnostic = New 'Feature.Diagnostic.File' (vfile)
-    end
-    return vfile.diagnostic
-end
-
-return M

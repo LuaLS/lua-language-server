@@ -68,7 +68,7 @@ require 'async.worker-init' (options)
         debugger = debugger(useDebugger),
     })
 
-    ls.eventLoop.addTask(function ()
+    ls.eventLoop.addHighTask(function ()
         if not next(self.requestMap) then
             return
         end

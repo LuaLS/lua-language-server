@@ -11,6 +11,7 @@ function M:__init(context, callback)
     self.context = context or {}
     self.callback = callback or function () end
     self.threads = {}
+    self.awaitings = {}
 end
 
 function M:__del()
@@ -34,8 +35,10 @@ function M:resolve(result)
         return
     end
     self.resolved = true
+    self.result = result
 
     self.callback(result, nil)
+    self:resolveAwaitings()
 
     Delete(self)
 end
@@ -46,10 +49,19 @@ function M:reject(err)
         return
     end
     self.resolved = true
+    self.err = err
 
     self.callback(nil, err)
+    self:resolveAwaitings()
 
     Delete(self)
+end
+
+---@private
+function M:resolveAwaitings()
+    for _, resume in ipairs(self.awaitings) do
+        resume(self.result, self.err)
+    end
 end
 
 ---@type table<thread, Task>
@@ -79,6 +91,16 @@ end
 ---@async
 function M:delay()
     yieldDelay()
+end
+
+---@async
+function M:await()
+    if self.resolved then
+        return self.result, self.err
+    end
+    return ls.await.yield(function (resume)
+        self.awaitings[#self.awaitings+1] = resume
+    end)
 end
 
 ls.task = {}

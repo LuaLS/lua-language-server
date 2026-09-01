@@ -20,7 +20,7 @@ require 'feature.text-scanner'
 ---@param offset integer  # 字节偏移量（0-based）
 ---@return CompletionItem[]
 ls.feature.completion = function (uri, offset)
-    ls.scope.waitIndexing(uri)
+    ls.scope.waitReady(uri)
     if not offset then
         return {}
     end

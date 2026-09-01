@@ -16,9 +16,6 @@ M.nextVersion = -1
 --- 当前使用的 Document
 ---@type Document?
 M.document = nil
---- 诊断状态（懒创建，由 feature.diagnostic.file 挂载）
----@type Feature.Diagnostic.File?
-M.diagnostic = nil
 
 M.traceMap = ls.util.weakKTable()
 
@@ -29,6 +26,8 @@ function M:__init(scope, uri)
     self.uri = uri
     self.onDidIndex = ls.sevent.create()
     M.traceMap[self] = true
+
+    self.diagnostic = self:bindGC(New 'Feature.Diagnostic.File' (self))
 end
 
 function M:__close()

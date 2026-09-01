@@ -3,8 +3,8 @@ local ScopeDiagnostics = require 'feature.diagnostic.scope'
 local converter = require 'feature.diagnostic.converter'
 
 ls.capability.registerCapability.diagnosticProvider = {
-    interFileDependencies = false,
-    workspaceDiagnostics  = true,
+    interFileDependencies = true,
+    workspaceDiagnostics  = false,
 }
 
 ---@async
@@ -36,7 +36,8 @@ ls.capability.register('workspace/diagnostic', function (server, params, task)
 
     local items = {}
     for _, scope in ipairs(ls.scope.all) do
-        local results = ScopeDiagnostics.get(scope):fetchAll()
+        ---@type table<Uri, Feature.Diagnostic[]>
+        local results = scope.diagnostic:refreshNow():await()
         for uri, diagnostics in pairs(results) do
             local document = scope:getDocument(uri)
             if document then

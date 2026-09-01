@@ -61,7 +61,7 @@ ls.await.setSleepWaker(function (time, callback)
         ls.timer.wait(time, callback)
     end
 end)
-ls.eventLoop.addTask(ls.timer.update)
+ls.eventLoop.addHighTask(ls.timer.update)
 
 local inspect = require 'tools.inspect'
 

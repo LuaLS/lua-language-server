@@ -59,6 +59,13 @@ ls.eventLoop.addTask(function ()
     end
 end)
 
+ls.eventLoop.addTask(function ()
+    local err = thread.errlog()
+    if err then
+        log.error(err)
+    end
+end)
+
 log.info('Lua Lsp startup!')
 log.info('LUALS:', ls.env.ROOT_URI)
 log.info('LOGPATH:', ls.env.LOG_URI)

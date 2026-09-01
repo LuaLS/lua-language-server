@@ -4,21 +4,30 @@ local time   = require 'bee.time'
 ---@class EventLoop
 local M = {}
 
+---@package
 M.tasks = {}
+---@package
+M.highTasks = {}
+---@package
 M.started = false
+---@package
 M.busyTime = 0
 
 ---@param sleeper? fun(seconds: number)
-function M.start(sleeper)
+---@param errorHandler? fun(err: string)
+function M.start(sleeper, errorHandler)
     if not sleeper then
         sleeper = function (seconds)
             thread.sleep(math.floor(seconds * 1000))
         end
     end
+    if not errorHandler then
+        errorHandler = print
+    end
     M.started = true
     while M.started do
-        M.runTask()
-        local busy = M.runDelayQueue(100)
+        M.runTask(errorHandler)
+        local busy = M.runDelayQueue(100, errorHandler)
         if busy then
             M.markBusy()
         end
@@ -39,20 +48,20 @@ function M.stop()
 end
 
 ---@private
-function M.runTask()
-    for i = 1, #M.tasks do
-        xpcall(M.tasks[i], log.error)
+function M.runTask(errorHandler)
+    for i = 1, #M.highTasks do
+        xpcall(M.highTasks[i], errorHandler)
     end
-    local err = thread.errlog()
-    if err then
-        log.error(err)
+    for i = 1, #M.tasks do
+        xpcall(M.tasks[i], errorHandler)
     end
 end
 
 ---@private
 ---@param max integer
+---@param errorHandler fun(err: any)
 ---@return boolean # 是否还有剩余任务
-function M.runDelayQueue(max)
+function M.runDelayQueue(max, errorHandler)
     local queue = M.delayQueue
     if not queue then
         return false
@@ -61,7 +70,10 @@ function M.runDelayQueue(max)
         if not queue[i] then
             break
         end
-        xpcall(queue[i], log.error)
+        xpcall(queue[i], errorHandler)
+        for j = 1, #M.highTasks do
+            xpcall(M.highTasks[j], errorHandler)
+        end
     end
     if not queue[max + 1] then
         M.delayQueue = nil
@@ -75,6 +87,11 @@ end
 ---@param callback fun()
 function M.addTask(callback)
     M.tasks[#M.tasks+1] = callback
+end
+
+---@param callback fun()
+function M.addHighTask(callback)
+    M.highTasks[#M.highTasks+1] = callback
 end
 
 function M.addDelayQueue(callback)

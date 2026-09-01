@@ -33,14 +33,20 @@ local function needCheckNilProvider(param)
         if not var.loc or var.value then
             goto continueVar
         end
-        -- 仅检查「被调用」场景（x(...) 的 x 可能 nil，调用必然崩溃）。
-        -- 链式访问中间环节（x.y.z 的 x / x.y）与索引 key（t[x] 的 x）默认不检查：
-        -- Lua 没有非空断言，用户难以通过注解消除这类 nil
         local checkNil = false
         local parent = var.parent
-        if parent and parent.kind == 'call' then
+        if not parent then
+            goto continueVar
+        end
+        if parent.kind == 'call' then
             ---@cast parent LuaParser.Node.Call
             if parent.node == var then
+                checkNil = true
+            end
+        end
+        if parent.kind == 'field' then
+            ---@cast parent LuaParser.Node.Field
+            if parent.last == var then
                 checkNil = true
             end
         end

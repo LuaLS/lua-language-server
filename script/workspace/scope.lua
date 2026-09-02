@@ -3,7 +3,7 @@ local gc = require 'gc'
 ---@class scope.manager
 local m = {}
 
----@alias scope.type '"override"'|'"folder"'|'"fallback"'
+---@alias scope.type 'override'|'folder'|'fallback'
 
 ---@class scope
 ---@field type   scope.type

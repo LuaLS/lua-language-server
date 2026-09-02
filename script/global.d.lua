@@ -11,7 +11,7 @@ DBGPORT = 0
 DBGWAIT = false
 
 ---displayed language, use command line: --locale="en-us"
----@type '"en-us"'|'"zh-cn"'|'"pt-br"'
+---@type 'en-us'|'zh-cn'|'pt-br'
 LOCALE = 'en-us'
 
 ---path of local config file, use command line: --configpath="config.lua"
@@ -60,7 +60,7 @@ DOC_OUT_PATH = ''
 ---@type string
 DOC_UPDATE = ''
 
----@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
+---@type string | 'Error' | 'Warning' | 'Information' | 'Hint'
 CHECKLEVEL = 'Warning'
 
 --Where to write the check results (JSON).

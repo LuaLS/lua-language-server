@@ -95,7 +95,7 @@ local function packMessage(...)
     return table.concat(strs, '\t')
 end
 
----@alias message.type '"Error"'|'"Warning"'|'"Info"'|'"Log"'
+---@alias message.type 'Error'|'Warning'|'Info'|'Log'
 
 ---show message to client
 ---@param type message.type
@@ -203,7 +203,7 @@ end
 ---@field key       string
 ---@field prop?     string
 ---@field value     any
----@field action    '"add"'|'"set"'|'"prop"'
+---@field action    'add'|'set'|'prop'
 ---@field global?   boolean
 ---@field uri?      uri
 

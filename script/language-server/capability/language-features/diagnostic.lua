@@ -1,11 +1,4 @@
-local File     = require 'feature.diagnostic.file'
-local ScopeDiagnostics = require 'feature.diagnostic.scope'
 local converter = require 'feature.diagnostic.converter'
-
-ls.capability.registerCapability.diagnosticProvider = {
-    interFileDependencies = true,
-    workspaceDiagnostics  = false,
-}
 
 ---@async
 ls.capability.register('textDocument/diagnostic', function (_, params, task)
@@ -22,7 +15,7 @@ ls.capability.register('textDocument/diagnostic', function (_, params, task)
     end
     local vfile = scope.vm:getFile(uri)
                or scope.vm:createFile(uri)
-    File.get(vfile):refresh()
+    vfile.diagnostic:refresh()
 
     task:resolve {
         kind     = ls.spec.DocumentDiagnosticReportKind.Unchanged,

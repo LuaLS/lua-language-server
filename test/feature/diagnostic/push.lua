@@ -24,11 +24,17 @@ break
 ]], function ()
     local vfile = test.scope.vm:getFile(test.fileUri)
     assert(vfile)
-    vfile.diagnostic = nil
+
+    -- 等待后台事件触发的刷新完成，避免污染 mock 窗口
+    ---@diagnostic disable-next-line: await-in-sync
+    ls.await.sleep(0.5)
+
+    local file = vfile.diagnostic
+    file.calculated = false
 
     local notifications = withMockServer(function ()
         ---@diagnostic disable-next-line: await-in-sync
-        File.get(vfile):refresh()
+        file:refresh()
         ---@diagnostic disable-next-line: await-in-sync
         ls.await.sleep(0.5)
     end)
@@ -47,10 +53,9 @@ print(x)
 ]], function ()
     local vfile = test.scope.vm:getFile(test.fileUri)
     assert(vfile)
-    vfile.diagnostic = nil
 
     local notifications = withMockServer(function ()
-        File.get(vfile):dispose()
+        vfile.diagnostic:remove()
     end)
 
     assert(#notifications == 1, 'expected 1 notification, actual ' .. #notifications)
@@ -66,27 +71,20 @@ print(x)
 ]], function ()
     local vfile = test.scope.vm:getFile(test.fileUri)
     assert(vfile)
-    vfile.diagnostic = nil
+    vfile.diagnostic = New 'Feature.Diagnostic.File' (vfile)
+
+    -- 等待后台事件触发的刷新完成，避免污染 mock 窗口
+    ---@diagnostic disable-next-line: await-in-sync
+    ls.await.sleep(0.5)
 
     local notifications = withMockServer(function ()
-        local file = File.get(vfile)
-        ---@diagnostic disable-next-line: missing-fields
-        local disposeOld = file:contribute({ {
-            code    = 'old',
-            level   = 1,
-            start   = 0,
-            finish  = 1,
-            message = 'old',
-        } })
-        disposeOld()
-        ---@diagnostic disable-next-line: missing-fields
-        file:contribute({ {
+        vfile.diagnostic:contribute {
             code    = 'new',
             level   = 1,
             start   = 0,
             finish  = 1,
             message = 'new',
-        } })
+        }
         ---@diagnostic disable-next-line: await-in-sync
         ls.await.sleep(0.2)
     end)

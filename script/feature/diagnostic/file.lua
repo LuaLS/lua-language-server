@@ -2,6 +2,12 @@ local converter = require 'feature.diagnostic.converter'
 
 ---@class Feature.Diagnostic.File: Class.Base
 ---@field vfile VM.Vfile
+---@field contributions Feature.Diagnostic[]
+---@field lastResults Feature.Diagnostic[]?
+---@field version integer
+---@field calculated boolean
+---@field refreshTask Task?
+---@field pushTimer Timer?
 local M = Class 'Feature.Diagnostic.File'
 
 ---@type VM.Vfile
@@ -12,6 +18,8 @@ M.contributions = nil
 M.lastResults = nil
 ---@type integer
 M.version = -1
+---@type boolean
+M.calculated = false
 
 local DELAY = 0.1
 
@@ -22,6 +30,7 @@ function M:__init(vfile)
 end
 
 function M:__del()
+    self.refreshTask?:reject(ls.task.REJECT_CANCELED)
     self:stop()
     self.contributions = {}
     self:pushNow()
@@ -41,7 +50,7 @@ end
 ---@param callback? fun(results: Feature.Diagnostic[])
 ---@return Task
 function M:refresh(callback)
-    self.refreshTask?.reject(ls.task.REJECT_CANCELED)
+    self.refreshTask?:reject(ls.task.REJECT_CANCELED)
     self.refreshTask = ls.task.create({}, function (result, err)
         self:pushNow()
         if callback then
@@ -53,11 +62,13 @@ function M:refresh(callback)
             ls.await.sleep(DELAY)
             local vfile = self.vfile
             ls.scope.waitReady(vfile.uri)
-            if self.version == vfile.version then
+            if self.calculated and self.version == vfile.version then
+                task:resolve(self.lastResults or {})
                 return
             end
             self:stop()
             self.contributions = {}
+            self.calculated = true
             self.version = vfile.version
             local results = ls.feature.diagnostic(vfile.uri, function (item)
                 self:contribute(item)
@@ -113,6 +124,7 @@ end
 
 function M:pushNow()
     self.pushTimer?:remove()
+    self.pushTimer = nil
     local results = organize(self.contributions)
     if ls.util.equal(self.lastResults, results) then
         return
@@ -123,11 +135,14 @@ function M:pushNow()
     if not server then
         return
     end
-    local document = self.vfile.scope:getDocument(self.vfile.uri)
-    if not document then
-        return
+    local items = {}
+    if #results > 0 then
+        local document = self.vfile.scope:getDocument(self.vfile.uri)
+        if not document then
+            return
+        end
+        items = converter.convert(document, results, server.positionEncoding)
     end
-    local items = converter.convert(document, results, server.positionEncoding)
     server.client:notify('textDocument/publishDiagnostics', {
         uri         = self.vfile.uri,
         diagnostics = items,

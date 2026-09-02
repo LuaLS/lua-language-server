@@ -36,6 +36,7 @@ require 'custom'
 require 'file'
 require 'feature'
 require 'language-server.task'
+require 'language-server.progress'
 
 test.rootPath = ls.env.ROOT_PATH .. '/test_root'
 test.rootUri  = ls.uri.encode(test.rootPath)

@@ -4,16 +4,7 @@ require 'language-server.capability.language-features.diagnostic'
 
 assert(ls.capability.registered['textDocument/diagnostic'], 'textDocument/diagnostic not registered')
 assert(ls.capability.registered['workspace/diagnostic'], 'workspace/diagnostic not registered')
-assert(ls.capability.serverCapabilities.diagnosticProvider, 'diagnosticProvider capability not set')
-assert(ls.capability.serverCapabilities.diagnosticProvider.workspaceDiagnostics == true, 'workspaceDiagnostics should be true')
-assert(ls.capability.serverCapabilities.diagnosticProvider.interFileDependencies == false, 'interFileDependencies should be false')
-
-local function resetDiagnostic()
-    local vfile = test.scope.vm:getFile(test.fileUri)
-    if vfile then
-        vfile.diagnostic = nil
-    end
-end
+assert(ls.capability.serverCapabilities.diagnosticProvider == nil, 'diagnosticProvider should not be advertised')
 
 local function callHandler(uri)
     local handler = ls.capability.registered['textDocument/diagnostic'].callback
@@ -30,7 +21,6 @@ end
 TEST_FRAME([[
 break
 ]], function ()
-    resetDiagnostic()
     local r = callHandler(test.fileUri)
     assert(r, 'pull should resolve')
     assert(r.kind == ls.spec.DocumentDiagnosticReportKind.Unchanged, tostring(r.kind))

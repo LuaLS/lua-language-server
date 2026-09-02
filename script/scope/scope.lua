@@ -269,6 +269,9 @@ end
 ---@async
 ---@param uri Uri
 function ls.scope.waitReady(uri)
+    if test then
+        return
+    end
     local scope = ls.scope.find(uri)
     if not scope or scope.ready then
         return

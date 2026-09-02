@@ -25,7 +25,7 @@ local disable = require 'feature.diagnostic.disable'
 ---@field errors table[]
 ---@field vfile VM.Vfile?
 
----@alias Feature.Diagnostic.Provider async fun(param: Feature.Diagnostic.Param, callback: fun(diag: Feature.Diagnostic))
+---@alias Feature.Diagnostic.Provider async fun(param: Feature.Diagnostic.Param, callback: fun(diag: Feature.Diagnostic)): Feature.Diagnostic[]?
 
 ---@type Feature.Diagnostic.Provider[]
 local providers = {}
@@ -103,20 +103,27 @@ function ls.feature.diagnostic(uri, partialPush)
     end
 
     local results = {}
-    for _, provider in ipairs(providers) do
-        provider(param, function (diag)
-            local isSyntax = diag.data == 'syntax'
-            if isDisabled(diag, isSyntax) then
+    local function accept(diag)
+        local isSyntax = diag.data == 'syntax'
+        if isDisabled(diag, isSyntax) then
+            return
+        end
+        if not isSyntax then
+            if not acceptSemantic(scope, uri, diag, opened) then
                 return
             end
-            if not isSyntax then
-                if not acceptSemantic(scope, uri, diag, opened) then
-                    return
-                end
+        end
+        results[#results+1] = diag
+        partialPush?(diag)
+    end
+
+    for _, provider in ipairs(providers) do
+        local items = provider(param, accept)
+        if items then
+            for _, diag in ipairs(items) do
+                accept(diag)
             end
-            results[#results+1] = diag
-            partialPush?(diag)
-        end)
+        end
     end
 
     return results

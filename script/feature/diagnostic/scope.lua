@@ -27,7 +27,7 @@ end
 ---@return Task
 function M:refreshNow()
     self.refreshTimer?:remove()
-    self.task?.reject(ls.task.REJECT_CANCELED)
+    self.task?:reject(ls.task.REJECT_CANCELED)
 
     local scope = self.scope
     self.task = ls.task.create()
@@ -39,7 +39,10 @@ function M:refreshNow()
                 task:reject(ls.task.REJECT_CANCELED)
             end)
 
-            local vfiles = scope.vm.vfiles
+            local vfiles = {}
+            for _, vfile in pairs(scope.vm.vfiles) do
+                vfiles[#vfiles+1] = vfile
+            end
             local total = #vfiles
             prog:setMessage('%d/%d' % { 0, total })
 

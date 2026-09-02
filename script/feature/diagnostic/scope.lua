@@ -39,6 +39,7 @@ function M:refreshNow()
                 task:reject(ls.task.REJECT_CANCELED)
             end)
 
+            ---@type VM.Vfile[]
             local vfiles = {}
             for _, vfile in pairs(scope.vm.vfiles) do
                 vfiles[#vfiles+1] = vfile
@@ -50,7 +51,7 @@ function M:refreshNow()
             local results = {}
 
             for i, vfile in ipairs(vfiles) do
-                results[vfile.uri] = vfile.diagnostic:refresh():await()
+                results[vfile.uri] = vfile.diagnostic:refreshNow():await()
 
                 prog:setMessage(('%d/%d'):format(i, total))
                 prog:setPercentage(i / total * 100)

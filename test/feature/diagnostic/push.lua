@@ -34,7 +34,7 @@ break
 
     local notifications = withMockServer(function ()
         ---@diagnostic disable-next-line: await-in-sync
-        file:refresh()
+        file:refreshNow()
         ---@diagnostic disable-next-line: await-in-sync
         ls.await.sleep(0.5)
     end)

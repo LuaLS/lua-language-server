@@ -15,7 +15,7 @@ ls.capability.register('textDocument/diagnostic', function (_, params, task)
     end
     local vfile = scope.vm:getFile(uri)
                or scope.vm:createFile(uri)
-    vfile.diagnostic:refresh()
+    vfile.diagnostic:refreshNow()
 
     task:resolve {
         kind     = ls.spec.DocumentDiagnosticReportKind.Unchanged,

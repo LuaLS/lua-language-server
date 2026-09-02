@@ -47,9 +47,21 @@ function M:contribute(item)
     self:schedulePush()
 end
 
+---@private
+---@type Timer?
+M.refreshTimer = nil
+
+---@param delay number
+function M:refreshAfter(delay)
+    self.refreshTimer?:remove()
+    self.refreshTimer = ls.timer.wait(delay, function ()
+        self:refreshNow()
+    end)
+end
+
 ---@param callback? fun(results: Feature.Diagnostic[])
 ---@return Task
-function M:refresh(callback)
+function M:refreshNow(callback)
     self.refreshTask?:reject(ls.task.REJECT_CANCELED)
     self.refreshTask = ls.task.create({}, function (result, err)
         self:pushNow()
@@ -59,7 +71,6 @@ function M:refresh(callback)
     end)
         ---@async
         : execute(function (task)
-            ls.await.sleep(DELAY)
             local vfile = self.vfile
             ls.scope.waitReady(vfile.uri)
             if self.calculated and self.version == vfile.version then

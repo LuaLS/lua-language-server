@@ -238,7 +238,7 @@ function Ast:mergeStatesAndCats(block)
     end)
 end
 
----@package
+---@private
 Ast.needSortBlock = true
 
 -- 获取最近的block

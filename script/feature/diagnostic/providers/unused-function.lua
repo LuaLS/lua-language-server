@@ -2,10 +2,9 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function unusedFunctionProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function unusedFunctionProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['function']) do
         delayer:delay()
@@ -21,10 +20,9 @@ local function unusedFunctionProvider(param)
         if #name.gets > 0 then
             goto continue
         end
-        pd.push(results, 'unused-function', name.start, name.finish, ('Unused function `%s`.'):format(name.id))
+        pd.push(callback, 'unused-function', name.start, name.finish, ('Unused function `%s`.'):format(name.id))
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(unusedFunctionProvider)

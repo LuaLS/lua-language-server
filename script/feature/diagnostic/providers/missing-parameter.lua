@@ -12,14 +12,13 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function missingParameterProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function missingParameterProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, call in ipairs(ast.nodesMap['call']) do
         delayer:delay()
@@ -47,7 +46,7 @@ local function missingParameterProvider(param)
         if callArgs >= minParams then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'missing-parameter',
             level   = 0,
             start   = call.start,
@@ -56,7 +55,6 @@ local function missingParameterProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(missingParameterProvider)

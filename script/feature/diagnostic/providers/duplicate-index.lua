@@ -26,10 +26,9 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function duplicateIndexProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function duplicateIndexProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, tbl in ipairs(ast.nodesMap['table']) do
         delayer:delay()
@@ -58,15 +57,16 @@ local function duplicateIndexProvider(param)
                 local related = {}
                 for i, def in ipairs(defs) do
                     related[i] = {
-                        uri    = param.uri,
-                        start  = def.start,
-                        finish = def.finish,
+                        uri     = param.uri,
+                        start   = def.start,
+                        finish  = def.finish,
+                        message = 'Also defined here.',
                     }
                 end
                 local message = ('Duplicate index `%s`.'):format(tostring(name))
                 for i = 1, #defs - 1 do
                     local def = defs[i]
-                    results[#results+1] = {
+                    callback {
                         code    = 'duplicate-index',
                         level   = 0,
                         start   = def.start,
@@ -77,7 +77,7 @@ local function duplicateIndexProvider(param)
                     }
                 end
                 local def = defs[#defs]
-                results[#results+1] = {
+                callback {
                     code    = 'duplicate-index',
                     level   = 0,
                     start   = def.start,
@@ -88,7 +88,6 @@ local function duplicateIndexProvider(param)
             end
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(duplicateIndexProvider)

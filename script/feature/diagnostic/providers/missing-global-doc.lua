@@ -53,10 +53,9 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function missingGlobalDocProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function missingGlobalDocProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, func in ipairs(ast.nodesMap['function']) do
         delayer:delay()
@@ -81,7 +80,7 @@ local function missingGlobalDocProvider(param)
 
         if not hasDoc then
             if not hasParam and not hasReturn then
-                results[#results+1] = {
+                callback {
                     code    = 'missing-global-doc',
                     level   = 0,
                     start   = func.start,
@@ -95,7 +94,7 @@ local function missingGlobalDocProvider(param)
         if hasParam then
             for _, p in ipairs(func.params) do
                 if p.id ~= 'self' and p.id ~= '_' and not paramDocs[p.id] then
-                    results[#results+1] = {
+                    callback {
                         code    = 'missing-global-doc',
                         level   = 0,
                         start   = p.start,
@@ -114,7 +113,7 @@ local function missingGlobalDocProvider(param)
                 end
                 for i, exp in ipairs(ret.exps) do
                     if i > returnCount then
-                        results[#results+1] = {
+                        callback {
                             code    = 'missing-global-doc',
                             level   = 0,
                             start   = exp.start,
@@ -128,7 +127,6 @@ local function missingGlobalDocProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(missingGlobalDocProvider)

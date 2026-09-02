@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function closeNonObjectProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function closeNonObjectProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['localdef']) do
         delayer:delay()
@@ -11,7 +10,7 @@ local function closeNonObjectProvider(param)
         for _, loc in ipairs(node.vars) do
             if loc.attr and loc.attr.name and loc.attr.name.id == 'close' then
                 if not loc.value then
-                    results[#results+1] = {
+                    callback {
                         code    = 'close-non-object',
                         level   = 0,
                         start   = loc.start,
@@ -22,7 +21,6 @@ local function closeNonObjectProvider(param)
             end
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(closeNonObjectProvider)

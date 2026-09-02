@@ -2,10 +2,9 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function redundantReturnProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function redundantReturnProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, ret in ipairs(ast.nodesMap['return']) do
         delayer:delay()
@@ -17,10 +16,9 @@ local function redundantReturnProvider(param)
         if not parent or parent.kind ~= 'function' then
             goto continue
         end
-        pd.push(results, 'redundant-return', ret.start, ret.finish, 'Redundant return.')
+        pd.push(callback, 'redundant-return', ret.start, ret.finish, 'Redundant return.')
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(redundantReturnProvider)

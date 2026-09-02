@@ -1,7 +1,7 @@
 ---@param vfile VM.Vfile
 ---@param var LuaParser.Node.Base
----@param results Feature.Diagnostic[]
-local function checkAssign(vfile, var, results)
+---@param callback fun(diag: Feature.Diagnostic)
+local function checkAssign(vfile, var, callback)
     local variable = vfile:getVariable(var)
     if not variable then
         return
@@ -29,7 +29,7 @@ local function checkAssign(vfile, var, results)
             goto continue
         end
         if not (actual >> expect) then
-            results[#results+1] = {
+            callback {
                 code    = 'assign-type-mismatch',
                 level   = 0,
                 start   = var.start,
@@ -43,21 +43,20 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function assignTypeMismatchProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function assignTypeMismatchProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['localdef']) do
         delayer:delay()
         ---@cast node LuaParser.Node.LocalDef
         for _, var in ipairs(node.vars) do
             if var.value then
-                checkAssign(vfile, var, results)
+                checkAssign(vfile, var, callback)
             end
         end
     end
@@ -66,11 +65,10 @@ local function assignTypeMismatchProvider(param)
         ---@cast node LuaParser.Node.Assign
         for _, exp in ipairs(node.exps) do
             if exp.kind == 'var' and exp.value then
-                checkAssign(vfile, exp, results)
+                checkAssign(vfile, exp, callback)
             end
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(assignTypeMismatchProvider)

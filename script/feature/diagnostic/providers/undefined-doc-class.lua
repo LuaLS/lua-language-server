@@ -1,10 +1,9 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function undefinedDocClassProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function undefinedDocClassProvider(param, callback)
     local ast = param.ast
     local rt = param.scope.rt
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     local defined = {}
@@ -40,7 +39,7 @@ local function undefinedDocClassProvider(param)
             if t.isBasicType or t:isClassLike() or t:isAliasLike() then
                 goto continueExt
             end
-            results[#results+1] = {
+            callback {
                 code    = 'undefined-doc-class',
                 level   = 0,
                 start   = id.start,
@@ -51,7 +50,6 @@ local function undefinedDocClassProvider(param)
         end
         ::continueCls::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(undefinedDocClassProvider)

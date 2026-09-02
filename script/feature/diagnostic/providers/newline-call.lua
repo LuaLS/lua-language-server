@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function newlineCallProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function newlineCallProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, call in ipairs(ast.nodesMap['call']) do
         delayer:delay()
@@ -27,7 +26,7 @@ local function newlineCallProvider(param)
         end
         local nodeText = ast.code:sub(node.start + 1, node.finish)
         local argsText = ast.code:sub(call.argPos + 1, call.finish)
-        results[#results+1] = {
+        callback {
             code    = 'newline-call',
             level   = 0,
             start   = node.start,
@@ -36,7 +35,6 @@ local function newlineCallProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(newlineCallProvider)

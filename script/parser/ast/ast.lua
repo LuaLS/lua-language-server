@@ -230,6 +230,10 @@ function M:createNode(kind, data)
     nodeMap[#nodeMap+1] = node
 
     if node.isBlock then
+        local last = self.blockList[#self.blockList]
+        if last and node.start < last.start then
+            self.needSortBlock = true
+        end
         self.blockList[#self.blockList+1] = node
     end
 

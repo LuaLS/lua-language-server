@@ -25,7 +25,7 @@ local disable = require 'feature.diagnostic.disable'
 ---@field errors table[]
 ---@field vfile VM.Vfile?
 
----@alias Feature.Diagnostic.Provider async fun(param: Feature.Diagnostic.Param, callback: fun(diag: Feature.Diagnostic)): Feature.Diagnostic[]?
+---@alias Feature.Diagnostic.Provider async fun(param: Feature.Diagnostic.Param, callback: fun(diag: Feature.Diagnostic))
 
 ---@type Feature.Diagnostic.Provider[]
 local providers = {}
@@ -118,12 +118,7 @@ function ls.feature.diagnostic(uri, partialPush)
     end
 
     for _, provider in ipairs(providers) do
-        local items = provider(param, accept)
-        if items then
-            for _, diag in ipairs(items) do
-                accept(diag)
-            end
-        end
+        provider(param, accept)
     end
 
     return results

@@ -14,11 +14,10 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function undefinedDocNameProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function undefinedDocNameProvider(param, callback)
     local ast = param.ast
     local rt = param.scope.rt
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     local defined = {}
@@ -58,7 +57,7 @@ local function undefinedDocNameProvider(param)
         if isDefined(rt, name) then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'undefined-doc-name',
             level   = 0,
             start   = id.start,
@@ -67,7 +66,6 @@ local function undefinedDocNameProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(undefinedDocNameProvider)

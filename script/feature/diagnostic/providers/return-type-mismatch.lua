@@ -1,13 +1,12 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function returnTypeMismatchProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function returnTypeMismatchProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, ret in ipairs(ast.nodesMap['return']) do
         delayer:delay()
@@ -46,7 +45,7 @@ local function returnTypeMismatchProvider(param)
             if actual >> expect then
                 goto continueExp
             end
-            results[#results+1] = {
+            callback {
                 code    = 'return-type-mismatch',
                 level   = 0,
                 start   = exp.start,
@@ -57,7 +56,6 @@ local function returnTypeMismatchProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(returnTypeMismatchProvider)

@@ -3,13 +3,13 @@ local M = {}
 
 local TAG_UNNECESSARY = ls.spec.DiagnosticTag.Unnecessary
 
----@param results Feature.Diagnostic[]
+---@param callback fun(diag: Feature.Diagnostic)
 ---@param code string
 ---@param start integer
 ---@param finish integer
 ---@param message string
-function M.push(results, code, start, finish, message)
-    results[#results+1] = {
+function M.push(callback, code, start, finish, message)
+    callback {
         code    = code,
         level   = 0,
         start   = start,

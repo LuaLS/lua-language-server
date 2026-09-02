@@ -14,10 +14,9 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function unknownDiagCodeProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function unknownDiagCodeProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['catstatediagnostic']) do
         delayer:delay()
@@ -28,7 +27,7 @@ local function unknownDiagCodeProvider(param)
         end
         for _, name in ipairs(names) do
             if not validCodes[name.id] then
-                results[#results+1] = {
+                callback {
                     code    = 'unknown-diag-code',
                     level   = 0,
                     start   = name.start,
@@ -39,7 +38,6 @@ local function unknownDiagCodeProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(unknownDiagCodeProvider)

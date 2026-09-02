@@ -2,10 +2,9 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function unusedVarargProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function unusedVarargProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, p in ipairs(ast.nodesMap['param']) do
         delayer:delay()
@@ -24,10 +23,9 @@ local function unusedVarargProvider(param)
         if used then
             goto continue
         end
-        pd.push(results, 'unused-vararg', p.start, p.finish, 'Unused vararg.')
+        pd.push(callback, 'unused-vararg', p.start, p.finish, 'Unused vararg.')
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(unusedVarargProvider)

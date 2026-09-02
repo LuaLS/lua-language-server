@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function duplicateDocParamProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function duplicateDocParamProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, block in ipairs(ast.blockList) do
         delayer:delay()
@@ -25,7 +24,7 @@ local function duplicateDocParamProvider(param)
             ---@cast value LuaParser.Node.CatStateParam
             local name = value.key.id
             if seen[name] then
-                results[#results+1] = {
+                callback {
                     code    = 'duplicate-doc-param',
                     level   = 0,
                     start   = value.key.start,
@@ -39,7 +38,6 @@ local function duplicateDocParamProvider(param)
         end
         ::continueBlock::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(duplicateDocParamProvider)

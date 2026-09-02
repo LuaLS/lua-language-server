@@ -1,11 +1,10 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function globalElementProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function globalElementProvider(param, callback)
     local ast = param.ast
     local scope = param.scope
     local uri = param.uri
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     local globals = scope.config:get(uri, 'Lua.diagnostics.globals') or {}
@@ -45,7 +44,7 @@ local function globalElementProvider(param)
                 goto continueExp
             end
             reported[name] = false
-            results[#results+1] = {
+            callback {
                 code    = 'global-element',
                 level   = 0,
                 start   = exp.start,
@@ -55,7 +54,6 @@ local function globalElementProvider(param)
             ::continueExp::
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(globalElementProvider)

@@ -1,13 +1,12 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function undefinedFieldProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function undefinedFieldProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile or not vfile.coder or not vfile.coder.map then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, field in ipairs(ast.nodesMap['field']) do
         delayer:delay()
@@ -37,7 +36,7 @@ local function undefinedFieldProvider(param)
         if exists then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'undefined-field',
             level   = 0,
             start   = key.start,
@@ -46,7 +45,6 @@ local function undefinedFieldProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(undefinedFieldProvider)

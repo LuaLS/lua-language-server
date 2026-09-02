@@ -2,11 +2,11 @@ local TAG_UNNECESSARY = ls.spec.DiagnosticTag.Unnecessary
 
 ---@param targets LuaParser.Node.Base[]
 ---@param values LuaParser.Node.Exp[]
----@param results Feature.Diagnostic[]
-local function pushRedundant(targets, values, results)
+---@param callback fun(diag: Feature.Diagnostic)
+local function pushRedundant(targets, values, callback)
     for i = #targets + 1, #values do
         local value = values[i]
-        results[#results+1] = {
+        callback {
             code    = 'redundant-value',
             level   = 0,
             start   = value.start,
@@ -19,33 +19,31 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function redundantValueProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function redundantValueProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['localdef']) do
         delayer:delay()
         ---@cast node LuaParser.Node.LocalDef
         if node.values then
-            pushRedundant(node.vars, node.values, results)
+            pushRedundant(node.vars, node.values, callback)
         end
     end
     for _, node in ipairs(ast.nodesMap['globaldef']) do
         delayer:delay()
         ---@cast node LuaParser.Node.GlobalDef
         if node.values then
-            pushRedundant(node.vars, node.values, results)
+            pushRedundant(node.vars, node.values, callback)
         end
     end
     for _, node in ipairs(ast.nodesMap['assign']) do
         delayer:delay()
         ---@cast node LuaParser.Node.Assign
         if node.values then
-            pushRedundant(node.exps, node.values, results)
+            pushRedundant(node.exps, node.values, callback)
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(redundantValueProvider)

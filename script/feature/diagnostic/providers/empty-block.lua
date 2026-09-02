@@ -2,10 +2,9 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function emptyBlockProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function emptyBlockProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     local kinds = { 'while', 'for', 'repeat' }
     for _, kind in ipairs(kinds) do
@@ -13,7 +12,7 @@ local function emptyBlockProvider(param)
             delayer:delay()
             ---@cast node LuaParser.Node.Block
             if not pd.hasStatements(node) then
-                pd.push(results, 'empty-block', node.start, node.finish, 'Empty block.')
+                pd.push(callback, 'empty-block', node.start, node.finish, 'Empty block.')
             end
         end
     end
@@ -28,10 +27,9 @@ local function emptyBlockProvider(param)
             end
         end
         if allEmpty then
-            pd.push(results, 'empty-block', node.start, node.finish, 'Empty block.')
+            pd.push(callback, 'empty-block', node.start, node.finish, 'Empty block.')
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(emptyBlockProvider)

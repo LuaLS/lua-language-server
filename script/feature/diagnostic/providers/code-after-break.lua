@@ -2,10 +2,9 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function codeAfterBreakProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function codeAfterBreakProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local mark = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, kind in ipairs({ 'break', 'continue' }) do
@@ -28,7 +27,7 @@ local function codeAfterBreakProvider(param)
                 if childs[i] == brk then
                     if i < #childs then
                         local word = kind == 'break' and 'break' or 'continue'
-                        pd.push(results, 'code-after-break', childs[i+1].start, childs[#childs].finish, ('Unable to execute code after `%s`.'):format(word))
+                        pd.push(callback, 'code-after-break', childs[i+1].start, childs[#childs].finish, ('Unable to execute code after `%s`.'):format(word))
                     end
                     break
                 end
@@ -36,7 +35,6 @@ local function codeAfterBreakProvider(param)
             ::continueNode::
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(codeAfterBreakProvider)

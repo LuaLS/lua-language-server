@@ -28,14 +28,13 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function duplicateDocFieldProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function duplicateDocFieldProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     ---@type table<integer, LuaParser.Node.CatStateField>
@@ -104,7 +103,7 @@ local function duplicateDocFieldProvider(param)
                         message = 'Previous field definition.',
                     } }
                 end
-                results[#results+1] = {
+                callback {
                     code    = 'duplicate-doc-field',
                     level   = 0,
                     start   = source.key.start,
@@ -118,7 +117,6 @@ local function duplicateDocFieldProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(duplicateDocFieldProvider)

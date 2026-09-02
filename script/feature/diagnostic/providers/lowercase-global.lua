@@ -1,11 +1,10 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function lowercaseGlobalProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function lowercaseGlobalProvider(param, callback)
     local ast = param.ast
     local scope = param.scope
     local uri = param.uri
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     local globals = scope.config:get(uri, 'Lua.diagnostics.globals') or {}
@@ -90,7 +89,7 @@ local function lowercaseGlobalProvider(param)
             if matched then
                 goto continueExp
             end
-            results[#results+1] = {
+            callback {
                 code    = 'lowercase-global',
                 level   = 0,
                 start   = exp.start,
@@ -100,7 +99,6 @@ local function lowercaseGlobalProvider(param)
             ::continueExp::
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(lowercaseGlobalProvider)

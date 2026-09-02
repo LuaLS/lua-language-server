@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function unknownCastVariableProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function unknownCastVariableProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     for _, cast in ipairs(ast.nodesMap['catstatecast']) do
@@ -20,7 +19,7 @@ local function unknownCastVariableProvider(param)
         if var.loc or var.global then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'unknown-cast-variable',
             level   = 0,
             start   = var.start,
@@ -29,7 +28,6 @@ local function unknownCastVariableProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(unknownCastVariableProvider)

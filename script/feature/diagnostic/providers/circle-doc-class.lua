@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function circleDocClassProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function circleDocClassProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     ---@type table<string, string[]>
@@ -61,7 +60,7 @@ local function circleDocClassProvider(param)
             return false
         end
         if walk(name) then
-            results[#results+1] = {
+            callback {
                 code    = 'circle-doc-class',
                 level   = 0,
                 start   = cls.start,
@@ -70,7 +69,6 @@ local function circleDocClassProvider(param)
             }
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(circleDocClassProvider)

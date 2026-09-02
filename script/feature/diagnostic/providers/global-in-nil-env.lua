@@ -1,13 +1,12 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function globalInNilEnvProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function globalInNilEnvProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, var in ipairs(ast.nodesMap['var']) do
         delayer:delay()
@@ -25,7 +24,7 @@ local function globalInNilEnvProvider(param)
         if not (envNode.kind == 'type' and envNode.typeName == 'nil') then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'global-in-nil-env',
             level   = 0,
             start   = var.start,
@@ -33,15 +32,15 @@ local function globalInNilEnvProvider(param)
             message = 'Invalid global (`_ENV` is `nil`).',
             related = {
                 {
-                    uri    = param.uri,
-                    start  = var.env.start,
-                    finish = var.env.finish,
+                    uri     = param.uri,
+                    start   = var.env.start,
+                    finish  = var.env.finish,
+                    message = 'The `_ENV` is set to `nil` here.',
                 },
             },
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(globalInNilEnvProvider)

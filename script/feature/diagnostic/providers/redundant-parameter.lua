@@ -1,13 +1,12 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function redundantParameterProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function redundantParameterProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, call in ipairs(ast.nodesMap['call']) do
         delayer:delay()
@@ -50,7 +49,7 @@ local function redundantParameterProvider(param)
         local startIndex = isMethod and maxParams or (maxParams + 1)
         for i = startIndex, #args do
             local arg = args[i]
-            results[#results+1] = {
+            callback {
                 code    = 'redundant-parameter',
                 level   = 0,
                 start   = arg.start,
@@ -60,7 +59,6 @@ local function redundantParameterProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(redundantParameterProvider)

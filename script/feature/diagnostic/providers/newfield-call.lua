@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function newfieldCallProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function newfieldCallProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, tbl in ipairs(ast.nodesMap['table']) do
         delayer:delay()
@@ -26,7 +25,7 @@ local function newfieldCallProvider(param)
             end
             local nodeText = ast.code:sub(node.start + 1, node.finish)
             local argsText = ast.code:sub(call.argPos + 1, call.finish)
-            results[#results+1] = {
+            callback {
                 code    = 'newfield-call',
                 level   = 0,
                 start   = call.start,
@@ -36,7 +35,6 @@ local function newfieldCallProvider(param)
             ::continueField::
         end
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(newfieldCallProvider)

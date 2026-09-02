@@ -18,14 +18,13 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function needCheckNilProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function needCheckNilProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, var in ipairs(ast.nodesMap['var']) do
         delayer:delay()
@@ -60,7 +59,7 @@ local function needCheckNilProvider(param)
         if not mayBeNil(node) then
             goto continueVar
         end
-        results[#results+1] = {
+        callback {
             code    = 'need-check-nil',
             level   = 0,
             start   = var.start,
@@ -69,7 +68,6 @@ local function needCheckNilProvider(param)
         }
         ::continueVar::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(needCheckNilProvider)

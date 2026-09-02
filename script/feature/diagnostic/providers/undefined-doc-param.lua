@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function undefinedDocParamProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function undefinedDocParamProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, func in ipairs(ast.nodesMap['function']) do
         delayer:delay()
@@ -34,7 +33,7 @@ local function undefinedDocParamProvider(param)
             ---@cast value LuaParser.Node.CatStateParam
             local name = value.key.id
             if not paramSet[name] then
-                results[#results+1] = {
+                callback {
                     code    = 'undefined-doc-param',
                     level   = 0,
                     start   = value.key.start,
@@ -46,7 +45,6 @@ local function undefinedDocParamProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(undefinedDocParamProvider)

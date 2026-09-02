@@ -1,13 +1,12 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function discardReturnsProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function discardReturnsProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, call in ipairs(ast.nodesMap['call']) do
         delayer:delay()
@@ -26,7 +25,7 @@ local function discardReturnsProvider(param)
         if not func or not func:hasAnnotation('nodiscard') then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'discard-returns',
             level   = 0,
             start   = call.start,
@@ -35,7 +34,6 @@ local function discardReturnsProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(discardReturnsProvider)

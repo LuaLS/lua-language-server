@@ -2,11 +2,10 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function trailingSpaceProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function trailingSpaceProvider(param, callback)
     local ast = param.ast
     local text = ast.code
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(5000)
     local pos = 1
     while pos <= #text do
@@ -31,9 +30,9 @@ local function trailingSpaceProvider(param)
             local finish = pos + #lineText - 1
             if not pd.isInStringOrComment(ast, start, finish) then
                 if first == 1 then
-                    pd.push(results, 'trailing-space', start, finish, 'Line contains only whitespace.')
+                    pd.push(callback, 'trailing-space', start, finish, 'Line contains only whitespace.')
                 else
-                    pd.push(results, 'trailing-space', start, finish, 'Trailing whitespace.')
+                    pd.push(callback, 'trailing-space', start, finish, 'Trailing whitespace.')
                 end
             end
         end
@@ -42,7 +41,6 @@ local function trailingSpaceProvider(param)
         end
         pos = lineEnd + 1
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(trailingSpaceProvider)

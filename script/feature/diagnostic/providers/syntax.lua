@@ -111,21 +111,20 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function syntaxProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function syntaxProvider(param, callback)
     local errors = param.errors
     if #errors == 0 then
-        return {}
+        return
     end
 
     local uri  = param.uri
     local text = param.document.text
 
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, err in ipairs(errors) do
         delayer:delay()
-        results[#results+1] = {
+        callback {
             code    = err.errorCode:lower():gsub('_', '-'),
             level   = ls.spec.DiagnosticSeverity.Error,
             start   = err.start,
@@ -135,7 +134,6 @@ local function syntaxProvider(param)
             related = buildRelated(err, uri, text),
         }
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(syntaxProvider)

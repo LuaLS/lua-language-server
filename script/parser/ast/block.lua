@@ -246,14 +246,16 @@ Ast.needSortBlock = true
 ---@param pos integer
 ---@return LuaParser.Node.Block?
 function Ast:getRecentBlock(pos)
+    local blocks = self.blockList
     if self.needSortBlock then
         self.needSortBlock = false
-        table.sort(self.blocks, function (a, b)
+        table.sort(blocks, function (a, b)
+            if a.start == b.start then
+                return a.finish > b.finish
+            end
             return a.start < b.start
         end)
     end
-
-    local blocks = self.blockList
     -- 使用二分法找到最近的block
     local low = 1
     local high = #blocks

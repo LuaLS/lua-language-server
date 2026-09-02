@@ -1,10 +1,9 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function undefinedGlobalProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function undefinedGlobalProvider(param, callback)
     local ast = param.ast
     local rt = param.scope.rt
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, var in ipairs(ast.nodesMap['var']) do
         delayer:delay()
@@ -16,7 +15,7 @@ local function undefinedGlobalProvider(param)
         if g:isDefined() then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'undefined-global',
             level   = 0,
             start   = var.start,
@@ -25,7 +24,6 @@ local function undefinedGlobalProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(undefinedGlobalProvider)

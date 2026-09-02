@@ -2,10 +2,9 @@ local pd = require 'feature.diagnostic.parser-diagnostics'
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function unusedLabelProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function unusedLabelProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['label']) do
         delayer:delay()
@@ -13,10 +12,9 @@ local function unusedLabelProvider(param)
         if #node.gotos > 0 then
             goto continue
         end
-        pd.push(results, 'unused-label', node.start, node.finish, 'Unused label.')
+        pd.push(callback, 'unused-label', node.start, node.finish, 'Unused label.')
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(unusedLabelProvider)

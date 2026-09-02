@@ -1,13 +1,12 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function docFieldNoClassProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function docFieldNoClassProvider(param, callback)
     local ast = param.ast
     local vfile = param.vfile
     if not vfile then
-        return {}
+        return
     end
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     for _, field in ipairs(ast.nodesMap['catstatefield']) do
@@ -16,7 +15,7 @@ local function docFieldNoClassProvider(param)
         if vfile:getNode(field) then
             goto continue
         end
-        results[#results+1] = {
+        callback {
             code    = 'doc-field-no-class',
             level   = 0,
             start   = field.start,
@@ -25,7 +24,6 @@ local function docFieldNoClassProvider(param)
         }
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(docFieldNoClassProvider)

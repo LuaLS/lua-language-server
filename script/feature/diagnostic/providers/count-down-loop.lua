@@ -12,10 +12,9 @@ end
 
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function countDownLoopProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function countDownLoopProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, node in ipairs(ast.nodesMap['for']) do
         delayer:delay()
@@ -43,7 +42,7 @@ local function countDownLoopProvider(param)
         local text = ast.code:sub(initExp.start + 1, maxExp.finish)
         local stepExp = exps[3]
         if not stepExp then
-            results[#results+1] = {
+            callback {
                 code    = 'count-down-loop',
                 level   = 0,
                 start   = initExp.start,
@@ -54,7 +53,7 @@ local function countDownLoopProvider(param)
             local stepNumber = getNumber(stepExp)
             if stepNumber and stepNumber > 0 then
                 local stepText = ast.code:sub(stepExp.start + 1, stepExp.finish)
-                results[#results+1] = {
+                callback {
                     code    = 'count-down-loop',
                     level   = 0,
                     start   = initExp.start,
@@ -65,7 +64,6 @@ local function countDownLoopProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(countDownLoopProvider)

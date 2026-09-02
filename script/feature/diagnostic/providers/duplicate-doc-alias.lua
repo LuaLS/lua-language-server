@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function duplicateDocAliasProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function duplicateDocAliasProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
 
     ---@type table<string, {start: integer, finish: integer}[]>
@@ -72,7 +71,7 @@ local function duplicateDocAliasProvider(param)
             goto continueGroup
         end
         for _, pos in ipairs(group) do
-            results[#results+1] = {
+            callback {
                 code    = 'duplicate-doc-alias',
                 level   = 0,
                 start   = pos.start,
@@ -82,7 +81,6 @@ local function duplicateDocAliasProvider(param)
         end
         ::continueGroup::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(duplicateDocAliasProvider)

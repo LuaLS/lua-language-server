@@ -1,9 +1,8 @@
 ---@async
 ---@param param Feature.Diagnostic.Param
----@return Feature.Diagnostic[]
-local function incompleteSignatureDocProvider(param)
+---@param callback fun(diag: Feature.Diagnostic)
+local function incompleteSignatureDocProvider(param, callback)
     local ast = param.ast
-    local results = {}
     local delayer = ls.task.newThrottledDelayer(500)
     for _, func in ipairs(ast.nodesMap['function']) do
         delayer:delay()
@@ -49,7 +48,7 @@ local function incompleteSignatureDocProvider(param)
         if func.params then
             for _, p in ipairs(func.params) do
                 if p.id ~= 'self' and p.id ~= '_' and not paramDocs[p.id] then
-                    results[#results+1] = {
+                    callback {
                         code    = 'incomplete-signature-doc',
                         level   = 0,
                         start   = p.start,
@@ -66,7 +65,7 @@ local function incompleteSignatureDocProvider(param)
             end
             for i, exp in ipairs(ret.exps) do
                 if i > returnCount then
-                    results[#results+1] = {
+                    callback {
                         code    = 'incomplete-signature-doc',
                         level   = 0,
                         start   = exp.start,
@@ -79,7 +78,6 @@ local function incompleteSignatureDocProvider(param)
         end
         ::continue::
     end
-    return results
 end
 
 ls.feature.provider.diagnostic(incompleteSignatureDocProvider)

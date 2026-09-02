@@ -434,7 +434,7 @@ local compilerGlobalSwitch = util.switch()
     end)
 
 
----@alias vm.global.cate '"variable"' | '"type"'
+---@alias vm.global.cate 'variable' | 'type'
 
 ---@param cate vm.global.cate
 ---@param name string

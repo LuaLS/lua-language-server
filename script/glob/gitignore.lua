@@ -82,7 +82,7 @@ function mt:setOption(op, val)
     self.options[op] = val
 end
 
----@param key string | "'type'" | "'list'"
+---@param key string | 'type' | 'list'
 ---@param func function | "function (path) end"
 function mt:setInterface(key, func)
     if type(func) ~= 'function' then

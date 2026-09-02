@@ -3,7 +3,7 @@
     "Lua.misc.parameters": [
         //"--preview",
         "--develop=true",
-        "--dbgport=11431",
+        "--dbgport=11466",
         //"--dbgwait",
         "--loglevel=trace",
         "--trace-rpc",

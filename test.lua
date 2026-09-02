@@ -130,6 +130,7 @@ ls.await.call(function ()
         test.require 'test.coder'
         test.require 'test.feature'
         test.require 'test.project'
+        test.require 'test.file'
         if test.filter and not test.loadedAnyFile then
             error('过滤器 "' .. test.filter .. '" 没有匹配到任何测试文件，请检查路径是否正确')
         end

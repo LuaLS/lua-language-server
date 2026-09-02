@@ -74,9 +74,9 @@ local y = 2
     local v2 = rt.call('Module', { rt.value 'a.b' })
     lt.assertEquals(v2:view(), 'never')
 
-    -- Module: 无匹配返回 never
+    -- Module: 无匹配模块返回 any
     local v3 = rt.call('Module', { rt.value 'zzz' })
-    lt.assertEquals(v3:view(), 'never')
+    lt.assertEquals(v3:view(), 'any')
 
     playground:dispose()
 end
@@ -183,6 +183,10 @@ return {
     -- Module：modname -> main return
     local v = scope.rt.call('Module', { scope.rt.value 'a' })
     lt.assertEquals(v:view(), '{ x: 1 }')
+
+    -- Module：未知模块（无匹配文件）-> any
+    local z = scope.rt.call('Module', { scope.rt.value 'zzz' })
+    lt.assertEquals(z:view(), 'any')
 
     -- ModName 也已注册：继承 string，带 customHover
     local modType = scope.rt.type('ModName')

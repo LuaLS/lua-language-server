@@ -43,6 +43,13 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
+    -- any 是 top 类型（吸收其他成员），含有 any 的 union 可赋值给任意类型
+    for _, v in ipairs(self.values) do
+        local t = v.kind == 'variable' and v.value or v
+        if t.typeName == 'any' then
+            return other.typeName ~= 'never'
+        end
+    end
     for _, v in ipairs(self.values) do
         if not v:canCast(other) then
             return false

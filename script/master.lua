@@ -44,6 +44,11 @@ log = New 'Log' {
     level = ls.args.LOGLEVEL,
     print = function (timeStamp, level, sourceStr, message)
         writeLog('master', timeStamp, level, sourceStr, message)
+        if level == 'error' or level == 'fatal' then
+            if ls.server then
+                ls.server.client:logMessage('Error', message)
+            end
+        end
         return true
     end
 }

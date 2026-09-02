@@ -12,12 +12,12 @@ alias 'Module'
         local modname = c.args[1]
         local literal = modname?.value?.literal
         if type(literal) ~= 'string' then
-            return c.type 'never'
+            return c.type 'any'
         end
         local suri = c.location?.uri
         local uris = c.scope:searchFiles(literal, suri)
         if #uris == 0 then
-            return c.type 'never'
+            return c.type 'any'
         end
         local ret = c.scope:getMainReturn(uris[1])
         if not ret then

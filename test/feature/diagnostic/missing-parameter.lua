@@ -1,8 +1,8 @@
 TEST_DIAGNOSTIC [[
 local function f(x, y)
 end
-<?f(1)?>
-]] { 'missing-parameter' }
+f(1)
+]] { '-missing-parameter' }
 
 TEST_DIAGNOSTIC [[
 local function f(x)
@@ -19,8 +19,26 @@ f(1)
 ]] { '-missing-parameter' }
 
 TEST_DIAGNOSTIC [[
+---@param a any
+---@param b boolean
+---@param c any
+local function f(a, b, c)
+end
+<?f(1)?>
+]] { 'missing-parameter' }
+
+TEST_DIAGNOSTIC [[
+---@param a any
+---@param b boolean
+---@param c any
+local function f(a, b, c)
+end
+f(1, true)
+]] { '-missing-parameter' }
+
+TEST_DIAGNOSTIC [[
 local t = {}
 function t:m(x, y)
 end
-<?t:m(1)?>
-]] { 'missing-parameter' }
+t:m(1)
+]] { '-missing-parameter' }

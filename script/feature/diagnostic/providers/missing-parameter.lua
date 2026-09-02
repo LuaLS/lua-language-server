@@ -1,13 +1,22 @@
+--- 最小参数数：从右往左找第一个"不能为 nil"的参数（其左侧参数都必须实参占位）
+--- 例如 (any, boolean, any) 的最小参数数为 2。
+---@param rt Node.Runtime
 ---@param f Node.Function
 ---@return integer
-local function getRequiredParams(f)
-    local count = 0
-    for _, p in ipairs(f.paramsDef) do
+local function getRequiredParams(rt, f)
+    local params = f.paramsDef
+    local min = 0
+    for i = #params, 1, -1 do
+        local p = params[i]
         if not p.optional then
-            count = count + 1
+            local t = p.value
+            if t and not rt.NIL:canCast(t) then
+                min = i
+                break
+            end
         end
     end
-    return count
+    return min
 end
 
 ---@async
@@ -32,9 +41,10 @@ local function missingParameterProvider(param, callback)
         if #matched == 0 then
             goto continue
         end
+        local rt = param.scope.rt
         local minParams
         for _, f in ipairs(matched) do
-            local m = getRequiredParams(f)
+            local m = getRequiredParams(rt, f)
             if not minParams or m < minParams then
                 minParams = m
             end

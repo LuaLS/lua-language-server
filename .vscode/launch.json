@@ -14,6 +14,7 @@
 			},
 			"luaVersion": "lua55",
 			"sourceCoding": "utf8",
+			"syntaxCompatibility": true,
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "openOnSessionStart",
 			"outputCapture": [
@@ -60,7 +61,7 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11431",
+			"address": "127.0.0.1:11466",
 			"outputCapture": [
 			],
 			"sourceFormat": "string",

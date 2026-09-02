@@ -60,6 +60,7 @@ function M:setClientText(text, version)
         return
     end
     self.clientVersion = version
+    self.merger = nil
     if self.clientText == text then
         return
     end
@@ -95,6 +96,7 @@ end
 
 function M:removeByClient()
     self.clientText = nil
+    self.merger = nil
     if not self.serverText then
         self:remove()
     end

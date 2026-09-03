@@ -119,6 +119,7 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
 - When needed, prefer VSCode-Operator tools to inspect LSP information and drive debugger-based flow tracing.
 - Before starting a new debugger run, always stop/disconnect any existing debugger session first.
 - Always stop/disconnect debugger sessions after use to avoid stale sessions affecting later tests and diagnosis.
+- 设置断点：给函数调用设断点要设在**函数内部的语句**上（如 `self.currentValue = value`），不要设在函数定义行（`function M:xxx()`）。可优先用函数断点功能（VSCode-Operator `debugFunctionBreakpoints`）。
 
 ## 10) tree-sitter 预研状态（已暂停）
 

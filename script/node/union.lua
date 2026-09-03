@@ -43,13 +43,6 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    -- any 是 top 类型（吸收其他成员），含有 any 的 union 可赋值给任意类型
-    for _, v in ipairs(self.values) do
-        local t = v.kind == 'variable' and v.value or v
-        if t.typeName == 'any' then
-            return other.typeName ~= 'never'
-        end
-    end
     for _, v in ipairs(self.values) do
         if not v:canCast(other) then
             return false
@@ -321,19 +314,7 @@ function M:onView(viewer, options)
     if #values == 0 then
         return 'never'
     end
-    -- any 是 top 类型（包含其他所有成员），union 里只显示 any
-    for _, value in ipairs(values) do
-        local v = value
-        if v.kind == 'variable' then
-            v = v.value
-        end
-        if v.typeName == 'any' then
-            return viewer:view(v, {
-                skipLevel = 0,
-                needParentheses = options.needParentheses,
-            })
-        end
-    end
+    -- any 不吸收其他成员：含 any 也显示完整 union
     if #values == 1 then
         return viewer:view(values[1], {
             skipLevel = 0,

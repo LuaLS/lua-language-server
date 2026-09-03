@@ -51,7 +51,7 @@ function new(...)
 	local a, b = ...
 	print(<?b?>)
 end
-]] 'local b: any'
+]] 'local b: any | nil'
 
 TEST_HOVER [[
 ---@overload fun(...)

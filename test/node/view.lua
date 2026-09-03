@@ -193,12 +193,12 @@ do
 end
 
 do
-    -- top 类型：只有 any 遮蔽其他成员，unknown 保留
+    -- any 不遮蔽其他成员：显式保留各成员
     local u = rt.type('any') | rt.type('nil')
-    lt.assertEquals(u:view(), 'any')
+    lt.assertEquals(u:view(), 'any | nil')
 
     local u2 = rt.type('any') | rt.type('nil') | rt.type('string')
-    lt.assertEquals(u2:view(), 'any')
+    lt.assertEquals(u2:view(), 'any | string | nil')
 
     local u3 = rt.type('unknown') | rt.array(rt.type('any'))
     lt.assertEquals(u3:view(), 'unknown | any[]')

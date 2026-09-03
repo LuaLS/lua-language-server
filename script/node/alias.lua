@@ -61,6 +61,7 @@ end
 ---@return Node.Alias
 function M:setCustomValue(callback)
     self.customValue = callback
+    self:flushCache()
     return self
 end
 

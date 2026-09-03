@@ -81,12 +81,14 @@ function M:applyClientChanges(changes, version, encoding)
         return
     end
     self.clientVersion = version
-    if not self.merger then
-        self.merger = tmerger.create(self.clientText, encoding or 'utf-16')
+    local merger = self.merger
+    if merger?:getText() ~= self.clientText then
+        merger = tmerger.create(self.clientText, encoding or 'utf-16')
+        self.merger = merger
     end
-    self.merger:applyChanges(changes)
+    merger:applyChanges(changes)
     local oldText = self:getText()
-    self.clientText = self.merger:getText()
+    self.clientText = merger:getText()
     if self:getText() == oldText then
         return
     end

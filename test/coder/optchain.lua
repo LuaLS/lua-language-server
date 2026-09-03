@@ -24,7 +24,7 @@ do
     local rt = test.scope.rt
     lt.assertEquals(rt:globalGet('R1').value:view(), 'string | nil')
     lt.assertEquals(rt:globalGet('R2').value:view(), 'integer | nil')
-    lt.assertEquals(rt:globalGet('R3').value:view(), 'any')
+    lt.assertEquals(rt:globalGet('R3').value:view(), 'any | nil')
     lt.assertEquals(rt:globalGet('R4').value:view(), 'string')
     lt.assertEquals(rt:globalGet('R5').value:view(), 'string | nil')
 end

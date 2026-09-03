@@ -28,7 +28,10 @@ function M:__init(scope, name, parent)
         self.key = scope.rt.value(name)
     end
     self.scope = scope
-    self.parent = parent
+    if parent then
+        self.parent = parent
+        parent:addRef(self)
+    end
 end
 
 ---@private
@@ -588,6 +591,7 @@ function M:addField(field, path)
     if field.value then
         current:addAssign(field)
     end
+    current:flushCache()
     current.parent:flushCache()
 
     return current

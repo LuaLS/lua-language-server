@@ -341,6 +341,15 @@ function M:fillPresets()
             return true
         end)
         : setConfig('basicType', true)
+    --- 求值未完成时的占位类型，行为与 any 一致，但身份独立，便于识别中间态
+    self.PROVISIONAL = New 'Node.Type' (self.scope, 'any')
+        : setConfig('onCanCast', function (_, other)
+            return other.typeName ~= 'never'
+        end)
+        : setConfig('onCanBeCast', function (_, other)
+            return true
+        end)
+        : setConfig('basicType', true)
     self.UNKNOWN = self.type 'unknown'
         : setConfig('onCanCast', function (_, other)
             local hasNilOrNever
@@ -402,6 +411,10 @@ function M:fillPresets()
     self.ANY:addClass(anykv)
     class.preset(self.ANY, 'truthy', self.TRUTHY)
     class.preset(self.ANY, 'falsy', self.FALSY)
+
+    self.PROVISIONAL:addClass(anykv)
+    class.preset(self.PROVISIONAL, 'truthy', self.TRUTHY)
+    class.preset(self.PROVISIONAL, 'falsy', self.FALSY)
 
 
     self.UNKNOWN:addClass(anykv)

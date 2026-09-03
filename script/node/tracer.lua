@@ -140,6 +140,7 @@ function W:traceRef(ref)
 
     local value = self:getValue(id)
     local pdata = self.parentMap[id]
+    local rt = self.scope.rt
     if pdata and pdata[3] then
         local pver = self.versionMap[pdata[1]]
         local myver = self.versionMap[id]
@@ -154,9 +155,13 @@ function W:traceRef(ref)
                     if r.kind == 'variable' then
                         r = r.value
                     end
+                    -- 读到未完成的中间态，本次结果不可信，不予采纳与持久化
+                    if r == rt.PROVISIONAL then
+                        return nil
+                    end
                     value = r
                 elseif myver then
-                    value = self.scope.rt.NIL
+                    value = rt.NIL
                 end
             end
         end

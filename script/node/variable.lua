@@ -818,7 +818,7 @@ M.value = nil
 ---@return true
 M.__getter.value = function (self)
     local rt = self.scope.rt
-    self.value = rt.ANY
+    self.value = rt.PROVISIONAL
     -- 收窄值依赖 master 实时状态：master 变化时收窄缓存必须失效
     self:getMasterVariable()
     if self.tracer then

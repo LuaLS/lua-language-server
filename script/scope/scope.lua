@@ -7,6 +7,9 @@ local M = Class 'Scope'
 Extends('Scope', 'Node.RefModule')
 Extends('Scope', 'GCHost')
 
+--- 文件是否已加载完毕（扫描 + 读取）。
+M.loaded = false
+--- loaded 且所有文件均已索引后才会为 true。
 M.ready = false
 
 ---@type Feature.Diagnostic.Scope?
@@ -40,6 +43,11 @@ function M:__init(name, uri, fs)
     self.wordIndex = New 'Scope.WordIndex' (self)
 
     self.vm = ls.vm.create(self)
+    self.vm.onDidIndex:on(function ()
+        self:checkReady()
+    end)
+    self.onDidLoad  = ls.sevent.create()
+    self.onDidReady = ls.sevent.create()
     self.diagnostic = self:bindGC(New 'Feature.Diagnostic.Scope' (self))
 end
 
@@ -53,7 +61,8 @@ end
 
 ---@param options Scope.Load.Options
 function M:reload(options)
-    self.ready = false
+    self.loaded = false
+    self.ready  = false
     ---@async
     ls.await.call(function ()
         if self.uri then
@@ -101,9 +110,26 @@ function M:reload(options)
             end
         end)
         self.uris = result.uris
-        self.ready = true
+        self.loaded = true
         ls.scope.onDidLoad:fire(self)
+        self.onDidLoad:fire(self)
+        self:checkReady()
     end)
+end
+
+---@return boolean
+function M:checkReady()
+    if not self.loaded or self.ready then
+        return self.ready
+    end
+    -- 该 scope 内所有文件都已完成索引（无正在编译中的 vfile）时才真正 ready
+    if #self.vm.indexingFiles > 0 then
+        return false
+    end
+    self.ready = true
+    ls.scope.onDidReady:fire(self)
+    self.onDidReady:fire(self)
+    return true
 end
 
 ---@param uri Uri
@@ -277,13 +303,7 @@ function ls.scope.waitReady(uri)
         return
     end
     ls.await.yield(function (resume)
-        local unsubscribe
-        unsubscribe = ls.scope.onDidLoad:on(function (s)
-            if s == scope then
-                unsubscribe()
-                resume()
-            end
-        end)
+        scope.onDidReady:once(resume)
     end)
 end
 

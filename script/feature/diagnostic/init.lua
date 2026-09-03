@@ -132,6 +132,8 @@ ls.file.onDidChange:on(function (uri)
         scope.diagnostic:refreshAfter(1)
     end
 end)
+
+---@param scope Scope
 ls.scope.onDidLoad:on(function (scope)
     scope.diagnostic:refreshNow()
 end)

@@ -5,7 +5,7 @@ local M = Class 'Node.RefModule'
 ---@type table<Node.RefModule, true>?
 M.refMap = nil
 
--- 注册缓存清理链
+-- 注册缓存清理链。注意这是临时引用，不能作为永久引用使用。
 ---@param child Node.RefModule
 function M:addRef(child)
     if self == child then

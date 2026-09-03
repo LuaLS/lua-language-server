@@ -71,7 +71,6 @@ function M:addClass(class)
     table.insert(self.classes, class)
 
     self:flushCache()
-    class:addRef(self)
 
     return self
 end
@@ -101,7 +100,6 @@ function M:addAlias(alias)
     table.insert(self.aliases, alias)
 
     self:flushCache()
-    alias:addRef(self)
 
     return self
 end
@@ -184,6 +182,9 @@ M.protoClasses = nil
 ---@return Node.Class[]
 ---@return true
 M.__getter.protoClasses = function (self)
+    for _, class in ipairs(self.classes or {}) do
+        class:addRef(self)
+    end
     return self:getProtos(self.classes), true
 end
 
@@ -194,6 +195,9 @@ M.protoAliases = nil
 ---@return Node.Alias[]
 ---@return true
 M.__getter.protoAliases = function (self)
+    for _, alias in ipairs(self.aliases or {}) do
+        alias:addRef(self)
+    end
     return self:getProtos(self.aliases), true
 end
 

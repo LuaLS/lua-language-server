@@ -314,7 +314,6 @@ function M:onView(viewer, options)
     if #values == 0 then
         return 'never'
     end
-    -- any 不吸收其他成员：含 any 也显示完整 union
     if #values == 1 then
         return viewer:view(values[1], {
             skipLevel = 0,

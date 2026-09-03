@@ -30,7 +30,6 @@ function M:__init(scope, name, parent)
     self.scope = scope
     if parent then
         self.parent = parent
-        parent:addRef(self)
     end
 end
 
@@ -47,7 +46,7 @@ end
 
 function M:getLocation()
     if self.masterVariable then
-        return self.masterVariable:getLocation()
+        return self:getMasterVariable():getLocation()
     end
     return self.location
 end
@@ -60,7 +59,7 @@ M._types = nil
 M.types = nil
 
 M.__getter.types = function (self)
-    return (self.masterVariable or self)._types
+    return self:getMasterVariable()._types
 end
 
 ---@param node Node
@@ -184,7 +183,7 @@ end
 ---@return boolean
 function M:hasAssign()
     if self.masterVariable then
-        return self.masterVariable:hasAssign()
+        return self:getMasterVariable():hasAssign()
     end
     return self.assigns ~= nil
 end
@@ -193,7 +192,7 @@ end
 ---@return boolean
 function M:isDefined()
     if self.masterVariable then
-        return self.masterVariable:isDefined()
+        return self:getMasterVariable():isDefined()
     end
     return self.assigns ~= nil
         or self._types  ~= nil
@@ -203,7 +202,7 @@ end
 ---@return ...
 function M:eachAssign()
     if self.masterVariable then
-        return self.masterVariable:eachAssign()
+        return self:getMasterVariable():eachAssign()
     end
     if not self.assigns then
         return function () end
@@ -263,7 +262,7 @@ end
 ---@return fun(): Node.Location?
 function M:eachUsage()
     if self.masterVariable then
-        return self.masterVariable:eachUsage()
+        return self:getMasterVariable():eachUsage()
     end
     if not self.usages then
         return function () end
@@ -283,7 +282,7 @@ M._classes = nil
 M.classes = nil
 
 M.__getter.classes = function (self)
-    return (self.masterVariable or self)._classes
+    return self:getMasterVariable()._classes
 end
 
 ---@param node Node.Class
@@ -355,7 +354,7 @@ end
 ---@return boolean
 function M:hasAnnotation(name)
     if self.masterVariable then
-        return self.masterVariable:hasAnnotation(name)
+        return self:getMasterVariable():hasAnnotation(name)
     end
     return self.annotations ~= nil and self.annotations[name] == true
 end
@@ -366,20 +365,25 @@ function M:setMasterVariable(var)
         error('Cannot set master variable')
     end
     self.masterVariable = var.masterVariable or var
-    self.masterVariable:addRef(self)
 
     self:flushCache()
 end
 
+-- 读取 masterVariable 并注册依赖（refMap 为一次性，每次读取时重建引用链）
 ---@return Node.Variable
 function M:getMasterVariable()
-    return self.masterVariable or self
+    local master = self.masterVariable
+    if master then
+        master:addRef(self)
+        return master
+    end
+    return self
 end
 
 ---@return table<Node.Key, Node.Variable>?
 function M:getChilds()
     if self.masterVariable then
-        return self.masterVariable:getChilds()
+        return self:getMasterVariable():getChilds()
     end
     local sv = self.currentValue or self.staticValue
     if sv and sv ~= self and sv.kind == 'variable' then
@@ -397,7 +401,7 @@ M.classValue = nil
 ---@return true
 M.__getter.classValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.classValue, true
+        return self:getMasterVariable().classValue, true
     end
     if not self._classes then
         return false, true
@@ -419,7 +423,7 @@ M.typeValue = nil
 ---@return true
 M.__getter.typeValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.typeValue, true
+        return self:getMasterVariable().typeValue, true
     end
     if not self._types then
         return false, true
@@ -438,7 +442,7 @@ M.parentExpectValue = nil
 ---@return true?
 M.__getter.parentExpectValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.parentExpectValue, true
+        return self:getMasterVariable().parentExpectValue, true
     end
     local parent = self.parent
     if not parent then
@@ -460,7 +464,7 @@ M.parentFieldValue = nil
 ---@return true?
 M.__getter.parentFieldValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.parentFieldValue, true
+        return self:getMasterVariable().parentFieldValue, true
     end
     local parent = self.parent
     if not parent or parent.kind ~= 'variable' then
@@ -486,7 +490,7 @@ M.fields = nil
 ---@return true
 M.__getter.fields = function (self)
     if self.masterVariable then
-        return self.masterVariable.fields, true
+        return self:getMasterVariable().fields, true
     end
     local childs = {}
     if self.assigns then
@@ -518,7 +522,7 @@ M.childs = nil
 ---@return Node.Variable
 function M:getChild(key1, key2, ...)
     if self.masterVariable then
-        return self.masterVariable:getChild(key1, key2, ...)
+        return self:getMasterVariable():getChild(key1, key2, ...)
     end
     local sv = self.currentValue or self.staticValue
     if sv and sv ~= self and sv.kind == 'variable' then
@@ -616,7 +620,7 @@ function M:get(key)
         return r, e
     end
     if self.masterVariable then
-        local r, e = self.masterVariable:get(key)
+        local r, e = self:getMasterVariable():get(key)
         _getVisiting[self] = nil
         return r, e
     end
@@ -635,7 +639,7 @@ end
 ---@return boolean exists
 function M:getExpect(key)
     if self.masterVariable then
-        return self.masterVariable:getExpect(key)
+        return self:getMasterVariable():getExpect(key)
     end
     if self.parentExpectValue then
         return self.parentExpectValue:get(key)
@@ -732,8 +736,7 @@ end
 
 ---@return Node?
 function M:getExpectValue()
-    local master = self.masterVariable or self
-    master:addRef(self)
+    local master = self:getMasterVariable()
     return master.classValue
         or master.parentExpectValue
         or master.typeValue
@@ -743,8 +746,7 @@ end
 ---@package
 ---@return Node?
 function M:getGuessValue()
-    local master = self.masterVariable or self
-    master:addRef(self)
+    local master = self:getMasterVariable()
     return master.equivalentValue
         or master.parentFieldValue
         or nil
@@ -817,6 +819,8 @@ M.value = nil
 M.__getter.value = function (self)
     local rt = self.scope.rt
     self.value = rt.ANY
+    -- 收窄值依赖 master 实时状态：master 变化时收窄缓存必须失效
+    self:getMasterVariable()
     if self.tracer then
         self.tracer:trace()
     end
@@ -840,7 +844,7 @@ M.allEquivalents = nil
 ---@return true
 M.__getter.allEquivalents = function (self)
     if self.masterVariable then
-        return self.masterVariable.allEquivalents, true
+        return self:getMasterVariable().allEquivalents, true
     end
     local rt = self.scope.rt
     local key = rt.luaKey(self.key)
@@ -938,7 +942,7 @@ M.equivalentValue = nil
 ---@return true?
 M.__getter.equivalentValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.equivalentValue, true
+        return self:getMasterVariable().equivalentValue, true
     end
     local rt = self.scope.rt
     ---@type Node[]
@@ -1093,7 +1097,7 @@ M.childsValue = nil
 ---@return true
 M.__getter.childsValue = function (self)
     if self.masterVariable then
-        return self.masterVariable.childsValue, true
+        return self:getMasterVariable().childsValue, true
     end
     local rt = self.scope.rt
     if not self.childs then
@@ -1147,7 +1151,7 @@ end
 ---@return boolean
 function M:isGlobal()
     if self.masterVariable then
-        return self.masterVariable:isGlobal()
+        return self:getMasterVariable():isGlobal()
     end
 
     if self == self.scope.rt.VAR_G then

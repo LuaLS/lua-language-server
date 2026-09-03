@@ -128,7 +128,7 @@ ls.file.onDidChange:on(function (uri)
     local scope = ls.scope.find(uri)
     if scope?.ready then
         ---@cast scope -?
-        ls.scope.findVfile(uri)?.diagnostic:refreshNow()
+        ls.scope.findVfile(uri)?.diagnostic:refreshThrottle(0.5)
         scope.diagnostic:refreshAfter(1)
     end
 end)

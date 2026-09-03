@@ -21,8 +21,6 @@ M.version = -1
 ---@type boolean
 M.calculated = false
 
-local DELAY = 0.1
-
 ---@param vfile VM.Vfile
 function M:__init(vfile)
     self.vfile = vfile
@@ -52,9 +50,12 @@ end
 M.refreshTimer = nil
 
 ---@param delay number
-function M:refreshAfter(delay)
-    self.refreshTimer?:remove()
+function M:refreshThrottle(delay)
+    if self.refreshTimer then
+        return
+    end
     self.refreshTimer = ls.timer.wait(delay, function ()
+        self.refreshTimer = nil
         self:refreshNow()
     end)
 end
@@ -63,12 +64,7 @@ end
 ---@return Task
 function M:refreshNow(callback)
     self.refreshTask?:reject(ls.task.REJECT_CANCELED)
-    self.refreshTask = ls.task.create({}, function (result, err)
-        self:pushNow()
-        if callback then
-            callback(result)
-        end
-    end)
+    self.refreshTask = ls.task.create()
         ---@async
         : execute(function (task)
             local vfile = self.vfile
@@ -87,6 +83,10 @@ function M:refreshNow(callback)
 
             task:resolve(results)
         end)
+        : onResolved(function (result)
+            self:pushNow()
+            callback?(result)
+        end)
 
     return self.refreshTask
 end
@@ -98,7 +98,7 @@ function M:schedulePush()
     if self.pushTimer then
         return
     end
-    self.pushTimer = ls.timer.wait(DELAY, function ()
+    self.pushTimer = ls.timer.wait(0.2, function ()
         self.pushTimer = nil
         self:pushNow()
     end)

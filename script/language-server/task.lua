@@ -1,15 +1,23 @@
 ---@class Task
 local M = Class 'Task'
 
+---@private
 M.resolved = false
 
----@alias Task.Callback fun(result?: any, err?: any)
+---@alias Task.OnResolved fun(result: any)
+---@alias Task.OnRejected fun(err: any)
+
+---@private
+---@type Task.OnResolved?
+M._onResolved = nil
+
+---@private
+---@type Task.OnRejected?
+M._onRejected = nil
 
 ---@param context? table
----@param callback? Task.Callback
-function M:__init(context, callback)
+function M:__init(context)
     self.context = context or {}
-    self.callback = callback or function () end
     self.threads = {}
     self.awaitings = {}
 end
@@ -29,6 +37,26 @@ function M:__close(err)
     Delete(self)
 end
 
+---@param callback Task.OnResolved
+---@return Task
+function M:onResolved(callback)
+    self._onResolved = callback
+    if self.resolved then
+        callback(self.result)
+    end
+    return self
+end
+
+---@param callback Task.OnRejected
+---@return Task
+function M:onRejected(callback)
+    self._onRejected = callback
+    if self.resolved and self.err then
+        callback(self.err)
+    end
+    return self
+end
+
 ---@param result any
 function M:resolve(result)
     if self.resolved then
@@ -37,7 +65,7 @@ function M:resolve(result)
     self.resolved = true
     self.result = result
 
-    self.callback(result, nil)
+    self._onResolved?(result)
     self:resolveAwaitings()
 
     Delete(self)
@@ -51,7 +79,7 @@ function M:reject(err)
     self.resolved = true
     self.err = err
 
-    self.callback(nil, err)
+    self._onRejected?(err)
     self:resolveAwaitings()
 
     Delete(self)
@@ -109,10 +137,9 @@ ls.task.REJECT_CLOSED = { '<REJECT_CLOSED>' }
 ls.task.REJECT_CANCELED = { '<REJECT_CANCELED>' }
 
 ---@param context? table
----@param callback? Task.Callback
 ---@return Task
-function ls.task.create(context, callback)
-    return New 'Task' (context, callback)
+function ls.task.create(context)
+    return New 'Task' (context)
 end
 
 ---@return Task?

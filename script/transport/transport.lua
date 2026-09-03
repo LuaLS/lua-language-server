@@ -70,15 +70,22 @@ function M:next()
         if data.method then
             -- request or notification
 
-            local task = ls.task.create(data, function (result, err)
+            local function handlePending()
                 if not data.id then
-                    return
+                    return false
                 end
                 if not self.pendingMap[data.id] then
-                    return
+                    return false
                 end
                 self.pendingMap[data.id] = nil
-                if not err then
+                return true
+            end
+
+            local task = ls.task.create(data)
+                : onResolved(function (result)
+                    if not handlePending() then
+                        return
+                    end
                     if result == nil then
                         result = ls.json.null
                     end
@@ -86,7 +93,12 @@ function M:next()
                         id     = data.id,
                         result = result,
                     }
-                else
+                end)
+                : onRejected(function (err)
+                    if not handlePending() then
+                        return
+                    end
+
                     local function pushError(code, message)
                         self:write {
                             id    = data.id,
@@ -114,8 +126,8 @@ function M:next()
                         return
                     end
                     pushError(ls.spec.ErrorCodes.InternalError, ls.inspect(err))
-                end
-            end)
+                end)
+
             if data.id then
                 self.pendingMap[data.id] = task
             end

@@ -516,7 +516,9 @@ end)
 ls.vm.registerCoderProvider('catstatetype', function (coder, source)
     ---@cast source LuaParser.Node.CatStateType
 
-    coder:compile(source.exp)
+    for _, exp in ipairs(source.exps or { source.exp }) do
+        coder:compile(exp)
+    end
 
     coder:addToCatGroup(source.parent, true)
 end)

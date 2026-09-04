@@ -54,14 +54,17 @@ local function tryBindCat(coder, var, index)
             end
         elseif cat.kind == 'catstatetype' then
             ---@cast cat LuaParser.Node.CatStateType
-            -- type 目前只支持绑定第一个变量
-            if index == 1 then
+            -- type 按变量顺序绑定：`---@type A, B` 分别绑定 local 的第 1/2 个变量
+            local typeExp = cat.exps and cat.exps[index] or (index == 1 and cat.exp or nil)
+            if typeExp then
                 coder:addLine('{var}:addType({type})' % {
                     var  = coder:getKey(var),
-                    type = coder:getKey(cat.exp),
+                    type = coder:getKey(typeExp),
                 })
-                catState.binded = true
-                return coder:getKey(cat.exp)
+                if cat.exps and index >= #cat.exps then
+                    catState.binded = true
+                end
+                return coder:getKey(typeExp)
             end
         elseif cat.kind == 'catstateparam' then
             ---@cast cat LuaParser.Node.CatStateParam
@@ -223,6 +226,18 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
             local tracer = coder:getTracer()
             if tracer then
                 tracer:appendLink(var, callNode, returnIndex)
+            end
+        end
+    end
+    -- 消费未用完的 ---@type 注解（如 `---@type A, B, C` 只声明两个变量），避免泄漏给后续相邻语句
+    do
+        local catGroup = coder:getCatGroup(source)
+        if catGroup then
+            for _, catState in ipairs(catGroup) do
+                local cat = catState.value
+                if cat and cat.kind == 'catstatetype' and not catState.binded then
+                    catState.binded = true
+                end
             end
         end
     end

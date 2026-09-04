@@ -97,6 +97,29 @@ TEST [[
 }
 
 TEST [[
+---@type A, B, C
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatetype',
+                exp  = {
+                    kind = 'catid',
+                    id   = 'A',
+                },
+                exps = {
+                    { kind = 'catid', id = 'A' },
+                    { kind = 'catid', id = 'B' },
+                    { kind = 'catid', id = 'C' },
+                },
+            }
+        }
+    }
+}
+
+TEST [[
 ---@type A?
 ]]
 {

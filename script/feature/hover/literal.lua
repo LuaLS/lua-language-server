@@ -14,6 +14,7 @@ ls.feature.provider.hover(function (param, action)
         label = "{} 个字节，{} 个字符" % { len, charLen }
     end
     local value = param.vm:getNode(source)
+    ---@cast value Node.Value?
     local desc
     if value and value.getDocument then
         desc = value:getDocument()

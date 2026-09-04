@@ -12,6 +12,7 @@
 ---@field finishRow integer # 结束行号
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
+---@field desc? string # 附带的文档描述
 ---@field uniqueKey string # 形如"string@2:10"
 ---@field parent? unknown
 ---@field parentBlock LuaParser.Node.Block | false # 向上搜索一个block

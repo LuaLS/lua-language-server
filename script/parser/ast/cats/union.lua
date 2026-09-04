@@ -61,7 +61,7 @@ function Ast:parseCatUnion(required)
 end
 
 ---@private
----@param node LuaParser.Node.CatExp?
+---@param node LuaParser.Node.Base?
 function Ast:parseCatDescription(node)
     if not self.lexer:consume '#' then
         return

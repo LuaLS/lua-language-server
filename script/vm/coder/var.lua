@@ -166,6 +166,9 @@ ls.vm.registerCoderProvider('param', function (coder, source)
     local type = 'rt.ANY'
     if cat and cat.value then
         type = coder:getKey(cat.value)
+    elseif source.value then
+        coder:compile(source.value)
+        type = coder:getKey(source.value)
     end
     coder:addLine('{key}:addType({type})' % {
         key  = coder:getKey(source),

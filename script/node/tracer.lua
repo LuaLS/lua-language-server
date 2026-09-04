@@ -238,7 +238,8 @@ function W:traceIfChild(ifchild, lastStack)
     local bodyStart = 1
     local first = ifchild[1]
     local terminated
-    if type(first) == 'table' and first[1] == 'return' then
+    if first == 'return'
+    or (type(first) == 'table' and first[1] == 'return') then
         terminated = true
         bodyStart = 2
         first = ifchild[2]

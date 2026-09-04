@@ -277,9 +277,10 @@ ls.vm.registerCoderProvider('catstring', function (coder, source)
         quo   = source.quo,
     })
     if source.desc then
+        local doc = source.desc
         coder:addLine('{key}:setDocument({desc%q})' % {
             key  = key,
-            desc = source.desc,
+            desc = doc,
         })
     end
 end)

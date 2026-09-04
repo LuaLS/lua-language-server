@@ -252,6 +252,15 @@ function Ast:parseParam(required)
     end
     local param = self:parseID('LuaParser.Node.Param', required, 'warn')
     if param then
+        self:skipSpace()
+        if self.lexer:consume ':' then
+            self:skipSpace()
+            local litType = self:parseCatExp()
+            if litType then
+                litType.parent = param
+                param.value = litType --[[@as LuaParser.Node.Exp]]
+            end
+        end
         return param
     end
 

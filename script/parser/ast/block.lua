@@ -187,6 +187,12 @@ function Ast:blockParseChilds(block)
         end
     end
     self:parseDelayedComments(block)
+    if lastState and lastState.kind == 'return' then
+        ---@cast lastState LuaParser.Node.Return
+        block.returns = { lastState }
+    else
+        block.returns = nil
+    end
     self:mergeStatesAndCats(block)
 end
 
@@ -234,9 +240,18 @@ function Ast:mergeStatesAndCats(block)
             break
         end
         cat.used = true
-        cat.parent = block
-        needMerge = true
-        block.childs[#block.childs+1] = cat
+        local already = false
+        for _, child in ipairs(block.childs) do
+            if child == cat then
+                already = true
+                break
+            end
+        end
+        if not already then
+            cat.parent = block
+            needMerge = true
+            block.childs[#block.childs+1] = cat
+        end
     end
 
     if not needMerge then

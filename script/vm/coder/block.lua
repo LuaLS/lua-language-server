@@ -20,10 +20,12 @@ local function parseBlock(coder, block, blockKV)
     -- 正常编译其余子节点（跳过已编译的尾随注解）
     for _, child in ipairs(block.childs) do
         if not (child.kind == 'cat' and child.trailing) then
-            coder:withIndentation(function ()
-                coder:compile(child)
-            end, child)
-            coder:addLine('')
+            if not coder.compiled[child] then
+                coder:withIndentation(function ()
+                    coder:compile(child)
+                end, child)
+                coder:addLine('')
+            end
         end
     end
     coder:popBlock()

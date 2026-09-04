@@ -10,9 +10,11 @@ end
 assert(metaRoot, 'meta root not built')
 
 local baseUri = metaRoot.uri / 'basic.lua'
-assert(ls.afs.read(baseUri):find('"param"', 1, true), '5.5 meta basic.lua should contain param')
+local content = ls.afs.read(baseUri)
+assert(content)
+assert(content:find('"param"', 1, true), '5.5 meta basic.lua should contain param')
 
-local metaFile <close> = ls.file.setServerText(baseUri, ls.afs.read(baseUri))
+local metaFile <close> = ls.file.setServerText(baseUri, content)
 metaRoot.uriSet[baseUri] = true
 test.scope.vm:indexFile(baseUri)
 

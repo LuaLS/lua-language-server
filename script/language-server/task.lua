@@ -103,7 +103,9 @@ function M:execute(func)
         local co = coroutine.running()
         taskMap[co] = self
         table.insert(self.threads, co)
-        func(self)
+        xpcall(func, function (err)
+            self:reject(debug.traceback(err, 2))
+        end, self)
     end)
     return self
 end
@@ -133,8 +135,8 @@ end
 
 ls.task = {}
 
-ls.task.REJECT_CLOSED = { '<REJECT_CLOSED>' }
-ls.task.REJECT_CANCELED = { '<REJECT_CANCELED>' }
+ls.task.REJECT_CLOSED = 'closed'
+ls.task.REJECT_CANCELED = 'canceled'
 
 ---@param context? table
 ---@return Task

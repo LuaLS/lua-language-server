@@ -111,9 +111,9 @@ function M:reload(options)
         end)
         self.uris = result.uris
         self.loaded = true
+        self:checkReady()
         ls.scope.onDidLoad:fire(self)
         self.onDidLoad:fire(self)
-        self:checkReady()
     end)
 end
 

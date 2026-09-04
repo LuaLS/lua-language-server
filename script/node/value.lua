@@ -90,3 +90,25 @@ end
 function M:addRef(child)
     -- do nothing
 end
+
+---@type string?
+M.document = nil
+
+---@param doc string
+---@return Node.Value
+function M:setDocument(doc)
+    if self.scope.rt.valueDocs then
+        self.scope.rt.valueDocs[self.literal] = doc
+    end
+    self.document = doc
+    return self
+end
+
+---@return string?
+function M:getDocument()
+    if self.scope.rt.valueDocs
+    and self.scope.rt.valueDocs[self.literal] ~= nil then
+        return self.scope.rt.valueDocs[self.literal]
+    end
+    return self.document
+end

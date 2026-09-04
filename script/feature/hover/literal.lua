@@ -13,7 +13,15 @@ ls.feature.provider.hover(function (param, action)
     else
         label = "{} 个字节，{} 个字符" % { len, charLen }
     end
-    action.push { label = label }
+    local value = param.vm:getNode(source)
+    local desc
+    if value and value.getDocument then
+        desc = value:getDocument()
+    end
+    action.push {
+        label = label,
+        description = desc,
+    }
 end)
 
 ls.feature.provider.hover(function (param, action)

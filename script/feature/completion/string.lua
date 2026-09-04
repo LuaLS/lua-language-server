@@ -927,9 +927,21 @@ ls.feature.provider.completion(function (param, action)
             goto continue
         end
         used[label] = true
+        local detail
+        if param.scope and param.scope.rt and param.scope.rt.valueDocs then
+            local raw = literal
+            local first = raw:sub(1, 1)
+            local last = raw:sub(-1)
+            if (first == '"' and last == '"')
+            or (first == "'" and last == "'") then
+                raw = raw:sub(2, -2)
+            end
+            detail = param.scope.rt.valueDocs[raw]
+        end
         action.push {
             label = label,
             kind = ls.spec.CompletionItemKind.EnumMember,
+            detail = detail,
             textEdit = makeLegacyTextEdit(editStart, editFinish, label),
         }
         ::continue::

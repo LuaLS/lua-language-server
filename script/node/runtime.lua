@@ -12,6 +12,9 @@ function M:__init(scope)
     ---@private
     self.scope = scope
 
+    ---@type table<string|number|boolean, string>
+    self.valueDocs = {}
+
     self:fillAPIs()
 end
 
@@ -468,6 +471,7 @@ function M:reset()
     self:createPools()
     self:fillPresets()
     self.castCache = nil
+    self.valueDocs = {}
 end
 
 ---@param ... Node.Key

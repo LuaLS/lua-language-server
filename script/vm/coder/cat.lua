@@ -270,11 +270,18 @@ end)
 ls.vm.registerCoderProvider('catstring', function (coder, source)
     ---@cast source LuaParser.Node.CatString
 
+    local key = coder:getKey(source)
     coder:addLine('{key} = rt.value({value%q}, {quo%q})' % {
-        key = coder:getKey(source),
+        key   = key,
         value = source.value,
         quo   = source.quo,
     })
+    if source.desc then
+        coder:addLine('{key}:setDocument({desc%q})' % {
+            key  = key,
+            desc = source.desc,
+        })
+    end
 end)
 
 ls.vm.registerCoderProvider('catboolean', function (coder, source)

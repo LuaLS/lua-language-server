@@ -61,8 +61,8 @@ M.register {
     'redefined-local',
 } {
     group    = 'redefined',
-    severity = 'Warning',
-    status   = 'Any',
+    severity = 'Hint',
+    status   = 'Opened',
 }
 
 M.register {

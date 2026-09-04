@@ -404,8 +404,13 @@ function W:traceConditionUnit(exp, revert)
         self:traceCallEqual(left, right, not revert)
         self:traceCallEqual(right, left, not revert)
     elseif kind == 'not' then
-        -- 树形：exp[2] 是被取反的子表达式
-        local inner = exp[2]
+        -- 结构：{'not', [副作用ref...], condExp}
+        -- 最后子节点是 condExp，前面的副作用 ref 用于建立 aliasID
+        local n = #exp
+        for i = 2, n - 1 do
+            self:traceUnit(exp[i])
+        end
+        local inner = exp[n]
         if inner then
             self:traceConditionUnit(inner, not revert)
         end

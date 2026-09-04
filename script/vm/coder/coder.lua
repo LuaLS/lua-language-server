@@ -473,7 +473,8 @@ function M:getCatGroup(nearbySource)
         end
     end
 
-    local group = self:getBlockKV('catGroup')
+    -- 注解可能落在外层块（如循环体首句），向上查找，靠行号相邻性保证正确归属
+    local group = self:findBlockKV('catGroup')
     if not group then
         return nil
     end

@@ -32,6 +32,7 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 - 如果 tracer 报 `No such key`，先检查 middle code 和 flow 产物，不要先加防御式绕过。
 - 术语约定："诊断"一词只表示 VSCode 问题面板中由 LSP 提供的静态分析结果（警告或错误等级），无需编译、运行。涉及诊断时应当通过工具查看问题面板，并根据最近改动研究是哪些改动导致的，而不是跑测试或清理调试输出。
 - Windows PowerShell 写入文件必须指定 `-Encoding UTF8`（默认 GBK/UTF-16 LE 会破坏源码）；项目源码统一 UTF-8 无 BOM。
+- 测试 harness（`TEST_INDEX` / `TEST_COMPLETION`）运行在**裸环境，无标准库**。用例若需 `string`/`table`/`ipairs`/`select` 等标准库函数，用 `--!include <name>` 宏手动导入（见 `test/include.lua` 的 `test.includeCodes`），或自行定义。用例尽量写抽象通用代码。
 
 ## 使用步骤
 1. 先看 [architecture](./references/architecture.md)，确认你要改的能力属于哪个子系统。

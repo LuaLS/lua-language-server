@@ -91,11 +91,11 @@ function Ast:parseFor()
     if symbolPos2 then
         forNode.symbolPos2 = symbolPos2
 
-        self:skipSpace()
         self:blockStart(forNode)
         for i = 1, #vars do
             self:initLocal(vars[i])
         end
+        self:skipSpace()
         self:blockParseChilds(forNode)
         self:blockFinish(forNode)
 

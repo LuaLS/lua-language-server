@@ -18,6 +18,7 @@ bin\lua-language-server.exe --test feature.completion.field
 - node 或 tracer 改动根据归属放到 `test/node/` 或 `test/coder/`。
 - 面向 LSP 行为的改动，优先在 `test/feature/` 补测试。
 - completion 测试使用 `test/feature/completion/init.lua` 中的 harness；要记住 `TEST_COMPLETION` 运行在裸环境。
+- **测试环境没有标准库**：`TEST_INDEX`（`test/coder/init.lua`）、`TEST_COMPLETION` 等 harness 运行在裸 `rt` 环境，`string`/`table`/`math`/`ipairs`/`select` 等标准库函数不可用。若用例需要某个标准库函数，用 `--!include <name>` 宏手动导入，或直接用 `test.includeCodes[name]` 中已有的片段（见 `test/include.lua`），再或者在用例里自行定义。测试用例也应尽量用抽象、通用代码，避免依赖具体标准库实现。
 
 ## 调试工作流
 - tracer 或 flow 失败后，先看 `tmp/LAST_CODE`、`tmp/LAST_FLOW`、`tmp/LAST_PMAP`。

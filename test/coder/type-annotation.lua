@@ -37,3 +37,16 @@ do
     lt.assertEquals(rt:globalGet('X'):view(), 'string | nil')
     lt.assertEquals(rt:globalGet('Y'):view(), 'integer')
 end
+
+do
+    -- 循环体内第一句的 ---@type 也应绑定到多值 local 的第一个变量
+    local _ <close> = TEST_INDEX [[
+    for i = 1, 10 do
+        ---@type string?
+        local key, tail = unknownCall()
+        K = key
+    end
+    ]]
+
+    lt.assertEquals(rt:globalGet('K'):view(), 'string | nil')
+end

@@ -41,7 +41,7 @@ function collectgarbage(opt, arg) end
 
 ---#DES 'dofile'
 ---@param filename? string
----@return any ...
+---@return ... any
 function dofile(filename) end
 
 ---#DES 'error'
@@ -161,7 +161,7 @@ function pairs(t) end
 ---@param f function
 ---@return boolean success
 ---@return any result
----@return any ...
+---@return ... any
 function pcall(f) end
 ---#else
 ---@overload fun<R: any[]>(f: async fun(...):...R, ...any):true, ...R
@@ -171,7 +171,7 @@ function pcall(f) end
 ---@param ...   any
 ---@return boolean success
 ---@return any result
----@return any ...
+---@return ... any
 function pcall(f, arg1, ...) end
 ---#end
 
@@ -326,7 +326,7 @@ function warn(message, ...) end
 ---@param err function
 ---@return boolean success
 ---@return any result
----@return any ...
+---@return ... any
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
@@ -338,7 +338,7 @@ function xpcall(f, err) end
 ---@param ...   any
 ---@return boolean success
 ---@return any result
----@return any ...
+---@return ... any
 function xpcall(f, msgh, arg1, ...) end
 ---#end
 

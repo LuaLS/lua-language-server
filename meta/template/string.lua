@@ -8,7 +8,7 @@ string = {}
 ---@param s  string|number
 ---@param i? integer
 ---@param j? integer
----@return integer ...
+---@return ... integer
 ---@nodiscard
 function string.byte(s, i, j) end
 
@@ -92,7 +92,7 @@ function string.lower(s) end
 ---@param s       string|number
 ---@param pattern string|number
 ---@param init?   integer
----@return any ...
+---@return ... any
 ---@nodiscard
 function string.match(s, pattern, init) end
 
@@ -149,7 +149,7 @@ function string.sub(s, i, j) end
 ---@param fmt  string
 ---@param s    string
 ---@param pos? integer
----@return any ...
+---@return ... any
 ---@return integer offset
 ---@nodiscard
 function string.unpack(fmt, s, pos) end

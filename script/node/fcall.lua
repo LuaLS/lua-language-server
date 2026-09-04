@@ -198,6 +198,15 @@ M.__getter.returns = function (self)
             returns[i] = returns[i] | (f:getReturn(i) or rt.NIL)
         end
     end
+    -- 不定长返回（spread）：保留末位元素，使任意位置都可取到
+    if allMax == false then
+        for _, f in ipairs(matchedFuncs) do
+            local tail = f:getReturn(allMin + 1)
+            if tail then
+                returns[allMin + 1] = returns[allMin + 1] | tail
+            end
+        end
+    end
 
     local list = rt.list(returns, allMin, allMax)
     return list, true

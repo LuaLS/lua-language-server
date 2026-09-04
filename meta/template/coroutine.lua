@@ -35,7 +35,7 @@ function coroutine.close(co) end
 ---@param co    thread
 ---@param val1? any
 ---@return boolean success
----@return any ...
+---@return ... any
 function coroutine.resume(co, val1, ...) end
 
 ---#DES 'coroutine.running'
@@ -63,7 +63,7 @@ function coroutine.wrap(f) end
 
 ---#DES 'coroutine.yield'
 ---@async
----@return any ...
+---@return ... any
 function coroutine.yield(...) end
 
 return coroutine

@@ -227,7 +227,7 @@ function buf:skip(len) end
 ---
 ---@param len? integer
 ---@param ... integer|nil
----@return string ...
+---@return ... string
 function buf:get(len, ...) end
 
 --- Creates a string from the buffer data, but doesn't consume it. The buffer remains unchanged.

@@ -72,7 +72,7 @@ M.__getter.value = function (self)
             return rt.list(values), true
         end
     end
-    return rt.list({ self.head }), true
+    return rt.list({ self.head }, 0, false), true
 end
 
 ---@param self Node.Spread

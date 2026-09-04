@@ -181,3 +181,37 @@ do
     local fcall = rt.fcall(f, { arg })
     lt.assertEquals(fcall.value:viewAsList(), 'integer, string')
 end
+
+do
+    -- `...any`：单类型 spread 应支持任意位置取到元素类型
+    local f = rt.func()
+        : addReturnDef(nil, rt.spread(rt.ANY))
+
+    lt.assertEquals(f.returnsPack.min, 0)
+    lt.assertEquals(f:getReturn(1):view(), 'any')
+    lt.assertEquals(f:getReturn(2):view(), 'any')
+    lt.assertEquals(f:getReturn(8):view(), 'any')
+end
+
+do
+    -- `...string`：经由调用可取值到任意位置的返回
+    local f = rt.func()
+        : addReturnDef(nil, rt.spread(rt.STRING))
+    local fcall = rt.fcall(f, {})
+
+    lt.assertEquals(fcall:select(2):view(), 'string')
+    lt.assertEquals(fcall:select(3):view(), 'string')
+    lt.assertEquals(fcall:select(9):view(), 'string')
+end
+
+do
+    -- 固定首值 + 不定长尾部：`boolean, ...any`
+    local f = rt.func()
+        : addReturnDef(nil, rt.TRUE)
+        : addReturnDef(nil, rt.spread(rt.ANY))
+    local fcall = rt.fcall(f, {})
+
+    lt.assertEquals(fcall:select(1):view(), 'true')
+    -- 尾部为不定长（0 个或多个 any）：第 2 位可能缺省，故为 any | nil
+    lt.assertEquals(fcall:select(2):view(), 'any | nil')
+end

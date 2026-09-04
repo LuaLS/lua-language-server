@@ -25,6 +25,7 @@ bin\lua-language-server.exe --test feature.completion.field
 - 如果 `self.map` 报 `No such key`，优先检查 coder 输出中的读写顺序，不要直接绕过 map。
 - 临时日志和诊断产物统一留在 `tmp/`。
 - 临时调试脚本/文件必须放在 `tmp/` 下，测试完毕后清理；不要散落在 `test/` 或 `script/` 目录。
+- **新增文件可以，但尽量不要删除文件**（`del`/`rm` 会被拦截，需用户手动确认）；尽量复用已有文件或就地修改。
 - 如果使用 debugger，启动新会话前先停掉旧会话，用完后及时断开。
 
 ## 风格约定

@@ -28,6 +28,7 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 - 正常功能开发不要运行 `PreCompile` 或 `Compile` 任务。
 - 改动保持小而聚焦，避免无关重构和整仓格式化。
 - 临时调试输出统一放到 `tmp/`。
+- **新增文件可以，但尽量不要删除文件**：`del`/`rm` 等删除操作会被拦截，需用户手动确认。尽量复用已有文件或就地修改；确需清理时先征询用户。
 - narrowing 优先走 `script/node/tracer.lua`，不要把新 narrowing 逻辑加到 `script/vm/coder/flow.lua` 或 `script/vm/coder/branch.lua`。
 - 如果 tracer 报 `No such key`，先检查 middle code 和 flow 产物，不要先加防御式绕过。
 - 术语约定："诊断"一词只表示 VSCode 问题面板中由 LSP 提供的静态分析结果（警告或错误等级），无需编译、运行。涉及诊断时应当通过工具查看问题面板，并根据最近改动研究是哪些改动导致的，而不是跑测试或清理调试输出。

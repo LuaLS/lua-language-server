@@ -379,11 +379,11 @@ function M:fillPresets()
             return other.truthy ~= self.NEVER
         end)
         : setConfig('basicType', true)
+    self.NIL = self.type 'nil'
+        : setConfig('basicType', true)
     self.FALSY = self.FALSE | self.NIL
     self.TYPE_POOL['truly'] = self.TRUTHY
     self.TYPE_POOL['falsy'] = self.FALSY
-    self.NIL = self.type 'nil'
-        : setConfig('basicType', true)
     self.VALUE_NAN = New 'Node.Value' (self.scope, 0/0)
     self.NUMBER = self.type 'number'
         : setConfig('basicType', true)

@@ -37,6 +37,9 @@ function M:__init(scope)
 
     ---@type { param: string, type: Node? }[]
     self.narrowDefs = {}
+
+    ---@type Node.Function[]?
+    self.overloads = nil
 end
 
 function M:setAsync()
@@ -71,6 +74,16 @@ end
 ---@return Node.Variable?
 function M:getName()
     return self._name
+end
+
+---@param func Node.Function
+---@return Node.Function
+function M:addOverload(func)
+    if not self.overloads then
+        self.overloads = {}
+    end
+    self.overloads[#self.overloads + 1] = func
+    return self
 end
 
 ---@param other Node
@@ -193,6 +206,32 @@ M.__getter.returnsPack = function (self)
     end
 end
 
+---@param s Node.Function
+---@param t Node.Function
+---@return boolean
+local function castSignature(s, t)
+    if not s.paramsPack:canCast(t.paramsPack) then
+        return false
+    end
+    return s.returnsPack:canCast(t.returnsPack)
+end
+
+---@param f Node.Function
+---@return Node.Function[]
+local function collectSignatures(f)
+    local sigs = {}
+    local hasOverloads = f.overloads and #f.overloads > 0
+    if not f:isDummy() or not hasOverloads then
+        sigs[#sigs + 1] = f
+    end
+    if f.overloads then
+        for _, o in ipairs(f.overloads) do
+            sigs[#sigs + 1] = o
+        end
+    end
+    return sigs
+end
+
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
@@ -202,12 +241,40 @@ function M:onCanCast(other)
     end
     if other.kind == 'function' then
         ---@cast other Node.Function
-        if not self.paramsPack:canCast(other.paramsPack) then
-            return false
+        for _, t in ipairs(collectSignatures(other)) do
+            local ok = false
+            for _, s in ipairs(collectSignatures(self)) do
+                if castSignature(s, t) then
+                    ok = true
+                    break
+                end
+            end
+            if not ok then
+                return false
+            end
         end
-        return self.returnsPack:canCast(other.returnsPack)
+        return true
     end
     return false
+end
+
+---@param kind string
+---@param callback fun(node: Node)
+---@param visited? table<Node, boolean>
+function M:each(kind, callback, visited)
+    if kind ~= 'function' then
+        return
+    end
+    visited = ls.util.visited(self, visited)
+    if not visited then
+        return
+    end
+    callback(self)
+    if self.overloads then
+        for _, o in ipairs(self.overloads) do
+            o:each(kind, callback, visited)
+        end
+    end
 end
 
 ---@param key string
@@ -402,6 +469,16 @@ function M:resolveGeneric(map, ctx)
             newEntry.type = entry.type:resolveGeneric(map, ctx)
         end
         newFunc.narrowDefs[#newFunc.narrowDefs + 1] = newEntry
+    end
+    if self.overloads then
+        for _, o in ipairs(self.overloads) do
+            local newOverload = o:resolveGeneric(map, ctx)
+            ---@cast newOverload Node.Function
+            if not newFunc.overloads then
+                newFunc.overloads = {}
+            end
+            newFunc.overloads[#newFunc.overloads + 1] = newOverload
+        end
     end
     return newFunc
 end

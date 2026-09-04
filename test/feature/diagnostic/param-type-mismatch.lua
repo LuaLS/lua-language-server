@@ -62,6 +62,33 @@ local sp
 f(sp == '' and '.' or sp)
 ]] { '-param-type-mismatch' }
 
+-- 重载作为值传给单签名参数：重载应自动选择合适签名，而非 union 的"全部匹配"
+TEST_DIAGNOSTIC [[
+---@overload fun(n: integer): string
+local function read(...) end
+---@param reader fun(arg: integer): string
+local function decode(reader) end
+decode(read)
+]] { '-param-type-mismatch' }
+
+-- 基础签名不匹配、仅某个重载匹配：仍应通过（重载选择）
+TEST_DIAGNOSTIC [[
+---@overload fun(n: integer): string
+local function read() end
+---@param reader fun(arg: integer): string
+local function decode(reader) end
+decode(read)
+]] { '-param-type-mismatch' }
+
+-- 真正不确定的函数 union（非重载）仍按"全部成员匹配"：一个成员不匹配则失败
+TEST_DIAGNOSTIC [[
+---@type fun(): string | fun(n: number): string
+local f
+---@param reader fun(arg: integer): string
+local function decode(reader) end
+decode(f)
+]] { 'param-type-mismatch' }
+
 TEST_DIAGNOSTIC [[
 ---@type thread
 local co

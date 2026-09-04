@@ -133,9 +133,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         ---@type LuaParser.Node.CatStateOverload[]?
         local overloads = coder:findNearedCats(source, 'catstateoverload')
 
-        local funcKey = overloads
-                    and coder:getCustomKey('origin|' .. source.uniqueKey)
-                    or  coder:getKey(source)
+        local funcKey = coder:getKey(source)
         coder:addLine('{key} = rt.func()' % {
             key = funcKey,
         })
@@ -303,11 +301,13 @@ ls.vm.registerCoderProvider('function', function (coder, source)
         end
 
         if overloads then
-            local overloadKeys = { funcKey }
-
+            coder:addLine('-- function overloads --')
             for _, overload in ipairs(overloads) do
                 local overloadKey = coder:getKey(overload.value)
-                overloadKeys[#overloadKeys+1] = overloadKey
+                coder:addLine('{funcKey}:addOverload({overloadKey})' % {
+                    funcKey     = funcKey,
+                    overloadKey = overloadKey,
+                })
                 if source.name then
                     coder:addLine('{overloadKey}:setName({nameKey})' % {
                         overloadKey = overloadKey,
@@ -315,13 +315,6 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     })
                 end
             end
-
-            coder:addLine('-- function overloads --')
-            coder:addLine('{key} = rt.union { {overloadList} }' % {
-                key          = coder:getKey(source),
-                funcKey      = funcKey,
-                overloadList = table.concat(overloadKeys, ', '),
-            })
         end
 
         if source.name then

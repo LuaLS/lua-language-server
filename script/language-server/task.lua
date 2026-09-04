@@ -1,5 +1,7 @@
----@class Task
+---@class Task: GCHost
 local M = Class 'Task'
+
+Extends('Task', 'GCHost')
 
 ---@private
 M.resolved = false
@@ -85,6 +87,13 @@ function M:reject(err)
     Delete(self)
 end
 
+---@param timeout number
+function M:setTimeout(timeout)
+    self:bindGC(ls.timer.wait(timeout, function ()
+        self:reject(ls.task.REJECT_TIMEOUT)
+    end))
+end
+
 ---@private
 function M:resolveAwaitings()
     for _, resume in ipairs(self.awaitings) do
@@ -137,6 +146,7 @@ ls.task = {}
 
 ls.task.REJECT_CLOSED = 'closed'
 ls.task.REJECT_CANCELED = 'canceled'
+ls.task.REJECT_TIMEOUT = 'timeout'
 
 ---@param context? table
 ---@return Task

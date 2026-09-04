@@ -62,6 +62,10 @@ function M:__del()
     self:pop()
 end
 
+function M:__close()
+    self:remove()
+end
+
 ---@private
 function M:setTimeOut()
     if self.removed or self.pausing then

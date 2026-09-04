@@ -968,7 +968,11 @@ M.__getter.equivalentValue = function (self)
                                 av.tracer:trace()
                             end
                         end
-                        results[#results+1] = assign.value
+                        -- 未注解表读取默认不含 nil：求值时过滤掉 nil 写贡献的 nil 成员，
+                        -- 但保留该 assign（字段仍存在，不触发 undefined-field）。
+                        if not (assign.value.kind == 'type' and assign.value.typeName == 'nil') then
+                            results[#results+1] = assign.value
+                        end
                     end
                 end
             end

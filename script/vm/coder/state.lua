@@ -123,6 +123,8 @@ function M:compileAssign(var, index, valueKey, isTable)
         value    = valueKey,
         location = self:makeLocationCode(var),
     })
+    -- 对未注解表的索引写 nil 视为删除：不作为类型性 assign 登记，
+    -- 避免 nil 写把读值压成 nil（未注解表读取默认不含 nil）。
     self:addLine('{varKey}:addAssign({fieldKey})' % {
         varKey   = self:getKey(var),
         fieldKey = fieldKey,

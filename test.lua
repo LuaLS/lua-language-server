@@ -54,10 +54,14 @@ local function test(name)
     local clock = os.clock()
     print(('测试[%s]...'):format(name))
     local originRequire = require
-    require = function (n)
-        local v, p = originRequire(n)
+    ---@generic T: ModName
+    ---@param modname T
+    ---@return Module<T>
+    ---@return unknown loaderdata
+    require = function (modname)
+        local v, p = originRequire(modname)
         if p and p:find 'test/' then
-            package.loaded[n] = nil
+            package.loaded[modname] = nil
         end
         return v, p
     end

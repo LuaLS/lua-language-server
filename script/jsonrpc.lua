@@ -14,7 +14,7 @@ function m.encode(pack)
     return buf
 end
 
----@param reader fun(arg: integer):string
+---@param reader fun(arg: integer):string?
 local function readProtoHead(reader)
     local head = {}
     local line = ''
@@ -45,7 +45,7 @@ local function readProtoHead(reader)
     return head
 end
 
----@param reader fun(arg: integer):string
+---@param reader fun(arg: integer):string?
 function m.decode(reader)
     local head, err = readProtoHead(reader)
     if not head then

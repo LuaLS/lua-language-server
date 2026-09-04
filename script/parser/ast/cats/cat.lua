@@ -36,6 +36,7 @@ require 'parser.ast.cats.block'
 ---@field used? boolean
 ---@field trailing? boolean # 是否是尾随注解（出现在语句右侧同一行）
 ---@field binded? boolean
+---@field commentBlockFirstRow? integer # 所在连续注释块的首行（空行/代码断块，普通注释行不断）
 local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 Cat.kind = 'cat'
@@ -158,6 +159,7 @@ function Ast:parseCat()
         start = pos,
         subtype = subtype,
         symbolPos = symbolPos - 1,
+        commentBlockFirstRow = self.currentCommentBlockFirstRow,
     })
 
     if self.code:sub(nextPos + 1, nextPos + 1) == '(' then

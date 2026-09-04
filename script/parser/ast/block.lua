@@ -200,12 +200,22 @@ function Ast:parseDelayedComments(block)
     end
     block.delayComments = nil
     local ci = self.lexer.ci
-    for _, comment in ipairs(comments) do
+    for i, comment in ipairs(comments) do
+        local blockFirst = comment.startRow
+        for j = i - 1, 1, -1 do
+            if comments[j].finishRow + 1 == blockFirst then
+                blockFirst = comments[j].startRow
+            else
+                break
+            end
+        end
+        self.currentCommentBlockFirstRow = blockFirst
         self.lexer:moveTo(comment.start)
         local _  = self:parseCat()
                 or self:parseCatBlock()
     end
     self.lexer.ci = ci
+    self.currentCommentBlockFirstRow = nil
 end
 
 

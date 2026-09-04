@@ -57,7 +57,11 @@ ls.vm.registerCoderProvider('catstatefield', function (coder, source)
 
     local classParams = coder:getBlockKV('lastClass')
     if classParams then
-        if source.startRow ~= classParams.finishRow + 1 then
+        -- 类与字段需同处一个连续注释块（中间允许普通注释行，空行/代码断块）
+        local blockFirst = source.parent.commentBlockFirstRow
+        if  not blockFirst
+        or  blockFirst > classParams.finishRow
+        or  source.startRow < classParams.finishRow then
             classParams = nil
         else
             classParams.finishRow = source.finishRow

@@ -53,3 +53,11 @@ end
 local x
 f(x)
 ]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param s string
+local function f(s) end
+---@type string
+local sp
+f(sp == '' and '.' or sp)
+]] { '-param-type-mismatch' }

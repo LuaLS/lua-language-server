@@ -163,6 +163,12 @@ M.__getter.value = function (self)
     end
 end
 
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    return self.value:canCast(other)
+end
+
 ---@return Node.Narrow
 function M:otherSide()
     local new = self.scope.rt.narrow(self.node)

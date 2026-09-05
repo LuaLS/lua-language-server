@@ -85,6 +85,12 @@ function M:onCanCast(other)
     return self.value:canCast(other)
 end
 
+---@param other Node
+---@return boolean
+function M:onCanBeCast(other)
+    return other:canCast(self.value)
+end
+
 ---@param map table<Node.Generic, Node>
 ---@param ctx? Node.ResolveContext
 ---@return Node

@@ -90,6 +90,21 @@ decode(f)
 ]] { 'param-type-mismatch' }
 
 TEST_DIAGNOSTIC [[
+--!include pairslib
+local function decode(flag)
+    if flag then
+        return {}
+    end
+    return nil
+end
+local result = decode(FLAG)
+for k, v in pairs(result) do
+    for _, entry in ipairs(v) do
+    end
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
 ---@type thread
 local co
 ---@param co thread

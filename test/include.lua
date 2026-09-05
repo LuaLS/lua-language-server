@@ -214,6 +214,21 @@ test.includeCodes['pairs'] = [[
 function pairs(t) end
 ]]
 
+test.includeCodes['pairslib'] = [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+function pairs(t) end
+
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+function ipairs(t) end
+]]
+
 test.includeCodes['print'] = [[
 ---@param ... any
 function print(...) end

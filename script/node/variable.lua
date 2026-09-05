@@ -746,9 +746,24 @@ end
 ---@return Node?
 function M:getGuessValue()
     local master = self:getMasterVariable()
-    return master.equivalentValue
-        or master.parentFieldValue
-        or nil
+    local result = master.equivalentValue
+                or master.parentFieldValue
+                or nil
+    -- master 有静态值（require/调用返回，equivalentValue 因此短路）时，
+    -- 其字段写（childs）被短路丢弃；用交集补上（get 遍历所有 tableLike
+    -- 成员、跳过缺字段者，无 nil 污染，且不覆盖收窄/class 语义）。
+    -- 无静态值（表字面量路径）时 childs 已在等价值合并中，不重复处理，
+    -- 避免自引用 metatable（mt.__index = mt）在 onSameKey 交成 never。
+    if  result
+    and master.staticValue
+    and not master.currentValue
+    and (result.kind == 'select' or result.kind == 'table') then
+        local childsValue = master.childsValue
+        if childsValue then
+            return result & childsValue
+        end
+    end
+    return result
 end
 
 ---@type Node?

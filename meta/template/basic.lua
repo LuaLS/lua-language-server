@@ -268,10 +268,11 @@ function setfenv(f, table) end
 ---#end
 
 ---#DES 'setmetatable'
----@generic T: table, MT: table|nil
+---@generic T: table, MT: table|nil, V
 ---@param table      T
 ---@param metatable? MT
 ---@return T & MT['__index']
+---@overload fun(table: T, metatable: { __index: fun(self: T, key: any): V }): T & { [any]: V }
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'

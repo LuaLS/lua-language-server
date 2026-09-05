@@ -62,3 +62,26 @@ function t:m()
 end
 print(t:m())
 ]] {}
+
+-- setmetatable 的 __index 为函数时，字段访问应走 __index 返回值，不应误报
+TEST_DIAGNOSTIC [[
+--!include setmetatable
+local lang = setmetatable({ id = 'en-us' }, {
+    __index = function(self, name)
+        return function(key) end
+    end,
+})
+lang.script('CLI_CHECK_PROGRESS')
+]] { '-undefined-field' }
+
+-- __index 函数的返回值类型应被正确推断（防止退化为 unknown 的假绿）
+TEST_DIAGNOSTIC [[
+--!include setmetatable
+local t = setmetatable({}, {
+    __index = function(self, key)
+        return 42
+    end,
+})
+---@type string
+local s = t.anything
+]] { 'assign-type-mismatch' }

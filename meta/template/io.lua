@@ -70,7 +70,8 @@ function io.output(file) end
 function io.popen(prog, mode) end
 
 ---#DES 'io.read'
----@param ... readmode
+---@alias ReadOption integer | "l" | "L" | "n" | "a"
+---@param ... ReadOption
 ---@return any
 ---@return ... any
 ---@nodiscard

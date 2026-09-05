@@ -210,7 +210,7 @@ end
 ---@param t Node.Function
 ---@return boolean
 local function castSignature(s, t)
-    if not s.paramsPack:canCast(t.paramsPack) then
+    if not t.paramsPack:canCast(s.paramsPack) then
         return false
     end
     return s.returnsPack:canCast(t.returnsPack)

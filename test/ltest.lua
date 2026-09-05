@@ -822,6 +822,7 @@ local coverage = {}; do
         end
         if prefix == "@" then
             local f = assert(io.open(source:sub(2)))
+            ---@cast f file*
             source = f:read "a"
             f:close()
         end

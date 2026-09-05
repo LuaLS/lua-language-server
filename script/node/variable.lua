@@ -833,12 +833,19 @@ M.__getter.value = function (self)
     -- 使模块 export 值携带本文件对它的字段挂载（跨文件可见）。
     -- 只在结果仍是 master 的静态值本身时合并：
     -- 若 tracer 已把它收窄成别的节点（如 nil），则不合并，保住收窄语义。
-    if currentValue and not self.currentValue then
+    -- 值来源为 select（require/调用返回的出处指针）时不自足：
+    -- 后续字段写记录在变量 childs 上，读取时并入 childsValue。
+    -- 表字面量节点自身积累字段；tracer 收窄值（type/union 等）语义优先，
+    -- 均不处理。用交集而非并集/merge：
+    -- 并集的字段读取会给缺字段成员贡献 nil（污染下游 cast）；
+    -- mergeTables 会丢弃非 table 成员、抹掉 class 支撑的方法；
+    -- 交集的 get 会遍历所有 tableLike 成员且跳过缺字段者——
+    -- 恰是「主值 + 补充字段」的语义（与 setmetatable 的 T & __index 一致）。
+    if currentValue and currentValue.kind == 'select' then
         local master = self:getMasterVariable()
-        if  master.staticValue
-        and not master.currentValue
-        and master.childsValue then
-            result = rt.mergeTables { result, master.childsValue }
+        local childsValue = master.childsValue
+        if childsValue then
+            result = result & childsValue
         end
     end
     -- 可选链访问（?. ?: ?[）：结果总是包含 nil

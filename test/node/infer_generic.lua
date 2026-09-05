@@ -334,7 +334,7 @@ do
     --[[
     fun(x: T1, y: T2) @ fun(x: number, ...: string)
     T1 -> number
-    T2 -> string
+    T2 -> string | nil
     ]]
     local T1 = rt.generic 'T1'
     local T2 = rt.generic 'T2'

@@ -111,7 +111,7 @@ do
         : addParamDef('y', rt.type 'string')
 
     lt.assertEquals(a >> b, true)
-    lt.assertEquals(b >> a, false)
+    lt.assertEquals(b >> a, true)
 end
 
 do

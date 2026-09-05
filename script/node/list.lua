@@ -340,8 +340,10 @@ function M:onCanCast(other)
 
     -- 先快速检长度
     if self.min < other.min then
-        if not rt.NIL:canCast(lastValueB) then
-            return false
+        if self.max then
+            if not rt.NIL:canCast(lastValueB) then
+                return false
+            end
         end
     end
 
@@ -353,13 +355,27 @@ function M:onCanCast(other)
         if other.max and i > other.max then
             return true
         end
-        local a = self:select(i)
-        local b = other:select(i)
-        -- 类型匹配
-        if a:canCast(b) then
+        -- rest 区：取纯 vararg 类型（恒提供，不带 |NIL）
+        local function pick(list)
+            if not list.max and i > #list.values - 1 then
+                return list.values[#list.values], true
+            end
+            return list:select(i)
+        end
+        local a, ae = pick(self)
+        local b, be = pick(other)
+        -- self 未提供该位置：other 为 rest(可空)则放行，否则须其他位置可接受缺省(nil)
+        if not ae then
+            if not other.max then
+                return true
+            end
+            return self.scope.rt.NIL:canCast(b)
+        end
+        -- other 未提供该位置：放行
+        if not be then
             return true
         end
-        return false
+        return a:canCast(b)
     end
 
     -- 逐个对比(允许我的参数比对方多)

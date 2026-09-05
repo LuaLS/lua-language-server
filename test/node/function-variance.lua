@@ -43,3 +43,11 @@ do
     -- b: fun(integer):number >> a: fun(number):integer
     lt.assertEquals(b >> a, false)
 end
+
+do
+    -- rest 目标(`...:any`) 应可接收固定参函数：逆变下应兼容
+    local fn = rt.func():addParamDef('m', rt.type 'string')
+    local c  = rt.func():addVarargParamDef(rt.type 'any')
+    lt.assertEquals(fn >> c, true)
+    lt.assertEquals(c >> fn, true)
+end

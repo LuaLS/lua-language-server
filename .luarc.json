@@ -62,7 +62,7 @@
         "expandAlias": false
     },
     "type": {
-        "castNumberToInteger": false,
+        "castNumberToInteger": true,
         "weakUnionCheck": false
     },
     "doc": {

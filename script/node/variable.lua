@@ -123,7 +123,6 @@ function M:setVisibleType(visibleType)
     return self
 end
 
----@package
 ---@type Node.Field[]?
 M.assigns = nil
 
@@ -824,10 +823,24 @@ M.__getter.value = function (self)
     if self.tracer then
         self.tracer:trace()
     end
-    local result = self:getCurrentValue()
+    local currentValue = self:getCurrentValue()
+    local result = currentValue
                 or self:getExpectValue()
                 or self:getGuessValue()
                 or rt.ANY
+    -- 静态值来自非表字面量赋值（如 require/函数调用返回）时，
+    -- 变量自身的字段赋值（childs）不会体现在该值里，此处补合并，
+    -- 使模块 export 值携带本文件对它的字段挂载（跨文件可见）。
+    -- 只在结果仍是 master 的静态值本身时合并：
+    -- 若 tracer 已把它收窄成别的节点（如 nil），则不合并，保住收窄语义。
+    if currentValue and not self.currentValue then
+        local master = self:getMasterVariable()
+        if  master.staticValue
+        and not master.currentValue
+        and master.childsValue then
+            result = rt.mergeTables { result, master.childsValue }
+        end
+    end
     -- 可选链访问（?. ?: ?[）：结果总是包含 nil
     if self:isOptional() then
         result = result | rt.NIL

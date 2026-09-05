@@ -36,6 +36,19 @@ local function undefinedFieldProvider(param, callback)
         if exists then
             goto continue
         end
+        -- 变量有静态值（如 require/函数调用返回）时，其字段赋值记录在变量的 childs 上，
+        -- 不在该值里；回退检查变量自身的 childs（读取路径本身是正确的）。
+        do
+            local var = vfile:getVariable(field.last)
+            if var and var.kind == 'variable' then
+                ---@cast var Node.Variable
+                local master = var:getMasterVariable()
+                local child = master.childs and master.childs[key.id]
+                if child and (child.assigns or child.childs) then
+                    goto continue
+                end
+            end
+        end
         callback {
             code    = 'undefined-field',
             level   = 0,

@@ -309,7 +309,7 @@ function M:fillAPIs()
         return New 'Node.Tracer' (scope, map, parentMap)
     end
 
-    ---@param childs Node.Table[]
+    ---@param childs Node[]
     ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table
     function self.mergeTables(childs, onSameKey)
@@ -317,7 +317,11 @@ function M:fillAPIs()
             return self.table()
         end
         if #childs == 1 then
-            return childs[1]
+            local only = childs[1]
+            if only.kind == 'table' then
+                ---@cast only Node.Table
+                return only
+            end
         end
         return self.table():addChilds(childs, onSameKey)
     end

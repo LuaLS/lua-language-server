@@ -168,6 +168,7 @@ function Ast:parseShortString(stringType)
                     pushEsc('byte', offset - 2, offset + 2)
                     curOffset = offset + 3
                     local num = tonumber(code, 16)
+                    ---@cast num -?
                     pieces[#pieces+1] = string.char(num)
                 else
                     pushEsc('err', offset - 2, offset)

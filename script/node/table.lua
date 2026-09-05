@@ -399,7 +399,7 @@ local function defaultOnSameKey(a, b)
 end
 
 ---越靠前的字段越优先。
----@param childs Node
+---@param childs Node[]
 ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
 ---@return Node.Table
 function M:addChilds(childs, onSameKey)
@@ -419,10 +419,11 @@ function M:addChilds(childs, onSameKey)
     for _, child in ipairs(childs) do
         local value = child.value
         if value.kind ~= 'table' then
-            value = value:findValue { 'table' }
-            if not value then
+            local found = value:findValue(ls.node.kind['table'])
+            if not found then
                 goto continue
             end
+            value = found
         end
         ---@cast value Node.Table
         if value.locations then

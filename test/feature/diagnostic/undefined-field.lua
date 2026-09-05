@@ -85,3 +85,20 @@ local t = setmetatable({}, {
 ---@type string
 local s = t.anything
 ]] { 'assign-type-mismatch' }
+
+-- 变量已有静态值（非表字面量赋值）时，后续字段赋值不应丢失
+TEST_DIAGNOSTIC [[
+local function f() return {} end
+local t = f()
+t.foo = 1
+print(t.foo)
+]] { '-undefined-field' }
+
+-- 守卫：收窄为 nil 后字段不应复活（need-check-nil 语义不被削弱）
+TEST_DIAGNOSTIC [[
+local function f() return {} end
+local t = f()
+t.foo = 1
+t = nil
+print(t.foo)
+]] { 'need-check-nil' }

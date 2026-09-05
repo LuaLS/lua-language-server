@@ -42,3 +42,10 @@ function t:m(x, y)
 end
 t:m(1)
 ]] { '-missing-parameter' }
+
+TEST_DIAGNOSTIC [[
+local lines = {}
+---@type any
+local line
+table.insert(lines, line)
+]] { '-missing-parameter' }

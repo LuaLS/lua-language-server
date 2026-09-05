@@ -94,6 +94,12 @@ function M:getBestMatchs(params, n, packs)
     table.sort(matchs, function (a, b)
         local paramsA = params[a]
         local paramsB = params[b]
+        -- 参数数越接近实参数者优先（overload 优先于参数过多的 base）
+        local da = math.abs((paramsA and #paramsA or 0) - n)
+        local db = math.abs((paramsB and #paramsB or 0) - n)
+        if da ~= db then
+            return da < db
+        end
         for i = 1, n do
             local moreExact = isMoreExact(paramsA[i] or self.ANY, paramsB[i] or self.ANY)
             if moreExact ~= nil then

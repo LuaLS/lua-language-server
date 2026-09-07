@@ -183,6 +183,14 @@ M.register {
     status   = 'Any',
 }
 
+M.register {
+    'await-in-sync',
+} {
+    group    = 'await',
+    severity = 'Warning',
+    status   = 'None',
+}
+
 ---@param scope Scope
 ---@param uri Uri
 ---@param name string

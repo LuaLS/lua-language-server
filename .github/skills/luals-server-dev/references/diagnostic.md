@@ -7,7 +7,7 @@
 - 里程碑 1 已完成：诊断引擎 + push/pull 管道 + 配置过滤 + `---@diagnostic` 禁用注释 + 语法诊断 provider。
 - 里程碑 2 进行中：已迁移语义规则（主线程计算）：
   - parser-only：`empty-block`、`unused-local`、`unused-function`、`unused-label`、`unused-vararg`、`redefined-local`、`trailing-space`、`redundant-return`、`code-after-break`、`duplicate-index`、`duplicate-doc-param`、`unbalanced-assignments`、`unknown-diag-code`、`lowercase-global`、`redundant-value`、`count-down-loop`、`undefined-doc-param`、`close-non-object`、`newline-call`、`newfield-call`
-  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`missing-return-value`、`redundant-return-value`、`discard-returns`、`global-in-nil-env`
+  - VM 语义：`undefined-field`、`undefined-global`、`deprecated`、`need-check-nil`、`redundant-parameter`、`missing-parameter`、`assign-type-mismatch`、`param-type-mismatch`、`return-type-mismatch`、`missing-return-value`、`redundant-return-value`、`discard-returns`、`global-in-nil-env`、`await-in-sync`
   - parser-only：`duplicate-doc-alias`、`unknown-cast-variable`
   - VM/LuaDoc 语义：`undefined-doc-class`、`doc-field-no-class`、`incomplete-signature-doc`、`circle-doc-class`、`missing-global-doc`
   - VM 语义：`global-element`
@@ -64,6 +64,7 @@
 - `redundant-return-value`：函数返回多余值。`funcNode:getReturnCount()` 第二个返回值 max（有限时），`#ret.exps > max` 则对 `max+1 .. #ret.exps` 每个 exp 报。max==nil（变参）跳过。
 - `global-in-nil-env`：`_ENV` 被赋 nil 后访问全局。遍历 var（`var.loc==nil` 且 `var.env` 存在，跳过 `var.id==var.env.id` 的 `_ENV` 自身访问），`vfile:getNode(var.env)` 得 `_ENV` 推断值，`typeName=='nil'` 则报，带 related 指向 `_ENV` local。
 - `discard-returns`：`@nodiscard` 函数返回值被丢弃。`vfile:getVariable(call.node):hasAnnotation('nodiscard')` 判断（`tryBindCat` 已把裸 `---@nodiscard` 绑定到变量注解）。只对 `call.parent.isBlock`（语句级调用）报；skip：`parent.condition==call`（if/while/repeat 条件）、for 循环 `parent.exps` 含 call、`f() == ...` 等 binary 内嵌（parent 非 block）。
+- `await-in-sync`：同步函数内调用 async 函数。默认 `status='None'`（group `await`）。上下文判定：沿 `call.parent` 上溯首个 `isFunction` 节点（`isMain` 视为 async 上下文直接跳过），`vfile:getNode(func).async` 为真则跳过。callee 判定：`vfile:getVariable(call.node):hasAnnotation('async')`（裸 `---@async` 经 `tryBindCat` 绑变量注解）或 `vfile:getNode(call.node)` 经 `each('function')` 任一 `Node.Function.async`（`---@async` 经 function coder `setAsync`、`async fun()` 类型经 catfunction coder `setAsync`）。不支持：`Lua.hint.awaitPropagate` 传播、master 的 linked-call（async 回调参数被调内视为 async 调用）、`function () ---@async` 行内注解（该 cat 落入外层 block 且晚于函数编译，parser 层缺口）。
 
 ### coder 相关修复
 
@@ -89,7 +90,7 @@
 
 ## 测试
 
-`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / duplicate-doc-alias / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / discard-returns / need-check-nil / redundant-parameter / missing-parameter / assign-type-mismatch / param-type-mismatch / return-type-mismatch / missing-return-value / redundant-return-value / global-in-nil-env / semantic
+`--test feature.diagnostic`：syntax / config / disable / converter / push / pull / empty-block / unused-local / redundant-return / code-after-break / duplicate-index / duplicate-doc-param / duplicate-doc-alias / unbalanced-assignments / unknown-diag-code / lowercase-global / redundant-value / count-down-loop / undefined-doc-param / close-non-object / newline-call / newfield-call / undefined-field / undefined-global / deprecated / discard-returns / need-check-nil / redundant-parameter / missing-parameter / assign-type-mismatch / param-type-mismatch / return-type-mismatch / missing-return-value / redundant-return-value / global-in-nil-env / await-in-sync / semantic
 
 诊断测试 stdlib meta（`test/feature/diagnostic/init.lua` 用 `metaBuilder.compile('Lua 5.4')` 填 `test.metaUris`），故 `print` 等 stdlib 全局 `isDefined=true` 不误报。
 

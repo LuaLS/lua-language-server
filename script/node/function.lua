@@ -3,6 +3,7 @@
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
 ---@overload fun(scope: Scope): Node.Function
+---@field async? boolean
 local M = ls.node.register 'Node.Function'
 
 M.kind = 'function'

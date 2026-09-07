@@ -10,7 +10,7 @@ print(<?x?>.y)
 ]] { 'need-check-nil' }
 
 TEST_DIAGNOSTIC [[
----@type number
+---@return number
 local x = 1
 print(x.y)
 ]] { '-need-check-nil' }
@@ -62,4 +62,20 @@ if not t then
 end
 t.x = 1
 local y = t.x
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@generic T: table, V
+---@param t T
+---@return fun<V>(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+function ipairs(t) end
+
+local function f(json_data)
+    for _, section in ipairs(json_data) do
+        return section.DOC
+    end
+end
+f(1)
 ]] { '-need-check-nil' }

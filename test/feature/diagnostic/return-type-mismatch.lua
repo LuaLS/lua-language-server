@@ -125,3 +125,18 @@ local function f(source)
 end
 f(1)
 ]] { '-return-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@generic T
+---@param v T
+---@return T & { x: number }
+local function f(v)
+    return v
+end
+
+---@type string
+local s
+local r = f(s)
+local bad = r.x + 1
+print(bad)
+]] { '-return-type-mismatch' }

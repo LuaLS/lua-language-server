@@ -530,9 +530,8 @@ local <?<!v2!>?> = v1()
 ]]
 
 TEST_DEF [[
----@generic V
----@return fun(x: V):V
-local function f(x) end
+---@return fun<V>(x: V):V
+local function f() end
 
 local v1 = f()
 local <?<!v2!>?> = v1(<!function () end!>)
@@ -692,8 +691,7 @@ c.<?x?>
 ]]
 
 TEST_DEF [[
----@generic V
----@return fun(t: V[]):V
+---@return fun<V>(t: V[]):V
 local function f() end
 
 ---@type A[]
@@ -705,9 +703,9 @@ local <?<!c!>?> = f2(b)
 ]]
 
 TEST_DEF [[
----@generic T, V
+---@generic T
 ---@param t T
----@return fun(t: V[]):V
+---@return fun<V>(t: V[]):V
 ---@return T
 local function f(t) end
 
@@ -725,9 +723,9 @@ d.<?x?>
 ]]
 
 TEST_DEF [[
----@generic V, T
+---@generic T
 ---@param t T
----@return fun(t: V): V
+---@return fun<V>(t: V): V
 ---@return T
 local function iterator(t) end
 
@@ -742,9 +740,9 @@ TEST_DEF [[
 ---@type C[]
 local v1
 
----@generic V, T
+---@generic T
 ---@param t T
----@return fun(t: V[]): V
+---@return fun<V>(t: V[]): V
 ---@return T
 local function iterator(t) end
 
@@ -781,9 +779,9 @@ TEST_DEF [[
 ---@type TT<<!{}!>>
 local v1
 
----@generic V, T
+---@generic T
 ---@param t T
----@return fun(t: { [number]: V }): V
+---@return fun<V>(t: { [number]: V }): V
 ---@return T
 local function iterator(t) end
 
@@ -798,9 +796,9 @@ TEST_DEF [[
 ---@type TT<number, <!{}!>>
 local v1
 
----@generic V, T
+---@generic T
 ---@param t T
----@return fun(t: { [number]: V }): V
+---@return fun<V>(t: { [number]: V }): V
 ---@return T
 local function iterator(t) end
 
@@ -817,9 +815,9 @@ function Foo:<!bar1!>() end
 ---@type { [number]: Foo }
 local v1
 
----@generic T: table, V
+---@generic T: table
 ---@param t T
----@return fun(table: { [number]: V }, i?: integer):integer, V
+---@return fun<V>(table: { [number]: V }, i?: integer):integer, V
 ---@return T
 ---@return integer i
 local function ipairs(t) end
@@ -837,9 +835,9 @@ function Foo:<!bar1!>() end
 ---@type table<number, Foo>
 local v1
 
----@generic T: table, V
+---@generic T: table
 ---@param t T
----@return fun(table: { [number]: V }, i?: integer):integer, V
+---@return fun<V>(table: { [number]: V }, i?: integer):integer, V
 ---@return T
 ---@return integer i
 local function ipairs(t) end
@@ -857,9 +855,9 @@ function Foo:<!bar1!>() end
 ---@type table<Foo, Foo>
 local v1
 
----@generic T: table, K, V
+---@generic T: table
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun<K, V>(table: table<K, V>, index: K):K, V
 ---@return T
 ---@return nil
 local function pairs(t) end
@@ -878,9 +876,9 @@ function Foo:<!bar1!>() end
 ---@type table<Foo, Foo>
 local v1
 
----@generic T: table, K, V
+---@generic T: table
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun<K, V>(table: table<K, V>, index: K):K, V
 ---@return T
 ---@return nil
 local function pairs(t) end
@@ -896,9 +894,9 @@ TEST_DEF [[
 local Foo = {}
 function Foo:<!bar1!>() end
 
----@generic T: table, V
+---@generic T: table
 ---@param t T
----@return fun(table: table<number, V>, i?: integer):integer, V
+---@return fun<V>(table: table<number, V>, i?: integer):integer, V
 ---@return T
 ---@return integer i
 local function ipairs(t) end

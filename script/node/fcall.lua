@@ -162,7 +162,20 @@ M.__getter.matchedFuncs = function (self)
     local result = {}
     for _, match in ipairs(matches) do
         local f = defs[match]
-        result[#result+1] = f:resolveGeneric(f:makeGenericMap(self.args), ctx)
+        local map = f:makeGenericMap(self.args)
+        if f.typeParams then
+            for _, g in ipairs(f.typeParams) do
+                if not map[g] then
+                    if g.kind == 'generic' then
+                        ---@cast g Node.Generic
+                        map[g] = g.default or g.extends
+                    else
+                        map[g] = rt.ANY
+                    end
+                end
+            end
+        end
+        result[#result+1] = f:resolveGeneric(map, ctx)
     end
     return result, true
 end

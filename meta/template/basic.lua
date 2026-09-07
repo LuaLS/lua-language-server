@@ -73,7 +73,7 @@ function getmetatable(object) end
 ---#DES 'ipairs'
 ---@generic T: table, V
 ---@param t T
----@return fun(table: V[], i?: integer):integer, V
+---@return fun<V>(table: V[], i?: integer):integer, V
 ---@return T
 ---@return integer i
 function ipairs(t) end
@@ -152,9 +152,9 @@ function module(name, ...) end
 function next(table, index) end
 
 ---#DES 'pairs'
----@generic T: table, K, V
+---@generic T: table
 ---@param t T
----@return fun(table: table<K, V>, index?: K):K, V
+---@return fun<K, V>(table: table<K, V>, index?: K):K, V
 ---@return T
 function pairs(t) end
 
@@ -272,7 +272,7 @@ function setfenv(f, table) end
 ---@param table      T
 ---@param metatable? MT
 ---@return T & MT['__index']
----@overload fun(table: T, metatable: { __index: fun(self: T, key: any): V }): T & { [any]: V }
+---@overload fun(table: T, metatable: { __index: fun(self: T, key: any): V }): T & { [any]: any }
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'

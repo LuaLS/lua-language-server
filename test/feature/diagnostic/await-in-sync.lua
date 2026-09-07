@@ -83,6 +83,33 @@ end
 ]] { 'await-in-sync' }
 
 TEST_DIAGNOSTIC [[
+coroutine = {}
+
+---@async
+function coroutine.yield(...)
+end
+
+local f = function () ---@async
+end
+
+local function syncFunction()
+    <?f?>()
+end
+]] { 'await-in-sync' }
+
+TEST_DIAGNOSTIC [[
+coroutine = {}
+
+---@async
+function coroutine.yield(...)
+end
+
+local f = function () ---@async
+    coroutine.yield()
+end
+]] { '-await-in-sync' }
+
+TEST_DIAGNOSTIC [[
 local f = function() end ---@async
 
 local function syncFunction()
@@ -152,3 +179,66 @@ local function outer()
     end
 end
 ]] { 'await-in-sync' }
+
+TEST_DIAGNOSTIC [[
+coroutine = {}
+
+---@async
+function coroutine.yield(...)
+end
+
+local function syncFunction()
+    while true do
+        ---@async
+        local f = (function ()
+            coroutine.yield()
+        end)
+    end
+end
+]] { '-await-in-sync' }
+
+TEST_DIAGNOSTIC [[
+coroutine = {}
+
+---@async
+function coroutine.yield(...)
+end
+
+local parser = (function ()
+    while true do
+        ---@async
+        local proto = (function (len)
+            coroutine.yield()
+        end)
+    end
+end)
+]] { '-await-in-sync' }
+
+TEST_DIAGNOSTIC [[
+coroutine = {}
+
+---@async
+function coroutine.yield(...)
+end
+
+local function syncFunction()
+    do
+        ---@async
+        local f = (function ()
+            coroutine.yield()
+        end)
+    end
+    if true then
+        ---@async
+        local g = (function ()
+            coroutine.yield()
+        end)
+    end
+    repeat
+        ---@async
+        local h = (function ()
+            coroutine.yield()
+        end)
+    until true
+end
+]] { '-await-in-sync' }

@@ -128,12 +128,12 @@ function Ast:parseFunction(isLocal, isGlobal)
     end
 
     if symbolPos2 then
-        self:skipSpace()
         if isLocal and name then
             ---@cast name LuaParser.Node.Local
             self:initLocal(name)
         end
         self:blockStart(func)
+        self:skipSpace()
         if params then
             for i = 1, #params do
                 local param = params[i]

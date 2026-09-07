@@ -295,6 +295,16 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     coder:compile(child)
                     coder:addLine('')
                 end
+                for _, child in ipairs(source.childs) do
+                    if  child.kind == 'cat'
+                    and child.subtype == 'async'
+                    and child.finishRow == source.startRow then
+                        coder:addLine('{key}:setAsync()' % {
+                            key = funcKey,
+                        })
+                        break
+                    end
+                end
                 coder:finishTracer()
                 coder:popBlock()
             end, 'function body --')

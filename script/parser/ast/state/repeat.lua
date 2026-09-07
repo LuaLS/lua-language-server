@@ -21,8 +21,8 @@ function Ast:parseRepeat()
         start = pos,
     })
 
-    self:skipSpace()
     self:blockStart(repeatNode)
+    self:skipSpace()
     self:blockParseChilds(repeatNode)
 
     self:skipSpace()

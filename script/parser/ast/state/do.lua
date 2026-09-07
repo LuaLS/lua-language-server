@@ -20,8 +20,8 @@ function Ast:parseDo()
         start  = pos,
     })
 
-    self:skipSpace()
     self:blockStart(doNode)
+    self:skipSpace()
     self:blockParseChilds(doNode)
     self:blockFinish(doNode)
 

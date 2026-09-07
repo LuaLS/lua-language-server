@@ -34,8 +34,8 @@ function Ast:parseWhile()
     if symbolPos1 then
         whileNode.symbolPos1 = symbolPos1
 
-        self:skipSpace()
         self:blockStart(whileNode)
+        self:skipSpace()
         self:blockParseChilds(whileNode)
         self:blockFinish(whileNode)
 

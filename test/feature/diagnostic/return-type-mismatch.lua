@@ -24,6 +24,22 @@ f()
 ]] { 'return-type-mismatch' }
 
 TEST_DIAGNOSTIC [[
+---@return number ~ nil
+local function f()
+    return 1
+end
+f()
+]] { '-return-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@return number ~ nil
+local function f()
+    return <?'str'?>
+end
+f()
+]] { 'return-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
 ---@class docUnion
 ---@field name string
 

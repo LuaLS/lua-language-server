@@ -324,6 +324,28 @@ ls.vm.registerCoderProvider('catintersection', function (coder, source)
     })
 end)
 
+ls.vm.registerCoderProvider('catsubtract', function (coder, source)
+    ---@cast source LuaParser.Node.CatSubtract
+
+    if source.b then
+        coder:compile(source.a)
+        coder:compile(source.b)
+
+        coder:addLine('{key} = rt.subtract({a}, {b})' % {
+            key = coder:getKey(source),
+            a   = coder:getKey(source.a),
+            b   = coder:getKey(source.b),
+        })
+        return
+    end
+
+    coder:compile(source.a)
+    coder:addLine('{key} = {a}' % {
+        key = coder:getKey(source),
+        a   = coder:getKey(source.a),
+    })
+end)
+
 ls.vm.registerCoderProvider('catarray', function (coder, source)
     ---@cast source LuaParser.Node.CatArray
 

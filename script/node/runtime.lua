@@ -173,6 +173,22 @@ function M:fillAPIs()
         return New 'Node.Intersection' (scope, nodes)
     end
 
+    ---@param a Node
+    ---@param b Node
+    ---@return Node
+    function self.subtract(a, b)
+        if a == b then
+            return scope.rt.NEVER
+        end
+        if a.kind == 'type' and a.typeName == 'never' then
+            return scope.rt.NEVER
+        end
+        if b.kind == 'type' and (b.typeName == 'never' or b.typeName == 'any') then
+            return a
+        end
+        return New 'Node.Subtract' (scope, a, b)
+    end
+
     ---@param fields? table<string|number|boolean|Node, string|number|boolean|Node>
     ---@return Node.Table
     function self.table(fields)

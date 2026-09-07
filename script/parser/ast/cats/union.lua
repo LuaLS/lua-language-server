@@ -19,7 +19,7 @@ function Ast:parseCatUnion(required)
         self:skipSpace()
     end
 
-    local first = self:parseCatIntersection(required)
+    local first = self:parseCatSubtract(required)
     if not first then
         return nil
     end
@@ -41,7 +41,7 @@ function Ast:parseCatUnion(required)
 
     while true do
         self:skipSpace()
-        local nextNode = self:parseCatIntersection(true)
+        local nextNode = self:parseCatSubtract(true)
         union.exps[#union.exps+1] = nextNode
 
         self:parseCatDescription(nextNode)

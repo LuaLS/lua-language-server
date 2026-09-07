@@ -40,6 +40,7 @@ ls.node.kind = {
     ['tracer']       = 1 << 24,
     ['spread']       = 1 << 25,
     ['pack']         = 1 << 26,
+    ['subtract']     = 1 << 27,
 }
 
 ---@class Node.Location

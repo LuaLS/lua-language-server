@@ -73,7 +73,7 @@ function getmetatable(object) end
 ---#DES 'ipairs'
 ---@generic T: table, V
 ---@param t T
----@return fun<V>(table: V[], i?: integer):integer, V
+---@return fun<V>(table: V[], i?: integer):integer, V ~ nil
 ---@return T
 ---@return integer i
 function ipairs(t) end
@@ -154,7 +154,7 @@ function next(table, index) end
 ---#DES 'pairs'
 ---@generic T: table
 ---@param t T
----@return fun<K, V>(table: table<K, V>, index?: K):K, V
+---@return fun<K, V>(table: table<K, V>, index?: K):K, V ~ nil
 ---@return T
 function pairs(t) end
 

@@ -7,6 +7,7 @@
 ---| LuaParser.Node.CatCall
 ---| LuaParser.Node.CatUnion
 ---| LuaParser.Node.CatIntersection
+---| LuaParser.Node.CatSubtract
 ---| LuaParser.Node.CatFunction
 ---| LuaParser.Node.CatTable
 ---| LuaParser.Node.CatBoolean
@@ -14,6 +15,7 @@
 ---| LuaParser.Node.CatString
 ---| LuaParser.Node.CatTuple
 ---| LuaParser.Node.CatFCall
+
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatExp

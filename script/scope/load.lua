@@ -34,6 +34,10 @@ function M:initGlob(options)
     if options.ignores then
         ls.util.arrayMerge(ignores, options.ignores)
     end
+    local ignoreDirs = self.config:get(self.uri, 'Lua.workspace.ignoreDir')
+    if ignoreDirs then
+        ls.util.arrayMerge(ignores, ignoreDirs)
+    end
     ignores[#ignores+1] = '.git'
     ignores[#ignores+1] = '.svn'
     ignores[#ignores+1] = '.hg'
@@ -53,12 +57,6 @@ function M:initGlob(options)
     end)
     self.glob:setInterface('patterns', function (uri)
         local patterns = {}
-        do -- 忽略配置 `Lua.workspace.ignoreDir` 中定义的文件
-            local ignoreDirs = self.config:get(uri, 'Lua.workspace.ignoreDir')
-            if ignoreDirs then
-                ls.util.arrayMerge(patterns, ignoreDirs)
-            end
-        end
         -- 应用 .gitignore 中定义的规则
         if self.config:get(uri, 'Lua.workspace.useGitIgnore') then
             local ignoreUri = uri / '.gitignore'

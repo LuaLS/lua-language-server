@@ -207,8 +207,21 @@ M.__getter.values = function (self)
     return values, true
 end
 
+---@return boolean
 function M:isTableLike()
     return true
+end
+
+---是否存在 unknown/any 类型的 key 字段（任意 key 同值表，可视为值类型的数组）
+---@return boolean
+function M:isAnyKeyTable()
+    for _, key in ipairs(self.keys) do
+        if  key.kind == 'type'
+        and (key.typeName == 'unknown' or key.typeName == 'any') then
+            return true
+        end
+    end
+    return false
 end
 
 ---@param key Node.Key
@@ -342,7 +355,11 @@ function M:onCanCast(other)
         local myType = self:get(rt.INTEGER)
         if myType:canCast(other.head) then
             return true
-        elseif myType ~= rt.NIL then
+        end
+        if myType ~= rt.NIL then
+            if self:isAnyKeyTable() then
+                return other.head:canCast(myType)
+            end
             return false
         end
         for _, key in ipairs(self.keys) do

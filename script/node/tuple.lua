@@ -138,6 +138,19 @@ function M:onCanBeCast(other)
     if not other:isTableLike() then
         return false
     end
+    if other.kind == 'table' then
+        ---@cast other Node.Table
+        if other:isAnyKeyTable() then
+            for i = 1, math.min(100, self.values.max) do
+                local v = self.values:select(i)
+                local value = other:get(i)
+                if not value:canCast(v) and not v:canCast(value) then
+                    return false
+                end
+            end
+            return true
+        end
+    end
     for i = 1, math.min(100, self.values.max) do
         local v = self.values:select(i)
         local value = other:get(i)

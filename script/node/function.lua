@@ -570,9 +570,8 @@ function M:makeView(viewer)
         local returnBuf = {}
         for i, v in ipairs(self.returnsDef) do
             if v.key then
-                returns[i] = string.format('%s%s: %s'
+                returns[i] = string.format('%s: %s'
                     , v.key
-                    , v.optional and '?' or ''
                     , viewer:view(v.value)
                 )
                 returnBuf[i] = '(' .. returns[i] .. ')'

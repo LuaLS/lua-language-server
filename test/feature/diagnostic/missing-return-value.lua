@@ -37,3 +37,27 @@ local function f()
 end
 f()
 ]] { '-missing-return-value' }
+
+TEST_DIAGNOSTIC [[
+---@return boolean ok, string[] outputPaths, (string|nil)[]? errs
+local function f()
+    return true, {}
+end
+f()
+]] { '-missing-return-value' }
+
+TEST_DIAGNOSTIC [[
+---@return boolean ok, string[] outputPaths, string[]? errs
+local function f()
+    return true, {}
+end
+f()
+]] { '-missing-return-value' }
+
+TEST_DIAGNOSTIC [[
+---@return boolean ok, string[]? outputPaths, string[] errs
+local function f()
+    return true
+end
+f()
+]] { 'missing-return-value' }

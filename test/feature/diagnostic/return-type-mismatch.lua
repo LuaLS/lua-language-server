@@ -126,6 +126,29 @@ TEST_DIAGNOSTIC [[
 ---@class A
 ---@field name string
 
+---@generic T: table
+---@param t T
+---@return fun<V>(table: V[], i?: integer):integer, V ~ nil
+---@return T
+---@return integer i
+function ipairs(t) end
+
+---@class D
+---@field severity string
+
+local function report(diags)
+    for _, d in ipairs(diags) do
+        print(d.severity)
+    end
+end
+
+report({})
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@class A
+---@field name string
+
 ---@return A
 local function g(x)
     return {

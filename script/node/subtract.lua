@@ -37,7 +37,8 @@ M.__getter.value = function (self)
 
     local remain = {}
     for _, m in ipairs(members) do
-        if m.kind == 'generic' then
+        if  m.kind == 'generic'
+        or (m.kind == 'type' and (m.typeName == 'any' or m.typeName == 'unknown')) then
             remain[#remain+1] = m
         elseif not m:canCast(b) then
             remain[#remain+1] = m

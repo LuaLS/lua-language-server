@@ -147,6 +147,11 @@ function M:compileAssign(var, index, valueKey, isTable)
             varKey   = self:getKey(var),
             valueKey = catKey or valueKey,
         })
+    elseif not catKey then
+        self:addLine('{varKey}:setAssignValue({valueKey})' % {
+            varKey   = self:getKey(var),
+            valueKey = valueKey,
+        })
     end
 end
 ls.vm.registerCoderProvider('assign', function (coder, source)

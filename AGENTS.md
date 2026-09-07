@@ -147,6 +147,14 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
 - `coder/state.lua`：`compileAssign` 对 `_ENV`（var/local）即使 table 赋值也 `setStaticValue`（isEnv 判断）。
 - `coder/var.lua`：全局 var（`source.env`）生成 `parentMap[name] = { envName, id, true }`（第三元素标记 env 子字段）。
 - `tracer.lua`：`traceVar` 记录赋值版本号（`assignVersion`/`versionMap`）；`traceRef` 对 env 子字段，仅当 parent（`_ENV`）版本号 > 自身版本号时从 parent `get` 取字段值（field→value→variable→value 解包），实现「`_ENV` 重赋值使全局失效、全局自身重赋值不失效」。
+
+## 11.2) 未注解表字面量赋值的 flow 值
+
+- `t = {}`（无 `---@type` 注解、值是表字面量）**不**落 `staticValue`（会短路 `equivalentValue` 的 childs 合并语义），改落 `Variable.assignValue`（`coder/state.lua` `compileAssign` 发射 `setAssignValue`）。
+- Walker 的 `traceVar` 经 `Variable:getStaticValue()` 优先消费 `assignValue`，并与 master 的 `childsValue` 一起走 `mergeValueResults`（`rt.mergeTables` + union，自 `equivalentValue` 尾部提取的公共逻辑）。
+- 修复背景：「`if not t then t = {} end` 后读 `t` 仍为 `table | nil`」导致 need-check-nil 误报（如旧工程 `cli/doc/export.lua` 的 `has_seen`）。
+- 注解过的赋值（有 catKey）依旧走 `setStaticValue(catKey)`，注解语义优先。
+
 ## 12) PowerShell 文件编码
 
 - Windows PowerShell 默认编码为 GBK/UTF-16 LE，**严禁**写入项目文件时不指定编码（会导致 UTF8 文件乱码）。

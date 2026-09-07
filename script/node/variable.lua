@@ -723,10 +723,57 @@ function M:removeField(field, path)
     return current
 end
 
+local function mergeValueResults(results, rt)
+    local tableParts = {}
+    local unionResults = {}
+    local hasType = false
+    for _, node in ipairs(results) do
+        local t = node:findValue(ls.node.kind['table'] | ls.node.kind['type'])
+        if t then
+            if t.kind == 'table' then
+                ---@cast t Node.Table
+                tableParts[#tableParts+1] = t
+            end
+            if t.kind == 'type' then
+                ---@cast t Node.Type
+                if not t.isBasicType then
+                    hasType = true
+                end
+                unionResults[#unionResults+1] = t
+            end
+        else
+            unionResults[#unionResults+1] = node
+        end
+    end
+
+    ls.util.arrayRemoveDuplicate(tableParts)
+
+    if not hasType and #tableParts > 0 then
+        unionResults[#unionResults+1] = rt.mergeTables(tableParts)
+    end
+
+    if #unionResults > 0 then
+        return rt.union(unionResults)
+    end
+    return nil
+end
+
 --- 获取变量的静态初始值（不触发 Tracer），供 Walker 使用
 ---@return Node
 function M:getStaticValue()
     local rt = self.scope.rt
+    if self.assignValue then
+        local master = self:getMasterVariable()
+        local results = { self.assignValue }
+        if master.childsValue then
+            results[#results+1] = master.childsValue
+        end
+        local merged = mergeValueResults(results, rt)
+        if merged then
+            return merged
+        end
+        return self.assignValue
+    end
     return self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
@@ -783,6 +830,15 @@ end
 ---@param value Node
 function M:setStaticValue(value)
     self.staticValue = value
+    self:flushCache()
+end
+
+---@type Node?
+M.assignValue = nil
+
+---@param value Node
+function M:setAssignValue(value)
+    self.assignValue = value
     self:flushCache()
 end
 
@@ -1024,36 +1080,7 @@ M.__getter.equivalentValue = function (self)
         ::continue::
     end
 
-    -- 尽量合并表的字段
-    local tableParts = {}
-    local unionResults = {}
-    local hasType = false
-    for _, node in ipairs(results) do
-        local t = node:findValue(ls.node.kind['table'] | ls.node.kind['type'])
-        if t then
-            if t.kind == 'table' then
-                ---@cast t Node.Table
-                tableParts[#tableParts+1] = t
-            end
-            if t.kind == 'type' then
-                ---@cast t Node.Type
-                if not t.isBasicType then
-                    hasType = true
-                end
-                unionResults[#unionResults+1] = t
-            end
-        else
-            unionResults[#unionResults+1] = node
-        end
-    end
-
-    ls.util.arrayRemoveDuplicate(tableParts)
-
-    if not hasType and #tableParts > 0 then
-        unionResults[#unionResults+1] = rt.mergeTables(tableParts)
-    end
-
-    local result = #unionResults > 0 and rt.union(unionResults)
+    local result = mergeValueResults(results, rt)
     if result then
         return result, true
     end

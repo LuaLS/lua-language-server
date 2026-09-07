@@ -116,7 +116,7 @@ function W:traceVar(var)
     local id, alias = var[2], var[3]
     self.aliasID[alias] = id
     local node = self.map[alias]
-    -- 用 getCurrentValue()（不触发 tracer）而非 .value（会触发新 Walker 递归）。
+    -- 用 getStaticValue()（不触发 tracer）而非 .value（会触发新 Walker 递归）。
     -- 赋值点 shadow 的 currentValue 即是 Coder 编译时已设置好的赋值表达式值。
     local value = node:getStaticValue()
     self:setValue(id, value, true)

@@ -5,6 +5,34 @@ print(<?x?>.y)
 ]] { 'need-check-nil' }
 
 TEST_DIAGNOSTIC [[
+local m = {}
+function m.getAbility(name)
+    if not m.info
+    or not m.info.capabilities then
+        return nil
+    end
+    local current = m.info.capabilities
+    while true do
+        local parent, nextPos = name:match '^([^%.]+)()'
+        if not parent then
+            break
+        end
+        current = current[parent]
+        if not current then
+            return current
+        end
+        if nextPos > #name then
+            break
+        else
+            name = name:sub(nextPos + 1)
+        end
+    end
+    return current
+end
+m.getAbility('a.b')
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
 local x = nil
 print(<?x?>.y)
 ]] { 'need-check-nil' }

@@ -287,6 +287,10 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
     local needCloseNode
     if source.op == '=='
     or source.op == '~='
+    or source.op == '<'
+    or source.op == '>'
+    or source.op == '<='
+    or source.op == '>='
     or source.op == 'and'
     or source.op == 'or' then
         if source.exp1 and source.exp2 then

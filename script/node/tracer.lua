@@ -403,6 +403,17 @@ function W:traceConditionUnit(exp, revert)
         self:traceEqual(right, left, not revert)
         self:traceCallEqual(left, right, not revert)
         self:traceCallEqual(right, left, not revert)
+    elseif kind == '<'
+    or     kind == '>'
+    or     kind == '<='
+    or     kind == '>=' then
+        -- 比较运算不产生类型收窄，仅追踪操作数 ref 的流
+        for i = 2, #exp do
+            local inner = exp[i]
+            if type(inner) == 'table' then
+                self:traceUnit(inner)
+            end
+        end
     elseif kind == 'not' then
         -- 结构：{'not', [副作用ref...], condExp}
         -- 最后子节点是 condExp，前面的副作用 ref 用于建立 aliasID

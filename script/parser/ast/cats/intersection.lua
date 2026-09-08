@@ -19,6 +19,7 @@ function Ast:parseCatIntersection(required)
         return nil
     end
 
+    self:skipSpace()
     local pos = self.lexer:consume '&'
     if not pos then
         return first

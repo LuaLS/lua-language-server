@@ -26,6 +26,7 @@ function Ast:parseCatUnion(required)
 
     self:parseCatDescription(first)
 
+    self:skipSpace()
     local pos = self.lexer:consume '|'
     if not pos then
         return first
@@ -73,15 +74,11 @@ function Ast:parseCatDescription(node)
         end
     end
     while true do
-        local token = self.lexer:peek()
+        local token, tp = self.lexer:peek()
         if not token
         or token == '|'
         or token == '&'
-        or token == 'NL' then
-            break
-        end
-        if token == '#'
-        or token == '@' then
+        or tp == 'NL' then
             break
         end
         if token == '-' then

@@ -397,3 +397,17 @@ do
 
     lt.assertEquals(omap2:get('set'):view(), 'fun(key: integer, value: string)')
 end
+
+do
+    rt:reset()
+
+    -- 回归：`{ [K]: V }` 无已知键/值时，K/V 应取 other 的完整键/值类型
+    -- （此前 K 经 narrow(never) 的 value 链被绑成空表 `{}`）
+    local K = rt.generic 'K'
+    local V = rt.generic 'V'
+    local result = {}
+    rt.table { [K] = V }:inferGeneric(rt.table { [rt.UNKNOWN] = rt.BOOLEAN }, result)
+
+    lt.assertEquals(result[K]:view(), 'unknown')
+    lt.assertEquals(result[V]:view(), 'boolean')
+end

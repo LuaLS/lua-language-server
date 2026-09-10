@@ -26,22 +26,7 @@ do
     -- 只要 vfile:index() 不抛出异常即可，无需额外断言
 end
 
--- 回归测试：---@return 的 `#` 行内描述不应吞掉换行导致注解丢失
--- （描述消费循环曾拿 token 内容与 'NL' 比较，越过行尾把后续代码行也吃掉，
---  使 Cat.finishRow 落到函数行上，getCatGroup 行邻接失败，returnsDef 全部丢失）
-do
-    TEST_INDEX [[
-        ---@return string # path of 'doc.json'
-        ---@return string # path to be documented
-        function getPathDocUpdate()
-            return './', '.'
-        end
-    ]]
-
-    local F = rt:globalGet('getPathDocUpdate')
-    lt.assertEquals(F:view(), 'fun():(string, string)')
-end
-
+-- 回归测试：---@return 的 `#` 行内描述不应吞掉换行导致签名丢失
 do
     TEST_INDEX [[
         ---@return string # path of 'doc.json'
@@ -52,6 +37,7 @@ do
         RESULT1, RESULT2 = getPathDocUpdate()
     ]]
 
+    lt.assertEquals(rt:globalGet('getPathDocUpdate'):view(), 'fun():(string, string)')
     lt.assertEquals(rt:globalGet('RESULT1').value:view(), 'string')
     lt.assertEquals(rt:globalGet('RESULT2').value:view(), 'string')
 end

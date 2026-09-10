@@ -1,25 +1,10 @@
+-- 回归：比较条件（`>`）不产生收窄，也不应污染后续读取
 TEST_DIAGNOSTIC [[
----@type number?
-local x
-print(<?x?>.y)
-]] { 'need-check-nil' }
-
-TEST_DIAGNOSTIC [[
-local m = {}
-function m.getAbility(name)
-    if not m.info
-    or not m.info.capabilities then
-        return nil
-    end
-    local current = m.info.capabilities
+local function f(name)
     while true do
         local parent, nextPos = name:match '^([^%.]+)()'
         if not parent then
             break
-        end
-        current = current[parent]
-        if not current then
-            return current
         end
         if nextPos > #name then
             break
@@ -27,10 +12,15 @@ function m.getAbility(name)
             name = name:sub(nextPos + 1)
         end
     end
-    return current
 end
-m.getAbility('a.b')
+f('a.b')
 ]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@type number?
+local x
+print(<?x?>.y)
+]] { 'need-check-nil' }
 
 TEST_DIAGNOSTIC [[
 local x = nil

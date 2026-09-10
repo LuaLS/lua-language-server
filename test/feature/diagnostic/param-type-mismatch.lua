@@ -6,6 +6,35 @@ f(<?'str'?>)
 ]] { 'param-type-mismatch' }
 
 TEST_DIAGNOSTIC [[
+---@generic T: table, V
+---@param t T
+---@return fun<V>(table: V[], i?: integer):integer, V
+---@return T
+function ipairs(t) end
+
+---@class uri
+
+---@class item
+---@field uri? uri
+
+---@param uri uri
+---@return boolean
+function check(uri) end
+
+---@param items item[]
+local function filter(items)
+    for _, item in ipairs(items) do
+        if check(<?item.uri?>) then
+        end
+    end
+end
+
+---@type item[]
+local all
+filter(all)
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
 ---@param x number
 local function f(x)
 end

@@ -571,8 +571,16 @@ function M:inferGeneric(other, result)
     if #fieldsKV > 0 then
         local knownKey   = rt.union(knownKeys)
         local knownValue = rt.union(knownValues)
-        local _, otherKey   = other.typeOfKey:narrow(knownKey)
-        local _, otherValue = other:get(rt.ANY):narrow(knownValue)
+        local otherKey   = other.typeOfKey
+        local otherValue = other:get(rt.ANY)
+        -- 无已知键/值时无过滤条件，直接取 other 的完整键/值类型，
+        -- 避免 narrow(never) 经 value 链退化成空表
+        if #knownKeys > 0 and otherKey then
+            otherKey = select(2, otherKey:narrow(knownKey))
+        end
+        if #knownValues > 0 then
+            otherValue = select(2, otherValue:narrow(knownValue))
+        end
         for _, field in ipairs(fieldsKV) do
             field.key:inferGeneric(otherKey, result)
             field.value:inferGeneric(otherValue, result)

@@ -579,7 +579,15 @@ function M:makeView(viewer)
                 returns[i] = '...: unknown'
                 returnBuf[i] = '(' .. returns[i] .. ')'
             else
-                returns[i] = viewer:view(v.value)
+                -- `...R`（泛型包，解包为多个值）保持原样；`... R`（不定长，
+                -- 每个值都是 R）渲染为 `...: R`
+                local spread = v.value:findValue(ls.node.kind['spread'])
+                ---@cast spread Node.Spread?
+                if spread and not spread.head:findValue(ls.node.kind['generic']) then
+                    returns[i] = string.format('...: %s', viewer:view(spread.head))
+                else
+                    returns[i] = viewer:view(v.value)
+                end
                 returnBuf[i] = returns[i]
             end
         end

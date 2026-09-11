@@ -353,16 +353,23 @@ function M:onCanBeCast(other)
     if self == other then
         return true
     end
-    if not other:isTableLike() then
-        -- 目标是 union 时，按成员逐一检查：任一 table-like 成员可命中即通过
-        if other.kind == 'union' then
-            ---@cast other Node.Union
-            for _, member in ipairs(other.values) do
-                if member:isTableLike() and self:onCanBeCast(member) then
-                    return true
+    -- union 不能参与逐字段比较：Union:get 每次读取都会构造新的 union 节点，
+    -- 与 canCast 相互递归时节点身份不断变化，无法收敛。
+    -- 按成员判断：能转换为 self 需要每个 table 成员都能转换
+    if other.kind == 'union' then
+        ---@cast other Node.Union
+        local hasTableLike = false
+        for _, member in ipairs(other.values) do
+            if member:isTableLike() then
+                hasTableLike = true
+                if not self:onCanBeCast(member) then
+                    return false
                 end
             end
         end
+        return hasTableLike
+    end
+    if not other:isTableLike() then
         return false
     end
     if other.kind == 'table' and #other.keys == 0 then
@@ -382,16 +389,18 @@ end
 ---@return boolean
 function M:onCanCast(other)
     local rt = self.scope.rt
-    if not other:isTableLike() then
-        -- 目标是 union 时，按成员逐一检查：任一 table-like 成员可命中即通过
-        if other.kind == 'union' then
-            ---@cast other Node.Union
-            for _, member in ipairs(other.values) do
-                if member:isTableLike() and self:onCanCast(member) then
-                    return true
-                end
+    -- 同 onCanBeCast：union 不能参与逐字段比较，按成员判断——
+    -- 能转换为 union 只需任一 table 成员可转换
+    if other.kind == 'union' then
+        ---@cast other Node.Union
+        for _, member in ipairs(other.values) do
+            if member:isTableLike() and self:onCanCast(member) then
+                return true
             end
         end
+        return false
+    end
+    if not other:isTableLike() then
         return false
     end
     if other.kind == 'array' then

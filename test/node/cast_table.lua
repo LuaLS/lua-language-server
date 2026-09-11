@@ -170,3 +170,23 @@ do
     lt.assertEquals(a >> b, true)
     lt.assertEquals(b >> a, true)
 end
+
+do
+    -- 表转换为 union：任一 table 成员可转换即可
+    -- union 转换为表：要求所有成员都能转换为该表
+    local A = rt.table()
+        : addField(rt.field('x', rt.value(1)))
+    local B = rt.table()
+        : addField(rt.field('x', rt.value(1)))
+    local C = rt.table()
+        : addField(rt.field('x', rt.value(2)))
+    local D = rt.table()
+        : addField(rt.field('y', rt.value(2)))
+
+    lt.assertEquals(A >> (B | A), true)
+    lt.assertEquals(A >> (B | C), true)
+    lt.assertEquals(A >> (B | D), true)
+    lt.assertEquals((B | A) >> A, true)
+    lt.assertEquals((B | C) >> A, false)
+    lt.assertEquals((C | D) >> A, false)
+end

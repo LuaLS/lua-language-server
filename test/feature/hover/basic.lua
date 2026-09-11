@@ -1481,6 +1481,29 @@ function unpack<T:any[]>(t: T)
 }
 
 TEST_HOVER [[
+---@param ... boolean
+---@return ... number
+local function <?f?>(...) end
+]] {
+    'local f: function',
+    [[
+function f(...: boolean)
+  -> ...: number
+]],
+}
+
+TEST_HOVER [[
+---@return ... any
+local function <?f?>() end
+]] {
+    'local f: function',
+    [[
+function f()
+  -> ...: any
+]],
+}
+
+TEST_HOVER [[
 ---@generic T: any[]
 ---@param t T
 ---@return ...T

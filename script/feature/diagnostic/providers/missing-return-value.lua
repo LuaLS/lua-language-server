@@ -24,6 +24,29 @@ local function getRequiredReturnCount(f)
     return count
 end
 
+---@param ret LuaParser.Node.Return
+---@param vfile VM.Vfile
+---@return integer? count
+local function getReturnedCount(ret, vfile)
+    local n = #ret.exps
+    if n == 0 then
+        return 0
+    end
+    local last = vfile:getNode(ret.exps[n])
+    if not last then
+        return nil
+    end
+    local list = last:findValue(ls.node.kind['list'])
+    if not list then
+        return n
+    end
+    ---@cast list Node.List
+    if not list.max then
+        return nil
+    end
+    return n - 1 + list.min
+end
+
 ---@async
 ---@param param Feature.Diagnostic.Param
 ---@param callback fun(diag: Feature.Diagnostic)
@@ -50,8 +73,8 @@ local function missingReturnValueProvider(param, callback)
         if not min or min == 0 then
             goto continue
         end
-        local rmin = #ret.exps
-        if rmin >= min then
+        local rmin = getReturnedCount(ret, vfile)
+        if not rmin or rmin >= min then
             goto continue
         end
         callback {

@@ -475,20 +475,46 @@ function M:getCatGroup(nearbySource)
 
     local group = self:getBlockKV('catGroup')
     if not group then
-        return nil
+        return self:findCatGroupInBlock(nearbySource)
     end
     local first = group[1]
     if not first then
-        return nil
+        return self:findCatGroupInBlock(nearbySource)
     end
     if nearbySource then
         local sourceLine = nearbySource.startRow
         local catLine = group[#group].finishRow
         if (sourceLine - 1) ~= catLine then
-            return nil
+            return self:findCatGroupInBlock(nearbySource)
         end
     end
     return self:filterConsumed(group)
+end
+
+--- 注解写在语句内部时（如作为实参的函数字面量之前），注解节点会被排在语句之后编译，
+--- 此时无法通过编译顺序拿到注解，按行号从当前 block 的注解表里直接取。
+--- 只取没有值的注解（如 `---@async`）：这类注解只用于打标记（addAnnotation），
+--- 不依赖注解自身的编译产物；带值的注解需要先编译，仍走原来的顺序
+---@param nearbySource? LuaParser.Node.Base
+---@return LuaParser.Node.Cat[]?
+function M:findCatGroupInBlock(nearbySource)
+    if not nearbySource then
+        return nil
+    end
+    local block = self:getBlockKV('parserBlock')
+    local cats  = block and block.cats
+    if not cats then
+        return nil
+    end
+    local row = nearbySource.startRow - 1
+    local result
+    for _, cat in ipairs(cats) do
+        if not cat.value and cat.finishRow == row and not cat.binded then
+            result = result or {}
+            result[#result+1] = cat
+        end
+    end
+    return result
 end
 
 ---@param source { start: integer, finish: integer, key?: { start: integer, finish: integer } }

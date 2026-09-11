@@ -3,6 +3,7 @@
 ---@param blockKV? table<string, any>
 local function parseBlock(coder, block, blockKV)
     coder:pushBlock()
+    coder:setBlockKV('parserBlock', block)
     if blockKV then
         for k, v in pairs(blockKV) do
             coder:setBlockKV(k, v)

@@ -601,12 +601,16 @@ end)
 ls.vm.registerCoderProvider('catstatesee', function (coder, source)
     ---@cast source LuaParser.Node.CatStateSee
 
+    coder:addToCatGroup(source.parent, true)
     coder:addUnneeded(source)
 end)
 
 ls.vm.registerCoderProvider('catstatediagnostic', function (coder, source)
     ---@cast source LuaParser.Node.CatStateDiagnostic
 
+    -- 注解本身不参与求值，但必须登记进注解组：
+    -- 注解组的「上一行」判定依赖组内最后一个注解的位置
+    coder:addToCatGroup(source.parent, true)
     coder:addUnneeded(source)
 end)
 

@@ -126,6 +126,8 @@ end
 
 ---@param ref ['ref', string, string]
 ---@return Node?
+--- 不变量：本函数只允许通过不触发 Tracer 的接口读取输入（stratum-1），
+--- 否则会与正在进行的求值相互递归（求值 -> walk -> 求值）。
 function W:traceRef(ref)
     local id, alias = ref[2], ref[3]
     self.aliasID[alias] = id
@@ -153,13 +155,14 @@ function W:traceRef(ref)
                         r = r.value
                     end
                     if r.kind == 'variable' then
-                        r = r.value
+                        ---@cast r Node.Variable
+                        r = r:getStaticValue()
                     end
-                    -- 读到未完成的中间态，本次结果不可信，不予采纳与持久化
-                    if r == rt.PROVISIONAL then
-                        return nil
+                    -- 求值未完成：不采纳该值，但保留 walker 自身的值（无则后续走静态兜底），
+                    -- 不能丢弃整次读取，否则节点拿不到位置相关的值
+                    if r ~= rt.PROVISIONAL then
+                        value = r
                     end
-                    value = r
                 elseif myver then
                     value = rt.NIL
                 end

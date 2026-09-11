@@ -75,6 +75,17 @@ M.__getter.value = function (self)
     return self.fvalue, true
 end
 
+-- 该赋值所属语句的结束位置。用于判断某个写入相对于读取点是否已经生效
+---@type integer?
+M.statementFinish = nil
+
+---@param finish integer
+---@return Node.Field
+function M:setStatementFinish(finish)
+    self.statementFinish = finish
+    return self
+end
+
 ---@param self Node.Field
 ---@return boolean
 ---@return true

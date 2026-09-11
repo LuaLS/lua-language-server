@@ -379,6 +379,49 @@ function M:getMasterVariable()
     return self
 end
 
+-- 是否为环境子字段（global）：父链沿变量向上，键为 _G / _ENV
+---@return boolean
+function M:isEnvChild()
+    local parent = self.parent
+    while parent and parent.kind == 'variable' do
+        ---@cast parent Node.Variable
+        local key = parent.key
+        if key and key.kind == 'value' then
+            local literal = key.literal
+            if literal == '_G' or literal == '_ENV' then
+                return true
+            end
+        end
+        parent = parent.parent
+    end
+    return false
+end
+
+-- 本文件对该 env 子字段的写入是否**全部尚未生效**（语句结束位置都在读取点之后）。
+-- 此时父环境上的字段值只可能来自本文件自己的写（含当前语句自身的写，自引用），
+-- 不能作为读取的兜底值；反之（存在读点之前生效的本文件写入）交给 flow 处理。
+---@return boolean
+function M:hasPendingLocalAssign()
+    local location = self.location
+    if not location or not location.uri then
+        return false
+    end
+    local master = self:getMasterVariable()
+    local hasLocal = false
+    for assign in master:eachAssign() do
+        ---@cast assign Node.Field
+        local assignLocation = assign.location
+        if assignLocation and assignLocation.uri == location.uri then
+            hasLocal = true
+            local finish = assign.statementFinish
+            if not finish or finish < location.offset then
+                return false
+            end
+        end
+    end
+    return hasLocal
+end
+
 ---@return table<Node.Key, Node.Variable>?
 function M:getChilds()
     if self.masterVariable then
@@ -793,9 +836,13 @@ end
 ---@return Node?
 function M:getGuessValue()
     local master = self:getMasterVariable()
-    local result = master.equivalentValue
-                or master.parentFieldValue
-                or nil
+    -- env 子字段（global）且本文件的写入都尚未生效时，父字段聚合值是自引用，不作兜底依据
+    local result
+    if not (self:isEnvChild() and self:hasPendingLocalAssign()) then
+        result = master.equivalentValue
+            or   master.parentFieldValue
+            or   nil
+    end
     -- master 有静态值（require/调用返回，equivalentValue 因此短路）时，
     -- 其字段写（childs）被短路丢弃；用交集补上（get 遍历所有 tableLike
     -- 成员、跳过缺字段者，无 nil 污染，且不覆盖收窄/class 语义）。

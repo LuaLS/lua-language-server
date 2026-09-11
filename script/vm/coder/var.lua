@@ -16,13 +16,18 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         coder:getTracer():appendVar(source)
     else
         coder:getTracer():appendRef(source)
+        local location = coder:makeLocationCode(source)
+        coder:addLine('{key}:setLocation {location}' % {
+            key      = coder:getKey(source),
+            location = location,
+        })
         coder:addLine('{key}:addUsage {location}' % {
             key      = coder:getKey(source),
-            location = coder:makeLocationCode(source),
+            location = location,
         })
         coder:addDisposer('{key}:removeUsage {location}' % {
             key      = coder:getKey(source),
-            location = coder:makeLocationCode(source),
+            location = location,
         })
     end
 end)

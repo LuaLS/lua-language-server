@@ -115,13 +115,17 @@ function M:compileAssign(var, index, valueKey, isTable)
         key = self:makeFieldCode(var.key) or 'rt.UNKNOWNKEY'
     end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
+    -- 记录语句结束位置：读取点落在这条语句内部时，此次写入尚未生效（自引用）
+    local statement = var.parent
+    local statementFinish = statement and statement.finish or var.finish
     self:addLine([[
-{fieldKey} = rt.field({key}, {value}):setLocation {location}
+{fieldKey} = rt.field({key}, {value}):setLocation {location}:setStatementFinish({finish})
 ]] % {
         fieldKey = fieldKey,
         key      = key,
         value    = valueKey,
         location = self:makeLocationCode(var),
+        finish   = statementFinish,
     })
     -- 对未注解表的索引写 nil 视为删除：不作为类型性 assign 登记，
     -- 避免 nil 写把读值压成 nil（未注解表读取默认不含 nil）。

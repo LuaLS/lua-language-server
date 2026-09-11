@@ -151,3 +151,35 @@ function m.step()
 end
 m.step()
 ]] { '-param-type-mismatch' }
+
+-- 临时探针：二元运算占位类型作为实参时是否被当作 any
+TEST_DIAGNOSTIC [[
+---@param s string
+local function needString(s) end
+
+---@type integer
+local a
+needString(a .. 'x')
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param n integer
+local function needInt(n) end
+
+---@type integer
+local a
+---@type integer
+local b
+needInt(a & b)
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param s string
+local function needString(s) end
+
+---@type string
+local s
+---@type any
+local u
+needString(s .. u)
+]] { '-param-type-mismatch' }

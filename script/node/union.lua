@@ -144,6 +144,28 @@ M.__getter.values = function (self)
     ls.util.arrayRemoveDuplicate(values)
 
     local rt = self.scope.rt
+    -- 求值未完成的占位类型不得进入持久化的 union：
+    -- 组合体会被缓存，中间态一旦混入便不会随求值结束自愈
+    local hasProvisional = false
+    for _, v in ipairs(values) do
+        if v == rt.PROVISIONAL then
+            hasProvisional = true
+            break
+        end
+    end
+    if hasProvisional then
+        local filtered = {}
+        for _, v in ipairs(values) do
+            if v ~= rt.PROVISIONAL then
+                filtered[#filtered+1] = v
+            end
+        end
+        if #filtered == 0 then
+            filtered[1] = rt.ANY
+        end
+        values = filtered
+    end
+
     local hasTrue, hasFalse, hasBoolean
     for _, v in ipairs(values) do
         if v == rt.TRUE then

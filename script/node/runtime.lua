@@ -365,7 +365,7 @@ function M:fillPresets()
         end)
         : setConfig('basicType', true)
     --- 求值未完成时的占位类型，行为与 any 一致，但身份独立，便于识别中间态
-    self.PROVISIONAL = New 'Node.Type' (self.scope, 'any')
+    self.PROVISIONAL = self.type 'provisional'
         : setConfig('onCanCast', function (_, other)
             return other.typeName ~= 'never'
         end)

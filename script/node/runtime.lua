@@ -373,6 +373,7 @@ function M:fillPresets()
             return true
         end)
         : setConfig('basicType', true)
+        : setConfig('viewType', 'any')
     --- 动态键写入（`X[expr] = v` 且键无法在编译期解析）的键类型，
     --- 身份独立于 unknown：字面量键读取不应命中该键的字段，
     --- unknown 键读取可以命中（与 PROVISIONAL 之于 ANY 同理）

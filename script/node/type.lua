@@ -511,10 +511,15 @@ M._basicType = false
 ---@type boolean
 M._hideEmptyArgs = false
 
+---@package
+---@type string?
+M._viewType = nil
+
 ---@overload fun(self, key: 'onCanCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
 ---@overload fun(self, key: 'onCanBeCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
 ---@overload fun(self, key: 'basicType', value: boolean): Node.Type
 ---@overload fun(self, key: 'hideEmptyArgs', value: boolean): Node.Type
+---@overload fun(self, key: 'viewType', value: string): Node.Type
 function M:setConfig(key, value)
     self['_' .. key] = value
     return self
@@ -680,5 +685,5 @@ function M:call(nodes)
 end
 
 function M:onView(viewer, options)
-    return self.typeName
+    return self._viewType or self.typeName
 end

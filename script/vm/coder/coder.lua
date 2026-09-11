@@ -598,7 +598,7 @@ function M:makeVarKey(source)
     if source.kind == 'field' then
         ---@cast source LuaParser.Node.Field
         local fieldCode =  self:makeFieldCode(source.key)
-                        or 'rt.UNKNOWN'
+                        or 'rt.UNKNOWNKEY'
         return '{last}:getChild({field})' % {
             last  = self:getKey(source.last),
             field = fieldCode,

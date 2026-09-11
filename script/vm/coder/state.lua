@@ -103,7 +103,7 @@ function M:compileAssign(var, index, valueKey, isTable)
         return
     end
 
-    local key = 'rt.UNKNOWN'
+    local key = 'rt.UNKNOWNKEY'
     if var.kind == 'var' then
         ---@cast var LuaParser.Node.Var
         key = ('rt.value %q'):format(var.id)
@@ -112,7 +112,7 @@ function M:compileAssign(var, index, valueKey, isTable)
         key = ('rt.value %q'):format(var.id)
     elseif var.kind == 'field' then
         ---@cast var LuaParser.Node.Field
-        key = self:makeFieldCode(var.key) or 'rt.UNKNOWN'
+        key = self:makeFieldCode(var.key) or 'rt.UNKNOWNKEY'
     end
     local fieldKey = self:getCustomKey('field|' .. var.uniqueKey)
     self:addLine([[

@@ -39,9 +39,9 @@ do
     ]]
 
     local g = rt.type '_G'
-    lt.assertEquals(g:get('A'):view(), '{ [unknown]: { C: 1 } }')
-    lt.assertEquals(rt:globalGet('A', rt.UNKNOWN, 'C'):viewAsVariable(), 'A[unknown].C')
-    lt.assertEquals(rt:globalGet('A', rt.UNKNOWN, 'C').value:view(), '1')
+    lt.assertEquals(g:get('A'):view(), '{ [unknownkey]: { C: 1 } }')
+    lt.assertEquals(rt:globalGet('A', rt.UNKNOWNKEY, 'C'):viewAsVariable(), 'A[unknownkey].C')
+    lt.assertEquals(rt:globalGet('A', rt.UNKNOWNKEY, 'C').value:view(), '1')
 end
 
 do

@@ -36,6 +36,24 @@ do
 end
 
 do
+    -- unknownkey：动态键写入的字段，unknown 键读取可命中，字面量键读取不命中
+    local t = rt.table {
+        [rt.UNKNOWNKEY] = rt.value(1),
+    }
+
+    lt.assertEquals(t:get(rt.UNKNOWN):view(), '1')
+    lt.assertEquals(t:get('foo'):view(), 'nil')
+end
+
+do
+    -- 动态键往返：以同一变量节点为键写入/读取
+    local t = rt.table()
+    local abc = rt.variable 'abc'
+    t:addField(rt.field(abc, rt.value(1)))
+    lt.assertEquals(t:get(abc):view(), '1')
+end
+
+do
     local A = rt.class('A')
     A:addField(rt.field('x', rt.NUMBER))
 

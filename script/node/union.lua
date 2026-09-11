@@ -44,35 +44,90 @@ end
 ---@return boolean
 function M:onCanCast(other)
     for _, v in ipairs(self.values) do
+        if v.kind == 'type' and v.typeName == 'unknown' then
+            -- unknown 成员不阻断转换，由其余成员决定
+            goto continue
+        end
         if not v:canCast(other) then
             return false
         end
+        ::continue::
     end
     return true
+end
+
+-- 用于检测 get(key) 递归调用中的循环引用
+local _getVisiting = {}
+
+---@param visited? table<Node, true>
+---@return boolean
+function M:isTableLike(visited)
+    visited = visited or {}
+    if visited[self] then
+        return false
+    end
+    visited[self] = true
+    for _, v in ipairs(self.values) do
+        if v:isTableLike(visited) then
+            return true
+        end
+    end
+    return false
+end
+
+---@param key Node.Key
+---@return Node
+---@return boolean exists
+function M:get(key)
+    local rt = self.scope.rt
+    if _getVisiting[self] then
+        return rt.NIL, false
+    end
+    _getVisiting[self] = true
+    local value
+    local existsOnce = false
+    for _, v in ipairs(self.values) do
+        local thisValue, exists = v:get(key)
+        value = value | thisValue
+        if exists then
+            existsOnce = true
+        end
+    end
+    _getVisiting[self] = nil
+    return value or rt.NIL, existsOnce
 end
 
 ---@type Node[]
 M.values = nil
 
+---@package
+---@type Node[]?
+M._valuesBuilding = nil
+
 ---@param self Node.Union
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
-    self.values = {}
+    if self._valuesBuilding then
+        return self._valuesBuilding, true
+    end
+    self._valuesBuilding = {}
     ---@type Node[]
     local values = {}
 
     ---@param v Node
-    local function insertValue(v)
-        if #values >= 1000 then
+    ---@param visited table<Node, true>
+    local function insertValue(v, visited)
+        if #values >= 1000 or visited[v] then
             return
         end
+        visited[v] = true
         local nv = v:findValue(ls.node.kind['union'] | ls.node.kind['type'] | ls.node.kind['generic'])
                 or v:simplify()
         if nv.kind == 'union' then
             ---@cast nv Node.Union
             for _, vv in ipairs(nv.values) do
-                insertValue(vv)
+                insertValue(vv, visited)
             end
             return
         end
@@ -83,7 +138,7 @@ M.__getter.values = function (self)
     end
     for _, v in ipairs(self.rawNodes) do
         v:addRef(self)
-        insertValue(v)
+        insertValue(v, {})
     end
 
     ls.util.arrayRemoveDuplicate(values)
@@ -112,23 +167,10 @@ M.__getter.values = function (self)
         values = merged
     end
 
-    return values, true
-end
+    self._valuesBuilding = nil
+    self.values = values
 
----@param key Node.Key
----@return Node
----@return boolean exists
-function M:get(key)
-    local value
-    local existsOnce = false
-    for _, v in ipairs(self.values) do
-        local thisValue, exists = v:get(key)
-        value = value | thisValue
-        if exists then
-            existsOnce = true
-        end
-    end
-    return value or self.scope.rt.NIL, existsOnce
+    return values, true
 end
 
 ---@type Node

@@ -42,7 +42,8 @@ local function returnTypeMismatchProvider(param, callback)
             if expect.kind == 'type' and (expect.typeName == 'any' or expect.typeName == 'unknown') then
                 goto continueExp
             end
-            if actual >> expect then
+            local castResult = actual >> expect
+            if castResult then
                 goto continueExp
             end
             callback {

@@ -212,12 +212,32 @@ function M:isTableLike()
     return true
 end
 
----是否存在 unknown/any 类型的 key 字段（任意 key 同值表，可视为值类型的数组）
+---是否存在 unknown/any/unknownkey 类型的 key 字段（任意 key 同值表，可视为值类型的数组）
 ---@return boolean
 function M:isAnyKeyTable()
     for _, key in ipairs(self.keys) do
         if  key.kind == 'type'
-        and (key.typeName == 'unknown' or key.typeName == 'any') then
+        and (key.typeName == 'unknown'
+            or key.typeName == 'any'
+            or key.typeName == 'unknownkey') then
+            return true
+        end
+    end
+    return false
+end
+
+---是否存在动态键（unknownkey）写入的字段（开放结构：任意具名字段都可能存在）
+---@return boolean
+function M:hasDynamicKey()
+    if not self.fields then
+        return false
+    end
+    for field in self.fields:pairsFast() do
+        ---@cast field Node.Field
+        local key = field.key
+        if  key
+        and key.kind == 'type'
+        and key.typeName == 'unknownkey' then
             return true
         end
     end
@@ -252,15 +272,21 @@ function M:get(key)
     key = rt.nodeKey(key)
     if key.kind == 'value' then
         ---@cast key Node.Value
+        -- 字面量键只精确匹配字面量/类型键字段；unknownkey 键的字段是
+        -- 动态键写入（`X[动态键] = v`）的宽泛记录，字面量读取不应命中
         local result = self.valueMap[rt.luaKey(key)]
         if result then
             return result, true
         end
         for field in self.fields:pairsFast() do
             ---@cast field Node.Field
+            if field.key == rt.UNKNOWNKEY then
+                goto continue
+            end
             if key:canCast(field.key) then
                 return field.value, true
             end
+            ::continue::
         end
         return rt.NIL, false
     end
@@ -328,6 +354,15 @@ function M:onCanBeCast(other)
         return true
     end
     if not other:isTableLike() then
+        -- 目标是 union 时，按成员逐一检查：任一 table-like 成员可命中即通过
+        if other.kind == 'union' then
+            ---@cast other Node.Union
+            for _, member in ipairs(other.values) do
+                if member:isTableLike() and self:onCanBeCast(member) then
+                    return true
+                end
+            end
+        end
         return false
     end
     if other.kind == 'table' and #other.keys == 0 then
@@ -348,6 +383,15 @@ end
 function M:onCanCast(other)
     local rt = self.scope.rt
     if not other:isTableLike() then
+        -- 目标是 union 时，按成员逐一检查：任一 table-like 成员可命中即通过
+        if other.kind == 'union' then
+            ---@cast other Node.Union
+            for _, member in ipairs(other.values) do
+                if member:isTableLike() and self:onCanCast(member) then
+                    return true
+                end
+            end
+        end
         return false
     end
     if other.kind == 'array' then

@@ -102,3 +102,37 @@ t.foo = 1
 t = nil
 print(t.foo)
 ]] { 'need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+local function f(k)
+    local t = {}
+    t[k] = 1
+    print(t.foo)
+end
+]] { '-undefined-field' }
+
+TEST_DIAGNOSTIC [[
+local function f(k)
+    local t = {}
+    t[k] = 1
+    local u = t
+    print(u.foo)
+end
+]] { '-undefined-field' }
+
+TEST_DIAGNOSTIC [[
+local function f(k, cond)
+    local t = {}
+    t[k] = { C = 1 }
+    local u = cond and t or {}
+    print(u.C)
+end
+]] { '-undefined-field' }
+
+TEST_DIAGNOSTIC [[
+local A = {}
+local function f(k)
+    A[k] = { C = 1 }
+end
+print(A.C)
+]] { '-undefined-field' }

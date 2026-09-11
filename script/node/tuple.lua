@@ -143,7 +143,10 @@ function M:onCanBeCast(other)
         if other:isAnyKeyTable() then
             for i = 1, math.min(100, self.values.max) do
                 local v = self.values:select(i)
-                local value = other:get(i)
+                local value, exists = other:get(i)
+                if not exists then
+                    value = other:get(self.scope.rt.UNKNOWN)
+                end
                 if not value:canCast(v) and not v:canCast(value) then
                     return false
                 end

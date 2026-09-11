@@ -353,13 +353,23 @@ M.variableTable = nil
 ---@return true
 M.__getter.variableTable = function (self)
     local variableTables = {}
+    local rt = self.scope.rt
 
     for _, class in ipairs(self.protoClasses) do
         if class.variables then
             for _, variable in ipairs(class.variables) do
                 variable:addRef(self)
-                if variable.fields then
-                    variableTables[#variableTables+1] = variable.fields
+                if variable.fields and variable.fields.kind == 'table' then
+                    -- 只并入字面量键字段：动态键（[unknown]/[any] 等）写入
+                    -- 是「任意键都可能命中」的宽泛记录，进入类表会污染
+                    -- 所有同类变量的具名字段读取
+                    local fields = rt.table()
+                    for _, field in pairs(variable.fields.fieldMap) do
+                        if field.key and field.key.kind == 'value' then
+                            fields:addField(field)
+                        end
+                    end
+                    variableTables[#variableTables+1] = fields
                 end
             end
         end
@@ -638,6 +648,11 @@ end
 ---@return Node
 ---@return boolean exists
 function M:get(key)
+    -- any/unknown 类型的字段读取恒为 any（任意字段都可能存在）
+    if self.typeName == 'any'
+    or self.typeName == 'unknown' then
+        return self.scope.rt.ANY, true
+    end
     if self.extendsValue == self then
         return self.scope.rt.NEVER, false
     end

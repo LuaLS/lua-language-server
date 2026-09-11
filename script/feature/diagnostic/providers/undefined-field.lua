@@ -36,6 +36,19 @@ local function undefinedFieldProvider(param, callback)
         if exists then
             goto continue
         end
+        -- 表含动态键（unknownkey）写入时是开放结构：任意字段都可能存在，
+        -- 字段存在性不可判定，不做报告；读取路径常包着变量/联合，
+        -- 需沿 value 链找出真正承载字段的表
+        local hasDynamicKey = false
+        node:each('table', function (tableNode)
+            ---@cast tableNode Node.Table
+            if tableNode:hasDynamicKey() then
+                hasDynamicKey = true
+            end
+        end)
+        if hasDynamicKey then
+            goto continue
+        end
         -- 变量有静态值（如 require/函数调用返回）时，其字段赋值记录在变量的 childs 上，
         -- 不在该值里；回退检查变量自身的 childs（读取路径本身是正确的）。
         do

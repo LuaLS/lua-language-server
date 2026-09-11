@@ -39,7 +39,9 @@ end
 f()
 ]] { 'return-type-mismatch' }
 
-TEST_DIAGNOSTIC [[
+TEST_DIAGNOSTIC [[--!include setmetatable
+--!include type
+--!include pairslib
 ---@class docUnion
 ---@field name string
 

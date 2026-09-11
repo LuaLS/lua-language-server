@@ -173,6 +173,36 @@ local b
 needInt(a & b)
 ]] { '-param-type-mismatch' }
 
+-- 动态键读取在中间码中共用一个槽位，不同键之间不得互相收窄
+TEST_DIAGNOSTIC [[
+---@param t table
+local function need(t) end
+
+---@param t table
+---@param key string
+local function f(t, key)
+    if t[key] then
+        return
+    end
+    local k = key
+    need(t[k])
+    need(t[key])
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param t table
+local function need(t) end
+
+---@param t table
+local function f(t)
+    if t.a then
+        return
+    end
+    need(t.b)
+end
+]] { '-param-type-mismatch' }
+
 TEST_DIAGNOSTIC [[
 ---@param s string
 local function needString(s) end
@@ -182,4 +212,22 @@ local s
 ---@type any
 local u
 needString(s .. u)
+]] { '-param-type-mismatch' }
+
+-- 经动态键读取得到的变量，其字面量字段在分支内仍应收窄
+TEST_DIAGNOSTIC [[
+---@class S
+---@field pattern? string
+
+---@param s string
+local function needString(s) end
+
+---@param t S[]
+---@param key string
+local function f(t, key)
+    local st = t[key]
+    if st.pattern then
+        needString(st.pattern)
+    end
+end
 ]] { '-param-type-mismatch' }

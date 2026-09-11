@@ -583,6 +583,14 @@ function W:traceEqual(left, right, revert)
     end
 end
 
+--- 是否为动态键读取（键无法静态解析的 `t[expr]`）
+---@param ref ['ref', string, string]
+---@return boolean
+function W:isDynamicKeyRef(ref)
+    local node = self.map[ref[3]]
+    return node ~= nil and node.kind == 'variable' and node.key == self.scope.rt.UNKNOWNKEY
+end
+
 function W:traceByValue(var, value, revert)
     local vvalue = self:traceRef(var)
     if not vvalue then
@@ -591,6 +599,15 @@ function W:traceByValue(var, value, revert)
 
     local id = var[2]
     local narrowed, otherSide = vvalue:narrowEqual(value)
+    -- 动态键读取（`t[expr]`）在中间码中共用一个槽位（`t[unknown]`），不同键之间会互相覆盖：
+    -- 只对当前分支做断言，另一侧保持原值，避免某个键的真假结果泄漏给其他键的读取
+    if self:isDynamicKeyRef(var) then
+        if revert then
+            narrowed = vvalue
+        else
+            otherSide = vvalue
+        end
+    end
     if revert then
         self:setNarrowResult(id, otherSide, narrowed)
     else

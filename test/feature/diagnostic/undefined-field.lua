@@ -137,6 +137,7 @@ end
 print(A.C)
 ]] { '-undefined-field' }
 
+-- `table & { n: integer }`：n 参与字段检查
 TEST_DIAGNOSTIC [[
 ---@type fun(...): table & { n: integer }
 local pack
@@ -144,3 +145,15 @@ local pack
 local t = pack(1, 2)
 print(t.n)
 ]] { '-undefined-field' }
+
+-- `T & { n: integer }`：n 存在，其他字段仍是未定义
+TEST_DIAGNOSTIC [[
+---@generic T
+---@param ... T
+---@return T & { n: integer }
+local function pack(...) end
+
+local t = pack(1, 2)
+print(t.n)
+print(t.zzz)
+]] { 'undefined-field' }

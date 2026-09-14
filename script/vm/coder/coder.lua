@@ -502,7 +502,7 @@ function M:findCatGroupInBlock(nearbySource)
         return nil
     end
     local block = self:getBlockKV('parserBlock')
-    local cats  = block and block.cats
+    local cats  = block?.cats
     if not cats then
         return nil
     end

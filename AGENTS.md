@@ -113,6 +113,12 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
 ## 8) Style Note
 
 - For multi-condition `if` blocks using `and/or`, keep project-consistent aligned layout.
+- **判空链用可选链**：支持 `?.` `?:` `?(` `?[`，可任意链式——写 `a?.b?.c`、`p?.childs?[i]`、`f?.g()`、`o?:m()`，
+  不要写 `a and a.b and a.b.c`。仅 `script/tools/` 例外（该目录不允许可选链）。
+  `?.` 之后的类型收窄目前不可靠（上游 master 亦然），因此链上**每一级都带 `?`**（`a?.b?.c`、`a?.b?.c == 1`），
+  不要写成依赖收窄的 `a?.b and a.b.c`。
+- **字符串格式化用 `%` 形式**：`'{} = {}' % { var, value }`（位置 `{}`、命名 `{name}`、带格式 `{name%q}` / `{%d}`），
+  不要用 `('%s = %s'):format(var, value)` 或 `string.format(...)`；多行模板直接用 `[[...{}...]]`。
 - 禁止写任何注释；确有必要写注释时，必须先询问用户并得到同意。即便用户同意，注释也只写意图、保持简练，不暴露内部实现细节。
 - **语句不要以 `(` 开头**：Lua 的 newline-call 规则会把「上一行以函数调用结尾、下一行以 `(` 开头」连成一条链式调用（如 `print(...)` 后跟 `(g)(nil)` 会解析为 `print(...)(g)(nil)`，对 print 的返回值 nil 调用）。必要时在上一行末尾加 `;` 断句。测试用例同样遵守（`tmp/` 下诊断被屏蔽，此类问题不会被静态诊断提示）。
 - 清理诊断：如无特殊说明，只需处理 warning 及以上等级（error/warning）；hint/information 级存量为项目常态，不主动清理，避免无关重构。

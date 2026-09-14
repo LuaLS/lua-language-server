@@ -211,9 +211,15 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                         })
                         coder:getTracer():appendVar(varargLocal)
                         local varargTable = overloads and makeVarargTableCode(coder, overloads)
+                        if not varargTable then
+                            -- 命名不定长（Lua 5.5 `...name`）：元素类型跟随 `---@param ... T`，n 固定为 integer
+                            local catParamValue = catParam?.value
+                            local element = catParamValue and coder:getKey(catParamValue) or 'rt.ANY'
+                            varargTable = 'rt.array({}) & rt.table():addField(rt.field(rt.value("n"), rt.INTEGER))' % { element }
+                        end
                         coder:addLine('{key}:addType({type})' % {
                             key  = varargKey,
-                            type = varargTable or 'rt.array(rt.ANY) & rt.table():addField(rt.field(rt.value("n"), rt.INTEGER))',
+                            type = varargTable,
                         })
                     end
                     if param.id == '...' and overloads then

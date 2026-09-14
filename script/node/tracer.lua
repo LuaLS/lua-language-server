@@ -588,7 +588,7 @@ end
 ---@return boolean
 function W:isDynamicKeyRef(ref)
     local node = self.map[ref[3]]
-    return node ~= nil and node.kind == 'variable' and node.key == self.scope.rt.UNKNOWNKEY
+    return node?.kind == 'variable' and node?.key == self.scope.rt.UNKNOWNKEY
 end
 
 function W:traceByValue(var, value, revert)

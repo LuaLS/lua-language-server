@@ -18,9 +18,7 @@ local function isAsyncArgument(func, vfile)
     if not index then
         return false
     end
-    if  call.node
-    and call.node.kind == 'field'
-    and call.node.subtype == 'method' then
+    if call.node?.kind == 'field' and call.node?.subtype == 'method' then
         index = index + 1
     end
     local fcall = vfile:getNode(call)

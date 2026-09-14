@@ -28,3 +28,16 @@ TEST_DIAGNOSTIC [[
 local x
 <?x?> = 'str'
 ]] { 'assign-type-mismatch' }
+
+-- 实际存在的字段仍要比较类型
+TEST_DIAGNOSTIC [[
+---@type { a: integer }
+local <?t?> = 1
+]] { 'assign-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@type { a: integer }[]
+local vars = {
+    { a = 'str' },
+}
+]] { 'assign-type-mismatch' }

@@ -136,3 +136,11 @@ local function f(k)
 end
 print(A.C)
 ]] { '-undefined-field' }
+
+TEST_DIAGNOSTIC [[
+---@type fun(...): table & { n: integer }
+local pack
+
+local t = pack(1, 2)
+print(t.n)
+]] { '-undefined-field' }

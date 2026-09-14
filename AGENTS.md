@@ -8,7 +8,10 @@ It is intended for both human collaborators and coding agents.
 本仓库是 **4.0.0 完全重构分支**，架构与上游 master 不同（LuaParser.Ast + node 系统 + coder/middle code）。
 在本仓库做任何 parser / node / vm / feature / completion 改动前，必须：
 
-1. **先读 skill**：`.github/skills/luals-server-dev/SKILL.md` 及其 references
+0. **先读 `项目实践.md`**：当前阶段（2026-09 起）正在用本仓库 LS 清理目标工程
+   `D:\github\vscode-lua\server` 的诊断。遇到诊断先做**语义判断**（写法/注解本身是否有误），
+   并用上游 master 的二进制对照，确认是误报再进入实现排查。该文件还记录了常用命令、约定与已知未决项。
+1. **再读 skill**：`.github/skills/luals-server-dev/SKILL.md` 及其 references
    （`architecture.md`、`module-map.md`、`workflow-and-style.md`），再动手。
    各子系统的具体实现约束以 references 为准（例如 completion 应复用 VM/Node 语义、不要文本扫描）。
    不要凭通用 Lua 经验直接改代码。

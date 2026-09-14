@@ -78,3 +78,34 @@ local function f(...args)
     local <?s?> = args[1]
 end
 ]] { 'assign-type-mismatch' }
+
+-- 表字面量类型里的可选字段（`b?`）可以缺失
+TEST_DIAGNOSTIC [[
+---@param v string
+local function strToBool(v)
+    return v == 'true'
+end
+
+---@type { name: string, key: string, converter?: fun(value: string): any }[]
+local vars = {
+    { name = 'A', key = 'B' },
+    { name = 'C', key = 'D', converter = strToBool },
+}
+]] { '-assign-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@type { a: integer, b?: integer }[]
+local vars = {
+    { a = 1 },
+    { a = 2, b = 3 },
+}
+]] { '-assign-type-mismatch' }
+
+-- 非可选字段缺失仍要报
+TEST_DIAGNOSTIC [[
+---@type { a: integer, b: integer }[]
+local vars = {
+    { a = 1 },
+    { a = 2, b = 3 },
+}
+]] { 'assign-type-mismatch' }

@@ -385,11 +385,12 @@ ls.vm.registerCoderProvider('cattablefield', function (coder, source)
     coder:compile(source.value)
 
     coder:addLine([[
-{field} = rt.field({key}, {value}):setLocation {location}
+{field} = rt.field({key}, {value}, {optional}):setLocation {location}
 ]] % {
         field    = coder:getKey(source),
         key      = coder:getKey(source.key),
         value    = coder:getKey(source.value),
+        optional = source.optional,
         location = coder:makeLocationCode(source.key),
     })
 end)

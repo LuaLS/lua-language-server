@@ -191,6 +191,117 @@ M.register {
     status   = 'None',
 }
 
+-- 上游 master 已有、本仓库尚未实现的诊断码：
+-- 只参与「未知诊断码」识别与配置键（分组/等级/状态与 master 保持一致），不产生报告
+M.register {
+    'unreachable-code',
+} {
+    group    = 'unused',
+    severity = 'Hint',
+    status   = 'Opened',
+}
+
+M.register {
+    'missing-return',
+    'missing-fields',
+} {
+    group    = 'unbalanced',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'cast-local-type',
+    'cast-type-mismatch',
+    'inject-field',
+} {
+    group    = 'type-check',
+    severity = 'Warning',
+    status   = 'Opened',
+}
+
+M.register {
+    'unknown-operator',
+} {
+    group    = 'luadoc',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'missing-local-export-doc',
+} {
+    group    = 'luadoc',
+    severity = 'Warning',
+    status   = 'None',
+}
+
+M.register {
+    'codestyle-check',
+    'name-style-check',
+} {
+    group    = 'codestyle',
+    severity = 'Warning',
+    status   = 'None',
+}
+
+M.register {
+    'spell-check',
+} {
+    group    = 'codestyle',
+    severity = 'Information',
+    status   = 'None',
+}
+
+M.register {
+    'ambiguity-1',
+    'different-requires',
+} {
+    group    = 'ambiguity',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
+M.register {
+    'not-yieldable',
+} {
+    group    = 'await',
+    severity = 'Warning',
+    status   = 'None',
+}
+
+M.register {
+    'no-unknown',
+} {
+    group    = 'strong',
+    severity = 'Warning',
+    status   = 'None',
+}
+
+M.register {
+    'undefined-env-child',
+} {
+    group    = 'global',
+    severity = 'Information',
+    status   = 'Any',
+}
+
+M.register {
+    'duplicate-set-field',
+} {
+    group    = 'duplicate',
+    severity = 'Warning',
+    status   = 'Opened',
+}
+
+M.register {
+    'invisible',
+} {
+    group    = 'strict',
+    severity = 'Warning',
+    status   = 'Any',
+}
+
 ---@param scope Scope
 ---@param uri Uri
 ---@param name string

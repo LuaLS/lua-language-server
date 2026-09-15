@@ -663,8 +663,44 @@ local function pcall_(f, index) end
                 value = {
                     kind   = 'catfunction',
                     params = {
-                        [1] = { name = { id = 'f' } },
-                        [2] = { name = { id = 'index' } },
+                        [1] = {
+                            name  = { id = 'f' },
+                            value = {
+                                returns = {
+                                    [1] = { spread = true },
+                                },
+                            },
+                        },
+                        [2] = { name = { id = 'index' }, value = { id = 'integer' } },
+                    },
+                },
+            },
+        },
+    }
+}
+
+TEST [[
+---@overload fun(f: fun(...):...string, index: integer)
+local function pcall_(f, index) end
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind  = 'catstateoverload',
+                value = {
+                    kind   = 'catfunction',
+                    params = {
+                        [1] = {
+                            name  = { id = 'f' },
+                            value = {
+                                returns = {
+                                    [1] = { spread = true, value = { id = 'string' } },
+                                },
+                            },
+                        },
+                        [2] = { name = { id = 'index' }, value = { id = 'integer' } },
                     },
                 },
             },

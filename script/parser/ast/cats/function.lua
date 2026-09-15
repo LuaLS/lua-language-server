@@ -233,19 +233,19 @@ function Ast:parseCatFuncReturn(required)
     local value
     if spread then
         value = self:parseCatListValue(false)
-        if not value then
-            name = self:createNode('LuaParser.Node.CatFuncReturnName', {
-                start  = pos,
-                finish = pos + #'...',
-                id     = '...',
-            })
-            spread = nil
-        end
     elseif not name or symbolPos then
         value = self:parseCatListValue()
     end
 
-    if not name and not value then
+    local start
+    if name then
+        start = name.start
+    elseif value then
+        start = value.start
+    elseif spread then
+        ---@cast pos -?
+        start = pos
+    else
         return nil
     end
 
@@ -253,7 +253,7 @@ function Ast:parseCatFuncReturn(required)
         name = name,
         value = value,
         spread = spread,
-        start = (name or value).start,
+        start = start,
         symbolPos = symbolPos,
         finish = self:getLastPos(),
     })
@@ -276,7 +276,7 @@ function Ast:parseCatReturnList(noComma)
     local list = {}
     local first = self:parseCatFuncReturn(false)
     list[#list+1] = first
-    if noComma then
+    if noComma or first?.spread then
         return list
     end
     local wantSep = first ~= nil
@@ -293,10 +293,12 @@ function Ast:parseCatReturnList(noComma)
         if not wantSep then
             self:throw('UNEXPECT_SYMBOL', pos, pos + 1)
         end
+        local sepCI = self.lexer.ci
         self.lexer:next()
         self:skipSpace()
         local unit = self:parseCatFuncReturn(true)
         if not unit then
+            self.lexer.ci = sepCI
             break
         end
         list[#list+1] = unit

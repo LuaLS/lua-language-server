@@ -39,6 +39,16 @@ function M:addField(field)
     return self
 end
 
+-- 开放结构标记：未注解的表字面量（任意具名字段都可能存在）
+---@type boolean?
+M.dynamic = nil
+
+---@return Node.Table
+function M:setDynamic()
+    self.dynamic = true
+    return self
+end
+
 ---@param field Node.Field
 ---@return Node.Table
 function M:removeField(field)
@@ -229,6 +239,9 @@ end
 ---是否存在动态键（unknownkey）写入的字段（开放结构：任意具名字段都可能存在）
 ---@return boolean
 function M:hasDynamicKey()
+    if self.dynamic then
+        return true
+    end
     if not self.fields then
         return false
     end

@@ -107,6 +107,10 @@ ls.vm.registerCoderProvider('table', function (coder, source)
     coder:addLine('{key} = rt.table()' % {
         key = coder:getKey(source),
     })
+    -- 未注解的表字面量是开放结构：任意具名字段都可能存在，不报未定义字段
+    coder:addLine('{key}:setDynamic()' % {
+        key = coder:getKey(source),
+    })
 
     for _, field in ipairs(source.fields) do
         if not field.value then

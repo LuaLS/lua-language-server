@@ -3,10 +3,11 @@ local t = { foo = 1 }
 print(t.foo)
 ]] {}
 
+-- 未注解的表字面量是开放结构：任意具名字段都可能存在（master 亦不报）
 TEST_DIAGNOSTIC [[
 local t = { foo = 1 }
-print(t.<?bar?>)
-]] { 'undefined-field' }
+print(t.bar)
+]] { '-undefined-field' }
 
 TEST_DIAGNOSTIC [[
 local t = {}
@@ -51,10 +52,11 @@ end
 f(C)
 ]] { 'undefined-field' }
 
+-- 未注解表字面量上的方法调用同样不报（master 也不报）
 TEST_DIAGNOSTIC [[
 local t = {}
-print(t:<?m?>())
-]] { 'undefined-field' }
+print(t:m())
+]] { '-undefined-field' }
 
 TEST_DIAGNOSTIC [[
 local t = {}

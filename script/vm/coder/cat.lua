@@ -351,10 +351,21 @@ ls.vm.registerCoderProvider('catarray', function (coder, source)
 
     coder:compile(source.node)
 
-    coder:addLine('{key} = rt.array({value})' % {
-        key   = coder:getKey(source),
+    local key   = coder:getKey(source)
+    local value = 'rt.array({value})' % {
         value = coder:getKey(source.node),
-    })
+    }
+    if source.optional then
+        coder:addLine('{key} = {value} | rt.NIL' % {
+            key   = key,
+            value = value,
+        })
+    else
+        coder:addLine('{key} = {value}' % {
+            key   = key,
+            value = value,
+        })
+    end
 end)
 
 ls.vm.registerCoderProvider('cattable', function (coder, source)

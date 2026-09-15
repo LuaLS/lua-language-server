@@ -53,6 +53,18 @@ local function missingParameterProvider(param, callback)
         if call.node and call.node.kind == 'field' and call.node.subtype == 'method' then
             callArgs = callArgs + 1
         end
+        -- 末位实参是多返回值调用时会展开：`f(g())` 实际收到 g 的全部返回值
+        local lastArg = fcall.args and fcall.args[#fcall.args]
+        if lastArg and lastArg.kind == 'fcall' then
+            ---@cast lastArg Node.FCall
+            local returns = lastArg.returns
+            if returns and returns.kind == 'list' then
+                ---@cast returns Node.List
+                if returns.min > 1 then
+                    callArgs = callArgs + returns.min - 1
+                end
+            end
+        end
         if callArgs >= minParams then
             goto continue
         end

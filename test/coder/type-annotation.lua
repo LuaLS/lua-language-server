@@ -50,3 +50,14 @@ do
 
     lt.assertEquals(rt:globalGet('K'):view(), 'string | nil')
 end
+
+do
+    -- `?` 后缀的数组类型也要并入 nil
+    local _ <close> = TEST_INDEX [[
+    ---@type integer[]?
+    local a = unknownCall()
+    A = a
+    ]]
+
+    lt.assertEquals(rt:globalGet('A'):view(), 'integer[] | nil')
+end

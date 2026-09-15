@@ -49,3 +49,20 @@ local lines = {}
 local line
 table.insert(lines, line)
 ]] { '-missing-parameter' }
+
+TEST_DIAGNOSTIC [[
+---@param errs integer[]?
+local function f(a, b, errs) end
+f(1, 2)
+]] { '-missing-parameter' }
+
+TEST_DIAGNOSTIC [[
+---@return integer, integer
+local function pair() return 1, 2 end
+
+---@param a integer
+---@param b integer
+local function f(a, b) end
+
+f(pair())
+]] { '-missing-parameter' }

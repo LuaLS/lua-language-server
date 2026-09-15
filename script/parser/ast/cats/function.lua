@@ -293,12 +293,12 @@ function Ast:parseCatReturnList(noComma)
         if not wantSep then
             self:throw('UNEXPECT_SYMBOL', pos, pos + 1)
         end
-        local sepCI = self.lexer.ci
+        local savePoint = self.lexer:savePoint()
         self.lexer:next()
         self:skipSpace()
         local unit = self:parseCatFuncReturn(true)
         if not unit then
-            self.lexer.ci = sepCI
+            savePoint()
             break
         end
         list[#list+1] = unit

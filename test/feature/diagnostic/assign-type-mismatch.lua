@@ -109,3 +109,56 @@ local vars = {
     { a = 2, b = 3 },
 }
 ]] { 'assign-type-mismatch' }
+
+-- 收窄后的局部变量直接读取（嵌套函数/闭包内读取见 项目实践.md 已知未决）
+TEST_DIAGNOSTIC [[
+---@param chunk string | function
+local function load(chunk) end
+
+---@return string?
+local function loadFile(path) end
+
+local buf = loadFile('x')
+if not buf then
+    return
+end
+load(buf, 'name', 't')
+]] { '-param-type-mismatch' }
+
+-- 闭包内读取外层已收窄的变量
+TEST_DIAGNOSTIC [[
+---@param chunk string | function
+local function load(chunk) end
+
+---@return string?
+local function loadFile(path) end
+
+local buf = loadFile('x')
+if not buf then
+    return
+end
+local suc, res = pcall(function ()
+    return load(buf, 'name', 't')
+end)
+print(suc, res)
+]] { '-param-type-mismatch' }
+
+-- 两层闭包：快照需要逐层传下去
+TEST_DIAGNOSTIC [[
+---@param chunk string | function
+local function load(chunk) end
+
+---@return string?
+local function loadFile(path) end
+
+local buf = loadFile('x')
+if not buf then
+    return
+end
+local outer = function ()
+    return function ()
+        return load(buf, 'name', 't')
+    end
+end
+print(outer)
+]] { '-param-type-mismatch' }

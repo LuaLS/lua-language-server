@@ -8,6 +8,7 @@ M.tracers = nil
 function M:startTracer(source)
     local id = 'scope|' .. source.uniqueKey
     local tracerKey = self:getCustomKey(id)
+    local parent = self.tracers and self.tracers[#self.tracers]
     self:addLine('{tracer} = rt.tracer(r, p)' % {
         tracer = tracerKey,
     })
@@ -15,10 +16,19 @@ function M:startTracer(source)
         tracer = tracerKey,
         flow = id,
     })
+    if parent then
+        -- 闭包：记下外层 tracer，并在外层的创建点插一个 seed 入口，
+        -- 外层 walker 走到这里时会把当前收窄快照推给内层
+        self:addLine('{tracer}:setParent({parent})' % {
+            tracer = tracerKey,
+            parent = self:getCustomKey(parent.id),
+        })
+        parent:append('seed', id)
+    end
     if not self.tracers then
         self.tracers = {}
     end
-    table.insert(self.tracers, New 'Coder.Tracer' (self, id))
+    table.insert(self.tracers, New 'Coder.Tracer' (self, id, parent))
 end
 
 function M:getTracer()
@@ -39,14 +49,23 @@ Presize(T, 4)
 
 ---@param coder Coder
 ---@param id string
-function T:__init(coder, id)
+---@param parent? Coder.Tracer
+function T:__init(coder, id, parent)
     self.coder   = coder
     self.id      = id
+    self.parent  = parent
     -- block 栈：最顶层是当前语句块，push/pop 对应 if 分支进出
     self.blocks  = {{}}
     -- node 栈：正在构建的复合表达式节点（==, and, or, not ...）
     self.nodes   = {}
+    -- 闭包要能对外层已可见的变量挂 tracer（upvalue 读取需要走 walker 拿收窄值），
+    -- 因此继承外层已有的可见变量集合；本层的变量仍只记在本层
     self.visibleVars = {}
+    if parent then
+        for k, v in pairs(parent.visibleVars) do
+            self.visibleVars[k] = v
+        end
+    end
 end
 
 --- 将一个 entry 追加到当前位置。

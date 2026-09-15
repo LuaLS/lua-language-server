@@ -24,11 +24,25 @@ function M:setFlow(flow)
     self.flow = flow
 end
 
+---@param tracker Node.Tracer
+---@return Node.Tracer
+function M:setParent(tracker)
+    self.parent = tracker
+    return self
+end
+
+---@type Node.Tracer?
+M.parent = nil
+
+-- 闭包创建点处外层收窄状态的快照（由外层 walker 推入）
+---@type table<table<string, Node>>?
+M.parentStack = nil
+
 ---@type Node.Tracer.Walker?
 M.walker = nil
 
 M.__getter.walker = function (self)
-    return New 'Node.Tracer.Walker' (self.scope, self.map, self.parentMap), true
+    return New 'Node.Tracer.Walker' (self.scope, self.map, self.parentMap, self), true
 end
 
 function M:trace()
@@ -43,10 +57,12 @@ Presize(W, 3)
 ---@param scope Scope
 ---@param map table<string, Node.Variable>
 ---@param parentMap table<string, [string, string]>
-function W:__init(scope, map, parentMap)
+---@param tracer Node.Tracer
+function W:__init(scope, map, parentMap, tracer)
     self.scope = scope
     self.map   = map
     self.parentMap = parentMap
+    self.tracer = tracer
 end
 
 function W:start(block)
@@ -86,7 +102,81 @@ function W:getValue(id)
             return value
         end
     end
+    return self:getUpvalue(id)
+end
+
+--- 闭包内读取外层变量：用创建时外层 walker 推来的收窄快照兜底
+---@param id string
+---@return Node?
+function W:getUpvalue(id)
+    local tracer = self.tracer
+    if not tracer then
+        return nil
+    end
+    local snapshot = tracer.parentStack
+    if not snapshot then
+        local parent = tracer.parent
+        if not parent then
+            return nil
+        end
+        -- 快照还没推过来：先让外层 walker 走到闭包创建点（结果与触发者无关）
+        parent.walker:start(parent.flow)
+        snapshot = tracer.parentStack
+        if not snapshot then
+            return nil
+        end
+    end
+    for i = #snapshot, 1, -1 do
+        local value = snapshot[i][id]
+        -- 只采用外层已经排除 nil 的结果：这正是收窄要修的场景；
+        -- 仍带 nil 的 flow 值往往比注解/赋值推断更含糊，用在闭包里会引入误报
+        if value and not self.scope.rt.NIL:canCast(value) then
+            return value
+        end
+    end
     return nil
+end
+
+--- 该 id 是否为闭包里的外层变量（外层 walker 在创建点已记过它的状态）
+---@param id string
+---@return boolean
+function W:isUpvalue(id)
+    local tracer = self.tracer
+    if not tracer then
+        return false
+    end
+    local snapshot = tracer.parentStack
+    if not snapshot then
+        return false
+    end
+    for i = #snapshot, 1, -1 do
+        if snapshot[i][id] ~= nil then
+            return true
+        end
+    end
+    return false
+end
+
+--- 当前收窄状态的快照：逐层拷贝，外层 walker 还会继续往里写，不能共享；
+--- 同时带上本 tracer 已收到的那份（两层以上闭包时逐层传下去）
+---@return table<table<string, Node>>
+function W:snapshot()
+    local result = {}
+    local base = self.tracer and self.tracer.parentStack
+    if base then
+        for i = 1, #base do
+            result[#result+1] = base[i]
+        end
+    end
+    for i = 1, #self.stacks do
+        local src = self.stacks[i].current
+        local dst = {}
+        for k, v in pairs(src) do
+            dst[k] = v
+        end
+        result[#result+1] = dst
+    end
+    return result
 end
 
 function W:setValue(id, value, isAssign)
@@ -169,7 +259,7 @@ function W:traceRef(ref)
             end
         end
     end
-    if not value then
+    if not value and not self:isUpvalue(id) then
         local node = self.map[alias]
         -- 统一使用 getStaticValue()（不含可选链的 nil 合并），
         -- 避免把单次可选链访问的 nil 写入共享的 id 值，污染后续普通访问。
@@ -278,6 +368,15 @@ function W:traceUnit(unit)
     end
     if tag == 'link' then
         self:traceLink(unit)
+        return
+    end
+    if tag == 'seed' then
+        -- 闭包创建点：把当前收窄快照推给内层 tracer
+        local tracer = self.map[unit[2]]
+        if tracer and tracer.kind == 'tracer' then
+            ---@cast tracer Node.Tracer
+            tracer.parentStack = self:snapshot()
+        end
         return
     end
     if tag == 'and' or tag == 'or' then

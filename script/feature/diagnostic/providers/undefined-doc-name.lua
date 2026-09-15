@@ -50,7 +50,7 @@ local function undefinedDocNameProvider(param, callback)
         if defined[id] then
             goto continue
         end
-        if id.var or id.generic or id.genericTemplate then
+        if id.var or id.generic or id.genericTemplate or id.asCode then
             goto continue
         end
         local name = id.id

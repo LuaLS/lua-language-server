@@ -56,3 +56,15 @@ TEST_DIAGNOSTIC [[
 ---@param x falsy
 local function f(x) end
 ]] { '-undefined-doc-name' }
+
+-- `#` 描述里的 `|` 不应被当成类型的一部分
+TEST_DIAGNOSTIC [[
+---@param events integer # Event flags (SELECT_READ | SELECT_WRITE)
+local function f(events) end
+]] { '-undefined-doc-name' }
+
+-- 反引号里的是字面名字（asCode），不参与类型解析
+TEST_DIAGNOSTIC [[
+---@param options? integer | `fs.copy_options.overwrite_existing`
+local function f(options) end
+]] { '-undefined-doc-name' }

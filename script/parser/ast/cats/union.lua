@@ -68,29 +68,38 @@ function Ast:parseCatDescription(node)
         return
     end
     if node then
-        local tail = self.code:match('^[^|&\r\n]+', self:getLastPos() + 1)
+        local tail = self.code:match('^[^\r\n]+', self:getLastPos() + 1)
         if tail then
             node.desc = tail:gsub('^%s+', ''):gsub('%s+$', '')
         end
     end
+    -- 描述一直吃到行尾；只有跨行的续行前缀（`---|` / `---&`）才把 `|`/`&` 交还给 union
+    local dashes = 0
     while true do
         local token, tp = self.lexer:peek()
         if not token
-        or token == '|'
-        or token == '&'
         or tp == 'NL' then
             break
         end
-        if token == '-' then
+        if token == '|'
+        or token == '&' then
+            if dashes >= 2 then
+                break
+            end
+            dashes = 0
+            self.lexer:next()
+        elseif token == '-' then
             local j = 0
             while self.lexer:peek(j) == '-' do j = j + 1 end
             local nt = self.lexer:peek(j)
             if nt == '|' or nt == '&' then
+                dashes = dashes + 1
                 self.lexer:next()
             else
                 break
             end
         else
+            dashes = 0
             self.lexer:next()
         end
     end

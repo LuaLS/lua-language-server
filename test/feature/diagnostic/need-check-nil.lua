@@ -149,6 +149,25 @@ local function f(a)
 end
 ]] { 'need-check-nil' }
 
+-- 探针：动态键写入 nil 不应让基变量变成可能 nil
+TEST_DIAGNOSTIC [[
+---@param mark table
+---@param k string
+local function f(mark, k)
+    if mark[k] then
+        return
+    end
+    mark[k] = true
+    for _, v in ipairs({ 1, 2 }) do
+        if v == 3 then
+            mark[k] = nil
+            return
+        end
+    end
+    mark[k] = nil
+end
+]] { '-need-check-nil' }
+
 -- 探针：闭包赋值得到的局部变量 + `or` 守卫
 TEST_DIAGNOSTIC [[
 ---@class P

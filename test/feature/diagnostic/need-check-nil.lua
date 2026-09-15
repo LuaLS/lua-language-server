@@ -97,3 +97,72 @@ local function f(json_data)
 end
 f(1)
 ]] { '-need-check-nil' }
+
+-- 短路：`or` 右侧只在左侧为假时求值，此时左侧已确定非 nil
+TEST_DIAGNOSTIC [[
+---@class A
+---@field type string
+
+---@param a A?
+local function f(a)
+    if not a or a.type ~= 'string' then
+        return
+    end
+    print(a.type)
+end
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@class A
+---@field type string
+
+---@param a A?
+local function f(a)
+    if a == nil or a.type ~= 'string' then
+        return
+    end
+    print(a.type)
+end
+]] { '-need-check-nil' }
+
+-- 短路：`and` 右侧只在左侧为真时求值
+TEST_DIAGNOSTIC [[
+---@class A
+---@field type string
+
+---@param a A?
+local function f(a)
+    if a and a.type == 'string' then
+        print(a.type)
+    end
+end
+]] { '-need-check-nil' }
+
+-- 反向护栏：没有守卫时仍要提示
+TEST_DIAGNOSTIC [[
+---@class A
+---@field type string
+
+---@param a A?
+local function f(a)
+    print(<?a?>.type)
+end
+]] { 'need-check-nil' }
+
+-- 探针：`or` 链上后续操作数不应因为前一个比较而丢失非 nil 收窄
+TEST_DIAGNOSTIC [[
+---@class N
+---@field type string
+---@field cate? string
+
+---@param list N[]
+local function f(list)
+    for i = 1, #list do
+        local c = list[i]
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type') then
+            print(i)
+        end
+    end
+end
+]] { '-need-check-nil' }

@@ -88,6 +88,19 @@ function W:popStack()
     self.stacks[#self.stacks] = nil
 end
 
+-- 短路操作数的继承起点：只继承「确定非 nil」的收窄。
+-- 另一侧带 nil 的值多是字段比较向上传播的副产品，带进去会把可能为 nil 的值算给短路右侧
+---@param stack Node.Tracer.Stack
+---@param base table<string, Node>
+function W:seedOpposite(stack, base)
+    local nilNode = self.scope.rt.NIL
+    for k, v in pairs(base) do
+        if not nilNode:canCast(v) then
+            stack.current[k] = v
+        end
+    end
+end
+
 function W:currentStack()
     return self.stacks[#self.stacks]
 end
@@ -547,10 +560,16 @@ function W:traceAnd(exp, revert)
         self:traceConditionUnit(left, revert)
     end
 
+    -- 右侧只在左侧为真时才求值（`and` 短路）：把左侧的真流垫在下面供其继承，
+    -- 右侧自己的收窄仍只记在 stack2，避免左侧的收窄被当成右侧的结果合并出去
+    local seed = self:pushStack()
+    self:seedOpposite(seed, revert and stack1.otherSide or stack1.current)
+
     local stack2 = self:pushStack()
     if right then
         self:traceConditionUnit(right, revert)
     end
+    self:popStack()
     self:popStack()
     self:popStack()
 
@@ -572,17 +591,22 @@ function W:traceOr(exp, revert)
     local left  = exp[2]
     local right = exp[3]
 
-    -- stack1 和 stack2 从同一基础出发独立收窄（平行而非嵌套）
     local stack1 = self:pushStack()
     if left then
         self:traceConditionUnit(left, revert)
     end
-    self:popStack()
+
+    -- 右侧只在左侧为假时才求值（`or` 短路）：把左侧的假流垫在下面供其继承，
+    -- 右侧自己的收窄仍只记在 stack2，避免左侧的收窄被当成右侧的结果合并出去
+    local seed = self:pushStack()
+    self:seedOpposite(seed, revert and stack1.current or stack1.otherSide)
 
     local stack2 = self:pushStack()
     if right then
         self:traceConditionUnit(right, revert)
     end
+    self:popStack()
+    self:popStack()
     self:popStack()
 
     local currentStack = self:currentStack()

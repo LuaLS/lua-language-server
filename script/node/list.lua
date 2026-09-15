@@ -48,7 +48,7 @@ M.__getter.values = function (self)
         local value = raw:findValue(ls.node.kind['list']) or raw
         if value.kind == 'list' then
             ---@cast value Node.List
-            values[i] = value.values[1]
+            values[i] = value.values[1] or raw
         else
             values[i] = raw
         end

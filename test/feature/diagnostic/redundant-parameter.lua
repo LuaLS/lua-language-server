@@ -31,6 +31,12 @@ f(1, 2)
 ]] { '-redundant-parameter' }
 
 TEST_DIAGNOSTIC [[
+---@overload fun(f: fun(): string, x: integer)
+local function g(f, x) end
+g(function () return '' end, 1)
+]] { '-redundant-parameter' }
+
+TEST_DIAGNOSTIC [[
 ---@overload fun(f: integer|async fun(...):..., index: integer): string, any
 ---@param thread thread
 ---@param f integer|async fun(...):...

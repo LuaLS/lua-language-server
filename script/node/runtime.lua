@@ -339,7 +339,18 @@ function M:fillAPIs()
                 return only
             end
         end
-        return self.table():addChilds(childs, onSameKey)
+        local merged = self.table()
+        -- 合并结果里只要有一张开放表（未注解的字面量表），合并后仍然是开放结构
+        for _, child in ipairs(childs) do
+            if child.kind == 'table' then
+                ---@cast child Node.Table
+                if child.dynamic then
+                    merged:setDynamic()
+                    break
+                end
+            end
+        end
+        return merged:addChilds(childs, onSameKey)
     end
 end
 

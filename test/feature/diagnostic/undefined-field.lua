@@ -159,3 +159,10 @@ local t = pack(1, 2)
 print(t.n)
 print(t.zzz)
 ]] { 'undefined-field' }
+
+-- open-table flag must survive merging literal + written fields
+TEST_DIAGNOSTIC [[
+local t = {}
+t.foo = 1
+print(t.bar)
+]] { '-undefined-field' }

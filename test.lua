@@ -4,6 +4,7 @@ local thread = require 'bee.thread'
 package.path = package.path.. ';./?.lua;./?/init.lua'
 
 ---@class Test
+---@field scope Scope
 test = {}
 
 test.arg = {}

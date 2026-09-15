@@ -372,7 +372,9 @@ function W:traceUnit(unit)
     end
     if tag == 'seed' then
         -- 闭包创建点：把当前收窄快照推给内层 tracer
-        local tracer = self.map[unit[2]]
+        ---@type table<string, Node>
+        local map = self.map
+        local tracer = map[unit[2]]
         if tracer and tracer.kind == 'tracer' then
             ---@cast tracer Node.Tracer
             tracer.parentStack = self:snapshot()

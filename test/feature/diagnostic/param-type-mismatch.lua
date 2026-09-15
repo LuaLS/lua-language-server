@@ -231,3 +231,39 @@ local function f(t, key)
     end
 end
 ]] { '-param-type-mismatch' }
+
+-- 类实例传给可选参数（`Node?`）时只要求能转成某个非 nil 成员（子类上溯继承）
+TEST_DIAGNOSTIC [[
+---@class Base
+---@field a string
+local B = {}
+
+---@class Node: Base
+---@field b string
+local N = {}
+
+---@class Node.Value: Node
+local V = {}
+
+---@param n Node?
+local function take(n) end
+
+---@type Node.Value
+local v
+take(v)
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@class Node
+local N = {}
+
+---@class Node.Value: Node
+local V = {}
+
+---@param n Node?
+local function take(n) end
+
+---@type string
+local s
+take(s)
+]] { 'param-type-mismatch' }

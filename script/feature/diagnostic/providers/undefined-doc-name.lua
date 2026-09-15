@@ -3,6 +3,9 @@
 ---@return boolean
 local function isDefined(rt, name)
     local t = rt.type(name)
+    if t.kind ~= 'type' then
+        return true
+    end
     if t.isBasicType then
         return true
     end

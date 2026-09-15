@@ -50,3 +50,9 @@ function Container:getBad()
     return {}
 end
 ]] { 'undefined-doc-name' }
+
+-- `falsy` 等预置名字在运行时是 union 类型，判定时不应按 type 节点处理（此前会抛错）
+TEST_DIAGNOSTIC [[
+---@param x falsy
+local function f(x) end
+]] { '-undefined-doc-name' }

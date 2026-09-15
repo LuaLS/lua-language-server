@@ -910,7 +910,7 @@ M.__getter.currentValue = function (self)
     return nil, true
 end
 
----@param value Node
+---@param value Node?
 function M:setCurrentValue(value)
     -- 先 flush 再写入：flush 清掉旧收窄值（getter 字段）并级联刷新依赖
     self:flushCache()
@@ -1299,6 +1299,13 @@ end
 ---@return boolean
 function M:isOptional()
     return self._optional or false
+end
+
+---@param viewer Node.Viewer
+---@param options Node.Viewer.Options
+---@return string
+function M:onView(viewer, options)
+    return viewer:view(self.value, ls.util.tableMerge({ skipDeep = true }, options))
 end
 
 ---@param viewer Node.Viewer

@@ -28,7 +28,11 @@ function M:onCanBeCast(other)
     if other.typeName == 'any' then
         return true
     end
-    other = other.value
+    -- type 节点（类）保留自身身份：`.value` 会退化成本身继承链的合并表，
+    -- 表与类之间没有可转性，会让「类实例传给可选参数」误报
+    if other.kind ~= 'type' then
+        other = other.value
+    end
     if other.kind == 'union' then
         return nil
     end

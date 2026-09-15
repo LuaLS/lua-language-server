@@ -181,3 +181,14 @@ local r = f(s)
 local bad = r.x + 1
 print(bad)
 ]] { '-return-type-mismatch' }
+
+-- 返回值是变量时，诊断消息需要能 view 变量节点（此前会抛 "Cannot view node of kind variable"）
+TEST_DIAGNOSTIC [[
+---@return number
+local function f()
+    ---@type string
+    local s
+    return <?s?>
+end
+f()
+]] { 'return-type-mismatch' }

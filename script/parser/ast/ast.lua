@@ -25,7 +25,6 @@ require 'parser.ast.cats.cat'
 ---@class LuaParser.Ast
 ---@field envMode '@fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
----@field catInListValue? boolean # 正在解析列表项的类型值（此时不能把外层的 `,` 当作内联 `fun` 的返回值分隔符）
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = Class 'LuaParser.Ast'
 

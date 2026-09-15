@@ -110,7 +110,7 @@ function Ast:parseCatTableFieldAsField()
     self:skipSpace()
     if self.lexer:consume ':' then
         self:skipSpace()
-        value = self:parseCatListValue(true)
+        value = self:parseCatExp(true)
     end
 
     local tfield = self:createNode('LuaParser.Node.CatTableField', {
@@ -146,7 +146,7 @@ function Ast:parseCatTableFieldAsIndex()
     local value
     if self.lexer:consume ':' then
         self:skipSpace()
-        value = self:parseCatListValue(true)
+        value = self:parseCatExp(true)
     end
     local tfield = self:createNode('LuaParser.Node.CatTableField', {
         subtype    = 'index',

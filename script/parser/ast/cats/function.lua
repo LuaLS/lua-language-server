@@ -102,7 +102,7 @@ function Ast:parseCatFunction()
         self:skipSpace()
         funNode.symbolPos4 = self.lexer:consume '('
         self:skipSpace()
-        funNode.returns = self:parseCatReturnList(self.catInListValue and not funNode.symbolPos4)
+        funNode.returns = self:parseCatReturnList()
         for i, ret in ipairs(funNode.returns) do
             ret.parent = funNode
             ret.index = i
@@ -117,17 +117,6 @@ function Ast:parseCatFunction()
     self:blockFinish(funNode)
 
     return funNode
-end
-
----@private
----@param required? boolean
----@return LuaParser.Node.CatExp?
-function Ast:parseCatListValue(required)
-    local inListValue = self.catInListValue
-    self.catInListValue = true
-    local value = self:parseCatExp(required)
-    self.catInListValue = inListValue
-    return value
 end
 
 ---@private
@@ -171,13 +160,13 @@ function Ast:parseCatFuncParam(required)
     if param.symbolPos then
 
         self:skipSpace()
-        param.value = self:parseCatListValue()
+        param.value = self:parseCatExp()
         if param.value then
             param.value.parent = param
         end
     elseif tightType then
         self:skipSpace()
-        param.value = self:parseCatListValue()
+        param.value = self:parseCatExp()
         if param.value then
             param.value.parent = param
         end
@@ -232,9 +221,9 @@ function Ast:parseCatFuncReturn(required)
 
     local value
     if spread then
-        value = self:parseCatListValue(false)
+        value = self:parseCatExp(false)
     elseif not name or symbolPos then
-        value = self:parseCatListValue()
+        value = self:parseCatExp()
     end
 
     local start
@@ -270,13 +259,12 @@ function Ast:parseCatFuncReturn(required)
 end
 
 ---@private
----@param noComma? boolean # 内联于列表项时，返回值不能吃掉外层列表的 `,`
 ---@return LuaParser.Node.CatFuncReturn[]
-function Ast:parseCatReturnList(noComma)
+function Ast:parseCatReturnList()
     local list = {}
     local first = self:parseCatFuncReturn(false)
     list[#list+1] = first
-    if noComma or first?.spread then
+    if first?.spread then
         return list
     end
     local wantSep = first ~= nil

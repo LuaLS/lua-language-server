@@ -232,6 +232,40 @@ local function f(t, key)
 end
 ]] { '-param-type-mismatch' }
 
+-- 类名字面量可作为该类使用（`Class 'X'` 这类用法的实参）
+TEST_DIAGNOSTIC [[
+---@class X
+local XX = {}
+
+---@param x X
+local function take(x) end
+
+take('X')
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@class X
+local XX = {}
+
+---@param x X
+local function take(x) end
+
+take(<?'Y'?>)
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@class X
+local XX = {}
+
+---@class Y
+local YY = {}
+
+---@param y Y
+local function take(y) end
+
+take(<?'X'?>)
+]] { 'param-type-mismatch' }
+
 -- 类实例传给可选参数（`Node?`）时只要求能转成某个非 nil 成员（子类上溯继承）
 TEST_DIAGNOSTIC [[
 ---@class Base

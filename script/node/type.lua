@@ -542,6 +542,12 @@ function M:onCanBeCast(other)
         if other.kind == 'type' then
             return
         end
+        -- 类名字面量（`Class 'X'` 这类用法）可作为该类使用
+        if other.kind == 'value'
+        and type(other.literal) == 'string'
+        and other.literal == self.typeName then
+            return true
+        end
         if self.value == self then
             return
         end

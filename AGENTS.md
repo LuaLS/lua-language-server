@@ -10,12 +10,13 @@ It is intended for both human collaborators and coding agents.
 
 0. **先读 `项目实践.md`**：当前阶段（2026-09 起）正在用本仓库 LS 清理目标工程
    `D:\github\vscode-lua\server` 的诊断。遇到诊断先做**语义判断**（写法/注解本身是否有误），
-   并用上游 master 的二进制对照，确认是误报再进入实现排查。该文件还记录了常用命令、约定与已知未决项。
+   确认是我们自己实现的误报再进入实现排查。该文件还记录了常用命令、约定与已知未决项。
 1. **再读 skill**：`.github/skills/luals-server-dev/SKILL.md` 及其 references
    （`architecture.md`、`module-map.md`、`workflow-and-style.md`），再动手。
    各子系统的具体实现约束以 references 为准（例如 completion 应复用 VM/Node 语义、不要文本扫描）。
    不要凭通用 Lua 经验直接改代码。
-2. **上游 master 只作为"期望行为"参考，不作为"实现方式"参考**：实现必须基于本仓库自己的
+2. **不要用上游 master 做对照**（不要跑 master 的二进制 `--check`，也不要拿 master 的输出当"应该报/不该报"的判据）：
+   判断只基于本仓库自己的语义、现有测试与目标工程代码本身。实现必须基于本仓库自己的
    node / runtime / coder 机制，不要照搬 master 的 special / vm.compiler 等旧架构概念。
 3. 若无法确定某能力应落在哪个子系统，先读 skill 的 references，不要自行猜测。
 

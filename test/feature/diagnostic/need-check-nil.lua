@@ -149,7 +149,29 @@ local function f(a)
 end
 ]] { 'need-check-nil' }
 
--- 探针：`or` 链上后续操作数不应因为前一个比较而丢失非 nil 收窄
+-- 探针：闭包赋值得到的局部变量 + `or` 守卫
+TEST_DIAGNOSTIC [[
+---@class P
+---@field type string
+
+---@param list P[]
+local function f(list)
+    local near
+    local function each(cb)
+        for _, source in ipairs(list) do
+            cb(source)
+        end
+    end
+    each(function (source)
+        near = source
+    end)
+    if not near or near.type ~= 'string' then
+        return
+    end
+    print(near.type)
+end
+]] { '-need-check-nil' }
+
 TEST_DIAGNOSTIC [[
 ---@class N
 ---@field type string

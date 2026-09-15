@@ -88,14 +88,33 @@ function W:popStack()
     self.stacks[#self.stacks] = nil
 end
 
--- 短路操作数的继承起点：只继承「确定非 nil」的收窄。
--- 另一侧带 nil 的值多是字段比较向上传播的副产品，带进去会把可能为 nil 的值算给短路右侧
+-- 值本身是否就是 nil（或 union 里含 nil 成员）
+---@param node Node
+---@return boolean
+local function isNilValue(node)
+    if node.kind == 'type' then
+        ---@cast node Node.Type
+        return node.typeName == 'nil'
+    end
+    if node.kind == 'union' then
+        ---@cast node Node.Union
+        for _, v in ipairs(node.values) do
+            if v.kind == 'type' and v.typeName == 'nil' then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- 短路操作数的继承起点：只继承「确定不是 nil」的收窄。
+-- 另一侧变成 nil 的收窄多是字段比较向上传播的副产品（`c.type ~= 'x'` 不该让 c 变成 nil），
+-- 带进短路右侧会把可能为 nil 的值算给右操作数
 ---@param stack Node.Tracer.Stack
 ---@param base table<string, Node>
 function W:seedOpposite(stack, base)
-    local nilNode = self.scope.rt.NIL
     for k, v in pairs(base) do
-        if not nilNode:canCast(v) then
+        if not isNilValue(v) then
             stack.current[k] = v
         end
     end

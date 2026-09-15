@@ -588,10 +588,10 @@ local function pcall_(f, arg1, ...) end
                             value = {
                                 returns = {
                                     [1] = { spread = true, value = { id = 'R', generic = {} } },
-                                    [2] = { spread = true, value = { id = 'any' } },
                                 },
                             },
                         },
+                        [2] = { name = { id = '...' }, value = { id = 'any' } },
                     },
                     returns = {
                         [1] = { value = { value = true } },
@@ -646,6 +646,28 @@ local function pack(...) end
                     }
                 }
             }
+        },
+    }
+}
+
+TEST [[
+---@overload fun(f: async fun(...):..., index: integer)
+local function pcall_(f, index) end
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind  = 'catstateoverload',
+                value = {
+                    kind   = 'catfunction',
+                    params = {
+                        [1] = { name = { id = 'f' } },
+                        [2] = { name = { id = 'index' } },
+                    },
+                },
+            },
         },
     }
 }

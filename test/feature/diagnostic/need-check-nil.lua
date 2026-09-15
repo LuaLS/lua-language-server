@@ -149,6 +149,48 @@ local function f(a)
 end
 ]] { 'need-check-nil' }
 
+-- 探针：`---@cast` 之后不应丢掉守卫得到的非 nil 收窄
+TEST_DIAGNOSTIC [[
+---@class A
+---@field k integer
+---@field other integer
+
+---@param x A?
+local function f(x)
+    if not x then
+        return
+    end
+    if x.k == 1 then
+        ---@cast x A
+        print(x.other)
+    end
+end
+]] { '-need-check-nil' }
+
+-- 探针：多个「以 return 结尾」的分支之后，守卫得到的收窄不应丢失
+TEST_DIAGNOSTIC [[
+---@class R
+---@field a? boolean
+---@field b? boolean
+---@field c? string
+
+---@param x R?
+---@return boolean
+local function f(x)
+    if not x then
+        return false
+    end
+    if x.a then
+        return true
+    end
+    if x.b then
+        return true
+    end
+    print(x.c)
+    return false
+end
+]] { '-need-check-nil' }
+
 -- 探针：动态键写入 nil 不应让基变量变成可能 nil
 TEST_DIAGNOSTIC [[
 ---@param mark table

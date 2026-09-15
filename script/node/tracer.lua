@@ -88,12 +88,27 @@ function W:popStack()
     self.stacks[#self.stacks] = nil
 end
 
+-- 这些节点一定不是 nil（基础类型由 isDefinitelyNotNil 单独判定）
+local NOT_NIL_KINDS = {
+    table   = true,
+    class   = true,
+    ['function'] = true,
+    array   = true,
+    list    = true,
+    tuple   = true,
+    value   = true,
+    pack    = true,
+    spread  = true,
+}
+
 -- 值本身是否就是 nil（或 union 里含 nil 成员）
----@param node Node
+---@param node any
 ---@return boolean
 local function isNilValue(node)
+    if not node then
+        return false
+    end
     if node.kind == 'type' then
-        ---@cast node Node.Type
         return node.typeName == 'nil'
     end
     if node.kind == 'union' then
@@ -105,6 +120,34 @@ local function isNilValue(node)
         end
     end
     return false
+end
+
+-- 值是否「确定不是 nil」：any / unknown / 含 nil 成员的 union 都不算确定
+---@param node any
+---@return boolean
+local function isDefinitelyNotNil(node)
+    if not node then
+        return false
+    end
+    if node.kind == 'type' then
+        ---@cast node Node.Type
+        local name = node.typeName
+        if name == 'nil' or name == 'any' or name == 'unknown'
+        or name == 'provisional' or name == 'unknownkey' then
+            return false
+        end
+        return true
+    end
+    if node.kind == 'union' then
+        ---@cast node Node.Union
+        for _, v in ipairs(node.values) do
+            if not isDefinitelyNotNil(v) then
+                return false
+            end
+        end
+        return true
+    end
+    return NOT_NIL_KINDS[node.kind] == true
 end
 
 -- 短路操作数的继承起点：只继承「确定不是 nil」的收窄。
@@ -810,6 +853,16 @@ function W:traceCallTruthy(exp, revert)
             targetIndex = 1,
             targetValue = rt.TRUTHY,
         }:narrowCall()
+        -- 谓词真假只说明实参是否满足条件，不应把「确定不是 nil」的实参整份换成含 nil 的值
+        -- （`fun(...): boolean?` 这类返回值与实参无关的签名会把实参收窄成假流）
+        if isDefinitelyNotNil(argValue) then
+            if isNilValue(narrowed) then
+                narrowed = argValue
+            end
+            if isNilValue(otherSide) then
+                otherSide = argValue
+            end
+        end
         if revert then
             self:setNarrowResult(id, otherSide, narrowed)
         else

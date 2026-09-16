@@ -175,6 +175,20 @@ function T:appendRef(source)
     self.visibleVars[id] = true
 end
 
+--- 记录 `---@cast` 收窄：{'cast', varId, op, typeKey, isOptional}
+--- op 为 '+'（并入）/'-'（按同名去掉）/nil（断言：按注解给的类型）；typeKey 为注解类型值的 key
+---@param varSource LuaParser.Node.Base
+---@param op? '+' | '-'
+---@param typeKey? string
+---@param isOptional? boolean
+function T:appendCast(varSource, op, typeKey, isOptional)
+    local id = self.coder:getVarName(varSource)
+    if not id then
+        return
+    end
+    self:append('cast', id, op, typeKey, isOptional)
+end
+
 ---@param source LuaParser.Node.Call
 function T:appendCall(source)
     local funcAlias = source.node.uniqueKey

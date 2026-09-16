@@ -52,7 +52,7 @@ function Ast:parseCatStateCastItem()
     if self.lexer:consume '?' then
         isOptional = true
     else
-        local exp = self:parseCatExp()
+        exp = self:parseCatExp()
         if not exp then
             return nil
         end

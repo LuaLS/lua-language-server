@@ -50,6 +50,9 @@ function M:makeFromAst(ast)
     self:addLine 'local p   = coder.parentMap'
     self:addLine ''
 
+    -- 前导区末尾：这里的赋值一定会执行，供 walker 读取（如 `---@cast` 的类型）
+    self.preludeIndex = #self.buf + 1
+
     self:compile(ast.main)
 
     self:addLine ''
@@ -107,6 +110,27 @@ function M:makeFromFile(file, options)
     self.tracerFlowMap = result.tracerFlowMap
     self.parentMap = result.parentMap
     self.errors = result.errors
+end
+
+--- 在文件前导区（一定执行的位置）编译一个节点，返回其 key（不是 `r[...]` 表达式，
+--- flow 里的 key 与 `appendVar`/`appendRef` 一样用裸 uniqueKey）。
+--- 用于「值在分支里也应该已经存在」的读取（如 `---@cast` 的类型：注解在分支内，
+--- 但 walker 走整条 flow 时会读到它，落在分支里的赋值可能根本没执行）。
+---@param source LuaParser.Node.Base
+---@return string
+function M:compileToPrelude(source)
+    local buf = self.buf
+    local scratch = {}
+    self.buf = scratch
+    self:compile(source)
+    self.buf = buf
+    local index = self.preludeIndex
+    for i = 1, #scratch do
+        table.insert(buf, index, scratch[i])
+        index = index + 1
+    end
+    self.preludeIndex = index
+    return source.uniqueKey
 end
 
 ---@param code string

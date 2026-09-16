@@ -327,3 +327,38 @@ end
 
 f()
 ]] { '-param-type-mismatch' }
+
+-- `---@cast x T` 之后按 T 使用
+TEST_DIAGNOSTIC [[
+---@class A
+---@field a integer
+
+---@class B
+---@field b integer
+
+---@param x A
+local function needA(x) end
+
+---@param x A | B
+local function f(x)
+    ---@cast x A
+    needA(x)
+end
+]] { '-param-type-mismatch' }
+
+-- `---@cast x -T` 只去掉同名成员，T 的子类要保留
+TEST_DIAGNOSTIC [[
+---@class Base
+---@field id integer
+
+---@class Derived: Base
+---@field name string
+
+---@param x Base | Derived
+local function f(x, cond)
+    if cond then
+        ---@cast x -Base
+        print(x.name)
+    end
+end
+]] { '-undefined-field' }

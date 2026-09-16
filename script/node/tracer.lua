@@ -424,6 +424,97 @@ function W:getFieldNarrowValue(id)
     return self:deriveFieldValue(id)
 end
 
+-- `---@cast x -T` 用：只按**同名**去掉成员。
+-- 不能按 `canCast` 去（那会把 T 的子类一并去掉：`---@cast p -fs.path` 里的 fs.dummy
+-- 继承 fs.path，属于「不是父类本身」的成员，应当保留）。
+---@param rt Node.Runtime
+---@param value Node
+---@param castType Node
+---@return Node?
+local function removeMemberByName(rt, value, castType)
+    if castType.kind ~= 'type' then
+        return nil
+    end
+    ---@cast castType Node.Type
+    local name = castType.typeName
+    local target = value:simplify()
+    local members
+    if target.kind == 'union' then
+        ---@cast target Node.Union
+        members = target.values
+    elseif target.kind == 'type' and target.value ~= target and target.value.kind == 'union' then
+        ---@cast target Node.Type
+        local tv = target.value
+        ---@cast tv Node.Union
+        members = tv.values
+    else
+        members = { target }
+    end
+    local remain = {}
+    for _, m in ipairs(members) do
+        local mname
+        if m.kind == 'type' then
+            ---@cast m Node.Type
+            mname = m.typeName
+        elseif m.kind == 'class' then
+            ---@cast m Node.Class
+            mname = m.className
+        elseif m.kind == 'alias' then
+            ---@cast m Node.Alias
+            mname = m.aliasName
+        end
+        if mname ~= name then
+            remain[#remain + 1] = m
+        end
+    end
+    if #remain == #members then
+        return nil
+    end
+    if #remain == 0 then
+        return rt.NEVER
+    end
+    if #remain == 1 then
+        return remain[1]
+    end
+    return rt.union(remain)
+end
+
+---@param cast ['cast', string, ('+' | '-' | nil), (string | nil), (boolean | nil)]
+function W:traceCast(cast)
+    local id  = cast[2]
+    local op  = cast[3]
+    local key = cast[4]
+    local opt = cast[5]
+    local rt  = self.scope.rt
+    local castType = key and self.map[key] or nil
+    local value = self:getValue(id)
+    if not value then
+        -- 形参在函数 flow 里没有 `var`（它的赋值在闭包外层），此时只能做「断言」：
+        -- `+`/`-` 需要旧值，取不到就不动
+        if not castType or op then
+            return
+        end
+        value = castType
+    elseif castType then
+        if op == '-' then
+            value = removeMemberByName(rt, value, castType) or value
+        elseif op == '+' then
+            value = value | castType
+        else
+            -- 不带 op 是断言：注解说是什么就是什么（与 `+`/`-` 的并入/去掉不同）
+            value = castType
+        end
+    end
+    if opt then
+        if op == '-' then
+            value = rt.subtract(value, rt.NIL)
+        else
+            value = value | rt.NIL
+        end
+    end
+    self:setValue(id, value)
+end
+
 ---@param data ['value', string]
 ---@return Node?
 function W:traceValue(data)
@@ -521,6 +612,10 @@ function W:traceUnit(unit)
     end
     if tag == 'link' then
         self:traceLink(unit)
+        return
+    end
+    if tag == 'cast' then
+        self:traceCast(unit)
         return
     end
     if tag == 'seed' then

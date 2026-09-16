@@ -101,12 +101,35 @@ local NOT_NIL_KINDS = {
     spread  = true,
 }
 
+-- 收窄结果常以变量包装返回（如把实参收窄到形参的注解变量），判定前先展开
+---@param node Node
+---@return Node
+local function resolveNarrowValue(node)
+    local cur = node
+    for _ = 1, 8 do
+        if cur.kind ~= 'variable' then
+            break
+        end
+        ---@cast cur Node.Variable
+        local inner = cur:getStaticValue()
+        if not inner or inner == cur then
+            break
+        end
+        cur = inner
+    end
+    return cur
+end
+
 -- 值本身是否就是 nil（或 union 里含 nil 成员）
 ---@param node any
 ---@return boolean
 local function isNilValue(node)
     if not node then
         return false
+    end
+    if node.kind == 'variable' then
+        ---@cast node Node
+        node = resolveNarrowValue(node)
     end
     if node.kind == 'type' then
         return node.typeName == 'nil'
@@ -128,6 +151,10 @@ end
 local function isDefinitelyNotNil(node)
     if not node then
         return false
+    end
+    if node.kind == 'variable' then
+        ---@cast node Node
+        node = resolveNarrowValue(node)
     end
     if node.kind == 'type' then
         ---@cast node Node.Type
@@ -905,8 +932,8 @@ function W:traceCallTruthy(exp, revert)
             targetValue = rt.TRUTHY,
         }:narrowCall()
         -- 谓词真假只说明实参是否满足条件，不应把「确定不是 nil」的实参整份换成含 nil 的值
-        -- （`fun(...): boolean?` 这类返回值与实参无关的签名会把实参收窄成假流）
-        if isDefinitelyNotNil(argValue) then
+        -- （`fun(...): boolean?`、形参注解可选等与实参无关的签名会把实参收窄成含 nil 的形参变量）
+        if isDefinitelyNotNil(argValue:simplify()) then
             if isNilValue(narrowed) then
                 narrowed = argValue
             end

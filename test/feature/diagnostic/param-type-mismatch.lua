@@ -301,3 +301,29 @@ local function take(n) end
 local s
 take(s)
 ]] { 'param-type-mismatch' }
+
+-- 谓词调用的形参注解可选时，不该把实参收窄成含 nil 的形参变量
+TEST_DIAGNOSTIC [[
+---@alias uri string
+
+---@param uri uri?
+---@param key string
+---@return boolean
+local function check(uri, key) end
+
+---@param u uri
+local function needUri(u) end
+
+---@return uri
+local function getUri() end
+
+local function f()
+    local uri = getUri()
+    if not check(uri, 'k') then
+        return
+    end
+    needUri(uri)
+end
+
+f()
+]] { '-param-type-mismatch' }

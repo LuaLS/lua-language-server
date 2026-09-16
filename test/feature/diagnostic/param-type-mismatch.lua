@@ -362,3 +362,27 @@ local function f(x, cond)
     end
 end
 ]] { '-undefined-field' }
+
+-- else 分支里的 `---@cast` 也要生效（`else` 与首条语句之间的注解属于 else 块）
+TEST_DIAGNOSTIC [[
+---@class A
+---@field a integer
+
+---@class B
+---@field b integer
+
+---@param x B
+local function needB(x) end
+
+---@param list (A | B)[]
+local function f(list, cond)
+    for _, x in ipairs(list) do
+        if cond then
+            print(x.a)
+        else
+            ---@cast x -A
+            needB(x)
+        end
+    end
+end
+]] { '-param-type-mismatch' }

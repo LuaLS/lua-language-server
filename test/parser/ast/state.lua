@@ -527,3 +527,27 @@ end
         }
     }
 }
+
+-- `else` 后、首条语句前的注解属于 else 块（在 blockStart 之前跳过会挂到外层 block）
+TEST [[
+if x then
+else
+    ---@cast y -A
+end
+]]
+{
+    kind   = 'if',
+    childs = {
+        [1] = { kind = 'ifchild', subtype = 'if' },
+        [2] = {
+            kind    = 'ifchild',
+            subtype = 'else',
+            childs  = {
+                [1] = {
+                    kind  = 'cat',
+                    value = { kind = 'catstatecast' },
+                },
+            },
+        },
+    }
+}

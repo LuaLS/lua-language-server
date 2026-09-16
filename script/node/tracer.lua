@@ -427,6 +427,7 @@ end
 -- `---@cast x -T` 用：只按**同名**去掉成员。
 -- 不能按 `canCast` 去（那会把 T 的子类一并去掉：`---@cast p -fs.path` 里的 fs.dummy
 -- 继承 fs.path，属于「不是父类本身」的成员，应当保留）。
+-- 成员都取不到名字时（如合并出来的表）返回 nil，由调用方按 `canCast` 回退。
 ---@param rt Node.Runtime
 ---@param value Node
 ---@param castType Node
@@ -451,6 +452,7 @@ local function removeMemberByName(rt, value, castType)
         members = { target }
     end
     local remain = {}
+    local named  = false
     for _, m in ipairs(members) do
         local mname
         if m.kind == 'type' then
@@ -463,15 +465,22 @@ local function removeMemberByName(rt, value, castType)
             ---@cast m Node.Alias
             mname = m.aliasName
         end
+        if mname then
+            named = true
+        end
         if mname ~= name then
             remain[#remain + 1] = m
         end
     end
-    if #remain == #members then
+    if not named then
         return nil
     end
     if #remain == 0 then
         return rt.NEVER
+    end
+    if #remain == #members then
+        -- 按同名没有可去成员：保持原值（不回退按 canCast 去，否则子类会被连坐）
+        return value
     end
     if #remain == 1 then
         return remain[1]
@@ -489,15 +498,14 @@ function W:traceCast(cast)
     local castType = key and self.map[key] or nil
     local value = self:getValue(id)
     if not value then
-        -- 形参在函数 flow 里没有 `var`（它的赋值在闭包外层），此时只能做「断言」：
-        -- `+`/`-` 需要旧值，取不到就不动
+        -- 取不到旧值时只能做「断言」：`+`/`-` 需要旧值，不动
         if not castType or op then
             return
         end
         value = castType
     elseif castType then
         if op == '-' then
-            value = removeMemberByName(rt, value, castType) or value
+            value = removeMemberByName(rt, value, castType) or rt.subtract(value, castType)
         elseif op == '+' then
             value = value | castType
         else

@@ -737,6 +737,27 @@ local function pcall_(f, index) end
     }
 }
 
+-- `---@cast` 的 item 要带上类型（`parseCatStateCastItem` 里曾是影子变量，type 永远为 nil）
+TEST [[
+---@cast x -A
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind  = 'catstatecast',
+                items = {
+                    [1] = {
+                        op   = '-',
+                        type = { kind = 'catid', id = 'A' },
+                    },
+                },
+            },
+        },
+    }
+}
+
 TEST [[
 ---@overload fun(f: fun(): (string, integer), index: integer)
 local function pcall_(f, index) end

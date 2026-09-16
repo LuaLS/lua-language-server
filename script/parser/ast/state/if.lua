@@ -140,13 +140,13 @@ function Ast:parseIfChildElse()
         return nil
     end
 
-    self:skipSpace()
-
     local node = self:createNode('LuaParser.Node.IfChild', {
         subtype   = 'else',
         start     = pos,
     })
 
+    -- 先 blockStart 再 skipSpace：`else` 后、首条语句前的注释/注解属于 else 块，
+    -- 在 blockStart 之前跳过会把它们记到外层 block（`---@cast` 这类就失效了）
     self:blockStart(node)
     self:skipSpace()
     self:blockParseChilds(node)

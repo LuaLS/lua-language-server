@@ -296,6 +296,11 @@ function M:get(key)
             if field.key == rt.UNKNOWNKEY then
                 goto continue
             end
+            -- 动态键写入（`X[表达式] = v`）记录的键是求值节点，不等于任何字面量：
+            -- 字面量读取只匹配字面量/类型键字段
+            if field.key.kind ~= 'value' and field.key.kind ~= 'type' then
+                goto continue
+            end
             if key:canCast(field.key) then
                 return field.value, true
             end

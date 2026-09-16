@@ -651,8 +651,9 @@ local _getVisiting = {}
 ---@return boolean exists
 function M:get(key)
     if _getVisiting[self] then
-        -- 检测到循环，返回 ANY
-        return self.scope.rt.ANY, false
+        -- 检测到循环：值不可判定，但字段可能存在——
+        -- 返回 exists = true，避免消费方（undefined-field 等）当成「字段不存在」
+        return self.scope.rt.ANY, true
     end
     _getVisiting[self] = true
     local cv = self:getCurrentValue()

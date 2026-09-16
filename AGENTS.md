@@ -63,6 +63,11 @@ It is intended for both human collaborators and coding agents.
     **flow** value (`W:deriveFieldValue`, used by `W:traceRef` and `W:getFieldNarrowValue`).
   - Adopt a derived value only when it has no nil; derived values are never written back to the
     narrowing stack (a remembered field value would hide later reassignments of the base).
+- `---@cast` narrows through the flow (`{'cast', varId, op, typeKey, opt}`):
+  - The type value is compiled into the file prelude (`Coder:compileToPrelude`): a cast inside a branch
+    must still be readable when the walker walks the whole flow.
+  - `op`: nil = assert (use the annotated type), `+` = union, `-` = drop members **by name**
+    (not by `canCast`: a subclass of the removed type must survive).
 
 ## 4) Worker/Thread Boundary Rules
 

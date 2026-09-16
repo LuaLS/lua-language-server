@@ -68,6 +68,8 @@ It is intended for both human collaborators and coding agents.
     must still be readable when the walker walks the whole flow.
   - `op`: nil = assert (use the annotated type), `+` = union, `-` = drop members **by name**
     (not by `canCast`: a subclass of the removed type must survive).
+  - Annotation ownership: `parseIfChildElse` starts the block **before** skipping space, otherwise a cat
+    right after `else` is recorded on the outer block and such a cast never reaches its branch.
 
 ## 4) Worker/Thread Boundary Rules
 

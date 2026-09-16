@@ -793,8 +793,10 @@ function W:traceConditionUnit(exp, revert)
 end
 
 function W:traceAnd(exp, revert)
-    -- 树形：exp[2] 是左操作数，exp[3] 是右操作数
-    -- 如果某一侧编译时没有产生 flow 条目（如字面量），则该位置为 nil，跳过
+    -- 树形：{'and', 左, 右的 ref…, 右} —— 右操作数自己的 ref 会平铺在同一个节点里
+    -- （只有单条目操作数才长成 {'and', 左, 右}）。这里保持 exp[2]/exp[3] 的旧读法，
+    -- 但中间的 ref 必须跟着右操作数、在 seed 之后走一遍：否则这些读取拿不到收窄值，
+    -- 节点上也没有 currentValue，消费方（诊断 provider）会退回注解值。
     local left  = exp[2]
     local right = exp[3]
 
@@ -809,6 +811,12 @@ function W:traceAnd(exp, revert)
     self:seedOpposite(seed, revert and stack1.otherSide or stack1.current)
 
     local stack2 = self:pushStack()
+    for i = 3, #exp - 1 do
+        local inner = exp[i]
+        if type(inner) == 'table' then
+            self:traceUnit(inner)
+        end
+    end
     if right then
         self:traceConditionUnit(right, revert)
     end
@@ -829,8 +837,9 @@ function W:traceAnd(exp, revert)
 end
 
 function W:traceOr(exp, revert)
-    -- 树形：exp[2] 是左操作数，exp[3] 是右操作数
-    -- 如果某一侧编译时没有产生 flow 条目（如字面量），则该位置为 nil，跳过
+    -- 树形：{'or', 左, 右的 ref…, 右} —— 右操作数自己的 ref 会平铺在同一个节点里
+    -- （只有单条目操作数才长成 {'or', 左, 右}）。中间的 ref 跟着右操作数一起走，
+    -- 理由同 traceAnd。
     local left  = exp[2]
     local right = exp[3]
 
@@ -845,6 +854,12 @@ function W:traceOr(exp, revert)
     self:seedOpposite(seed, revert and stack1.current or stack1.otherSide)
 
     local stack2 = self:pushStack()
+    for i = 3, #exp - 1 do
+        local inner = exp[i]
+        if type(inner) == 'table' then
+            self:traceUnit(inner)
+        end
+    end
     if right then
         self:traceConditionUnit(right, revert)
     end

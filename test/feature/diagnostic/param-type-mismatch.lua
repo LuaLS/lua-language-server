@@ -386,3 +386,23 @@ local function f(list, cond)
     end
 end
 ]] { '-param-type-mismatch' }
+
+-- 条件里调用的参数要拿到短路收窄（`not x or f(x)` 里的 x 不该还带 nil）
+TEST_DIAGNOSTIC [[
+---@param name string
+---@param uri string
+---@return boolean
+local function isAlias(name, uri) end
+
+---@param childName string?
+---@param uri string
+local function f(childName, uri)
+    if childName == 'any' then
+        return true
+    end
+    if not childName or isAlias(childName, uri) then
+        return nil
+    end
+    return false
+end
+]] { '-param-type-mismatch' }

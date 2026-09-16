@@ -57,6 +57,12 @@ It is intended for both human collaborators and coding agents.
   - If you see `No such key`, do not bypass with `pcall` or `rawget`.
   - Check generated middle code and flow data first (`LAST_CODE`, `LAST_FLOW`).
   - If needed, inspect failed coder logs and verify read-before-write ordering of keys.
+- Field reads go through `parentMap` (`{last}:getChild({field})`):
+  - `Variable:getExpect` derives a field value from the base's *annotation* path, which folds in the
+    spurious nil of a `---@type T?` base. The walker therefore derives field values from the base's
+    **flow** value (`W:deriveFieldValue`, used by `W:traceRef` and `W:getFieldNarrowValue`).
+  - Adopt a derived value only when it has no nil; derived values are never written back to the
+    narrowing stack (a remembered field value would hide later reassignments of the base).
 
 ## 4) Worker/Thread Boundary Rules
 

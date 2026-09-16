@@ -289,6 +289,37 @@ function W:traceVar(var)
     self.versionMap[id] = self.assignVersion
 end
 
+--- 由基变量的 flow 值派生字段读取结果（不写入收窄栈）：
+--- 基变量被收窄后，注解推导出的字段值里掺着的 nil 不该再算进来。
+--- 求值未完成（PROVISIONAL）或字段不存在时不采纳。
+---@param id string
+---@return Node?
+function W:deriveFieldValue(id)
+    local pdata = self.parentMap[id]
+    if not pdata or pdata[3] then
+        return nil
+    end
+    local pvalue = self:getValue(pdata[1]) or self:deriveFieldValue(pdata[1])
+    if not pvalue then
+        return nil
+    end
+    local r, e = pvalue:get(pdata[2])
+    if not e then
+        return nil
+    end
+    if r.kind == 'field' then
+        r = r.value
+    end
+    if r.kind == 'variable' then
+        ---@cast r Node.Variable
+        r = r:getStaticValue()
+    end
+    if r == self.scope.rt.PROVISIONAL then
+        return nil
+    end
+    return r
+end
+
 ---@param ref ['ref', string, string]
 ---@return Node?
 --- 不变量：本函数只允许通过不触发 Tracer 的接口读取输入（stratum-1），
@@ -333,6 +364,15 @@ function W:traceRef(ref)
                 end
             end
         end
+    elseif pdata and not value then
+        -- 普通字段读取的 flow 值：基变量收窄后，注解推导里的 nil 不该再算进来
+        -- （`---@type T?` 的局部收窄后读字段仍是 `T?` 那一族误报）。
+        -- 派生值仍可能为 nil 时不采纳（多半比注解更含糊，采纳会引入新误报），
+        -- 也不写回收窄栈：字段读取的记忆值会掩盖基变量后续的重赋值。
+        local derived = self:deriveFieldValue(id)
+        if derived and not isNilValue(derived) then
+            value = derived
+        end
     end
     if not value and not self:isUpvalue(id) then
         local node = self.map[alias]
@@ -344,6 +384,17 @@ function W:traceRef(ref)
     local node = self.map[alias]
     node:setCurrentValue(value)
     return value
+end
+
+--- 字段读取 id 的收窄值：收窄栈上没有时按基变量的 flow 值派生
+---@param id string
+---@return Node?
+function W:getFieldNarrowValue(id)
+    local value = self:getValue(id)
+    if value then
+        return value
+    end
+    return self:deriveFieldValue(id)
 end
 
 ---@param data ['value', string]
@@ -807,7 +858,7 @@ function W:traceByValue(var, value, revert)
             break
         end
         id = pdata[1]
-        local pvalue = self:getValue(id)
+        local pvalue = self:getFieldNarrowValue(id)
         if pvalue then
             local key = pdata[2]
             narrowed, otherSide = pvalue:narrowByField(key, narrowed)
@@ -840,7 +891,7 @@ function W:traceCallTruthy(exp, revert)
         if not id then
             goto continue
         end
-        local argValue = self:getValue(id)
+        local argValue = self:getFieldNarrowValue(id)
         if not argValue then
             goto continue
         end
@@ -876,7 +927,7 @@ function W:traceCallTruthy(exp, revert)
                 break
             end
             pid = pdata[1]
-            local pvalue = self:getValue(pid)
+            local pvalue = self:getFieldNarrowValue(pid)
             if pvalue then
                 local key = pdata[2]
                 local pnarrowed, potherSide = pvalue:narrowByField(key, revert and otherSide or narrowed)
@@ -956,7 +1007,7 @@ function W:traceCallNarrow(exp, revert)
             if not id then
                 goto continue
             end
-            local argValue = self:getValue(id)
+            local argValue = self:getFieldNarrowValue(id)
             if not argValue then
                 goto continue
             end
@@ -1007,7 +1058,7 @@ function W:propagateNarrow(id, narrowed, otherSide, revert)
             break
         end
         pid = pdata[1]
-        local pvalue = self:getValue(pid)
+        local pvalue = self:getFieldNarrowValue(pid)
         if pvalue then
             local key = pdata[2]
             local pnarrowed, potherSide = pvalue:narrowByField(key, revert and otherSide or narrowed)
@@ -1051,7 +1102,7 @@ function W:traceCallEqual(callExp, valueExp, revert)
         if not id then
             goto continue
         end
-        local argValue = self:getValue(id)
+        local argValue = self:getFieldNarrowValue(id)
         if not argValue then
             goto continue
         end
@@ -1077,7 +1128,7 @@ function W:traceCallEqual(callExp, valueExp, revert)
                 break
             end
             pid = pdata[1]
-            local pvalue = self:getValue(pid)
+            local pvalue = self:getFieldNarrowValue(pid)
             if pvalue then
                 local key = pdata[2]
                 local pnarrowed, potherSide = pvalue:narrowByField(key, revert and otherSide or narrowed)

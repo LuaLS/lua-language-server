@@ -783,6 +783,52 @@ end
 
 do
     --[[
+    ---@class A
+    ---@field a string
+
+    ---@class B
+
+    ---@type A | B
+    local x
+    ---@cast x A
+    x.a
+    ]]
+    -- 字段读取的注解推导值里带 nil（B 没有 a），flow 值已排除时应以 flow 值为准
+
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local A = rt.class('A')
+        : addField(rt.field('a', rt.STRING))
+
+    rt.class('B')
+
+    local tracer = rt.tracer(r, p)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.type 'A' | rt.type 'B')
+
+    r['x.cast'] = rt.variable 'x'
+    r['x.cast']:setStaticValue(rt.type 'A')
+
+    r['x.a0'] = r['x0']:getChild('a')
+    r['x.a0']:setTracer(tracer)
+    r['x.a1'] = r['x.a0']:shadow()
+    r['x.a1']:setTracer(tracer)
+
+    p['x.a'] = { 'x', 'a' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x.cast' },
+        { 'ref', 'x.a', 'x.a1' },
+    }
+
+    lt.assertEquals(r['x.a1']:view(), 'string')
+end
+
+do
+    --[[
     ---@type string?
     local x
     assert(x)

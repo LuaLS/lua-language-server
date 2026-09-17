@@ -249,3 +249,45 @@ local function f(list)
     end
 end
 ]] { '-need-check-nil' }
+
+-- 闭包里对外层变量（upvalue）的守卫收窄：注解值作为收窄基值
+TEST_DIAGNOSTIC [[
+---@class timer
+---@field restart fun(self: timer)
+
+---@type timer?
+local delayTimer
+
+local function f()
+    if delayTimer then
+        delayTimer:restart()
+    end
+end
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@class timer
+---@field restart fun(self: timer)
+
+---@type timer?
+local delayTimer
+
+local function f()
+    if not delayTimer then
+        return
+    end
+    delayTimer:restart()
+end
+]] { '-need-check-nil' }
+
+-- 无注解（any）的外层变量不做收窄：truthy 标记不应盖住读值
+TEST_DIAGNOSTIC [[
+local param
+
+local function f()
+    if param then
+        print(param.anything)
+        param:anyMethod()
+    end
+end
+]] { '-need-check-nil', '-undefined-field' }

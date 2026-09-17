@@ -996,9 +996,19 @@ function W:isDynamicKeyRef(ref)
 end
 
 function W:traceByValue(var, value, revert)
+    local rt = self.scope.rt
     local vvalue = self:traceRef(var)
     if not vvalue then
-        return
+        -- 闭包里的外层变量（或参数）：外层 flow 值带 nil 时 getUpvalue 不采纳，
+        -- 读值退回注解推断，收窄也就没有基值。这里补上注解作为基值，
+        -- 但 `any` 不作为基值——对它收窄只会得到 truthy/falsy 标记，写进栈会盖住读值。
+        local node = self.map[var[3]]
+        vvalue = node and node:getExpectValue()
+        if not vvalue
+        or vvalue == rt.ANY
+        or vvalue == rt.UNKNOWN then
+            return
+        end
     end
 
     local id = var[2]
@@ -1026,12 +1036,17 @@ function W:traceByValue(var, value, revert)
         id = pdata[1]
         local pvalue = self:getFieldNarrowValue(id)
         if pvalue then
-            local key = pdata[2]
-            narrowed, otherSide = pvalue:narrowByField(key, narrowed)
-            if revert then
-                self:setNarrowResult(id, otherSide, narrowed)
-            else
-                self:setNarrowResult(id, narrowed, otherSide)
+            -- 基值含糊（any/unknown）时按字段反推出来的只是垃圾值，
+            -- 写回基变量会盖住它自己的读值（`if src.type == 'x'` 一族）
+            local final = pvalue:finalValue()
+            if final ~= rt.ANY and final ~= rt.UNKNOWN then
+                local key = pdata[2]
+                narrowed, otherSide = pvalue:narrowByField(key, narrowed)
+                if revert then
+                    self:setNarrowResult(id, otherSide, narrowed)
+                else
+                    self:setNarrowResult(id, narrowed, otherSide)
+                end
             end
         end
     end

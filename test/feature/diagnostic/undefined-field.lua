@@ -191,3 +191,33 @@ t.a.b = 1
 ---@type string
 local s = t.a.b
 ]] { 'assign-type-mismatch' }
+
+-- 基值含糊（any）时，按字段反推出的值不该写回基变量（会盖住基变量自己的读值）
+TEST_DIAGNOSTIC [[
+---@param src any
+local function f(src)
+    if src.type == 'getfield' and src.field then
+        print(src.field)
+    elseif src.type == 'getmethod' and src.method then
+        print(src.method)
+    end
+end
+]] { '-undefined-field' }
+
+-- 有类型支撑时仍按字段收窄基变量（上面的守卫不能把这条也挡掉）
+TEST_DIAGNOSTIC [[
+---@class A
+---@field kind 'a'
+---@field av integer
+
+---@class B
+---@field kind 'b'
+---@field bv string
+
+---@type A | B
+local x
+
+if x.kind == 'a' then
+    print(x.bv)
+end
+]] { 'undefined-field' }

@@ -1,3 +1,28 @@
+--- 字段读取的路径上可能挂着字段记录（`Table:get` 的字面量键分支返回的是 valueMap 里的
+--- `Node.Field`），字段存在性要看字段的**值**，沿 value 链展开（union 逐成员处理）
+---@param node Node
+---@return Node
+local function unwrapFieldValue(node)
+    if node.kind == 'field' then
+        ---@cast node Node.Field
+        local value = node.value
+        if not value then
+            return node
+        end
+        return unwrapFieldValue(value)
+    end
+    if node.kind == 'union' then
+        ---@cast node Node.Union
+        local rt = node.scope.rt
+        local values = {}
+        for i, v in ipairs(node.values) do
+            values[i] = unwrapFieldValue(v)
+        end
+        return rt.union(values)
+    end
+    return node
+end
+
 ---@async
 ---@param param Feature.Diagnostic.Param
 ---@param callback fun(diag: Feature.Diagnostic)
@@ -26,6 +51,7 @@ local function undefinedFieldProvider(param, callback)
         if not node then
             goto continue
         end
+        node = unwrapFieldValue(node)
         if node.kind == 'type' then
             ---@cast node Node.Type
             if node.typeName == 'nil' or node.typeName == 'never' then

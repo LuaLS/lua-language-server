@@ -189,6 +189,28 @@ function T:appendCast(varSource, op, typeKey, isOptional)
     self:append('cast', id, op, typeKey, isOptional)
 end
 
+--- 记录变量在当前位置的非 nil 收窄：{'nonnil', varId, alias}
+--- 泛型 for 的第一个控制变量在循环体内恒非 nil（为 nil 时循环已结束），
+--- 循环结束后用 appendNonNilEnd 撤回该收窄
+---@param varSource LuaParser.Node.Base
+function T:appendNonNil(varSource)
+    local id = self.coder:getVarName(varSource)
+    if not id then
+        return
+    end
+    self:append('nonnil', id, varSource.uniqueKey)
+end
+
+--- 撤回 appendNonNil 的收窄：{'unnonnil', varId}
+---@param varSource LuaParser.Node.Base
+function T:appendNonNilEnd(varSource)
+    local id = self.coder:getVarName(varSource)
+    if not id then
+        return
+    end
+    self:append('unnonnil', id)
+end
+
 ---@param source LuaParser.Node.Call
 function T:appendCall(source)
     local funcAlias = source.node.uniqueKey

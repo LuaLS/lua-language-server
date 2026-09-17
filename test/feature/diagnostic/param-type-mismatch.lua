@@ -173,6 +173,32 @@ local b
 needInt(a & b)
 ]] { '-param-type-mismatch' }
 
+-- 泛型 for 的第一个控制变量在循环体内恒非 nil（迭代器返回 `string?` 时不该带 nil）
+TEST_DIAGNOSTIC [[
+---@return fun(): string?
+local function each() end
+
+---@param s string
+local function needString(s) end
+
+for s in each() do
+    needString(s)
+end
+]] { '-param-type-mismatch' }
+
+-- 第二个控制变量可以是 nil，不参与该收窄
+TEST_DIAGNOSTIC [[
+---@return fun(): string?, string?
+local function each() end
+
+---@param s string
+local function needString(s) end
+
+for k, v in each() do
+    needString(v)
+end
+]] { 'param-type-mismatch' }
+
 -- 动态键读取在中间码中共用一个槽位，不同键之间不得互相收窄
 TEST_DIAGNOSTIC [[
 ---@param t table

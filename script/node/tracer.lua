@@ -626,6 +626,27 @@ function W:traceUnit(unit)
         self:traceCast(unit)
         return
     end
+    if tag == 'nonnil' then
+        local id, alias = unit[2], unit[3]
+        self.aliasID[alias] = id
+        local stack = self:currentStack()
+        self.nonNilBackup = self.nonNilBackup or {}
+        self.nonNilBackup[id] = { stack.current[id], stack.otherSide[id] }
+        self:traceByValue({ 'ref', id, alias }, self.scope.rt.NIL, true)
+        return
+    end
+    if tag == 'unnonnil' then
+        local id = unit[2]
+        local backup = self.nonNilBackup and self.nonNilBackup[id]
+        if not backup then
+            return
+        end
+        self.nonNilBackup[id] = nil
+        local stack = self:currentStack()
+        stack.current[id] = backup[1]
+        stack.otherSide[id] = backup[2]
+        return
+    end
     if tag == 'seed' then
         -- 闭包创建点：把当前收窄快照推给内层 tracer
         ---@type table<string, Node>

@@ -152,9 +152,18 @@ ls.vm.registerCoderProvider('for', function (coder, source)
                 index = i,
             })
         end
+        -- 第一个控制变量为 nil 时循环结束，循环体内它恒非 nil
+        local firstVar = source.vars[1]
+        if firstVar then
+            coder:getTracer():appendNonNil(firstVar)
+        end
     end
 
     parseBlock(coder, source)
+
+    if source.subtype == 'in' and source.vars[1] then
+        coder:getTracer():appendNonNilEnd(source.vars[1])
+    end
 end)
 
 ls.vm.registerCoderProvider('while', function (coder, source)

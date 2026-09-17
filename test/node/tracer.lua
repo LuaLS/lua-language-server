@@ -831,6 +831,43 @@ do
     --[[
     ---@type string?
     local x
+    for x in f() do     -- 第一个控制变量收窄为非 nil
+        x
+    end
+    ]]
+    -- 非 nil 收窄只到循环体结束（unnonnil 撤回），不泄漏到循环之后
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.STRING | rt.NIL)
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'nonnil', 'x', 'x1' },
+        { 'ref', 'x', 'x2' },
+        { 'unnonnil', 'x' },
+        { 'ref', 'x', 'x3' },
+    }
+
+    lt.assertEquals(r['x2']:view(), 'string')
+    lt.assertEquals(r['x3']:view(), 'string | nil')
+end
+
+do
+    --[[
+    ---@type string?
+    local x
     assert(x)
     x
     ]]

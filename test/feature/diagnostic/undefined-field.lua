@@ -166,3 +166,28 @@ local t = {}
 t.foo = 1
 print(t.bar)
 ]] { '-undefined-field' }
+
+-- 开放表上的字面量键读取：读取本身创建的子变量不是字段写记录，
+-- 读到的值不可判定，不应拿它去报未定义字段
+TEST_DIAGNOSTIC [[
+local t = {}
+local w = t[1]
+print(w:match('x'))
+]] { '-undefined-field' }
+
+-- 开放表上的写入仍是字段写记录（读值不该退化成 any）
+TEST_DIAGNOSTIC [[
+local t = {}
+t[1] = 'a'
+local w = t[1]
+---@type integer
+local n = w
+]] { 'assign-type-mismatch' }
+
+-- 嵌套写入的中间层同样保留（其子变量自身无赋值，但后代有）
+TEST_DIAGNOSTIC [[
+local t = {}
+t.a.b = 1
+---@type string
+local s = t.a.b
+]] { 'assign-type-mismatch' }

@@ -1203,6 +1203,28 @@ function M:getEquivalentLocations(onlySameVariable, onlySameKey)
     return locations
 end
 
+---@param var Node.Variable
+---@param visited? table<Node.Variable, boolean>
+---@return boolean
+local function hasAssignedField(var, visited)
+    visited = visited or {}
+    if visited[var] then
+        return false
+    end
+    visited[var] = true
+    if var.assigns and #var.assigns > 0 then
+        return true
+    end
+    if var.childs then
+        for _, child in pairs(var.childs) do
+            if hasAssignedField(child, visited) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 ---@type Node.Table|false
 M.childsValue = nil
 
@@ -1220,7 +1242,7 @@ M.__getter.childsValue = function (self)
     local fields = {}
     for key, var in pairs(self.childs) do
         var:addRef(self)
-        if var.assigns or var.childs then
+        if hasAssignedField(var) then
             local f = rt.field(key, var)
             if var.visibleType then
                 f:setVisibleType(var.visibleType)

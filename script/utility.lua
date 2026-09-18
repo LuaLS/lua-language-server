@@ -470,7 +470,26 @@ local esc = {
     ['\n'] = '\\\n',
 }
 
+local function escapeInvalidUtf8(str)
+    local result = {}
+    local start = 1
+    while true do
+        local _, invalid = utf8Len(str, start)
+        if not invalid then
+            result[#result+1] = str:sub(start)
+            break
+        end
+        result[#result+1] = str:sub(start, invalid - 1)
+        result[#result+1] = ('\\%03d'):format(stringByte(str, invalid))
+        start = invalid + 1
+    end
+    return tableConcat(result)
+end
+
 function m.viewString(str, quo)
+    if not utf8Len(str) then
+        str = escapeInvalidUtf8(str)
+    end
     if not quo then
         if str:find('[\r\n]') then
             quo = '[['
@@ -1437,6 +1456,43 @@ function m.asKey(str)
         return str
     end
     return ('[%q]'):format(str)
+end
+
+---@param ... table
+---@return table
+function m.mergeStruct(...)
+    local result
+    local copyed = {}
+
+    local function merge(a, b)
+        if copyed[b] then
+            return copyed[b]
+        end
+        if type(b) ~= 'table' then
+            return b
+        end
+        if not a then
+            a = {}
+        end
+        copyed[b] = a
+        local usedKeys = {}
+        for i, v in ipairs(b) do
+            a[#a+1] = v
+            usedKeys[i] = true
+        end
+        for k, v in pairs(b) do
+            if not usedKeys[k] then
+                a[k] = merge(a[k], v)
+            end
+        end
+        return a
+    end
+
+    for _, t in ipairs { ... } do
+        result = merge(result, t)
+    end
+
+    return result
 end
 
 ---@param job function

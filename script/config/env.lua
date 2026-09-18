@@ -10,7 +10,7 @@ end
 ---- `name` is the ENV arg name
 ---- `key` is the value used to index `_G` for setting the argument
 ---- `converter` if present, will be used to convert the string value into another type
----@type { name: string, key: string, converter: fun(value: string): any }[]
+---@type { name: string, key: string, converter?: fun(value: string): any }[]
 local vars = {
     {
         name = "LLS_CHECK_LEVEL",

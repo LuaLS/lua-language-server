@@ -44,7 +44,7 @@ function mt:eachLink()
     return next, self._links
 end
 
----@param uri uri
+---@param uri? uri
 ---@return boolean
 function mt:isChildUri(uri)
     if not uri then
@@ -66,7 +66,7 @@ function mt:isChildUri(uri)
     return false
 end
 
----@param uri uri
+---@param uri? uri
 ---@return boolean
 function mt:isLinkedUri(uri)
     if not uri then

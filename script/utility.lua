@@ -26,6 +26,7 @@ local inf          = 1 / 0
 local nan          = 0 / 0
 local error        = error
 local assert       = assert
+local clock        = os.clock
 
 _ENV = nil
 
@@ -469,26 +470,7 @@ local esc = {
     ['\n'] = '\\\n',
 }
 
-local function escapeInvalidUtf8(str)
-    local result = {}
-    local start = 1
-    while true do
-        local _, invalid = utf8Len(str, start)
-        if not invalid then
-            result[#result+1] = str:sub(start)
-            break
-        end
-        result[#result+1] = str:sub(start, invalid - 1)
-        result[#result+1] = ('\\%03d'):format(stringByte(str, invalid))
-        start = invalid + 1
-    end
-    return tableConcat(result)
-end
-
 function m.viewString(str, quo)
-    if not utf8Len(str) then
-        str = escapeInvalidUtf8(str)
-    end
     if not quo then
         if str:find('[\r\n]') then
             quo = '[['
@@ -673,7 +655,7 @@ function m.eachLine(text, keepNL)
     end
 end
 
----@alias SortByScoreCallback fun(o: any): integer
+---@alias SortByScoreCallback fun(o: any): number
 
 -- 按照分数排序，分数越高越靠前
 ---@param tbl any[]
@@ -762,6 +744,12 @@ function m.trim(str, mode)
         return (str:gsub('%s+$', ''))
     end
     return (str:match '^%s*(.-)%s*$')
+end
+
+---@param str string
+---@return string
+function m.firstLine(str)
+    return str:match('([^\r\n]*)')
 end
 
 ---@param path string
@@ -924,6 +912,11 @@ end
 
 function m.multiTable(max, default)
     local mts = {}
+    if default and type(default) ~= 'function' then
+        local value = default
+        default = function () return value end
+        ---@cast default function
+    end
     for i = 1, max - 1 do
         if i < max - 1 then
             mts[i] = { __index = function (t, k)
@@ -989,10 +982,19 @@ function m.arrayInsert(array, value)
     end
 end
 
-function m.arrayRemove(array, value)
+---@generic T
+---@param array T[]
+---@param value T
+---@param noOrder? boolean
+function m.arrayRemove(array, value, noOrder)
     for i = 1, #array do
         if array[i] == value then
-            tableRemove(array, i)
+            if noOrder then
+                array[i] = array[#array]
+                array[#array] = nil
+            else
+                tableRemove(array, i)
+            end
             return
         end
     end
@@ -1013,9 +1015,45 @@ function m.arrayOverlap(a1, a2)
     return result
 end
 
+---@generic T
+---@param total T[]
+---@param part T[]
+---@return T[]
+function m.arrayDiff(total, part)
+    local diff = {}
+
+    local partSet = m.arrayToHash(part)
+    for i = 1, #total do
+        local v = total[i]
+        if not partSet[v] then
+            diff[#diff+1] = v
+        end
+    end
+
+    return diff
+end
+
 m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }
+
+---@param t? table
+---@return table
+function m.weakTable(t)
+    return setmetatable(t or {}, m.MODE_KV)
+end
+
+---@param t? table
+---@return table
+function m.weakKTable(t)
+    return setmetatable(t or {}, m.MODE_K)
+end
+
+---@param t? table
+---@return table
+function m.weakVTable(t)
+    return setmetatable(t or {}, m.MODE_V)
+end
 
 ---@generic T: fun(param: any):any
 ---@param func T
@@ -1038,6 +1076,31 @@ function m.tableMerge(a, b)
         a[k] = v
     end
     return a
+end
+
+function m.tableDefault(a, b)
+    for k, v in pairs(b) do
+        if a[k] == nil then
+            a[k] = v
+        end
+    end
+    return a
+end
+
+---@param a table
+---@param b table
+---@param recursive boolean
+function m.tableExtends(a, b, recursive)
+    for k, v in pairs(b) do
+        if recursive and type(v) == 'table' then
+            if type(a[k]) ~= 'table' then
+                a[k] = {}
+            end
+            m.tableExtends(a[k], v, true)
+        else
+            a[k] = v
+        end
+    end
 end
 
 ---@param a any[]
@@ -1121,6 +1184,9 @@ local sbyteMap = {
 ---@param b string
 ---@return boolean
 function m.stringLess(a, b)
+    if a == b then
+        return false
+    end
     for i = 1, #a do
         if i > #b then
             return false
@@ -1134,6 +1200,52 @@ function m.stringLess(a, b)
         end
     end
     return true
+end
+
+---@param s1 string
+---@param s2 string
+---@param ignoreCase? boolean
+---@return boolean isMatch
+---@return integer matchScore
+function m.stringSimilar(s1, s2, ignoreCase)
+    if s1 == s2 then
+        return true, 0
+    end
+    if s1 == '' then
+        return true, 0
+    end
+    if #s1 > #s2 then
+        return false, 0
+    end
+
+    if ignoreCase then
+        s1 = s1:upper()
+        s2 = s2:upper()
+    end
+
+    local inputCodes = { stringByte(s1, 1, #s1) }
+    local otherCodes = { stringByte(s2, 1, #s2) }
+
+    local matchScore = 1
+    if inputCodes[1] ~= otherCodes[1] then
+        matchScore = 2
+    end
+
+    local inputBit = 0
+    for i = 1, #inputCodes do
+        inputBit = inputBit | (1 << (inputCodes[i] - 64))
+    end
+
+    local otherBit = 0
+    for i = 1, #otherCodes do
+        otherBit = otherBit | (1 << (otherCodes[i] - 64))
+    end
+
+    if inputBit == (inputBit & otherBit) then
+        return true, matchScore
+    end
+
+    return false, 0
 end
 
 ---@param v any
@@ -1207,7 +1319,7 @@ function m.enableFormatString()
     mt.__mod = function (str, args)
         local count = 0
         return str:gsub('%b{}', function (key)
-            local k, fmt = key:match('^{(.-):(.+)}$')
+            local k, fmt = key:match('^{(.-)(%%.+)}$')
             if not k then
                 k = key:sub(2, -2)
             end
@@ -1218,11 +1330,16 @@ function m.enableFormatString()
             else
                 value = args[k]
             end
-            if value == nil and k:find('{', 1, true) then
-                return '{' .. k % args .. '}'
+            if value == nil then
+                local inside = key:sub(2, -2)
+                if inside:find('{', 1, true) then
+                    return '{' .. inside % args .. '}'
+                else
+                    return
+                end
             end
             if fmt then
-                value = stringFormat('%' .. fmt, value)
+                value = stringFormat(fmt, value)
             else
                 value = tostring(value)
             end
@@ -1249,6 +1366,14 @@ function m.enableDividStringAsPath()
         end
         return str .. '/' .. path
     end
+end
+
+function m.enableFalswallow()
+    setmetatable(false, {
+        __index = function ()
+            return false
+        end
+    })
 end
 
 ---@param str string
@@ -1314,41 +1439,197 @@ function m.asKey(str)
     return ('[%q]'):format(str)
 end
 
----@param ... table
----@return table
-function m.mergeStruct(...)
-    local result
-    local copyed = {}
+---@param job function
+---@param finish fun(duration: number)
+---@return any
+function m.withDuration(job, finish)
+    local startTime = clock()
+    local result = job()
+    local endTime = clock()
+    finish(endTime - startTime)
+    return result
+end
 
-    local function merge(a, b)
-        if copyed[b] then
-            return copyed[b]
+---@generic T
+---@param obj T
+---@param visited? table<T, boolean>
+---@return table<T, boolean>?
+function m.visited(obj, visited)
+    if visited then
+        if visited[obj] then
+            return nil
         end
-        if type(b) ~= 'table' then
-            return b
+        visited[obj] = true
+        return visited
+    else
+        return { [obj] = true }
+    end
+end
+
+--- `[start: integer, finish: integer, id?: any, ]`
+--- 必须保证 layers 已经按 start 升序排列，为光标位置
+---@param layers [integer, integer, any][]
+---@return [integer, integer, any][]
+function m.mergeLayers(layers)
+    local desk = {}
+    local result = {}
+
+    local function checkDesk(start, finish)
+        local top = desk[#desk]
+        if not top then
+            return
         end
-        if not a then
-            a = {}
+
+        local _, e, id = top[1], top[2], top[3]
+        if e <= start then
+            desk[#desk] = nil
+            return checkDesk(start, finish)
+        elseif e > finish then
+            result[#result+1] = { start, finish, id }
+            return
+        else
+            result[#result+1] = { start, e, id }
+            desk[#desk] = nil
+            return checkDesk(e, finish)
         end
-        copyed[b] = a
-        local usedKeys = {}
-        for i, v in ipairs(b) do
-            a[#a+1] = v
-            usedKeys[i] = true
-        end
-        for k, v in pairs(b) do
-            if not usedKeys[k] then
-                a[k] = merge(a[k], v)
-            end
-        end
-        return a
     end
 
-    for _, t in ipairs { ... } do
-        result = merge(result, t)
+    for i, layer in ipairs(layers) do
+        local s, e, id = layer[1], layer[2], layer[3]
+        local nextLayer = layers[i + 1]
+        local nextStart = nextLayer and nextLayer[1] or mathHuge
+        if e > nextStart then
+            result[#result+1] = { s, nextStart, id }
+            desk[#desk+1] = layer
+            goto continue
+        end
+        result[#result+1] = layer
+        if e < nextStart then
+            checkDesk(e, nextStart)
+        end
+        ::continue::
     end
 
     return result
+end
+
+--- fillRanges({{1, 10}, {20, 30}}, 5, 40) -> {{1, 40}}, {{11, 19}, {31, 40}}
+---@param ranges [integer, integer][]
+---@param start integer
+---@param finish integer
+---@return [integer, integer][] # 填充后的范围列表
+---@return [integer, integer][] # 本次实际填充的范围列表
+function m.fillRanges(ranges, start, finish)
+    local merged = {}
+    local filled = {}
+
+    -- 找出与 [start, finish] 重叠或相邻的范围，计算合并后的边界
+    local minStart = start
+    local maxFinish = finish
+
+    for i = 1, #ranges do
+        local s, e = ranges[i][1], ranges[i][2]
+        -- 检查是否有重叠或相邻（e + 1 == start 或 s - 1 == finish）
+        if e >= start - 1 and s <= finish + 1 then
+            minStart = s < minStart and s or minStart
+            maxFinish = e > maxFinish and e or maxFinish
+        end
+    end
+
+    -- 构建合并后的范围列表
+    for i = 1, #ranges do
+        local s, e = ranges[i][1], ranges[i][2]
+        -- 保留那些完全在合并范围之外的范围
+        if e < minStart or s > maxFinish then
+            merged[#merged+1] = ranges[i]
+        end
+    end
+    -- 添加合并后的大范围
+    merged[#merged+1] = { minStart, maxFinish }
+
+    -- 排序合并后的范围
+    tableSort(merged, function (a, b)
+        return a[1] < b[1]
+    end)
+
+    -- 合并连续的范围
+    local i = 1
+    while i < #merged do
+        local current = merged[i]
+        local next = merged[i + 1]
+        -- 如果当前范围的结束位置 + 1 >= 下一个范围的开始位置，则合并
+        if current[2] + 1 >= next[1] then
+            current[2] = next[2] > current[2] and next[2] or current[2]
+            tableRemove(merged, i + 1)
+        else
+            i = i + 1
+        end
+    end
+
+    -- 计算实际填充的部分（即 [start, finish] 中原本为空白的区域）
+    local cursor = start
+    for i = 1, #ranges do
+        local s, e = ranges[i][1], ranges[i][2]
+        if e < start then
+            goto continue
+        end
+        if s > finish then
+            break
+        end
+        -- 这个范围与 [start, finish] 有交集
+        if s > cursor then
+            -- 有空白需要填充
+            filled[#filled+1] = { cursor, s - 1 }
+        end
+        -- 更新游标到已有范围的结束位置
+        if e >= cursor then
+            cursor = e + 1
+        end
+        ::continue::
+    end
+
+    -- 检查最后是否还有空白
+    if cursor <= finish then
+        filled[#filled+1] = { cursor, finish }
+    end
+
+    tableSort(filled, function (a, b)
+        return a[1] < b[1]
+    end)
+
+    return merged, filled
+end
+
+---@generic T: function
+---@param f T
+---@param aliveTime number
+---@param getClock? fun(): number
+---@return T
+function m.methodCacher(f, aliveTime, getClock)
+    getClock = getClock or clock
+    local cache = m.weakKTable()
+    return function (self, ...)
+        if not cache[self] then
+            cache[self] = { time = 0, result = nil }
+        end
+        if getClock() > cache[self].time then
+            cache[self].result = f(self, ...)
+            cache[self].time = getClock() + aliveTime
+        end
+        return cache[self].result
+    end
+end
+
+---@param obj any
+---@param name string
+---@param value any
+function m.setMetaMethod(obj, name, value)
+    local mt = getmetatable(obj)
+    if mt then
+        mt[name] = value
+    else
+        setmetatable(obj, { [name] = value })
+    end
 end
 
 return m

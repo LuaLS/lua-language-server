@@ -24,6 +24,9 @@ It is intended for both human collaborators and coding agents.
 
 - Run tests from the `server` root with:
   - `bin\\lua-language-server.exe --test <suite-or-file>`
+- 批量项目扫描（`--test project.external[-diagnostic] --test-project=<path>`）必须带 `--mem-limit=2`
+  （默认 10GB 太高），且**不要并发跑多个扫描进程**（会耗光机器内存）；细节见
+  `.github/skills/luals-server-dev/references/workflow-and-style.md` 的「批量扫描与内存护栏」。
 - Do not run tasks `PreCompile` or `Compile` for feature work in this repo context.
 - Keep changes focused. Avoid unrelated refactors and broad formatting-only edits.
 - Put temporary debug outputs in `tmp/` only.

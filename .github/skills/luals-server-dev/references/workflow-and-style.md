@@ -28,6 +28,38 @@ bin\lua-language-server.exe --test feature.completion.field
 - **新增文件可以，但尽量不要删除文件**（`del`/`rm` 会被拦截，需用户手动确认）；尽量复用已有文件或就地修改。
 - 如果使用 debugger，启动新会话前先停掉旧会话，用完后及时断开。
 
+## 批量扫描与内存护栏
+
+命令行项目扫描（`--test project.external[-diagnostic] --test-project=<path>`）跑在测试模式，
+Lua 堆上限由 `ls.args.MEM_LIMIT`（默认 10GB）控制，由 `test.lua` 的 `test.enableMemoryGuard()`
+用指令级 `debug.sethook` 检查堆占用，超限 `os.exit(1)`（已有 `debug.gethook` 时跳过，避免占用调试器钩子）。
+
+- **批量扫描一律显式传 `--mem-limit=2`**：默认 10GB 远超机器承受范围，加载型爆炸会先吃光机器才触发。
+- **不要并发跑多个扫描/测试进程**：上限叠加（2026-09-18 实测两个 meta 扫描并发 → 机器内存耗尽）；
+  重试前先用 `Get-CimInstance Win32_Process -Filter "Name='lua-language-server.exe'"` 确认没有残留 `--test` 进程。
+- 需要观察峰值时用看门狗：启动扫描进程后轮询其 WorkingSet，超阈值自动 kill 并打印峰值。
+  本仓库 `tmp/` 下留有这轮用的脚本（`scan-guard.ps1` / `variant-scan.ps1` / `prefix-sweep.ps1` / `cs-shrink.ps1`），
+  但 `tmp/` 不入库，脚本被清掉时按下面对应做法重建。
+- 加 `--test project.external` 可只加载不跑诊断，用来区分「加载/索引」与「诊断」两个阶段的消耗。
+- 缩小/定位体积：按行数前缀扫描找跃变点（每次截前 N 行写成一个文件扫一遍，比较峰值），
+  或对前缀做二分找最小复现。
+- 判定「是否爆炸」不要用中文标记匹配（PowerShell 5.1 读无 BOM 的 `.ps1` 会把中文字面量读成乱码，
+  导致恒真）；用 ASCII 标记（如看门狗输出的 `killed=True`）。
+
+看门狗核心（PowerShell，`$Project` 为待扫目录）：
+
+```powershell
+$p = Start-Process -FilePath 'bin\lua-language-server.exe' -PassThru -NoNewWindow `
+     -ArgumentList @('--test', 'project.external', "--test-project=$Project", '--mem-limit=2')
+$peak = 0
+while (-not $p.HasExited) {
+    $ws = (Get-Process -Id $p.Id).WorkingSet64 / 1MB
+    if ($ws -gt $peak) { $peak = $ws }
+    if ($ws -gt 2000) { Stop-Process -Id $p.Id -Force; Write-Host "killed peak=$([int]$peak)MB"; break }
+    Start-Sleep -Milliseconds 400
+}
+```
+
 ## 风格约定
 - Lua 文件使用 4 空格缩进。
 - 行宽尽量接近仓库限制 120。

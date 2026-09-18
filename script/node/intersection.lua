@@ -34,10 +34,77 @@ end
 ---@type Node[]
 M.values = nil
 
+---@type integer
+local DEPTH_LIMIT = 64
+
+---@type integer
+local depth = 0
+
+---@type table<Task, integer>
+local taskDepths = ls.util.weakKTable()
+
+---@type number
+local lastOverflowLog = 0
+
+---@type table<string, true>
+local buildingValues = {}
+
+---@type table<string, true>
+local buildingHasGeneric = {}
+
+---@param raw Node
+---@return string
+local function rawKey(raw)
+    local kind = raw.kind
+    if kind == 'variable' then
+        ---@cast raw Node.Variable
+        local key = raw.key
+        return 'v:' .. tostring(type(key) == 'table' and key.literal or key)
+    end
+    if kind == 'call' then
+        ---@cast raw Node.Call
+        return 'c:' .. raw.head.typeName .. '/' .. #raw.args
+    end
+    return tostring(raw)
+end
+
+---@param nodes Node[]
+---@return string
+local function rawSignature(nodes)
+    local parts = {}
+    for i, raw in ipairs(nodes) do
+        parts[i] = rawKey(raw)
+    end
+    table.sort(parts)
+    return table.concat(parts, '|')
+end
+
+---@return Task?, integer
+local function enterDepth()
+    local task = ls.task.getCurrentTask()
+    if not task then
+        depth = depth + 1
+        return nil, depth
+    end
+    local d = (taskDepths[task] or 0) + 1
+    taskDepths[task] = d
+    return task, d
+end
+
+---@param task Task?
+---@param d integer
+local function leaveDepth(task, d)
+    if task then
+        taskDepths[task] = d - 1
+    else
+        depth = d - 1
+    end
+end
+
 ---@param self Node.Intersection
 ---@return Node[]
 ---@return true
-M.__getter.values = function (self)
+local function buildValues(self)
     local rt = self.scope.rt
     local values = {}
     local tables = {}
@@ -126,6 +193,41 @@ M.__getter.values = function (self)
         end
     end
     return merged, true
+end
+
+---@param self Node.Intersection
+---@param what string
+local function logOverflow(self, what)
+    local clock = os.clock()
+    if clock - lastOverflowLog <= 5 then
+        return
+    end
+    lastOverflowLog = clock
+    log.error('[Intersection] {}: {} raw node(s), sig={}' % {
+        what, #self.rawNodes, rawSignature(self.rawNodes),
+    })
+end
+
+---@param self Node.Intersection
+---@return Node[]
+---@return true
+M.__getter.values = function (self)
+    local signature = rawSignature(self.rawNodes)
+    if buildingValues[signature] then
+        logOverflow(self, 'values cycle detected')
+        return {}, true
+    end
+    local task, d = enterDepth()
+    if d > DEPTH_LIMIT then
+        leaveDepth(task, d)
+        logOverflow(self, 'values depth overflow (>64)')
+        return { self.scope.rt.ANY }, true
+    end
+    buildingValues[signature] = true
+    local values, isTrue = buildValues(self)
+    buildingValues[signature] = nil
+    leaveDepth(task, d)
+    return values, isTrue
 end
 
 ---@type Node
@@ -256,7 +358,7 @@ end
 ---@param self Node.Intersection
 ---@return boolean
 ---@return true
-M.__getter.hasGeneric = function (self)
+local function buildHasGeneric(self)
     if self.value == self then
         local hasGeneric = false
         for _, v in ipairs(self.rawNodes) do
@@ -270,6 +372,28 @@ M.__getter.hasGeneric = function (self)
         self.value:addRef(self)
         return self.value.hasGeneric, true
     end
+end
+
+---@param self Node.Intersection
+---@return boolean
+---@return true
+M.__getter.hasGeneric = function (self)
+    local signature = rawSignature(self.rawNodes)
+    if buildingHasGeneric[signature] then
+        logOverflow(self, 'hasGeneric cycle detected')
+        return false, true
+    end
+    local task, d = enterDepth()
+    if d > DEPTH_LIMIT then
+        leaveDepth(task, d)
+        logOverflow(self, 'hasGeneric depth overflow (>64)')
+        return false, true
+    end
+    buildingHasGeneric[signature] = true
+    local hasGeneric, isTrue = buildHasGeneric(self)
+    buildingHasGeneric[signature] = nil
+    leaveDepth(task, d)
+    return hasGeneric, isTrue
 end
 
 ---@param map table<Node.Generic, Node>

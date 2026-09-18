@@ -942,10 +942,16 @@ function W:traceTruthy(exp, revert)
                                 targetIndex = myRetIndex,
                                 targetValue = rt.TRUTHY,
                             }:narrowCall()
-                            if revert then
-                                self:setNarrowResult(info.varId, otherSide, narrowed)
-                            else
-                                self:setNarrowResult(info.varId, narrowed, otherSide)
+                            local current = revert and otherSide or narrowed
+                            local base = otherValue:simplify()
+                            local known = base ~= rt.ANY and base ~= rt.UNKNOWN
+                            local skip = known and otherValue:canCast(current)
+                            if not skip then
+                                if revert then
+                                    self:setNarrowResult(info.varId, otherSide, narrowed)
+                                else
+                                    self:setNarrowResult(info.varId, narrowed, otherSide)
+                                end
                             end
                         end
                     end

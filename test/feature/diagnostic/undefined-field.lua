@@ -221,3 +221,38 @@ if x.kind == 'a' then
     print(x.bv)
 end
 ]] { 'undefined-field' }
+
+-- 取用多返回值里不存在的那一项（值落到 never）时，字段存在性不可判定
+TEST_DIAGNOSTIC [[
+local function f() end
+
+local a, b = f()
+print(b.x)
+]] { '-undefined-field' }
+
+-- 同上，跨文件的未知模块返回值
+TEST_DIAGNOSTIC [[
+local mod = require 'unknown_mod'
+local a, b = mod.call()
+print(b.x)
+]] { '-undefined-field' }
+
+-- 与 never 无关的未知字段仍然要报
+TEST_DIAGNOSTIC [[
+---@class C
+---@field name string
+
+---@type C
+local c
+print(c.age)
+]] { 'undefined-field' }
+
+-- 2 个返回值里的第 2 个（函数只返回 1 个）同样是不可判定，而不是 undefined-field
+TEST_DIAGNOSTIC [[
+local function g()
+    return 1
+end
+
+local i, j = g()
+print(j.y)
+]] { '-undefined-field' }

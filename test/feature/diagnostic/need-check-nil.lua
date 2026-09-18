@@ -291,3 +291,38 @@ local function f()
     end
 end
 ]] { '-need-check-nil', '-undefined-field' }
+
+-- 同一次调用的多个返回值之间不做「无信息」的间接窄化：
+-- 对任一返回值做真值判断，不该把其他返回值的守卫收窄（如 t 的非 nil）覆盖掉
+TEST_DIAGNOSTIC [[
+---@return table?, string?, boolean?, string?
+local function query(a, b) end
+
+---@param a any
+---@param b any
+local function f(a, b)
+    local t, k, isarray, lastpath = query(a, b)
+    if not t then
+        error(k)
+        return
+    end
+    if lastpath then
+        print(lastpath)
+    end
+    if isarray then
+        if t.v[k] then
+            return t.v[k]
+        elseif k == 1 then
+            return t
+        else
+            return t.v[k - 1]
+        end
+    else
+        if t.v[k] then
+            return t.v[k]
+        else
+            return t
+        end
+    end
+end
+]] { '-need-check-nil' }

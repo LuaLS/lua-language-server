@@ -52,10 +52,13 @@ local function undefinedFieldProvider(param, callback)
             goto continue
         end
         node = unwrapFieldValue(node)
-        if node.kind == 'type' then
-            ---@cast node Node.Type
-            if node.typeName == 'nil' or node.typeName == 'never' then
-                goto continue
+        do
+            local target = node:simplify()
+            if target.kind == 'type' then
+                ---@cast target Node.Type
+                if target.typeName == 'nil' or target.typeName == 'never' then
+                    goto continue
+                end
             end
         end
         local _, exists = node:get(key.id)

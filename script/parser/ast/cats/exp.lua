@@ -139,7 +139,10 @@ function Ast:parseCatParen()
     end
 
     self:skipSpace()
+    local inListValue = self.catInListValue
+    self.catInListValue = nil
     local value = self:parseCatExp(true)
+    self.catInListValue = inListValue
     local paren = self:createNode('LuaParser.Node.CatParen', {
         start = plPos,
         value = value,

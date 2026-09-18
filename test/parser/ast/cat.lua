@@ -834,3 +834,77 @@ print(x)
         }
     }
 }
+
+TEST [[
+---@field __pairs (fun(t):((fun(t,k,v):any,any),any,any))|nil
+---@field __newindex table|fun(t,k,v)|nil
+]]
+{
+    childs = {
+        [1] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatefield',
+                key  = { kind = 'catfieldname', id = '__pairs' },
+                value = {
+                    kind = 'catunion',
+                    exps = {
+                        [1] = {
+                            kind  = 'catparen',
+                            value = {
+                                kind   = 'catfunction',
+                                params = {
+                                    [1] = { name = { id = 't' } },
+                                },
+                                returns = {
+                                    [1] = {
+                                        value = {
+                                            kind  = 'catparen',
+                                            value = {
+                                                kind   = 'catfunction',
+                                                params = {
+                                                    [1] = { name = { id = 't' } },
+                                                    [2] = { name = { id = 'k' } },
+                                                    [3] = { name = { id = 'v' } },
+                                                },
+                                                returns = {
+                                                    [1] = { value = { kind = 'catid', id = 'any' } },
+                                                    [2] = { value = { kind = 'catid', id = 'any' } },
+                                                },
+                                            },
+                                        },
+                                    },
+                                    [2] = { value = { kind = 'catid', id = 'any' } },
+                                    [3] = { value = { kind = 'catid', id = 'any' } },
+                                },
+                            },
+                        },
+                        [2] = { kind = 'catid', id = 'nil' },
+                    },
+                },
+            },
+        },
+        [2] = {
+            kind  = 'cat',
+            value = {
+                kind = 'catstatefield',
+                key  = { kind = 'catfieldname', id = '__newindex' },
+                value = {
+                    kind = 'catunion',
+                    exps = {
+                        [1] = { kind = 'catid', id = 'table' },
+                        [2] = {
+                            kind   = 'catfunction',
+                            params = {
+                                [1] = { name = { id = 't' } },
+                                [2] = { name = { id = 'k' } },
+                                [3] = { name = { id = 'v' } },
+                            },
+                        },
+                        [3] = { kind = 'catid', id = 'nil' },
+                    },
+                },
+            },
+        },
+    }
+}

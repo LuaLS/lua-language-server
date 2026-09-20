@@ -31,8 +31,19 @@ bin\lua-language-server.exe --test feature.completion.field
 ## 批量扫描与内存护栏
 
 命令行项目扫描（`--test project.external[-diagnostic] --test-project=<path>`）跑在测试模式，
-Lua 堆上限由 `ls.args.MEM_LIMIT`（默认 10GB）控制，由 `test.lua` 的 `test.enableMemoryGuard()`
-用指令级 `debug.sethook` 检查堆占用，超限 `os.exit(1)`（已有 `debug.gethook` 时跳过，避免占用调试器钩子）。
+Lua 堆上限由 `ls.args.MEM_LIMIT`（默认 10GB）控制：`test.lua` 的 `test.enableMemoryGuard()` 在
+没有现成钩子时（有调试器钩子就跳过，避免互相占用）装一个**指令级（字节码）钩子**，
+每 10 万条指令查一次 `collectgarbage('count')`，超限打印 `[MEMORY GUARD] (<state>) ... force exit`
+并 `os.exit(1)`。
+
+- **钩子只对设置它的线程生效**：协程不会自动继承（实测主线程计数钩子调用 602 次，同一钩子在协程内 0 次）。
+  因此 `enableMemoryGuard()` 同时包装 `coroutine.create` / `coroutine.wrap`，给每个新建协程显式
+  `debug.sethook(co, hook, mask, count)`；回归用例见 `test/tools/memory-guard.lua`
+  （在协程内 `debug.gethook()` 必须拿到函数）。
+- **bee.thread 工作线程是独立 Lua 状态，不在这套护栏内**（worker 里跑 coder 编译）。若遇到只在 worker
+  里增长的内存，需要单独在 worker 初始化处装钩子。
+- 实测：600 行的 `CS.lua` 前缀在 `--mem-limit=0.5` 下会在 master 状态触发护栏，触发时进程 RSS ≈ 550MB
+  （≈ 堆 + 50MB），因此用 `--mem-limit` 能有效阻止吃满机器。
 
 - **批量扫描一律显式传 `--mem-limit=2`**：默认 10GB 远超机器承受范围，加载型爆炸会先吃光机器才触发。
 - **不要并发跑多个扫描/测试进程**：上限叠加（2026-09-18 实测两个 meta 扫描并发 → 机器内存耗尽）；

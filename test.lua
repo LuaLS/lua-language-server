@@ -9,22 +9,48 @@ test = {}
 
 test.arg = {}
 
---- 测试模式内存护栏：指令级钩子定期检查 Lua 堆，超限强制退出，防止死循环耗尽内存。
---- debug.sethook 是单例，若已有钩子（如调试器）则跳过，避免互相占用。
+--- 测试模式内存护栏：指令级（字节码）钩子定期检查 Lua 堆，超限强制退出，防止死循环耗尽内存。
+--- debug.sethook 是单例：若已有钩子（如调试器）则跳过，避免互相占用。
+--- 钩子只对设置它的线程生效，所以每个新建协程都要显式挂上同一个钩子。
 function test.enableMemoryGuard()
     if debug.gethook() then
         return
     end
     local memLimitKB = ls.args.MEM_LIMIT * 1024 * 1024
-    debug.sethook(function ()
+    local hook = function ()
         local heapKB = collectgarbage('count')
         if heapKB > memLimitKB then
-            io.write(('[MEMORY GUARD] Lua heap %.1f GB exceeded limit %.1f GB, force exit\n')
-                :format(heapKB / 1024 / 1024, memLimitKB / 1024 / 1024))
+            io.write(('[MEMORY GUARD] (%s) Lua heap %.1f GB exceeded limit %.1f GB, force exit\n')
+                :format(ls.threadName or 'master', heapKB / 1024 / 1024, memLimitKB / 1024 / 1024))
             io.flush()
             os.exit(1)
         end
-    end, '', 100000)
+    end
+    local mask    = ''
+    local count   = 100000
+    local rawCreate = coroutine.create
+
+    debug.sethook(hook, mask, count)
+
+    local function attach(co)
+        debug.sethook(co, hook, mask, count)
+        return co
+    end
+
+    coroutine.create = function (f)
+        return attach(rawCreate(f))
+    end
+
+    coroutine.wrap = function (f)
+        local co = attach(rawCreate(f))
+        return function (...)
+            local results = table.pack(coroutine.resume(co, ...))
+            if not results[1] then
+                error(results[2], 0)
+            end
+            return table.unpack(results, 2, results.n)
+        end
+    end
 end
 
 require 'master'

@@ -224,19 +224,26 @@ function M:makeCompileOptions(uri)
     return options
 end
 
+---@param uri Uri
+---@return Scope.Root?
+function M:findRoot(uri)
+    for _, root in ipairs(self.roots) do
+        if root.uri == uri or ls.uri.relativePath(uri, root.uri) then
+            return root
+        end
+    end
+    return nil
+end
+
 ---@async
 ---@param uri Uri
 ---@return boolean
 function M:isIgnored(uri)
-    for _, root in ipairs(self.roots) do
-        if root.uri == uri or ls.uri.relativePath(uri, root.uri) then
-            if not root.glob then
-                return false
-            end
-            return root.glob:check(uri)
-        end
+    local root = self:findRoot(uri)
+    if not root or not root.glob then
+        return false
     end
-    return false
+    return root.glob:check(uri)
 end
 
 ---@param uri Uri

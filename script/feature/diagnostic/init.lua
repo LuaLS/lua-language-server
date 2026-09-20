@@ -70,6 +70,29 @@ function ls.feature.diagnostic(uri, partialPush)
         return {}
     end
 
+    local opened = document.file:isOpenedByClient()
+
+    ---@param option string
+    ---@return boolean
+    local function isDisabledByFileStatus(option)
+        local status = scope.config:get(uri, option)
+        if status == 'Disable' then
+            return true
+        end
+        if status == 'Opened' and not opened then
+            return true
+        end
+        return false
+    end
+
+    local root = scope:findRoot(uri)
+    if root and root.kind == 'library' and isDisabledByFileStatus('Lua.diagnostics.libraryFiles') then
+        return {}
+    end
+    if scope:isIgnored(uri) and isDisabledByFileStatus('Lua.diagnostics.ignoredFiles') then
+        return {}
+    end
+
     local vfile = scope.vm:getFile(uri)
     local syntaxErrors = vfile?.coder?.errors or {}
 
@@ -81,7 +104,6 @@ function ls.feature.diagnostic(uri, partialPush)
     local disableRanges = disable.buildRanges(ast)
 
     local disables = ls.util.arrayToHash(scope.config:get(uri, 'Lua.diagnostics.disable') or {})
-    local opened = document.file:isOpenedByClient()
     local positionConverter = document.positionConverter
 
     ---@type Feature.Diagnostic.Param

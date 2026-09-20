@@ -88,6 +88,13 @@
 - 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间。codes 数组语义：`'code'` 表示必须有该诊断（允许其他诊断）、`'-code'` 表示必须没有该诊断、`{}` 空数组表示必须 0 诊断。marks 只要求每个 mark 匹配某个诊断区间。
 - push 暂不带 `version` 字段。
 - `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
+- **文件级开关（重要）**：`ls.feature.diagnostic` 入口先按文件过滤——`scope:findRoot(uri).kind == 'library'`
+  走 `Lua.diagnostics.libraryFiles`，`scope:isIgnored(uri)`（ignoreDir 命中）走
+  `Lua.diagnostics.ignoredFiles`；两者取值语义一致：`Enable` 总是诊断、`Opened`（默认）仅在
+  `document.file:isOpenedByClient()` 时诊断、`Disable` 一律不诊断。目标工程 `.luarc.json` 的
+  `workspace.ignoreDir = ['/meta']` + `diagnostics.ignoredFiles = 'Disable'` 就依赖这条实现
+  （否则 `meta/template/*.lua` 会被当普通 Lua 诊断）。测试见 `test/feature/diagnostic/config.lua`
+  （用 stub root glob 模拟「被忽略」）。
 
 ## 测试
 

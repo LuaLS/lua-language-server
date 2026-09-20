@@ -1,7 +1,11 @@
 do
-    if not debug.gethook() then
+    local guard = require 'tools.mem-guard'
+    if not guard.isEnabled() then
         return
     end
+
+    lt.assertEquals(guard.enable(1), false)
+    lt.assertEquals(type(debug.gethook()), 'function')
 
     local co = coroutine.create(function ()
         return debug.gethook()

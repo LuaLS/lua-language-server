@@ -49,6 +49,11 @@ return function (options)
 
     assert(requestChannel,  options.name .. '-request channel not found')
     assert(responseChannel, options.name .. '-response channel not found')
+
+    if options.memLimit then
+        require 'tools.mem-guard'.enable(options.memLimit)
+    end
+
     local module = require(options.entry)
 
     local function resolve(request)

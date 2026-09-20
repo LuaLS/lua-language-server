@@ -66,6 +66,7 @@ require 'async.worker-init' (options)
         entry = entry,
         logLevel = log.level,
         debugger = debugger(useDebugger),
+        memLimit = ls.args.TEST and ls.args.MEM_LIMIT or nil,
     })
 
     ls.eventLoop.addHighTask(function ()

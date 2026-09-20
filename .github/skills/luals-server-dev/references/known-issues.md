@@ -17,11 +17,17 @@
     「98s 完成，峰值 1745MB」。
   - **回归**：`test/parser/ast/cat.lua` 末尾的注释数断言（`---@source` + 连续 `--` 块 + 语句 ×20，
     断言 `#ast.comments == 200`）；修复前该形状会膨胀到 2 倍以上。
-- **批量扫描时 worker 编译个别生成型 meta 会抛 `Source is nil`（2026-09-20，未解决）**：
-  扫 `meta/default utf8` 全目录时，`UnityEngine.lua` 的 `makeCode` 请求在 worker 里失败
-  （`coder.lua` `M:compile(nil)` → `Source is nil`，master 侧表现为
-  `attempt to index a nil value (local 'result')`，该文件因此没被索引）；单独扫同一个文件不复现，
-  疑似与并发/累计状态有关。属 coder 健壮性问题，需要时再深挖。
+- **残缺下标注解会让整个文件编译失败（2026-09-20 已修）**：
+  - **触发**：生成型 meta 里的 C# 风格数组注解，如 `---@param results float[*,*]`（`UnityEngine.lua` 有 7 处）。
+    `parseCatIndex` 中 `index.index = parseCatExp(true)` 解析 `*` 失败（只记录 MISS_CAT_NAME），
+    于是产出一个 `index = nil` 的 `catindex` 节点；coder 的 `catindex` provider 会
+    `coder:compile(source.index)` → `Source is nil` → worker 请求整体报错
+    （master 侧 `attempt to index a nil value (local 'result')`）→ **该文件完全不被索引**（静默丢失）。
+  - **修法**：`script/parser/ast/cats/exp.lua` 的 `parseCatIndex` 先解析下标、成功后才创建
+    `CatIndex` 节点（失败则不产出残缺节点，错误照常记录），类型退化为下标前的部分（`float[*,*]` → `float`）。
+  - **回归**：`test/coder/type-annotation.lua`（`TEST_INDEX` 含该注解，断言 `X` 的类型是
+    `fun(results: float)`）与 `test/parser/ast/cat.lua`（断言不产出 `catindex` 节点）；修复前会抛 `Source is nil`。
+  - **实测**：`meta/default utf8` 整目录扫描不再出现 worker 编译失败（`UnityEngine.lua` 现已正常索引）。
 - **meta 模板语法缺口（2026-09-18 复查）**：`meta/template/{io,os,debug}.lua` 里的
   `---|>"r"`、`---|+"n"`（`|` 后的 `>` / `+` 项修饰符）会报 `miss-cat-name`，parser 未支持。
   `meta/template/basic.lua:292` 的 `(fun(t):((fun(t,k,v):any,any),any,any))|nil` 已支持

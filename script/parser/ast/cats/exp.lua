@@ -193,18 +193,24 @@ function Ast:parseCatIndex(head)
     if not pos1 then
         return nil
     end
+
+    self:skipSpace()
+    local inner = self:parseCatExp(true)
+    local pos2 = self:assertSymbol ']'
+    if not inner then
+        return nil
+    end
+
     local index = self:createNode('LuaParser.Node.CatIndex', {
         start = head.start,
         node = head,
+        index = inner,
         symbolPos1 = pos1,
+        symbolPos2 = pos2,
     })
 
     head.parent = index
 
-    self:skipSpace()
-    index.index = self:parseCatExp(true)
-
-    index.symbolPos2 = self:assertSymbol ']'
     index.finish = self:getLastPos()
 
     return index

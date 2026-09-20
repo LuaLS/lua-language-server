@@ -1,6 +1,17 @@
 local rt = test.scope.rt
 
 do
+    -- 残缺下标（如 C# 生成工具写出的 float[*,*]）不应让整个文件编译失败
+    local _ <close> = TEST_INDEX [[
+    ---@param results float[*,*]
+    local function f(results) end
+    X = f
+    ]]
+
+    lt.assertEquals(rt:globalGet('X'):view(), 'fun(results: float)')
+end
+
+do
     -- ---@type A, B 分别绑定 local 的第 1/2 个变量
     local _ <close> = TEST_INDEX [[
     ---@type integer, boolean

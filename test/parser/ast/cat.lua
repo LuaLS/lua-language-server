@@ -910,6 +910,15 @@ TEST [[
 }
 
 do
+    -- 下标解析失败时不产出残缺的 catindex 节点（否则 coder 会 compile(nil)，
+    -- 整个文件编译失败、worker 请求整体报错）
+    local ast = New 'LuaParser.Ast' ('---@type float[*,*]\nX = 1\n')
+    assert(ast:parseMain())
+    assert(#ast.errors > 0)
+    assert(#ast.nodesMap['catindex'] == 0)
+end
+
+do
     -- 同一位置的注释只应解析一次：跨行回头重复跳过会让 `delayComments` 反复入队，
     -- 注释节点数随语句数超线性膨胀（真实文件里曾放大到 545519 条）
     local parts = {}

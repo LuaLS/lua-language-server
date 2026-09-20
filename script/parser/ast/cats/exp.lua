@@ -187,7 +187,7 @@ end
 
 ---@private
 ---@param head LuaParser.Node.CatExp
----@return LuaParser.Node.CatIndex?
+---@return LuaParser.Node.CatIndex | LuaParser.Node.CatArray?
 function Ast:parseCatIndex(head)
     local pos1 = self.lexer:consume '['
     if not pos1 then
@@ -198,7 +198,19 @@ function Ast:parseCatIndex(head)
     local inner = self:parseCatExp(true)
     local pos2 = self:assertSymbol ']'
     if not inner then
-        return nil
+        -- 下标不是类型（如 C# 数组的 `float[*,*]`）：按数组 `{[integer]: float}` 处理
+        local array = self:createNode('LuaParser.Node.CatArray', {
+            start = head.start,
+            node = head,
+            symbolPos1 = pos1,
+            symbolPos2 = pos2,
+        })
+
+        head.parent = array
+
+        array.finish = self:getLastPos()
+
+        return array
     end
 
     local index = self:createNode('LuaParser.Node.CatIndex', {

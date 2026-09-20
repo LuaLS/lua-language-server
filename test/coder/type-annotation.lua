@@ -1,14 +1,14 @@
 local rt = test.scope.rt
 
 do
-    -- 残缺下标（如 C# 生成工具写出的 float[*,*]）不应让整个文件编译失败
+    -- 下标不是类型（如 C# 生成工具写出的 float[*,*]）时按数组处理；缺类型一律视为 any
     local _ <close> = TEST_INDEX [[
     ---@param results float[*,*]
     local function f(results) end
     X = f
     ]]
 
-    lt.assertEquals(rt:globalGet('X'):view(), 'fun(results: float)')
+    lt.assertEquals(rt:globalGet('X'):view(), 'fun(results: float[])')
 end
 
 do

@@ -910,12 +910,13 @@ TEST [[
 }
 
 do
-    -- 下标解析失败时不产出残缺的 catindex 节点（否则 coder 会 compile(nil)，
-    -- 整个文件编译失败、worker 请求整体报错）
+    -- 下标不是类型（如 C# 数组的 float[*,*]）时按数组 {[integer]: float} 处理，
+    -- 不再产出残缺的 catindex 节点（否则 coder 会 compile(nil)，整个文件编译失败）
     local ast = New 'LuaParser.Ast' ('---@type float[*,*]\nX = 1\n')
     assert(ast:parseMain())
     assert(#ast.errors > 0)
     assert(#ast.nodesMap['catindex'] == 0)
+    assert(#ast.nodesMap['catarray'] == 1)
 end
 
 do

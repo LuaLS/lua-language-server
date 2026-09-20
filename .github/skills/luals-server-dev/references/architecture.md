@@ -29,6 +29,14 @@
 - flow-sensitive reasoning 优先走 `script/node/tracer.lua`。
 - LSP 协议路由属于 `script/language-server/`，具体功能行为属于 `script/feature/`。
 
+## 类型语义约定
+- **数组默认无 nil 元素**：`T[]` 等价于 `{ [integer]: T }`——用整数下标取值得到 `T`（不是 `T | nil`），
+  只有显式写成 `T?[]`（元素类型是 `T?`）才需要 nil 检查。`Node.Array:get` 返回 `head` 即是此约定，
+  不要在数组下标路径上补 nil。
+- **下标不是合法类型时按数组处理**：`T[...]` 里 `...` 解析不出类型（如 C# 生成工具写出的 `float[*,*]`）时，
+  `parseCatIndex` 产出 `CatArray`（即 `{[integer]: T}`），错误照常上报，但**不得**产出 `index = nil`
+  的 `CatIndex`（coder 会 `compile(nil)`，导致整个文件编译失败、静默不进索引）。
+
 ## 核心入口文件
 - `main.lua`
 - `script/luals.lua`

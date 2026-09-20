@@ -60,6 +60,9 @@ Lua 堆上限由 `ls.args.MEM_LIMIT`（默认 10GB）控制，护栏实现是 `s
   或对前缀做二分找最小复现。
 - 判定「是否爆炸」不要用中文标记匹配（PowerShell 5.1 读无 BOM 的 `.ps1` 会把中文字面量读成乱码，
   导致恒真）；用 ASCII 标记（如看门狗输出的 `killed=True`）。
+- 判断膨胀发生在哪个阶段：`log/test.log` 里的 `Index ... took` / `Run coder ... took` 区分
+  coder 编译与执行；`--test project.external` 只加载不跑诊断。**parser 侧的重复劳动看 `#ast.comments`**
+  （注释节点数应与注释行数同阶；`skipComment` 已按起始位置去重，见 `script/parser/ast/ast.lua`）。
 
 看门狗核心（PowerShell，`$Project` 为待扫目录）：
 

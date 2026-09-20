@@ -67,6 +67,10 @@ function M:__init(code, source, options)
     -- 按类型存放的节点
     ---@type table<string, LuaParser.Node.Base[]>
     self.nodesMap = util.multiTable(2)
+    -- 已解析过的注释（按起始位置），供重复遇到时直接跳过
+    ---@private
+    ---@type table<integer, LuaParser.Node.Comment>
+    self.parsedComments = {}
     -- 存放所有的block
     ---@type LuaParser.Node.Block[]
     self.blockList = {}
@@ -149,8 +153,20 @@ end
 ---@param inExp? boolean # 在表达式中
 ---@return boolean # 是否成功跳过注释
 function M:skipComment(inExp)
+    local token, _, pos = self.lexer:peek()
+    if token == '--' and pos then
+        local parsed = self.parsedComments[pos]
+        if parsed then
+            if parsed.subtype == 'short' then
+                self.lexer:moveTo(parsed.finish + 1)
+                return true
+            end
+            return self:parseComment(inExp) ~= nil
+        end
+    end
     local comment = self:parseComment(inExp)
     if comment then
+        self.parsedComments[comment.start] = comment
         self.comments[#self.comments+1] = comment
         table.insert(self.curBlock.delayComments, comment)
         return true

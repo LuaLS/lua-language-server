@@ -908,3 +908,29 @@ TEST [[
         },
     }
 }
+
+do
+    -- 同一位置的注释只应解析一次：跨行回头重复跳过会让 `delayComments` 反复入队，
+    -- 注释节点数随语句数超线性膨胀（真实文件里曾放大到 545519 条）
+    local parts = {}
+    local commentCount = 0
+    for i = 1, 20 do
+        parts[#parts+1] = '---@source file:///c:/x.cs:' .. i
+        parts[#parts+1] = '---@class C' .. i .. ': UnityEngine.MonoBehaviour'
+        parts[#parts+1] = '--'
+        parts[#parts+1] = '--some text'
+        parts[#parts+1] = '--'
+        parts[#parts+1] = '---@source file:///c:/x.cs:' .. i
+        parts[#parts+1] = '---@field f UnityEngine.Vector3'
+        parts[#parts+1] = '--'
+        parts[#parts+1] = '--more text'
+        parts[#parts+1] = '--'
+        parts[#parts+1] = 'CS.C' .. i .. ' = {}'
+        commentCount = commentCount + 10
+    end
+
+    local ast = New 'LuaParser.Ast' (table.concat(parts, '\n'))
+    assert(ast:parseMain())
+    assert(#ast.errors == 0)
+    lt.assertEquals(#ast.comments, commentCount)
+end

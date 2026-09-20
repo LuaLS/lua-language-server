@@ -11,13 +11,14 @@ local client = require 'client'
 
 ---@class codeLens.resolving
 ---@field mode    'reference'
----@field source? parser.object
+---@field source parser.object
 
 ---@class codeLens.result
 ---@field position integer
 ---@field id       integer
 
 ---@class codeLens
+---@field state parser.state
 local mt = {}
 mt.__index = mt
 mt.type = 'codeLens'
@@ -26,10 +27,11 @@ mt.id = 0
 ---@param uri uri
 ---@return boolean
 function mt:init(uri)
-    self.state     = files.getState(uri)
-    if not self.state then
+    local state = files.getState(uri)
+    if not state then
         return false
     end
+    self.state     = state
     ---@type uri
     self.uri       = uri
     ---@type codeLens.result[]

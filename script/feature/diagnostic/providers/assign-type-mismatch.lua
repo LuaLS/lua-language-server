@@ -1,3 +1,20 @@
+---@param actual Node
+---@return boolean
+local function hasAnyMember(actual)
+    if actual.kind == 'type' then
+        return actual.typeName == 'any'
+    end
+    if actual.kind == 'union' then
+        ---@cast actual Node.Union
+        for _, v in ipairs(actual.values) do
+            if v.kind == 'type' and v.typeName == 'any' then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 ---@param vfile VM.Vfile
 ---@param var LuaParser.Node.Base
 ---@param callback fun(diag: Feature.Diagnostic)
@@ -26,6 +43,10 @@ local function checkAssign(vfile, var, callback)
             actual = actual.value
         end
         if actual.kind == 'type' and actual.typeName == 'nil' then
+            goto continue
+        end
+        -- 显式标注的类型上允许逆变：`X | any` 等价于 any，可赋给任何标注类型
+        if hasAnyMember(actual) or hasAnyMember(actual:simplify()) then
             goto continue
         end
         if not (actual >> expect) then

@@ -16,19 +16,24 @@ function TEST_DIAGNOSTIC(script)
     return function (codes)
         if codes ~= nil then
             local actual = {}
+            local details = {}
             for i, diag in ipairs(results) do
                 actual[i] = diag.code
+                details[i] = ('%s: %s'):format(diag.code, diag.message)
+            end
+            local function actualText()
+                return table.concat(details, '\n')
             end
             if #codes == 0 then
-                assert(#actual == 0, ('expected 0 diagnostics, actual %d\nactual codes:\n%s')
-                    :format(#actual, table.concat(actual, '\n')))
+                assert(#actual == 0, ('expected 0 diagnostics, actual %d\nactual:\n%s')
+                    :format(#actual, actualText()))
             else
                 for _, code in ipairs(codes) do
                     if code:sub(1, 1) == '-' then
                         local name = code:sub(2)
                         for _, a in ipairs(actual) do
-                            assert(a ~= name, ('unexpected diagnostic `%s`\nactual codes:\n%s')
-                                :format(name, table.concat(actual, '\n')))
+                            assert(a ~= name, ('unexpected diagnostic `%s`\nactual:\n%s')
+                                :format(name, actualText()))
                         end
                     else
                         local found = false
@@ -38,8 +43,8 @@ function TEST_DIAGNOSTIC(script)
                                 break
                             end
                         end
-                        assert(found, ('expected diagnostic `%s`, not found\nactual codes:\n%s')
-                            :format(code, table.concat(actual, '\n')))
+                        assert(found, ('expected diagnostic `%s`, not found\nactual:\n%s')
+                            :format(code, actualText()))
                     end
                 end
             end

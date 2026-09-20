@@ -76,7 +76,20 @@ local lang = setmetatable({ id = 'en-us' }, {
 lang.script('CLI_CHECK_PROGRESS')
 ]] { '-undefined-field' }
 
--- __index 函数的返回值类型应被正确推断（防止退化为 unknown 的假绿）
+-- `__index` 推断出的具体值仍参与类型检查
+TEST_DIAGNOSTIC [[
+--!include setmetatable
+local t = setmetatable({ a = 1 }, {
+    __index = function(self, key)
+        return 42
+    end,
+})
+---@type string
+local s = t.a
+]] { 'assign-type-mismatch' }
+
+-- 联合体里含 `any` 时按逆变允许（`any` 吸收其余成员，可赋给任何类型）：
+-- 这条注解链会带出 `any | 42`，因此不再报 assign-type-mismatch
 TEST_DIAGNOSTIC [[
 --!include setmetatable
 local t = setmetatable({}, {
@@ -86,7 +99,7 @@ local t = setmetatable({}, {
 })
 ---@type string
 local s = t.anything
-]] { 'assign-type-mismatch' }
+]] { '-assign-type-mismatch' }
 
 -- 变量已有静态值（非表字面量赋值）时，后续字段赋值不应丢失
 TEST_DIAGNOSTIC [[

@@ -86,6 +86,12 @@
 - **scope 就绪（重要）**：`scope.ready` 在 reload 协程真正完成时才置 true，完成时 `ls.scope.onDidLoad:fire(scope)`。`File.refresh` 与 `scope.watchFiles` 的 `onDidChange` 索引都先 `ls.scope.waitReady(uri)`，避免配置加载前用默认 `Lua.runtime.version` 编译（否则 Lua 5.5 语法被 5.4 规则误报）。
 - `unused-local` 豁免：`_`、`_ENV`、`isGlobal`、`<close>`、local function 名（parent=function）、for 循环变量（parent=for）；以 `#loc.gets==0` 判未读。
 - 测试用 `<??>`/`<?x?>` catch mark 断言诊断区间。codes 数组语义：`'code'` 表示必须有该诊断（允许其他诊断）、`'-code'` 表示必须没有该诊断、`{}` 空数组表示必须 0 诊断。marks 只要求每个 mark 匹配某个诊断区间。
+- **assign-type-mismatch 的「显式标注允许逆变」（重要）**：该规则只在目标带标注（`variable:getExpectValue()`
+  非空）时生效，语义上允许显式标注当作 cast——源类型里含 `any` 成员时（如 `parser.object | any`，
+  来自 `---@field [integer] parser.object|any` 这类注解）**直接放行**，因为 `X | any` 等价于 `any`。
+  注意：**不要**把这个放宽做进 `Node.Union:onCanCast`（全局 `canCast`）——`canCast` 还被 tracer 收窄、
+  table 结构兼容等复用，实测会让目标工程诊断 398 → 415（新增 26 处，多为 `any | nil` 之类的新误报）。
+  放宽只放在 provider 内（`hasAnyMember(actual)` / `hasAnyMember(actual:simplify())`）。
 - push 暂不带 `version` 字段。
 - `define.getSeverity`/`getFileStatus` 仅语义规则路径会用到。
 - **文件级开关（重要）**：`ls.feature.diagnostic` 入口先按文件过滤——`scope:findRoot(uri).kind == 'library'`

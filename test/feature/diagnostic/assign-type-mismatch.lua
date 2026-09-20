@@ -79,6 +79,18 @@ local function f(...args)
 end
 ]] { 'assign-type-mismatch' }
 
+-- 联合体里含 `any` 时按逆变允许：`A | any` 等价于 any，可赋给任何类型
+TEST_DIAGNOSTIC [[
+---@class UnionAny
+---@field k integer
+
+---@type UnionAny | any
+local v
+
+---@type string
+local s = v
+]] { '-assign-type-mismatch' }
+
 -- 表字面量类型里的可选字段（`b?`）可以缺失
 TEST_DIAGNOSTIC [[
 ---@param v string

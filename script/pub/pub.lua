@@ -11,8 +11,8 @@ local type    = type
 local counter = utility.counter()
 
 local braveTemplate = [[
-package.path  = {path:q}
-package.cpath = {cpath:q}
+package.path  = {path%q}
+package.cpath = {cpath%q}
 DEVELOP = {DEVELOP}
 DBGPORT = {DBGPORT}
 DBGWAIT = {DBGWAIT}
@@ -21,9 +21,9 @@ collectgarbage 'generational'
 
 log = require 'brave.log'
 
-xpcall(dofile, log.error, {debugger:q})
+xpcall(dofile, log.error, {debugger%q})
 local brave = require 'brave'
-brave.register({id}, {taskChName:q}, {replyChName:q})
+brave.register({id}, {taskChName%q}, {replyChName%q})
 ]]
 
 ---@class pub

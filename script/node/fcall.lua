@@ -92,7 +92,14 @@ end
 ---@return Node
 ---@return boolean exists
 function M:select(key)
-    local v, exists = self.returns:select(key)
+    local returns = self.returns
+    local v, exists
+    if #self.matchedFuncs == 0 then
+        -- 未知函数（如 any / 表上的未知字段）：返回值个数未知，任意位置都取 returns
+        v, exists = returns, true
+    else
+        v, exists = returns:select(key)
+    end
     -- 可选链调用（?(）：所有位置的值都可能为 nil
     if self:isOptional() then
         v = v | self.scope.rt.NIL

@@ -36,6 +36,10 @@
 - **下标不是合法类型时按数组处理**：`T[...]` 里 `...` 解析不出类型（如 C# 生成工具写出的 `float[*,*]`）时，
   `parseCatIndex` 产出 `CatArray`（即 `{[integer]: T}`），错误照常上报，但**不得**产出 `index = nil`
   的 `CatIndex`（coder 会 `compile(nil)`，导致整个文件编译失败、静默不进索引）。
+- **未知调用的多返回值每个位置都是 `any`**：`local a, b, c = f()` 里 `f` 是 `any`（或 `---@return table`
+  模块上的未知字段）时，`matchedFuncs` 为空，`Node.FCall:select` 必须在任意位置都返回 `returns`（`any`），
+  不能走 `Node:select` 基类（那里非 list 值只有位置 1 存在，其余给 `never`）。
+  回归：`test/coder/multi-return.lua`。
 
 ## 核心入口文件
 - `main.lua`

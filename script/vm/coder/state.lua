@@ -210,10 +210,14 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
             coder:compile(value)
         end
     end
+    local hasValue = source.values ~= nil and #source.values > 0
     for i, var in ipairs(source.vars) do
         coder:compile(var)
         if valueKeys[i] then
             coder:compileAssign(var, i, valueKeys[i], isTable[i])
+        elseif hasValue then
+            -- 右值不够时，多余的变量是 nil（Lua 语义：`local a, b = 1` 里 b 为 nil）
+            coder:compileAssign(var, i, 'rt.NIL', false)
         else
             coder:compileAssign(var, i)
         end

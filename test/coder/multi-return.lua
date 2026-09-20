@@ -1,6 +1,32 @@
 local rt = test.scope.rt
 
 do
+    -- 单值右值在多余位置上是 nil（不是 never）：`local a, b = 1`
+    local _ <close> = TEST_INDEX [[
+    local a, b = 1
+    X = a
+    Y = b
+    ]]
+
+    lt.assertEquals(rt:globalGet('X'):view(), '1')
+    lt.assertEquals(rt:globalGet('Y'):view(), 'nil')
+end
+
+do
+    -- 多个右值时按位置对应；右值少于变量数时多余的是 nil
+    local _ <close> = TEST_INDEX [[
+    local a, b, c = 1, 'x'
+    X = a
+    Y = b
+    Z = c
+    ]]
+
+    lt.assertEquals(rt:globalGet('X'):view(), '1')
+    lt.assertEquals(rt:globalGet('Y'):view(), "'x'")
+    lt.assertEquals(rt:globalGet('Z'):view(), 'nil')
+end
+
+do
     -- 未知函数（any）：返回值个数未知，任意位置都应是 any（不能出现 never）
     local _ <close> = TEST_INDEX [[
     ---@type any

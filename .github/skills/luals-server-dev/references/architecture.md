@@ -40,6 +40,10 @@
   模块上的未知字段）时，`matchedFuncs` 为空，`Node.FCall:select` 必须在任意位置都返回 `returns`（`any`），
   不能走 `Node:select` 基类（那里非 list 值只有位置 1 存在，其余给 `never`）。
   回归：`test/coder/multi-return.lua`。
+- **右值不够时，多余的变量是 `nil`**：`local a, b = 1` 里 `b` 为 `nil`（coder 侧给 `rt.NIL` 赋值，
+  见 `script/vm/coder/state.lua` 的 `localdef`）。注意 `local x`（完全没有初始值）仍走旧路径（不赋任何值），
+  读它会把后续赋值并入（`local x; X0 = x; x = 10; x = 5` → `5 | 10`），这是另一处待修语义。
+  回归：`test/coder/multi-return.lua`。
 
 ## 核心入口文件
 - `main.lua`

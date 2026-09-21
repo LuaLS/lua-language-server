@@ -44,6 +44,13 @@
   见 `script/vm/coder/state.lua` 的 `localdef`）。注意 `local x`（完全没有初始值）仍走旧路径（不赋任何值），
   读它会把后续赋值并入（`local x; X0 = x; x = 10; x = 5` → `5 | 10`），这是另一处待修语义。
   回归：`test/coder/multi-return.lua`。
+- **按返回值相等反推实参类型时，不得比实参自己的类型更宽**：`if get(uri, key) == 'x'` 这类比较会用
+  被调函数的形参类型反推实参（`traceCallEqual` + `Node.Narrow:asCall`）。反推值只是「形参要求什么」，
+  不能成为实参的读值：形参注解可选（`uri?`）时会把实参染成 `uri | nil`，实参已确定不是 nil 时同理
+  （`if not args then return end` 之后）。`traceCallEqual` 里因此有两道约束——反推结果必须能 cast 到实参
+  自己的类型（`getExpectValue`），且实参「确定不是 nil」时要按同名去掉反推结果里的 nil。
+  回归：`test/coder/narrow-branch.lua`。注意 `Node.FCall` 的 `link`/`traceCallTruthy` 走同一套语义，
+  改动需一起考虑（`type(x) == 'string'` 一族的收窄依赖这里的反推，`test/coder/flow.lua` 已钉住）。
 
 ## 核心入口文件
 - `main.lua`

@@ -1293,6 +1293,7 @@ function W:traceCallEqual(callExp, valueExp, revert)
         if not argValue then
             goto continue
         end
+        local argIsNotNil = isDefinitelyNotNil(argValue:simplify())
         local narrowed, otherSide = rt.narrow(argValue):asCall {
             func        = func,
             myType      = 'param',
@@ -1302,6 +1303,26 @@ function W:traceCallEqual(callExp, valueExp, revert)
             targetIndex = 1,
             targetValue = rvalue,
         }:narrowCall()
+        -- 反推结果只是「形参要求什么」，不得比实参自己的类型更宽：
+        -- 形参注解可选（`uri?`）时反推值会把实参读值染成 `uri | nil`，盖掉实参自己的类型
+        local ownType = self.map[argAlias]:getExpectValue()
+        if ownType and ownType ~= rt.ANY and ownType ~= rt.UNKNOWN then
+            if not narrowed:canCast(ownType) then
+                narrowed = ownType
+            end
+            if not otherSide:canCast(ownType) then
+                otherSide = ownType
+            end
+        end
+        -- 与 traceCallTruthy 同理：实参已确定不是 nil 时，反推结果里的 nil 只是形参注解带来的
+        if argIsNotNil then
+            if isNilValue(narrowed) then
+                narrowed = removeMemberByName(rt, narrowed, rt.NIL) or argValue
+            end
+            if isNilValue(otherSide) then
+                otherSide = removeMemberByName(rt, otherSide, rt.NIL) or argValue
+            end
+        end
         if revert then
             self:setNarrowResult(id, otherSide, narrowed)
         else

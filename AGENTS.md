@@ -27,7 +27,9 @@ It is intended for both human collaborators and coding agents.
 ## 1) Run and Test Rules
 
 - 环境前提（**新机器**）：`bin/` 被 `.gitignore` 忽略、不随仓库走，需要先
-  `git submodule update --init --recursive` 再跑 `make.bat`（= `3rd\luamake\luamake.exe rebuild`）拿到宿主二进制。
+  `git submodule update --init --recursive`，再按 `make.bat` 的步骤（`3rd\luamake\compile\install.bat`
+  → `3rd\luamake\luamake.exe rebuild`）拿到宿主二进制。注意本分支的虚拟机是**改过的**
+  （可选链、协程钩子等），要用本仓库构建出的 `bin`，不要拿上游发布版顶替。
   `script/` 与 `test/` 都是**脚本**，改完立即生效、不需要重编译；`bin` 只在改 C/VM 层时才需要重建。
 - Run tests from the `server` root with:
   - `bin\\lua-language-server.exe --test <suite-or-file>`

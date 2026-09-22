@@ -521,6 +521,14 @@ function W:traceCast(cast)
         end
     end
     self:setValue(id, value)
+    -- 读取点自身的读值也要更新：`f(x--[[@as T]])` 的实参就是这条 cast 所在的表达式，
+    -- 否则消费方（诊断 provider）读到的是 cast 之前的值
+    local alias = cast[6]
+    local node = alias and self.map[alias]
+    if node and node.kind == 'variable' then
+        ---@cast node Node.Variable
+        node:setCurrentValue(value)
+    end
 end
 
 ---@param data ['value', string]

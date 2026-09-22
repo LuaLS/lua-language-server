@@ -277,7 +277,8 @@ function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
 ---@overload fun<T: number>(e: T):T
----@overload fun(e: string, base?: integer):number?
+---@overload fun(e: string):number?
+---@overload fun(e: string, base: integer):integer?
 ---@nodiscard
 function tonumber(e) end
 

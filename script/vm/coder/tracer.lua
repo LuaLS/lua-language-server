@@ -175,8 +175,9 @@ function T:appendRef(source)
     self.visibleVars[id] = true
 end
 
---- 记录 `---@cast` 收窄：{'cast', varId, op, typeKey, isOptional}
+--- 记录 `---@cast` 收窄：{'cast', varId, op, typeKey, isOptional, alias}
 --- op 为 '+'（并入）/'-'（按同名去掉）/nil（断言：按注解给的类型）；typeKey 为注解类型值的 key
+--- alias 是 cast 所在表达式的读取点（`f(x--[[@as T]])` 里就是这次读），walker 要一并更新它的读值
 ---@param varSource LuaParser.Node.Base
 ---@param op? '+' | '-'
 ---@param typeKey? string
@@ -186,7 +187,10 @@ function T:appendCast(varSource, op, typeKey, isOptional)
     if not id then
         return
     end
-    self:append('cast', id, op, typeKey, isOptional)
+    -- 只有真正被编译过的表达式才有读取点（`f(x--[[@as T]])` 的这次读有）；
+    -- `---@cast x T` 注解里的名字没有对应的运行时节点，不能记 alias
+    local alias = self.coder.compiled[varSource] and varSource.uniqueKey or nil
+    self:append('cast', id, op, typeKey, isOptional, alias)
 end
 
 --- 记录变量在当前位置的非 nil 收窄：{'nonnil', varId, alias}

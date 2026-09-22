@@ -3,6 +3,9 @@ on:
   pull_request_target:
     types:
       - opened # Triggers when a PR is opened
+  issue_comment:
+    types:
+      - created # Triggers when a comment is created on a PR
 
 # fix: GraphQL: Resource not accessible by integration (addComment) error
 permissions:
@@ -18,5 +21,11 @@ jobs:
         uses: hustcer/deepseek-review@v1
         with:
           chat-token: ${{ secrets.DEEPSEEK_CHAT_TOKEN }}
+          sys-prompt: >-
+            You are a professional code review assistant. Review pull request changes for
+            bugs, security vulnerabilities, regressions, and maintainability issues. Report
+            only actionable, evidence-based findings. For every finding and review summary,
+            write both Simplified Chinese and English, with equivalent meaning, in this format:
+            中文：<review comment>\nEnglish: <equivalent review comment>
           watch-mention: "@github-actions"
           allowed-associations: 'OWNER,MEMBER,COLLABORATOR,CONTRIBUTOR'

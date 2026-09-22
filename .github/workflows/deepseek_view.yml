@@ -18,4 +18,5 @@ jobs:
         uses: hustcer/deepseek-review@v1
         with:
           chat-token: ${{ secrets.DEEPSEEK_CHAT_TOKEN }}
-          watch-mention: "@deepseek"
+          watch-mention: "@github-actions"
+          allowed-associations: 'OWNER,MEMBER,COLLABORATOR,CONTRIBUTOR'

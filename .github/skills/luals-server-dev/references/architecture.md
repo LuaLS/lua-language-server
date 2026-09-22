@@ -66,6 +66,13 @@
   **末位元素与已有最后一项相同时不要重复追加**，否则单值无界 list 变成两个值，第 2 位起就成了 `T | nil`
   （目标工程 `script/core/command/exportDocument.lua:13` 的 `any | nil` 误报即此）。
   回归：`test/node/fcall.lua`、`test/node/vararg.lua`；细节与反面实验见 `facts/returns.md`。
+- **字段反推不得把基值算成 `never`**：`Node:narrowByField` 对类/实例基值按「字段类型能否 cast 到比较值」
+  二选一，字段声明比比较值宽时（`type: string` 对 `type == 'getlocal'`）会返回 `(NEVER, self)`，
+  基变量的读值随即变成 `never`（随后所有字段/实参检查都失去意义）。落地做法：
+  `M:narrowByField` 前置一条守卫——**传入的 `value` 已是 `never` 时不做任何收窄**（返回 `(self, NEVER)`）。
+  不加宽整体判据的原因：那会打破「全局变量的真值收窄」（`_ENV` 那一级被写成 `_G` 而非 `never`，
+  `test/feature/hover/manually.lua` 会挂）。
+  回归：`test/node/narrow.lua`；完整背景与被暴露出来的 6 处待分诊项见 `facts/narrowing.md` F3。
 - **内联 cast `--[[@as T]]` 是「当次读取的类型覆盖」，不是变量收窄**：`f(x--[[@as T]])` 里读值变 `T`，
   但后续读同一个变量仍是原值。链路：parser `Ast:parseInlineCast` 把类型写在 `exp.catAs` 上（必须在
   `parseTerm` 链循环的 `skipSpace` **之前**判断，`skipSpace` 会吃掉注释）→ coder `T:appendRef` 紧跟 ref 发一条

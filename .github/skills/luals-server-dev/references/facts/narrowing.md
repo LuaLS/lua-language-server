@@ -27,15 +27,21 @@
   字段声明类型比比较值宽时（`parser.object` 的 `type: string` 对 `type == 'getlocal'`）
   `myValue:canCast(value)` 为假 → 返回 `(NEVER, self)` → 基变量被写成 `never`
   （目标工程 `auto-require.lua:88` 的 `targetSource` 就是这样，随后 `vm.getDeprecated(targetSource.node)` 的实参报 `parser.object | nil`）。
-  把判据放宽成「两个方向任一能 cast 就算可能」（`myValue:canCast(value) or value:canCast(myValue)`）：
-  目标工程 377 → 371（移除 12 / **新增 6**）——移除包括 `auto-require.lua:88/115`、`vm/compiler.lua:174/181/945/956`、
-  `vm/node.lua:351`、`vm/visible.lua:170`；新增 6 处是**被 `never` 顺带压掉的老问题**暴露出来
-  （`vm/operator.lua:157/158/163` 的 `c.node`/`c.signs`——那里 `c` 推出来只有 `vm.global` 一个类，
-  字段比较靠 `never` 侥幸不报；`hover/description.lua:263/264` 的 `enum.default`，
-  以及 `plugins/ffi/c-parser/c99.lua`、`vm/compiler.lua:2320`、`vm/function.lua:444`、`vm/node.lua:272/307-309`、`vm/type.lua:886`）。
-  也试过在四处「字段收窄向上传播」的写入点加「不写 never」护栏：rm11+add17（把 union 变体的正常排除也挡掉了），更差
-- 状态：**未满足（open）** ← 修 F3 是收窄方向的下一入口
-  （下一步：`narrowByField` 判据放宽 + 逐个分诊那 6 处暴露项——是我们推得太窄还是目标工程注解该补）
+  探针实测：`PROP2 targetSource@83:23 key=type pvalue=parser.object narrowed=never`，
+  且此时传进来的 `value` 本身已经是 `never`（上一级就已经判成不可能）。
+- **落地形式（决策，2026-09-22）**：不改宽 `narrowByField` 的整体判据
+  （试过「两个方向任一能 cast 就算可能」：目标工程 377 → 371（移除 12 / 新增 6），
+  但会打破全局变量的真值收窄——`test/feature/hover/manually.lua:56`
+  `if GB then print(GB) end` 里 GB 从 `string` 变回 `string | nil`，因为 `_ENV` 那一级被写成 `_G` 而不是 `never`），
+  改为加一条**前置守卫**：传入的 `value` 已经是 `never` 时不做任何收窄，直接返回 `(self, NEVER)`
+  （`script/node/node.lua` 的 `M:narrowByField`）。
+  效果：目标工程 377 → **376**（移除 7 / 新增 6），全量 `--test` 绿；`test/node/narrow.lua` 钉住该语义。
+- **新增 6 处（待分诊，都是先前靠 `never` 侥幸压住的老问题被暴露）**：
+  `vm/operator.lua:157/158/163`（`c.node`/`c.signs`，那里 `c` 只推成 `vm.global` 一个类）、
+  `hover/description.lua:263/264`（`enum.default`），另有 `plugins/ffi/c-parser/c99.lua:66`、
+  `vm/compiler.lua:2320`、`vm/function.lua:444`、`vm/node.lua:272/307-309`、`vm/type.lua:886`。
+  下一步是逐条判断「我们推得太窄」还是「目标工程注解该补」。
+- 状态：**部分满足**（撤 `never` 污染这一支已落地；「收窄结果必须与变量自身类型相容」的完整约束仍未立）
 
 ## F4 `and` / `or` 的值位置（`x = a and b`）目前不做真值收窄
 - 断言：值位置只遍历操作数条目取 currentValue；右操作数拿不到左侧收窄（`x = s and #s` 里 `#s` 是 `op.len<string | nil>`）

@@ -390,12 +390,19 @@ local _narrowByFieldVisiting = {}
 ---@return Node narrowed
 ---@return Node otherSide
 function M:narrowByField(key, value)
+    local rt = self.scope.rt
+    -- 传入的收窄值已经是 never（上游某一级已经把它算成不可能）时不再收窄：
+    -- 继续按它判断会把基变量也写成 never，基变量的读值随后变成 never
+    -- （`x.type == 'y'` 一族的反推会把类/实例基值踩成这样）
+    if value == rt.NEVER then
+        return self, rt.NEVER
+    end
     if self.value == self or _narrowByFieldVisiting[self] then
         local myValue = self:get(key)
         if myValue:canCast(value) then
-            return self, self.scope.rt.NEVER
+            return self, rt.NEVER
         end
-        return self.scope.rt.NEVER, self
+        return rt.NEVER, self
     end
     _narrowByFieldVisiting[self] = true
     local n, o = self.value:narrowByField(key, value)

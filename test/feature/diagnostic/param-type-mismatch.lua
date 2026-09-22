@@ -474,3 +474,62 @@ local function f(state)
     end
 end
 ]] { '-param-type-mismatch' }
+
+-- 内联 `--[[@as T]]` cast：作者用它覆盖推断出来的类型（实参位置）
+TEST_DIAGNOSTIC [==[
+---@param s string
+---@return integer
+local function len(s) end
+
+---@param v number|string
+local function f(v)
+    X = len(v --[[@as string]])
+end
+]==] { '-param-type-mismatch' }
+
+-- 同上的对照组：不带 cast 时该报
+TEST_DIAGNOSTIC [==[
+---@param s string
+---@return integer
+local function len(s) end
+
+---@param v number|string
+local function f(v)
+    X = len(v)
+end
+]==] { 'param-type-mismatch' }
+
+-- 目标工程 tools/lua51.lua 的形状：`tonumber(v) or 0` 推出 number，用 cast 压回 integer
+TEST_DIAGNOSTIC [==[
+---@param e string
+---@param base? integer
+---@return number?
+local function tonumber(e, base) end
+
+---@param code boolean|integer|nil
+local function osExit(code) end
+
+---@param v string
+local function f(v)
+    local code = tonumber(v) or 0
+    osExit(code--[[@as integer]])
+end
+]==] { '-param-type-mismatch' }
+
+-- 同上的对照组：不带 cast 时该报（`0 | number` 不能赋给 `boolean|integer|nil`）
+TEST_DIAGNOSTIC [==[
+---@param e string
+---@param base? integer
+---@return number?
+local function tonumber(e, base) end
+
+---@param code boolean|integer|nil
+local function osExit(code) end
+
+---@param v string
+local function f(v)
+    local code = tonumber(v) or 0
+    osExit(code)
+end
+]==] { 'param-type-mismatch' }
+

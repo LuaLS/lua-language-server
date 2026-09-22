@@ -60,6 +60,13 @@
   已知残留：这类分支的 `otherSide` 反推在「两个变量比较」（`def == src`）和部分字段比较上会给出
   与变量自身声明不相容的值（`{ uri: uri }` / `never`），目标工程因此新增 5 处误报（`auto-require.lua:123`、
   `duplicate-set-field.lua:68/88/89`、`luadoc.lua:1973`），待做「收窄结果必须与变量自己的类型相容」的统一约束。
+- **内联 cast `--[[@as T]]` 是「当次读取的类型覆盖」，不是变量收窄**：`f(x--[[@as T]])` 里读值变 `T`，
+  但后续读同一个变量仍是原值。链路：parser `Ast:parseInlineCast` 把类型写在 `exp.catAs` 上（必须在
+  `parseTerm` 链循环的 `skipSpace` **之前**判断，`skipSpace` 会吃掉注释）→ coder `T:appendRef` 紧跟 ref 发一条
+  `{'cast', id, nil, typeKey, nil, alias}` → walker `W:traceCast` 带 alias 时只写回该读取点、**不写回收窄栈**。
+  `---@cast x T` 语句式则相反：没有 alias，按变量收窄在 flow 里生效。
+  细节与踩坑（`moveTo` 的偏移、测试要用 `[==[`、严格 `coder.map`）见 `facts/casts.md`。
+  回归：`test/coder/inline-cast.lua`、`test/parser/ast/exp.lua`、`test/feature/diagnostic/param-type-mismatch.lua`（末尾 4 例）。
 
 ## 核心入口文件
 - `main.lua`

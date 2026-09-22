@@ -163,6 +163,10 @@ function T:appendRef(source)
         return
     end
     self:append('ref', id, source.uniqueKey)
+    -- 内联 cast（`x--[[@as T]]`）：紧随这次读取发一条断言型 cast，读值按注解类型
+    if source.catAs then
+        self:append('cast', id, nil, self.coder:compileToPrelude(source.catAs), nil, source.uniqueKey)
+    end
     -- 只有在该变量曾经被赋值（visibleVars[id] 为 true）之后的读取点（ref shadow）
     -- 才设置 tracer，触发 Walker 来获得正确的收窄/赋值后的值。
     -- Walker 内部通过 getCurrentValue() 读赋值表达式，不会触发 ref shadow 的 tracer，避免递归。

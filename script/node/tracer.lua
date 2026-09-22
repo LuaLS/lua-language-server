@@ -520,15 +520,18 @@ function W:traceCast(cast)
             value = value | rt.NIL
         end
     end
-    self:setValue(id, value)
-    -- 读取点自身的读值也要更新：`f(x--[[@as T]])` 的实参就是这条 cast 所在的表达式，
-    -- 否则消费方（诊断 provider）读到的是 cast 之前的值
+    -- 内联 cast（`x--[[@as T]]`，带 alias）：只作用于这一次读取，不写回收窄栈
+    -- （后续读取仍是变量原本的值；语义上它是「表达式类型覆盖」而不是变量收窄）
     local alias = cast[6]
-    local node = alias and self.map[alias]
-    if node and node.kind == 'variable' then
-        ---@cast node Node.Variable
-        node:setCurrentValue(value)
+    if alias then
+        local node = self.map[alias]
+        if node and node.kind == 'variable' then
+            ---@cast node Node.Variable
+            node:setCurrentValue(value)
+        end
+        return
     end
+    self:setValue(id, value)
 end
 
 ---@param data ['value', string]

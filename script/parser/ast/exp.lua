@@ -95,6 +95,55 @@ function Ast:parseExp(required, asState, curLevel)
     return curExp
 end
 
+-- 内联 cast：紧跟表达式的 `--[[@as T]]`，类型落在该表达式上（`x.catAs`）
+-- 与 `---@cast`（语句式）不同，它只作用于这一次读取，供作者覆盖推断出来的类型
+---@private
+---@param exp LuaParser.Node.Exp
+---@return LuaParser.Node.CatExp?
+function Ast:parseInlineCast(exp)
+    if self.status ~= 'Lua' then
+        return nil
+    end
+    local token, _, pos = self.lexer:peek()
+    if token ~= '--' or not pos then
+        return nil
+    end
+    local _, typeStart, quo = self.code:find('^(%[=*%[)%s*@as%s+', pos + 3)
+    if not typeStart then
+        return nil
+    end
+    local finishQuo = quo:gsub('%[', ']')
+    local offset = self.code:find(finishQuo, typeStart + 1, true)
+    local commentFinish = offset and (offset + #finishQuo - 1) or #self.code
+
+    local oldStatus = self.status
+    self.status = 'Cats'
+    self.lexer:moveTo(typeStart)
+    local typeExp = self:parseCatExp()
+    self.status = oldStatus
+    -- `moveTo(x)` 之后下一次取词从 `x + 1` 开始，所以传注释最后一个字符的下标
+    self.lexer:moveTo(commentFinish)
+
+    -- 注释本身照常登记（与 skipComment 一致：去重表 / 注释列表 / 待处理注释）
+    local comment = self:createNode('LuaParser.Node.Comment', {
+        subtype = 'long',
+        start   = pos,
+        finish  = commentFinish,
+    })
+    self.parsedComments[comment.start] = comment
+    self.comments[#self.comments+1] = comment
+    if self.curBlock then
+        table.insert(self.curBlock.delayComments, comment)
+    end
+
+    if not typeExp then
+        return nil
+    end
+    exp.catAs = typeExp
+    typeExp.parent = exp
+    return typeExp
+end
+
 -- 解析表达式列表，以逗号分隔
 ---@private
 ---@param atLeastOne? boolean
@@ -149,6 +198,8 @@ function Ast:parseTerm()
     local current = head
 
     while true do
+        -- 内联 cast（`f(x--[[@as T]])`）要紧跟表达式，放在 skipSpace（会吃掉注释）之前判断
+        self:parseInlineCast(current)
         self:skipSpace(true)
 
         local chain = self:parseField(current)

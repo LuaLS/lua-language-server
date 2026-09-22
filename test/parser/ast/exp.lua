@@ -606,3 +606,43 @@ TEST 'a ^ - b'
         }
     }
 }
+
+-- 内联 cast：`--[[@as T]]` 紧跟表达式，类型挂在该表达式上
+TEST 'a --[[@as integer]]'
+{
+    id    = 'a',
+    catAs = {
+        kind = 'catid',
+        id   = 'integer',
+    },
+}
+
+TEST 't[1] --[[@as string]]'
+{
+    kind  = 'field',
+    catAs = {
+        kind = 'catid',
+        id   = 'string',
+    },
+}
+
+do
+    -- 普通长注释不挂 catAs，但照常登记为注释
+    local ast = New 'LuaParser.Ast' 'return a --[[note]]'
+    local node = ast:parseMain()
+    assert(node)
+    lt.assertEquals(#ast.errors, 0)
+    lt.assertEquals(#ast.comments, 1)
+    local ret = ast.nodesMap['return'][1]
+    lt.assertEquals(ret.exps[1].catAs, nil)
+end
+
+do
+    -- `--[[@as]]` 没有类型时不挂，也不影响后续解析
+    local ast = New 'LuaParser.Ast' 'return a --[[@as]] + b'
+    local node = ast:parseMain()
+    assert(node)
+    lt.assertEquals(#ast.errors, 0)
+    local ret = ast.nodesMap['return'][1]
+    lt.assertEquals(ret.exps[1].kind, 'binary')
+end

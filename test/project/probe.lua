@@ -25,8 +25,10 @@ do
     local hit = 0
     for _, uri in ipairs(result.uris) do
         local path = ls.uri.decode(uri)
+        -- 过滤串里的 `/` 与 Windows 的 `\` 视为等价，`--probe-file=cli/doc/init.lua` 才命中
+        local normalized = path:gsub('\\', '/')
         local matchFile = type(fileFilter) == 'string' and fileFilter ~= ''
-            and path:find(fileFilter, 1, true) ~= nil
+            and normalized:find(fileFilter:gsub('\\', '/'), 1, true) ~= nil
         local vfile = scope.vm:getFile(uri)
 
         if matchFile and vfile then

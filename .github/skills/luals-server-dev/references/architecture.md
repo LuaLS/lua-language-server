@@ -60,6 +60,12 @@
   已知残留：这类分支的 `otherSide` 反推在「两个变量比较」（`def == src`）和部分字段比较上会给出
   与变量自身声明不相容的值（`{ uri: uri }` / `never`），目标工程因此新增 5 处误报（`auto-require.lua:123`、
   `duplicate-set-field.lua:68/88/89`、`luadoc.lua:1973`），待做「收窄结果必须与变量自己的类型相容」的统一约束。
+- **无界返回（`return ...` / `table.unpack(x)`）的 List 语义**：`Node.List` 用「一个值 + `max = false`」
+  表示「任意位置都存在、读值不加 `| NIL`」，用「多个值 + `min`」表示「只有前 `min` 个保证有」
+  （`script/node/list.lua` 的 `select`/`makeViews`）。因此 `FCall.returns` 拼装调用返回值时，
+  **末位元素与已有最后一项相同时不要重复追加**，否则单值无界 list 变成两个值，第 2 位起就成了 `T | nil`
+  （目标工程 `script/core/command/exportDocument.lua:13` 的 `any | nil` 误报即此）。
+  回归：`test/node/fcall.lua`、`test/node/vararg.lua`；细节与反面实验见 `facts/returns.md`。
 - **内联 cast `--[[@as T]]` 是「当次读取的类型覆盖」，不是变量收窄**：`f(x--[[@as T]])` 里读值变 `T`，
   但后续读同一个变量仍是原值。链路：parser `Ast:parseInlineCast` 把类型写在 `exp.catAs` 上（必须在
   `parseTerm` 链循环的 `skipSpace` **之前**判断，`skipSpace` 会吃掉注释）→ coder `T:appendRef` 紧跟 ref 发一条

@@ -222,7 +222,12 @@ M.__getter.returns = function (self)
     if allMax == false then
         for _, f in ipairs(matchedFuncs) do
             local tail = f:getReturn(allMin + 1)
-            if tail then
+            local last = returns[allMin]
+            -- 末位元素与已有的最后一项相同时不要重复追加：`Node.List:select` 靠
+            -- `#values == 1` 判定「无界单值 list：任意位置都存在、不加 | NIL」，
+            -- 追加成两个值会让第 2 位起变成 `T | nil`
+            if  tail
+            and (not last or tail:simplify() ~= last:simplify()) then
                 returns[allMin + 1] = returns[allMin + 1] | tail
             end
         end

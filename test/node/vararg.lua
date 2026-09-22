@@ -157,3 +157,19 @@ do
 
     lt.assertEquals(V:viewAsList(), '1, integer?...')
 end
+
+do
+    -- 无界单值 list：任意位置都存在，且不带 | NIL（Node.List:select 的 vararg 规则）
+    local V = node.list({ node.INTEGER }, 0, false)
+    lt.assertEquals(V:select(1):view(), 'integer')
+    lt.assertEquals(V:select(2):view(), 'integer')
+    lt.assertEquals(V:select(100):view(), 'integer')
+end
+
+do
+    -- 无界多值 list：只有 min 内的位置是保证有的，更后面的位置可能缺省，带 | NIL
+    local V = node.list({ node.value(1), node.value(2) }, 1, false)
+    lt.assertEquals(V:select(1):view(), '1')
+    lt.assertEquals(V:select(2):view(), '2 | nil')
+    lt.assertEquals(V:select(3):view(), '2 | nil')
+end

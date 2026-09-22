@@ -181,6 +181,25 @@ do
     lt.assertEquals(fcall:select(1):view(), 'unknown')
 end
 
+do
+    rt:reset()
+    --[[
+    local function f(...)
+        return ...
+    end
+
+    local a, b = f()
+    --> unknown, unknown（无界返回：任意位置都取到值，且不带 nil）
+    ]]
+    local f = rt.func()
+        : addReturnList(rt.list({ rt.UNKNOWN }, 0, false))
+
+    local fcall = rt.fcall(f, {})
+    lt.assertEquals(fcall:select(1):view(), 'unknown')
+    lt.assertEquals(fcall:select(2):view(), 'unknown')
+    lt.assertEquals(fcall.returns:select(2):view(), 'unknown')
+end
+
 do -- 方案1
     rt:reset()
     --[[

@@ -15,18 +15,35 @@ It is intended for both human collaborators and coding agents.
    （`architecture.md`、`module-map.md`、`workflow-and-style.md`），再动手。
    各子系统的具体实现约束以 references 为准（例如 completion 应复用 VM/Node 语义、不要文本扫描）。
    不要凭通用 Lua 经验直接改代码。
-2. **不要用上游 master 做对照**（不要跑 master 的二进制 `--check`，也不要拿 master 的输出当"应该报/不该报"的判据）：
+2. **改收窄 / 诊断前先读事实台账**：`.github/skills/luals-server-dev/references/facts/<能力>.md`
+   （如 `narrowing.md`）。每条 = 断言 / 证据 / 代码 / 状态；`状态: 未满足(open)` 是下一轮入口，
+   `试过:` 是被否决的方案与实测数字，**不要重走**。改完把结论上提成一条 fact（`--test tools.facts` 校验引用）。
+   台账只记实测事实与反例，不记需求。
+3. **不要用上游 master 做对照**（不要跑 master 的二进制 `--check`，也不要拿 master 的输出当"应该报/不该报"的判据）：
    判断只基于本仓库自己的语义、现有测试与目标工程代码本身。实现必须基于本仓库自己的
    node / runtime / coder 机制，不要照搬 master 的 special / vm.compiler 等旧架构概念。
-3. 若无法确定某能力应落在哪个子系统，先读 skill 的 references，不要自行猜测。
+4. 若无法确定某能力应落在哪个子系统，先读 skill 的 references，不要自行猜测。
 
 ## 1) Run and Test Rules
 
+- 环境前提（**新机器**）：`bin/` 被 `.gitignore` 忽略、不随仓库走，需要先
+  `git submodule update --init --recursive` 再跑 `make.bat`（= `3rd\luamake\luamake.exe rebuild`）拿到宿主二进制。
+  `script/` 与 `test/` 都是**脚本**，改完立即生效、不需要重编译；`bin` 只在改 C/VM 层时才需要重建。
 - Run tests from the `server` root with:
   - `bin\\lua-language-server.exe --test <suite-or-file>`
 - 批量项目扫描（`--test project.external[-diagnostic] --test-project=<path>`）必须带 `--mem-limit=2`
   （默认 10GB 太高），且**不要并发跑多个扫描进程**（会耗光机器内存）；细节见
   `.github/skills/luals-server-dev/references/workflow-and-style.md` 的「批量扫描与内存护栏」。
+  - `<path>` 是**目标工程的实际路径**（示例 `D:\github\vscode-lua\server`，换机器可能不同），
+    不要假设它固定；台账里的测试路径都是仓库内相对路径，基线文件的 key 也相对目标工程，跨机器可比。
+- 诊断基线与探针（跨会话、跨机器通用，都在仓库内，随 git 走）：
+  - 存基线 `… --save=tmp\scan-a.txt`，改完 `… --baseline=tmp\scan-a.txt` → 直接打印
+    `基线 N 条 → 当前 M 条：移除 x / 新增 y` 与逐条 `- ` / `+ `；**改前必存、改后必比**。
+  - 探针 `--test project.probe --test-project=<path> --mem-limit=2 --probe-file=<文件名片段> [--probe-filter=<key 片段>]`
+    看某个变量读出来的类型；`--probe-flow=<片段>` 看对应函数的收窄 flow（探针同样会加载整个工程，别漏 `--mem-limit`）。
+  - 台账引用校验 `--test tools.facts`（已随 `--test` 全量跑）。
+- 新增/修改能力时，`.github/skills/luals-server-dev/references/facts/` 下的台账是**唯一的"当前事实"入口**：
+  结论写进台账，过程与时间线写 `项目实践.md`（只留摘要）。
 - Do not run tasks `PreCompile` or `Compile` for feature work in this repo context.
 - Keep changes focused. Avoid unrelated refactors and broad formatting-only edits.
 - Put temporary debug outputs in `tmp/` only.

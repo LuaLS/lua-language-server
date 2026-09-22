@@ -1,5 +1,8 @@
 # 已知问题 / 待办
 
+> 本文件只放**未收敛的排查过程**；已经定性的「事实」（断言 + 证据 + 状态）统一登记在
+> `references/facts/<能力>.md`（`状态: 未满足(open)` 就是待办入口，由 `--test tools.facts` 校验引用）。
+
 - **加载期内存爆炸已根治（2026-09-20）**：元凶不是 node/tracer，而是 **parser 里同一位置的注释被反复解析**。
   - **触发文件**：`d:\github\vscode-lua\server\meta\default utf8\CS.lua`（659KB / 14408 行，
     Unity+NGUI 生成的 C# 绑定 meta；`---@source <url>` 未知注解与连续 `--` 注释块、类/字段注解、

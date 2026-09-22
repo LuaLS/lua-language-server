@@ -22,7 +22,20 @@
   （`def == src` 两变量比较把 `def` 反推成 `{ uri: uri }`；字段比较 `a.t ~= 'x'` 反推成 `never`）
 - 试过：按 canCast 过滤 exit 分支的 otherSide 三方向 —— value→outer：rm28+add25；
   outer→value：rm18+add233；只滤字面量表：rm28+add25。都会连带丢掉大量正常收窄，均不可行
+- 试过（2026-09-22 第二轮，定位到具体那一处）：`Node:narrowByField`（`script/node/node.lua`）
+  对**类/实例**基值走的是 `myValue = self:get(key)` + `if myValue:canCast(value)` 二选一：
+  字段声明类型比比较值宽时（`parser.object` 的 `type: string` 对 `type == 'getlocal'`）
+  `myValue:canCast(value)` 为假 → 返回 `(NEVER, self)` → 基变量被写成 `never`
+  （目标工程 `auto-require.lua:88` 的 `targetSource` 就是这样，随后 `vm.getDeprecated(targetSource.node)` 的实参报 `parser.object | nil`）。
+  把判据放宽成「两个方向任一能 cast 就算可能」（`myValue:canCast(value) or value:canCast(myValue)`）：
+  目标工程 377 → 371（移除 12 / **新增 6**）——移除包括 `auto-require.lua:88/115`、`vm/compiler.lua:174/181/945/956`、
+  `vm/node.lua:351`、`vm/visible.lua:170`；新增 6 处是**被 `never` 顺带压掉的老问题**暴露出来
+  （`vm/operator.lua:157/158/163` 的 `c.node`/`c.signs`——那里 `c` 推出来只有 `vm.global` 一个类，
+  字段比较靠 `never` 侥幸不报；`hover/description.lua:263/264` 的 `enum.default`，
+  以及 `plugins/ffi/c-parser/c99.lua`、`vm/compiler.lua:2320`、`vm/function.lua:444`、`vm/node.lua:272/307-309`、`vm/type.lua:886`）。
+  也试过在四处「字段收窄向上传播」的写入点加「不写 never」护栏：rm11+add17（把 union 变体的正常排除也挡掉了），更差
 - 状态：**未满足（open）** ← 修 F3 是收窄方向的下一入口
+  （下一步：`narrowByField` 判据放宽 + 逐个分诊那 6 处暴露项——是我们推得太窄还是目标工程注解该补）
 
 ## F4 `and` / `or` 的值位置（`x = a and b`）目前不做真值收窄
 - 断言：值位置只遍历操作数条目取 currentValue；右操作数拿不到左侧收窄（`x = s and #s` 里 `#s` 是 `op.len<string | nil>`）

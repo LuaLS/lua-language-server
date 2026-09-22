@@ -128,6 +128,7 @@ do
     })
 
     local c3 = os.clock()
+    local diagKeys = {}
     for _, uri in ipairs(result.uris) do
         local isProjectFile = uri:sub(1, #rootUri) == rootUri
         local doc = isProjectFile and scope:getDocument(uri) or nil
@@ -152,18 +153,24 @@ do
                     end
                     if #list < SAMPLE_LIMIT then
                         local row, col = doc.positionConverter:offsetToPosition(diag.start)
-                        list[#list+1] = '{}:{}:{} | {} | {}' % {
+                        local sample = '{}:{}:{} | {} | {}' % {
                             relPath(projectPath, uri),
                             row + 1,
                             col + 1,
                             getSourceLine(text, diag.start),
                             diag.message,
                         }
+                        list[#list+1] = sample
+                        diagKeys[#diagKeys+1] = ('{}:{}:{}|{}' % {
+                            relPath(projectPath, uri), row + 1, col + 1, diag.code,
+                        })
+                            .. '\t' .. sample:gsub('[\r\n]+', ' ⏎ ')
                     end
                 end
             end
         end
     end
+    table.sort(diagKeys)
     local c4 = os.clock()
 
     print('语义诊断总数：{}，涉及文件：{}，耗时：{%.2f} 秒' % { diagN, diagFileN, c4 - c3 })
@@ -187,6 +194,61 @@ do
         print('{%-24s} {%6d} 处 / {} 文件' % { code, diagTotal[code], fileN })
         for _, sample in ipairs(diagSample[code]) do
             print('    ' .. sample)
+        end
+    end
+
+    -- 基线对比：--save=<file> 存一份，之后 --baseline=<file> 看移除/新增
+    local function nameToUri(name)
+        local path = tostring(name)
+        if path:find(':', 1, true) then
+            return ls.uri.encode(path)
+        end
+        return ls.env.ROOT_URI / path
+    end
+    local save = ls.args.SAVE
+    if type(save) == 'string' and save ~= '' then
+        ls.afs.write(nameToUri(save), table.concat(diagKeys, '\n'))
+        print('已写入基线：' .. save)
+    end
+    local baseline = ls.args.BASELINE
+    if type(baseline) == 'string' and baseline ~= '' then
+        local text = ls.afs.read(nameToUri(baseline))
+        if not text then
+            print('基线不存在：' .. baseline)
+            return
+        end
+        local old, oldN = {}, 0
+        for line in text:gmatch('[^\r\n]+') do
+            local key, sample = line:match('^([^\t]+)\t(.*)$')
+            if key then
+                old[key] = sample
+                oldN = oldN + 1
+            end
+        end
+        local current = {}
+        for _, line in ipairs(diagKeys) do
+            local key, sample = line:match('^([^\t]+)\t(.*)$')
+            current[key] = sample
+        end
+        local removed, added = {}, {}
+        for key, sample in pairs(old) do
+            if not current[key] then
+                removed[#removed+1] = sample
+            end
+        end
+        for key, sample in pairs(current) do
+            if not old[key] then
+                added[#added+1] = sample
+            end
+        end
+        table.sort(removed)
+        table.sort(added)
+        print('基线 {} 条 → 当前 {} 条：移除 {} / 新增 {}' % { oldN, diagN, #removed, #added })
+        for _, sample in ipairs(removed) do
+            print('  - ' .. sample)
+        end
+        for _, sample in ipairs(added) do
+            print('  + ' .. sample)
         end
     end
 end

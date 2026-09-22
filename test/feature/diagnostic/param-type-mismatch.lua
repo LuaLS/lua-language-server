@@ -432,3 +432,45 @@ local function f(childName, uri)
     return false
 end
 ]] { '-param-type-mismatch' }
+
+-- `goto` 守护：跳走的分支不落到 if 之后，守护后的实参不该还带 nil
+TEST_DIAGNOSTIC [[
+---@param u string
+---@return boolean
+local function isOpen(u) end
+
+---@param state string?
+---@return boolean
+local function f(state)
+    if not state then
+        goto CONTINUE
+    end
+    local ok = isOpen(state)
+    ::CONTINUE::
+    return ok
+end
+]] { '-param-type-mismatch' }
+
+-- `break` / 循环里的 `goto continue` 守护同理
+TEST_DIAGNOSTIC [[
+---@param u string
+---@return boolean
+local function isOpen(u) end
+
+---@param state string?
+local function f(state)
+    for _ = 1, 3 do
+        if not state then
+            break
+        end
+        isOpen(state)
+    end
+    for _ = 1, 3 do
+        if not state then
+            goto CONTINUE
+        end
+        isOpen(state)
+        ::CONTINUE::
+    end
+end
+]] { '-param-type-mismatch' }

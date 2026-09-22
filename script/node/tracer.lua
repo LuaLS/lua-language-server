@@ -541,8 +541,8 @@ function W:traceIf(ifNode)
     -- ifNode: {'if', ifchild1, ifchild2, ...}
     for i = 2, #ifNode do
         lastStack = self:traceIfChild(ifNode[i], lastStack)
-        -- 以 return 结尾的分支不可达后续流程，其流不参与合并；
-        -- 但其 otherSide（guard 收窄后的 else 流）需要参与合并
+        -- 以 return / goto / break / continue 结尾的分支不可达 if 之后的流程，其流不参与合并；
+        -- 但其 otherSide（guard 收窄后的另一侧）需要参与合并
         if lastStack.terminated then
             for id in pairs(lastStack.otherSide) do
                 stacks[#stacks+1] = { current = { [id] = lastStack.otherSide[id] } }
@@ -579,12 +579,14 @@ function W:traceIfChild(ifchild, lastStack)
         stack.current = lastStack.otherSide
     end
 
-    -- ifchild 是一个数组，第一个元素若为 return/condition 节点则处理条件
+    -- ifchild 是一个数组，第一个元素若为 return/exit/condition 节点则处理条件。
+    -- return/exit 都表示该分支不会顺序落到 if 之后（return 返回、goto 跳 label、
+    -- break/continue 跳出循环），合并时只取其 otherSide（守护后的另一侧收窄）
     local bodyStart = 1
     local first = ifchild[1]
     local terminated
-    if first == 'return'
-    or (type(first) == 'table' and first[1] == 'return') then
+    if first == 'return' or first == 'exit'
+    or (type(first) == 'table' and (first[1] == 'return' or first[1] == 'exit')) then
         terminated = true
         bodyStart = 2
         first = ifchild[2]

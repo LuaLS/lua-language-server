@@ -78,14 +78,16 @@ ls.vm.registerCoderProvider('if', function (coder, source)
     -- 生成树形 DSL: {'if', child1, child2, ...}
     -- 每个 child: {'condition', condExp} 后接 block entries（平铺在同一 table 里）
     -- 实际结构: {'if', {condExp?, ...block_entries}, {condExp?, ...block_entries}, ...}
-    -- 以 return 结尾的分支打上 'return' 标记，tracer 合并时跳过其流；
-    -- 若最后分支带条件且以 return 结尾（guard-return），补一个隐式空 else 分支
+    -- 以 return / goto / break / continue 结尾的分支打上标记，tracer 合并时跳过其流；
+    -- 若最后分支带条件且以这类语句结尾（guard），补一个隐式空 else 分支
     local tracer = coder:getTracer()
     tracer:openNode('if')
     for i, child in ipairs(source.childs) do
         coder:withIndentation(function ()
-            local terminated = child.returns and #child.returns > 0
-            tracer:openNode(terminated and 'return' or false)
+            local terminated = (child.returns and #child.returns > 0) and 'return'
+                or (child.exits and 'exit')
+                or false
+            tracer:openNode(terminated)
             if child.condition then
                 -- 条件表达式嵌入为第一个子节点
                 tracer:openNode('condition')

@@ -51,6 +51,15 @@
   自己的类型（`getExpectValue`），且实参「确定不是 nil」时要按同名去掉反推结果里的 nil。
   回归：`test/coder/narrow-branch.lua`。注意 `Node.FCall` 的 `link`/`traceCallTruthy` 走同一套语义，
   改动需一起考虑（`type(x) == 'string'` 一族的收窄依赖这里的反推，`test/coder/flow.lua` 已钉住）。
+- **跳转语句结尾的分支按「不落到 if 之后」处理**：`goto` / `break` / `continue` 结尾的 if 分支
+  不会顺序执行 if 之后的代码，守卫后的收窄必须保留（`if not x then goto CONTINUE end` 之后的 `x` 是 `T`）。
+  链路：parser 在块尾记 `block.exits`（`script/parser/ast/block.lua`）→ coder 给该分支打 `'exit'` 标记
+  （`script/vm/coder/block.lua`，与 `'return'` 同族）→ tracer 的 `traceIfChild` 认 `'exit'` 为
+  `terminated`，合并时只取该分支的 `otherSide`（`script/node/tracer.lua`）。
+  回归：`test/coder/goto-narrow.lua`、`test/feature/diagnostic/param-type-mismatch.lua`（末尾两个用例）。
+  已知残留：这类分支的 `otherSide` 反推在「两个变量比较」（`def == src`）和部分字段比较上会给出
+  与变量自身声明不相容的值（`{ uri: uri }` / `never`），目标工程因此新增 5 处误报（`auto-require.lua:123`、
+  `duplicate-set-field.lua:68/88/89`、`luadoc.lua:1973`），待做「收窄结果必须与变量自己的类型相容」的统一约束。
 
 ## 核心入口文件
 - `main.lua`

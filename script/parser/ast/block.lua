@@ -13,6 +13,7 @@
 ---@field genericMap table<string, LuaParser.Node.CatGeneric>
 ---@field delayComments LuaParser.Node.Comment[]
 ---@field returns? LuaParser.Node.Return[] # 块尾的 return 语句
+---@field exits? true # 块尾是 goto / break / continue（分支不会顺序落到后续流程）
 local Block = Class('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.kind = 'block'
@@ -190,8 +191,17 @@ function Ast:blockParseChilds(block)
     if lastState and lastState.kind == 'return' then
         ---@cast lastState LuaParser.Node.Return
         block.returns = { lastState }
+        block.exits = nil
+    elseif lastState and (lastState.kind == 'goto'
+        or lastState.kind == 'break'
+        or lastState.kind == 'continue') then
+        -- `goto` / `break` / `continue` 结尾的分支同样不会顺序落到 if 之后
+        -- （跳去 label / 跳出循环），收窄时要按「分支不参与后续合并」处理
+        block.returns = nil
+        block.exits = true
     else
         block.returns = nil
+        block.exits = nil
     end
     self:mergeStatesAndCats(block)
 end

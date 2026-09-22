@@ -16,3 +16,15 @@
 - 推荐命令模式（Windows PowerShell + cmd 重定向，规避管道无法捕获输出的问题）：
   - `cmd /c "cd /d <repo> && bin\lua-language-server.exe test.lua --name=<test> > temp\test_xx.log 2>&1 & echo EXIT=%ERRORLEVEL%"`
   - 完成后用 `read_file` / `grep_search` 查日志，或用 `Select-String` 找结束标记
+
+## Pull Request Review Language
+
+When performing pull request reviews, write every finding in both Chinese and English.
+
+Use this format for inline comments and review summaries:
+
+**中文**：<审查意见>
+
+**English**: <equivalent review comment>
+
+Keep both versions semantically equivalent. Report only actionable, evidence-based findings.

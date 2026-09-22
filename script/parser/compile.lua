@@ -273,7 +273,7 @@ local function addSpecial(name, obj)
 end
 
 ---@param offset integer
----@param leftOrRight '"left"'|'"right"'
+---@param leftOrRight 'left'|'right'
 local function getPosition(offset, leftOrRight)
     if not offset or offset > #Lua then
         return LineMulti * Line + #Lua - LineOffset + 1
@@ -664,7 +664,7 @@ local function expectAssign(isAction)
     return false
 end
 
----@param kind? '"prefix"'|'"suffix"'
+---@param kind? 'prefix'|'suffix'
 local function parseLocalAttrs(kind)
     local attrs
     while true do

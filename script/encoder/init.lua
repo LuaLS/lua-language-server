@@ -3,9 +3,9 @@ local utf16   = require 'encoder.utf16'
 local utf16le = utf16('le', utf8.codepoint '�')
 local utf16be = utf16('be', utf8.codepoint '�')
 
----@alias encoder.encoding '"utf8"'|'"utf16"'|'"utf16le"'|'"utf16be"'
+---@alias encoder.encoding 'utf8'|'utf16'|'utf16le'|'utf16be'
 
----@alias encoder.bom '"no"'|'"yes"'|'"auto"'
+---@alias encoder.bom 'no'|'yes'|'auto'
 
 local m = {}
 

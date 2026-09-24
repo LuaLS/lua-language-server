@@ -350,3 +350,16 @@
   （节点图在中间码执行期间仍在增长，所以「早期 walk 结果不完整」才是本因），
   并且重跑必须能防住「walk → flush → 代数推进 → 再 walk」的正反馈（例如只在
   「读到的值为空」时重跑、或对 walker 做版本化后按需重建）
+
+## F20 动态键标记（`unknownkey`）作为读值时字段读取恒 `any`
+- 断言：读值恰为 `unknownkey` 时，字段读取按 `any` 处理（不报「未定义字段」）。
+  典型来源：`for k in pairs(t)` 的键——表被动态键写过（`t[expr] = v`）时，键的类型就是 `unknownkey`
+- 证据：test/node/get.lua（`rt.UNKNOWNKEY:get('anyField')` = `any`；去掉修复立刻退回 `never`）；
+  目标工程 `service/service.lua:104`（`for cache in pairs(vm.cacheTracker) … cache.dead`）、
+  `test/parser_test/perform/init.lua:42`（`path:string()`）两条误报消失
+- 代码：`script/node/runtime.lua` 里给 `UNKNOWNKEY` 挂 `anykv`（「任意字段 → any」的类，
+  与 ANY / UNKNOWN / PROVISIONAL / TRUTHY 一致）。**不要**改在 `Type:get` 里加特判（重复机制）
+- 机制：`unknownkey` 与 `provisional` 的 `onCanCast` / `onCanBeCast` 配置本是一对，
+  但只有 `provisional` 挂了 `anykv` ⇒ 前者字段读取走空的继承表返回 `never`
+- 数字：目标工程 276 → **274**（移除 2 / 新增 0）
+- 状态：成立（2026-09-24）

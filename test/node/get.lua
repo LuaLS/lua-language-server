@@ -46,6 +46,12 @@ do
 end
 
 do
+    -- unknownkey 自己作为读值的基：字段不可知 ⇒ 恒为 any
+    -- （`for k in pairs(t)` 的键就是它；否则对这类表做遍历的代码会一片「未定义字段」）
+    lt.assertEquals(rt.UNKNOWNKEY:get('anyField'):view(), 'any')
+end
+
+do
     -- 动态键往返：以同一变量节点为键写入/读取
     local t = rt.table()
     local abc = rt.variable 'abc'

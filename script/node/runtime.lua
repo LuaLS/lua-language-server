@@ -467,7 +467,9 @@ function M:fillPresets()
     class.preset(self.UNKNOWN, 'falsy', self.FALSE)
 
     self.TRUTHY:addClass(anykv)
-
+    -- 动态键标记同样「字段不可知」：`for k in pairs(t)` 的键会是它，读它的字段按 any 处理，
+    -- 否则对这类表做遍历的代码会一片「未定义字段」（与 PROVISIONAL 之于 ANY 同理）
+    self.UNKNOWNKEY:addClass(anykv)
     class.preset(self.NIL, 'truthy', self.NEVER)
     class.preset(self.NIL, 'falsy', self.NIL)
 

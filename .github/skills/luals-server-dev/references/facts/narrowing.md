@@ -297,3 +297,23 @@
 - 同族线索（未修）：`parser/compile.lua:2263` 一族的 `assign-type-mismatch` 里出现
   `type: never`、`args: { [1]: never }`、`finish: … | truthy | …`；`vm/compiler.lua:346` 的
   `return { … type: never … }`；`vm/function.lua:444`、`vm/global.lua:74`、`utility.lua:857`
+
+## F18 多值类型与单值比较：相等侧是那个单值（不是 `never`），不等侧保留多值成员
+- 断言：`---@type string` 的 `x` 与 `'a'` 判等，相等侧是 `'a'`（交集），不相容才是不可能；
+  联合体 `'generic' | string` 与 `'doc.field'` 判等，相等侧是 `'doc.field'`、不等侧保留
+  `'generic' | string`（多值成员去掉一个字面量后还有别的取值，不能整块排除）。
+  另外 `x.key ~= 值` 的**不等于**方向不得按字段把 `x` 收窄成「缺 `key` 的成员」
+- 证据：test/node/narrow.lua（多值类型与单值比较 3 组：`string` 对字面量、不相容、
+  联合体不等侧）；test/node/tracer.lua（成员缺字段时 `~=` 反推不写回：去掉判断即退回 `never`）；
+  目标工程 `vm/vm.lua:75:41` 的 `parser.object | nil` 实参误报消失，
+  `vm/compiler.lua:346` 返回表里的 `type: never` 变成 `type: string`
+- 代码：`script/node/type.lua` `M:narrowEqual`（尾部相容判定）、`script/node/union.lua`
+  `M:narrowEqual`（相等侧取成员收窄结果、不等侧按 `isMultiValue` 保留）、
+  `script/node/tracer.lua` `W:traceByValue`（`isFieldReadable`）
+- 机制：原来多值类型与单值比较一律 `return rt.NEVER, self`，`never` 随即作为读值
+  写进流并向上反推（`if field.type ~= 'doc.field' … return nil end` 之后 `field.type` 是 `never`）
+- 数字：目标工程 278 → **276**（移除 2 / 新增 0；本轮净 −1，诊断消息里的 `type: never` 9 → 8 处）
+- 状态：成立（2026-09-24）
+- 试过但未采用（见 openspec change `narrow-multi-value-equality`）：
+  只改联合体成员分类（`never` 仍在）／相等侧整块留下多值成员（新增 `vm/compiler.lua:945/956`、
+  `vm/type.lua:886`）／`isFieldReadable` 对两个方向都生效（多移除 4 条但新增 3 条值质量回归）

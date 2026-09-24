@@ -1124,3 +1124,63 @@ do
     lt.assertEquals(r['x.a.b3']:view(), 'truthy')
     lt.assertEquals(r['x.a.b.c3']:view(), 'any')
 end
+
+do
+    --[[
+    ---@type { base: { type: string } } | { other: 1 }
+    local x
+    if x.base.type ~= 'local' then
+        x
+    end
+    ]]
+
+    -- 「字段不等于某值」的反推：成员缺这个字段时（`{ other: 1 }` 没有 `base`）不能
+    -- 按字段分类把基值收成那个成员——否则随后对 `.base` 的访问会报未定义字段
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local tracer = rt.tracer(r, p)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.table {
+        base = rt.table { type = rt.STRING },
+    } | rt.table {
+        other = rt.value(1),
+    })
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+
+    r['x.b1']   = r['x0']:getChild('base'):shadow()
+    r['x.b.t1'] = r['x.b1']:getChild('type'):shadow()
+
+    r['v'] = rt.value 'local'
+
+    p['x.base']      = { 'x', 'base' }
+    p['x.base.type'] = { 'x.base', 'type' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if', {
+            { 'condition', {
+                '~=',
+                { 'ref', 'x', 'x1' },
+                { 'ref', 'x.base', 'x.b1' },
+                { 'ref', 'x.base.type', 'x.b.t1' },
+                { '|' },
+                { 'value', 'v' },
+            } },
+            { 'ref', 'x', 'x2' },
+        } },
+        { 'ref', 'x', 'x3' },
+    }
+
+    lt.assertEquals(r['x.b.t1']:view(), 'string')
+    lt.assertEquals(r['x2']:view(), '{ base: { type: string } } | { other: 1 }')
+    lt.assertEquals(r['x3']:view(), '{ base: { type: string } } | { other: 1 }')
+end

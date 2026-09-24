@@ -307,19 +307,30 @@ function M:narrowEqual(other)
         return self, self
     end
     local matched = {}
+    local rest    = {}
     for _, v in ipairs(self.values) do
         local l = v:findValue(ls.node.kind['value'] | ls.node.kind['type'])
-        if l and l:narrowEqual(other) ~= rt.NEVER then
-            matched[#matched+1] = v
+        -- 相等侧：成员可能取到该值。取成员自己的收窄结果（多值成员按单值比较时
+        -- 收窄成那个单值，`string` 与 `'a'` 相等就是 `'a'`），不能整块留下 `string`
+        if l then
+            local narrowed = l:narrowEqual(other)
+            if narrowed ~= rt.NEVER then
+                matched[#matched+1] = narrowed
+            end
+        end
+        -- 不等侧：成员只要能取到「不是该值」的值就仍可能。多值成员（`string` 一类）
+        -- 去掉这一个字面量后还有别的取值，不能整块排除；只有「恰是该值的单值成员」才排除
+        if not (not v:isMultiValue() and v:canCast(other)) then
+            rest[#rest+1] = v
         end
     end
     if #matched == 0 then
         return rt.NEVER, self
     end
-    if #matched == #self.values then
-        return self, rt.NEVER
+    if #rest == 0 then
+        return rt.union(matched), rt.NEVER
     end
-    return rt.union(matched), rt.union(ls.util.arrayDiff(self.values, matched))
+    return rt.union(matched), rt.union(rest)
 end
 
 ---@param self Node.Union

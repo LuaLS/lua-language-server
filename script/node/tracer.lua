@@ -1059,6 +1059,29 @@ function W:isDynamicKeyRef(ref)
     return node?.kind == 'variable' and node?.key == self.scope.rt.UNKNOWNKEY
 end
 
+--- 字段反推（`x.field == 值` 收窄 `x`）的前提：基值的每个成员都真的带这个字段。
+--- 只要有一个成员没有（`parser.object | vm.variable` 里 `parser.object` 没有 `base`），
+--- 按字段做的「成员能不能取到该值」分类就不是可靠证据，写回基值会把它收成错的成员
+--- （随后对该字段的访问变成「未定义字段」，或者干脆变成标记 `never`）。
+---@param value Node
+---@param key Node.Key
+---@return boolean
+local function isFieldReadable(value, key)
+    local union = value:findValue(ls.node.kind['union'])
+    if not union then
+        local _, exists = value:get(key)
+        return exists
+    end
+    ---@cast union Node.Union
+    for _, v in ipairs(union.values) do
+        local _, exists = v:get(key)
+        if not exists then
+            return false
+        end
+    end
+    return true
+end
+
 function W:traceByValue(var, value, revert)
     local rt = self.scope.rt
     -- 比较值是 `any`、`unknown`（含其它多值类型，如与另一个同类型变量比较）时，
@@ -1108,9 +1131,18 @@ function W:traceByValue(var, value, revert)
         local pvalue = self:getFieldNarrowValue(id)
         if pvalue then
             -- 基值含糊（any/unknown）时按字段反推出来的只是垃圾值，
-            -- 写回基变量会盖住它自己的读值（`if src.type == 'x'` 一族）
+            -- 写回基变量会盖住它自己的读值（`if src.type == 'x'` 一族）；
+            -- 「不等于」方向写回的是「字段不等于比较值」的成员集合，成员缺这个字段时
+            -- （`parser.object | vm.variable` 里 `parser.object` 没有 `base`）这个分类不是
+            -- 可靠证据，写回会把基值收成错的成员。相等方向不受此限：缺字段的成员本来就被排除在外，
+            -- `node.type == 'global'` 那种反推正是靠它把循环变量收窄的
             local final = pvalue:finalValue()
-            if final ~= rt.ANY and final ~= rt.UNKNOWN then
+            local usable = final ~= rt.ANY and final ~= rt.UNKNOWN
+            if usable and revert
+            and value ~= rt.TRUTHY and value ~= rt.FALSY then
+                usable = isFieldReadable(pvalue, pdata[2])
+            end
+            if usable then
                 local key = pdata[2]
                 narrowed, otherSide = pvalue:narrowByField(key, narrowed)
                 if revert then

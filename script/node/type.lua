@@ -659,6 +659,14 @@ function M:narrowEqual(other)
         return l:narrowEqual(other)
     end
 
+    -- 本类型是多值（`string` 一类）而比较值是单值：交集就是那个单值本身
+    -- （`---@type string` 的 `x` 与 `'a'` 相等 ⇒ 相等侧是 `'a'`）。
+    -- 不能直接返回 `never`：那会把「相等」算成不可能，`never` 随即作为读值泄漏
+    -- （`if field.type ~= 'doc.field' … return nil end` 之后的 `field.type` 变成 `never`）
+    if other:canCast(self) then
+        return other, self
+    end
+
     return rt.NEVER, self
 end
 

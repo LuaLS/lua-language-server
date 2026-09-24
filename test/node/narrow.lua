@@ -245,3 +245,25 @@ do
     lt.assertEquals(q1:view(), '{ type: any }')
     lt.assertEquals(q2:view(), '{ cate: "x" }')
 end
+
+do
+    rt:reset()
+
+    -- 多值类型与单值比较：相等一侧是那个单值本身（交集），不是 never
+    -- （`never` 会作为读值泄漏到后面的流程里）
+    local s1, s2 = rt.type('string'):narrowEqual(rt.value 'doc.field')
+    lt.assertEquals(s1:view(), '"doc.field"')
+    lt.assertEquals(s2:view(), 'string')
+
+    -- 不相容时相等一侧才是不可能
+    local n1, n2 = rt.type('number'):narrowEqual(rt.value 'doc.field')
+    lt.assertEquals(n1:view(), 'never')
+    lt.assertEquals(n2:view(), 'number')
+
+    -- 联合体里的多值成员：相等侧按单值比较收窄（不留整个 `string`），
+    -- 不等侧保留该成员（`string` 去掉 `'doc.field'` 后还有别的取值，不能整块排除）
+    local u = rt.value('generic') | rt.type('string')
+    local u1, u2 = u:narrowEqual(rt.value 'doc.field')
+    lt.assertEquals(u1:view(), '"doc.field"')
+    lt.assertEquals(u2:view(), '"generic" | string')
+end

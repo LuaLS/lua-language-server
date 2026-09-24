@@ -273,16 +273,24 @@ function M:narrow(other)
 end
 
 function M:narrowByField(key, value)
+    local rt = self.scope.rt
+    -- `Node.Key` 允许直接传字面量：先规范化成节点，后面才能判断“是否单值”
+    if type(value) ~= 'table' then
+        value = rt.value(value)
+    end
     local result = {}
     local others = {}
     for _, v in ipairs(self.values) do
-        if v:get(key):canCast(value) then
+        local myValue = v:get(key)
+        -- 单值比较且落在字段的取值域内时，字段可能相等（成员进入 narrowed）；
+        -- 否则「字段 == 字面量」会把整个基类算成 never
+        if myValue:canCast(value)
+        or (not value:isMultiValue() and value:canCast(myValue)) then
             result[#result+1] = v
         else
             others[#others+1] = v
         end
     end
-    local rt = self.scope.rt
     return rt.union(result), rt.union(others)
 end
 
@@ -293,6 +301,10 @@ function M:narrowEqual(other)
     end
     if other == rt.FALSY then
         return self.falsy, self.truthy
+    end
+    -- 比较值本身是多值类型时，成员之间无法按“同值”判定：两侧都保持原样
+    if other:isMultiValue() then
+        return self, self
     end
     local matched = {}
     for _, v in ipairs(self.values) do

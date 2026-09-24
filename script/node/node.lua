@@ -383,6 +383,18 @@ function M:narrow(other)
     return n, o
 end
 
+--- 该类型是否可能有多个取值（`any`、`unknown`、类/表/基础类型等多值类型）。
+--- 判等收窄只能在“单值”比较上成立：单值类型（字面量、`nil`、`never`）相等才意味着同值。
+---@param self Node
+---@return boolean
+function M:isMultiValue()
+    local rt = self.scope.rt
+    local value = self:finalValue()
+    return value.kind ~= 'value'
+        and value ~= rt.NIL
+        and value ~= rt.NEVER
+end
+
 local _narrowByFieldVisiting = {}
 
 ---@param key Node.Key
@@ -391,6 +403,10 @@ local _narrowByFieldVisiting = {}
 ---@return Node otherSide
 function M:narrowByField(key, value)
     local rt = self.scope.rt
+    -- `Node.Key` 允许直接传字面量：先规范化成节点，后面才能判断“是否单值”
+    if type(value) ~= 'table' then
+        value = rt.value(value)
+    end
     -- 传入的收窄值已经是 never（上游某一级已经把它算成不可能）时不再收窄：
     -- 继续按它判断会把基变量也写成 never，基变量的读值随后变成 never
     -- （`x.type == 'y'` 一族的反推会把类/实例基值踩成这样）
@@ -400,7 +416,18 @@ function M:narrowByField(key, value)
     if self.value == self or _narrowByFieldVisiting[self] then
         local myValue = self:get(key)
         if myValue:canCast(value) then
-            return self, rt.NEVER
+            -- 真值过滤（value 是字段自己的类型）或字段恰好就是该单值时：另一侧不可能
+            if value:isMultiValue()
+            or not myValue:isMultiValue() then
+                return self, rt.NEVER
+            end
+            -- 字段域比比较值宽（`字段: any` 对字面量）：值不可知，两侧都保持原样
+            return self, self
+        end
+        -- 比较值是单值（字面量 / `nil`）且落在字段的取值域内时，
+        -- 字段既可能等于它也可能不等：两侧都保持原样（不再把基值算成 never）
+        if not value:isMultiValue() and value:canCast(myValue) then
+            return self, self
         end
         return rt.NEVER, self
     end

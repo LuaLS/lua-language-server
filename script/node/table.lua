@@ -334,6 +334,12 @@ function M:get(key)
         end
         return rt.union(self.values), true
     end
+    if typeName == 'unknownkey' then
+        -- 动态键读取不做值推断：动态键写入只把表标记成开放结构
+        -- （`hasDynamicKey` 压住未定义字段），写入值不扩散给其它动态键
+        -- （`T[XXX] = 1` 不该让 `T[YYY]` 变成 1）
+        return rt.ANY, true
+    end
     local result = {}
     for field in self.fields:pairsFast() do
         ---@cast field Node.Field

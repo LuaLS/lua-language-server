@@ -364,9 +364,21 @@ function W:traceRef(ref)
     self.idAliasMap[id][alias] = true
 
     local value = self:getValue(id)
+    -- 动态键读取（`t[expr]`）：不采用共用槽位上的流值（其它动态键的读写会互相污染），
+    -- 按基值的当前值求（与 Node.Variable:getDynamicKeyValue 同一语义）
+    if self:isDynamicKeyRef(ref) then
+        local dynamicNode = self.map[alias]
+        if dynamicNode and dynamicNode.kind == 'variable' then
+            local dynamic = dynamicNode:getDynamicKeyValue()
+            if dynamic then
+                value = dynamic
+            end
+        end
+    end
     local pdata = self.parentMap[id]
     local rt = self.scope.rt
     if pdata and pdata[3] then
+        branch = 'pdata3'
         local pver = self.versionMap[pdata[1]]
         local myver = self.versionMap[id]
         if pver and (not myver or pver > myver) then
@@ -766,37 +778,64 @@ function W:traceCondition(condition, revert)
     end
 end
 
+--- 从复合节点（`and`/`or`/`==`/`~=`）的子节点里分出左右操作数与副作用 ref。
+--- 结构：`{op, 左组…, '|', 右组…}`（`|` 由 coder 在编译完左操作数后插入）；
+--- 每组的最后一个子节点是操作数，前面的都是它自己的路径 ref（字段读取会先追加基值 ref，
+--- 把基值当操作数做收窄会把它收成 truthy/falsy）。无标记时退化为最后两个子节点的旧读法。
+---@param exp any[]
+---@return any left
+---@return any right
+---@return any[] mids
+local function splitLogicOperands(exp)
+    local n = #exp
+    local marker
+    for i = 2, n do
+        local e = exp[i]
+        if type(e) == 'table' and e[1] == '|' then
+            marker = i
+            break
+        end
+    end
+    if not marker then
+        -- 无标记（旧格式/手工构造的 flow）：沿用「最后两个子节点是操作数」的旧读法
+        local mids = {}
+        for i = 2, n - 2 do
+            mids[#mids+1] = exp[i]
+        end
+        return exp[n - 1], exp[n], mids
+    end
+    local left, right, mids = exp[marker - 1], exp[n], {}
+    for i = 2, marker - 2 do
+        mids[#mids+1] = exp[i]
+    end
+    for i = marker + 1, n - 1 do
+        mids[#mids+1] = exp[i]
+    end
+    return left, right, mids
+end
+
 function W:traceConditionUnit(exp, revert)
     local kind = exp[1]
     if kind == 'ref' then
         self:traceTruthy(exp, revert)
     elseif kind == 'call' then
         self:traceCallTruthy(exp, revert)
-    elseif kind == '==' then
-        -- 结构：{'==', [副作用ref...], left, right}
-        -- 最后两个子节点是左右操作数，前面的是副作用 ref
-        local n     = #exp
-        local left  = exp[n - 1]
-        local right = exp[n]
-        -- 先处理副作用 ref
-        for i = 2, n - 2 do
-            self:traceUnit(exp[i])
+    elseif kind == '=='
+    or     kind == '~=' then
+        -- 结构：{'==', 左组（含它的路径 ref）…, '|', 右组…}；
+        -- 每组最后一个子节点才是操作数，前面的路径 ref（如字段读取的基值）不能当操作数，
+        -- 否则会把基值按比较值收窄（`a.name ~= b.name` 把 `b` 收成 false | nil）
+        local left, right, mids = splitLogicOperands(exp)
+        for _, inner in ipairs(mids) do
+            if type(inner) == 'table' then
+                self:traceUnit(inner)
+            end
         end
-        self:traceEqual(left, right, revert)
-        self:traceEqual(right, left, revert)
-        self:traceCallEqual(left, right, revert)
-        self:traceCallEqual(right, left, revert)
-    elseif kind == '~=' then
-        local n     = #exp
-        local left  = exp[n - 1]
-        local right = exp[n]
-        for i = 2, n - 2 do
-            self:traceUnit(exp[i])
-        end
-        self:traceEqual(left, right, not revert)
-        self:traceEqual(right, left, not revert)
-        self:traceCallEqual(left, right, not revert)
-        self:traceCallEqual(right, left, not revert)
+        local rev = kind == '~=' and not revert or revert
+        self:traceEqual(left, right, rev)
+        self:traceEqual(right, left, rev)
+        self:traceCallEqual(left, right, rev)
+        self:traceCallEqual(right, left, rev)
     elseif kind == '<'
     or     kind == '>'
     or     kind == '<='
@@ -827,12 +866,7 @@ function W:traceConditionUnit(exp, revert)
 end
 
 function W:traceAnd(exp, revert)
-    -- 树形：{'and', 左, 右的 ref…, 右} —— 右操作数自己的 ref 会平铺在同一个节点里
-    -- （只有单条目操作数才长成 {'and', 左, 右}）。这里保持 exp[2]/exp[3] 的旧读法，
-    -- 但中间的 ref 必须跟着右操作数、在 seed 之后走一遍：否则这些读取拿不到收窄值，
-    -- 节点上也没有 currentValue，消费方（诊断 provider）会退回注解值。
-    local left  = exp[2]
-    local right = exp[3]
+    local left, right, mids = splitLogicOperands(exp)
 
     local stack1 = self:pushStack()
     if left then
@@ -845,8 +879,7 @@ function W:traceAnd(exp, revert)
     self:seedOpposite(seed, revert and stack1.otherSide or stack1.current)
 
     local stack2 = self:pushStack()
-    for i = 3, #exp - 1 do
-        local inner = exp[i]
+    for _, inner in ipairs(mids) do
         if type(inner) == 'table' then
             self:traceUnit(inner)
         end
@@ -871,11 +904,7 @@ function W:traceAnd(exp, revert)
 end
 
 function W:traceOr(exp, revert)
-    -- 树形：{'or', 左, 右的 ref…, 右} —— 右操作数自己的 ref 会平铺在同一个节点里
-    -- （只有单条目操作数才长成 {'or', 左, 右}）。中间的 ref 跟着右操作数一起走，
-    -- 理由同 traceAnd。
-    local left  = exp[2]
-    local right = exp[3]
+    local left, right, mids = splitLogicOperands(exp)
 
     local stack1 = self:pushStack()
     if left then
@@ -888,8 +917,7 @@ function W:traceOr(exp, revert)
     self:seedOpposite(seed, revert and stack1.current or stack1.otherSide)
 
     local stack2 = self:pushStack()
-    for i = 3, #exp - 1 do
-        local inner = exp[i]
+    for _, inner in ipairs(mids) do
         if type(inner) == 'table' then
             self:traceUnit(inner)
         end
@@ -1016,6 +1044,13 @@ end
 
 function W:traceByValue(var, value, revert)
     local rt = self.scope.rt
+    -- 比较值是 `any`、`unknown`（含其它多值类型，如与另一个同类型变量比较）时，
+    -- 判等得不到任何信息：既不能排除取值，也不能断定同值，收窄与向上反推都不该发生
+    if value ~= rt.TRUTHY
+    and value ~= rt.FALSY
+    and value:isMultiValue() then
+        return
+    end
     local vvalue = self:traceRef(var)
     if not vvalue then
         -- 闭包里的外层变量（或参数）：外层 flow 值带 nil 时 getUpvalue 不采纳，
@@ -1071,6 +1106,38 @@ function W:traceByValue(var, value, revert)
     end
 end
 
+--- 反推结果只是「形参要求什么」，不得比实参自己的类型更宽：
+--- 形参注解可选（`uri?`）时反推值会把实参读值染成 `uri | nil`，盖掉实参自己的类型。
+--- 实参没有声明类型时（如 for-in 的循环变量），退回用它自己的当前读值当基准，
+--- 否则 `find(uri, …)` 一族的反推会把实参放宽（`uri` 被写成 `string | number`）。
+---@param rt Node.Runtime
+---@param ownNode Node?
+---@param argValue Node
+---@param narrowed Node
+---@param otherSide Node
+---@return Node narrowed
+---@return Node otherSide
+local function limitByOwnValue(rt, ownNode, argValue, narrowed, otherSide)
+    local ownType = ownNode and ownNode:getExpectValue()
+    if not ownType
+    or ownType == rt.ANY
+    or ownType == rt.UNKNOWN then
+        ownType = argValue
+    end
+    if not ownType
+    or ownType == rt.ANY
+    or ownType == rt.UNKNOWN then
+        return narrowed, otherSide
+    end
+    if not narrowed:canCast(ownType) then
+        narrowed = ownType
+    end
+    if not otherSide:canCast(ownType) then
+        otherSide = ownType
+    end
+    return narrowed, otherSide
+end
+
 ---通过函数调用返回值（truthy检测）收窄参数类型
 ---call entry: {'call', callAlias, funcAlias, {arg1Alias, ...}}
 function W:traceCallTruthy(exp, revert)
@@ -1106,6 +1173,7 @@ function W:traceCallTruthy(exp, revert)
         }:narrowCall()
         -- 谓词真假只说明实参是否满足条件，不应把「确定不是 nil」的实参整份换成含 nil 的值
         -- （`fun(...): boolean?`、形参注解可选等与实参无关的签名会把实参收窄成含 nil 的形参变量）
+        narrowed, otherSide = limitByOwnValue(rt, self.map[argAlias], argValue, narrowed, otherSide)
         if isDefinitelyNotNil(argValue:simplify()) then
             if isNilValue(narrowed) then
                 narrowed = argValue
@@ -1316,17 +1384,8 @@ function W:traceCallEqual(callExp, valueExp, revert)
             targetIndex = 1,
             targetValue = rvalue,
         }:narrowCall()
-        -- 反推结果只是「形参要求什么」，不得比实参自己的类型更宽：
-        -- 形参注解可选（`uri?`）时反推值会把实参读值染成 `uri | nil`，盖掉实参自己的类型
-        local ownType = self.map[argAlias]:getExpectValue()
-        if ownType and ownType ~= rt.ANY and ownType ~= rt.UNKNOWN then
-            if not narrowed:canCast(ownType) then
-                narrowed = ownType
-            end
-            if not otherSide:canCast(ownType) then
-                otherSide = ownType
-            end
-        end
+        -- 反推结果只是「形参要求什么」，不得比实参自己的类型更宽
+        narrowed, otherSide = limitByOwnValue(rt, self.map[argAlias], argValue, narrowed, otherSide)
         -- 与 traceCallTruthy 同理：实参已确定不是 nil 时，反推结果里的 nil 只是形参注解带来的
         if argIsNotNil then
             if isNilValue(narrowed) then

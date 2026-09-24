@@ -643,6 +643,56 @@ function M:addField(field, path)
     return current
 end
 
+-- 动态键读取的重入保护
+local _dynamicKeyVisiting = {}
+
+--- 动态键读取（`t[expr]`，键不可解析为字面量）的值：按基值求值，
+--- 不用共用槽位（`t[unknown]`）上被其它动态键读写污染过的流值。
+---@param self Node.Variable
+---@return Node?
+---@return true?
+function M:getDynamicKeyValue()
+    local rt = self.scope.rt
+    if self.key ~= rt.UNKNOWNKEY or _dynamicKeyVisiting[self] then
+        return nil
+    end
+    local parent = self.parent
+    if not parent or parent.kind ~= 'variable' then
+        return nil
+    end
+    ---@cast parent Node.Variable
+    _dynamicKeyVisiting[self] = true
+    -- 字段链基值（`m.fileMap[uri]`）没有 currentValue/staticValue，退回完整取值链
+    local base = parent:getCurrentValue()
+        or parent:getStaticValue()
+        or parent.value
+    _dynamicKeyVisiting[self] = nil
+    if not base then
+        return nil
+    end
+    for _ = 1, 100 do
+        local value = base:simplify()
+        if value.kind == 'list' then
+            -- list（含可变参数）的动态位置读取：取 rest 元素，不按可选位置补 nil
+            ---@cast value Node.List
+            local values = value.values
+            if #values == 0 then
+                return nil
+            end
+            return values[#values], true
+        end
+        if value.value == value then
+            local result, exists = value:get(rt.UNKNOWNKEY)
+            if not exists then
+                return nil
+            end
+            return result, true
+        end
+        base = value.value
+    end
+    return nil
+end
+
 -- 用于检测 get(key) 递归调用中的循环引用
 local _getVisiting = {}
 
@@ -650,12 +700,21 @@ local _getVisiting = {}
 ---@return Node
 ---@return boolean exists
 function M:get(key)
-    if _getVisiting[self] then
-        -- 检测到循环：值不可判定，但字段可能存在——
+    if _getVisiting[self] then        -- 检测到循环：值不可判定，但字段可能存在——
         -- 返回 exists = true，避免消费方（undefined-field 等）当成「字段不存在」
         return self.scope.rt.ANY, true
     end
     _getVisiting[self] = true
+    -- 动态键读取：字段读也走派生值（与 value/getStaticValue 一致），
+    -- 不用共用槽位上的写入记录做推断（F10/B）
+    if self.key == self.scope.rt.UNKNOWNKEY then
+        local derived = self:getDynamicKeyValue()
+        if derived then
+            local dr, de = derived:get(key)
+            _getVisiting[self] = nil
+            return dr, de
+        end
+    end
     local cv = self:getCurrentValue()
     if cv then
         local r, e = cv:get(key)
@@ -818,7 +877,8 @@ function M:getStaticValue()
         end
         return self.assignValue
     end
-    return self:getCurrentValue()
+    return self:getDynamicKeyValue()
+        or self:getCurrentValue()
         or self:getExpectValue()
         or self:getGuessValue()
         or rt.ANY
@@ -942,7 +1002,7 @@ M.__getter.value = function (self)
     if self.tracer then
         self.tracer:trace()
     end
-    local currentValue = self:getCurrentValue()
+    local currentValue = self:getDynamicKeyValue() or self:getCurrentValue()
     local result = currentValue
                 or self:getExpectValue()
                 or self:getGuessValue()

@@ -1007,3 +1007,220 @@ do
     local A1 = rt:globalGet('A1')
     lt.assertEquals(A1.value:view(), 'string')
 end
+
+do
+    TEST_INDEX [[
+    ---@param s string
+    ---@param n number
+    ---@param b string
+    ---@param w any
+    ---@param u unknown
+    local function eqProbe(s, n, b, w, u)
+        if s == w then
+            X1 = s --> string
+        else
+            X2 = s --> string
+        end
+
+        if s == u then
+            X3 = s --> string
+        else
+            X4 = s --> string
+        end
+
+        if s == n then
+            X5 = s --> string
+        else
+            X6 = s --> string
+        end
+
+        if s == b then
+            X7 = s --> string
+        else
+            X8 = s --> string
+        end
+
+        if s == nil then
+            X9 = s --> never
+        else
+            X10 = s --> string
+        end
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local X4 = rt:globalGet('X4')
+    local X5 = rt:globalGet('X5')
+    local X6 = rt:globalGet('X6')
+    local X7 = rt:globalGet('X7')
+    local X8 = rt:globalGet('X8')
+    local X9 = rt:globalGet('X9')
+    local X10 = rt:globalGet('X10')
+
+    -- 与多值类型（any / unknown / 另一个同类型变量）比较时得不到信息：两支都保持原类型
+    lt.assertEquals(X1:view(), 'string')
+    lt.assertEquals(X2:view(), 'string')
+    lt.assertEquals(X3:view(), 'string')
+    lt.assertEquals(X4:view(), 'string')
+    lt.assertEquals(X5:view(), 'string')
+    lt.assertEquals(X6:view(), 'string')
+    lt.assertEquals(X7:view(), 'string')
+    lt.assertEquals(X8:view(), 'string')
+
+    -- 单值（nil）比较仍按判等收窄
+    lt.assertEquals(X9:view(), 'never')
+    lt.assertEquals(X10:view(), 'string')
+end
+
+do
+    TEST_INDEX [[
+    ---@class parser.object
+    ---@field [integer] parser.object | any
+    ---@field enum parser.object
+
+    ---@type parser.object
+    local doc
+
+    ---@param word any
+    local function f(word)
+        if not (doc.enum[1] == word or doc.enum[1]:match('x') == word) then
+            X1 = doc --> parser.object
+        end
+        X2 = doc --> parser.object
+        X3 = doc.enum[1] --> parser.object | any
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+
+    -- `字段 == any` 不应把基变量或字段读值算成 never（目标工程 auto-require.lua:106 一族）
+    lt.assertEquals(X1:view(), 'parser.object')
+    lt.assertEquals(X2:view(), 'parser.object')
+    lt.assertEquals(X3:view(), 'parser.object | any')
+end
+
+do
+    TEST_INDEX [[
+    ---@type { type: string }
+    local t
+
+    if t.type == 'x' then
+        X1 = t --> { type: string }
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+
+    -- 字段声明类型（string）比比较值（'x'）宽时，字段可能相等：相等一侧的基值不能被算成 never
+    lt.assertEquals(X1:view(), '{ type: string }')
+end
+
+do
+    TEST_INDEX [[
+    ---@type integer[]
+    local arr
+
+    ---@type (integer?)[]
+    local optArr
+
+    ---@class State
+    ---@field lines integer[]
+
+    ---@return State?
+    local function getState() end
+
+    ---@param i integer
+    local function tmpIndexProbe(i)
+        X1 = arr[i]
+        X2 = arr[1]
+        X3 = optArr[i]
+
+        local state = getState()
+        if not state then
+            return
+        end
+        local lines = state.lines
+        X4 = lines[i]
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+    local X4 = rt:globalGet('X4')
+
+    -- 非字面量键读取（`t[expr]`）按基值求值：`T[]` 取 T，`T?[]` 才带 nil
+    lt.assertEquals(X1:view(), 'integer')
+    lt.assertEquals(X2:view(), 'integer')
+    lt.assertEquals(X3:view(), 'integer | nil')
+    lt.assertEquals(X4:view(), 'integer')
+end
+
+do
+    TEST_INDEX [[
+    local T = {}
+
+    ---@param x integer
+    ---@param y integer
+    local function tmpDynamicKeyProbe(x, y)
+        T[x] = 1
+        X1 = T[y]
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+
+    -- 动态键写入只把表标记成开放结构，写入值不扩散给其它动态键读取
+    lt.assertEquals(X1:view(), 'any')
+end
+
+do
+    TEST_INDEX [[
+    ---@type integer[]
+    local arr
+
+    ---@param i integer
+    local function tmpDynReadProbe(i)
+        if arr[i] then
+            X1 = arr[i]
+        end
+        X2 = arr[i]
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+
+    -- 动态键读取的读值不受共用槽位污染（条件分支里的真值收窄不再泄漏成 truthy）
+    lt.assertEquals(X1:view(), 'integer')
+    lt.assertEquals(X2:view(), 'integer')
+end
+
+do
+    TEST_INDEX [[
+    ---@param a integer
+    ---@param s string
+    local function tmpOpProbe(a, s)
+        local n1 = a + 1
+        local n2 = a // 2
+        local n3 = #s // 2
+        local t = { line = a, character = n3 }
+        X1, X2, X3, XT = n1, n2, n3, t
+    end
+    ]]
+
+    local X1 = rt:globalGet('X1')
+    local X2 = rt:globalGet('X2')
+    local X3 = rt:globalGet('X3')
+
+    -- 未折叠的运算结果（op.*）仍可当作 integer/number 使用
+    lt.assertEquals(X1:view(), 'op.add<integer, 1>')
+    lt.assertEquals(X1:canCast(rt.INTEGER), true)
+    lt.assertEquals(X2:canCast(rt.NUMBER), true)
+    lt.assertEquals(X3:view(), 'op.idiv<op.len<string>, 2>')
+    lt.assertEquals(X3:canCast(rt.INTEGER), true)
+end

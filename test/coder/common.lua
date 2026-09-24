@@ -39,7 +39,10 @@ do
     ]]
 
     local g = rt.type '_G'
-    lt.assertEquals(g:get('A'):view(), '{ [unknownkey]: { C: 1 } }')
+    -- 动态键写入只登记结构（开放结构标记）：表的视图里动态键读到的是 any
+    -- （写入值不参与动态键读取的推断，见 F10/F13）；而 `.C` 是写在动态键槽位上的
+    -- 具名字段，变量链仍保留它自己的赋值
+    lt.assertEquals(g:get('A'):view(), '{ [unknownkey]: any }')
     lt.assertEquals(rt:globalGet('A', rt.UNKNOWNKEY, 'C'):viewAsVariable(), 'A[unknownkey].C')
     lt.assertEquals(rt:globalGet('A', rt.UNKNOWNKEY, 'C').value:view(), '1')
 end

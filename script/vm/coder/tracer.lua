@@ -219,6 +219,12 @@ function T:appendNonNilEnd(varSource)
     self:append('unnonnil', id)
 end
 
+--- 标记复合节点的操作数边界：`and`/`or` 编译完左操作数时调用，
+--- 让 tracer 能精确分出左右操作数（否则字段读取的基值 ref 会被当成条件做真值收窄）
+function T:markOperand()
+    self:append('|')
+end
+
 ---@param source LuaParser.Node.Call
 function T:appendCall(source)
     local funcAlias = source.node.uniqueKey

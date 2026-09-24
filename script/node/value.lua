@@ -56,6 +56,10 @@ function M:narrowEqual(other)
     if other == rt.FALSY then
         return self.falsy, self.truthy
     end
+    -- 比较值本身是多值类型时无法断定同值或不同值：两侧都保持原样
+    if other:isMultiValue() then
+        return self, self
+    end
     local v = other:findValue(ls.node.kind['value'])
     if v and self.literal == v.literal then
         return self, rt.NEVER

@@ -305,6 +305,16 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
     if source.exp1 then
         coder:compile(source.exp1)
     end
+    -- `and`/`or`/`==`/`~=` 的操作数边界：左操作数的路径 ref（如字段读取的基值）会和它平铺在一起，
+    -- 打一个标记让 tracer 能精确切分（否则基值会被当成操作数做收窄）
+    if source.op == 'and'
+    or source.op == 'or'
+    or source.op == '=='
+    or source.op == '~=' then
+        if source.exp1 and source.exp2 then
+            coder:getTracer():markOperand()
+        end
+    end
     if source.exp2 then
         coder:compile(source.exp2)
     end

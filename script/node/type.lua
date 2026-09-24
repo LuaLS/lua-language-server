@@ -608,9 +608,6 @@ end
 function M:narrowEqual(other)
     local rt = self.scope.rt
     other = other:finalValue()
-    if self == other then
-        return self, rt.NEVER
-    end
 
     if other == rt.TRUTHY then
         return self.truthy, self.falsy
@@ -645,6 +642,16 @@ function M:narrowEqual(other)
             return rt.FALSE, self
         end
         return other, self
+    end
+
+    -- 比较值本身是多值类型（`x == any`、`x == 另一个 string 变量`）时，
+    -- 相等既不能排除任何取值，也不能断定同值：两侧都保持原样
+    if other:isMultiValue() then
+        return self, self
+    end
+
+    if self == other then
+        return self, rt.NEVER
     end
 
     local l = self:findValue(ls.node.kind['value'] | ls.node.kind['union'])

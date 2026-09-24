@@ -22,3 +22,32 @@
   **+121 处误报**（`return-type-mismatch` 一片，形如 `await.lua:37 return ...`），已还原。
   要动那个 `min` 得先搞清它在 `return-type-mismatch` 里被当成什么用
 - 状态：成立（2026-09-22；目标工程 373，本轮移除 4 / 新增 0）
+
+## F2 调用的第 1 个返回值在部分时机解析成 `nil`（未满足）
+- 断言（未满足）：`local child = parseExp()`（**无 `---@return` 注解的递归局部函数**）之后，
+  调用结果的第 1 个返回值应当是推断出来的返回类型（`{...} | nil`），
+  而不是 `nil`；否则 `if child then` 会把它收窄成 `never`，分支内的读值退化成 nil，
+  报一片 `need-check-nil`
+- 证据（目标工程 `script/parser/compile.lua`，**29 条 need-check-nil** 全是这个形状）：
+  - `if child then` 内部 `child.start`（3043/3112/3365/3411/3450 等）
+  - 探针（目标工程）：`var:parseExp@3033:19-3033:26` 的 view = `fun(…):{...} | nil` ✓，
+    但**同一个调用点**的 `head` 视图 = `fun(…):nil`（`FCall:onView`），
+    `selHead=fcall selKey=value:1 headReturns=nil selValue=nil` →
+    `List:select(1)` 对**空 list** 返回 `nil`（`script/node/list.lua:128-130` 的
+    `values[key] or values[#values] or NIL`）
+  - 同一节点在不同时机/顺序下的 view 不一致（探针一次给 `{...}`、一次给 `nil`）⇒ 与
+    「编译早期算出来的缓存」有关
+- 代码：`script/node/function.lua`（`returnsPack` / `returnList` / `returnsDef`）、
+  `script/node/fcall.lua`（`returns`）、`script/node/list.lua`（`select`）；
+  以及 `script/node/tracer.lua`（收窄值随 `class.flush` 失效后不重跑）
+- 试过（2026-09-24，见 openspec change `tracer-flush-retrace`，**均不采用已回退**）：
+  1. Tracer 按「flush 代数」重跑 walk（`Node.Runtime.traceEpoch` + `Walker.epoch/running`）——
+     目标工程 276 → 276（0/0）。诊断链说明这条路不完整：walk **内部**的写入会互相 flush
+     （`setCurrentValue` 会把自己登记进 flush 列表），早期写入的值在同一趟 walk 里就被清掉，
+     代数却已在 walk 结束时对齐 ⇒ 不重跑；要彻底修得让 walk 的写入不受同趟 flush 影响
+     （例如先收集 `written` 再统一写入，或写入后按需 `rawset` 回填）
+  2. `Function:addReturnDef` / `addReturnList` 里 `flushCache()`（返回值集合变了让 `returnsPack` 重算）——
+     目标工程 276 → 276（0/0），说明这个空 list 不是（只是）early-cache 造成的
+- 状态：未满足（open）。下一步：先查清「调用点 head 的返回类型为什么是 `nil`」——
+  是 `matchedFuncs` 拿到了另一个函数实例（generic resolve / clone），还是 `returnsPack`
+  在递归求值中被当成 `PROVISIONAL` 后缓存

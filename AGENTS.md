@@ -34,12 +34,12 @@ It is intended for both human collaborators and coding agents.
    `pathGlob = 'd:/github/vscode-lua-4/server/**'`，`minSeverity = information`）读面板，
    **以面板为准**（面板由扩展自带的 LS 产生，规则集未必等于工作区源码），
    只清 `error / warning / information` 三档，**hint 一概不管**。
+   - **不要自扫**（`--test project.external-diagnostic --test-project=<本仓库>` 一律不跑）：
+     面板才有意义，自举扫描规则集不同、结果对不上，纯浪费时间（2026-09-24 用户明确）
    - 「清」= 该修代码/注解就修（本仓库自己的 `@field` 缺声明、多余全局、引擎误报），
      确实是目标工程侧注解偏松的另记台账，不硬改语义去迎合
-   - `bin\lua-language-server.exe --test project.external-diagnostic --test-project=d:\github\vscode-lua-4\server`
-     只作为**批量统计 / 回归对照**，不能替代面板（也不是「自己给自己判分」的依据）
-   - 面板与统计的存量、分类结论记在 `项目实践.md` 的「自扫本仓库」一节
-   - 清理轮同样走 OpenSpec（`openspec new change self-scan-cleanup-<n>`）并做 `--test` 全量回归；
+   - 面板存量的分类结论记在 `项目实践.md` 的「本仓库问题面板」一节
+   - 清理轮同样走 OpenSpec（`openspec new change panel-cleanup-<n>`）并做 `--test` 全量回归；
      清理不是无限义务：**先清「我们自己的 bug / 缺注解」，积压的 FP 归到对应家族台账**
 
 ## 1) Run and Test Rules
@@ -177,10 +177,11 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
 - **语句不要以 `(` 开头**：Lua 的 newline-call 规则会把「上一行以函数调用结尾、下一行以 `(` 开头」连成一条链式调用（如 `print(...)` 后跟 `(g)(nil)` 会解析为 `print(...)(g)(nil)`，对 print 的返回值 nil 调用）。必要时在上一行末尾加 `;` 断句。测试用例同样遵守（`tmp/` 下诊断被屏蔽，此类问题不会被静态诊断提示）。
 - 清理诊断：**只关心 info（Information）及以上**（error / warning / information），**hint 一概不管**
   （hint 级存量为项目常态，不主动清理，避免无关重构）。读问题面板用 `minSeverity=information`
-  （不要用 hint），批扫报告同样只看这三档。
+  （不要用 hint），目标工程的批扫报告同样只看这三档。
   - **本仓库自己的警告属「收尾必清」范围**（见第 0 节第 6 条）：收尾时用
-    `vscodeOperator_readProblems` 读本仓库面板并逐条处理；`--test project.external-diagnostic`
-    的统计只做批量对照。面板里混着的目标工程条目不算本仓库存量。
+    `vscodeOperator_readProblems` 读本仓库面板并逐条处理。
+    **不要自扫**（`--test project.external-diagnostic --test-project=<本仓库>` 不跑：规则集不同、
+    结果对不上，纯浪费时间）。面板里混着的目标工程条目不算本仓库存量。
 
 ## 9) Debugging Workflow Rule
 

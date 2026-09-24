@@ -1,4 +1,11 @@
 ---@class Node.Tracer: Node
+---@field scope Scope
+---@field map table<string, Node.Variable>
+---@field parentMap table<string, [string, string]>
+---@field flow? table
+---@field parent? Node.Tracer
+---@field parentStack? table<table<string, Node>>
+---@field walker? Node.Tracer.Walker
 local M = ls.node.register 'Node.Tracer'
 
 M.kind = 'tracer'
@@ -378,7 +385,6 @@ function W:traceRef(ref)
     local pdata = self.parentMap[id]
     local rt = self.scope.rt
     if pdata and pdata[3] then
-        branch = 'pdata3'
         local pver = self.versionMap[pdata[1]]
         local myver = self.versionMap[id]
         if pver and (not myver or pver > myver) then

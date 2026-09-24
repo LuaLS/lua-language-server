@@ -55,5 +55,17 @@ ls.args = {
     TEST_PROJECT = false,
     -- 测试模式内存护栏上限（GB），Lua 堆超过该值强制退出
     MEM_LIMIT = 10,
+
+    -- 命令行：项目探针（配合 --test project.probe）
+    ---@type boolean|string
+    PROBE_FILE = false,
+    ---@type boolean|string
+    PROBE_FILTER = false,
+    ---@type boolean|string
+    PROBE_FLOW = false,
+    ---@type boolean|string
+    PROBE_VAR = false,
+    ---@type boolean|string
+    PROBE_CODE = false,
 }
 ls.util.tableMerge(ls.args, argparser.parse(arg, true))

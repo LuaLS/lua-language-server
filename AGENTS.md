@@ -29,6 +29,14 @@ It is intended for both human collaborators and coding agents.
    必填项写在仓库根的 `openspec/config.yaml`（proposal 必须带基线数字与「试过未采用」）。
    **本阶段事实台账仍以 `.github/skills/luals-server-dev/references/facts/` 为准**
    （迁移到 `openspec/specs/` 之前不改），轮次纪要仍写进 `项目实践.md`。
+6. **自主迭代收尾必清本仓库的警告**：每轮收尾（归档 / 提交前）跑一次**本仓库自扫**并清理
+   `error / warning / information` 三档（**hint 一概不管**）：
+   `bin\lua-language-server.exe --test project.external-diagnostic --test-project=d:\github\vscode-lua-4\server`
+   - 「清」= 该修代码/注解就修（本仓库自己的 `@field` 缺声明、多余全局、provider 误报），
+     确实是目标工程侧注解偏松的另记台账，不硬改语义去迎合
+   - 自扫存量与分类结论记在 `项目实践.md` 的「自扫本仓库」一节（数字 + 按 code/文件的分类）
+   - 清理轮同样走 OpenSpec（`openspec new change self-scan-cleanup-<n>`）并做 `--test` 全量回归；
+     清理不是无限义务：**先清「我们自己的 bug / 缺注解」，积压的 FP 归到对应家族台账**
 
 ## 1) Run and Test Rules
 
@@ -166,6 +174,9 @@ Remaining skipped cases are marked `[SKIPPED]` in each completion test file（�
 - 清理诊断：**只关心 info（Information）及以上**（error / warning / information），**hint 一概不管**
   （hint 级存量为项目常态，不主动清理，避免无关重构）。读问题面板用 `minSeverity=information`
   （不要用 hint），批扫报告同样只看这三档。
+  - **本仓库自己的警告属「收尾必清」范围**（见第 0 节第 6 条）：自主迭代轮结束时跑本仓库自扫
+    （`--test project.external-diagnostic --test-project=d:\github\vscode-lua-4\server`），
+    清掉我们自己的缺注解 / 多余全局 / provider 误报；面板里的目标工程条目不算本仓库的存量。
 
 ## 9) Debugging Workflow Rule
 

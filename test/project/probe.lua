@@ -40,6 +40,8 @@ do
                 for key, node in pairs(vfile.coder.map) do
                     if key:find(varFilter, 1, true) then
                         print('[varDump] === ' .. key .. ' kind=' .. tostring(node.kind) .. ' ===')
+                        ---@param name string
+                        ---@param fn fun(): any
                         local function show(name, fn)
                             local ok, v = pcall(fn)
                             if not ok then
@@ -75,6 +77,8 @@ do
                             end
                             cur = cur.parent
                             print('[varDump]   ^ parent' .. i .. ' key=' .. tostring(cur.kind == 'variable' and type(cur.key) == 'table' and cur.key:view() or cur.key))
+                            ---@param name string
+                            ---@param fn fun(): any
                             local function showP(name, fn)
                                 local ok, v = pcall(fn)
                                 local text = 'nil'

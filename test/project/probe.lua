@@ -106,7 +106,9 @@ do
             end
         end
 
-        if type(flowFilter) == 'string' and flowFilter ~= '' and vfile and vfile.coder then
+        -- flow 也受 --probe-file 约束：否则同一段 key 文本会在别的文件里先命中，吃满 3 次机会
+        if type(flowFilter) == 'string' and flowFilter ~= '' and vfile and vfile.coder
+        and (type(fileFilter) ~= 'string' or fileFilter == '' or matchFile) then
             for key, flow in pairs(vfile.coder.tracerFlowMap) do
                 local text = ls.util.dump(flow, { noArrayKey = true })
                 if key:find(flowFilter, 1, true) or text:find(flowFilter, 1, true) then

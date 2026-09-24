@@ -274,3 +274,26 @@
   `stack1.current` 的假值降解（`any.falsy` = `false | nil`）→ 对 `B` 取字段报未定义字段
 - 数字：目标工程 278 → **277**（移除 1 / 新增 0），全量 `--test` 绿
 - 状态：成立（2026-09-24）
+
+## F17 终止分支的 guard 事实会盖掉存活分支的赋值（未满足）
+- 断言（未满足）：`W:traceIf` 把终止分支（`return` / `goto` / `break` / `continue`）的 `otherSide`
+  当作 fall-through 事实合并（F1 的 guard 收窄机制所需），但该 `otherSide` 是在**分支体跑完之后**
+  读的，会带上分支体内嵌套收窄写入的键；存活分支已给同一键赋值时，两值并在一起就把**标记**混成读值
+- 证据（目标工程）：`script/vm/value.lua:176/200/223` 的 `return-type-mismatch` 读值是
+  `false | parser.object | any | nil`——`if result then return nil else result = n[1] end` 里
+  `result` 的假值事实（`any.falsy` = `false | nil`）与 else 分支的赋值合并（`vm/getString` 一族）
+- 代码：`script/node/tracer.lua` `W:traceIf` 的合并循环；相关 `W:traceIfChild`（分支栈的 `current`/`otherSide`）
+- 试过（2026-09-24，见 openspec change `ifguard-assigned-skip`，**不采用已回退**）：
+  先收集存活分支（含 `changed`），再把终止分支的 `otherSide` 按「未被存活分支赋值的键」补进来 ——
+  目标工程 278 → **279**（移除 1 / 新增 2，净 +2 且零移除）：
+  - 收益：`vm/value.lua:176/200/223` 的读值里 `false` 消失（诊断本身没消失，`parser.object` 仍不可 cast 到 `string`）
+  - 代价：`vm/type.lua:529/562` 新增 `Cannot assign 'table | nil' to parameter 'table'`——
+    `mark = mark or {}` 的收窄丢失（读值退回注解 `table?`），且 `var:uri@396`、`var:errs@394/397/398/399`、
+    `var:n@493`、`var:child@498`、`field@399`、`unary@397/398/399` 一簇变成 **`never`**（读值污染）
+  - 机制未查清：`W:traceIf` 末尾 `union[#union+1] = stack.current[id]` 在值为 `nil` 时留下数组空洞，
+    `rt.union` 见此走 `#nodes == 0 ⇒ NEVER`（`script/node/runtime.lua:243`）
+- 状态：未满足（open；重走前置条件：先查清 `never` 簇，或改从**标记的生产侧**
+  `narrowEqual` / `narrowByField` 入手，让标记不进读值）
+- 同族线索（未修）：`parser/compile.lua:2263` 一族的 `assign-type-mismatch` 里出现
+  `type: never`、`args: { [1]: never }`、`finish: … | truthy | …`；`vm/compiler.lua:346` 的
+  `return { … type: never … }`；`vm/function.lua:444`、`vm/global.lua:74`、`utility.lua:857`

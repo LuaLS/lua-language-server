@@ -52,6 +52,7 @@ function bit32.extract(n, field, width) end
 ---@param v integer
 ---@param field  integer
 ---@param width? integer
+---@return integer
 ---@nodiscard
 function bit32.replace(n, v, field, width) end
 

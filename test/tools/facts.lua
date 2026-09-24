@@ -3,6 +3,7 @@ do
     local dir = ls.env.ROOT_URI / '.github/skills/luals-server-dev/references/facts'
     local childs = ls.afs.getChilds(dir)
     lt.assertNotEquals(#childs, 0)
+    ---@cast childs Uri[]
 
     local checked = 0
     for _, uri in ipairs(childs) do

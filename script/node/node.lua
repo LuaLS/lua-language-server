@@ -405,6 +405,7 @@ function M:narrowByField(key, value)
     local rt = self.scope.rt
     -- `Node.Key` 允许直接传字面量：先规范化成节点，后面才能判断“是否单值”
     if type(value) ~= 'table' then
+        ---@cast value boolean|string|number
         value = rt.value(value)
     end
     -- 传入的收窄值已经是 never（上游某一级已经把它算成不可能）时不再收窄：

@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-24
+# 结论：只改注解 / 用例，无 spec 级行为变更，不产生增量。
+skip_specs: true

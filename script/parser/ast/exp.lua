@@ -139,6 +139,7 @@ function Ast:parseInlineCast(exp)
     if not typeExp then
         return nil
     end
+    ---@cast exp LuaParser.Node.Base
     exp.catAs = typeExp
     typeExp.parent = exp
     return typeExp

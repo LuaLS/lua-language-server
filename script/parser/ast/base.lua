@@ -30,6 +30,7 @@
 ---@field dummy? boolean
 ---@field optional? boolean
 ---@field index? integer
+---@field catAs? LuaParser.Node.CatExp # 紧跟表达式的 `--[[@as T]]`（仅表达式上有）
 local Base = Class 'LuaParser.Node.Base'
 
 ---@alias LuaParser.StateKind

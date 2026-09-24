@@ -1,6 +1,6 @@
 ---@class Node.Tracer: Node
 ---@field scope Scope
----@field map table<string, Node.Variable>
+---@field map table<string, Node> # Coder 的 alias -> 节点映射（变量与字面量值都有）
 ---@field parentMap table<string, [string, string]>
 ---@field flow? table
 ---@field parent? Node.Tracer
@@ -62,7 +62,7 @@ local W = Class 'Node.Tracer.Walker'
 Presize(W, 3)
 
 ---@param scope Scope
----@param map table<string, Node.Variable>
+---@param map table<string, Node>
 ---@param parentMap table<string, [string, string]>
 ---@param tracer Node.Tracer
 function W:__init(scope, map, parentMap, tracer)
@@ -315,6 +315,7 @@ function W:traceVar(var)
     local id, alias = var[2], var[3]
     self.aliasID[alias] = id
     local node = self.map[alias]
+    ---@cast node Node.Variable
     -- 用 getStaticValue()（不触发 tracer）而非 .value（会触发新 Walker 递归）。
     -- 赋值点 shadow 的 currentValue 即是 Coder 编译时已设置好的赋值表达式值。
     local value = node:getStaticValue()
@@ -375,6 +376,7 @@ function W:traceRef(ref)
     -- 按基值的当前值求（与 Node.Variable:getDynamicKeyValue 同一语义）
     if self:isDynamicKeyRef(ref) then
         local dynamicNode = self.map[alias]
+        ---@cast dynamicNode Node.Variable
         if dynamicNode and dynamicNode.kind == 'variable' then
             local dynamic = dynamicNode:getDynamicKeyValue()
             if dynamic then
@@ -421,12 +423,14 @@ function W:traceRef(ref)
     end
     if not value and not self:isUpvalue(id) then
         local node = self.map[alias]
+        ---@cast node Node.Variable
         -- 统一使用 getStaticValue()（不含可选链的 nil 合并），
         -- 避免把单次可选链访问的 nil 写入共享的 id 值，污染后续普通访问。
         value = node:getStaticValue()
         self:setValue(id, value)
     end
     local node = self.map[alias]
+    ---@cast node Node.Variable
     node:setCurrentValue(value)
     return value
 end
@@ -715,6 +719,7 @@ function W:getFuncVar(funcVarId)
     if not aliases then return nil end
     for alias in pairs(aliases) do
         local v = self.map[alias]
+        ---@cast v Node.Variable
         if v then return v end
     end
     return nil
@@ -1062,6 +1067,7 @@ end
 ---@return boolean
 function W:isDynamicKeyRef(ref)
     local node = self.map[ref[3]]
+    ---@cast node Node.Variable
     return node?.kind == 'variable' and node?.key == self.scope.rt.UNKNOWNKEY
 end
 
@@ -1103,6 +1109,7 @@ function W:traceByValue(var, value, revert)
         -- 读值退回注解推断，收窄也就没有基值。这里补上注解作为基值，
         -- 但 `any` 不作为基值——对它收窄只会得到 truthy/falsy 标记，写进栈会盖住读值。
         local node = self.map[var[3]]
+        ---@cast node Node.Variable
         vvalue = node and node:getExpectValue()
         if not vvalue
         or vvalue == rt.ANY
@@ -1166,7 +1173,7 @@ end
 --- 实参没有声明类型时（如 for-in 的循环变量），退回用它自己的当前读值当基准，
 --- 否则 `find(uri, …)` 一族的反推会把实参放宽（`uri` 被写成 `string | number`）。
 ---@param rt Node.Runtime
----@param ownNode Node?
+---@param ownNode Node.Variable?
 ---@param argValue Node
 ---@param narrowed Node
 ---@param otherSide Node
@@ -1228,7 +1235,9 @@ function W:traceCallTruthy(exp, revert)
         }:narrowCall()
         -- 谓词真假只说明实参是否满足条件，不应把「确定不是 nil」的实参整份换成含 nil 的值
         -- （`fun(...): boolean?`、形参注解可选等与实参无关的签名会把实参收窄成含 nil 的形参变量）
-        narrowed, otherSide = limitByOwnValue(rt, self.map[argAlias], argValue, narrowed, otherSide)
+        local argNode = self.map[argAlias]
+        ---@cast argNode Node.Variable
+        narrowed, otherSide = limitByOwnValue(rt, argNode, argValue, narrowed, otherSide)
         if isDefinitelyNotNil(argValue:simplify()) then
             if isNilValue(narrowed) then
                 narrowed = argValue
@@ -1440,7 +1449,9 @@ function W:traceCallEqual(callExp, valueExp, revert)
             targetValue = rvalue,
         }:narrowCall()
         -- 反推结果只是「形参要求什么」，不得比实参自己的类型更宽
-        narrowed, otherSide = limitByOwnValue(rt, self.map[argAlias], argValue, narrowed, otherSide)
+        local argNode = self.map[argAlias]
+        ---@cast argNode Node.Variable
+        narrowed, otherSide = limitByOwnValue(rt, argNode, argValue, narrowed, otherSide)
         -- 与 traceCallTruthy 同理：实参已确定不是 nil 时，反推结果里的 nil 只是形参注解带来的
         if argIsNotNil then
             if isNilValue(narrowed) then

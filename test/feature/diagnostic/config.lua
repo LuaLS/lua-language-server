@@ -5,8 +5,9 @@ TEST_DIAGNOSTIC [[
 do
     local scope = test.scope
     scope.roots[#scope.roots+1] = {
-        uri  = test.rootUri,
-        kind = 'workspace',
+        uri     = test.rootUri,
+        kind    = 'workspace',
+        uriSet  = {},
         glob = { check = function () return true end },
     }
     local root = scope.roots[#scope.roots]

@@ -97,10 +97,11 @@ do
                     end
                 end
             end
-            if type(ls.args.PROBE_CODE) == 'string' and ls.args.PROBE_CODE ~= '' and vfile.coder and vfile.coder.code then
+            local probeCode = ls.args.PROBE_CODE
+            if type(probeCode) == 'string' and probeCode ~= '' and vfile.coder and vfile.coder.code then
                 print('[codeDump] === ' .. path .. ' ===')
                 for line in vfile.coder.code:gmatch('[^\r\n]+') do
-                    if line:find(ls.args.PROBE_CODE, 1, true) then
+                    if line:find(probeCode, 1, true) then
                         print('[codeDump] ' .. line)
                     end
                 end

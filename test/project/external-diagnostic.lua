@@ -198,6 +198,7 @@ do
     end
 
     -- 基线对比：--save=<file> 存一份，之后 --baseline=<file> 看移除/新增
+    -- （开关定义见 `script/runtime/make-args.lua`）
     local function nameToUri(name)
         local path = tostring(name)
         if path:find(':', 1, true) then

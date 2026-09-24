@@ -48,10 +48,13 @@ function m.enable(memLimitGB)
         return co
     end
 
+    -- 故意覆盖内存护栏用的协程包装（不是重复定义）
+    ---@diagnostic disable-next-line: duplicate-set-field
     coroutine.create = function (f)
         return attach(rawCreate(f))
     end
 
+    ---@diagnostic disable-next-line: duplicate-set-field
     coroutine.wrap = function (f)
         local co = attach(rawCreate(f))
         return function (...)

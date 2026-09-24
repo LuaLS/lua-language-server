@@ -634,6 +634,7 @@ do
     lt.assertEquals(#ast.errors, 0)
     lt.assertEquals(#ast.comments, 1)
     local ret = ast.nodesMap['return'][1]
+    ---@cast ret LuaParser.Node.Return
     lt.assertEquals(ret.exps[1].catAs, nil)
 end
 
@@ -644,5 +645,6 @@ do
     assert(node)
     lt.assertEquals(#ast.errors, 0)
     local ret = ast.nodesMap['return'][1]
+    ---@cast ret LuaParser.Node.Return
     lt.assertEquals(ret.exps[1].kind, 'binary')
 end

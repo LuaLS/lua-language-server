@@ -67,5 +67,11 @@ ls.args = {
     PROBE_VAR = false,
     ---@type boolean|string
     PROBE_CODE = false,
+
+    -- 命令行：诊断基线存档 / 比对（配合 --test project.external*）
+    ---@type boolean|string
+    SAVE = false,
+    ---@type boolean|string
+    BASELINE = false,
 }
 ls.util.tableMerge(ls.args, argparser.parse(arg, true))

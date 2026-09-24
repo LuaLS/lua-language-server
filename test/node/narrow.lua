@@ -6,7 +6,7 @@ do
     -- 传入的收窄值已是 never 时，按字段收窄不做任何收窄：
     -- 继续判断会把基变量算成 never（`x.type == 'y'` 一族的反推会把类/实例踩成这样）
     local fieldType = rt.class 'F'
-    local classA = rt.class('A', nil, { rt.field(rt.value 'type', fieldType) })
+    local classA = rt.class('A'):addField(rt.field(rt.value 'type', fieldType))
     local narrowed, otherSide = classA:narrowByField(rt.value 'type', rt.NEVER)
 
     lt.assertEquals(narrowed, classA)

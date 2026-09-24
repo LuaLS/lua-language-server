@@ -60,6 +60,9 @@ local function getFunc(f, level)
     return info.func
 end
 
+---@param name string
+---@return table?
+---@return string?
 local function findTable(name)
     local pg = {}
     local current = lua51._G

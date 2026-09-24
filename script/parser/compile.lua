@@ -21,7 +21,7 @@ _ENV = nil
 ---@alias parser.position integer
 
 ---@param str string
----@return table<integer, boolean>
+---@return table<string, boolean>
 local function stringToCharMap(str)
     local map = {}
     local pos = 1

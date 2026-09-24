@@ -753,7 +753,7 @@ end
 
 ---裁剪字符串
 ---@param str string
----@param mode? '"left"'|'"right"'
+---@param mode? 'left'|'right'
 ---@return string
 function m.trim(str, mode)
     if mode == "left" then

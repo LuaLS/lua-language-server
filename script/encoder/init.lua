@@ -13,6 +13,7 @@ local m = {}
 ---@param s        string
 ---@param i?       integer
 ---@param j?       integer
+---@return integer
 function m.len(encoding, s, i, j)
     i = i or 1
     j = j or #s

@@ -293,8 +293,7 @@
   - 机制未查清：`W:traceIf` 末尾 `union[#union+1] = stack.current[id]` 在值为 `nil` 时留下数组空洞，
     `rt.union` 见此走 `#nodes == 0 ⇒ NEVER`（`script/node/runtime.lua:243`）
 - 状态：未满足（open；重走前置条件：先查清 `never` 簇，或改从**标记的生产侧**
-  `narrowEqual` / `narrowByField` 入手，让标记不进读值）
-- 同族线索（未修）：`parser/compile.lua:2263` 一族的 `assign-type-mismatch` 里出现
+  `narrowEqual` / `narrowByField` 入手，让标记不进读值）- 同族线索（未修）：`parser/compile.lua:2263` 一族的 `assign-type-mismatch` 里出现
   `type: never`、`args: { [1]: never }`、`finish: … | truthy | …`；`vm/compiler.lua:346` 的
   `return { … type: never … }`；`vm/function.lua:444`、`vm/global.lua:74`、`utility.lua:857`
 
@@ -317,3 +316,37 @@
 - 试过但未采用（见 openspec change `narrow-multi-value-equality`）：
   只改联合体成员分类（`never` 仍在）／相等侧整块留下多值成员（新增 `vm/compiler.lua:945/956`、
   `vm/type.lua:886`）／`isFieldReadable` 对两个方向都生效（多移除 4 条但新增 3 条值质量回归）
+
+## F19 守卫收窄 + 循环内重赋值：循环体里的读值退回未收窄的 guess（未满足）
+- 断言（未满足）：`if not exp then return nil end` 之类的守卫之后，`exp` 在**循环体**里的读值
+  应当只含非 nil 的取值；现在会退化回 `guess`（含 nil）⇒ 误报 `need-check-nil`
+- 证据（仓库内最小复现）：
+  - `test/project/repro/guard-loop-reassign.lua` —— 复现（去掉文件里的
+    `---@diagnostic disable-next-line: need-check-nil` 即见误报）：
+    守卫 + `while true do …… exp = bin end`（循环内重赋值）+ 循环体内读 `exp.start`
+  - `test/project/repro/guard-loop-noreassign.lua`（循环内不重赋值）与
+    `test/project/repro/guard-noloop.lua`（无循环）都是**对照组：不报**
+    ⇒ 诱因是「循环内重赋值 + 循环体内的读」这一步
+  - 目标工程同族：`script/parser/compile.lua` 的 29 条 `need-check-nil`
+    （`local child = parseExp()` + `if child then … child.start`，`parseExp` 是无 `---@return` 注解的递归局部函数）
+- 机制（诊断 pass 里的临时打印，已回退）：
+  - 诊断侧读到的是 `guess`（推断值，union 里带 nil 成员）；`Variable.tracer` 非空、`walker.started=true`、
+    但 `currentValue = nil` ⇒ 收窄值没写进来（或写进来后被清掉）
+  - 同一文件在 **probe 方式**下（不跑诊断 provider）读值是正确的、已收窄的
+    ⇒ 与「walk 在哪个时机跑过、之后没有再跑」有关（`Walker.started` 会一直挡住重跑）
+  - `Node.Tracer.Walker` 是 `__getter.walker` 缓存字段：一次 flush 会把它整个丢掉、下次读时**新建**
+    ⇒ 「flush 之后不重算」只在没新建 walker 的路径上成立，这解释了为什么两种时机结果不同
+- 代码：`script/node/tracer.lua`（`M:trace` / `W:start` / `Variable.__getter.value`）、
+  `script/node/variable.lua`（`setCurrentValue` / `currentValue` 随 `class.flush` 失效）、
+  `script/node/runtime.lua`（`flushCacheNow` / `cacheLocked`）
+- 试过（2026-09-24，见 openspec change `tracer-flush-retrace` 与 `guard-loop-reassign`，**均不采用已回退**）：
+  1. `flushCacheNow` 里「清掉 raw currentValue 就 +1 代数」+ `M:trace` 按代数重跑 ——
+     目标工程 276 → 276；最小复现仍报（约 0.02s 的小工程，2 条 → 2 条）
+  2. ①放宽成「每次 flush 批次都 +1 代数」—— 最小复现**修好了**（2 → 1 条），
+     但目标工程扫描 **C 栈溢出**（`variable.lua:1001` ← `fcall` ← `value` 递归 2129 层）：
+     walk 会触发 flush、flush 又推进代数 ⇒ 嵌套 walk 链爆炸
+  3. `Function:addReturnDef` / `addReturnList` 里 `flushCache()` —— 276 → 276（那一族另有成因）
+- 状态：未满足（open）。下一步：把「重跑」的触发条件收敛成**编译结束后的一个信号**
+  （节点图在中间码执行期间仍在增长，所以「早期 walk 结果不完整」才是本因），
+  并且重跑必须能防住「walk → flush → 代数推进 → 再 walk」的正反馈（例如只在
+  「读到的值为空」时重跑、或对 walker 做版本化后按需重建）

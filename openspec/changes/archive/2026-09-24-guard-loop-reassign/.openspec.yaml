@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-24
+# 结论：本轮只落复现资产 + 修面板条目，无 spec 级行为变更。
+skip_specs: true

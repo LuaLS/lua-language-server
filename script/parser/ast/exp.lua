@@ -139,7 +139,9 @@ function Ast:parseInlineCast(exp)
     if not typeExp then
         return nil
     end
-    ---@cast exp LuaParser.Node.Base
+    -- `catAs` 声明在 `LuaParser.Node.Base`（`exp` 的静态类型是 `LuaParser.Node.Exp` 这个别名，
+    -- 别名不能挂字段，所以这里按意图显式关闭「注入字段」检查）
+    ---@diagnostic disable-next-line: inject-field
     exp.catAs = typeExp
     typeExp.parent = exp
     return typeExp

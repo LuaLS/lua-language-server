@@ -876,7 +876,8 @@ function W:traceAnd(exp, revert)
     -- 右侧只在左侧为真时才求值（`and` 短路）：把左侧的真流垫在下面供其继承，
     -- 右侧自己的收窄仍只记在 stack2，避免左侧的收窄被当成右侧的结果合并出去
     local seed = self:pushStack()
-    self:seedOpposite(seed, revert and stack1.otherSide or stack1.current)
+    local seedValue = revert and stack1.otherSide or stack1.current
+    self:seedOpposite(seed, seedValue)
 
     local stack2 = self:pushStack()
     for _, inner in ipairs(mids) do
@@ -896,9 +897,25 @@ function W:traceAnd(exp, revert)
     ls.util.tableMerge(currentStack.current, stack1.current)
     ls.util.tableMerge(currentStack.current, stack2.current)
 
-    for k in pairs(stack2.otherSide) do
-        if stack1.otherSide[k] then
-            currentStack.otherSide[k] = stack2.otherSide[k] | stack1.otherSide[k]
+    -- 「另一侧」的事实：共有键恒取并集；单侧独有的键只在**另一侧是合取**时才采纳
+    -- （`and` 为真时不采纳：另一侧是「A 假 或 A 真且 B 假」的析取，单侧键在另一分支未必成立）。
+    -- 合取方向（追踪 `and` 为假，另一侧 = A 且 B 为真）下两侧事实同时成立，单侧键也必须传达：
+    -- 左侧是嵌套的 `and` / `or`（`(A and B) and C`）时 `B` 的真值事实只在内层 stack2 里，
+    -- 丢掉它会让 `C` 读 `B` 时穿透到左侧的假值降解（`false | nil`），进而报「未定义字段」
+    local conjunctive = seedValue == stack1.otherSide
+    for k, v in pairs(stack2.otherSide) do
+        local s1 = stack1.otherSide[k]
+        if s1 then
+            currentStack.otherSide[k] = v | s1
+        elseif conjunctive then
+            currentStack.otherSide[k] = v
+        end
+    end
+    if conjunctive then
+        for k, v in pairs(stack1.otherSide) do
+            if not stack2.otherSide[k] then
+                currentStack.otherSide[k] = v
+            end
         end
     end
 end

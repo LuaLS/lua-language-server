@@ -1029,3 +1029,98 @@ do
     lt.assertEquals(r['g1']:view(), 'string')
     lt.assertEquals(r['g0']:view(), 'string')
 end
+
+do
+    --[[
+    ---@type any
+    local x
+    if not (x.a and x.a.b and x.a.b.c) then
+        return
+    end
+    x
+    ]]
+
+    -- 嵌套 and 链（`(A and B) and C`）：求值 C 时 B 必然为真，不该继承 A 的假值降解
+    -- （`any` 的 falsy = `false | nil`）；否则 C 读 B 会拿到 `false | nil`，
+    -- 对 B 取字段就会报「未定义字段」（c99.lua:66 的形状）
+    rt:reset()
+    local r = {}
+    local p = {}
+
+    local tracer = rt.tracer(r, p)
+
+    r['x0'] = rt.variable 'x'
+    r['x0']:addType(rt.ANY)
+
+    r['x1'] = r['x0']:shadow()
+    r['x1']:setTracer(tracer)
+    r['x2'] = r['x0']:shadow()
+    r['x2']:setTracer(tracer)
+    r['x3'] = r['x0']:shadow()
+    r['x3']:setTracer(tracer)
+    r['x4'] = r['x0']:shadow()
+    r['x4']:setTracer(tracer)
+    r['x5'] = r['x0']:shadow()
+    r['x5']:setTracer(tracer)
+    r['x6'] = r['x0']:shadow()
+    r['x6']:setTracer(tracer)
+
+    r['x.a1'] = r['x0']:getChild('a'):shadow()
+    r['x.a2'] = r['x0']:getChild('a'):shadow()
+    r['x.a3'] = r['x0']:getChild('a'):shadow()
+
+    r['x.a.b2'] = r['x.a1']:getChild('b'):shadow()
+    r['x.a.b3'] = r['x.a3']:getChild('b'):shadow()
+
+    r['x.a.b.c3'] = r['x.a.b3']:getChild('c'):shadow()
+
+    p['x.a']     = { 'x', 'a' }
+    p['x.a.b']   = { 'x.a', 'b' }
+    p['x.a.b.c'] = { 'x.a.b', 'c' }
+
+    tracer:setFlow {
+        { 'var', 'x', 'x0' },
+        { 'if', {
+            { 'condition', {
+                'not',
+                {
+                    'and',
+                    {
+                        'and',
+                        { 'ref', 'x', 'x1' },
+                        { 'ref', 'x.a', 'x.a1' },
+                        { '|' },
+                        { 'ref', 'x', 'x2' },
+                        { 'ref', 'x.a', 'x.a2' },
+                        { 'ref', 'x.a.b', 'x.a.b2' },
+                    },
+                    { '|' },
+                    { 'ref', 'x', 'x3' },
+                    { 'ref', 'x.a', 'x.a3' },
+                    { 'ref', 'x.a.b', 'x.a.b3' },
+                    { 'ref', 'x.a.b.c', 'x.a.b.c3' },
+                },
+            } },
+            { 'ref', 'x', 'x4' },
+        }, {
+            { 'ref', 'x', 'x5' },
+        } },
+        { 'ref', 'x', 'x6' },
+    }
+
+    lt.assertEquals(r['x1']:view(), 'any')
+    lt.assertEquals(r['x2']:view(), 'any')
+    lt.assertEquals(r['x3']:view(), 'any')
+    lt.assertEquals(r['x4']:view(), 'any')
+    lt.assertEquals(r['x5']:view(), 'any')
+    lt.assertEquals(r['x6']:view(), 'any')
+
+    lt.assertEquals(r['x.a1']:view(), 'any')
+    lt.assertEquals(r['x.a2']:view(), 'truthy')
+    lt.assertEquals(r['x.a3']:view(), 'truthy')
+
+    lt.assertEquals(r['x.a.b2']:view(), 'any')
+    -- 关键：C 的操作数基值必须是真值事实，而不是 A 的假值降解
+    lt.assertEquals(r['x.a.b3']:view(), 'truthy')
+    lt.assertEquals(r['x.a.b.c3']:view(), 'any')
+end

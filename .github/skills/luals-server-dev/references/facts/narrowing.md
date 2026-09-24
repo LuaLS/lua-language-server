@@ -78,7 +78,11 @@
     探针确认 `c-parser/c99.lua:66` 的 `decl.ids[1].decl` 已从「未定义」变成 `any`，
     但那条 FP 的外层成因是 `decl.ids[1]` 被写成 `false | nil`（真值收窄的 **falsy 降解**）：
     `if A and B and C` 链里后面的操作数继承了前面的 falsy
-  - 下一步（新 change）：`any` 的 `.falsy`（`false | nil`）不得污染「非 falsy 位置」的读值
+  - 已做（2026-09-24，openspec change `falsy-degradation-leak`）：falsy 降解经由
+    `and` 的「另一侧事实」漏键泄漏给后续操作数，已在 F16 修掉 → `c-parser/c99.lua:66` 消失
+  - 遗留（候选，未验证）：`or` 的 `current` 合并只并「两侧都有的键」（`W:traceOr`），
+    在「追踪 `or` 为假」的合取方向同样会漏键，形状是 `if not (A or B or C)`
+    （`(A or B) or C` 的嵌套左侧）——需要先构造目标工程实例再决定动不动
 
 ## F6 `type(x) == 'string'` 一族的收窄依赖 F2 的反推，不能一刀切
 - 断言：实参自己**没有**类型（`any`/`unknown`）时，反推是该族收窄的唯一来源，必须保留
@@ -254,3 +258,19 @@
   - 已全部回退（`git checkout -- meta script/node/tracer.lua`），目标工程回到 278
   - 结论：先不做；将来要做需同时解决「目标工程 meta 覆盖」，并先在 `test/` 里钉出「`never` 调用终止」的回归
 - 状态：未满足（open，含两次实测结论，不要重走）
+
+## F16 `and` 的「另一侧事实」必须覆盖单侧独有的键（合取方向）
+- 断言：`and` 节点向外暴露的 `otherSide`（另一分支的事实）在**另一侧是合取**时 —— 即追踪
+  `and` 为假、另一侧 = 「A 且 B 为真」—— 必须把两侧操作数各自贡献的键都带上；
+  只有「另一侧是析取」（追踪 `and` 为真，另一侧 = 「A 假 或 A 真且 B 假」）时才只并共有键
+  （单侧键在另一分支未必成立，采纳会过度收窄：`if x and y` 的 else 里 x 会从 `string | nil` 变成 `nil`）
+- 证据：test/node/tracer.lua（新增「`(A and B) and C` 里 C 读 B 为真」一例：`x.a.b3` 必须是
+  `truthy`，撤掉修复即为 `false | nil`；同文件既有的 `if x and y` / `if x or y` 一族的 else 读值钉住析取方向）；
+  目标工程 `script/plugins/ffi/c-parser/c99.lua:66` 的 `Undefined field 'decl'` 消失
+- 代码：`script/node/tracer.lua` `W:traceAnd` 末尾的 `otherSide` 合并（`seedValue == stack1.otherSide`
+  即种子取自 stack1 的另一侧 ⇒ 合取方向；析取方向保持原来的「共有键 `|` 并集」）
+- 机制：嵌套左侧（`(A and B)` 是外层 `and` 的左操作数）的 `B` 的真值事实只出现在**内层** `stack2.otherSide`，
+  原来的「只并两侧都有的键」把它丢掉 → 外层 seed 没有 `B` → 右操作数 `C` 读 `B` 时穿透到
+  `stack1.current` 的假值降解（`any.falsy` = `false | nil`）→ 对 `B` 取字段报未定义字段
+- 数字：目标工程 278 → **277**（移除 1 / 新增 0），全量 `--test` 绿
+- 状态：成立（2026-09-24）

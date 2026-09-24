@@ -666,9 +666,11 @@ end
 ---@return Node
 ---@return boolean exists
 function M:get(key)
-    -- any/unknown 类型的字段读取恒为 any（任意字段都可能存在）
+    -- any/unknown 类型的字段读取恒为 any（任意字段都可能存在）；
+    -- truthy 是收窄标记（无成员集），同样按 any 处理，避免「未定义字段」误报
     if self.typeName == 'any'
-    or self.typeName == 'unknown' then
+    or self.typeName == 'unknown'
+    or self.typeName == 'truthy' then
         return self.scope.rt.ANY, true
     end
     if self.extendsValue == self then

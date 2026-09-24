@@ -110,3 +110,11 @@ do
     lt.assertEquals(a.truthy:view(), '1 | 2 | true')
     lt.assertEquals(a.falsy:view(), 'false')
 end
+
+do
+    rt:reset()
+
+    -- `truthy` 是收窄标记（无成员集）：读它的字段按 any 处理，不能报「未定义字段」
+    local v = rt.TRUTHY:get('anyField')
+    lt.assertEquals(v:view(), 'any')
+end

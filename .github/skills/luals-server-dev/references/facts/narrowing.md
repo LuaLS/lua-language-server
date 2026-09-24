@@ -73,6 +73,12 @@
 - 状态：未满足（open；当前结论：标记要留在 flow 里，不能作为读值暴露给消费方，修点在消费侧）
   - 已做（2026-09-23）：`undefined-field` 不再对 `truthy` 目标报未定义字段（与 nil/never 同等对待）；
     目标工程数字未变，剩余 `cli/doc/export.lua:75/79` 那 4 条的读值不是纯 `truthy`，需要继续查
+  - 已做（2026-09-24，openspec change `truthy-marker-field-read`）：`Node.Type:get` 把 `truthy` 并入
+    `any` / `unknown` 那一支（读它的字段恒为 `any`）。目标工程 278 → 278（移除 0 / 新增 0）——
+    探针确认 `c-parser/c99.lua:66` 的 `decl.ids[1].decl` 已从「未定义」变成 `any`，
+    但那条 FP 的外层成因是 `decl.ids[1]` 被写成 `false | nil`（真值收窄的 **falsy 降解**）：
+    `if A and B and C` 链里后面的操作数继承了前面的 falsy
+  - 下一步（新 change）：`any` 的 `.falsy`（`false | nil`）不得污染「非 falsy 位置」的读值
 
 ## F6 `type(x) == 'string'` 一族的收窄依赖 F2 的反推，不能一刀切
 - 断言：实参自己**没有**类型（`any`/`unknown`）时，反推是该族收窄的唯一来源，必须保留

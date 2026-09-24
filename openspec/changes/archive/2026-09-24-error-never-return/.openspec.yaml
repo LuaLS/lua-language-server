@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-09-24
+# 结论：做法 A/B′ 实测均不采用（见 proposal.md 的「实测结论」），
+# 无 spec 级行为变更，因此不产生增量。
+skip_specs: true

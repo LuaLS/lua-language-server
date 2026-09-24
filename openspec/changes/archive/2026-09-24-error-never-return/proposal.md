@@ -40,3 +40,17 @@ end
 - 做法 A：`meta/whimsical/basic.lua` 与各版本 `meta/*/basic.lua`
 - 做法 B：`script/node/tracer.lua`（分支终止判定）与「永不返回」清单的落点（待定）
 - 任何 `error(...)` 守卫的收窄都会变 → 目标工程诊断基线可能大幅变动，需完整比对与逐条分诊
+
+## 实测结论（2026-09-24，不采用）
+
+基线：目标工程 278 条（`tmp/scan-before-error-never.txt`）。
+
+| 做法 | 改动 | 目标工程 | 结论 |
+|---|---|---|---|
+| A（meta 给 `error` 加 `---@return never`） | `meta/template/basic.lua` + `meta/whimsical/basic.lua` | 278 → 278（0 / 0） | **惰性**：分支终止只看 `block.exits`（goto/break/continue）这类语法信息，不看类型 |
+| A + B′（tracer 在语句级调用处判「返回 never ⇒ 该分支不落地」） | 上表 + `script/node/tracer.lua`（`traceCallStatement` + `traceIfChild` 保留标记） | 278 → **281**（移除 1 / 新增 4） | **不采用**：净变差；且目标工程自己的 meta 里 `error` 没有 `never`，会盖住我们的注解，`tools/lua51.lua:201-203` 那三条并没修掉 |
+
+- 唯一收益：`core/completion/completion.lua:1645` 一条移除
+- 新增 4 条（`parser/compile.lua:1664/1677/1683/4204`）都是「本该非 nil 的值变回 `... | nil`」，属净噪声
+- 结论：`error` 这一类「永不返回」判定**先不做**；若将来要做，需要同时解决「目标工程 meta 覆盖 + 先量后改」两件事，
+  且先在 `test/` 里钉出终止语义的回归

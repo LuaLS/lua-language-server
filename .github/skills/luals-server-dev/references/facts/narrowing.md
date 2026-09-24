@@ -238,4 +238,13 @@
   tracer 侧终止判定见 F1（goto/break/return 一族）
 - 未落地原因：改 meta 会影响所有 `error(...)` 守卫的收窄（量级大，需单独一轮基线比对）；
   引擎侧维护「永不返回」内建清单更 hack。先记录取舍
-- 状态：未满足（open）
+- **实测（2026-09-24，不采用，见 openspec change `error-never-return`）**：
+  - 做法 A（`meta/template/basic.lua` + `meta/whimsical/basic.lua` 给 `error` 加 `---@return never`）：
+    目标工程 278 → 278（移除 0 / 新增 0）——**惰性**：分支终止只看 `block.exits`（goto/break/continue）这类语法信息
+  - 做法 A + B′（`script/node/tracer.lua` 新增 `traceCallStatement`：语句级调用返回 `never` ⇒ 该分支不落地；
+    `traceIfChild` 的 `terminated` 改成 `terminated or stack.terminated` 保留它）：278 → **281**
+    （移除 1 / 新增 4），净变差；新增的 4 条都在 `parser/compile.lua`（本该非 nil 的值变回 `... | nil`）。
+    而且目标工程自己的 meta 里 `error` 没有 `never`，会盖住我们的注解，`tools/lua51.lua:201-203` 并未修掉
+  - 已全部回退（`git checkout -- meta script/node/tracer.lua`），目标工程回到 278
+  - 结论：先不做；将来要做需同时解决「目标工程 meta 覆盖」，并先在 `test/` 里钉出「`never` 调用终止」的回归
+- 状态：未满足（open，含两次实测结论，不要重走）

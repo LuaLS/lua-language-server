@@ -1,0 +1,32 @@
+schema: spec-driven
+
+context: |
+  Language: zh-CN
+  All artifacts must be written in zh-CN.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  本仓库是 4.0.0 重构分支，当前阶段用本仓库的 LS 清理目标工程
+  D:\github\vscode-lua\server 的诊断（见 项目实践.md）。
+  判断只基于本仓库自己的语义、测试与目标工程代码，不要拿上游 master 的输出当判据。
+  改收窄 / 诊断前先读事实台账：.github/skills/luals-server-dev/references/facts/<能力>.md
+  （每轮结论上提成一条 fact，--test tools.facts 校验其中引用的 test/ 路径）。
+
+rules:
+  proposal:
+    - 必须写明目标工程诊断基线数字：改前 → 改后（移除 N / 新增 M）
+    - 必须写明「试过但未采用」的方案与实测数字（避免重走）
+    - 必须写明语义依据（本仓库自己的语义 / 参照语言的实测行为）
+  tasks:
+    - 必须包含「bin\lua-language-server.exe --test 全量绿」
+    - 必须包含「目标工程基线比对：--test project.external-diagnostic --test-project=... --mem-limit=2」
+    - 必须包含「把结论上提成一条 fact 并跑 --test tools.facts」
+
+operations:
+  apply:
+    guidance:
+      - 每步先量后改：先存基线（--save），改完再比对（--baseline），用数字决定去留
+      - 临时调试输出只放 tmp\，不要留在引擎代码里
+  archive:
+    guidance:
+      - 归档时把 spec 增量合并进主 spec，并保留「试过但未采用」的记录
+      - 同步更新 项目实践.md 的对应轮次（时间线仍以该文件为准，直到完成台账迁移）

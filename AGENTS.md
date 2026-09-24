@@ -23,6 +23,12 @@ It is intended for both human collaborators and coding agents.
    判断只基于本仓库自己的语义、现有测试与目标工程代码本身。实现必须基于本仓库自己的
    node / runtime / coder 机制，不要照搬 master 的 special / vm.compiler 等旧架构概念。
 4. 若无法确定某能力应落在哪个子系统，先读 skill 的 references，不要自行猜测。
+5. **记账走 OpenSpec（2026-09-24 起）**：一轮改动开一个 change
+   （`openspec new change <slug>`，按 `openspec instructions` 写 proposal / design / tasks），
+   在飞的轮次用 `openspec list` / `openspec show` 查，落地后用 `openspec archive` 归档。
+   必填项写在仓库根的 `openspec/config.yaml`（proposal 必须带基线数字与「试过未采用」）。
+   **本阶段事实台账仍以 `.github/skills/luals-server-dev/references/facts/` 为准**
+   （迁移到 `openspec/specs/` 之前不改），轮次纪要仍写进 `项目实践.md`。
 
 ## 1) Run and Test Rules
 

@@ -490,3 +490,37 @@
      要么承认「成员缺字段 ⇒ 该成员给 nil」是注解语义（那 ① 是唯一出路），
      要么按 F3 的方向补完约束（先解决当时被打破的全局真值收窄）
 - 状态：未满足（open）
+- 2026-09-28 补记：该目标实例（`completion.lua:1365`）已被 **F25**（表值 → 类的缺字段宽限）连带移除；
+  本条作为「读值端」的事实仍成立（`M:get` 的行为没变）。
+
+## F25 「表值 → 类」的缺字段不算不匹配（与上游 `checkTableShape = false` 对齐）
+
+- 断言：`x` 是**表**、`x` 与某个类之间**有同名同字段的交集**、但**缺**该类其它必填字段时，
+  `x >> 该类` SHALL 为 true（缺字段交给 `missing-fields` 一类专门规则）；交集里的字段类型
+  SHALL 照旧比较。字段齐全的、以及与该类毫无交集的表（`{[1] = ...}` 这类索引构造）SHALL 走原判据。
+- 背景（上游实测）：目标工程 `Lua.type.checkTableShape` 默认 **false**
+  （`script/config/template.lua:432`），`vm.isSubType` 里 `script/vm/type.lua:572-581` 据此
+  对「child 是 table、parent 是非基础类型」直接 `return true` ⇒ 上游的
+  `param-type-mismatch`/`assign-type-mismatch` **不报**这类形状，只有专门的 `missing-fields`
+  （`script/proto/diagnostic.lua:57-70`，group `unbalanced`、Warning、status Any）会报。
+  上游的诊断管道**没有**跨诊断的同位置优先级：按位置去重只在**单个诊断内部**
+  （`script/core/diagnostics/init.lua:117-129` 的 `mark[result.start]`），禁用按代码名匹配
+  （同文件 120 行的 `vm.isDiagDisabledAt(uri, start, name)`）。
+- 证据：
+  - `test/project/repro/class-literal-shape.lua`（三态：完整 / 缺字段 / 已出现字段类型错）
+  - `test/node/cast_type.lua`（`ta`/`tb` 部分字段 ⇒ true；`tc` 无交集 ⇒ false）、
+    `test/node/cast_table.lua`（完整 ⇒ true；缺字段 ⇒ true；字段类型错 ⇒ false；数组 ⇒ false）
+  - 目标工程：**259 → 220（移除 23 / 新增 0）**，含 `core/completion/completion.lua:1683`、
+    `vm/operator.lua:180/210/227/315/343/392/475/520`、`vm/compiler.lua:1304/1318/1439/346/…`
+    —— 这些行**目标工程自己就写着** `---@diagnostic disable-next-line: missing-fields`
+    （`vm/operator.lua` 8 处、`vm/compiler.lua` 3 处，逐行对得上）⇒ 宽限与目标工程意图一致
+- 代码：`script/node/type.lua` `M:onCanBeCast` 的类分支（表值 + 有交集 + 有缺失时才走宽限；
+  就地比较，不新建节点；带 `_classCastDepth` 兜底，否则自引用字段会爆栈）
+- 试过（2026-09-28，**不采用**）：
+  1. 无限制地对所有 table-like 值宽限 ⇒ 259 → **194**，但把 `parser.object[] | parser.object`
+     这类联合/数组值也一起放了 ⇒ 丢掉真检查（`containsGenericName(field.extends)` 一族）
+  2. 临时拼一张「已出现字段」的表再 `canCast` ⇒ **爆栈**（每次新建节点，cast 缓存命中不了，
+     表与类互转的递归不收敛）
+  3. 只要求「有缺失」不要求「有交集」 ⇒ `{ [1] = ... }` 这类索引构造的表也放行，
+     破 `test/feature/diagnostic/return-type-mismatch.lua`（`objs[1] = g(source); return objs`）
+- 状态：成立（2026-09-28；目标 259 → 220，移除 23 / 新增 0）

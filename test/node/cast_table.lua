@@ -1,6 +1,24 @@
 local rt = test.scope.rt
 
 do
+    rt:reset()
+    -- 「表值 → 类」：类上没被写到的必填字段不算不匹配（缺字段交给 missing-fields 一类专门规则），
+    -- 但实参里**已出现**的字段类型照旧要比；数组之类的非表值不受此宽限
+    local C = rt.class 'C'
+    C:addField(rt.field('x', rt.INTEGER))
+    C:addField(rt.field('y', rt.INTEGER))
+
+    local full  = rt.table { x = rt.value(1), y = rt.value(2) }
+    local miss  = rt.table { x = rt.value(1) }
+    local wrong = rt.table { x = rt.value 'str', y = rt.value(2) }
+
+    lt.assertEquals(full  >> rt.type 'C', true)
+    lt.assertEquals(miss  >> rt.type 'C', true)
+    lt.assertEquals(wrong >> rt.type 'C', false)
+    lt.assertEquals(rt.array(rt.INTEGER) >> rt.type 'C', false)
+end
+
+do
     local A = rt.table()
         : addField(rt.field('x', rt.value(1)))
         : addField(rt.field('y', rt.value(2)))

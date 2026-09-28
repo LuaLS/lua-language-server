@@ -525,6 +525,13 @@ function M:setConfig(key, value)
     return self
 end
 
+--- 「表值 → 类」结构比较的再入深度（见 `M:onCanBeCast` 里的用法）
+local _classCastDepth = 0
+
+--- 自引用结构（`parser.object.node: parser.object` 一类）在 `Union:get` 每次新建节点的
+--- 情况下认不出环，只能按深度兜底：到顶就按相容处理
+local CLASS_CAST_DEPTH_LIMIT = 32
+
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
@@ -550,6 +557,51 @@ function M:onCanBeCast(other)
         end
         if self.value == self then
             return
+        end
+        -- 「表值 → 类」只比**实参里已出现**的字段的类型：类上没被写到的必填字段不算不匹配
+        -- （那属于 missing-fields 一类专门规则；目标工程里大量「局部构造的 parser 对象」
+        --  按注解缺字段传参，若在这里判死会整片误报）。
+        -- 注意两点：
+        -- 1. 这里就地比较，不能临时拼一张「已出现字段」的表再 canCast；
+        -- 2. 需要再入保护：`Union:get` 每次都新建节点，cast 缓存认不出来，
+        --    自引用字段（`parser.object.node: parser.object`）会无限递归
+        local require = self.value
+        if require and require.kind == 'table'
+        and other.kind == 'table' then
+            ---@cast require Node.Table
+            ---@cast other Node.Table
+            -- 只有「字面量表里写了部分同名字段」才走宽限：字段齐全的、以及跟该类毫无交集的
+            -- （`{[1] = ...}` 这类索引构造出来的表）都交回原判据
+            local missed  = false
+            local overlap = false
+            for _, key in ipairs(require.keys) do
+                local _, exists = other:get(key)
+                if exists then
+                    overlap = true
+                else
+                    missed = true
+                end
+            end
+            if not (missed and overlap) then
+                return other:canCast(self.value)
+            end
+            if _classCastDepth >= CLASS_CAST_DEPTH_LIMIT then
+                return true
+            end
+            _classCastDepth = _classCastDepth + 1
+            local ok = true
+            for _, key in ipairs(require.keys) do
+                local v, exists = other:get(key)
+                if exists then
+                    local myType = require:get(key)
+                    if not v:canCast(myType) then
+                        ok = false
+                        break
+                    end
+                end
+            end
+            _classCastDepth = _classCastDepth - 1
+            return ok
         end
         return other:canCast(self.value)
     end

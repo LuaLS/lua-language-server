@@ -78,8 +78,11 @@ do
     lt.assertEquals(a >> tb, true)
     lt.assertEquals(a >> tc, false)
 
-    lt.assertEquals(ta >> a, false)
-    lt.assertEquals(tb >> a, false)
+    -- 「表值 → 类」：实参里写了**部分同名**字段时（有交集又有缺失），类上没被写到的必填字段
+    -- 不算不匹配（缺字段交给 missing-fields 一类专门规则；上游默认 `checkTableShape = false`
+    -- 也不在这层判死）。字段齐全的、以及与该类毫无交集的表仍走原判据。
+    lt.assertEquals(ta >> a, true)
+    lt.assertEquals(tb >> a, true)
     lt.assertEquals(tc >> a, false)
 
     lt.assertEquals(a >> (ta & tb), true)

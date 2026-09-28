@@ -363,3 +363,39 @@
   但只有 `provisional` 挂了 `anykv` ⇒ 前者字段读取走空的继承表返回 `never`
 - 数字：目标工程 276 → **274**（移除 2 / 新增 0）
 - 状态：成立（2026-09-24）
+
+## F21 `if` 分支里的赋值没有与「条件不成立」那条路的值合并（未满足）
+
+- 断言（未满足）：`if cond then v = X end` 之后读 `v`，值应当是**两条路**的并集
+  （`旧值 | X`）；现在只剩 `X`（分支里的赋值把旧值顶掉了）——于是旧值才有的字段读被报
+  「未定义字段」
+- 证据（仓库内最小复现）：`test/project/repro/branch-assign-merge.lua`
+  （去掉文件里的 `---@diagnostic disable-next-line: undefined-field` 即见
+  `return c.a | Undefined field a`：`c` 只剩分支里赋的 `reproQ`）；
+  `W:traceIf` 的合并循环只并各分支栈的值，没有把「不走本分支」那条路的值算进去
+- 目标工程同族：`script/vm/operator.lua:157`（`if c.type == 'string' ... then c = vm.declareGlobal(...) end`
+  之后读 `c.node`：`c` 变成类 `vm.global`，丢掉循环变量 `parser.object` 上的 `node` 字段）
+- 代码：`script/node/tracer.lua`（`W:traceIf` 的 stacks / otherSide 合并、`W:traceIfChild` 的
+  `otherSide` 播种、`W:traceVar` 写 `stack.current`）
+- 试过（2026-09-28，**均不采用已回退**，基线 270）：
+  1. 合并时把「不走分支」那条路也算上，该路的值取**条件反面的收窄结果**（`otherSide[id]`），
+     没有就用变量在外层的值（新增 `W:getOuterValue`：收窄栈 → 变量注解值）——
+     目标工程 **270 → 291**（移除 0 / 新增 21）：`operator.lua:157` 没修掉
+     （那条路的 `otherSide` 里 `c` 是 `never`，并进并集等于没加），却多出 21 条
+     （`need-check-nil` / `param-type-mismatch`，都是「`error` 不是 `never` 时条件不成立那条路
+     真的可能走到」⇒ F15 一族被顺带解开）
+  2. 同 1，但那条路的值**优先取外层旧值**（不用 `otherSide`）——目标工程 **270 → 309**
+     （移除 1 / 新增 40）：`operator.lua:157` 修掉了，但新增里包含
+     `cli/doc/export.lua` 的 `has_seen` 一族（`if not has_seen then has_seen = {} end`），
+     等于把「条件反面已经排除的东西」又放宽回去
+  3. 同 1，并把会被放宽的 id 收紧成**分支里真正被赋值**的 id（给 `Stack` 加 `assigned`）——
+     目标工程 **270 → 289**（移除 0 / 新增 19）
+  ⇒ 三次都是净变差：这条语义改动本身是对的，但会把 F15（`error` 没有 `never` 返回语义）
+  一族一起解开，而那族的收敛方向（2026-09-24 受控测量）当时也是净变差 —— 两件事要一起做
+- 观测（下次的入口）：
+  - `otherSide` 里可能存着 `never`（`---@field a integer` + `if v.a then` 的反面：`v` = `never`，
+    那条路语义上确实不可能；但目标工程 `operator.lua` 那条条件的反面不该是 `never`）
+    ⇒ 「按字段判等收窄基值」仍有不健全的分支
+  - 同一次调试里 `sval.view()` 抛过 `view.lua:61: table index is nil`（节点 view 崩），
+    换个时序又正常 —— 与 F19 / `returns.md` F2 的「同一节点不同时机取值不同」同族
+- 状态：未满足（open）

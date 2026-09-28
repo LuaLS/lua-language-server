@@ -269,3 +269,21 @@ end
 local i, j = g()
 print(j.y)
 ]] { '-undefined-field' }
+
+-- `---@class X` 的第二次绑定经 `setmetatable({...})`（调用返回）：字面量字段仍要进入类
+-- （目标工程 `script/plugins/ffi/init.lua` 88 / 348 同族）
+TEST_DIAGNOSTIC [[
+--!include setmetatable
+---@class C
+local builder = { switch = 1 }
+
+function builder:get()
+    print(self.extra)
+end
+
+---@class C
+local b = setmetatable({ extra = true }, { __index = builder })
+
+print(b.extra)
+print(builder:get())
+]] { '-undefined-field' }

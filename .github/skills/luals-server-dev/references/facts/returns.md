@@ -23,6 +23,7 @@
   要动那个 `min` 得先搞清它在 `return-type-mismatch` 里被当成什么用
 - 状态：成立（2026-09-22；目标工程 373，本轮移除 4 / 新增 0）
 
+
 ## F2 调用的第 1 个返回值在部分时机解析成 `nil`（未满足）
 - 断言（未满足）：`local child = parseExp()`（**无 `---@return` 注解的递归局部函数**）之后，
   调用结果的第 1 个返回值应当是推断出来的返回类型（`{...} | nil`），
@@ -51,3 +52,28 @@
 - 状态：未满足（open）。下一步：先查清「调用点 head 的返回类型为什么是 `nil`」——
   是 `matchedFuncs` 拿到了另一个函数实例（generic resolve / clone），还是 `returnsPack`
   在递归求值中被当成 `PROVISIONAL` 后缓存
+
+## F3 泛型 for 的循环变量在部分时机退回「列表值」而不是元素（未满足）
+
+- 断言（未满足）：`for _, v in ipairs(list)` 的循环变量 `v` 应当恒为 `list` 的**元素**类型；
+  现在在「循环前用形参注解比实参宽的调用过同一个表」（如 `countList(returns)`，形参
+  `Obj[] | nil`）+ 循环体内嵌套 if 的读位置上，`v` 会解析成**列表值本身**
+  （`Obj[] | nil`）⇒ 元素字段读误报「未定义字段」
+- 证据（仓库内最小复现）：`test/project/repro/ipairs-narrow-field.lua`
+  （去掉文件里的 `---@diagnostic disable-next-line: undefined-field` 即见
+  `ipairs-narrow-field.lua:34 | start = ret.start | Undefined field start`）；
+  变量在文件不同读位置上取值不一致：循环体内 `countList(ret)` 处 = `any`、
+  嵌套 if 里的读 = 列表值（这种「同一变量不同位置取值不同」与 F2、`narrowing.md` F19 同族）
+- 目标工程同族：`script/core/diagnostics/missing-return-value.lua:30/31`（`ret.start`）、
+  `script/parser/compile.lua:3451`（`c.finish`，`c = parseExp()`），
+  以及 `script/utils/init.lua` 一族的 `undefined-field` 残留
+- 代码：`script/vm/coder/block.lua`（`for` 的 `forf`/`fors`/`forvar`/`forcall` + 循环变量
+  `rt.select(call, i)`）、`script/node/select.lua`、`script/node/fcall.lua`、
+  `script/node/list.lua`（元素/`select` 语义）、`script/node/tracer.lua`（读位置取 flow 值 / 静态兜底）
+- 机制线索：编码器把循环变量建成 `select(fcall(iterator, {状态, 控制}), i)`；
+  `fors` 取的是 explist 的第 2 个值（迭代器的 state = 原表），元素类型要靠
+  「泛型 V 在 ipairs 调用时绑定」；一旦泛型绑定退化（truthy 之类标记做参数），
+  V 就丢，部分路径退回 state。
+  诱因与「读到未收窄值」（`narrowing.md` F19）重叠，但成因在**循环变量的取值建模**上
+- 状态：未满足（open）
+

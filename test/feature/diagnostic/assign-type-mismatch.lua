@@ -174,3 +174,23 @@ local outer = function ()
 end
 print(outer)
 ]] { '-param-type-mismatch' }
+
+-- `---@class` 多次声明/多次绑定：由绑定值推断出来的字段只算「读取可见性」，不是赋值要求
+-- （`---@class X` + 多次 `local x = ...` 的装配写法；目标工程 ffi/init.lua 同族）
+TEST_DIAGNOSTIC [[
+---@class Dup
+local d1 = { a = 1 }
+
+---@class Dup
+local d2 = { b = 2 }
+
+print(d1.a, d2.b)
+]] { '-assign-type-mismatch' }
+
+-- 类标注目标放宽「推断字段」不代表什么都能赋：非表值仍要报
+TEST_DIAGNOSTIC [[
+---@class Dup2
+local d = 1
+
+print(d)
+]] { 'assign-type-mismatch' }

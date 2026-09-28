@@ -15,6 +15,39 @@ local function hasAnyMember(actual)
     return false
 end
 
+--- 类标注（`---@class`）变量的字段集是「同一名字的多次声明 + 各自绑定的字面量」拼出来的：
+--- 其中由绑定值推断出来的字段只算「读取可见性」，不是赋值要求。
+--- 比对时只按 `---@field` 与继承来的字段（目标工程 `assign-type-mismatch` 里
+--- `hasMarkClass` 的例外同理；否则 `---@class X` + 多次 `local x = setmetatable({...})`
+--- 这种装配写法会互相要求对方缺的字段）。
+---@param variable Node.Variable
+---@return Node?
+local function getDeclaredFields(variable)
+    local classes = variable.classes
+    if not classes or #classes == 0 then
+        return nil
+    end
+    local rt = variable.scope.rt
+    ---@type Node.Table[]
+    local tables = {}
+    for _, class in ipairs(classes) do
+        ---@cast class Node.Class
+        if class.fields then
+            tables[#tables+1] = class.fields
+        end
+        for _, ext in ipairs(class.extends or {}) do
+            if ext.kind == 'table' then
+                ---@cast ext Node.Table
+                tables[#tables+1] = ext
+            elseif ext.kind == 'type' then
+                ---@cast ext Node.Type
+                tables[#tables+1] = ext.fieldTable
+            end
+        end
+    end
+    return rt.mergeTables(tables)
+end
+
 ---@param vfile VM.Vfile
 ---@param var LuaParser.Node.Base
 ---@param callback fun(diag: Feature.Diagnostic)
@@ -33,6 +66,8 @@ local function checkAssign(vfile, var, callback)
             return
         end
     end
+    local declared = getDeclaredFields(variable)
+    local requireType = declared or expect
     for assign in variable:eachAssign() do
         local actual = assign.value
         if not actual then
@@ -49,7 +84,7 @@ local function checkAssign(vfile, var, callback)
         if hasAnyMember(actual) or hasAnyMember(actual:simplify()) then
             goto continue
         end
-        if not (actual >> expect) then
+        if not (actual >> requireType) then
             callback {
                 code    = 'assign-type-mismatch',
                 level   = 0,

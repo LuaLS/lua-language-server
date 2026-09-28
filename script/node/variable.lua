@@ -538,9 +538,23 @@ M.__getter.fields = function (self)
     if self.assigns then
         for assign in self:eachAssign() do
             ---@cast assign Node.Field
-            if assign.value and assign.value.kind == 'table' then
-                childs[#childs+1] = assign.value
-                assign.value:addRef(self)
+            local value = assign.value
+            if value then
+                if value.kind == 'table' then
+                    childs[#childs+1] = value
+                    value:addRef(self)
+                elseif value.kind == 'call'
+                    or value.kind == 'fcall'
+                    or value.kind == 'select' then
+                    -- 赋值是调用（`setmetatable({...})` 一类，可能包着一层 `select`）时，
+                    -- 其返回的表同样属于本变量（变量的值里没有字段记录，只能从这里取）。
+                    -- `---@class X` + `local x = setmetatable({ field = ... })` 的字段靠这条进入类
+                    value:each('table', function (tableNode)
+                        ---@cast tableNode Node.Table
+                        childs[#childs+1] = tableNode
+                        tableNode:addRef(self)
+                    end)
+                end
             end
         end
     end

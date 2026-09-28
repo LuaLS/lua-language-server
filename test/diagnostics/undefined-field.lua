@@ -171,3 +171,29 @@ function SomeClass:xyz()
     return self
 end
 ]]
+
+TEST [[
+---@class A
+---@field a integer
+
+---@class B
+---@field b integer
+
+---@generic T: A|B
+---@param x T
+local function f(x)
+    print(x.a, x.b, x.<!c!>)
+end
+]]
+
+TEST [[
+---@class A
+local A = {}
+
+-- self-referential constraint must not recurse forever
+---@generic T: T
+---@param self T
+function A:f()
+    print(self.<!x!>)
+end
+]]

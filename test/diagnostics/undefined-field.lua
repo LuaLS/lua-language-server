@@ -156,3 +156,18 @@ X = {
 
 print(X.<!C!>)
 ]]
+
+TEST [[
+---@class SomeClass
+---@field someExistingVar integer
+local SomeClass = {}
+
+---@generic T: SomeClass
+---@param self T
+---@return T
+function SomeClass:xyz()
+    print(self.someExistingVar)
+    print(self.<!doesNotExist!>)
+    return self
+end
+]]

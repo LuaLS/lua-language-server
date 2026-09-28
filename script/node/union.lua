@@ -285,10 +285,20 @@ function M:narrowByField(key, value)
         local myValue = v:get(key)
         -- 单值比较且落在字段的取值域内时，字段可能相等（成员进入 narrowed）；
         -- 否则「字段 == 字面量」会把整个基类算成 never
-        if myValue:canCast(value)
-        or (not value:isMultiValue() and value:canCast(myValue)) then
+        local canEqual = myValue:canCast(value)
+            or (not value:isMultiValue() and value:canCast(myValue))
+        if canEqual then
             result[#result+1] = v
-        else
+        end
+        -- 另一侧（字段 ≠ 值）：
+        -- ① 与**多值/非字面量**比较（真值测试 `if x.field then` 传进来的就是字段自己的类型）
+        --    时按 canEqual 互补 —— 取不到该值的成员才落在这一侧；
+        -- ② 与**单值**比较时不能整块取补集：多值字段（`string` 一类）去掉这一个字面量后还有
+        --    别的取值，仍要留下，只有「字段恰是该值」（单值且互相可转）的成员才在不等侧排除
+        local excludeFromOtherSide = canEqual
+            and (value:isMultiValue()
+                or (not myValue:isMultiValue() and value:canCast(myValue)))
+        if not excludeFromOtherSide then
             others[#others+1] = v
         end
     end

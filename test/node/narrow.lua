@@ -225,7 +225,9 @@ end
 do
     rt:reset()
 
-    -- 联合体基值：字段能容纳该字面量的成员进入 narrowed，没有该字段的成员仍在其它侧
+    -- 联合体基值：字段能容纳该字面量的成员进入 narrowed；另一侧（字段 ≠ 值）保留
+    -- ①「没有该字段」的成员，以及 ②「字段是多值（`string` / `any` 一类）因而还能取到
+    -- 别的取值」的成员 —— 不能按 narrowed 的补集整块排除（与 F18 同一条语义）
     local xField = rt.table { type = rt.value 'x' }
     local yField = rt.table { type = rt.value 'y' }
     local u1, u2 = (xField | yField):narrowByField(rt.value 'type', rt.value 'x')
@@ -236,14 +238,14 @@ do
     local noField   = rt.table { cate = rt.STRING }
     local v1, v2 = (wideField | noField):narrowByField(rt.value 'type', rt.value 'x')
     lt.assertEquals(v1:view(), '{ type: string }')
-    lt.assertEquals(v2:view(), '{ cate: string }')
+    lt.assertEquals(v2:view(), '{ type: string } | { cate: string }')
 
-    -- 成员字段为 any 时同样进入 narrowed（判定“可能相等”）
+    -- 成员字段为 any 时同样进入 narrowed（判定“可能相等”），另一侧也保留它
     local anyField = rt.table { type = rt.ANY }
     local noType   = rt.table { cate = rt.value 'x' }
     local q1, q2 = (anyField | noType):narrowByField(rt.value 'type', rt.value 'x')
     lt.assertEquals(q1:view(), '{ type: any }')
-    lt.assertEquals(q2:view(), '{ cate: "x" }')
+    lt.assertEquals(q2:view(), '{ type: any } | { cate: "x" }')
 end
 
 do

@@ -434,3 +434,46 @@
     （同一形状在 harness 里 `Union:get` 不掺 nil，在目标工程/复现文件里掺）
     ⇒ 回归以 `test/project/repro/array-index-nil.lua` + 目标基线比对为准
 - 状态：成立（2026-09-28；目标 270 → 260，移除 10 / 新增 0）
+
+## F23 字段判等收窄的「另一侧」不按补集整块排除（F18 的字段版）
+
+- 断言：`x.field == 值` 的另一侧（`x.field ≠ 值`）SHALL NOT 用 `narrowed` 的补集整块排除成员 ——
+  ①「没有该字段」的成员要留下（F18 已定），②「字段是多值（`string` / `any` 一类）、
+  去掉这一个字面量后还有别的取值」的成员也要留下；只有「字段恰是该值」（单值且互相可转）
+  的成员才在这一侧被排除。
+  （真值测试 `if x.field then` 传进来的「比较值」是**字段自己的类型**，按「能否取到该值」
+  互补判断 ⇒ 这一条不改变真值测试的行为。）
+- 证据：
+  - `test/project/repro/or-falsy-drop-member.lua` —— 修前：`if src.type == 'x' then return end`
+    之后的 `src` 丢掉「`type` 是多值 `string`」的别名成员 ⇒ `src.onlyA` 误报未定义字段
+  - `test/node/narrow.lua`（更新后的两条断言：多值成员 / `any` 成员在另一侧被保留 ——
+    去掉修复立刻退回旧的补集结果）
+  - 目标工程 `vm/compiler.lua:269`（`containsGenericName(obj.node)`）的实参误报消失
+- 代码：`script/node/union.lua` `M:narrowByField`（另一侧的成员判定：`value:isMultiValue()`
+  时按 `canEqual` 互补；否则只排除「字段恰是该值」的成员）
+- 数字：目标工程 260 → **259**（移除 1 / 新增 0）
+- 试过（2026-09-28，**不采用**）：先把真值测试单独按 `TRUTHY`/`FALSY` 标记 gate（那种情况仍互补）——
+  真值测试传进来的 `value` 不是标记，而是**字段自己的类型**（探针：`key=uri value=uri kind=union`）
+  ⇒ gate 不生效，目标 260 → 260（移除 1 / 新增 1：多出 `parser.guide.lua:488`）；
+  改成「比较值是单值时才整块取补集」⇒ 260 → 259（移除 1 / 新增 0）
+- 状态：成立（2026-09-28）
+
+## F24 联合体成员缺字段时读值掺 nil（未满足）
+
+- 断言（未满足）：`x` 是联合体、其中**部分成员没有** `field` 时，`x.field` 的读值带 `nil`
+  （缺字段的成员按「该键取不到 ⇒ nil」参与并集）。目标工程里这类成员往往只是**注解缺声明**
+  （运行期有该字段），于是「读字段传给非可选形参」一族误报
+- 证据：
+  - `test/project/repro/union-missing-field.lua` —— `reproA`（有 `node: integer`）| `reproB`（无）
+    的 `src.node` 读值 = `integer | nil`，传给 `---@param v integer` 报 param-type-mismatch
+  - 目标工程 `core/completion/completion.lua:1365`（用户报的这条）的**残留部分**：
+    前段 `src` 曾被上一条 `or` 链的假分支收窄成 `never`（F23 已修：现在 `src` = `vm.object`
+    = `parser.object | vm.generic`），剩下的误报来自 `vm.generic` **没有 `---@field node`**
+    ⇒ `src.node` = `parser.object | nil` ⇒ 形参 `parser.object` 报错
+- 代码：`script/node/union.lua` `M:get`（逐成员 `get`，`exists` 为否时仍把该成员的 `r` 并进结果）
+- 方向（下次入口）：
+  ①目标工程注解：`vm.generic` 补 `---@field node ...`（同类缺声明的成员还有多少要先数一遍）；
+  ②引擎侧：`session.type == 字面量` 时把基值收窄到**该字面量对应的子类**（`vm.getDefs` 那套），
+  这样 `src.type == 'doc.type.array'` 之后 `src` 就是 `doc.type.array` 本身（读值不带 nil）
+  —— 这是「按字段字面量收窄到子类」的新能力，不在本轮范围
+- 状态：未满足（open）

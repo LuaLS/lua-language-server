@@ -471,9 +471,22 @@
     = `parser.object | vm.generic`），剩下的误报来自 `vm.generic` **没有 `---@field node`**
     ⇒ `src.node` = `parser.object | nil` ⇒ 形参 `parser.object` 报错
 - 代码：`script/node/union.lua` `M:get`（逐成员 `get`，`exists` 为否时仍把该成员的 `r` 并进结果）
+- 关系（先看这两条，别重走）：
+  - **F3** 是同一处缺陷的**类/实例版**：`Node:narrowByField` 对一个类基值走
+    `myValue = self:get(key)` + `if myValue:canCast(value)`；字段声明比比较值宽
+    （`parser.object` 的 `type: string` 对 `type == 'getlocal'`）时 `canCast` 为假 ⇒ 返回
+    `(NEVER, self)` ⇒ 基值被写成 `never`。当时的决策是**只加「传入 value 已是 never 就不收窄」
+    的前置守卫**，不动整体判据（改宽会打破全局真值收窄），F3 因此记为**部分满足**
+    （「收窄结果必须与变量自身类型相容」的完整约束仍未立）；F3 的「新增 6 处待分诊」里就含
+    `vm/operator.lua:157/158/163` —— 与本条同族
+  - **F23**（本轮已修）处理的是 `Union:narrowByField` 的**另一侧**成员分类；
+    本条的残留与之无关，是**读值端**的 `M:get`
 - 方向（下次入口）：
-  ①目标工程注解：`vm.generic` 补 `---@field node ...`（同类缺声明的成员还有多少要先数一遍）；
-  ②引擎侧：`session.type == 字面量` 时把基值收窄到**该字面量对应的子类**（`vm.getDefs` 那套），
-  这样 `src.type == 'doc.type.array'` 之后 `src` 就是 `doc.type.array` 本身（读值不带 nil）
-  —— 这是「按字段字面量收窄到子类」的新能力，不在本轮范围
+  ①目标工程注解：`vm.generic` 补 `---@field node ...`（同类缺声明的成员还有多少要先数一遍）
+     —— 注意目标工程里 **没有** `---@class doc.type.array` 这类具体类（`doc.type.array` 只是
+     `parser/guide.lua` 表里的**运行期 tag 字符串**）⇒ 「`x.type == 字面量` 收窄到子类」
+     这条路对 `completion.lua:1365` **不适用**（已核对；别再往这个方向做）
+  ②引擎侧：属 F3 那条未立的约束（「收窄/读值结果必须与变量自身类型相容」）——
+     要么承认「成员缺字段 ⇒ 该成员给 nil」是注解语义（那 ① 是唯一出路），
+     要么按 F3 的方向补完约束（先解决当时被打破的全局真值收窄）
 - 状态：未满足（open）

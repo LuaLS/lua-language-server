@@ -399,3 +399,38 @@
   - 同一次调试里 `sval.view()` 抛过 `view.lua:61: table index is nil`（节点 view 崩），
     换个时序又正常 —— 与 F19 / `returns.md` F2 的「同一节点不同时机取值不同」同族
 - 状态：未满足（open）
+
+## F22 动态键读取（`t[expr]`）的元素推导不掺基值里的「恒假」成员
+
+- 断言：`t[expr]`（键不可静态解析）的读值按基值求；基值联合体里**恒假**的成员
+  （`nil` / `false`，运行期不能被索引）不参与元素推导：
+  `integer[] | nil` 的动态键读值应是 `integer`，不是 `integer | nil`。
+  基值本身可能为 nil 这件事由读点上基值的 flow 值负责（那里是收窄后的值），不在这里补。
+- 证据（仓库内最小复现）：`test/project/repro/array-index-nil.lua`
+  （`local state = getState()` + `if not state then return 0 end` + `local lines = state.lines`
+  + `lines[firstRow]`：修前 `integer | nil` 报 param-type-mismatch，修后 0 诊断）；
+  目标工程 `script/core/completion/completion.lua:270`（`text:sub(lines[firstRow], lastOffset)`）同族
+- 代码：`script/node/variable.lua` `Variable:getDynamicKeyValue`（循环里对
+  `base:simplify()` 的结果先过 `dropFalsyMembers`：按 `v.truthy ~= NEVER` 过滤，
+  全被滤掉或没滤掉就原样返回）
+- 数字：目标工程 270 → **260**（移除 10 / 新增 0）
+  —— `completion.lua:270`、`parser/guide.lua:817`、`vm/compiler.lua:758 / 873 / 1345 / 1378 / 1447 / 1485`、
+  `vm/global.lua:74`、`vm/sign.lua:274`（都是 `数组[i]` 的读值里掺了「基值可选」那层 nil）
+- 机制：`getDynamicKeyValue` 的基值来自**槽位**（`parent:getCurrentValue()` 会被 flush 清掉，
+  退回 `getStaticValue()` = 未收窄的旧值，如 `T[] | nil`）而非读点的 flow 值；
+  `Union:get(unknownkey)` 会把这层 nil 计入结果
+- 试过（2026-09-28，**不采用**）：
+  1. 在 `traceRef` 的动态键分支里改用**基值的 flow 值**（给 `getDynamicKeyValue` 加
+     `baseOverride`，并靠 `nodeID[baseNode]` 找基值 id）—— 拿不到：动态键子变量是在
+     `getChild` 里**转发到值链上的变量**（`parent` 是 `currentValue/staticValue` 那个变量，
+     不在 flow 里），`nodeID` 查不到 ⇒ baseID = nil，行为不变
+  2. 给动态键读也登记 `parentMap`（让 walker 走 `deriveFieldValue` 从基值 flow 值派生）——
+     需要 coder 侧配合（键不是字面量、且 `parentMap` 值是纯数据才不破坏 worker 边界），
+     未做；1 已经 0/0 说明这条路不是必需
+- 边界（别改回去）：
+  - 只滤**恒假**成员：元素类型自身若含 nil（`(integer|nil)[]`）不受影响
+  - 基值恒假（全被滤掉）时不改原样，走原来的「取不到元素」路径
+  - 这条**没有测试 harness 的回归钉**：`TEST_DIAGNOSTIC`（feature 侧）与节点级构造都不复现
+    （同一形状在 harness 里 `Union:get` 不掺 nil，在目标工程/复现文件里掺）
+    ⇒ 回归以 `test/project/repro/array-index-nil.lua` + 目标基线比对为准
+- 状态：成立（2026-09-28；目标 270 → 260，移除 10 / 新增 0）

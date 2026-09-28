@@ -660,6 +660,29 @@ end
 -- 动态键读取的重入保护
 local _dynamicKeyVisiting = {}
 
+--- 去掉联合体里「恒假」的成员（`nil` / `false`）：它们运行期不能被索引，
+--- 留着会把 nil 掺进元素类型（`T[] | nil` 的动态键读值不该是 `T | nil`）。
+--- 基值本身可能为 nil 这件事由读点的基值 flow 值负责，不在这里补。
+---@param rt Node.Runtime
+---@param value Node
+---@return Node
+local function dropFalsyMembers(rt, value)
+    if value.kind ~= 'union' then
+        return value
+    end
+    ---@cast value Node.Union
+    local values = {}
+    for _, v in ipairs(value.values) do
+        if v.truthy ~= rt.NEVER then
+            values[#values+1] = v
+        end
+    end
+    if #values == 0 or #values == #value.values then
+        return value
+    end
+    return rt.union(values)
+end
+
 --- 动态键读取（`t[expr]`，键不可解析为字面量）的值：按基值求值，
 --- 不用共用槽位（`t[unknown]`）上被其它动态键读写污染过的流值。
 ---@param self Node.Variable
@@ -685,7 +708,7 @@ function M:getDynamicKeyValue()
         return nil
     end
     for _ = 1, 100 do
-        local value = base:simplify()
+        local value = dropFalsyMembers(rt, base:simplify())
         if value.kind == 'list' then
             -- list（含可变参数）的动态位置读取：取 rest 元素，不按可选位置补 nil
             ---@cast value Node.List

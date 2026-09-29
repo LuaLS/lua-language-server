@@ -325,7 +325,50 @@
   只改联合体成员分类（`never` 仍在）／相等侧整块留下多值成员（新增 `vm/compiler.lua:945/956`、
   `vm/type.lua:886`）／`isFieldReadable` 对两个方向都生效（多移除 4 条但新增 3 条值质量回归）
 
-## F19 守卫收窄 + 循环内重赋值：循环体里的读值退回未收窄的 guess（未满足）
+## F27 收窄值被 `class.flush` 清掉后不会重算，读值退化成静态/猜测值
+
+- 断言：walker 写进 `Node.Variable.currentValue` 的收窄值是 **getter 字段**，
+  `rt:flushCacheNow()`（`class.flush`）会把它清掉；而 `W:start` 的 `started` 守卫让每个 walker
+  **一生只走一次** ⇒ flush 之后同一读取点不会重算，`Node.Variable.__getter.value` 落到
+  `getStaticValue()` / `getGuessValue()` 兜底，诊断/悬停等消费者读到**未收窄**的值。
+  修法：**在诊断 pass 边界（求值链之外）作废一次 walker**，让本 pass 的读取重算。
+- 证据（目标工程 `script/parser/compile.lua:459`，代码本身没问题：`if nestOffset and nestOffset < finishOffset then` 守卫过）：
+  - 报告原为 `param-type-mismatch`「Cannot assign `integer | nil` to parameter `integer`」，
+    探针 `--probe-file=parser/compile.lua --probe-filter=var:nestOffset` 显示该读点 view = `integer`
+  - 插桩 `param-type-mismatch` 打出：`rawKind=variable tracer=true cv=nil value=select view=integer | nil`
+    —— 有 tracer，但 `getCurrentValue()` 为 nil（收窄值已被清）；`.value` 退化到静态值
+    （`local nestOffset = sfind(...)` 编译成 `rt.select(call, 1)` ⇒ `integer | nil`）
+  - 插桩 `W:traceRef`：walker 确实为这个 ref 算出过 `integer` 并 `setCurrentValue`（整轮只 1 次）
+  - **规模**（修前）：该插桩统计 `param-type-mismatch` 199 条里有 **15 条**属于这一类
+  - **最小复现不成立**：把结构抄进 `tmp/repro-nest/nest.lua` 不报 ⇒ 需要真实工程规模
+    （中途发生 flush）才触发，单纯收窄逻辑没问题
+- 代码：`script/node/variable.lua:1001-1016`（`currentValue` getter 字段 + `setCurrentValue` 的 `flushCache()`）、
+  `script/node/tracer.lua`（`W:start` 的 `started`、`restart`、`walking` 护栏）、
+  `script/feature/diagnostic/init.lua`（pass 边界作废）、
+  `script/node/runtime.lua:568-599`（`flushCacheNow` / `class.flush`）
+- 试过（**不采用，别重走**，均有实测）：
+  1. 去掉 `W:start` 的 `started` 守卫（无条件重走）→ `C stack overflow`（`variable.lua:1180`）：walk 里重入
+  2. flush 时作废 walker（`invalidateWalker` + `runtime.lua` 的 `flushOne` 钩子 +
+     `_walker` 持久化 + `walkingDepth` 只在顶层重走）→ 仍 `C stack overflow`（`table.lua:97`）；
+     **把 flush 钩子改成 no-op 也照样爆** ⇒ 爆栈不只在作废时机
+  3. 让 `currentValue` 不被 flush（删 `M.__getter.currentValue` 声明）→ `intersection.lua:19 stack overflow`
+     （getter 字段声明删掉后 class 机制本身失效）
+  4. **在 `value` getter 里按需重走**（惰性嗅探：`setCurrentValue` 置普通字段 `tracedValue`，
+     `__getter.value` 发现值丢了就 `retrace`；护栏 `walkingDepth == 0` 才重走）：
+     护栏有效（`walkDebug`：walks=1000 / nested=125 / **maxDepth=10**，与基线同量级），
+     但仍 `C stack overflow`（`table.lua:97`，`skipping 1981 levels`）—— 这次爆的是**求值环**
+     （`__getter.value` → `mergeValueResults` → `Table:addChilds` → … 回到 `__getter.value`）：
+     在 getter 里重走把本该命中缓存的环重新喂活
+- **已落地**（`openspec change narrow-flush-rewalk`）：触发点改到 **`ls.feature.diagnostic(uri)`**
+  （求值链之外），遍历该文件 `coder.map` 的 tracer 逐个 `Node.Tracer:restart()`
+  （每个 tracer 每 pass 至多重走一次）；`W:start` 加 `walking` 护栏 + `xpcall` 异常清理；
+  `hasWalker` 普通字段避免为没用过的 tracer 建对象。
+  回归测试：`test/node/tracer.lua`（flush 后 `restart` 能恢复收窄 / 不 `restart` 则退化成 `integer | nil`）
+- 数字：目标工程 **199 → 156（移除 36 / 新增 0）**，含本条的 15 条与 **F19 的 `child.*` 一族**；
+  扫描耗时 10.3s → 10.56s（无回归）；全量 `--test` 绿、面板 0
+- 状态：成立（2026-09-29；方向固定为「pass 边界重算」，`value` getter 里重走这条路已实测排除）
+
+## F19 守卫收窄 + 循环内重赋值：循环体里的读值退回未收窄的 guess（已关闭）
 - 断言（未满足）：`if not exp then return nil end` 之类的守卫之后，`exp` 在**循环体**里的读值
   应当只含非 nil 的取值；现在会退化回 `guess`（含 nil）⇒ 误报 `need-check-nil`
 - 证据（仓库内最小复现）：
@@ -337,6 +380,10 @@
     ⇒ 诱因是「循环内重赋值 + 循环体内的读」这一步
   - 目标工程同族：`script/parser/compile.lua` 的 29 条 `need-check-nil`
     （`local child = parseExp()` + `if child then … child.start`，`parseExp` 是无 `---@return` 注解的递归局部函数）
+  - **2026-09-29 收口**：根因确认与 F27 同一条（收窄值被 `class.flush` 清掉 + walker 只走一次），
+    修法同 F27（诊断 pass 边界作废 walker）⇒ 本条的 `child.start/finish/parent` 一族
+    （`compile.lua:3043/3044/3048/3051/3052/3053/3112/3113/…`）已从目标工程诊断里消失
+- 状态：已关闭（2026-09-29，随 F27 的修法一并消失；修前记录见下）
 - 机制（诊断 pass 里的临时打印，已回退）：
   - 诊断侧读到的是 `guess`（推断值，union 里带 nil 成员）；`Variable.tracer` 非空、`walker.started=true`、
     但 `currentValue = nil` ⇒ 收窄值没写进来（或写进来后被清掉）
@@ -354,10 +401,9 @@
      但目标工程扫描 **C 栈溢出**（`variable.lua:1001` ← `fcall` ← `value` 递归 2129 层）：
      walk 会触发 flush、flush 又推进代数 ⇒ 嵌套 walk 链爆炸
   3. `Function:addReturnDef` / `addReturnList` 里 `flushCache()` —— 276 → 276（那一族另有成因）
-- 状态：未满足（open）。下一步：把「重跑」的触发条件收敛成**编译结束后的一个信号**
-  （节点图在中间码执行期间仍在增长，所以「早期 walk 结果不完整」才是本因），
-  并且重跑必须能防住「walk → flush → 代数推进 → 再 walk」的正反馈（例如只在
-  「读到的值为空」时重跑、或对 walker 做版本化后按需重建）
+  4. （2026-09-29）F27 的 **pass 边界重算**：目标工程 199 → 156，本条一族随之消失
+- 状态：**已关闭**（2026-09-29 随 F27 落地；上面第 2 条当时的爆栈正是「重跑被 flush 反复触发」，
+  与 F27 记的第 2/4 次尝试同因，最终解法是**把触发点移到求值链之外**）
 
 ## F20 动态键标记（`unknownkey`）作为读值时字段读取恒 `any`
 - 断言：读值恰为 `unknownkey` 时，字段读取按 `any` 处理（不报「未定义字段」）。

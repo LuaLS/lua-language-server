@@ -1264,3 +1264,78 @@ do
 
     lt.assertEquals(r['v2']:view(), 'integer | nil')
 end
+
+do
+    --[[
+    ---@type integer?
+    local v
+    if v then
+        v
+    end
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['v0'] = rt.variable 'v'
+    r['v0']:addType(rt.INTEGER | rt.NIL)
+
+    r['v1'] = r['v0']:shadow()
+    r['v1']:setTracer(tracer)
+    r['v2'] = r['v0']:shadow()
+    r['v2']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'v', 'v0' },
+        { 'if', {
+            { 'condition', { 'ref', 'v', 'v1' } },
+            { 'ref', 'v', 'v2' },
+        } },
+    }
+
+    lt.assertEquals(r['v2']:view(), 'integer')
+
+    r['v2']:flushCache()
+    rt:flushCacheNow()
+    tracer:restart()
+    lt.assertEquals(r['v2']:view(), 'integer')
+end
+
+do
+    --[[
+    ---@type integer?
+    local v
+    if v then
+        v
+    end
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['v0'] = rt.variable 'v'
+    r['v0']:addType(rt.INTEGER | rt.NIL)
+
+    r['v1'] = r['v0']:shadow()
+    r['v1']:setTracer(tracer)
+    r['v2'] = r['v0']:shadow()
+    r['v2']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'v', 'v0' },
+        { 'if', {
+            { 'condition', { 'ref', 'v', 'v1' } },
+            { 'ref', 'v', 'v2' },
+        } },
+    }
+
+    lt.assertEquals(r['v2']:view(), 'integer')
+
+    r['v2']:flushCache()
+    rt:flushCacheNow()
+    lt.assertEquals(r['v2']:view(), 'integer | nil')
+end

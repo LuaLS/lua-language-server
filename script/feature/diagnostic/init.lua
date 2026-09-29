@@ -103,6 +103,18 @@ function ls.feature.diagnostic(uri, partialPush)
 
     local disableRanges = disable.buildRanges(ast)
 
+    -- 收窄值是临时缓存（currentValue 会被 class.flush 清掉），而 walker 只走一次；
+    -- 在 pass 边界（求值链之外）作废一次，让本文件后续读取重算，避免读值退化成未收窄值
+    local coder = vfile and vfile.coder
+    if coder and coder.map then
+        for _, node in pairs(coder.map) do
+            if node.kind == 'tracer' then
+                ---@cast node Node.Tracer
+                node:restart()
+            end
+        end
+    end
+
     local disables = ls.util.arrayToHash(scope.config:get(uri, 'Lua.diagnostics.disable') or {})
     local positionConverter = document.positionConverter
 

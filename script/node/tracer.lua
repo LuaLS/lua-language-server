@@ -48,12 +48,28 @@ M.parentStack = nil
 ---@type Node.Tracer.Walker?
 M.walker = nil
 
+-- 是否已经为这个 tracer 建过 walker（`walker` 是 getter 字段，不能靠它判「建过没」）
+---@private
+---@type boolean?
+M.hasWalker = nil
+
 M.__getter.walker = function (self)
-    return New 'Node.Tracer.Walker' (self.scope, self.map, self.parentMap, self), true
+    local walker = New 'Node.Tracer.Walker' (self.scope, self.map, self.parentMap, self)
+    self.hasWalker = true
+    return walker, true
 end
 
 function M:trace()
     self.walker:start(self.flow)
+end
+
+--- 作废本次 walk 的结果，让下次读取重走一次（只在求值链之外调用，如诊断 pass 边界）。
+--- 已经建过 walker 的才需要作废：没建过的本来就是从头走。
+function M:restart()
+    if not self.hasWalker then
+        return
+    end
+    self.walker:restart()
 end
 
 ---@class Node.Tracer.Walker
@@ -73,17 +89,36 @@ function W:__init(scope, map, parentMap, tracer)
 end
 
 function W:start(block)
+    if self.walking then
+        return
+    end
     if self.started then
         return
     end
     self.started = true
+    self.walking = true
     self.aliasID = {}
     self.assignVersion = 0
     self.versionMap = {}
     ---@type Node.Tracer.Stack[]
     self.stacks  = {}
     self:pushStack()
-    self:traceBlock(block)
+    self.walking = true
+    local ok, err = xpcall(self.traceBlock, debug.traceback, self, block)
+    self.walking = nil
+    if not ok then
+        -- 异常时不能留下 walking/started：否则这个 walker 之后再也走不动
+        self.started = nil
+        error(err, 0)
+    end
+end
+
+--- 作废已有结果：下次 start 从头走一遍（走的过程中不动，避免把当前这次走坏）
+function W:restart()
+    if self.walking then
+        return
+    end
+    self.started = nil
 end
 function W:pushStack()
     local stack = New 'Node.Tracer.Stack' (self:currentStack())

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` LuaJIT nil-coalescing `??` now strips the optional `?` from the left-hand type (e.g. `integer? ?? 2` infers `integer`) [#3459](https://github.com/LuaLS/lua-language-server/issues/3459)
 * `FIX` A `.gitignore` line containing only whitespace no longer ignores the entire workspace [#3458](https://github.com/LuaLS/lua-language-server/issues/3458)
 * `FIX` `need-check-nil` diagnostic is no longer reported on safe navigation access (e.g. `x?.field`, `f?.()`, `t?.[key]`), since the optional access itself already handles the nil check. Note that a non-safe access chained after a safe one (e.g. `x.upper()?.field`) still reports, because the safe access only protects its own result.
 

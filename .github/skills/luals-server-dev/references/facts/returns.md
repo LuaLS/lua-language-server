@@ -115,6 +115,19 @@
   `local lastArg = list[#list]` 读值变宽、`lastArg.type == 'call'` 的收窄没生效 ⇒
   `function.lua:319` 新增一条 `Cannot assign <并集> to parameter parser.object`
   ⇒ 要**两处一起**（参数注解 + 本体元素读的收窄/注解），或先修「字段判等收窄没作用在索引读值上」那个缺口
-- 状态：未满足（open）
+- **目标侧落地（2026-09-29，已采用，218 → 216）**：两处一起改 ——
+  1. `vm/function.lua:291`：`---@param list parser.object | parser.object[] | nil`
+     （与 7 个调用点里 6 个传单节点的事实对齐）；
+  2. `vm/function.lua:300`：`local lastArg = list[#list]--[[@as parser.object?]]`
+     （元素读在参数变宽后是并集，出调用点前断言回节点；`if not lastArg` 的判空仍在，`?` 保住 nil）。
+  实测 **218 → 216（移除 2 / 新增 0）**：`missing-return-value.lua:30/31` 消失，
+  且不再冒出 `function.lua:319`。全量 `--test` 绿（本仓库无改动）、面板 0。
+- 余下的**引擎侧**候选（本轮用目标侧 cast 绕过了，仍值得单独量）：
+  1. 「字段判等收窄」作用在**索引读出来的值**上不生效（`list[#list]` 后 `lastArg.type == 'call'`
+     没能把并集收窄回节点）——注意其中「字段不存在（读值 = `never`）」的成员被判成
+     「可能相等」（`NEVER:canCast(任意)` = true）也是原因之一；
+  2. 「参数反推写回变量」是否该只作用于该次读取（整段停是净变差，见上）
+- 状态：目标工程侧已收敛（218 → 216）；引擎侧两个候选仍 open
+
 
 

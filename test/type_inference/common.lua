@@ -3312,6 +3312,14 @@ end
 local <?x?> = n or 0
 ]]
 
+config.set(nil, 'Lua.runtime.nonstandardSymbol', { '??' })
+TEST 'integer' [[
+---@type integer?
+local foo = 1
+local <?bar?> = foo ?? 2
+]]
+config.set(nil, 'Lua.runtime.nonstandardSymbol', {})
+
 TEST 'number' [=[
 local <?x?> = F()--[[@as number]]
 ]=]

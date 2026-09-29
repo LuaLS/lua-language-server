@@ -75,5 +75,29 @@
   「泛型 V 在 ipairs 调用时绑定」；一旦泛型绑定退化（truthy 之类标记做参数），
   V 就丢，部分路径退回 state。
   诱因与「读到未收窄值」（`narrowing.md` F19）重叠，但成因在**循环变量的取值建模**上
+- 追加证据（2026-09-29，目标工程 `core/diagnostics/missing-return-value.lua` 探针）：
+  **同一个循环变量 `ret` 在不同读位置取值不同** ——
+  `var:ret@25`（声明）= `any`、`var:ret@26`（循环体顶层，正好是 `vm.countList(ret)` 的实参读）= `any`、
+  `var:ret@30` / `@31`（`local rmin, rmax = vm.countList(ret)` 之后的嵌套 if 里，即报错处）
+  = `parser.object[] | nil`、第二个循环的 `var:ret@39` / `@40` = `never`。
+  ⇒ 循环变量进循环时是对的（`any`＝未知元素），**调用 + 结果比较之后退回未收窄的「声明类型」**
+  （`returns? parser.object[]` 的 `parser.object[] | nil`），更深的读位置甚至是 `never`
+- 诊断侧的另一半（现象自相矛盾的原因）：`undefined-field` 的 provider 检查的是**基值**
+  （`ret` = `parser.object[] | nil` ⇒ `Array` 不认具名字段 ⇒ `exists = false` ⇒ 报），
+  而读值/悬浮走的是**读节点自己的值**（= `any`，tracer 的宽松路径）
+- 归因（按注解判）：`returns` 声明是 `parser.object[]?`，其元素 = `parser.object | nil`，
+  **`start` 是有的** ⇒ 按注解 `ret.start` 不该报 ⇒ 这条是**我们的**缺口（循环变量/元素解析），
+  不是目标工程注解问题。两个观察到的诱因（都可能是真凶，下一步用二分确认）：
+  1. `for …, v in ipairs(returns)` 里 `<迭代对象>` 是**未收窄**的 `parser.object[] | nil`
+     （守卫的 truthy 收窄只体现在读点，槽位仍是声明类型）⇒ 元素/泛型 V 解析退化，
+     `v` 退回「迭代对象的表值」；
+  2. `local rmin, rmax = vm.countList(ret)` 之后对结果做比较（`rmax < min` / `rmin == rmax`）
+     会走 `W:traceLink` 的「间接窄化」→ `W:traceCallEqual`，按 **形参注解** 反推实参
+     ⇒ `ret` 被写成 `parser.object[] | nil`（形参 `list: parser.object[]?`，`vm/function.lua:291`）
+- 试过的候选（别再重复）：
+  1. 让 walker 按 flush 代数重跑 —— 目标 276 → 276；放宽触发条件会 C 栈溢出（`narrowing.md` F19 记）
+  2. 让「参数反推」只写回该次读取、不污染变量后续读取（对齐内联 cast 的既有设计）—— **未测**，
+     要量：会不会丢掉 `pcall/load` 一族依赖「实参被形参收窄」的既有行为
 - 状态：未满足（open）
+
 

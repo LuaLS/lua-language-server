@@ -98,6 +98,23 @@
   1. 让 walker 按 flush 代数重跑 —— 目标 276 → 276；放宽触发条件会 C 栈溢出（`narrowing.md` F19 记）
   2. 让「参数反推」只写回该次读取、不污染变量后续读取（对齐内联 cast 的既有设计）—— **未测**，
      要量：会不会丢掉 `pcall/load` 一族依赖「实参被形参收窄」的既有行为
+- **二分结论（2026-09-29 实测，基线 218）**：
+  - 候选 ② **就是这两条的元凶**：把 `W:traceLink` 的间接窄化（`tracer.lua:1053-1062` →
+    `W:traceCallEqual`）整段停掉 ⇒ `missing-return-value.lua:30/31` 消失，
+    但整体 **移除 6 / 新增 7**（净 +1）⇒ **不可整段停**：它同时修掉
+    `compile.lua:2789`、`vm/operator.lua:199/205/223`，并挡住 `cli/doc/export.lua:122`、
+    `newline-call.lua:46/49`（是**承重**机制，不是纯误报源）
+  - 候选 ①（`ipairs(<未收窄表>)` 的元素解析）**不是**这两条的成因：
+    停掉 ② 后复现文件里 `ret` 各位置都回到 `repro.Obj`
+- **目标侧候选（实测 218 → 217：移除 2 / 新增 1，未采用）**：
+  `vm/function.lua:291` 的 `---@param list parser.object[]?` 太**窄**——
+  `countList` 的 7 个调用点里 6 个传的是单个 `parser.object`
+  （`source.args` / `return` 节点等，按目标工程自己的约定「节点 = 带编号子项」），
+  只有 `vm/function.lua:203` 传真正的 `parser.object[]`。
+  把它放宽成 `parser.object | parser.object[] | nil` ⇒ 30/31 消失，但本体里
+  `local lastArg = list[#list]` 读值变宽、`lastArg.type == 'call'` 的收窄没生效 ⇒
+  `function.lua:319` 新增一条 `Cannot assign <并集> to parameter parser.object`
+  ⇒ 要**两处一起**（参数注解 + 本体元素读的收窄/注解），或先修「字段判等收窄没作用在索引读值上」那个缺口
 - 状态：未满足（open）
 
 

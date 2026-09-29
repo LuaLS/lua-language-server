@@ -1184,3 +1184,83 @@ do
     lt.assertEquals(r['x2']:view(), '{ base: { type: string } } | { other: 1 }')
     lt.assertEquals(r['x3']:view(), '{ base: { type: string } } | { other: 1 }')
 end
+
+do
+    --[[
+    ---@type integer?
+    local v
+    if not v then
+        fatal("no") -- noreturn
+    end
+    v
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['v0'] = rt.variable 'v'
+    r['v0']:addType(rt.INTEGER | rt.NIL)
+
+    r['v1'] = r['v0']:shadow()
+    r['v1']:setTracer(tracer)
+    r['v2'] = r['v0']:shadow()
+    r['v2']:setTracer(tracer)
+
+    local fatal = rt.func()
+    fatal:setNoReturn()
+    r['fatal'] = fatal
+    r['call1'] = rt.fcall(fatal, {})
+
+    tracer:setFlow {
+        { 'var', 'v', 'v0' },
+        { 'if', {
+            { 'condition', { 'not', { 'ref', 'v', 'v1' } } },
+            { 'call', 'call1', 'fatal', {} },
+        } },
+        { 'ref', 'v', 'v2' },
+    }
+
+    lt.assertEquals(r['v2']:view(), 'integer')
+end
+
+do
+    --[[
+    ---@type integer?
+    local v
+    local function log(msg) end
+    if not v then
+        log("miss") -- 普通函数，可以正常返回
+    end
+    v
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['v0'] = rt.variable 'v'
+    r['v0']:addType(rt.INTEGER | rt.NIL)
+
+    r['v1'] = r['v0']:shadow()
+    r['v1']:setTracer(tracer)
+    r['v2'] = r['v0']:shadow()
+    r['v2']:setTracer(tracer)
+
+    local log = rt.func()
+    r['log'] = log
+    r['call1'] = rt.fcall(log, {})
+
+    tracer:setFlow {
+        { 'var', 'v', 'v0' },
+        { 'if', {
+            { 'condition', { 'not', { 'ref', 'v', 'v1' } } },
+            { 'call', 'call1', 'log', {} },
+        } },
+        { 'ref', 'v', 'v2' },
+    }
+
+    lt.assertEquals(r['v2']:view(), 'integer | nil')
+end

@@ -63,7 +63,7 @@ ls.vm.registerCoderProvider('main', function (coder, source)
     parseBlock(coder, source, {
         ['function'] = mainKey,
     })
-    coder:finishTracer()
+    coder:finishTracer(mainKey)
 end)
 
 ls.vm.registerCoderProvider('do', function (coder, source)

@@ -4,6 +4,8 @@
 ---@operator shr(Node): boolean
 ---@overload fun(scope: Scope): Node.Function
 ---@field async? boolean
+---@field noreturn? boolean
+---@field flowTracer? Node.Tracer
 local M = ls.node.register 'Node.Function'
 
 M.kind = 'function'
@@ -46,6 +48,83 @@ end
 function M:setAsync()
     self.async = true
     return self
+end
+
+---@return Node.Function
+function M:setNoReturn()
+    self.noreturn = true
+    return self
+end
+
+---@param tracer Node.Tracer
+---@return Node.Function
+function M:setFlowTracer(tracer)
+    self.flowTracer = tracer
+    return self
+end
+
+---@param units table
+---@param map table<string, Node>
+---@return boolean
+function ls.node.tailCallNoReturn(units, map)
+    local unit = units[#units]
+    if type(unit) ~= 'table' or unit[1] ~= 'call' then
+        return false
+    end
+    local funcVar = map[unit[3]]
+    if not funcVar then
+        return false
+    end
+    local func = funcVar.value
+    if not func then
+        return false
+    end
+    local funcs = {}
+    if func.kind == 'function' then
+        ---@cast func Node.Function
+        if not func:isDummy() then
+            funcs[#funcs+1] = func
+        end
+    else
+        func:each('function', function (f)
+            ---@cast f Node.Function
+            if not f:isDummy() then
+                funcs[#funcs+1] = f
+            end
+        end)
+    end
+    if #funcs == 0 then
+        return false
+    end
+    for _, f in ipairs(funcs) do
+        if not f:isNoReturn() then
+            return false
+        end
+    end
+    return true
+end
+
+---@private
+M._noReturnChecked = false
+
+---@private
+M._noReturn = false
+
+---@return boolean
+function M:isNoReturn()
+    if self.noreturn then
+        return true
+    end
+    if self._noReturnChecked then
+        return self._noReturn == true
+    end
+    self._noReturnChecked = true
+    local tracer = self.flowTracer
+    if tracer and tracer.kind == 'tracer' and tracer.flow and tracer.map then
+        ---@cast tracer Node.Tracer
+        self._noReturn = ls.node.tailCallNoReturn(tracer.flow, tracer.map)
+    end
+    return self._noReturn == true
 end
 
 ---@param location Node.Location

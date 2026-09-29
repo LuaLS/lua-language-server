@@ -630,6 +630,11 @@ function W:traceIfChild(ifchild, lastStack)
     end
     self:traceBlock(ifchild, bodyStart)
 
+    -- 分支以「永不正常返回的调用」结尾（`error` 一类）：与 return/exit 同待遇
+    if not terminated and ls.node.tailCallNoReturn(ifchild, self.map) then
+        terminated = true
+    end
+
     self:popStack()
     stack.terminated = terminated
     return stack

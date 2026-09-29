@@ -238,8 +238,7 @@
 - 数字：目标工程 334（B 之前）→ 307（B）→ 286（and/or 标记）→ **282**（比较运算也标记）
 - 状态：成立（2026-09-23）
 
-## F15 以 `error(...)` 结尾的分支不算终止（`error` 没有 `never` 返回标注）
-- 断言（未满足）：`if not x then error('…') end` 之后 `x` 应当非 nil；当前 `error` 在我们的
+## F15 以 `error(...)` 结尾的分支不算终止（`error` 没有 `never` 返回标注）- 断言（未满足）：`if not x then error('…') end` 之后 `x` 应当非 nil；当前 `error` 在我们的
   meta 与目标工程的 meta 里都只写着 `function error(message, level) end`（无 `never`），
   该分支不计终止 → 合并后仍带 nil
 - 证据：目标工程 `tools/lua51.lua:201/202/203`（`mod._M = mod` 等三条 `Need check nil`，
@@ -257,7 +256,16 @@
     而且目标工程自己的 meta 里 `error` 没有 `never`，会盖住我们的注解，`tools/lua51.lua:201-203` 并未修掉
   - 已全部回退（`git checkout -- meta script/node/tracer.lua`），目标工程回到 278
   - 结论：先不做；将来要做需同时解决「目标工程 meta 覆盖」，并先在 `test/` 里钉出「`never` 调用终止」的回归
-- 状态：未满足（open，含两次实测结论，不要重走）
+- **已落地（2026-09-29，openspec change `noreturn-narrowing`）**：换成「注解 + 推断 + 分支末位调用终止」——
+  1. LuaCats `---@noreturn`（无参，与 `---@async` 同路，**不注册 cat parser**）；
+  2. `Node.Function:isNoReturn()`：注解优先，否则看函数**自身 flow 的末位 unit** 是否是对 noreturn 函数的调用
+     （这是上一次「做法 B′」失败的关键差异：只认**末位**那条调用，且要求目标**全部** noreturn——
+     `matchedFuncs` 为空 / 有任一能返回的成员一律 false）；
+  3. meta 的 `error` 标 `---@noreturn`（template + whimsical 两处）
+  实测：目标工程 **216 → 199（移除 17 / 新增 0）**，F15 列出的 `tools/lua51.lua:201-203` 一族
+  （现为 170/204/205/206）与 `json-edit.lua:405` 的 `return-type-mismatch` 全部消失。
+  详见下一条 F26（机制与反例）
+- 状态：成立（2026-09-29；三次实测：`---@return never` 0/0、语句级 `never` 净变差、本轮 -17/0）
 
 ## F16 `and` 的「另一侧事实」必须覆盖单侧独有的键（合取方向）
 - 断言：`and` 节点向外暴露的 `otherSide`（另一分支的事实）在**另一侧是合取**时 —— 即追踪
@@ -524,3 +532,37 @@
   3. 只要求「有缺失」不要求「有交集」 ⇒ `{ [1] = ... }` 这类索引构造的表也放行，
      破 `test/feature/diagnostic/return-type-mismatch.lua`（`objs[1] = g(source); return objs`）
 - 状态：成立（2026-09-28；目标 259 → 220，移除 23 / 新增 0）
+
+## F26 以 noreturn 调用结尾的分支不参与合并（`---@noreturn` 注解 + 函数级推断）
+
+- 断言：`if not x then f(...) end` 中 `f` 为 **noreturn**（① 定义处标了 `---@noreturn`，
+  或 ② 推断：`f` 自身 flow 的**末位 unit** 是对 noreturn 函数的调用）时，该分支不参与 `if` 之后的合并，
+  守卫后的 `x` 不含 nil。判据收严：`funcVar` 取不到、被调用者里没有 function 成员、
+  或目标里**有任一**能正常返回 ⇒ SHALL NOT 终止分支（未知函数 / 多目标并集一律不终止）
+- 证据：
+  - `test/feature/diagnostic/noreturn.lua`（5 例：注解 / 未注解包装 `err`（推断）/ 普通调用 `log` 仍报 /
+    `any` 形参做被调用者仍报 / `fun()` 形参同时绑到 `fatal` 与 `ok` 两个实参仍报）
+  - `test/node/tracer.lua` 末两例（收窄层：noreturn → `integer`，普通调用 → `integer | nil`）
+  - 目标工程：**216 → 199（移除 17 / 新增 0）**，含 `json-edit.lua:405`（原 `return-type-mismatch`，
+    实为 `statusPos` 被 `decode_error` 守卫污染出的 `integer | nil`）、`json.lua` / `jsonc.lua` 各 4 条
+    `param-type-mismatch`、`parser/lines.lua`、`proto/converter.lua`、`text-merger.lua`、
+    `parser/compile.lua:3368`、`tools/lua51.lua:170/204/205/206`
+- 代码：
+  - 注解：`---@noreturn` **不注册 cat parser**（未注册 subtype 的 cat 是普通
+    `LuaParser.Node.Cat`，`script/parser/ast/cats/cat.lua:176-183`；与 `---@async` 同路）
+  - `script/vm/coder/function.lua`：`getCatGroup(source)` 里 `cat.subtype == 'noreturn'` → `setNoReturn()`
+  - `script/vm/coder/tracer.lua`：`finishTracer(funcKey)` 发射 `{func}:setFlowTracer({tracer})`
+    （`startTracer` 时主函数的 `rt.func()` 还没执行，不能在那里发射）
+  - `script/node/function.lua`：`ls.node.tailCallNoReturn(units, map)`（walker 与推断**共用**的判定）、
+    `Node.Function:isNoReturn()`（记忆 + 求值中再进入返回 false 的环保护）
+  - `script/node/tracer.lua` `W:traceIfChild`：`traceBlock` 之后若末位 unit 是 noreturn 调用 → `terminated`
+  - meta：`meta/template/basic.lua`、`meta/whimsical/basic.lua` 的 `error` 标 `---@noreturn`
+- 试过（**不采用**，别重走）：
+  1. `Node.FCall` 的**值位置**在目标全为 noreturn 时返回 `rt.NEVER`：216 → 199 **不变**（移除 0 / 新增 0），
+     诊断耗时 9.74s → 10.12s（+3.9%，`value` 是热路径，加一次 `matchedFuncs` 泛型匹配）⇒ 回退
+  2. 复用 meta 里既有的 `---@throw`（`meta/whimsical/basic.lua` 已写在 `error` 上，但本仓库**没有**任何
+     `throw` 实现）：它有 DSL 形式 `---@throw => args[1].isFalsy`（`assert`），带**条件语义**，
+     直接当 noreturn 会把 `assert(v)` 之后的代码误判为不可达 ⇒ 本轮只做无参 `---@noreturn`
+  3. 用函数自身 AST 判末位语句（`LuaParser.Node.Function` 继承 `Block`）：Node → AST 没有反向索引
+     （`vfile:getNode(ast)` 只是 AST → Node），而 flow 已是同一份信息的现成形态
+- 状态：成立（2026-09-29；目标工程 216 → 199，全量 `--test` 绿，本仓库面板 0）

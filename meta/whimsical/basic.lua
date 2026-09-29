@@ -46,5 +46,6 @@ function dofile(filename) end
 ---#DES 'error'
 ---@param message any
 ---@param level?  integer
+---@noreturn
 ---@throw
 function error(message, level) end

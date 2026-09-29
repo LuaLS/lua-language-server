@@ -152,6 +152,14 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                     break
                 end
             end
+            for _, cat in ipairs(catGroup) do
+                if cat.subtype == 'noreturn' then
+                    coder:addLine('{key}:setNoReturn()' % {
+                        key = funcKey,
+                    })
+                    break
+                end
+            end
         end
 
         -- function name() end 翻译为 name = function() end：
@@ -313,7 +321,7 @@ ls.vm.registerCoderProvider('function', function (coder, source)
                         break
                     end
                 end
-                coder:finishTracer()
+                coder:finishTracer(funcKey)
                 coder:popBlock()
             end, 'function body --')
         end

@@ -35,11 +35,17 @@ function M:getTracer()
     return self.tracers[#self.tracers]
 end
 
-function M:finishTracer()
+function M:finishTracer(funcKey)
     ---@type Coder.Tracer
     local top = table.remove(self.tracers)
     local data = top:getStack()
     self.tracerFlowMap[top.id] = data
+    if funcKey then
+        self:addLine('{func}:setFlowTracer({tracer})' % {
+            func   = funcKey,
+            tracer = self:getCustomKey(top.id),
+        })
+    end
 end
 
 ---@class Coder.Tracer

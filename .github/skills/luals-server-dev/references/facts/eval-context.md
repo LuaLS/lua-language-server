@@ -34,6 +34,12 @@
   数字：目标工程 `[Intersection] values cycle detected` 日志数 2 → 2（未增）
 - 代码：`script/node/node.lua`（`Node.ResolveContext` 增 `inProgress` / `intersection`）、
   `script/node/intersection.lua`（`Node.Intersection.EvalState` + `evalState`）
+- 收编（2026-09-30，`ls.util.simplify` / `ls.util.visited`）：11 处完全同形的 `simplify` 覆盖体
+  （`call/fcall/field/index/list/param_of/select/spread/subtract/ternary/variable`）各收敛成一行，
+  另 2 处线程式手写守卫（`union:isTableLike`、`variable:hasAssignedField`）换用 `ls.util.visited`；
+  两轮净 **-75 行**、目标工程 154（0/0）。**其余手写 `visited` 形态不同/作用域自足，不收编**
+  （`class.lua` 按名去重、`completion/string.lua` 别名链、`node.lua` 链式循环、`runtime-helper.lua` 队列、
+  `variable.lua` 的局部递归、`union.lua:124` 集合去重）
 - 状态：成立（2026-09-30）
 
 ## E3 占位只放 ctx，不进缓存（只缓存完成态）

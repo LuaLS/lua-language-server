@@ -33,11 +33,16 @@
 
 ## 3. `PROVISIONAL` 迁到 `ctx.inProgress`（只缓存完成态）
 
-- [ ] 3.1 需要环保护的 getter（`variable` / `union` / `intersection` / `table` / `select` / `fcall` …）：
-  进入时查 `ctx.inProgress[self]`，命中即返回占位且 `needCache = false`
-- [ ] 3.2 去掉「把 `rt.PROVISIONAL` 写进 getter 缓存字段」的写法（保留常量语义供 `==` 识别）
-- [ ] 3.3 验证：全量 `--test` 绿 + 目标工程 `--baseline` **期望 154 → ≤154**（若 F2 族顺带消失要记数字）
-  + 面板复验（请用户重启 LS 后看 `compile.lua:3043/3044`）
+- [x] 3.1 `Node.Variable.__getter.value`（`variable.lua:1034`，**唯一**把占位写进缓存字段的地方）：
+  入口查 `ctx.inProgress[self]` → 命中即 `return placeholder, false`（占位不缓存）；计算前
+  `ctx.inProgress[self] = rt.PROVISIONAL`、算完清空；**没有 ctx 时退回旧写法**（占位写缓存字段）保持行为一致。
+  该 getter 的 `needCache` 标注由 `---@return true` 放宽为 `boolean`（占位路径返回 `false`）
+- [x] 3.2 `PROVISIONAL` 作为**类型/识别标记**保留：`runtime.lua` 的定义与 `anykv`/`truthy`/`falsy` preset、
+  `tracer.lua:387/441` 的「不采纳未完成值」、`union.lua:155/163` 的跳过占位成员 —— 均不动
+- [x] 3.3 验证：全量 `--test` 绿；目标工程 **154（removed 2 / added 0）**；面板 0。
+  **F2 / F27 族未顺带消失**（符合预期：那两条的 stale 值是 `Select.value`/`FCall.returns`，
+  不是 `Variable.value`）⇒ 数字记在 `returns.md` F2 与 `项目实践.md`。
+  附带收益：占位不再写进缓存字段 ⇒ 求值中途异常也不会把「半成品」永久留在变量缓存里
 
 ## 4. 防回归断言
 

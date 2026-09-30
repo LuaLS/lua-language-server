@@ -1030,10 +1030,21 @@ M.value = nil
 
 ---@param self Node.Variable
 ---@return Node
----@return true
+---@return boolean # needCache：同一节点重入时返回占位且**不缓存**（占位不得进缓存）
 M.__getter.value = function (self)
     local rt = self.scope.rt
-    self.value = rt.PROVISIONAL
+    -- 同一节点重入的占位：优先放求值上下文（生命周期=一次求值期，异常也不残留）；
+    -- 没有求值上下文时退回旧写法（占位写进缓存字段）。
+    local ctx = rt:evalContext()
+    if ctx then
+        local placeholder = ctx.inProgress[self]
+        if placeholder then
+            return placeholder, false
+        end
+        ctx.inProgress[self] = rt.PROVISIONAL
+    else
+        self.value = rt.PROVISIONAL
+    end
     -- 收窄值依赖 master 实时状态：master 变化时收窄缓存必须失效
     self:getMasterVariable()
     if self.tracer then
@@ -1067,6 +1078,9 @@ M.__getter.value = function (self)
     -- 可选链访问（?. ?: ?[）：结果总是包含 nil
     if self:isOptional() then
         result = result | rt.NIL
+    end
+    if ctx then
+        ctx.inProgress[self] = nil
     end
     return result, true
 end

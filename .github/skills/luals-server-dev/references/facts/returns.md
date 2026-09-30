@@ -90,6 +90,18 @@
       「让函数返回值在 **Select 首次计算前** 就齐」入手（例如 `addReturnList` 的时机/顺序）。
       另一条低成本路线：目标侧给无注解的递归函数补 `---@return`（`returnsDef` 在编码期就有值，
       Select 首次计算即正确），但要注意别引入新的返回值不匹配诊断。
+  - **2026-09-30 重试（在 `eval-context-unify` 落地之后，**仍不采用**）**：
+    新前提 = ①求值期不失效（入口锁 + 静默点批量）；②`intersection` 环保护换成**结构签名键**
+    （`Node.Intersection.EvalState`）；③只缓存完成态。
+    重放 #24 那版（`FCall.matchedFuncs` 登记 `f:addRef(self)` + `Function:addReturnList` → `flushCache()`）：
+    **仍 147014 层爆栈**，栈形同上次：`undefined-field provider → … → intersection.buildValues
+    → rt.intersection(parts)（新节点）→ onCanCast → …`。
+    **结论修正**：这条爆栈不是「签名环」（结构键也拦不住），而是**深度爆炸**——
+    `buildValues` 里每层都新建交集节点、签名各不相同 ⇒ 结构键的环保护不触发；
+    而 `values` getter 里的 `enterDepth` + `DEPTH_LIMIT = 64` **没有拦住这条路径**
+    （`buildValues → rt.intersection(...) → 新节点的 value getter` 这条链上的计数/任务键需要另外查）。
+    ⇒ 结论：**F2 的依赖边方案在「深度爆炸」修掉之前都不可能采用**；下一条入口是先查
+    「为什么 `DEPTH_LIMIT` 没拦住 `buildValues` 的递归」，或走目标侧 `---@return`（C 方案）。
   - **2026-09-30 调试图定位（根因链条完整；含「谁先读它」与「为什么那时还没齐」的实证）**：
     在**运行中的 LS**（attach 11466，`🍄attach` 配置；服务目标工程）里用调试器 + 落盘探针确认：
     - **谁先读 `Select.value`**：不是 coder 期，而是**诊断 pass 里的 tracer walk**。

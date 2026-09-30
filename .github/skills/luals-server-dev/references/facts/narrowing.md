@@ -54,11 +54,20 @@
   下一步是逐条判断「我们推得太窄」还是「目标工程注解该补」。
 - 状态：**部分满足**（撤 `never` 污染这一支已落地；「收窄结果必须与变量自身类型相容」的完整约束仍未立）
 
-## F4 `and` / `or` 的值位置（`x = a and b`）目前不做真值收窄
+## F4 `and` / `or` / `not` 的值位置不做真值收窄（但子树 SHALL 被走一遍）
 - 断言：值位置只遍历操作数条目取 currentValue；右操作数拿不到左侧收窄（`x = s and #s` 里 `#s` 是 `op.len<string | nil>`）
 - 证据：无测试（调研数据见 项目实践.md「2026-09-21（第二轮）」）
-- 代码：`W:traceUnit` 的 `and`/`or` 分支；`traceAnd`/`traceOr` 只在 condition 位置被调用
-- 状态：未满足（open，2026-09-21 调研：操作数边界要 coder 插标记，落 6 处新误报后暂缓）
+- 代码：`W:traceUnit` 的 `and`/`or`/`not` 分支；`traceAnd`/`traceOr` 只在 condition 位置被调用
+- **2026-09-30**：`not` 原先**没有**这个分支（`traceUnit` 只认 and/or）⇒ 值位置 `not` 的整棵子树
+  都不被走，内部读点拿不到 `currentValue`，退化到 `getStaticValue()`/`getGuessValue()` 兜底。
+  实例：目标工程 `plugins/astHelper.lua:72` 的 `return not not _M.addClassDoc(ast, arg, classname), arg`
+  —— 实参读 `var:arg@72:44-72:46` 的 `currentValue = nil`（插桩 `W:traceRef` 整轮一次都没进），
+  而同行的返回值读 `arg@72:61` 正常收窄成 `parser.object`。
+  修法：把 `and`/`or` 分支扩成 `and`/`or`/`not`（只走子树、不收窄）。
+  数字：目标工程 **156 → 154（移除 2 / 新增 0）**（另一条 `core/diagnostics/undefined-doc-name.lua:26`）；
+  回归测试 `test/node/tracer.lua`（撤掉修法立刻红）。**注意与 F27 区分**：F27 是「算过被 flush 清掉」，
+  本条是「压根没算」，症状相同、修法无关。
+- 状态：成立（2026-09-30；`not` 的子树已走；真值收窄仍不做 —— 「未满足」的部分只剩右操作数拿不到左侧收窄）
 
 ## F5 真假标记 `truthy` 会作为读值出现（无成员集）
 - 断言：`any` 上的真值收窄得到 `type truthy`，它没有字段 → 作为读值会引发「未定义字段」/形参不匹配

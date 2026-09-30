@@ -1339,3 +1339,39 @@ do
     rt:flushCacheNow()
     lt.assertEquals(r['v2']:view(), 'integer | nil')
 end
+
+do
+    --[[
+    ---@type integer?
+    local v
+    if v then
+        not not v
+    end
+    ]]
+
+    rt:reset()
+    local r = {}
+
+    local tracer = rt.tracer(r, {})
+
+    r['v0'] = rt.variable 'v'
+    r['v0']:addType(rt.INTEGER | rt.NIL)
+
+    r['v1'] = r['v0']:shadow()
+    r['v1']:setTracer(tracer)
+    r['v2'] = r['v0']:shadow()
+    r['v2']:setTracer(tracer)
+
+    tracer:setFlow {
+        { 'var', 'v', 'v0' },
+        { 'if', {
+            { 'condition', { 'ref', 'v', 'v1' } },
+            { 'not', {
+                'not',
+                { 'ref', 'v', 'v2' },
+            } },
+        } },
+    }
+
+    lt.assertEquals(r['v2']:view(), 'integer')
+end

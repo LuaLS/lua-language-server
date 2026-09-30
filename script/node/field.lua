@@ -59,16 +59,7 @@ end
 ---@param visited? table<Node, true>
 ---@return Node
 function M:simplify(visited)
-    if self.value == self then
-        return self
-    end
-    visited = visited or {}
-    if visited[self] then
-        return self
-    end
-    visited[self] = true
-    local result = self.value:simplify(visited)
-    return result
+    return ls.util.simplify(self, visited)
 end
 
 M.__getter.value = function (self)

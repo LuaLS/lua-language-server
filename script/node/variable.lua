@@ -1310,11 +1310,10 @@ end
 ---@param visited? table<Node.Variable, boolean>
 ---@return boolean
 local function hasAssignedField(var, visited)
-    visited = visited or {}
-    if visited[var] then
+    visited = ls.util.visited(var, visited)
+    if not visited then
         return false
     end
-    visited[var] = true
     if var.assigns and #var.assigns > 0 then
         return true
     end

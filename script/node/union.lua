@@ -66,11 +66,10 @@ local _getVisiting = {}
 ---@param visited? table<Node, true>
 ---@return boolean
 function M:isTableLike(visited)
-    visited = visited or {}
-    if visited[self] then
+    visited = ls.util.visited(self, visited)
+    if not visited then
         return false
     end
-    visited[self] = true
     for _, v in ipairs(self.values) do
         if v:isTableLike(visited) then
             return true

@@ -49,11 +49,13 @@ ls.node.kind = {
 ---@field length? integer
 
 --- 求值/遍历上下文：一次求值期内共享的环保护与位置信息。
---- - `visited`：本次遍历访问过的节点（跨节点路径语义，如 union/intersection/table 互递归）
+--- - `visited`：**每次遍历**的环保护（跨节点路径语义，如 union/intersection/table 互递归）
 --- - `inProgress`：正在求值的节点 → 占位值（同一节点重入时返回占位，不再起一次求值）
+--- - `intersection`：交集的求值期状态（**结构签名键**，见 `Node.Intersection.EvalState`）
 ---@class Node.ResolveContext
 ---@field visited table<Node, Node> 防环缓存
----@field inProgress? table<Node, Node> 正在求值的节点 → 占位值
+---@field inProgress? table<Node, Node> # 正在求值的节点 → 占位值
+---@field intersection? Node.Intersection.EvalState # 交集的求值期环保护状态
 ---@field location? Node.Location 泛型展开的调用点
 
 ---基础分类

@@ -38,19 +38,43 @@ M.values = nil
 local DEPTH_LIMIT = 64
 
 ---@type integer
-local depth = 0
-
----@type table<Task, integer>
-local taskDepths = ls.util.weakKTable()
-
----@type number
 local lastOverflowLog = 0
 
----@type table<string, true>
-local buildingValues = {}
+-- 求值期环保护状态（**结构签名键**：节点被重建后依然有效，因此不能换成身份键）。
+-- 有求值上下文时挂在 ctx 上，生命周期 = 一次求值期；否则退回模块级（与旧行为一致）。
+---@class Node.Intersection.EvalState
+---@field building table<string, true>
+---@field buildingHasGeneric table<string, true>
+---@field taskDepths table<Task, integer>
+---@field depth integer
 
----@type table<string, true>
-local buildingHasGeneric = {}
+---@return Node.Intersection.EvalState
+local function newEvalState()
+    return {
+        building           = {},
+        buildingHasGeneric = {},
+        taskDepths         = ls.util.weakKTable(),
+        depth              = 0,
+    }
+end
+
+---@type Node.Intersection.EvalState
+local fallbackState = newEvalState()
+
+---@param self Node.Intersection
+---@return Node.Intersection.EvalState
+local function evalState(self)
+    local ctx = self.scope.rt:evalContext()
+    if not ctx then
+        return fallbackState
+    end
+    local state = ctx.intersection
+    if not state then
+        state = newEvalState()
+        ctx.intersection = state
+    end
+    return state
+end
 
 ---@param raw Node
 ---@return string
@@ -79,25 +103,27 @@ local function rawSignature(nodes)
     return table.concat(parts, '|')
 end
 
+---@param state Node.Intersection.EvalState
 ---@return Task?, integer
-local function enterDepth()
+local function enterDepth(state)
     local task = ls.task.getCurrentTask()
     if not task then
-        depth = depth + 1
-        return nil, depth
+        state.depth = state.depth + 1
+        return nil, state.depth
     end
-    local d = (taskDepths[task] or 0) + 1
-    taskDepths[task] = d
+    local d = (state.taskDepths[task] or 0) + 1
+    state.taskDepths[task] = d
     return task, d
 end
 
+---@param state Node.Intersection.EvalState
 ---@param task Task?
 ---@param d integer
-local function leaveDepth(task, d)
+local function leaveDepth(state, task, d)
     if task then
-        taskDepths[task] = d - 1
+        state.taskDepths[task] = d - 1
     else
-        depth = d - 1
+        state.depth = d - 1
     end
 end
 
@@ -212,21 +238,22 @@ end
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
+    local state = evalState(self)
     local signature = rawSignature(self.rawNodes)
-    if buildingValues[signature] then
+    if state.building[signature] then
         logOverflow(self, 'values cycle detected')
         return {}, true
     end
-    local task, d = enterDepth()
+    local task, d = enterDepth(state)
     if d > DEPTH_LIMIT then
-        leaveDepth(task, d)
+        leaveDepth(state, task, d)
         logOverflow(self, 'values depth overflow (>64)')
         return { self.scope.rt.ANY }, true
     end
-    buildingValues[signature] = true
+    state.building[signature] = true
     local values, isTrue = buildValues(self)
-    buildingValues[signature] = nil
-    leaveDepth(task, d)
+    state.building[signature] = nil
+    leaveDepth(state, task, d)
     return values, isTrue
 end
 
@@ -378,21 +405,22 @@ end
 ---@return boolean
 ---@return true
 M.__getter.hasGeneric = function (self)
+    local state = evalState(self)
     local signature = rawSignature(self.rawNodes)
-    if buildingHasGeneric[signature] then
+    if state.buildingHasGeneric[signature] then
         logOverflow(self, 'hasGeneric cycle detected')
         return false, true
     end
-    local task, d = enterDepth()
+    local task, d = enterDepth(state)
     if d > DEPTH_LIMIT then
-        leaveDepth(task, d)
+        leaveDepth(state, task, d)
         logOverflow(self, 'hasGeneric depth overflow (>64)')
         return false, true
     end
-    buildingHasGeneric[signature] = true
+    state.buildingHasGeneric[signature] = true
     local hasGeneric, isTrue = buildHasGeneric(self)
-    buildingHasGeneric[signature] = nil
-    leaveDepth(task, d)
+    state.buildingHasGeneric[signature] = nil
+    leaveDepth(state, task, d)
     return hasGeneric, isTrue
 end
 

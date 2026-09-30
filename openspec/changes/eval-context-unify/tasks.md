@@ -17,12 +17,19 @@
 - [x] 1.4 验证：全量 `--test` 绿；目标工程 **154（removed 2 / added 0，与改前一致）**；本仓库面板 0；
   A/B 计时 基线 **10.26s** → 本步 **9.88s**（无回归，之前 11.5/12.4s 是机器噪声）
 
-## 2. 把各家的 visited 接到 ambient ctx（行为等价）
+## 2. 把各家自有状态接进 ctx（行为等价；按事实分两类）
 
-- [ ] 2.1 `intersection.lua` / `union.lua`：自有 `visited` / `logOverflow` 的路径改为用 `ctx.visited`
-  （保留 `logOverflow` 作为超限日志，但不再作为唯一兜底）
-- [ ] 2.2 `table.lua` / `variable.lua`：`simplify(visited)` / `get` 链路用 ambient ctx 播种
-- [ ] 2.3 验证：同 1.4（154 / 0/0）+ 确认 `[Intersection] values cycle detected` 日志不再增加
+- [x] 2a **不做**（2026-09-30 决定）：`union` / `table` / `variable` 的 `visited` 是**每次遍历**的环保护
+  （`ls.util.visited` 9 处 / 手写 `visited = visited or {}` 13 处 / 每次新建 8 处），接 ambient 会让同一次求值里
+  第二个独立遍历吞掉合法的重复访问 ✗；`union:each/every` 的 `visited` 还是公开 API 参数。
+  ⇒ **per-traversal 去重由各自内部维护**，ctx 只管 per-eval 部分（理由已写进 design D5-2a）
+- [x] 2b **结构键（`intersection`）**：新增 `Node.Intersection.EvalState`（`building` / `buildingHasGeneric` /
+  `taskDepths` / `depth`）挂到 `ctx.intersection`（无 ctx 时退回模块级）；`enterDepth/leaveDepth` 改为接收 state。
+  验证：全量 `--test` 绿；目标工程 **154（removed 2 / added 0）**；`[Intersection] values cycle detected`
+  日志数与基线**相同（2）**；本仓库面板 0
+- [x] 2c 记录「**不要**把结构键改成身份键」（身份随节点重建失效 ⇒ 147k 爆栈诱因之一）——已写进 design D5-2b/2a
+- [x] 2d 顺带记一条实测教训：**跨文件改动不会让已缓存的文件重算**（`calculated && version`）——
+  本仓库面板里 `intersection.lua` 的告警是旧缓存，touch 该文件后才刷新；排查面板时要留意
 
 ## 3. `PROVISIONAL` 迁到 `ctx.inProgress`（只缓存完成态）
 

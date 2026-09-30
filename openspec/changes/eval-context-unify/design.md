@@ -95,11 +95,22 @@ getter 返回 `res, needCache`：返回占位/中间态时一律 `needCache = fa
 
 ### D5 迁移顺序（每步独立验收，先"只加不删"）
 
-1. **引入 ctx + ambient + 入口 lock/unlock**：不改任何求值逻辑（只建栈、加锁）→ 目标工程 154 不变、全量测试绿；
-2. **把 `intersection` / `union` / `table` / `variable` 的自有 `visited` 接到 ambient ctx**
-   （行为等价，只是状态统一）→ 同上；
+1. **引入 ctx + ambient + 入口 lock/unlock**（已完成 ✓）：不改任何求值逻辑 → 目标工程 154 不变、全量测试绿；
+2. **把各家自有状态接进 ctx**（按事实分两类）：
+   - 2a **身份键（`union` / `table` / `variable`）——不做**（2026-09-30 决定）：
+     这些 `visited` 是**每次遍历**的环保护（`ls.util.visited` 9 处、手写 `visited = visited or {}` 13 处、
+     每次新建 8 处），作用域就是"这一次调用"。接 ambient ctx 会让**同一次求值里第二个独立遍历**
+     把前一个遍历访问过的节点当成"已访问"而跳过 ⇒ 合法的重复访问被吞掉（不是等价重构）✗。
+     `union:each/every` 的 `visited` 还是**公开 API 参数**（调用方可自带），更不能被 ambient 覆盖。
+     ⇒ **per-traversal 的去重由各自内部维护**，ctx 只管 per-eval 的那部分。
+   - 2b **结构键（`intersection`）——已做 ✓**：`buildingValues` / `buildingHasGeneric`（模块级，键
+     `rawSignature(rawNodes)`）与 `taskDepths` / `depth` 搬进 ctx（`Node.Intersection.EvalState`，键仍是结构签名），
+     生命周期从"整个进程"变成"一次求值期"；**没有 ctx 时退回模块级**（与旧行为一致）。
+     这同时消除「异常中途逃逸 ⇒ 模块级集合残留 `true` ⇒ 之后同签名求值永远返回 `{}`」的潜在坏状态。
+     `logOverflow` / `DEPTH_LIMIT` 保留为最后兜底与观测。
+   - 注意：**不要**把 `intersection` 的结构键改成身份键（身份会随节点重建失效，是本轮 147k 爆栈的诱因之一）。
 3. **`PROVISIONAL` → `ctx.inProgress`**（含"判定正在算时返回占位且不缓存"）→ 观察 F2/F27 族是否顺带消失，记数字；
-4. **加 debug 断言**「求值期不得 `flushCacheNow`」（用 `rt.cacheLocked > 0` 时不得直接 flush 作断言）→ 防回归；
+4. **加 debug 断言**「求值期不得 `flushCacheNow`」+ ctx 栈平衡断言 → 防回归；
 5. 台账/项目实践收尾（把"环保护统一"写进事实台账，替换掉零散描述）。
 
 ### 备选（未采用）

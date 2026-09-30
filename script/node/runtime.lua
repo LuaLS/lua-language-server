@@ -2,6 +2,7 @@ local class = require 'class'
 
 ---@class Node.Runtime: Class.Base
 ---@field generation integer
+---@field castDepth? integer
 ---@overload fun(scope: Scope): Node.Runtime
 local M = Class 'Node.Runtime'
 
@@ -515,6 +516,7 @@ function M:reset()
     self:createPools()
     self:fillPresets()
     self.castCache = nil
+    self.castDepth = nil
     self.valueDocs = {}
 end
 
@@ -551,6 +553,10 @@ M.__getter.castCache = function (self)
     return ls.tools.pathTable.create(true, false), true
 end
 
+-- `Node:canCast` 的递归深度（见 node.lua 的 CAST_DEPTH_LIMIT）：
+-- 正常路径进出配对；这里在失效点一并清掉，避免异常穿出时残留成"永久宽松"。
+M.castDepth = nil
+
 ---@type table<Node.RefModule, true>
 M.waitFlushList = nil
 
@@ -572,6 +578,7 @@ function M:flushCacheNow()
         error('[eval-context] flushCacheNow bypassed while cache locked', 2)
     end
     self.castCache = nil
+    self.castDepth = nil
     local list = self.waitFlushList
     if not list then
         return

@@ -170,6 +170,13 @@
 - 状态：未满足（open）。下一步：先查清「调用点 head 的返回类型为什么是 `nil`」——
   是 `matchedFuncs` 拿到了另一个函数实例（generic resolve / clone），还是 `returnsPack`
   在递归求值中被当成 `PROVISIONAL` 后缓存
+- **2026-09-30 前置障碍已解除（护栏装错了层，见 `casts.md` F3）**：147k 爆栈**不是** `intersection`
+  的 `DEPTH_LIMIT` 失效，而是**护栏不在失控链上** —— 失控在 `Node:canCast` 的递归
+  （`castCache` 身份键对不上：每层新建节点）。实测 `maxNesting=9` / `bailDepth=0` / `states=0` /
+  `tasks=0` / `rts=1` 排除了状态/任务/运行时分片。落地 `CAST_DEPTH_LIMIT = 64` 后重放本条的依赖边补丁：
+  **不再爆栈**，目标工程 **154 → 149（移除 5 / 新增 0）**（仅护栏则 154 → 154，0/0）
+  ⇒ 依赖边方案（`FCall.matchedFuncs` 加 `f:addRef(self)`、`Function:addReturnList` 加 `flushCache()`）
+  **从「不可采用」变为「可采用」**；下一步是带**面板**验证的一轮（本轮结论只说明它可跑通、批量不回归）。
 
 ## F3 泛型 for 的循环变量在部分时机退回「列表值」而不是元素（未满足）
 

@@ -232,6 +232,15 @@ function M:refreshCastCache()
     self._castCache = nil
 end
 
+--- 转换判定的最大递归层数：`canCast` 每层都可能新建节点（`intersection.buildValues`），
+--- `castCache` 的身份路径键对不上，环保护无从剪枝 —— 超过此深度按 `unknown` 处理（宽松放行，
+--- 与 `castCache` 命中 `'unknown'` 同义）。实测依据见 facts/casts.md F3（147k 层栈溢出）。
+---@type integer
+local CAST_DEPTH_LIMIT = 64
+
+---@type fun(self: Node, other: Node): boolean
+local castImpl
+
 ---自己是否是对方的子类型？
 ---* 对于基础值来说，自己是否是更具体的类型
 ---* 对于表类型来说，自己是否包含对方的所有字段
@@ -243,6 +252,21 @@ function M:canCast(other)
         ---@cast other -Node
         other = self.scope.rt.value(other)
     end
+    local rt = self.scope.rt
+    local depth = rt.castDepth
+    if depth and depth >= CAST_DEPTH_LIMIT then
+        return true
+    end
+    rt.castDepth = (depth or 0) + 1
+    local result = castImpl(self, other)
+    rt.castDepth = depth
+    return result
+end
+
+---@param self Node
+---@param other Node
+---@return boolean
+function castImpl(self, other)
     local castCache = self.scope.rt.castCache
     local path = { self, other }
     local res = castCache:get(path)

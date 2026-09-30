@@ -39,3 +39,31 @@
   `completion.lua:1861` 的区间是第 2 个实参 `name`，不是第一个 `source[1]`；
   先看列再下结论（我第一次改错了一个实参，白跑两趟扫描）。
 - 状态：成立（2026-09-27；目标工程 220 → 218，移除 2 / 新增 0）
+
+## F3 `canCast` 的递归深度必须有上限（超限按 unknown 宽松放行）
+
+- 断言：`Node:canCast` 的递归层数 SHALL 有上限；超限 SHALL 按「unknown（宽松 `true`）」返回
+  （与 `castCache` 命中 `'unknown'` 同义），SHALL NOT 无限下探。
+- 为什么必须有：`castCache` 的环保护键是**身份路径** `{self, other}`，而这条链**每层都新建节点**
+  （`intersection.buildValues` → `rt.intersection(parts)`），身份永不重复 ⇒ 剪枝无从生效。
+- 证据（2026-09-30 实测；触发场景 = 重放 F2 依赖边补丁，见 `returns.md` F2）：
+  - **147014 层栈溢出**，栈形：`undefined-field provider → … → intersection.onCanCast
+    → .value → #self.values → values getter → getValues → buildValues → rt.intersection → __init`；
+    `logOverflow` 落盘的 traceback 里可见 `node.lua:261 canCast ↔ union.lua:55 onCanCast ↔
+    node.lua:261 ↔ table.lua:405 onCanBeCast ↔ node.lua:267`，`skipping 8833 / 9989 / 11982 levels`。
+  - 插桩（临时，已撤）：`values` getter **嵌套**最大值 `maxNesting=9`、构造嵌套 `maxInitNesting=1`、
+    守卫计数 `maxD=19`、`bailDepth=0`、`states=0 / tasks=0 / rts=1`（单 state、无 task、单 runtime）
+    ⇒ `intersection` 的 `DEPTH_LIMIT=64` **从未触发**：它只数自己 getter 的嵌套，
+    而失控发生在 `canCast` 那一层（护栏装错了层）。
+- 代码：`script/node/node.lua` 的 `CAST_DEPTH_LIMIT = 64`（`M:canCast` 包装 + 模块级 `castImpl`）；
+  计数挂 `rt.castDepth`，并在 `Runtime:flushCacheNow` / `Runtime:reset` 一并清掉
+  （异常穿出时不留「永久宽松」）。
+- 数字：**仅护栏** ⇒ 目标工程 154 → 154（移除 0 / 新增 0，批量零行为变化）；
+  **护栏 + 重放 F2 依赖边补丁** ⇒ 154 → 149（移除 5 / 新增 0）且**不再爆栈**
+  ⇒ F2 的依赖边方案（`f:addRef(call)` + `addReturnList → flushCache`）从此可采用。
+- 试过但未采用：
+  - 用**结构签名键**替代身份键剪枝（按 `typeName`/`kind` 组合）：能命中「每层结构相同」的环，
+    但会改变正常路径的裁剪时机（未实测），且与 `castCache` 的身份键语义并成两套判定；
+  - 调大 `intersection` 的 `DEPTH_LIMIT`：护栏不在那条链上（`bailDepth=0`），无效。
+- 状态：成立（2026-09-30）
+

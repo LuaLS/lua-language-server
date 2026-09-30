@@ -12,8 +12,10 @@
 - 代码：`script/node/runtime.lua` 的 `enterEval/exitEval/evalContext/withEval`
   （ctx 栈**按协程隔离**：以 `coroutine.running()` 为键的弱键表 —— LS 的 task 会交错，单一栈会弹错协程的 ctx）；
   入口锁与 ctx 同在 `enterEval/exitEval` 里配对；`flushCacheNow` 加 test 断言「`cacheLocked > 0` 不得旁路」
-- 落地范围：`script/feature/diagnostic/file.lua` 的按文件诊断 task body 已接 `withEval`
-  （hover / completion 等入口尚未接，接的时候同样注意闭包要标 `---@async`）
+- 落地范围：`script/feature/diagnostic/file.lua`（按文件诊断的 task body）、
+  `script/language-server/capability/language-features/hover.lua` 与 `.../completion.lua`
+  （在求值调用外各包一层，不重排缩进）；其余 feature 入口（definition / references / implementation 等）
+  尚未接，接法同上（`---@async` 贴在**调用**上、闭包不换行）
 - 状态：成立（2026-09-30；全量 `--test` 与目标工程扫描下断言**零命中**）
 
 ## E2 per-eval 与 per-traversal 的环保护必须分开

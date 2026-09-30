@@ -6,12 +6,17 @@ ls.capability.register('textDocument/hover', function (server, params, task)
 
     local uri = params.textDocument.uri
     local document = ls.scope.findDocument(uri)
-    if not document then
+    local scope = document and ls.scope.find(uri)
+    if not document or not scope then
         return
     end
     local converter = document:makeLSPConverter(server.positionEncoding)
 
-    local result = ls.feature.hover(uri, converter:at(params.position))
+    local result
+    ---@async
+    scope.rt:withEval(function ()
+        result = ls.feature.hover(uri, converter:at(params.position))
+    end)
     if not result then
         return
     end

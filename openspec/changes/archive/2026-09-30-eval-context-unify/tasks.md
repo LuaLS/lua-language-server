@@ -63,5 +63,7 @@
 - [x] 5.2 `项目实践.md` 第二十五轮已记（含 147k 爆栈教训、"不做全量签名改造"的理由、2a 为何不做）
 - [x] 5.3 归档 `openspec archive eval-context-unify`（spec `eval-context` +3 需求）。
   F2 族**未**顺带修掉 ⇒ 后续仍按 `returns.md` F2 的入口走（依赖边/`addReturnList` 时机）
-- [ ] 5.4 **后续（未做）**：把 `withEval` 接到 hover / completion 等其余求值入口
-  （诊断按文件入口已接；接的时候注意闭包要标 `---@async`）
+- [x] 5.4 把 `withEval` 接到 hover / completion 入口（`language-features/hover.lua`、`.../completion.lua`：
+  在求值调用外各包一层，`---@async` 贴在调用上、闭包不换行）；诊断按文件入口已在第 1 步接。
+  验证：全量 `--test` 绿 + 面板 0
+- [ ] 5.5 **后续（未做）**：其余 feature 入口（definition / references / implementation 等）同样接 `withEval`

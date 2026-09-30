@@ -70,24 +70,23 @@ function M:refreshNow(callback)
             local vfile = self.vfile
             -- 一次求值期：期间登记的缓存失效被推迟到求值结束后批量生效
             -- （避免失效与求值交错导致节点换身份、环保护失效 —— facts：classes.md F25 / returns.md F2）
-            vfile.scope.rt:withEval(
-                ---@async
-                function ()
-                    ls.scope.waitReady(vfile.uri)
-                    if self.calculated and self.version == vfile.version then
-                        task:resolve(self.lastResults or {})
-                        return
-                    end
-                    self:stop()
-                    self.contributions = {}
-                    self.calculated = true
-                    self.version = vfile.version
-                    local results = ls.feature.diagnostic(vfile.uri, function (item)
-                        self:contribute(item)
-                    end)
-
-                    task:resolve(results)
+            ---@async
+            vfile.scope.rt:withEval(function ()
+                ls.scope.waitReady(vfile.uri)
+                if self.calculated and self.version == vfile.version then
+                    task:resolve(self.lastResults or {})
+                    return
+                end
+                self:stop()
+                self.contributions = {}
+                self.calculated = true
+                self.version = vfile.version
+                local results = ls.feature.diagnostic(vfile.uri, function (item)
+                    self:contribute(item)
                 end)
+
+                task:resolve(results)
+            end)
         end)
         : onResolved(function (result)
             self:pushNow()

@@ -15,14 +15,19 @@ ls.capability.register('textDocument/completion', function (server, params, task
 
     local uri = params.textDocument.uri
     local document = ls.scope.findDocument(uri)
-    if not document then
+    local scope = document and ls.scope.find(uri)
+    if not document or not scope then
         return
     end
 
     local converter = document:makeLSPConverter(server.positionEncoding)
     local byteOffset = converter:at(params.position)
 
-    local items = ls.feature.completion(uri, byteOffset)
+    local items
+    ---@async
+    scope.rt:withEval(function ()
+        items = ls.feature.completion(uri, byteOffset)
+    end)
 
     -- 将 CompletionItem[] 转换为 LSP.CompletionItem[]（用正确编码的 range 替换字节偏移）
     ---@param item CompletionItem

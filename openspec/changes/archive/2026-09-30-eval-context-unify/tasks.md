@@ -57,9 +57,11 @@
 
 ## 5. 收尾
 
-- [ ] 5.1 事实台账：把「环保护统一（ctx.visited / ctx.inProgress）+ 求值期不失效 + 只缓存完成态」
-  写进 `.github/skills/luals-server-dev/references/facts/`（新文件 `eval-context.md` 或并入 `narrowing.md`），
-  并与 `returns.md` F2 / `classes.md` F25 交叉引用；`--test tools.facts` 绿
-- [ ] 5.2 `项目实践.md` 记本轮（含：147k 爆栈的教训、"不做全量签名改造"的理由）
-- [ ] 5.3 归档 `openspec archive eval-context-unify`；若 3.3 顺带修掉 F2 族，单开一轮把
-  `returns.md` F2 的依赖边/`addReturnList` 时机收尾
+- [x] 5.1 事实台账：新增 `facts/eval-context.md`（E1 求值期不失效 / E2 per-eval 与 per-traversal 分开 +
+  结构键 / E3 占位只放 ctx / E4 面板缓存的跨文件陷阱），与 `returns.md` F2、`classes.md` F25 交叉引用；
+  `--test tools.facts` 绿
+- [x] 5.2 `项目实践.md` 第二十五轮已记（含 147k 爆栈教训、"不做全量签名改造"的理由、2a 为何不做）
+- [x] 5.3 归档 `openspec archive eval-context-unify`（spec `eval-context` +3 需求）。
+  F2 族**未**顺带修掉 ⇒ 后续仍按 `returns.md` F2 的入口走（依赖边/`addReturnList` 时机）
+- [ ] 5.4 **后续（未做）**：把 `withEval` 接到 hover / completion 等其余求值入口
+  （诊断按文件入口已接；接的时候注意闭包要标 `---@async`）

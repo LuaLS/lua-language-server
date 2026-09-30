@@ -12,10 +12,14 @@
 - 代码：`script/node/runtime.lua` 的 `enterEval/exitEval/evalContext/withEval`
   （ctx 栈**按协程隔离**：以 `coroutine.running()` 为键的弱键表 —— LS 的 task 会交错，单一栈会弹错协程的 ctx）；
   入口锁与 ctx 同在 `enterEval/exitEval` 里配对；`flushCacheNow` 加 test 断言「`cacheLocked > 0` 不得旁路」
-- 落地范围：`script/feature/diagnostic/file.lua`（按文件诊断的 task body）、
-  `script/language-server/capability/language-features/hover.lua` 与 `.../completion.lua`
-  （在求值调用外各包一层，不重排缩进）；其余 feature 入口（definition / references / implementation 等）
-  尚未接，接法同上（`---@async` 贴在**调用**上、闭包不换行）
+- 落地范围（2026-09-30 收口，**已全覆盖**产出类型求值的入口）：`script/feature/diagnostic/file.lua`
+  （按文件诊断的 task body）、`script/language-server/capability/language-features/` 下的
+  `hover.lua` / `completion.lua` / `go-to-definition.lua` / `go-to-references.lua` /
+  `go-to-implementation.lua`（在求值调用外各包一层，不重排缩进；`---@async` 贴在**调用**上、闭包不换行、
+  结果经闭包外 `local` 带出）
+- 包装位置断言：SHALL 落在 **capability 调用点**（`enterEval` 的锁与 ctx 栈按 `scope.rt`），
+  SHALL NOT 下沉到 `ls.feature.*` 函数内部 —— 那会让测试与内部调用路径也隐含「求值期」语义
+  （已落地的 5 处均为调用点包装，保持一致）
 - 状态：成立（2026-09-30；全量 `--test` 与目标工程扫描下断言**零命中**）
 
 ## E2 per-eval 与 per-traversal 的环保护必须分开

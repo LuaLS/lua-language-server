@@ -16,7 +16,11 @@ ls.capability.register('textDocument/references', function (server, params, task
 
     local prog <close> = ls.progress.create(uri, '正在查找引用', 0.5)
 
-    local results = ls.feature.references(uri, dconverter:at(params.position), params.context?.includeDeclaration)
+    local results
+    ---@async
+    scope.rt:withEval(function ()
+        results = ls.feature.references(uri, dconverter:at(params.position), params.context?.includeDeclaration)
+    end)
     if #results == 0 then
         return
     end

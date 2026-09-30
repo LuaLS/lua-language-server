@@ -14,7 +14,11 @@ ls.capability.register('textDocument/definition', function (server, params, task
 
     local dconverter = document:makeLSPConverter(server.positionEncoding)
 
-    local results = ls.feature.definition(uri, dconverter:at(params.position))
+    local results
+    ---@async
+    scope.rt:withEval(function ()
+        results = ls.feature.definition(uri, dconverter:at(params.position))
+    end)
     local locations = {}
 
     local sconverter = scope:makeLSPConverter(server.positionEncoding)

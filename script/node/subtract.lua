@@ -83,15 +83,7 @@ end
 ---@param visited? table<Node, true>
 ---@return Node
 function M:simplify(visited)
-    if self.value == self then
-        return self
-    end
-    visited = visited or {}
-    if visited[self] then
-        return self
-    end
-    visited[self] = true
-    return self.value:simplify(visited)
+    return ls.util.simplify(self, visited)
 end
 
 function M:resolveGeneric(map, ctx)

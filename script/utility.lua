@@ -1466,6 +1466,22 @@ function m.visited(obj, visited)
     end
 end
 
+--- 沿 `.value` 链委派简化，并用 `visited` 防环（**per-traversal** 语义：作用域是这一次遍历，
+--- 与 `m.visited` 配对；不要换成求值上下文里的 per-eval `visited`）
+---@param node Node
+---@param visited? table<Node, true>
+---@return Node
+function m.simplify(node, visited)
+    if node.value == node then
+        return node
+    end
+    visited = m.visited(node, visited)
+    if not visited then
+        return node
+    end
+    return node.value:simplify(visited)
+end
+
 --- `[start: integer, finish: integer, id?: any, ]`
 --- 必须保证 layers 已经按 start 升序排列，为光标位置
 ---@param layers [integer, integer, any][]

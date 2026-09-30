@@ -288,7 +288,7 @@ function vm.countReturnsOfCall(func, args, mark)
     return min or 0, max or math.huge, def or 0
 end
 
----@param list parser.object[]?
+---@param list parser.object | parser.object[] | nil
 ---@param mark? table
 ---@return integer min
 ---@return number  max
@@ -297,7 +297,7 @@ function vm.countList(list, mark)
     if not list then
         return 0, 0, 0
     end
-    local lastArg = list[#list]
+    local lastArg = list[#list]--[[@as parser.object?]]
     if not lastArg then
         return 0, 0, 0
     end

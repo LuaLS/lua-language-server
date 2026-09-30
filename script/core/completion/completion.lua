@@ -1362,7 +1362,7 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
             insertDocEnum(state, pos, src, enums)
         end
     elseif isInArray and src.type == 'doc.type.array' then
-        for _, d in ipairs(vm.getDefs(src.node)) do
+        for _, d in ipairs(vm.getDefs(src.node or {})) do
             insertEnum(state, pos, d, enums, isInArray, mark)
         end
     elseif src.type == 'global' and src.cate == 'type' then
@@ -1858,7 +1858,7 @@ local function tryluaDocBySource(state, position, source, results)
                 if  name
                 and name ~= source.parent.class[1]
                 and not used[name]
-                and matchKey(source[1], name) then
+                and matchKey(source[1], name--[[@as string]]) then
                     used[name] = true
                     results[#results+1] = {
                         label       = name,
@@ -1881,7 +1881,7 @@ local function tryluaDocBySource(state, position, source, results)
                     or   (doc.type == 'doc.enum'  and doc.enum[1])
             if  name
             and not used[name]
-            and matchKey(source[1], name) then
+            and matchKey(source[1], name--[[@as string]]) then
                 used[name] = true
                 results[#results+1] = {
                     label       = name,

@@ -29,6 +29,112 @@
   调用结果的第 1 个返回值应当是推断出来的返回类型（`{...} | nil`），
   而不是 `nil`；否则 `if child then` 会把它收窄成 `never`，分支内的读值退化成 nil，
   报一片 `need-check-nil`
+- **2026-09-30 补充（面板残留的完整链条 + 两条新实测）**：
+  - 插桩 `W:traceVar` / `W:traceRef`（目标工程 `compile.lua` 的 `local child = parseExp()`）：
+    **每一次 walk** 里 `child` 的静态值都是 `nil`（`[childVar] local:child@3033 static=nil`），
+    于是 `if child then` 把分支判死 ⇒ 分支内读点被写成 **`never`**（`[child3043] write value=never`）。
+    **`never` 不含 nil ⇒ `need-check-nil` 不报** —— 这是批量 harness「看起来已修好」的原因。
+  - 一旦发生**真实 flush**（长会话里随时发生），那些 `never` 被清掉 ⇒ 读值退回静态兜底
+    （`parser.object | nil`）⇒ 报 `need-check-nil`（实测：强制 flush 场景下 `cv=nil value=nil`）。
+    ⇒ 面板 `compile.lua:3043/3044` 一族 = **F2（错值 `never` 掩盖）+ flush 把它冲掉后暴露**，两个缺陷叠加，
+    只修「重走」不够。
+  - 新实测（**均不采用，已回退**）：
+    1. `W:restart()` 里顺手 flush「本次 walk 写过的收窄节点」⇒ 强制 flush 场景**精确复现面板那批**：
+       156 → 193（移除 3 / 新增 32 = 面板的 `compile.lua:1290/1387/1407/3043/3044/…`）；
+       普通过程 154 → **174**（净变差）
+    2. walk 内的收窄写入跳过 `setCurrentValue` 的 flush（`skipFlush`）⇒ 普通过程 154 → **174**
+       （移除 10 / 新增 25），且**把 #21/#22 修好的族带回来**（`json-edit.lua:249/257/265/322/405`、
+       `json.lua:427/435`）⇒ `setCurrentValue` 的 flush 是**承重**的（负责让依赖节点按位置重算），
+       不能简单去掉
+  - 下一步收窄：`W:traceVar` 里 `getStaticValue()` 对 `local child`（赋值来自调用）拿到的是**真 nil**
+    —— 而 `getStaticValue()` 的兜底是 `rt.ANY`，能返回 nil 说明链上某条 getter 直接给了 nil
+    （`assignValue` / `getGuessValue` / `select`），应从那里查，而不是只看 `List:select` 的空 list 分支
+  - **2026-09-30 下午：钉到「异常实例」这一层，三条修法实测无效**：
+    - 插桩 `FCall.returns`（空 list 时打印匹配到的函数）：`matched=1 retCalls=1 retList=1 firstVals=0`
+      —— 匹配到的函数实例只收到过**一次 `addReturnList`，而且那条 list 是空的**
+      （= coder 只为一条 bare `return` 发过 `addReturnList`），其 `returnsPack.min=0` ⇒ `select(1)` = nil。
+    - 但**同一时刻**探针（`--probe-var=var:parseExp@3033`）给的是
+      `fun(asAction…):{...} | parser.object | any | nil`（**有**返回值）⇒ 同一调用点的函数值
+      **在不同运行阶段不一致**（探针不跑诊断/walk）。这就是 F2 的老症状，新证据指向
+      「matched 到的那个实例不是有返回值的那个」或「该值在诊断阶段已退化成空」。
+    - 实测无效（**均不采用，已回退**）：
+      1. `Function:addReturnList` 里 `flushCache()` ⇒ 目标工程 154（0/0）
+      2. 同上改为直接清 `returnsPack` 字段 ⇒ 154（0/0）⇒ **不是「缓存早了」**
+      3. `FCall.returns` 空 list 时从 `head:each('function')` 里挑「有返回值」的成员兜底 ⇒
+         `retFallback` **一次都没触发**（那个时刻 head 上就是没有带返回值的成员）⇒ **是求值时机问题**
+    - 下一步入口：查「诊断阶段（walk 触发的那次求值）为什么该调用点拿到的实例/返回值是空的，
+      而探针阶段是对的」—— 重点看 `FCall.matchedFuncs` 的 `head:each('function')` 实际遍历到哪些实例、
+      以及 `Node.Variable.value` 的 `currentValue/guess/staticValue` 在那条路径上的来源。
+  - **2026-09-30 调试图定位（根因链条已完整，修法仍未落地）**：
+    在**运行中的 LS**（attach 11466，服务目标工程）里用调试器 + 落盘探针确认：
+    - `local child = parseExp()` 编译成 `rt.select(call, 1)`；`Node.Select.value` 是 **getter 缓存字段**；
+      它在「函数的返回集合还没齐时」被算过一次 **`nil`** 并**缓存住**，之后没有任何机制作废它。
+      活状态实测：`local:child@3033 => variable | { parent: { [1]: nil } }`、
+      `select#1@3033 => select | nil`，而**同一时刻**该函数 `retList=[1,1]`、`returnsPack` 完整 ✓
+      ⇒ 就是「早期 nil 被缓存」（不是函数真的没返回值）。
+    - 后果链：`child = nil` ⇒ `if child then` 判死 ⇒ 分支内读点被写成 `never`（批量 harness 因此不报）
+      ⇒ 一旦有 flush 把 `never` 冲掉，读值退回 `nil` 类型 ⇒ 报 `need-check-nil`（面板那批）。
+    - 同一进程两次分析结果不同也印证：LS 缓存里那份 30 条含 `3043/3044`；强制 `calculated=false`
+      重算后的 63 条不含（need-check-nil 变成 3411/3417/…）。
+    - 本轮修法实测（**均不采用，已回退**）：
+      1. `Select.value` 取到 `nil` 类型且被调函数有返回值时「按函数的返回集合重算」——
+         批量不回归（154，0/新增 0），但**面板无效**：那个 nil 是**已缓存**的，getter 不会再跑
+      2. 同上但让「nil 结果**不缓存**」(`return value, false`) ⇒ 批量 154 → **移除 9 / 新增 34** ✗
+         （`postfix.lua` 一片新误报：不缓存改变了取值时机）
+      3. 依赖登记 `f:addRef(call)`（函数 → 调用）+ `addReturnList` 里**手术式**清依赖节点的缓存
+         （`class.flush` 只清字段、不触发求值）⇒ 批量 **147k 层栈溢出**（`intersection.lua:19`，
+         在 `undefined-field` provider 里）✗
+      4. 早先的 `addReturnList` 里 `flushCache()`（0/0）与 `f:addRef` + eager flush（栈溢出）✗
+    - 结论（下一轮的约束）：**「作废缓存」与「交集求值的终止性」强耦合**——清掉这些缓存会让
+      intersection/intersection 派生值重算不收敛。要么解决这个耦合，要么改从
+      「让函数返回值在 **Select 首次计算前** 就齐」入手（例如 `addReturnList` 的时机/顺序）。
+      另一条低成本路线：目标侧给无注解的递归函数补 `---@return`（`returnsDef` 在编码期就有值，
+      Select 首次计算即正确），但要注意别引入新的返回值不匹配诊断。
+  - **2026-09-30 调试图定位（根因链条完整；含「谁先读它」与「为什么那时还没齐」的实证）**：
+    在**运行中的 LS**（attach 11466，`🍄attach` 配置；服务目标工程）里用调试器 + 落盘探针确认：
+    - **谁先读 `Select.value`**：不是 coder 期，而是**诊断 pass 里的 tracer walk**。
+      三条由探针 `debug.traceback` 落盘的栈完全同形：
+      `undefined-field provider → vfile:getNode → Variable.__getter.value → tracer:trace()
+      → traceIf → traceIfChild → traceCondition → traceConditionUnit → traceEqual
+      → traceByValue → isMultiValue → finalValue → Select.value`
+      （即 `node.lua` 的 `finalValue`/`isMultiValue` 在 walk 期间读到了它。）
+    - **为什么那时返回集合还是空**：读发生在**首次分析**期间（工作区索引/推断未完成），
+      此刻被调函数的返回集合为空 ⇒ `select(1)` = `nil` 被**缓存**在 `Select.value`（getter 字段）上；
+      之后没有任何机制作废它（见下「依赖边」）。
+    - 活状态（同一时刻）：`local:child@3033 => variable | { parent: { [1]: nil } }`、
+      `select#1@3033 => select | nil`，而被调函数 `retList=[1,1]`、`returnsPack` 视图**完整** ✓
+      ⇒ 就是「早期 nil 被缓存」，不是函数真的没返回值。
+    - 后果链：`child = nil` ⇒ `if child then` 判死 ⇒ 分支内读点被写成 `never`（批量 harness 因此不报）
+      ⇒ 一旦有 flush 把 `never` 冲掉，读值退回 `nil` 类型 ⇒ 报 `need-check-nil`（面板那批）。
+      旁证：同一进程两次分析结果不同 —— LS 缓存那份 30 条含 `3043/3044`；强制 `calculated=false`
+      重算后（此时索引已就绪）的 63 条**不含**（need-check-nil 变成 3411/3417/…）。
+  - **依赖边现状（代码坐标，2026-09-30 核对）**：
+    - `script/node/select.lua:53-54`：`head:addRef(self)` / `key:addRef(self)` ⇒ **call → select ✓**
+    - `script/node/fcall.lua:125-126`：`head:addRef(self)` / `args:addRef(self)` ⇒ **head 变量 / 实参 → call ✓**
+    - **函数节点没有出边**：`FCall.matchedFuncs` 不登记 `f:addRef(call)`；
+      `Function:addReturnList`（`function.lua:389`）只 `table.insert`、**不 flush**
+      ⇒「函数返回集合补齐」传不到 call/select；函数自己的 `returnsPack`（getter 缓存）
+      也不会因 `returnList` 变长而失效。
+  - **失效为什么难做（本次实测 + 修正后的机制解释）**：
+    - 实测：`addReturnList` 里单独 `flushCache()`（**不登记**函数→调用边）⇒ 批量 **0/0**（不炸，但也没用：
+      消费端 `FCall.returns`/`Select.value` 各自的缓存还在）；一旦**登记** `f:addRef(call)`，
+      再清（eager `flushCache()` 或只 `class.flush` 字段）⇒ **147k 层栈溢出**（`intersection.lua:19`，
+      在 `undefined-field` provider 里）。
+    - 机制（**不是**「缺缓存所以不收敛」——首次求值同样无缓存却收敛）：首次求值是**单调建立**、
+      节点身份一致，环保护（按节点身份记录"正在算"）能认出环；**事后清缓存**发生在已被彼此引用的图上，
+      重算会**新建等价节点**（身份变了）⇒ 环保护不再匹配 ⇒ 环重复展开 ⇒ 发散。
+      叠加**范围/时机**：登记那条边后，清一个函数会顺着 `函数 → 调用 → select → 读过它们的并集/交集/表`
+      一路清（每条 `return` 都触发、与其它文件的求值交错）⇒ 整片图的身份记忆被反复抹掉 ⇒ 不收敛。
+      同现象先例：`classes.md` F25「试过 #2」的「每次新建节点，cast 缓存命中不了，表与类互转的递归不收敛」。
+    - 结论：**不要在 flush / 依赖边上继续加力**。
+  - **候选修法（本轮决定：都先不动，仅记账）**：
+    - **A（窄、安全，用户暂不采用）**：不动缓存语义，只在 `ls.scope.onDidLoad` 那次刷新前把
+      `vfile.diagnostic.calculated` 清掉，让「索引就绪后的那一趟」覆盖「首次 pass 的残缺结果」
+      （实测依据：`calculated=false` 重算不再出 3043/3044）。
+    - **B（正、难）**：让「函数返回集合变化」真正传到 call/select，同时保证失效不破坏交集收敛
+      （例如失效只打标记、把重算推到静默期；或让 `addReturnList` 在 `Select` 首次计算之前完成）。
+    - **C（目标侧）**：给无注解的递归函数补 `---@return`（`returnsDef` 编码期即有值）——
+      要注意别引入新的返回值不匹配诊断。
 - 证据（目标工程 `script/parser/compile.lua`，**29 条 need-check-nil** 全是这个形状）：
   - `if child then` 内部 `child.start`（3043/3112/3365/3411/3450 等）
   - 探针（目标工程）：`var:parseExp@3033:19-3033:26` 的 view = `fun(…):{...} | nil` ✓，

@@ -58,9 +58,13 @@
 - 断言：值位置只遍历操作数条目取 currentValue；右操作数拿不到左侧收窄（`x = s and #s` 里 `#s` 是 `op.len<string | nil>`）
 - 证据：无测试（调研数据见 项目实践.md「2026-09-21（第二轮）」）
 - 代码：`W:traceUnit` 的 `and`/`or`/`not` 分支；`traceAnd`/`traceOr` 只在 condition 位置被调用
+- **2026-09-30**：同族残留——**值位置 `and` 的右操作数拿不到左侧收窄**，典型写法
+  `local x = child and child.finish or uop.finish`：右操作数读 `child.finish` 时 `child` 仍带 nil，
+  nil 成员没有 `finish` ⇒ 报 `undefined-field`（目标工程 `parser/compile.lua:3375:42`，
+  是上一轮 pass 边界重算把原来的 `need-check-nil` 换成了它 —— 净条数不变，但仍是误报）。
+  修法方向：值位置 `and`/`or` 把左侧的真值收窄传给右操作数（coder 已有操作数边界标记，见 F14）
 - **2026-09-30**：`not` 原先**没有**这个分支（`traceUnit` 只认 and/or）⇒ 值位置 `not` 的整棵子树
-  都不被走，内部读点拿不到 `currentValue`，退化到 `getStaticValue()`/`getGuessValue()` 兜底。
-  实例：目标工程 `plugins/astHelper.lua:72` 的 `return not not _M.addClassDoc(ast, arg, classname), arg`
+  都不被走，内部读点拿不到 `currentValue`，退化到 `getStaticValue()`/`getGuessValue()` 兜底。  实例：目标工程 `plugins/astHelper.lua:72` 的 `return not not _M.addClassDoc(ast, arg, classname), arg`
   —— 实参读 `var:arg@72:44-72:46` 的 `currentValue = nil`（插桩 `W:traceRef` 整轮一次都没进），
   而同行的返回值读 `arg@72:61` 正常收窄成 `parser.object`。
   修法：把 `and`/`or` 分支扩成 `and`/`or`/`not`（只走子树、不收窄）。
@@ -373,9 +377,24 @@
   （每个 tracer 每 pass 至多重走一次）；`W:start` 加 `walking` 护栏 + `xpcall` 异常清理；
   `hasWalker` 普通字段避免为没用过的 tracer 建对象。
   回归测试：`test/node/tracer.lua`（flush 后 `restart` 能恢复收窄 / 不 `restart` 则退化成 `integer | nil`）
-- 数字：目标工程 **199 → 156（移除 36 / 新增 0）**，含本条的 15 条与 **F19 的 `child.*` 一族**；
-  扫描耗时 10.3s → 10.56s（无回归）；全量 `--test` 绿、面板 0
+- 数字：目标工程 **199 → 156（移除 36 / 新增 1）**，含本条的 15 条与 **F19 的 `child.*` 一族**；
+  扫描耗时 10.3s → 10.56s（无回归）；全量 `--test` 绿、面板 0。
+  **新增的那 1 条**：`compile.lua:3375:42` 的 `undefined-field`
+  （`finish = child and child.finish or uop.finish` —— 值位置 `and` 的右操作数没拿到左侧收窄，见 F4；净 −35）
 - 状态：成立（2026-09-29；方向固定为「pass 边界重算」，`value` getter 里重走这条路已实测排除）
+- **2026-09-30 补充（面板残留 + 复现手段，未满足项）**：扩展自带 LS **仍报**
+  `compile.lua:3043/3044`（`if child then … child.start` 守卫后的读）⇒ round 22 的修法没覆盖到这批。
+  已确认面板 LS 跑的是 HEAD 代码（面板里有 #22 新增的 `compile.lua:3375:undefined-field`、
+  没有 #23 修掉的 `astHelper.lua:72`）。
+  - 批量 harness（全新一次性分析，甚至「`flushCacheNow` + 第二趟」）**都不复现** ⇒ 触发在增量/长会话。
+  - **复现手段（实测可用）**：pass 边界除 `tracer:restart()` 外，再把「本次 walk 写过的收窄节点」
+    用 `collectFlushNodes` 一起 flush（实现为 `W:markNarrowed` 记录 + `rt:lockCache/unlockCache` 一次 flush 批次），
+    批量 harness 立刻**精确复现面板那批**：目标工程 **156 → 193（移除 3 / 新增 32）**，
+    新增的 32 条就是面板的 `compile.lua:1290/1387/1407/3043/3044/…`。
+  - 推论：不只是「缓存住的兜底值」问题，而是 **flush 之后的重走没能把收窄值写回去**；
+    round 22 的 restart 只在「值缺失」那条路径有效。该改法净变差（+32），已 `git checkout` 回退。
+  - 下一步入口：拿这个「强制 flush」复现查重走为什么写不回（`setCurrentValue` 之后被谁清掉、
+    或 `W:start` 在 `walking`/`started` 护栏下没真正跑起来、以及 `flushCacheNow` 的处理顺序）。
 
 ## F19 守卫收窄 + 循环内重赋值：循环体里的读值退回未收窄的 guess（已关闭）
 - 断言（未满足）：`if not exp then return nil end` 之类的守卫之后，`exp` 在**循环体**里的读值

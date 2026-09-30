@@ -48,8 +48,12 @@ ls.node.kind = {
 ---@field offset integer
 ---@field length? integer
 
+--- 求值/遍历上下文：一次求值期内共享的环保护与位置信息。
+--- - `visited`：本次遍历访问过的节点（跨节点路径语义，如 union/intersection/table 互递归）
+--- - `inProgress`：正在求值的节点 → 占位值（同一节点重入时返回占位，不再起一次求值）
 ---@class Node.ResolveContext
 ---@field visited table<Node, Node> 防环缓存
+---@field inProgress? table<Node, Node> 正在求值的节点 → 占位值
 ---@field location? Node.Location 泛型展开的调用点
 
 ---基础分类
@@ -606,8 +610,9 @@ end
 ---@return Node.ResolveContext
 function ls.node.resolveContext(location)
     return {
-        visited = {},
-        location = location,
+        visited    = {},
+        inProgress = {},
+        location   = location,
     }
 end
 

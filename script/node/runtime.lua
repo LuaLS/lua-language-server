@@ -611,6 +611,63 @@ function M:unlockCache()
     end
 end
 
+-- 求值上下文（按协程隔离）：一次求值期内共享环保护状态
+-- 语义与 `lockCache` 配对：最外层 enter 时加锁、最外层 exit 时解锁
+-- ⇒ 求值期间登记的失效被推迟到求值结束后的静默点批量生效
+---@type table<thread, Node.ResolveContext[]>
+M.evalStacks = nil
+
+---@param ctx? Node.ResolveContext
+---@return Node.ResolveContext
+function M:enterEval(ctx)
+    local co = coroutine.running()
+    if not self.evalStacks then
+        self.evalStacks = setmetatable({}, ls.util.MODE_K)
+    end
+    local stack = self.evalStacks[co]
+    if not stack then
+        stack = {}
+        self.evalStacks[co] = stack
+        self:lockCache()
+    end
+    ctx = ctx or ls.node.resolveContext()
+    stack[#stack+1] = ctx
+    return ctx
+end
+
+function M:exitEval()
+    local stacks = self.evalStacks
+    local stack = stacks and stacks[coroutine.running()]
+    if not stack then
+        return
+    end
+    stack[#stack] = nil
+    if #stack == 0 then
+        stacks[coroutine.running()] = nil
+        self:unlockCache()
+    end
+end
+
+---@return Node.ResolveContext?
+function M:evalContext()
+    local stacks = self.evalStacks
+    local stack = stacks and stacks[coroutine.running()]
+    return stack and stack[#stack] or nil
+end
+
+--- 包住一次求值：入口加锁 + 挂 ctx，出口解锁（异常也保证出栈）
+---@param fn async fun()
+---@param ctx? Node.ResolveContext
+---@async
+function M:withEval(fn, ctx)
+    ctx = self:enterEval(ctx)
+    local ok, res = xpcall(fn, debug.traceback)
+    self:exitEval()
+    if not ok then
+        error(res, 0)
+    end
+end
+
 ---@param scope Scope
 ---@return Node.Runtime
 function ls.node.createRuntime(scope)

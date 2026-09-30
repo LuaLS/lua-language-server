@@ -566,6 +566,11 @@ function M:collectFlushNodes(node)
 end
 
 function M:flushCacheNow()
+    -- 求值期不变量：失效必须由 `unlockCache`（锁归零）触发；求值期内直接旁路调用会
+    -- 让节点在求值中途换身份 ⇒ 基于身份的环保护失效（facts：classes.md F25 / returns.md F2）
+    if test and self.cacheLocked > 0 then
+        error('[eval-context] flushCacheNow bypassed while cache locked', 2)
+    end
     self.castCache = nil
     local list = self.waitFlushList
     if not list then

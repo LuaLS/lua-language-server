@@ -46,10 +46,14 @@
 
 ## 4. 防回归断言
 
-- [ ] 4.1 加 debug 断言：求值期内不得直接 `flushCacheNow`（`rt.cacheLocked > 0` 时不得旁路）；
-  仅在 `--test`/debug 下生效，生产路径不付出代价
-- [ ] 4.2 给 `ctx` 栈配一个最小回归测试（`test/node/`）：嵌套求值共享同一 ctx、异常退出后栈为空、
-  失效被推迟到求值结束
+- [x] 4.1 `script/node/runtime.lua` 的 `flushCacheNow`：`test` 模式下若 `cacheLocked > 0` 直接
+  `error('[eval-context] flushCacheNow bypassed while cache locked')`（求值期不得旁路失效）。
+  验证：全量 `--test` **零命中**（说明现有测试路径没有旁路）；目标工程扫描（同为 test 模式）也**零命中** ✓
+  ⇒ 不变量在当前代码里成立，断言留给以后防回归
+- [x] 4.2 新增 `test/node/eval-context.lua`（并在 `test/node/init.lua` 里 require）：
+  ①嵌套求值共享可见（最内层可见、出栈回外层）；②`withEval` 里抛异常后 ctx 栈仍清空；
+  ③求值期内 `flushCache` 被推迟（期间值还在，出栈后失效生效）。
+  验证：`bin\lua-language-server.exe --test node` 绿 + 全量 `--test` 绿
 
 ## 5. 收尾
 

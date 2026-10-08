@@ -11,7 +11,7 @@ local function findGenericInTableFields(tableType, genericMap)
     for _, field in ipairs(tableType.fields) do
         if field.extends then
             local found
-            guide.eachSourceType(field.extends, 'doc.generic.name', function (src)
+            guide.eachSourceType(field.extends--[[@as parser.object]], 'doc.generic.name', function (src)
                 if genericMap[src[1]] then
                     found = src[1]
                 end

@@ -2453,8 +2453,8 @@ local compilerSwitch = util.switch()
                 end
             end
             if set.type == 'doc.alias' then
-                if vm.getGeneric(set.extends) then
-                    local resolved = vm.getGeneric(set.extends):resolve(uri, source.signs)
+                if vm.getGeneric(set.extends--[[@as parser.object]]) then
+                    local resolved = vm.getGeneric(set.extends--[[@as parser.object]]):resolve(uri, source.signs)
                     vm.setNode(source, resolved)
                 end
             end
@@ -2621,8 +2621,8 @@ local compilerSwitch = util.switch()
                     end
                 end
                 if set.type == 'doc.alias' then
-                    if not vm.getGeneric(set.extends) then
-                        vm.setNode(source, vm.compileNode(set.extends))
+                    if not vm.getGeneric(set.extends--[[@as parser.object]]) then
+                        vm.setNode(source, vm.compileNode(set.extends--[[@as parser.object]]))
                     end
                 end
             end

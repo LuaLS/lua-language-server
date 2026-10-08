@@ -302,12 +302,31 @@ M.register {
     status   = 'Any',
 }
 
+--- `X | any` 等价于 any：显式标注里带 any 成员时，该值可赋给/传给任何已标注类型。
+--- 三条类型检查（assign / param / return）必须用同一规则，否则同一声明会出现
+--- 「赋值不报、传参报」这类不一致。
+---@param actual Node
+---@return boolean
+function M.hasAnyMember(actual)
+    if actual.kind == 'type' then
+        return actual.typeName == 'any'
+    end
+    if actual.kind == 'union' then
+        ---@cast actual Node.Union
+        for _, v in ipairs(actual.values) do
+            if v.kind == 'type' and v.typeName == 'any' then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 ---@param scope Scope
 ---@param uri Uri
 ---@param name string
 ---@return integer
-function M.getSeverity(scope, uri, name)
-    local severityConfig = scope.config:get(uri, 'Lua.diagnostics.severity') or {}
+function M.getSeverity(scope, uri, name)    local severityConfig = scope.config:get(uri, 'Lua.diagnostics.severity') or {}
     local data = M.diagnosticDatas[name]
     local severity = severityConfig[name] or (data and data.severity) or 'Warning'
     if severity:sub(-1) == '!' then

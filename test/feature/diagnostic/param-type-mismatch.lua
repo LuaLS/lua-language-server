@@ -527,9 +527,44 @@ local function tonumber(e, base) end
 local function osExit(code) end
 
 ---@param v string
+
 local function f(v)
+
     local code = tonumber(v) or 0
+
     osExit(code)
+
 end
+
 ]==] { 'param-type-mismatch' }
+
+-- `X | any` 等价于 any：实参带 any 成员时不应报（与 assign-type-mismatch 同规则）
+TEST_DIAGNOSTIC [[
+---@class AnyMemberNode
+---@field [integer] AnyMemberNode | any
+
+---@param s string
+local function f(s)
+end
+
+---@param o AnyMemberNode
+local function g(o)
+    f(o[1])
+end
+]] { '-param-type-mismatch' }
+
+-- 对照：没有 any 成员时必须报
+TEST_DIAGNOSTIC [[
+---@class NoAnyMemberNode
+---@field [integer] NoAnyMemberNode
+
+---@param s string
+local function f(s)
+end
+
+---@param o NoAnyMemberNode
+local function g(o)
+    f(o[1])
+end
+]] { 'param-type-mismatch' }
 

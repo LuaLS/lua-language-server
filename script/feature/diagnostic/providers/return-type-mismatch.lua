@@ -1,3 +1,5 @@
+local define = require 'feature.diagnostic.define'
+
 ---@async
 ---@param param Feature.Diagnostic.Param
 ---@param callback fun(diag: Feature.Diagnostic)
@@ -40,6 +42,9 @@ local function returnTypeMismatchProvider(param, callback)
                 goto continueExp
             end
             if expect.kind == 'type' and (expect.typeName == 'any' or expect.typeName == 'unknown') then
+                goto continueExp
+            end
+            if define.hasAnyMember(actual) or define.hasAnyMember(actual:simplify()) then
                 goto continueExp
             end
             local castResult = actual >> expect

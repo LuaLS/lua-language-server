@@ -1,19 +1,4 @@
----@param actual Node
----@return boolean
-local function hasAnyMember(actual)
-    if actual.kind == 'type' then
-        return actual.typeName == 'any'
-    end
-    if actual.kind == 'union' then
-        ---@cast actual Node.Union
-        for _, v in ipairs(actual.values) do
-            if v.kind == 'type' and v.typeName == 'any' then
-                return true
-            end
-        end
-    end
-    return false
-end
+local define = require 'feature.diagnostic.define'
 
 --- 类标注（`---@class`）变量的字段集是「同一名字的多次声明 + 各自绑定的字面量」拼出来的：
 --- 其中由绑定值推断出来的字段只算「读取可见性」，不是赋值要求。
@@ -81,7 +66,7 @@ local function checkAssign(vfile, var, callback)
             goto continue
         end
         -- 显式标注的类型上允许逆变：`X | any` 等价于 any，可赋给任何标注类型
-        if hasAnyMember(actual) or hasAnyMember(actual:simplify()) then
+        if define.hasAnyMember(actual) or define.hasAnyMember(actual:simplify()) then
             goto continue
         end
         if not (actual >> requireType) then

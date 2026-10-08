@@ -192,3 +192,29 @@ local function f()
 end
 f()
 ]] { 'return-type-mismatch' }
+
+-- `X | any` 等价于 any：返回值类型里带 any 成员时不应报
+TEST_DIAGNOSTIC [[
+---@class AnyMemberNode
+---@field n AnyMemberNode | any
+
+---@param o AnyMemberNode
+---@return string
+local function f(o)
+    return o.n
+end
+f({})
+]] { '-return-type-mismatch' }
+
+-- 对照：没有 any 成员时必须报
+TEST_DIAGNOSTIC [[
+---@class NoAnyMemberNode
+---@field n NoAnyMemberNode
+
+---@param o NoAnyMemberNode
+---@return string
+local function f(o)
+    return o.n
+end
+f({})
+]] { 'return-type-mismatch' }

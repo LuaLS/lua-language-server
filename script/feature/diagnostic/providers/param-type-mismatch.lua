@@ -1,3 +1,5 @@
+local define = require 'feature.diagnostic.define'
+
 ---@async
 ---@param param Feature.Diagnostic.Param
 ---@param callback fun(diag: Feature.Diagnostic)
@@ -19,6 +21,9 @@ local function paramTypeMismatchProvider(param, callback)
     local function canAssign(actual, matched, allFuncs, paramIndex)
         -- 取实参的真实类型（调用会解析到返回值），再对其 union 逐成员判断
         local t = actual:simplify()
+        if define.hasAnyMember(actual) or define.hasAnyMember(t) then
+            return true
+        end
         local values
         if t.kind == 'union' then
             ---@cast t Node.Union

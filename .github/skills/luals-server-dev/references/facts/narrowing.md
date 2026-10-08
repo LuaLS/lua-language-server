@@ -395,6 +395,12 @@
     round 22 的 restart 只在「值缺失」那条路径有效。该改法净变差（+32），已 `git checkout` 回退。
   - 下一步入口：拿这个「强制 flush」复现查重走为什么写不回（`setCurrentValue` 之后被谁清掉、
     或 `W:start` 在 `walking`/`started` 护栏下没真正跑起来、以及 `flushCacheNow` 的处理顺序）。
+  - **2026-10-08 结论（该残留已消失，根因不在「重走」）**：面板的 `compile.lua:3043/3044` 一族
+    由 **F2 的依赖边缺失**解释 —— `local child = parseExp()` 的返回值在函数**返回集合未齐**时
+    首次求值得到空集合（⇒ `nil`），把 `if child then` 判死后又因 `never` 掩盖/被 flush 暴露。
+    落地 F2 依赖边（`facts/returns.md` F2，change `f2-dependency-edge`）后，用户确认**面板已不再报**
+    `3043/3044`（批量同时移除同族 5 条）。
+    ⇒ 上面「强制 flush 精确复现面板那批」是**症状放大**手段，不是修法方向；本条不需要再改「重走」。
 
 ## F19 守卫收窄 + 循环内重赋值：循环体里的读值退回未收窄的 guess（已关闭）
 - 断言（未满足）：`if not exp then return nil end` 之类的守卫之后，`exp` 在**循环体**里的读值

@@ -13,7 +13,7 @@
   `compile.lua:3365(x2) / 3375 / 3411 / 3417`（与面板 `3043/3044` 同形）
 - [x] 2.2 全量 `bin\lua-language-server.exe --test` 绿
 - [x] 2.3 本仓库面板 0（`vscodeOperator_readProblems`，error / warning / information；hint 不管）
-- [ ] 2.4 面板侧（目标工程）：请用户在编辑器里确认 `compile.lua:3043/3044` 一族消失、无新问题
+- [x] 2.4 面板侧（目标工程）：用户确认 `compile.lua:3043/3044` 一族**不再报**、无新问题
 
 ## 3. 记账
 

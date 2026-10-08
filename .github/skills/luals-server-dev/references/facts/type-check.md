@@ -42,11 +42,33 @@
 | 家族（实参类型） | 条数 | 判定 |
 | --- | --- | --- |
 | 含 `any` 成员（`any \| nil`、`parser.object \| any`、`parser.object \| truthy` 等） | 16 | **引擎不一致** ⇒ 本轮按 T1 放宽后消失 |
-| `parser.object[] \| parser.object` | 19 | 目标侧注解**不一致**：字段声明 `parser.object[]\|parser.object`（`---@field extends`），被传给只收单节点的参数（`vm.object`）⇒ 属目标侧写法/注解问题（`vm.getGeneric(set.extends)` 一族） |
+| `parser.object[] \| parser.object`（`extends` 一族） | 21 | **目标侧注解**（已清，见 T3） |
 | 裸 `parser.object` / `parser.object \| nil` / `parser.object[]` | 约 20 | 目标侧注解偏松：`parser.object` 声明了 `---@field node parser.object`、`---@field [integer] parser.object\|any` 这类「一把抓」类型，调用点直接当具体类型用；按目标自己的注解判定**成立**，不硬改引擎迎合 |
 | `uri \| nil` / `false \| uri \| nil` | 约 9 | 目标侧：`furi.decode(scp.uri)` 前未判空（`files.lua:948` 一族） |
 | 其它（`{ [string]: vm.node } \| nil`、`op.*` 怪物类型等） | 约 24 | 逐条看；多数是目标侧注解与实际推断不一致（含 operator 类型参与推断） |
 
-- 状态：本轮只落 T1 那一族；其余家族的判定与「不硬改引擎迎合目标侧注解」的结论记在此处（2026-10-08）。
-- 后续入口（若继续清）：`vm/compiler.lua` 的 `set.extends` 一族（`vm.getGeneric` / `containsGenericName`
-  参数只收单节点）优先——目标侧把参数放宽成 `vm.object|vm.object[]` 即可一次性消掉约 20 条。
+- 状态：T1 那一族已落地；其余家族的判定与「不硬改引擎迎合目标侧注解」的结论记在此处（2026-10-08）。
+- 后续入口（若继续清）：T3 之外，`uri | nil`（约 9 条）、`parser.object` 一把抓（约 20 条）。
+
+## T3 目标侧 `extends` 一族（21 条）：声明改成单节点 + 三处内联 cast
+
+- 背景：`parser.object` 的 `extends` 字段在目标工程里被声明成 `parser.object[]|parser.object`
+  （`script/parser/guide.lua`），于是所有「把 `X.extends` 当单个节点用」的调用点都按**联合**判：
+  `vm.compileNode(X.extends)`、`containsGenericName(field.extends)`、`vm.getGeneric(set.extends)` 等，
+  共 21 条 `param-type-mismatch` / `assign-type-mismatch`。
+- 语义核查（目标工程自己的代码）：`extends` 只在 `doc.class`（类继承名单）里被当**列表**
+  （`luadoc.lua` 的 `result.extends[#result.extends+1] = extend`）；其余（`doc.alias` / `doc.type.field` /
+  `doc.type.function` 的 arg / `@operator`）都是**单个类型节点**，目标自己在 `vm/operator.lua` 也有
+  「`extends` 运行时均为单个类型节点」的注释。列表消费方用 `ipairs(set.extends)`，而 `parser.object`
+  本身声明了 `---@field [integer] parser.object|any`，索引/遍历不受影响。
+- 实验（1 行声明改法）：
+  - 改 `parser.object`（单节点）⇒ 移除 21 / **新增 1**（`compiler.lua:346` 的返回表字面量：
+    `extends = vm.cloneObject(...)` 产出 `vm.object`（含 `vm.generic`），装不进 `parser.object` 字段）
+  - 改 `vm.object`（别名 `parser.object|vm.generic`）⇒ **移除 18 / 新增 0** ⇒ 采用
+- 落地（目标工程，3 文件 6 行）：
+  - `script/parser/guide.lua`：`---@field extends parser.object[]|parser.object` → `vm.object`
+  - `script/vm/compiler.lua`（2 处）+ `script/vm/sign.lua`（1 处）：`X.extends--[[@as parser.object]]`
+    —— 内联 cast 是**注释**，零运行时影响；目标工程自己也在用这个惯用法（`core/completion/completion.lua`）
+- 数字：目标工程 **130 → 109（移除 21 / 新增 0）**；基线存 `tmp/scan-109.txt`
+- 状态：成立（2026-10-08）
+

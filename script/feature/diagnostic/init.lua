@@ -61,6 +61,9 @@ function ls.feature.diagnostic(uri, partialPush)
     if not document or not scope then
         return {}
     end
+    -- `canCast` 的递归深度只在 pass 边界复位：异常从判定中途穿出会残留计数，
+    -- 让后续判定一律宽松；而失效点（flush）绝不能清它 —— 失控恰恰伴随失效（facts/casts.md F3）。
+    scope.rt.castDepth = nil
     if not scope.config:get(uri, 'Lua.diagnostics.enable') then
         return {}
     end

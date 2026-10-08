@@ -177,6 +177,18 @@
   **不再爆栈**，目标工程 **154 → 149（移除 5 / 新增 0）**（仅护栏则 154 → 154，0/0）
   ⇒ 依赖边方案（`FCall.matchedFuncs` 加 `f:addRef(self)`、`Function:addReturnList` 加 `flushCache()`）
   **从「不可采用」变为「可采用」**；下一步是带**面板**验证的一轮（本轮结论只说明它可跑通、批量不回归）。
+- **2026-10-08 依赖边已落地（OpenSpec change `f2-dependency-edge`）**：
+  - 改动 = 上面那两行（`script/node/fcall.lua` 的 `f:addRef(self)` + `script/node/function.lua` 的
+    `addReturnList → flushCache()`），零其他改动。
+  - 数字：目标工程 **154 → 149（移除 5 / 新增 0）**，移除的正是**同一族**：
+    `compile.lua:3365(x2) / 3375 / 3411 / 3417`（`child` / `exp` 的 `need-check-nil` / `undefined-field`，
+    与面板的 `3043/3044` 同形 —— 都来自「早期空返回集合被缓存」）。全量 `--test` 绿、本仓库面板 0。
+  - **踩坑（重要）**：落地前必须在 `canCast` 护栏里去掉「失效点清 `castDepth`」那行 ——
+    依赖边让失效在递归中途频繁发生，一清护栏就形同不存在（实测复现 `intersection.lua:151` 栈溢出）；
+    详见 `casts.md` F3 的「坑」。
+  - 面板侧（目标工程长会话）：`compile.lua:3043/3044` 一族应在用户编辑器里消失（**待用户确认**）；
+    两行改动，若出现新问题直接回退本 change。
+  - 状态：**批量侧已满足**（F2 断言在批扫下成立）；面板侧待确认。
 
 ## F3 泛型 for 的循环变量在部分时机退回「列表值」而不是元素（未满足）
 

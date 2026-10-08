@@ -578,7 +578,6 @@ function M:flushCacheNow()
         error('[eval-context] flushCacheNow bypassed while cache locked', 2)
     end
     self.castCache = nil
-    self.castDepth = nil
     local list = self.waitFlushList
     if not list then
         return

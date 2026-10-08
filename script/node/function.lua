@@ -388,6 +388,7 @@ end
 ---@return Node.Function
 function M:addReturnList(list)
     table.insert(self.returnList, list)
+    self:flushCache()
     return self
 end
 

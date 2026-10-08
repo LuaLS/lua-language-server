@@ -56,8 +56,11 @@
     ⇒ `intersection` 的 `DEPTH_LIMIT=64` **从未触发**：它只数自己 getter 的嵌套，
     而失控发生在 `canCast` 那一层（护栏装错了层）。
 - 代码：`script/node/node.lua` 的 `CAST_DEPTH_LIMIT = 64`（`M:canCast` 包装 + 模块级 `castImpl`）；
-  计数挂 `rt.castDepth`，并在 `Runtime:flushCacheNow` / `Runtime:reset` 一并清掉
-  （异常穿出时不留「永久宽松」）。
+  计数挂 `rt.castDepth`，**只在 pass 边界复位**：`ls.feature.diagnostic` 入口 + `Runtime:reset`
+- 坑（2026-10-08 实测踩过）：计数 **SHALL NOT 在失效点清零**（曾写在 `Runtime:flushCacheNow` 里）——
+  依赖边（`addReturnList → flushCache`）会让失效**在递归中途**频繁发生，一清就等于把护栏关掉：
+  同样的补丁立刻复现 `intersection.lua:151` 栈溢出；去掉那行即恢复（154 → 149 / 0 新增）。
+  异常穿出的泄漏改用 **pass 边界**复位来兜（而不是失效点）。
 - 数字：**仅护栏** ⇒ 目标工程 154 → 154（移除 0 / 新增 0，批量零行为变化）；
   **护栏 + 重放 F2 依赖边补丁** ⇒ 154 → 149（移除 5 / 新增 0）且**不再爆栈**
   ⇒ F2 的依赖边方案（`f:addRef(call)` + `addReturnList → flushCache`）从此可采用。

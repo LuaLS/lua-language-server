@@ -161,6 +161,7 @@ M.__getter.matchedFuncs = function (self)
     local result = {}
     for _, match in ipairs(matches) do
         local f = defs[match]
+        f:addRef(self)
         local map = f:makeGenericMap(self.args)
         if f.typeParams then
             for _, g in ipairs(f.typeParams) do

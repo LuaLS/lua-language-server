@@ -96,7 +96,21 @@
     （`id` 是「名字@行:列」= 按读取点编码），按 id 键的收窄到不了右侧读点。
     ⇒ 要做这条修法，需要一套**按变量（节点）键**的临时收窄通道（右操作数的读点在 `traceRef`
     里先查它、再回退到 `getStaticValue`），而不是复用按 id 键的收窄栈。
-- 状态：成立（2026-09-30；`not` 的子树已走；真值收窄仍不做 —— 「未满足」的部分只剩右操作数拿不到左侧收窄）
+- **2026-10-10（变体 C，基础值部分落地，change `short-circuit-variable-narrowing`）**：新增按 masterVariable/变量身份键的独立临时环境，仅限右操作数；直接 ref 与 not、and 真方向、or 假方向收集可靠事实。复用左侧 traceRef 返回值快照，不再次读取或向 parentMap 上行。
+  - 完整类/表方案：103 → 99（移除 5 / 新增 1），新增 `parser/compile.lua:3697:34` 的 need-check-nil；去掉普通临时栈、跳过无变化结果、同步临时 id、避免重复 traceRef 均未改变该数字，未采用。
+  - 落地范围：仅可转为 string/number/boolean/nil 的基础值收窄（含 uri 别名），103 → 100（移除 3 / 新增 0）：`workspace/require-path.lua:81`、`workspace/workspace.lua:196`、`provider/provider.lua:1565`。
+  - 证据：test/feature/diagnostic/param-type-mismatch.lua（8 个短路用例：直接变量、not/or、嵌套合取、字段、外泄及真实不匹配）；test/node/tracer.lua（不同 read-site id 的 and/or 与表达式之后恢复）；全量 --test 绿。
+  - 边界：类/表与动态键收窄仍未新增支持；基础值通道已成立。动态键诊断 harness 的可选表索引用例未报，不能据此建立防回归断言，未保留该用例。
+- **2026-10-10（重新分诊 C）**：完整方案相对基础值方案 100 → 99（移除 2 / 新增 1）。新增 `parser/compile.lua:3697:34` 已确认误报：该读点是受 `lastValue and` 保护的 `lastValue.finish`，不是无保护的 lastVar；parseVarTails 的 rest 只含成功解析的非 nil 节点，lastVar 初始化于已校验的 n1，随后只赋 n2/n。
+  - 额外移除 `core/hover/return.lua:42`（rtn and 内 getInfer(rtn)）与 `provider/provider.lua:1439`（lstate and 内 packRange(lstate)）均有真实短路守卫，不是因源码缺判空导致的真实错误。
+  - 探针：`var:lastValue@3697:20` 和受保护读点 `var:lastValue@3697:34` 均为 `parser.object | truthy | nil`；生成 flow 的 and 两侧使用同一逻辑 id `lastValue@3670:11`，右侧先 ref 基值再 ref finish。此例不是变体 B 的 read-site id 不同问题。
+  - 最小抽取（循环赋 lastValue/lastVar，再 return lastValue and lastValue.finish or lastVar.finish）在完整方案不报；类类型成对测试证明短路有效且无守卫访问仍报。先 simplify 再 narrowEqual 实测仍 100 → 99（移除 2 / 新增 1），未采用。完整工程剩余误报还需定位求值/收窄缓存与当次快照，尚不能断言具体缓存根因。
+  - 保持基础值实现并保留 test/feature/diagnostic/need-check-nil.lua 的无守卫类访问正向断言；完整方案与抽取通过用例本轮仅实验。不能仅以新增数判断方案，但本例已确认新增误报，完整方案暂未落地。
+- **2026-10-10（C 完整落地：临时联合体成员快照）**：collect/apply 取证时收窄值均不含 nil；结果联合体仍携带变量包装 rawNodes，后续重新展开受源变量变化污染。收集器最小回归（人工设置 truthy 返回含包装的联合体）证明：源变量 string → nil 并 flush 后，无快照 `string | truthy` → `truthy | nil`，复制已解析 values 重建则保持 `string | truthy`。
+  - 代码：`W:collectLogicValues` 联合体结果通过 `rt.union { table.unpack(narrowed.values) }` 固定当次成员；去掉基础值 canCast 限制，恢复类/表通道。不改 Union 全局语义。
+  - 证据：test/node/tracer.lua 首例（上述修复前失败/修复后通过的快照回归）；test/feature/diagnostic/need-check-nil.lua（循环赋值后短路字段、可选类受保护读取、无守卫访问仍报）；目标工程 parser/compile.lua:3697 的误报消失。
+  - 数字：基础值 100 → 98（移除 2 / 新增 0）；原始 103 → 98（移除 5 / 新增 0）。两个额外移除点仍是受守卫的 rtn/lstate，不用 any/never 掩盖。动态键仍不新增支持。
+- 状态：成立（基础值、类/表短路右侧支持；动态键不在本条新增范围）
 
 ## F5 真假标记 `truthy` 会作为读值出现（无成员集）
 - 断言：`any` 上的真值收窄得到 `type truthy`，它没有字段 → 作为读值会引发「未定义字段」/形参不匹配

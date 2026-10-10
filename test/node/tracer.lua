@@ -1,6 +1,67 @@
 local rt = test.scope.rt
 
 do
+    rt:reset()
+    local member = rt.variable 'member'
+    member:setStaticValue(rt.STRING)
+    local source = rt.STRING | rt.NIL
+    source.truthy = rt.union { member, rt.TRUTHY }
+    local r = { x = rt.variable 'x' }
+    local tracer = rt.tracer(r, {})
+    tracer:setFlow {}
+    tracer:trace()
+    local walker = assert(tracer.walker)
+    walker.refValues.x = source
+    local values = {}
+    walker:collectLogicValues({ 'ref', 'x', 'x' }, true, values)
+    local narrowed = values[r.x]
+    lt.assertEquals(narrowed:view(), 'string | truthy')
+    member:setStaticValue(rt.NIL)
+    rt:flushCacheNow()
+    lt.assertEquals(narrowed:view(), 'string | truthy')
+end
+
+do
+    rt:reset()
+    local r = {}
+    local tracer = rt.tracer(r, {})
+    r.x = rt.variable 'x'
+    r.x:addType(rt.STRING | rt.NIL)
+    for _, alias in ipairs { 'left', 'right', 'after' } do
+        r[alias] = r.x:shadow()
+        r[alias]:setTracer(tracer)
+    end
+    tracer:setFlow {
+        { 'var', 'x', 'x' },
+        { 'and', { 'ref', 'x@left', 'left' }, { '|' }, { 'ref', 'x@right', 'right' } },
+        { 'ref', 'x@after', 'after' },
+    }
+    tracer:trace()
+    lt.assertEquals(r.right.currentValue:view(), 'string')
+    lt.assertEquals(r.after.currentValue:view(), 'string | nil')
+end
+
+do
+    rt:reset()
+    local r = {}
+    local tracer = rt.tracer(r, {})
+    r.x = rt.variable 'x'
+    r.x:addType(rt.FALSE | rt.STRING)
+    for _, alias in ipairs { 'left', 'right', 'after' } do
+        r[alias] = r.x:shadow()
+        r[alias]:setTracer(tracer)
+    end
+    tracer:setFlow {
+        { 'var', 'x', 'x' },
+        { 'or', { 'ref', 'x@left', 'left' }, { '|' }, { 'ref', 'x@right', 'right' } },
+        { 'ref', 'x@after', 'after' },
+    }
+    tracer:trace()
+    lt.assertEquals(r.right.currentValue:view(), 'false')
+    lt.assertEquals(r.after.currentValue:view(), 'false | string')
+end
+
+do
     --[[
     ---@type string?
     local x

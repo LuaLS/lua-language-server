@@ -1,4 +1,82 @@
 TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param x string?
+local function check(x)
+    return x and f(x)
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param x string?
+local function check(x)
+    local result = x and f(x)
+    f(<?x?>)
+    return result
+end
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param x string?
+local function check(x)
+    return not x or f(x)
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param x string?
+---@param flag boolean
+local function check(x, flag)
+    return (x and flag) or f(<?x?>)
+end
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x number
+local function f(x) end
+---@param x string?
+local function check(x)
+    return x and f(<?x?>)
+end
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param x string?
+---@param y string?
+local function check(x, y)
+    return (x and y) and f(x) and f(y)
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param t { value: string? }
+local function check(t)
+    local result = t.value and f(t.value)
+    f(<?t.value?>)
+    return result
+end
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x string
+local function f(x) end
+---@param t { value: string? }
+local function check(t)
+    return t.value and f(t.value)
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
 ---@param x number
 local function f(x)
 end

@@ -98,6 +98,8 @@ function W:start(block)
     self.started = true
     self.walking = true
     self.aliasID = {}
+    self.logicValues = {}
+    self.refValues = {}
     self.assignVersion = 0
     self.versionMap = {}
     ---@type Node.Tracer.Stack[]
@@ -406,6 +408,20 @@ function W:traceRef(ref)
     end
     self.idAliasMap[id][alias] = true
 
+    local node = self.map[alias]
+    if node.kind == 'variable' then
+        ---@cast node Node.Variable
+        local key = node.masterVariable or node
+        for i = #self.logicValues, 1, -1 do
+            local value = self.logicValues[i][key]
+            if value then
+                node:setCurrentValue(value)
+                self.refValues[alias] = value
+                return value
+            end
+        end
+    end
+
     local value = self:getValue(id)
     -- 动态键读取（`t[expr]`）：不采用共用槽位上的流值（其它动态键的读写会互相污染），
     -- 按基值的当前值求（与 Node.Variable:getDynamicKeyValue 同一语义）
@@ -467,6 +483,7 @@ function W:traceRef(ref)
     local node = self.map[alias]
     ---@cast node Node.Variable
     node:setCurrentValue(value)
+    self.refValues[alias] = value
     return value
 end
 
@@ -733,10 +750,11 @@ function W:traceUnit(unit)
         end
         return
     end
-    if tag == 'and' or tag == 'or' or tag == 'not' then
-        -- 顶层 and/or/not 表达式节点（如 `x = a and b`、`return not not f(x)`）：
-        -- 遍历内部 ref，使其获得正确的 currentValue，避免退化到 getGuessValue 引入 nil
-        -- （值位置不做真值收窄：这不是条件位置）
+    if tag == 'and' or tag == 'or' then
+        self:traceLogicValue(unit)
+        return
+    end
+    if tag == 'not' then
         for i = 2, #unit do
             local inner = unit[i]
             if type(inner) == 'table' then
@@ -864,6 +882,81 @@ local function splitLogicOperands(exp)
         mids[#mids+1] = exp[i]
     end
     return left, right, mids
+end
+
+function W:collectLogicValues(exp, truthy, values)
+    local tag = exp[1]
+    if tag == 'ref' then
+        if self:isDynamicKeyRef(exp) then
+            return
+        end
+        local node = self.map[exp[3]]
+        if node.kind ~= 'variable' then
+            return
+        end
+        ---@cast node Node.Variable
+        local value = self.refValues[exp[3]] or node:getStaticValue()
+        if not value then
+            return
+        end
+        local rt = self.scope.rt
+        local base = value:simplify()
+        if base == rt.ANY or base == rt.UNKNOWN
+        or base == rt.PROVISIONAL or base == rt.TRUTHY
+        or base == rt.FALSY or base == rt.NEVER then
+            return
+        end
+        local yes, no = value:narrowEqual(rt.TRUTHY)
+        local narrowed = truthy and yes or no
+        if narrowed == rt.TRUTHY or narrowed == rt.FALSY
+        or narrowed == rt.NEVER or narrowed == value then
+            return
+        end
+        if narrowed.kind == 'union' then
+            ---@cast narrowed Node.Union
+            narrowed = rt.union { table.unpack(narrowed.values) }
+        end
+        values[node.masterVariable or node] = narrowed
+    elseif tag == 'not' then
+        self:collectLogicValues(exp[#exp], not truthy, values)
+    elseif (tag == 'and' and truthy) or (tag == 'or' and not truthy) then
+        local left, right = splitLogicOperands(exp)
+        if left then
+            self:collectLogicValues(left, truthy, values)
+        end
+        if right then
+            self:collectLogicValues(right, truthy, values)
+        end
+    end
+end
+
+function W:traceLogicValue(unit)
+    local marker
+    for i = 2, #unit do
+        local inner = unit[i]
+        if type(inner) == 'table' and inner[1] == '|' then
+            marker = i
+            break
+        end
+    end
+    if not marker then
+        for i = 2, #unit do
+            if type(unit[i]) == 'table' then
+                self:traceUnit(unit[i])
+            end
+        end
+        return
+    end
+    for i = 2, marker - 1 do
+        self:traceUnit(unit[i])
+    end
+    local values = {}
+    self:collectLogicValues(unit[marker - 1], unit[1] == 'and', values)
+    self.logicValues[#self.logicValues+1] = values
+    for i = marker + 1, #unit do
+        self:traceUnit(unit[i])
+    end
+    self.logicValues[#self.logicValues] = nil
 end
 
 function W:traceConditionUnit(exp, revert)

@@ -1,3 +1,41 @@
+TEST_DIAGNOSTIC [[
+---@param first { finish: integer }
+---@param rest { finish: integer }[]?
+---@param values { finish: integer }[]?
+---@param value { finish: integer }?
+local function check(first, rest, values, value)
+    local lastValue = value
+    local lastVar = first
+    if rest then
+        for i = 1, #rest do
+            local n = rest[i]
+            local v = values and values[i]
+            lastValue = v or lastValue
+            lastVar = n
+        end
+    end
+    return lastValue and lastValue.finish or lastVar.finish
+end
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@class shortCircuitGuard
+---@field finish integer
+---@param x shortCircuitGuard?
+local function check(x)
+    return x and x.finish
+end
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@class shortCircuitValue
+---@field finish integer
+---@param x shortCircuitValue?
+local function check(x)
+    return <?x?>.finish
+end
+]] { 'need-check-nil' }
+
 -- 回归：比较条件（`>`）不产生收窄，也不应污染后续读取
 TEST_DIAGNOSTIC [[
 local function f(name)

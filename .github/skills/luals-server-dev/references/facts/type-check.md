@@ -72,3 +72,24 @@
 - 数字：目标工程 **130 → 109（移除 21 / 新增 0）**；基线存 `tmp/scan-109.txt`
 - 状态：成立（2026-10-08）
 
+## T4 目标侧 `uri | nil` 一族（9 条）：folder 作用域用子类给出必有的 uri
+
+- 背景：`script/workspace/scope.lua` 的 `---@field uri? uri` 是给 override / fallback 作用域用的
+  （它们确实没有 uri），但 `scope.folders` / `workspace.folders` 里全是 **folder** 作用域
+  （只有 `scope.createFolder` 会建、且必然设 uri）⇒ `for _, scp in ipairs(scope.folders)` 里
+  `scp.uri` 一律带 nil，9 条 `param-type-mismatch`（`furi.decode(scp.uri)` / `ws.isReady(scp.uri)` 一族）。
+- 落地（目标工程 2 文件 12 行）：
+  - 新增 `---@class scope.folder: scope` + `---@field uri uri`（注释写明只有 override/fallback 没有 uri）
+  - `m.folders`（含 `workspace.m.folders`）改 `scope.folder[]`；`createFolder` 返回 `scope.folder`
+    （函数尾 `return scope--[[@as scope.folder]]` —— 内联 cast 对 **return** 检查有效）
+  - 顺带修正两处被暴露出来的注解不符（都零运行影响）：`scope._links` 声明 `table<uri, boolean>`
+    → `table<uri, true>`（实际只写 `true`/nil）；`mt:eachLink` 的返回 `fun(): uri` → `next` 的真实形状
+    `fun(t: table<uri, true>, i?: uri): uri?`（该方法在目标里没有调用方）
+- 实验数字（逐步）：只加子类 ⇒ 109 → 106（移除 6 / **新增 3**：`createScope 'folder'` 赋值与两处注解不符）
+  ⇒ 补掉那 3 条后 **109 → 103（移除 6 / 新增 0）**，基线存 `tmp/scan-104.txt`（内容即 103 条）
+- 残留（**属引擎侧，另轮**）：5 条全是 F4「值位置 `and`/`or` 的右操作数拿不到左侧收窄」——
+  `libUri and furi.decode(libUri)`、`uri and ('%08x'):format(...)`、`A and B` 形式；
+  修法方向见 `narrowing.md` F4（把左侧真值收窄传给右操作数）。
+- 状态：成立（2026-10-08）
+
+

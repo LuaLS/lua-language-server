@@ -2,6 +2,19 @@ local rt = test.scope.rt
 
 do
     rt:reset()
+    local node = rt.variable 'x'
+    node:addType(rt.STRING | rt.NIL)
+    rt:withEval(function ()
+        lt.assertEquals(node.value:view(), 'string | nil')
+        node:setCurrentValue(rt.STRING)
+        lt.assertEquals(node.value:view(), 'string')
+        node:setCurrentValue(rt.NIL)
+        lt.assertEquals(node.value:view(), 'nil')
+    end)
+end
+
+do
+    rt:reset()
     local outer = rt:enterEval()
     lt.assertEquals(rt:evalContext(), outer)
 

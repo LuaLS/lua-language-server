@@ -58,6 +58,19 @@
 - 状态：成立（2026-09-30）；**未解决**：`Select.value` / `FCall.returns` 这类值节点的"早期结果被缓存"
   仍存在（见 `returns.md` F2 —— 那两条的 stale 值不在 `Variable.value`，本轮未顺带修掉）
 
+## E5 外部诊断批扫必须与真实诊断调用点使用相同求值边界
+
+- 断言：批扫按文件调用 ls.feature.diagnostic 时也需 withEval，避免求值中 currentValue 被 flush；边界放调用点，不下沉 feature。
+- 证据：test/project/external-diagnostic.lua；test/feature/diagnostic/need-check-nil.lua 首两例（赋值键守卫/无守卫）；目标 main.lua:41，独立 probe string，但无边界批扫读 string | nil，currentValue 为空，重走后 string。
+- 代码：批扫调用点 scope.rt:withEval；真实入口 feature/diagnostic/file.lua:refreshNow 既有同形包装。
+- 实测：97 → 127 条，位置/code 差分打印移除 3 / 新增 17；main.lua:41、luadoc.lua:1080、library.lua:323 移除。总数与差分不一致尚需核实重复 key；新增中 completion.lua:848 有 func 真值守卫仍报 nil，parser/compile.lua:3411/3417 的 exp 由非 nil 构造或已守卫返回分支保证，属于候选引擎误报，不能归为合理真实新增。
+- 新增 global.lua:276 的 name 确可 nil（getfield 分支缺少 setfield 分支既有的 if not name then return end），是合理暴露；vm/tracer.lua:188-194 的 obj 来自必有 base 或 assign，自身注解不含 nil，仍待求值取证。
+- **2026-10-10 收口**：重复 key 已核实：原 97 条=65 个位置，新 127 条=79 个位置；8 个 assign-type-mismatch 坐标重复从各 5 条到 7 条，多重集合移除 3 / 新增 33，唯一位置移除 3 / 新增 17。批扫现在打印唯一位置并另列原始条数，不删除明细。
+- **锁内语义写入实测**：先缓存 node.value=string | nil，再 setCurrentValue(string)，锁内仍读旧值，test/node/eval-context.lua 首例修复前失败。setCurrentValue 写入后仅清 self.value，普通 flushCache 的依赖级联仍延迟；修复后 string/nil 两次写入可见，普通失效延迟旧测试仍绿。
+- 数字：锁定方案 127 → 117（移除 10 / 新增 0）；相对原无锁 97 → 117，唯一位置 65 → 69（移除 4 / 新增 8），剩余 parser 字段族候选误报另列 open。
+- 已知反例：global.lua:276 真实 nil 风险在此修法后不再报；最小 `local name; if flag then name='x' end; consume(name)` 也漏报。根因入口为无初值 local 未在 flow 发 NIL（architecture 已记录），不应把这条消失当修复成果；本轮不扩大到初始化语义。
+- 状态：成立（调用点与当前值写入已修；剩余字段族、未初始化局部漏报另列 open）
+
 ## E4 面板/诊断的缓存陷阱：跨文件改动不会让已缓存文件重算
 
 - 断言：`vfile.diagnostic` 的结果按 `calculated && version == vfile.version` 命中缓存；

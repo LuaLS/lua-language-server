@@ -1013,6 +1013,7 @@ function M:setCurrentValue(value)
     -- 先 flush 再写入：flush 清掉旧收窄值（getter 字段）并级联刷新依赖
     self:flushCache()
     self.currentValue = value
+    self.value = nil
 end
 
 ---@type Node.Tracer?

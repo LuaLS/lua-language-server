@@ -133,7 +133,11 @@ do
         local isProjectFile = uri:sub(1, #rootUri) == rootUri
         local doc = isProjectFile and scope:getDocument(uri) or nil
         if doc then
-            local diags = ls.feature.diagnostic(uri)
+            local diags
+            ---@async
+            scope.rt:withEval(function ()
+                diags = ls.feature.diagnostic(uri)
+            end)
             if diags and #diags > 0 then
                 diagFileN = diagFileN + 1
                 local text = doc.file:getText()
@@ -222,13 +226,18 @@ do
         for line in text:gmatch('[^\r\n]+') do
             local key, sample = line:match('^([^\t]+)\t(.*)$')
             if key then
+                if not old[key] then
+                    oldN = oldN + 1
+                end
                 old[key] = sample
-                oldN = oldN + 1
             end
         end
-        local current = {}
+        local current, currentN = {}, 0
         for _, line in ipairs(diagKeys) do
             local key, sample = line:match('^([^\t]+)\t(.*)$')
+            if not current[key] then
+                currentN = currentN + 1
+            end
             current[key] = sample
         end
         local removed, added = {}, {}
@@ -244,7 +253,7 @@ do
         end
         table.sort(removed)
         table.sort(added)
-        print('基线 {} 条 → 当前 {} 条：移除 {} / 新增 {}' % { oldN, diagN, #removed, #added })
+        print('基线 {} 处 → 当前 {} 处（原始诊断 {} 条）：移除 {} / 新增 {}' % { oldN, currentN, diagN, #removed, #added })
         for _, sample in ipairs(removed) do
             print('  - ' .. sample)
         end

@@ -1,4 +1,22 @@
 TEST_DIAGNOSTIC [[
+---@param key string?
+local function check(key)
+    local target = {}
+    if key then
+        target[key:upper():gsub('-', '_')] = true
+    end
+end
+]] { '-need-check-nil' }
+
+TEST_DIAGNOSTIC [[
+---@param key string?
+local function check(key)
+    local target = {}
+    target[<?key?>:upper()] = true
+end
+]] { 'need-check-nil' }
+
+TEST_DIAGNOSTIC [[
 ---@param first { finish: integer }
 ---@param rest { finish: integer }[]?
 ---@param values { finish: integer }[]?

@@ -71,6 +71,20 @@
   数字：目标工程 **156 → 154（移除 2 / 新增 0）**（另一条 `core/diagnostics/undefined-doc-name.lua:26`）；
   回归测试 `test/node/tracer.lua`（撤掉修法立刻红）。**注意与 F27 区分**：F27 是「算过被 flush 清掉」，
   本条是「压根没算」，症状相同、修法无关。
+- **2026-10-10（值位置收窄的第一次尝试，未采用已回退）**：做法 = 值位置 `and`/`or` 不再平铺走子树，
+  而是**套一层临时栈**后**复用条件位置的 `traceAnd`/`traceOr`**（左侧收窄垫给右操作数继承），
+  出栈即丢（值位置不外传）。
+  - 数字：目标工程 **103 → 99（移除 8 / 新增 4）** ⇒ 净变差，回退。
+  - 新增的 4 条说明**收窄不只落在栈里**：
+    `core/completion/completion.lua:1365`（`src.node or {}` ⇒ `src.node` 报 `undefined-field`）、
+    `parser/compile.lua:3697`（`lastValue and lastValue.finish or lastVar.finish` ⇒ `need-check-nil`）、
+    `vm/compiler.lua:1651`（`doc.extends.types or {}` ⇒ `undefined-field`）、
+    `vm/sign.lua:110`（`object.pattern and ... or n[1]` ⇒ `string | number` 传给 `string`）。
+    共同点：操作数是**字段读取**，假值侧的收窄沿 `parentMap` 上行（基变量被收窄）、
+    或被 `traceRef` 的 `setCurrentValue` 按**收窄后**的值写回读点。
+  - 结论：**复用条件位置的走法太粗**；下次要么只给「右操作数的读点」垫环境（左侧仍按旧法平铺追踪），
+    要么先定位那两个持久副作用的入口（`traceRef` 的 `setCurrentValue`、`traceByValue` 的上行收窄）
+    再决定收窄范围。开工前先在本条下面补一条实测（试过 = 上面这组数字）。
 - 状态：成立（2026-09-30；`not` 的子树已走；真值收窄仍不做 —— 「未满足」的部分只剩右操作数拿不到左侧收窄）
 
 ## F5 真假标记 `truthy` 会作为读值出现（无成员集）

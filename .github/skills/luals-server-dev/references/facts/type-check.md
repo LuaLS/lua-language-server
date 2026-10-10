@@ -92,4 +92,13 @@
   修法方向见 `narrowing.md` F4（把左侧真值收窄传给右操作数）。
 - 状态：成立（2026-10-08）
 
+## T5 数组传递给整数索引泛型表不得因目标包装被拒绝
 
+- 断言：T[] 到 table<integer, V> 应遵循解析后结构表的元素兼容规则；元素不兼容仍失败。
+- 语义依据：本仓库 T[] 等价整数索引表；目标 utility.lua:713 的 any[] 调用 revertMap(table<K,V>) 合法。
+- 证据：test/feature/diagnostic/param-type-mismatch.lua 首 3 例（any[] 兼容、number[] → string 值失败、非整数键域失败）；test/node/cast_table.lua（裸整数索引结构正负向）；test/node/call.lua（泛型别名目标正负向）。
+- 根因：Array 到裸 Table 已可转换；泛型实例 Node.Call 只有 onCanCast，没有目标侧 onCanBeCast，结构转换链未展开目标。
+- 代码：script/node/call.lua 的 onCanBeCast，复杂实例委托 other:canCast(self.value)，非复杂未定义类型不新增放宽。
+- 数字：98 → 97（移除 utility.lua:713 一条 / 新增 0）；全量 --test 绿、求值溢出 0。
+- 试过未采用：无失败实现方案；不改 Array 或 Table 转换、不在 provider 特判、不修改目标注解。
+- 状态：成立（2026-10-10，change array-index-table-cast）

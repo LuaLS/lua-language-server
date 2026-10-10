@@ -1,4 +1,31 @@
 TEST_DIAGNOSTIC [[
+---@param x table<integer, any>
+local function f(x) end
+---@param x any[]
+local function check(x)
+    f(x)
+end
+]] { '-param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x table<integer, string>
+local function f(x) end
+---@param x number[]
+local function check(x)
+    f(<?x?>)
+end
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
+---@param x table<string, number>
+local function f(x) end
+---@param x string[]
+local function check(x)
+    f(<?x?>)
+end
+]] { 'param-type-mismatch' }
+
+TEST_DIAGNOSTIC [[
 ---@param x string
 local function f(x) end
 ---@param x string?

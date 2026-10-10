@@ -262,6 +262,12 @@ function M:get(key)
     return self.value:get(key)
 end
 
+function M:onCanBeCast(other)
+    if self.head:isComplex() then
+        return other:canCast(self.value)
+    end
+end
+
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)

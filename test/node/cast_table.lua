@@ -110,6 +110,14 @@ do
 end
 
 do
+    local source = rt.array(rt.STRING)
+    local target = rt.table():addField(rt.field(rt.INTEGER, rt.STRING))
+    lt.assertEquals(source >> target, true)
+    local mismatch = rt.table():addField(rt.field(rt.INTEGER, rt.NUMBER))
+    lt.assertEquals(source >> mismatch, false)
+end
+
+do
     local A = rt.array(rt.value('x'))
     local B = rt.array(rt.type 'string')
 

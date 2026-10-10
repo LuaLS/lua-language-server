@@ -2,6 +2,17 @@ local rt = test.scope.rt
 
 do
     rt:reset()
+    local element = rt.generic 'T'
+    local alias = rt.alias('IndexTable', { element }, rt.table():addField(rt.field(rt.INTEGER, element)))
+    local target = rt.call('IndexTable', { rt.STRING })
+    lt.assertEquals(rt.array(rt.STRING) >> target, true)
+    lt.assertEquals(rt.array(rt.NUMBER) >> target, false)
+    lt.assertEquals(rt.array(rt.ANY) >> target, true)
+    lt.assertEquals(alias.kind, 'alias')
+end
+
+do
+    rt:reset()
     --[[
     ---@alias A 1
     ---@alias A<X, Y> 2

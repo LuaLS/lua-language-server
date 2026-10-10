@@ -9,12 +9,16 @@ local m = {}
 ---@field type   scope.type
 ---@field uri?   uri
 ---@field folderName? string
----@field _links table<uri, boolean>
+---@field _links table<uri, true>
 ---@field _data  table<string, any>
 ---@field _gc    gc
 ---@field _removed? true
 local mt = {}
 mt.__index = mt
+
+--- 文件夹作用域：uri 必定存在（只有 override / fallback 作用域没有 uri）
+---@class scope.folder: scope
+---@field uri uri
 
 function mt:__tostring()
     if self.uri then
@@ -38,7 +42,7 @@ function mt:removeAllLinks()
     self._links = {}
 end
 
----@return fun(): uri
+---@return fun(t: table<uri, true>, i?: uri): uri?
 ---@return table<uri, true>
 function mt:eachLink()
     return next, self._links
@@ -184,7 +188,7 @@ local function createScope(scopeType)
 end
 
 function m.reset()
-    ---@type scope[]
+    ---@type scope.folder[]
     m.folders  = {}
     m.override = createScope 'override'
     m.fallback = createScope 'fallback'
@@ -194,7 +198,7 @@ m.reset()
 
 ---@param uri uri
 ---@param folderName? string
----@return scope
+---@return scope.folder
 function m.createFolder(uri, folderName)
     local scope = createScope 'folder'
     scope.uri = uri
@@ -212,7 +216,7 @@ function m.createFolder(uri, folderName)
         table.insert(m.folders, scope)
     end
 
-    return scope
+    return scope--[[@as scope.folder]]
 end
 
 ---@param uri uri

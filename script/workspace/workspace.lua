@@ -74,7 +74,7 @@ function m.remove(uri)
 end
 
 function m.reset()
-    ---@type scope[]
+    ---@type scope.folder[]
     m.folders = {}
     m.rootUri = nil
 end

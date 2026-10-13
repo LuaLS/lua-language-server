@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` add rust.dll as dependency for lua-language-server
+* `NEW` replace formatter with emmylua_formatter
+
 
 ## 3.19.2
 `2026-10-13`

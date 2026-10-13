@@ -260,6 +260,8 @@ config.completion.maxSuggestCount        =
 "自動完成時最多分析的欄位數量。若物件欄位超過此上限，必須提供更精確的輸入才會顯示建議。"
 config.completion.showParams             =
 "在建議列表中顯示函式的參數資訊，函式擁有多個定義時會分開顯示。"
+config.completion.requireFunction        = -- TODO: need translate!
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "`require` 時使用的分隔符。"
 config.completion.postfix                =

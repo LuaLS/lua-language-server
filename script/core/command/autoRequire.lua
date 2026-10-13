@@ -4,6 +4,7 @@ local rpath  = require 'workspace.require-path'
 local client = require 'client'
 local lang   = require 'language'
 local guide  = require 'parser.guide'
+local config = require 'config'
 
 local function inComment(state, pos)
     for _, comm in ipairs(state.comms) do
@@ -119,7 +120,8 @@ local function applyAutoRequire(uri, row, name, result, fmt, fullKeyPath)
     if fmt.col and fmt.col > #text then
         sp = (' '):rep(fmt.col - #text - 1)
     end
-    text = ('local %s%s= require%s%s\n'):format(name, sp, quotedResult, fullKeyPath)
+    local requireName = config.get(uri, "Lua.completion.requireFunction")
+    text = ('local %s%s= %s%s%s\n'):format(name, sp, requireName, quotedResult, fullKeyPath)
     client.editText(uri, {
         {
             start  = guide.positionOf(row, 0),

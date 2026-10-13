@@ -261,6 +261,8 @@ config.completion.maxSuggestCount        =
 "Número máximo de campos analisados para autocompletar. Se um objeto tiver mais campos que esse limite, serão necessárias entradas mais específicas para que as sugestões apareçam."
 config.completion.showParams             =
 "Mostrar parâmetros na lista de conclusão. Se a função tiver várias definições, elas serão exibidas separadamente."
+config.completion.requireFunction        = -- TODO: need translate!
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "Separador usado em `require`."
 config.completion.postfix                =

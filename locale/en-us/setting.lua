@@ -261,6 +261,8 @@ config.completion.maxSuggestCount        =
 "Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear."
 config.completion.showParams             =
 "Display parameters in completion list. When the function has multiple definitions, they will be displayed separately."
+config.completion.requireFunction        =
+"The function to insert when an auto-require is triggered."
 config.completion.requireSeparator       =
 "The separator used when `require`."
 config.completion.postfix                =

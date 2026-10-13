@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.19.2
+`2026-10-13`
 * `NEW` Setting `Lua.completion.requireFunction` to choose what the auto-require completion inserts (e.g. `import` instead of `require`)
 * `FIX` Support 6-digit hex color codes (with and without `#`) in `textDocument/documentColor`, and correct the `alpha` of `#RRGGBB` colors to the LSP range `0..1`
 * `FIX` Resolve unbound class generic parameters to `any` instead of leaving the parameter as the field type [#3442](https://github.com/LuaLS/lua-language-server/pull/3442)

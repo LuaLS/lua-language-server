@@ -406,6 +406,58 @@ LuaDoc [[
 }
 
 LuaDoc [[
+---@field mode "async" | "sync"
+]]
+{
+    type   = "doc",
+    start  = 0,
+    finish = 10000,
+    parent = "<IGNORE>",
+    [1]    = {
+        type            = "doc.field",
+        start           = 10,
+        finish          = 31,
+        range           = 31,
+        parent          = "<IGNORE>",
+        field           = {
+            type   = "doc.field.name",
+            start  = 10,
+            finish = 14,
+            parent = "<IGNORE>",
+            [1]    = "mode",
+        },
+        bindComments    = {
+        },
+        extends         = {
+            type        = "doc.type",
+            start       = 15,
+            finish      = 31,
+            parent      = "<IGNORE>",
+            firstFinish = 31,
+            types       = {
+                [1] = {
+                    type   = "doc.type.string",
+                    start  = 15,
+                    finish = 22,
+                    parent = "<IGNORE>",
+                    [1]    = "async",
+                    [2]    = "\"",
+                },
+                [2] = {
+                    type   = "doc.type.string",
+                    start  = 25,
+                    finish = 31,
+                    parent = "<IGNORE>",
+                    [1]    = "sync",
+                    [2]    = "\"",
+                },
+            },
+        },
+        originalComment = "<IGNORE>",
+    },
+}
+
+LuaDoc [[
 ---@field private open function|string
 ]]
 {

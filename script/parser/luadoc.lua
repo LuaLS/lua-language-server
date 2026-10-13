@@ -669,7 +669,7 @@ end
 
 local function parseFunction(parent)
     local _, content = peekToken()
-    if content == 'async' then
+    if checkToken('name', 'async', 1) then
         nextToken()
         local pos = getStart()
         local tp, cont = peekToken()

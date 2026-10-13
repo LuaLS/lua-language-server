@@ -2,6 +2,7 @@ local core       = require 'core.hover'
 local files      = require 'files'
 local catch      = require 'catch'
 local config     = require 'config'
+local json       = require 'json'
 
 rawset(_G, 'TEST', true)
 
@@ -12,8 +13,18 @@ function TEST(script)
         files.setText(TESTURI, newScript)
         local hover = core.byUri(TESTURI, catched['?'][1][1], 1)
         assert(hover)
+        local value = hover:string():gsub('\r\n', '\n')
+        assert(utf8.len(value))
+        assert(utf8.len(json.encode {
+            result = {
+                contents = {
+                    kind  = 'markdown',
+                    value = value,
+                },
+            },
+        }))
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local label = hover:string():gsub('\r\n', '\n'):match('```lua[\r\n]*(.-)[\r\n]*```')
+        local label = value:match('```lua[\r\n]*(.-)[\r\n]*```')
         assert(expect == label)
         files.remove(TESTURI)
     end
@@ -372,6 +383,11 @@ TEST [[
 local s = <?'abc中文'?>
 ]]
 [[9 个字节，5 个字符]]
+
+TEST [[
+local fail = <?"\xC2"?>
+]]
+[[1 个字节]]
 
 TEST [[
 local n = <?0xff?>
@@ -2126,6 +2142,22 @@ local m = {
 [[
 (enum) A
 ]]
+
+TEST [[
+---@enum <?Broken?>
+local Broken = {
+    A = "\xC2",
+}
+]]
+[[(enum) Broken]]
+
+TEST [[
+---@enum(key) <?Key?>
+local Key = {
+    ["\xC2"] = 1,
+}
+]]
+[[(enum) Key]]
 
 TEST [[
 local <?x?> = 1 << 2

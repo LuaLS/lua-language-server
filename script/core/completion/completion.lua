@@ -1277,7 +1277,7 @@ local function insertDocEnumKey(doc, enums)
                 goto CONTINUE
             end
             enums[#enums+1] = {
-                label  = ('%q'):format(key),
+                label  = util.viewLiteral(key),
                 kind   = define.CompletionItemKind.EnumMember,
                 id     = stack(field, function (newField) ---@async
                     return {

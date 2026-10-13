@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Support 6-digit hex color codes (with and without `#`) in `textDocument/documentColor`, and correct the `alpha` of `#RRGGBB` colors to the LSP range `0..1`
 * `FIX` Resolve unbound class generic parameters to `any` instead of leaving the parameter as the field type [#3442](https://github.com/LuaLS/lua-language-server/pull/3442)
 * `FIX` LuaJIT nil-coalescing `??` now strips the optional `?` from the left-hand type (e.g. `integer? ?? 2` infers `integer`) [#3459](https://github.com/LuaLS/lua-language-server/issues/3459)
 * `FIX` Literal string `"async"` in LuaDoc types (e.g. `---@field mode "async" | "sync"`) is no longer mis-parsed as the `async fun` prefix [#3402](https://github.com/LuaLS/lua-language-server/issues/3402)

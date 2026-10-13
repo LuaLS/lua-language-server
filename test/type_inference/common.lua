@@ -334,6 +334,29 @@ local x
 _, <?y?> = xpcall(x, debug.traceback)
 ]]
 
+-- A generic class used without arguments: the parameter has nothing to resolve to, and
+-- keeping it as the field's type would leave a type no value can have.
+TEST 'any' [[
+---@class Storage<T>
+---@field Value T
+
+---@type Storage
+local storage
+local value = storage.Value
+print(<?value?>)
+]]
+
+-- Arguments still win where they are given.
+TEST 'string' [[
+---@class Storage2<T>
+---@field Value T
+
+---@type Storage2<string>
+local storage
+local value = storage.Value
+print(<?value?>)
+]]
+
 TEST 'A' [[
 ---@class A
 

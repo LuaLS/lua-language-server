@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Allow capture object types with backticks in generics
 
 ## 3.19.2
 `2026-10-13`

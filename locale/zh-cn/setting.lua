@@ -260,8 +260,8 @@ config.completion.maxSuggestCount        =
 "自动完成时最多分析的字段数量。当对象字段超过此上限时，需要更精确的输入才会显示补全。"
 config.completion.showParams             =
 "在建议列表中显示函数的参数信息，函数拥有多个定义时会分开显示。"
-config.completion.requireFunction        = -- TODO: need translate!
-"The function to insert when an auto-require is triggered."
+config.completion.requireFunction        =
+"触发自动 `require` 时插入的函数名。"
 config.completion.requireSeparator       =
 "`require` 时使用的分隔符。"
 config.completion.postfix                =

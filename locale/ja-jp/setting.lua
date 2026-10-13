@@ -261,8 +261,8 @@ config.completion.maxSuggestCount        =
 "補完用に分析するフィールドの最大数。オブジェクトがこの制限より多くのフィールドを持つ場合、補完が表示されるにはより具体的な入力が必要になります。"
 config.completion.showParams             =
 "補完リストにパラメータを表示します。関数に複数の定義がある場合、個別に表示されます。"
-config.completion.requireFunction        = -- TODO: need translate!
-"The function to insert when an auto-require is triggered."
+config.completion.requireFunction        =
+"自動`require`時に挿入される関数。"
 config.completion.requireSeparator       =
 "`require`時に使用される区切り文字。"
 config.completion.postfix                =

@@ -272,7 +272,7 @@ vm.binarySwitch = util.switch()
         local node2 = vm.compileNode(source[2])
         -- 统计具体类型：variable/local 是引用元信息，无具体类型时视为未知（可能为 nil）
         local count   = 0
-        local hasNil  = false
+        local hasNil  = node1:isOptional()
         for c in node1:eachObject() do
             if c.type == 'nil'
             or (c.type == 'global' and c.cate == 'type' and c.name == 'nil') then

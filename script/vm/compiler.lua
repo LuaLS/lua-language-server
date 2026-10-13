@@ -355,7 +355,8 @@ local function resolveGenericField(uri, classGlobal, field, signs)
     }
 end
 
-local searchFieldSwitch = util.switch()
+local searchFieldSwitch
+searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (_suri, source, key, pushResult)
         if type(key) == 'string'
@@ -513,6 +514,19 @@ local searchFieldSwitch = util.switch()
         end
         if node.cate == 'type' then
             vm.getClassFields(suri, node, key, pushResult)
+        end
+    end)
+    : case 'doc.generic.name'
+    : call(function (suri, source, key, pushResult)
+        searchFieldByLocalID(source, key, pushResult)
+        searchFieldByGlobalID(suri, source, key, pushResult)
+        -- unresolved generic `T: SomeClass`: search fields of its constraint
+        local constraint = source.generic and source.generic.extends
+        if not constraint then
+            return
+        end
+        for n in vm.compileNode(constraint):eachObject() do
+            searchFieldSwitch(n.type, suri, n, key, pushResult)
         end
     end)
     : default(function (suri, source, key, pushResult)

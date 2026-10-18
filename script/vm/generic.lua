@@ -113,6 +113,8 @@ local function cloneObject(source, resolved)
             start   = source.start,
             finish  = source.finish,
             parent  = source.parent,
+            async   = source.async,
+            asyncPos = source.asyncPos,
             args    = {},
             returns = {},
         }

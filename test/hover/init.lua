@@ -1812,6 +1812,16 @@ local <?f?>
 local f: async fun()
 ]]
 
+TEST [[
+---@alias AsyncGenericFunc<T> async fun(): T
+
+---@type AsyncGenericFunc<string>
+local <?f?>
+]]
+[[
+local f: async AsyncGenericFunc<string>
+]]
+
 config.set(nil, 'Lua.runtime.nonstandardSymbol', { '//' })
 TEST [[
 local <?x?> = 1 // 2

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` `continue` (LuaJIT extensions or `Lua.runtime.nonstandardSymbol`) followed by a comment on the same line (e.g. `continue -- note`) is now parsed as a `continue` statement instead of reporting `exp-in-action` [#3474](https://github.com/LuaLS/lua-language-server/issues/3474)
 
 ## 3.19.2
 `2026-10-13`

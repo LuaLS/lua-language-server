@@ -134,6 +134,10 @@ TestLuaJITExt 'while true do continue end'
 TestLuaJITExt 'for i = 1, 10 do continue end'
 TestLuaJITExt 'repeat continue until false'
 TestLuaJITExtDisabled 'while true do continue end'
+-- continue 后跟注释（#3474）
+TestLuaJITExt 'while true do continue -- comment\nend'
+TestLuaJITExt 'while true do continue --[[ comment ]] end'
+TestLuaJITExt 'while true do continue --[==[ multi\nline ]==]\nend'
 
 print('LuaJIT 扩展基本语法用例通过')
 
@@ -244,6 +248,13 @@ TestIndividual('number_underscore', 'local a = 0x1_2')
 TestIndividual('number_underscore', 'local a = 1_2.3_4')
 TestIndividual('number_underscore', 'local a = 1e1_0')
 TestIndividualDisabled('number_underscore', 'local a = 1_234')
+-- continue（soft keyword），后跟注释时仍为 continue 语句（#3474）
+TestIndividual('continue', 'for i = 1, 2 do continue end')
+TestIndividual('continue', 'for i = 1, 2 do\n    continue -- trailing comment\nend')
+TestIndividual('continue', 'for i = 1, 2 do continue --[[ comment ]] end')
+TestIndividual('continue', 'continue = 1')
+TestIndividual('continue', 'continue --[[ comment ]] = 1')
+TestIndividualDisabled('continue', 'for i = 1, 2 do continue end')
 
 print('LuaJIT 扩展单独启用用例通过')
 

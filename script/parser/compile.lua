@@ -615,42 +615,6 @@ local function skipSpace(isAction)
             and  not skipComment(isAction)
 end
 
--- 预读：返回 `Tokens[index + 1]` 起第一个不属于注释的 token，不移动 `Index`。
--- 短注释会延续到行尾，因此返回其后的换行符（或文件结束时返回 nil）。
----@param index integer
----@return string?
-local function peekTokenSkipComment(index)
-    while true do
-        local token = Tokens[index + 1]
-        local finishMark
-        if token == '--'
-        or (token == '//' and State.options.nonstandardSymbol['//']) then
-            local start = Tokens[index]
-            local mark  = Tokens[index + 2] == start + 2
-                      and smatch(Lua, '^%[%=*%[', start + 2)
-            if not mark then
-                repeat
-                    index = index + 2
-                    token = Tokens[index + 1]
-                until not token or NLMap[token]
-                return token
-            end
-            finishMark = sgsub(mark, '%[', ']')
-        elseif token == '/*' then
-            finishMark = '*/'
-        else
-            return token
-        end
-        local _, finishOffset = sfind(Lua, finishMark, Tokens[index] + 2, true)
-        if not finishOffset then
-            return nil
-        end
-        repeat
-            index = index + 2
-        until not Tokens[index] or Tokens[index] > finishOffset
-    end
-end
-
 local function expectAssign(isAction)
     local token = Tokens[Index + 1]
     if token == '=' then
@@ -4986,16 +4950,25 @@ function parseAction()
 
     if token == 'continue' and (State.options.nonstandardSymbol['continue'] or State.luaJITExtensions) then
         -- continue 是 soft keyword：仅当其后为换行/`;`/块结束符时才视为 continue 语句，
-        -- 否则（如 `continue = 2`、`continue()`）作为变量名；中间的注释会被跳过
-        local nextToken = peekTokenSkipComment(Index + 2)
-        if nextToken == nil
-        or NLMap[nextToken]
-        or nextToken == ';'
-        or nextToken == 'end'
-        or nextToken == 'else'
-        or nextToken == 'elseif'
-        or nextToken == 'until'
-        or nextToken == ')' then
+        -- 否则（如 `continue = 2`、`continue()`）作为变量名；中间的注释用 skipComment 跳过后再回退
+        local savePoint = getSavePoint()
+        local commCount = #State.comms
+        Index = Index + 2
+        repeat until not skipComment()
+        local nextToken = Tokens[Index + 1]
+        local isStatement = nextToken == nil
+            or NLMap[nextToken]
+            or nextToken == ';'
+            or nextToken == 'end'
+            or nextToken == 'else'
+            or nextToken == 'elseif'
+            or nextToken == 'until'
+            or nextToken == ')'
+        savePoint()
+        for i = commCount + 1, #State.comms do
+            State.comms[i] = nil
+        end
+        if isStatement then
             return parseBreak()
         end
     end

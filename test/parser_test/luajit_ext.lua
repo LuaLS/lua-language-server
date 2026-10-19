@@ -254,6 +254,7 @@ TestIndividual('continue', 'for i = 1, 2 do\n    continue -- trailing comment\ne
 TestIndividual('continue', 'for i = 1, 2 do continue --[[ comment ]] end')
 TestIndividual('continue', 'continue = 1')
 TestIndividual('continue', 'continue --[[ comment ]] = 1')
+TestIndividual('continue', 'continue --[[ multi\nline ]] = 1')
 TestIndividualDisabled('continue', 'for i = 1, 2 do continue end')
 
 print('LuaJIT 扩展单独启用用例通过')

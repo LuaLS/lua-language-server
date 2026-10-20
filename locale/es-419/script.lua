@@ -87,7 +87,7 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 'El valor que se asigna es `nil` debido a que el número de valores no es suficiente. En Lua, `x, y = 1 ` es equivalente a `x, y = 1, nil` .'
 DIAG_REQUIRE_LIKE       =
 'Puede tratar `{}` como `require` por configuración.'
-DIAG_COSE_NON_OBJECT    =
+DIAG_CLOSE_NON_OBJECT   =
 'No se puede cerrar un valor de este tipo. (A menos que se asigne el método meta `__close`)'
 DIAG_COUNT_DOWN_LOOP    =
 'Quizo decir `{}` ?'
@@ -688,6 +688,8 @@ CLI_DOC_INITING  =
 CLI_DOC_DONE     =
 [[
 Documentación exportada:
+Datos originales: {}
+Markdown(ejemplo): {}
 ]]
 CLI_DOC_WORKING  =
 'Construyendo la documentación...'

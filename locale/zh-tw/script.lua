@@ -87,7 +87,7 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 '由於值的數量不夠而賦值了 `nil` 。在Lua中, `x, y = 1` 等價於 `x, y = 1, nil` 。'
 DIAG_REQUIRE_LIKE       =
 '你可以在設定中將 `{}` 視為 `require`。'
-DIAG_COSE_NON_OBJECT    =
+DIAG_CLOSE_NON_OBJECT   =
 '無法 close 此類型的值。（除非給此類型設定 `__close` 元方法）'
 DIAG_COUNT_DOWN_LOOP    =
 '你的意思是 `{}` 嗎？'
@@ -686,7 +686,11 @@ CLI_CHECK_MULTIPLE_WORKERS =
 CLI_DOC_INITING   =
 '文件載入中…'
 CLI_DOC_DONE      =
-'文件輸出完成！'
+[[
+文件輸出完成！
+原始資料: {}
+Markdown(範例): {}
+]]
 CLI_DOC_WORKING   =
 '正在產生文件…'
 

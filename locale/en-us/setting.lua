@@ -407,11 +407,11 @@ Strictly check the shape of the table.
 config.type.inferTableSize               =
 'Maximum number of table fields analyzed during type inference.'
 config.doc.privateName                   =
-'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
+'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, which can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 =
-'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
+'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, which can only be accessed in the class where the definition is located and its subclasses.'
 config.doc.packageName                   =
-'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
+'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, which can only be accessed in the file where the definition is located.'
 config.doc.regengine                     =
 'The regular expression engine used for matching documentation scope names.'
 config.doc.regengine.glob                =
@@ -427,7 +427,7 @@ config.diagnostics['unused-function']       =
 config.diagnostics['undefined-global']      =
 'Enable undefined global variable diagnostics.'
 config.diagnostics['global-in-nil-env']     =
-'Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.'
+'Enable diagnostics for using global variables when `_ENV` is set to `nil`.'
 config.diagnostics['unused-label']          =
 'Enable unused label diagnostics.'
 config.diagnostics['unused-vararg']         =

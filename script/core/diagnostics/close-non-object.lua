@@ -20,7 +20,7 @@ return function (uri, callback)
             callback {
                 start   = source.start,
                 finish  = source.finish,
-                message = lang.script.DIAG_COSE_NON_OBJECT,
+                message = lang.script.DIAG_CLOSE_NON_OBJECT,
             }
             return
         end
@@ -33,7 +33,7 @@ return function (uri, callback)
             callback {
                 start   = source.value.start,
                 finish  = source.value.finish,
-                message = lang.script.DIAG_COSE_NON_OBJECT,
+                message = lang.script.DIAG_CLOSE_NON_OBJECT,
             }
         end
     end)

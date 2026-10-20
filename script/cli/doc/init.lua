@@ -247,10 +247,15 @@ function doc.runCLI()
         end
 
         local ok, outPaths, err = dirty_export.serializeAndExport(docs, DOC_OUT_PATH)
-        print(lang.script('CLI_DOC_DONE'))
+        print(lang.script('CLI_DOC_DONE',
+            files.normalize(outPaths[1]),
+            files.normalize(outPaths[2])
+        ))
         for i, path in ipairs(outPaths) do
             local this_err = (type(err) == 'table') and err[i] or nil
-            print(this_err or files.normalize(path))
+            if this_err then
+                print(this_err)
+            end
         end
     end)
 end

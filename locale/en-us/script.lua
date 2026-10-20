@@ -87,7 +87,7 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 'The value is assigned as `nil` because the number of values is not enough. In Lua, `x, y = 1 ` is equivalent to `x, y = 1, nil` .'
 DIAG_REQUIRE_LIKE       =
 'You can treat `{}` as `require` by setting.'
-DIAG_COSE_NON_OBJECT    =
+DIAG_CLOSE_NON_OBJECT   =
 'Cannot close a value of this type. (Unless set `__close` meta method)'
 DIAG_COUNT_DOWN_LOOP    =
 'Do you mean `{}` ?'
@@ -152,7 +152,7 @@ DIAG_PARAM_TYPE_MISMATCH              =
 DIAG_UNKNOWN_CAST_VARIABLE            =
 'Unknown type conversion variable `{}`.'
 DIAG_CAST_TYPE_MISMATCH               =
-'Cannot convert `{def}` to `{ref}`。'
+'Cannot convert `{def}` to `{ref}`.'
 DIAG_MISSING_RETURN_VALUE             =
 'Annotations specify that at least {min} return value(s) are required, found {rmax} returned here instead.'
 DIAG_MISSING_RETURN_VALUE_RANGE       =
@@ -460,7 +460,7 @@ ACTION_FIX_THEN_AS_DO   =
 ACTION_FIX_DO_AS_THEN   =
 'Modify to `do` .'
 ACTION_ADD_END          =
-'Add `end` (infer the addition location ny indentations).'
+'Add `end` (infer the addition location by indentations).'
 ACTION_FIX_COMMENT_PREFIX =
 'Modify to `--` .'
 ACTION_FIX_NONSTANDARD_SYMBOL =
@@ -687,7 +687,9 @@ CLI_DOC_INITING   =
 'Loading documents ...'
 CLI_DOC_DONE      =
 [[
-Documentation exported:
+Document exporting completed!
+Raw data: {}
+Markdown(example): {}
 ]]
 CLI_DOC_WORKING   =
 'Building docs...'

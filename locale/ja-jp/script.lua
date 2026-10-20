@@ -87,7 +87,7 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 '値の数が足りないため、`nil` が代入されました。Luaでは `x, y = 1` は `x, y = 1, nil` と同等です。'
 DIAG_REQUIRE_LIKE       =
 '`{}` を `require` として取り扱うように設定できます。'
-DIAG_COSE_NON_OBJECT    =
+DIAG_CLOSE_NON_OBJECT   =
 'このタイプの値はクローズできません。（`__close` メタメソッドを設定しない限り）'
 DIAG_COUNT_DOWN_LOOP    =
 'もしかして `{}` ？'

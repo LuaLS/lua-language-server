@@ -4950,16 +4950,25 @@ function parseAction()
 
     if token == 'continue' and (State.options.nonstandardSymbol['continue'] or State.luaJITExtensions) then
         -- continue 是 soft keyword：仅当其后为换行/`;`/块结束符时才视为 continue 语句，
-        -- 否则（如 `continue = 2`、`continue()`）作为变量名
-        local nextToken = Tokens[Index + 3]
-        if nextToken == nil
-        or NLMap[nextToken]
-        or nextToken == ';'
-        or nextToken == 'end'
-        or nextToken == 'else'
-        or nextToken == 'elseif'
-        or nextToken == 'until'
-        or nextToken == ')' then
+        -- 否则（如 `continue = 2`、`continue()`）作为变量名；中间的注释用 skipComment 跳过后再回退
+        local savePoint = getSavePoint()
+        local commCount = #State.comms
+        Index = Index + 2
+        repeat until not skipComment()
+        local nextToken = Tokens[Index + 1]
+        local isStatement = nextToken == nil
+            or NLMap[nextToken]
+            or nextToken == ';'
+            or nextToken == 'end'
+            or nextToken == 'else'
+            or nextToken == 'elseif'
+            or nextToken == 'until'
+            or nextToken == ')'
+        savePoint()
+        for i = commCount + 1, #State.comms do
+            State.comms[i] = nil
+        end
+        if isStatement then
             return parseBreak()
         end
     end

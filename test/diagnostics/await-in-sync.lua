@@ -130,3 +130,53 @@ end
 
 return af
 ]]
+
+TEST [[
+---@alias AsyncGenericFunc<T> async fun(): T
+
+---@type AsyncGenericFunc<string>
+local f
+
+function F()
+    <!f!>()
+end
+]]
+
+TEST [[
+---@alias AsyncGenericFunc<T> async fun(x: T)
+
+---@type AsyncGenericFunc<integer>
+local f
+
+---@async
+function F()
+    f(1)
+end
+]]
+
+TEST [[
+---@alias AsyncGenericFunc<T> async fun(): T
+
+---@class AsyncGenericHolder
+---@field run AsyncGenericFunc<string>
+
+---@type AsyncGenericHolder
+local holder
+
+function F()
+    <!holder.run!>()
+end
+]]
+
+TEST [[
+---@alias AsyncGenericFunc<T> async fun(): T
+
+---@type AsyncGenericFunc<string>
+local function f()
+    return 'x'
+end
+
+function F()
+    <!f!>()
+end
+]]

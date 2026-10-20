@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Generic aliases of async functions (e.g. `---@alias Name<T> async fun(): T` used as `Name<string>`) keep the `async` flag, so `await-in-sync` and hover treat them as async [#3469](https://github.com/LuaLS/lua-language-server/issues/3469)
 
 ## 3.19.2
 `2026-10-13`

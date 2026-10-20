@@ -85,6 +85,7 @@ local function testAll()
     test 'document_symbol'
     test 'code_action'
     test 'other'
+    test 'rust.test'
 end
 
 local files = require "files"

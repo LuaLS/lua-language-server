@@ -67,6 +67,7 @@ The install methods below are maintained by community members.
 - `pt-br` 🇧🇷
 - `ja-jp` 🇯🇵
 - `es-419` 🇪🇸
+- `uk-ua` 🇺🇦
 
 
 > **Note**

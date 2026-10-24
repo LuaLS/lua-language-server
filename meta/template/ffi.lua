@@ -2,7 +2,7 @@
 ---@meta ffi
 
 ---@class ffi.namespace*: table
----@field [string] function
+---@field [string] any
 
 ---@class ffi.ctype*: userdata
 ---@overload fun(init?: any, ...): ffi.cdata*

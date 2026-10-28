@@ -1,6 +1,8 @@
 # changelog
 
 ## Unreleased
+* `FEAT` Operators can have generic parameters through `---@operator add<T>(List<T>): T`.
+* `FIX` Generic classes with generic methods now have correct type inference.
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.19.2

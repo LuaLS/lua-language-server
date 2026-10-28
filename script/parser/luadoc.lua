@@ -511,6 +511,52 @@ local function parseDots(tp, parent)
     return dots
 end
 
+local function bindLocalGenerics(rootObj, signs)
+    if not signs or not rootObj then
+        return
+    end
+    local generics = {}
+    for _, sign in ipairs(signs) do
+        generics[sign[1]] = sign
+    end
+    local function walk(obj)
+        if not obj then return end
+        if obj.type == 'doc.type.name' and generics[obj[1]] then
+            obj.type    = 'doc.generic.name'
+            obj.generic = generics[obj[1]]
+        elseif obj.type == 'doc.type' and obj.types then
+            for _, t in ipairs(obj.types) do
+                walk(t)
+            end
+        elseif obj.type == 'doc.type.array' then
+            walk(obj.node)
+        elseif obj.type == 'doc.type.table' and obj.fields then
+            for _, field in ipairs(obj.fields) do
+                walk(field.name)
+                walk(field.extends)
+            end
+        elseif obj.type == 'doc.type.sign' then
+            walk(obj.node)
+            if obj.signs then
+                for _, s in ipairs(obj.signs) do
+                    walk(s)
+                end
+            end
+        elseif obj.type == 'doc.type.function' then
+            for _, arg in ipairs(obj.args) do
+                walk(arg.extends)
+            end
+            for _, ret in ipairs(obj.returns) do
+                walk(ret)
+            end
+        elseif obj.type == 'doc.operator' then
+            walk(obj.exp)
+            walk(obj.extends)
+        end
+    end
+    walk(rootObj)
+end
+
 local function  parseTypeUnitFunction(parent)
     if not checkToken('name', 'fun', 1) then
         return nil
@@ -621,48 +667,7 @@ local function  parseTypeUnitFunction(parent)
     typeUnit.finish = getFinish()
     -- Bind local generics from fun<T, V> to type names within this function
     if typeUnit.signs then
-        local generics = {}
-        for _, sign in ipairs(typeUnit.signs) do
-            generics[sign[1]] = sign
-        end
-        local function bindTypeNames(obj)
-            if not obj then return end
-            if obj.type == 'doc.type.name' and generics[obj[1]] then
-                obj.type = 'doc.generic.name'
-                obj.generic = generics[obj[1]]
-            elseif obj.type == 'doc.type' and obj.types then
-                for _, t in ipairs(obj.types) do
-                    bindTypeNames(t)
-                end
-            elseif obj.type == 'doc.type.array' then
-                bindTypeNames(obj.node)
-            elseif obj.type == 'doc.type.table' and obj.fields then
-                for _, field in ipairs(obj.fields) do
-                    bindTypeNames(field.name)
-                    bindTypeNames(field.extends)
-                end
-            elseif obj.type == 'doc.type.sign' then
-                bindTypeNames(obj.node)
-                if obj.signs then
-                    for _, s in ipairs(obj.signs) do
-                        bindTypeNames(s)
-                    end
-                end
-            elseif obj.type == 'doc.type.function' then
-                for _, arg in ipairs(obj.args) do
-                    bindTypeNames(arg.extends)
-                end
-                for _, ret in ipairs(obj.returns) do
-                    bindTypeNames(ret)
-                end
-            end
-        end
-        for _, arg in ipairs(typeUnit.args) do
-            bindTypeNames(arg.extends)
-        end
-        for _, ret in ipairs(typeUnit.returns) do
-            bindTypeNames(ret)
-        end
+        bindLocalGenerics(typeUnit, typeUnit.signs)
     end
     return typeUnit
 end
@@ -1626,6 +1631,9 @@ local docSwitch = util.switch()
         result.op = op
         result.finish = op.finish
 
+        -- Parse optional operator-level generic parameters: add<U>
+        result.signs = parseSigns(result)
+
         if checkToken('symbol', '(', 1) then
             nextToken()
             if checkToken('symbol', ')', 1) then
@@ -1646,6 +1654,11 @@ local docSwitch = util.switch()
         if ret then
             result.extends = ret
             result.finish  = ret.finish
+        end
+
+        -- Bind operator-local generics so that doc.type.name nodes for U are converted to doc.generic.name.
+        if result.signs then
+            bindLocalGenerics(result, result.signs)
         end
 
         return result

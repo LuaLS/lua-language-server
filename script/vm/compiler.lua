@@ -1834,27 +1834,20 @@ local function bindReturnOfFunction(source, mfunc, index, args)
                                     if doc.type == 'doc.return' then
                                         for _, rtn in ipairs(doc.returns) do
                                             if rtn.returnIndex == index then
-                                                -- Only clone if the return type only references class-level generics
-                                                -- (i.e. generics that exist in the genericMap from the receiver).
-                                                -- Method-level generics (e.g. V not in {T=string}) are
-                                                -- already resolved correctly in the first round above.
-                                                local onlyClassGenerics = true
-                                                guide.eachSourceType(rtn, 'doc.generic.name', function(src)
-                                                    if not genericMap[src[1]] then
-                                                        onlyClassGenerics = false
+                                                -- Check if rtn references any class generics from the receiver.
+                                                local hasClassGenerics = false
+                                                local function checkGeneric(src)
+                                                    if genericMap[src[1]] then
+                                                        hasClassGenerics = true
                                                     end
-                                                end)
-                                                if onlyClassGenerics then
-                                                    local newRtn = vm.cloneObject(rtn, genericMap)
-                                                    if newRtn then
-                                                        returnNode = vm.compileNode(newRtn)
-                                                        for rnode in returnNode:eachObject() do
-                                                            if rnode.type == 'generic' then
-                                                                returnNode = rnode:resolve(guide.getUri(source), args)
-                                                                break
-                                                            end
-                                                        end
-                                                    end
+                                                end
+                                                guide.eachSourceType(rtn, 'doc.generic.name', checkGeneric)
+                                                if not hasClassGenerics then
+                                                    guide.eachSourceType(rtn, 'doc.type.name', checkGeneric)
+                                                end
+                                                if hasClassGenerics then
+                                                    local sign = vm.getSign(mfunc)
+                                                    returnNode = vm.resolveGenericReturn(guide.getUri(source), genericMap, sign, resolveArgs, rtn)
                                                 end
                                                 break
                                             end

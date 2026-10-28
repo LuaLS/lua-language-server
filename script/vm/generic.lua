@@ -23,15 +23,36 @@ local function cloneObject(source, resolved)
     if source.type == 'doc.generic.name' then
         local key = source[1]
         local newName = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            [1]    = source[1],
+            type    = source.type,
+            start   = source.start,
+            finish  = source.finish,
+            parent  = source.parent,
+            literal = source.literal,
+            generic = source.generic,
+            [1]     = source[1],
         }
         if resolved[key] then
             vm.setNode(newName, resolved[key], true)
             newName._resolved = resolved[key]
+        elseif source._resolved then
+            local resolvedNode = vm.createNode()
+            local anyResolved = false
+            for rn in source._resolved:eachObject() do
+                if rn.type == 'doc.generic.name' and resolved[rn[1]] then
+                    resolvedNode:merge(resolved[rn[1]])
+                    anyResolved = true
+                else
+                    resolvedNode:merge(rn)
+                end
+            end
+            if anyResolved then
+                vm.setNode(newName, resolvedNode, true)
+                newName._resolved = resolvedNode
+            else
+                local copied = source._resolved:copy()
+                vm.setNode(newName, copied, true)
+                newName._resolved = copied
+            end
         end
         return newName
     end
@@ -88,11 +109,12 @@ local function cloneObject(source, resolved)
     end
     if source.type == 'doc.type.table' then
         local newTable = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            fields = {},
+            type    = source.type,
+            start   = source.start,
+            finish  = source.finish,
+            parent  = source.parent,
+            isTuple = source.isTuple,
+            fields  = {},
         }
         for i, field in ipairs(source.fields) do
             local newField = {
@@ -113,6 +135,8 @@ local function cloneObject(source, resolved)
             start   = source.start,
             finish  = source.finish,
             parent  = source.parent,
+            async   = source.async,
+            signs   = source.signs,
             args    = {},
             returns = {},
         }
@@ -157,6 +181,13 @@ local function cloneObject(source, resolved)
                 guide.eachSourceType(sign, 'doc.generic.name', function (src)
                     if hasConcreteResolution(src[1]) then
                         needsClone = true
+                    elseif src._resolved then
+                        for rn in src._resolved:eachObject() do
+                            if rn.type == 'doc.generic.name' and hasConcreteResolution(rn[1]) then
+                                needsClone = true
+                                break
+                            end
+                        end
                     end
                 end)
             end
@@ -181,7 +212,7 @@ local function cloneObject(source, resolved)
 end
 
 ---@param uri uri
----@param args parser.object
+---@param args parser.object[]
 ---@return vm.node
 function mt:resolve(uri, args)
     local resolved  = self.sign:resolve(uri, args)
@@ -276,3 +307,50 @@ end
 function vm.cloneObject(source, resolved)
     return cloneObject(source, resolved)
 end
+
+---Resolves generic return types for generic methods and generic operators
+---by combining receiver class generics and member generic signs.
+---@param uri               uri
+---@param classGenericMap?  table<string, vm.node>
+---@param sign?             vm.sign
+---@param args?             parser.object[]
+---@param returnAst         parser.object
+---@return vm.node?
+function vm.resolveGenericReturn(uri, classGenericMap, sign, args, returnAst)
+    local combinedMap = classGenericMap
+    if sign and args and #args > 0 then
+        local memberResolved = sign:resolve(uri, args)
+        if memberResolved and next(memberResolved) then
+            combinedMap = {}
+            if classGenericMap then
+                for k, v in pairs(classGenericMap) do
+                    combinedMap[k] = v
+                end
+            end
+            for k, v in pairs(memberResolved) do
+                combinedMap[k] = v
+            end
+        end
+    end
+
+    local returnNode
+    if combinedMap and next(combinedMap) then
+        local clonedAst = vm.cloneObject(returnAst, combinedMap)
+        if clonedAst then
+            returnNode = vm.compileNode(clonedAst)
+        end
+    end
+    if not returnNode then
+        returnNode = vm.compileNode(returnAst)
+    end
+
+    for rnode in returnNode:eachObject() do
+        if rnode.type == 'generic' and args then
+            returnNode = rnode:resolve(uri, args)
+            break
+        end
+    end
+
+    return returnNode
+end
+

@@ -195,7 +195,7 @@ local childMap = {
     ['doc.as']             = {'as'},
     ['doc.cast']           = {'name', '#casts'},
     ['doc.cast.block']     = {'extends'},
-    ['doc.operator']       = {'op', 'exp', 'extends'},
+    ['doc.operator']       = {'op', '#signs', 'exp', 'extends'},
     ['doc.meta']           = {'name'},
     ['doc.attr']           = {'#names'},
 }

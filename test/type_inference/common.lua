@@ -5278,3 +5278,111 @@ local myClass
 
 local <?result?> = myClass:pass(42)
 ]]
+
+-- Generic method on generic class via @field
+TEST 'Parser<[integer, string]>' [[
+---@class Parser<T>
+---@field parse fun(self: Parser<T>, content: string): T?
+---@field add fun<U>(self: Parser<T>, other: Parser<U>): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?a?> = x:add(y)
+]]
+
+TEST 'integer?' [[
+---@class Parser<T>
+---@field parse fun(self: Parser<T>, content: string): T?
+---@field add fun<U>(self: Parser<T>, other: Parser<U>): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+local <?res?> = x:parse('foo')
+]]
+
+TEST '[integer, string]?' [[
+---@class Parser<T>
+---@field parse fun(self: Parser<T>, content: string): T?
+---@field add fun<U>(self: Parser<T>, other: Parser<U>): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local a = x:add(y)
+local <?res?> = a:parse('foo')
+]]
+
+-- Generic method on generic class via ---@generic
+TEST 'Parser<[integer, string]>' [[
+---@class Parser<T>
+local parser = {}
+
+---@generic U
+---@param other Parser<U>
+---@return Parser<[T, U]>
+function parser:add(other)
+	return {}
+end
+
+---@param content string
+---@return T?
+function parser:parse(content)
+	return
+end
+
+---@type Parser<integer>
+local u
+---@type Parser<string>
+local v
+local <?w?> = u:add(v)
+]]
+
+TEST 'integer?' [[
+---@class Parser<T>
+local parser = {}
+
+---@generic U
+---@param other Parser<U>
+---@return Parser<[T, U]>
+function parser:add(other)
+	return {}
+end
+
+---@param content string
+---@return T?
+function parser:parse(content)
+	return
+end
+
+---@type Parser<integer>
+local u
+local <?res?> = u:parse('foo')
+]]
+
+TEST '[integer, string]?' [[
+---@class Parser<T>
+local parser = {}
+
+---@generic U
+---@param other Parser<U>
+---@return Parser<[T, U]>
+function parser:add(other)
+	return {}
+end
+
+---@param content string
+---@return T?
+function parser:parse(content)
+	return
+end
+
+---@type Parser<integer>
+local u
+---@type Parser<string>
+local v
+local w = u:add(v)
+local <?res?> = w:parse('foo')
+]]

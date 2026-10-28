@@ -200,3 +200,111 @@ TESTGENERICNAMES '' [[
 ---@operator call(): integer
 local Plain
 ]]
+
+-- Generic operators on a generic class
+TEST 'Parser<[integer, string]>' [[
+---@class Parser<T>
+---@operator add<U>(Parser<U>): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?z?> = x + y
+]]
+
+-- Chaining of operators
+TEST 'Parser<[[integer, string], boolean]>' [[
+---@class Parser<T>
+---@operator add<U>(Parser<U>): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+---@type Parser<boolean>
+local z
+local <?r?> = (x + y) + z
+]]
+
+-- Operators work on concrete classes
+TEST 'string' [[
+---@class Become
+---@operator mul<T>(T): T
+
+---@type Become
+local x
+local <?y?> = x * "hello"
+]]
+
+-- Optional return type
+TEST 'Parser<[integer, string]>?' [[
+---@class Parser<T>
+---@operator add<U>(Parser<U>): Parser<[T, U]>?
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?z?> = x + y
+]]
+
+-- Union return type
+TEST 'boolean|Parser<[integer, string]>' [[
+---@class Parser<T>
+---@operator add<U>(Parser<U>): Parser<[T, U]>|boolean
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?z?> = x + y
+]]
+
+-- Optional operand
+TEST 'Parser<[integer, string]>' [[
+---@class Parser<T>
+---@operator add<U>(Parser<U>?): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?z?> = x + y
+]]
+
+-- Union operand (generic in first branch)
+TEST 'Parser<[integer, string]>' [[
+---@class Parser<T>
+---@operator add<U>(Parser<U>|boolean): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?z?> = x + y
+]]
+
+-- Union operand (generic in second branch)
+TEST 'Parser<[integer, string]>' [[
+---@class Parser<T>
+---@operator add<U>(boolean|Parser<U>): Parser<[T, U]>
+
+---@type Parser<integer>
+local x
+---@type Parser<string>
+local y
+local <?z?> = x + y
+]]
+
+-- Optional generic in return type
+TEST 'string?' [[
+---@class Box<T>
+---@operator add<U>(Parser<U>): U?
+
+---@type Box<integer>
+local b
+---@type Parser<string>
+local p
+local <?res?> = b + p
+]]

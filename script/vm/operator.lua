@@ -91,20 +91,33 @@ local function checkOperators(operators, op, value, result, uri, classGlobal, si
         -- 类型注解仅供 doc.class 等使用），克隆结果可能是 vm.generic，故声明联合类型。
         ---@type parser.object|vm.generic
         local exp     = operator.exp
-        ---@type parser.object|vm.generic
         local extends = operator.extends
-        if genericMap then
-            if exp and vm.containsGenericName(exp) then
-                exp = vm.cloneObject(exp, genericMap) or exp
-            end
-            if vm.containsGenericName(extends) then
-                extends = vm.cloneObject(extends, genericMap) or extends
-            end
+        if genericMap and exp and vm.containsGenericName(exp) then
+            exp = vm.cloneObject(exp, genericMap) or exp
         end
         if value and exp then
             local valueNode = vm.compileNode(value)
             local expNode   = vm.compileNode(exp)
             local opUri     = guide.getUri(operator)
+            local checkExpNode = expNode
+            for en in expNode:eachObject() do
+                if en.type == 'doc.type.sign' and en.node and en.node[1] then
+                    if checkExpNode == expNode then
+                        checkExpNode = vm.createNode()
+                        for prev in expNode:eachObject() do
+                            if prev == en then
+                                checkExpNode:merge(vm.getGlobal('type', en.node[1]) or en)
+                            else
+                                checkExpNode:merge(prev)
+                            end
+                        end
+                    else
+                        checkExpNode:merge(vm.getGlobal('type', en.node[1]) or en)
+                    end
+                elseif checkExpNode ~= expNode then
+                    checkExpNode:merge(en)
+                end
+            end
             for vo in valueNode:eachObject() do
                 local child = vo
                 -- `vm.isSubType` has no notion of `doc.type.sign`; match an
@@ -112,11 +125,19 @@ local function checkOperators(operators, op, value, result, uri, classGlobal, si
                 if child.type == 'doc.type.sign' and child.node and child.node[1] then
                     child = vm.getGlobal('type', child.node[1]) or child
                 end
-                if vm.isSubType(opUri, child, expNode) then
+                if vm.isSubType(opUri, child, checkExpNode) then
                     if not result then
                         result = vm.createNode()
                     end
-                    result:merge(vm.compileNode(extends))
+                    local opSign
+                    if operator.signs and #operator.signs > 0 and vm.containsGenericName(exp) then
+                        opSign = vm.createSign()
+                        opSign:addSign(vm.compileNode(exp))
+                    end
+                    local opResult = vm.resolveGenericReturn(uri or opUri, genericMap, opSign, {value}, extends)
+                    if opResult then
+                        result:merge(opResult)
+                    end
                     return result
                 end
             end
@@ -124,7 +145,10 @@ local function checkOperators(operators, op, value, result, uri, classGlobal, si
             if not result then
                 result = vm.createNode()
             end
-            result:merge(vm.compileNode(extends))
+            local opResult = vm.resolveGenericReturn(uri or opUri, genericMap, nil, nil, extends)
+            if opResult then
+                result:merge(opResult)
+            end
             return result
         end
         ::CONTINUE::

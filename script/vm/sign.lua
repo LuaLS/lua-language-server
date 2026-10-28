@@ -68,7 +68,7 @@ function mt:addDocGeneric(doc)
 end
 
 ---@param uri uri
----@param args parser.object
+---@param args parser.object[]
 ---@return table<string, vm.node>?
 function mt:resolve(uri, args)
     if not args then

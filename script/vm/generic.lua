@@ -23,15 +23,35 @@ local function cloneObject(source, resolved)
     if source.type == 'doc.generic.name' then
         local key = source[1]
         local newName = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            [1]    = source[1],
+            type    = source.type,
+            start   = source.start,
+            finish  = source.finish,
+            parent  = source.parent,
+            literal = source.literal,
+            generic = source.generic,
+            [1]     = source[1],
         }
         if resolved[key] then
             vm.setNode(newName, resolved[key], true)
             newName._resolved = resolved[key]
+        elseif source._resolved then
+            local resolvedNode = vm.createNode()
+            local anyResolved = false
+            for rn in source._resolved:eachObject() do
+                if rn.type == 'doc.generic.name' and resolved[rn[1]] then
+                    resolvedNode:merge(resolved[rn[1]])
+                    anyResolved = true
+                else
+                    resolvedNode:merge(rn)
+                end
+            end
+            if anyResolved then
+                vm.setNode(newName, resolvedNode, true)
+                newName._resolved = resolvedNode
+            else
+                vm.setNode(newName, source._resolved, true)
+                newName._resolved = source._resolved
+            end
         end
         return newName
     end
@@ -88,11 +108,12 @@ local function cloneObject(source, resolved)
     end
     if source.type == 'doc.type.table' then
         local newTable = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            fields = {},
+            type    = source.type,
+            start   = source.start,
+            finish  = source.finish,
+            parent  = source.parent,
+            isTuple = source.isTuple,
+            fields  = {},
         }
         for i, field in ipairs(source.fields) do
             local newField = {
@@ -113,6 +134,8 @@ local function cloneObject(source, resolved)
             start   = source.start,
             finish  = source.finish,
             parent  = source.parent,
+            async   = source.async,
+            signs   = source.signs,
             args    = {},
             returns = {},
         }
@@ -157,6 +180,13 @@ local function cloneObject(source, resolved)
                 guide.eachSourceType(sign, 'doc.generic.name', function (src)
                     if hasConcreteResolution(src[1]) then
                         needsClone = true
+                    elseif src._resolved then
+                        for rn in src._resolved:eachObject() do
+                            if rn.type == 'doc.generic.name' and hasConcreteResolution(rn[1]) then
+                                needsClone = true
+                                break
+                            end
+                        end
                     end
                 end)
             end

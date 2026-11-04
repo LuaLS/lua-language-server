@@ -4631,3 +4631,24 @@ print(a:<??>)
         kind  = define.CompletionItemKind.Method,
     },
 }
+
+Cared['detail'] = true
+TEST [[
+---@class Force
+
+---@class Entity
+---@field (write) force Force|string
+---@field (read) force Force
+
+---@type Entity
+local entity
+entity.<??>
+]]
+{
+    {
+        label  = 'force',
+        kind   = define.CompletionItemKind.Field,
+        detail = 'Force',
+    },
+}
+Cared['detail'] = nil

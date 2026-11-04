@@ -2583,3 +2583,21 @@ entity.<?force?> = 'player'
 [[
 (field) Entity.force: string|Force
 ]]
+
+TEST [[
+---@class Force
+
+---@class Entity
+---@field (write) force Force|string
+---@field (read) force Force
+---@field name string
+
+---@type Entity
+local <?entity?>
+]]
+[[
+local entity: Entity {
+    force: Force,
+    name: string,
+}
+]]

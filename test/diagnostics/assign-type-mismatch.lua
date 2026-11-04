@@ -554,3 +554,29 @@ local entity
 entity.name = 'x'
 <!entity.name!> = 1
 ]]
+
+TEST [[
+---@class Force
+
+---@class Entity
+---@field (read) private force Force
+---@field (write) private force Force|string
+local Entity = {}
+
+function Entity:reset()
+    self.force = 'player'
+end
+]]
+
+TEST [[
+---@class Force
+
+---@class Entity
+---@field (read) private force Force
+---@field (write) private force Force|string
+local Entity = {}
+
+function Entity:reset()
+    <!self.force!> = true
+end
+]]

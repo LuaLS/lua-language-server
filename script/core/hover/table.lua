@@ -141,9 +141,21 @@ end
 local function getNodeMap(uri, fields, keyMap)
     ---@type table<string, vm.node>
     local nodeMap = {}
+    local readableKeys = {}
+    for _, field in ipairs(fields) do
+        if field.type == 'doc.field' and vm.getFieldAccess(field) ~= 'write' then
+            local key = vm.viewKey(field, uri)
+            if key then
+                readableKeys[key] = true
+            end
+        end
+    end
     for _, field in ipairs(fields) do
         local key = vm.viewKey(field, uri)
         if not key or not keyMap[key] then
+            goto CONTINUE
+        end
+        if readableKeys[key] and vm.getFieldAccess(field) == 'write' then
             goto CONTINUE
         end
         await.delay()

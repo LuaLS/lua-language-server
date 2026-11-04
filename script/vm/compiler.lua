@@ -1054,8 +1054,13 @@ end
 ---@param source parser.object | vm.variable
 ---@param key string|vm.global|vm.ANY|vm.ANYDOC
 ---@param pushResult fun(source: parser.object)
-function vm.compileByParentNode(source, key, pushResult)
+---@param access? vm.field.access # defaults to `read`
+function vm.compileByParentNode(source, key, pushResult, access)
     local docedResults, commonResults = vm.getNodesOfParentNode(source, key)
+
+    if key ~= vm.ANY and key ~= vm.ANYDOC then
+        docedResults = vm.filterFieldsByAccess(docedResults, access or 'read')
+    end
 
     if #docedResults > 0 then
         for _, res in ipairs(docedResults) do
@@ -2804,4 +2809,41 @@ function vm.compileNode(source)
     local node = vm.getNode(source)
     ---@cast node -?
     return node
+end
+
+local writeSourceTypes = util.arrayToHash {
+    'setfield',
+    'setmethod',
+    'setindex',
+    'tablefield',
+    'tableindex',
+}
+
+-- The type a value must have to be assigned to `source`.
+-- Differs from `vm.compileNode(source)` only when the field is declared
+-- with both `---@field (read)` and `---@field (write)`; `vm.compileNode`
+-- keeps the read type so narrowing after an assignment stays correct.
+---@param source parser.object
+---@return vm.node
+function vm.compileWriteNode(source)
+    local readNode = vm.compileNode(source)
+    if not writeSourceTypes[source.type] then
+        return readNode
+    end
+    if source.bindDocs and vm.bindDocs(source) then
+        return readNode
+    end
+    local key = guide.getKeyName(source)
+    if type(key) ~= 'string' then
+        return readNode
+    end
+    local writeNode
+    vm.compileByParentNode(source.node, key, function (src)
+        if vm.getFieldAccess(src) ~= 'write' then
+            return
+        end
+        writeNode = writeNode or vm.createNode()
+        writeNode:merge(vm.compileNode(src))
+    end, 'write')
+    return writeNode or readNode
 end

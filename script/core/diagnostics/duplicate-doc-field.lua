@@ -69,6 +69,11 @@ return function (uri, callback)
                 if view ~= myView then
                     goto CONTINUE
                 end
+                local myAccess = vm.getFieldAccess(myField)
+                local access   = vm.getFieldAccess(field)
+                if myAccess and access and myAccess ~= access then
+                    goto CONTINUE
+                end
                 callback {
                     start   = myField.field.start,
                     finish  = myField.field.finish,

@@ -1218,6 +1218,7 @@ local docSwitch = util.switch()
         local result = {
             type = 'doc.field',
         }
+        result.docAttr = parseDocAttr(result)
         try(function ()
             local tp, value = nextToken()
             if tp == 'name' then

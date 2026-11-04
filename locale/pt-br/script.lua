@@ -913,7 +913,7 @@ para uma tabela. A partir da versão `v3.6.0`, você pode marcar um campo como `
 `protected`, `public`, ou `package`.
 
 ## Sintaxe
-`---@field <nome> <tipo> [descrição]`
+`---@field [(read|write)] <nome> <tipo> [descrição]`
 
 ## Uso
 ```

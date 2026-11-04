@@ -913,7 +913,7 @@ LUADOC_DESC_FIELD =
 `protected`， `public` 或 `package`。
 
 ## 语法
-`---@field <name> <type> [description]`
+`---@field [(read|write)] <name> <type> [description]`
 
 ## 用法
 ```

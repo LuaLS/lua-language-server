@@ -199,3 +199,16 @@ mt.init = function ()
     obj.x = 1
 end
 ]]
+
+TEST [[
+---@class Force
+
+---@class Entity
+---@field (read) private force Force
+---@field (write) private force Force|string
+
+---@type Entity
+local entity
+entity.<!force!> = 'player'
+print(entity.<!force!>)
+]]

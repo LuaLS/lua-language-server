@@ -914,7 +914,7 @@ marcar un campo como privado (`private`), protegido (`protected`), público
 (`public`) o en-paquete (`package`).
 
 ## Sintaxis
-`---@field [alcance] <nombre> <tipo> [descripción]`
+`---@field [(read|write)] [alcance] <nombre> <tipo> [descripción]`
 
 ## Uso
 ```

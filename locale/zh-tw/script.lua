@@ -911,7 +911,7 @@ LUADOC_DESC_FIELD =
 在類別/表中宣告一個欄位。 這使你可以為表提供更深入詳細的文件。
 
 ## 語法
-`---@field <name> <type> [description]`
+`---@field [(read|write)] <name> <type> [description]`
 
 ## 用法
 ```

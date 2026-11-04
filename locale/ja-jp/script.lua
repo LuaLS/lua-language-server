@@ -912,7 +912,7 @@ LUADOC_DESC_FIELD =
 クラス/テーブル内のフィールドを宣言します。`v3.6.0`以降では、フィールドを`private`、`protected`、`public`、または`package`として指定することができます。
 
 ## 書き方
-`---@field [scope] <name> <type> [description]`
+`---@field [(read|write)] [scope] <name> <type> [description]`
 
 ## 例
 ```

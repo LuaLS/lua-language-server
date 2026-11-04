@@ -308,6 +308,17 @@ local function checkTableShape(parent, child, uri, mark, errs)
             end
         end
 
+        -- a table literal writes its fields, so `(write)` declarations win
+        local writeKeys = {}
+        for _, field in ipairs(def.fields) do
+            if vm.getFieldAccess(field) == 'write' then
+                local key = vm.getKeyName(field)
+                if key then
+                    writeKeys[key] = true
+                end
+            end
+        end
+
         for _, field in ipairs(def.fields) do
             local key = vm.getKeyName(field)
             if not key then
@@ -319,6 +330,9 @@ local function checkTableShape(parent, child, uri, mark, errs)
             end
             if not key then
                 goto continue
+            end
+            if writeKeys[key] and vm.getFieldAccess(field) == 'read' then
+                goto nextField
             end
 
             local ok
@@ -341,6 +355,7 @@ local function checkTableShape(parent, child, uri, mark, errs)
                 end
                 failedCheck = true
             end
+            ::nextField::
         end
         ::continue::
     end

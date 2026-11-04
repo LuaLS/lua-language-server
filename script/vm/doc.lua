@@ -524,3 +524,43 @@ function vm.docHasAttr(doc, key)
     end
     return false
 end
+
+---@alias vm.field.access 'read' | 'write'
+
+---@param doc parser.object
+---@return vm.field.access?
+function vm.getFieldAccess(doc)
+    if doc.type ~= 'doc.field' then
+        return nil
+    end
+    local read  = vm.docHasAttr(doc, 'read')
+    local write = vm.docHasAttr(doc, 'write')
+    if read == write then
+        return nil
+    end
+    return read and 'read' or 'write'
+end
+
+-- `---@field (read)` and `---@field (write)` only narrow which declaration
+-- applies when the other direction is also declared; a one-sided field is
+-- used for both reads and writes, like a plain `---@field`.
+---@param results parser.object[]
+---@param access vm.field.access
+---@return parser.object[]
+function vm.filterFieldsByAccess(results, access)
+    local filtered = {}
+    local hasDocField
+    for _, res in ipairs(results) do
+        local resAccess = vm.getFieldAccess(res)
+        if resAccess == nil or resAccess == access then
+            filtered[#filtered+1] = res
+            if res.type == 'doc.field' then
+                hasDocField = true
+            end
+        end
+    end
+    if not hasDocField then
+        return results
+    end
+    return filtered
+end

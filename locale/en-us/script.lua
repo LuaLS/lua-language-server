@@ -912,8 +912,11 @@ Declare a field in a class/table. This allows you to provide more in-depth
 documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
 `protected`, `public`, or `package`.
 
+A field can declare a different type for reading and for writing with the
+`(read)` and `(write)` attributes. A plain `---@field` is used for both.
+
 ## Syntax
-`---@field [scope] <name> <type> [description]`
+`---@field [(read|write)] [scope] <name> <type> [description]`
 
 ## Usage
 ```
@@ -933,6 +936,19 @@ response = get("localhost")
 
 --Extension provided intellisense for the below assignment
 statusCode = response.status.code
+```
+
+### Different read and write types
+```
+---@class Entity
+---@field (read) force Force
+---@field (write) force Force|string
+
+---@type Entity
+local entity
+
+entity.force = "player" -- checked against `Force|string`
+local force = entity.force -- `Force`
 ```
 ---
 [View Wiki](https://luals.github.io/wiki/annotations#field)

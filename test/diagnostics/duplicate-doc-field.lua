@@ -36,3 +36,21 @@ TEST [[
 ---@field [<!A!>] A
 ---@field [<!A!>] true
 ]]
+
+TEST [[
+---@class A
+---@field (read) x integer
+---@field (write) x number
+]]
+
+TEST [[
+---@class A
+---@field (read) <!x!> integer
+---@field (read) <!x!> number
+]]
+
+TEST [[
+---@class A
+---@field <!x!> integer
+---@field (read) <!x!> number
+]]

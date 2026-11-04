@@ -406,6 +406,64 @@ LuaDoc [[
 }
 
 LuaDoc [[
+---@field (read) open function
+]]
+{
+    type   = "doc",
+    start  = 0,
+    finish = 10000,
+    parent = "<IGNORE>",
+    [1]    = {
+        type            = "doc.field",
+        start           = 17,
+        finish          = 30,
+        range           = 30,
+        parent          = "<IGNORE>",
+        docAttr         = {
+            type   = "doc.attr",
+            start  = 10,
+            finish = 16,
+            parent = "<IGNORE>",
+            names  = {
+                [1] = {
+                    type   = "doc.attr.name",
+                    start  = 11,
+                    finish = 15,
+                    parent = "<IGNORE>",
+                    [1]    = "read",
+                },
+            },
+        },
+        field           = {
+            type   = "doc.field.name",
+            start  = 17,
+            finish = 21,
+            parent = "<IGNORE>",
+            [1]    = "open",
+        },
+        bindComments    = {
+        },
+        extends         = {
+            type        = "doc.type",
+            start       = 22,
+            finish      = 30,
+            parent      = "<IGNORE>",
+            firstFinish = 30,
+            types       = {
+                [1] = {
+                    type   = "doc.type.name",
+                    start  = 22,
+                    finish = 30,
+                    parent = "<IGNORE>",
+                    [1]    = "function",
+                },
+            },
+        },
+        originalComment = "<IGNORE>",
+    },
+}
+
+LuaDoc [[
 ---@field mode "async" | "sync"
 ]]
 {

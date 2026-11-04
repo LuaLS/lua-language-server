@@ -96,7 +96,7 @@ return function (uri, callback)
             valueNode = valueNode:copy():setTruthy()
         end
 
-        local varNode = vm.compileNode(source)
+        local varNode = vm.compileWriteNode(source)
         local errs = {}
         if vm.canCastType(uri, varNode, valueNode, errs) then
             return

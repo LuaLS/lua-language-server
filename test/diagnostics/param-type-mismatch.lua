@@ -414,3 +414,18 @@ f(child)
 ]]
 
 config.set(nil, 'Lua.type.checkTableShape', false)
+
+TEST [[
+---@class Force
+
+---@class Entity
+---@field (read) force Force
+---@field (write) force Force|string
+
+---@param f Force
+local function useForce(f) end
+
+---@type Entity
+local entity
+useForce(entity.force)
+]]

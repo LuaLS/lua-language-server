@@ -43,9 +43,10 @@ end
 
 ---@async
 ---@param level integer
-local function asValue(source, title, level)
+---@param node? vm.node
+local function asValue(source, title, level, node)
     local name    = buildName(source, false) or ''
-    local ifr     = vm.getInfer(source)
+    local ifr     = vm.getInfer(node or source)
     local type    = ifr:view(guide.getUri(source))
     local literal = ifr:viewLiterals()
     local cont, maxLevel = buildTable(source, level)
@@ -136,6 +137,14 @@ end
 local function asField(source, level)
     if isGlobalField(source) then
         return asGlobal(source, level)
+    end
+    local setter = source
+    if source.type == 'field' or source.type == 'method' then
+        setter = source.parent
+    end
+    local writeNode = vm.compileWriteNode(setter)
+    if writeNode ~= vm.compileNode(setter) then
+        return asValue(source, '(field)', level, writeNode)
     end
     return asValue(source, '(field)', level)
 end

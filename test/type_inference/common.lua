@@ -5278,3 +5278,46 @@ local myClass
 
 local <?result?> = myClass:pass(42)
 ]]
+
+TEST 'Force' [[
+---@class Force
+
+---@class Entity
+---@field (read) force Force
+---@field (write) force Force|string
+
+---@type Entity
+local entity
+local <?f?> = entity.force
+]]
+
+TEST 'Force' [[
+---@class Force
+
+---@class Entity
+---@field (write) force Force|string
+---@field (read) force Force
+
+---@type Entity
+local entity
+entity.force = 'player'
+local <?f?> = entity.force
+]]
+
+TEST 'string' [[
+---@class Entity
+---@field (write) name string
+
+---@type Entity
+local entity
+local <?n?> = entity.name
+]]
+
+TEST 'string' [[
+---@class Entity
+---@field (read) name string
+
+---@type Entity
+local entity
+local <?n?> = entity.name
+]]

@@ -24,6 +24,7 @@ local function findInsertRow(uri)
     if not state or not text then
         return
     end
+    local requireName = config.get(uri, "Lua.completion.requireFunction")
     local lines = state.lines
     local fmt   = {
         pair = false,
@@ -37,7 +38,7 @@ local function findInsertRow(uri)
         end
         local ln = lines[i]
         local lnText = text:match('[^\r\n]*', ln)
-        if not lnText:find('require', 1, true) then
+        if not lnText:find(requireName, 1, true) then
             if row then
                 break
             end

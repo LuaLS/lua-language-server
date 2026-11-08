@@ -2,6 +2,7 @@ local util        = require 'utility'
 local files       = require 'files'
 local autoRequire = require 'core.command.autoRequire'
 local client      = require 'client'
+local config      = require 'config'
 
 local findInsertRow    = util.getUpvalue(autoRequire, 'findInsertRow')
 local applyAutoRequire = util.getUpvalue(autoRequire, 'applyAutoRequire')
@@ -91,5 +92,17 @@ end
     finish = 0,
     text   = 'local test = require "test"\n'
 }
+
+local originRequireFunction = config.get(nil, 'Lua.completion.requireFunction')
+config.set(nil, 'Lua.completion.requireFunction', 'import')
+TEST [[
+local modulea = import("modulea")
+local moduleb = import("moduleb")
+]] 'modulec' {
+    start  = 20000,
+    finish = 20000,
+    text   = 'local modulec = import("modulec")\n'
+}
+config.set(nil, 'Lua.completion.requireFunction', originRequireFunction)
 
 client.editText = originEditText

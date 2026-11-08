@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Auto-require now detects existing imports using `Lua.completion.requireFunction` (e.g. `import`) instead of `require`, so new imports use the preferred syntax and get inserted after existing ones
 
 ## 3.19.2
 `2026-10-13`

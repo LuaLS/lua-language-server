@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Preserve fenced code blocks in hover documentation when resolving relative Markdown links [#3435](https://github.com/LuaLS/lua-language-server/issues/3435)
 
 ## 3.19.2
 `2026-10-13`

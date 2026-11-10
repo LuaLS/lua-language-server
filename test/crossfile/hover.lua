@@ -1378,6 +1378,58 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+--- [Before](before.md)
+--- ```lua
+--- t[i](...)
+--- ```
+--- [`after`](after.md)
+local function <?run?>() end
+        ]]
+    },
+    hover = [[
+```lua
+function run()
+```
+
+---
+
+ [Before](file:///before.md)
+ ```lua
+ t[i](...)
+ ```
+ [`after`](file:///after.md)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+--- ~~~~lua
+--- ~~~
+--- t[i](...)
+--- ~~~~
+--- [guide](guide.md)
+local <?run?>
+        ]]
+    },
+    hover = [[
+```lua
+local run: unknown
+```
+
+---
+
+ ~~~~lua
+ ~~~
+ t[i](...)
+ ~~~~
+ [guide](file:///guide.md)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
             --[here](D:/x.lua)
             local <?n?>
         ]]

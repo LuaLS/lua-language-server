@@ -600,9 +600,9 @@ WINDOW_MANUAL_CONFIG_SET         =
 '`{key}`: set to `{value:q}` ;'
 WINDOW_MANUAL_CONFIG_PROP        =
 '`{key}`: set the property `{prop}` to `{value:q}`;'
-WINDOW_APPLY_WHIT_SETTING        =
+WINDOW_APPLY_WITH_SETTING        =
 'Apply and modify settings'
-WINDOW_APPLY_WHITOUT_SETTING     =
+WINDOW_APPLY_WITHOUT_SETTING     =
 'Apply but do not modify settings'
 WINDOW_ASK_APPLY_LIBRARY         =
 'Do you need to configure your work environment as `{}`?'
@@ -832,7 +832,7 @@ function setFontStyle(style) end
 local enums = {
     READ = 0,
     WRITE = 1,
-    CLOSED = 2
+    CLOSE = 2
 }
 
 ---@alias FileStates

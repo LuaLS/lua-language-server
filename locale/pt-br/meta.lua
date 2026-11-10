@@ -51,7 +51,7 @@ Esta função é uma interface genérica para o coletor de lixo. Ela executa dif
 * `"step"`: executa uma etapa de coleta de lixo. O "tamanho" da etapa é controlado por arg. Com um valor zero, o coletor executará uma etapa básica (indivisível). Para valores diferentes de zero, o coletor se comportará como se essa quantidade de memória (em KBytes) tivesse sido alocada pelo Lua. Retorna true se a etapa terminou um ciclo de coleta.
 * `"setpause"`: define arg como o novo valor para a pausa do coletor (ver §2.5). Retorna o valor anterior da pausa.
 * `"setstepmul"`: define arg como o novo valor para o multiplicador de etapa do coletor (ver §2.5). Retorna o valor anterior do multiplicador de etapa.
-* "isrunning"`: retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
+* `"isrunning"`: retorna um booleano que indica se o coletor está em execução (ou seja, não parado).
 ]]
 
 collectgarbage54    =
@@ -854,7 +854,7 @@ table.new                   =
 table.clear                 =
 [[Limpa todas as chaves e valores de uma tabela, mas preserva os tamanhos alocados das partes array/hash. É útil quando uma tabela, que está vinculada de vários lugares, precisa ser limpa e/ou quando se recicla uma tabela para uso pelo mesmo contexto. Evita gerenciar backlinks, economiza uma alocação e o custo de crescimento incremental das partes array/hash. A função precisa ser requerida antes do uso.
 ```lua
-	require("table.clear").
+	require("table.clear")
 ```
 Observe que esta função é destinada a situações muito específicas. Na maioria dos casos, é melhor substituir o link (único geralmente) por uma nova tabela e deixar o GC fazer seu trabalho.
 ]]

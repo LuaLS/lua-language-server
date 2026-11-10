@@ -51,7 +51,7 @@ Esta función es una interfaz genérica para el recolector de basura. Realiza di
 * `"step"`: realiza un paso de recolección de basura. El "tamaño" del paso es controlado por arg. Con un valor cero, el recolector realizará un paso básico (indivisible). Para valores distintos de cero, el recolector se comportará como si esa cantidad de memoria (en KBytes) hubiera sido asignada por Lua. Retorna true si el paso terminó un ciclo de recolección.
 * `"setpause"`: establece arg como el nuevo valor para la pausa del recolector (ver §2.5). Retorna el valor anterior de pausa.
 * `"setstepmul"`: establece arg como el nuevo valor para el multiplicador de paso del recolector (ver §2.5). Retorna el valor anterior del multiplicador de paso.
-* "isrunning"`: retorna un booleano que indica si el recolector está en ejecución (es decir, no detenido).
+* `"isrunning"`: retorna un booleano que indica si el recolector está en ejecución (es decir, no detenido).
 ]]
 
 collectgarbage54    =
@@ -853,7 +853,7 @@ table.new                   =
 table.clear                 =
 [[Esta función barre con todas las claves y valores de una tabla, pero preserva los tamaños de arreglo/diccionario reservados en memoria. Esta función es útil cuando una tabla que ha sido enlazada desde múltiples otras partes requiere ser vaciada y/o cuando se recicla una tabla para ser usada en el mismo contexto. Esto previene manejar enlaces de vuelta, previene tener que asignar memoria y el costo operativo del crecimiento incremental de la parte arreglo/diccionario.
 ```lua
-    require("table.clear").
+    require("table.clear")
 ```
 Nótese que esta función está hecha para situaciones muy específicas. En la mayoría de los casos es mejor reemplazar el enlace (el cual suele ser simple) con una tabla nueva y permitir que el recolector de basura haga su trabajo.
 ]]

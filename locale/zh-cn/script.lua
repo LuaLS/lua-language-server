@@ -600,9 +600,9 @@ WINDOW_MANUAL_CONFIG_SET         =
 '将 `{key}` 的值设置为 `{value:q}`;'
 WINDOW_MANUAL_CONFIG_PROP        =
 '将 `{key}` 的属性 `{prop}` 设置为 `{value:q}`;'
-WINDOW_APPLY_WHIT_SETTING        =
+WINDOW_APPLY_WITH_SETTING        =
 '应用并修改设置'
-WINDOW_APPLY_WHITOUT_SETTING     =
+WINDOW_APPLY_WITHOUT_SETTING     =
 '应用但不修改设置'
 WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要将你的工作环境配置为 `{}` ？'
@@ -832,7 +832,7 @@ function setFontStyle(style) end
 local enums = {
     READ = 0,
     WRITE = 1,
-    CLOSED = 2
+    CLOSE = 2
 }
 
 ---@alias FileStates

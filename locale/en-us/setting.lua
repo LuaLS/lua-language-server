@@ -126,7 +126,7 @@ config.runtime.meta               =
 config.diagnostics.enable         =
 "Enable diagnostics."
 config.diagnostics.disable        =
-"Disabled diagnostic (Use code in hover brackets)."
+"Disable diagnostics (Use code in hover brackets)."
 config.diagnostics.globals        =
 "Defined global variables."
 config.diagnostics.globalsRegex   =

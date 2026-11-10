@@ -600,9 +600,9 @@ WINDOW_MANUAL_CONFIG_SET        =
 '`{key}`: asignado a `{value:q}` ;'
 WINDOW_MANUAL_CONFIG_PROP       =
 '`{key}`: la propiedad `{prop}` asignada a `{value:q}`;'
-WINDOW_APPLY_WHIT_SETTING       =
+WINDOW_APPLY_WITH_SETTING       =
 'Aplica y modifica la configuración'
-WINDOW_APPLY_WHITOUT_SETTING    =
+WINDOW_APPLY_WITHOUT_SETTING    =
 'Aplica pero sin modificar la configuración'
 WINDOW_ASK_APPLY_LIBRARY        =
 '¿Necesita configurar su ambiente de trabajo como `{}`?'

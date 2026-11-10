@@ -51,7 +51,7 @@ This function is a generic interface to the garbage collector. It performs diffe
 * `"step"`: performs a garbage-collection step. The step "size" is controlled by arg. With a zero value, the collector will perform one basic (indivisible) step. For non-zero values, the collector will perform as if that amount of memory (in KBytes) had been allocated by Lua. Returns true if the step finished a collection cycle.
 * `"setpause"`: sets arg as the new value for the pause of the collector (see §2.5). Returns the previous value for pause.
 * `"setstepmul"`: sets arg as the new value for the step multiplier of the collector (see §2.5). Returns the previous value for step.
-* "isrunning"`: returns a boolean that tells whether the collector is running (i.e., not stopped).
+* `"isrunning"`: returns a boolean that tells whether the collector is running (i.e., not stopped).
 ]]
 
 collectgarbage54    =
@@ -854,7 +854,7 @@ table.new                   =
 table.clear                 =
 [[This clears all keys and values from a table, but preserves the allocated array/hash sizes. This is useful when a table, which is linked from multiple places, needs to be cleared and/or when recycling a table for use by the same context. This avoids managing backlinks, saves an allocation and the overhead of incremental array/hash part growth. The function needs to be required before use.
 ```lua
-    require("table.clear").
+    require("table.clear")
 ```
 Please note this function is meant for very specific situations. In most cases it's better to replace the (usually single) link with a new table and let the GC do its work.
 ]]

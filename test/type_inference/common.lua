@@ -31,7 +31,7 @@ var = y
 
 TEST 'any' [[
 function f(<?x?>)
-    
+
 end
 ]]
 
@@ -1536,7 +1536,7 @@ local mt = {}
 function mt:loop(callback) end
 
 mt:loop(function (<?i?>)
-    
+
 end)
 ]]
 
@@ -2684,7 +2684,7 @@ return function ()
     if not t then
         return
     end
-    
+
     print(<?t?>)
 end
 ]]
@@ -2697,7 +2697,7 @@ f(function ()
     if not t then
         return
     end
-    
+
     print(<?t?>)
 end)
 ]]
@@ -3439,7 +3439,7 @@ local n
 ---@type string
 local s
 
-local <?test?>  = t[n] 
+local <?test?>  = t[n]
 local test2 = t[s] --test and test2 are unknow
 ]]
 
@@ -3452,7 +3452,7 @@ local n
 ---@type string
 local s
 
-local test  = t[n] 
+local test  = t[n]
 local <?test2?> = t[s] --test and test2 are unknow
 ]]
 
@@ -5277,4 +5277,21 @@ function MyClass:pass(val) return val end
 local myClass
 
 local <?result?> = myClass:pass(42)
+]]
+
+TEST 'Box<string>' [[
+---@class Box<T>
+---@field value T
+
+---@return Box<string>
+function make_box()
+    return { value = "x" }
+end
+
+function wrap()
+    local b = make_box()
+    return b
+end
+
+local <?r?> = wrap()
 ]]

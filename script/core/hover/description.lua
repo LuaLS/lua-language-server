@@ -87,8 +87,9 @@ end
 
 ---@param comment string
 ---@param suri uri
+---@param context { fence: string? }
 ---@return string?
-local function normalizeComment(comment, suri)
+local function normalizeComment(comment, suri, context)
     if not comment then
         return nil
     end
@@ -98,28 +99,63 @@ local function normalizeComment(comment, suri)
     if comment:sub(1, 1) == '@' then
         return nil
     end
-    comment = comment:gsub('(%[.-%]%()(.-)(%))', function (left, path, right)
-        local scheme = furi.split(path)
-        if scheme
-        -- strange way to check `C:/xxx.lua`
-        and #scheme > 1 then
-            return
+    local function resolveLinks(prose)
+        return (prose:gsub('(%[.-%]%()(.-)(%))', function (left, path, right)
+            local scheme = furi.split(path)
+            if scheme
+            -- strange way to check `C:/xxx.lua`
+            and #scheme > 1 then
+                return
+            end
+            local absPath = ws.getAbsolutePath(suri:gsub('/[^/]+$', ''), path)
+            if not absPath then
+                return
+            end
+            local uri = furi.encode(absPath)
+            return left .. uri .. right
+        end))
+    end
+
+    local fence = context.fence
+    if not fence and not comment:find('[`~]') then
+        return resolveLinks(comment)
+    end
+
+    local parts = {}
+    local offset, segment = 1, 1
+    for line in util.eachLine(comment, true) do
+        local marker, rest = line:match('^ ? ? ?(```+)([^\r\n]*)')
+        if not marker then
+            marker, rest = line:match('^ ? ? ?(~~~+)([^\r\n]*)')
         end
-        local absPath = ws.getAbsolutePath(suri:gsub('/[^/]+$', ''), path)
-        if not absPath then
-            return
+        if fence then
+            if marker and marker:sub(1, 1) == fence:sub(1, 1)
+            and #marker >= #fence and rest:match('^[ \t]*$') then
+                parts[#parts+1] = comment:sub(segment, offset + #line - 1)
+                segment = offset + #line
+                fence = nil
+            end
+        elseif marker and (marker:sub(1, 1) == '~' or not rest:find('`', 1, true)) then
+            -- CommonMark excludes backticks in backtick fence info strings to distinguish inline code.
+            parts[#parts+1] = resolveLinks(comment:sub(segment, offset - 1))
+            segment = offset
+            fence = marker
         end
-        local uri     = furi.encode(absPath)
-        return left .. uri .. right
-    end)
-    return comment
+        offset = offset + #line
+    end
+    -- A Markdown block can span several LuaDoc comments.
+    context.fence = fence
+    local tail = comment:sub(segment)
+    parts[#parts+1] = fence and tail or resolveLinks(tail)
+    return table.concat(parts)
 end
 
 local function getBindComment(source)
     local uri = guide.getUri(source)
     local lines = {}
+    local context = {}
     for _, docComment in ipairs(source.bindComments) do
-        lines[#lines+1] = normalizeComment(docComment.comment.text, uri)
+        lines[#lines+1] = normalizeComment(docComment.comment.text, uri, context)
     end
     if not lines or #lines == 0 then
         return nil
@@ -187,24 +223,25 @@ local function lookUpDocComments(source)
     end
     local uri = guide.getUri(source)
     local lines = {}
+    local context = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            lines[#lines+1] = normalizeComment(doc.comment.text, uri)
+            lines[#lines+1] = normalizeComment(doc.comment.text, uri, context)
         elseif doc.type == 'doc.type'
         or     doc.type == 'doc.public'
         or     doc.type == 'doc.protected'
         or     doc.type == 'doc.private' then
             if doc.comment then
-                lines[#lines+1] = normalizeComment(doc.comment.text, uri)
+                lines[#lines+1] = normalizeComment(doc.comment.text, uri, context)
             end
         elseif doc.type == 'doc.class' then
             for _, docComment in ipairs(doc.bindComments) do
-                lines[#lines+1] = normalizeComment(docComment.comment.text, uri)
+                lines[#lines+1] = normalizeComment(docComment.comment.text, uri, context)
             end
         end
     end
     if source.comment then
-        lines[#lines+1] = normalizeComment(source.comment.text, uri)
+        lines[#lines+1] = normalizeComment(source.comment.text, uri, context)
     end
     lookUpDocSees(lines, docGroup)
     if not lines or #lines == 0 then
@@ -330,7 +367,7 @@ local function tryDocFieldComment(source)
         return
     end
     if source.comment then
-        return normalizeComment(source.comment.text, guide.getUri(source))
+        return normalizeComment(source.comment.text, guide.getUri(source), {})
     end
     if source.bindGroup then
         return getBindComment(source)
@@ -353,9 +390,10 @@ local function getFunctionCommentMarkdown(source, raw)
 
     local uri = guide.getUri(source)
     local md = markdown()
+    local context = {}
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.comment' then
-            local comment = normalizeComment(doc.comment.text, uri)
+            local comment = normalizeComment(doc.comment.text, uri, context)
             md:add('md', comment)
         elseif doc.type == 'doc.param' and not raw then
             if doc.comment then

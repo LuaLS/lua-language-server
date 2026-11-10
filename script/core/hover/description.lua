@@ -130,12 +130,13 @@ local function normalizeComment(comment, suri, context)
         end
         if fence then
             if marker and marker:sub(1, 1) == fence:sub(1, 1)
-            and #marker >= #fence and rest:match('^%s*$') then
+            and #marker >= #fence and rest:match('^[ \t]*$') then
                 parts[#parts+1] = comment:sub(segment, offset + #line - 1)
                 segment = offset + #line
                 fence = nil
             end
         elseif marker and (marker:sub(1, 1) == '~' or not rest:find('`', 1, true)) then
+            -- CommonMark excludes backticks in backtick fence info strings to distinguish inline code.
             parts[#parts+1] = resolveLinks(comment:sub(segment, offset - 1))
             segment = offset
             fence = marker

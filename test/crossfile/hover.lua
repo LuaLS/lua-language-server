@@ -1377,16 +1377,17 @@ local n: unknown
 TEST {
     {
         path = 'a.lua',
-        content = [[
+        content = ([[
 --- [Before](before.md)
 --- ```lua
+--- ```%s
 --- t[i](...)
 --- ```
 --- [`after`](after.md)
 local function <?run?>() end
-        ]]
+        ]]):format('\f')
     },
-    hover = [[
+    hover = ([[
 ```lua
 function run()
 ```
@@ -1395,9 +1396,10 @@ function run()
 
  [Before](file:///before.md)
  ```lua
+ ```%s
  t[i](...)
  ```
- [`after`](file:///after.md)]]
+ [`after`](file:///after.md)]]):format('\f')
 }
 
 TEST {

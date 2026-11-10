@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Typos in locale and config docs, and the misspelled `WINDOW_APPLY_WHIT_SETTING` and `WINDOW_APPLY_WHITOUT_SETTING` locale keys [#3480](https://github.com/LuaLS/lua-language-server/issues/3480) [#3481](https://github.com/LuaLS/lua-language-server/issues/3481) [#3482](https://github.com/LuaLS/lua-language-server/issues/3482) [#3483](https://github.com/LuaLS/lua-language-server/issues/3483) [#3484](https://github.com/LuaLS/lua-language-server/issues/3484)
 
 ## 3.19.2
 `2026-10-13`

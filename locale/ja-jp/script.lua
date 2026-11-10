@@ -600,9 +600,9 @@ WINDOW_MANUAL_CONFIG_SET         =
 '`{key}` の値を `{value:q}` に設定します;'
 WINDOW_MANUAL_CONFIG_PROP        =
 '`{key}` のプロパティ `{prop}` を `{value:q}` に設定します;'
-WINDOW_APPLY_WHIT_SETTING        =
+WINDOW_APPLY_WITH_SETTING        =
 '設定を変更して適用します'
-WINDOW_APPLY_WHITOUT_SETTING     =
+WINDOW_APPLY_WITHOUT_SETTING     =
 '設定を変更せずに適用します'
 WINDOW_ASK_APPLY_LIBRARY         =
 '作業環境を `{}` に設定しますか？'
@@ -833,7 +833,7 @@ function setFontStyle(style) end
 local enums = {
     READ = 0,
     WRITE = 1,
-    CLOSED = 2
+    CLOSE = 2
 }
 
 ---@alias FileStates

@@ -487,8 +487,8 @@ local function askFor3rd(uri, cfg, checkThirdParty)
         return nil
     elseif checkThirdParty == 'Ask' then
         hasAsked[cfg.name] = true
-        local applyAndSetConfig = lang.script.WINDOW_APPLY_WHIT_SETTING
-        local applyInMemory = lang.script.WINDOW_APPLY_WHITOUT_SETTING
+        local applyAndSetConfig = lang.script.WINDOW_APPLY_WITH_SETTING
+        local applyInMemory = lang.script.WINDOW_APPLY_WITHOUT_SETTING
         local dontShowAgain   = lang.script.WINDOW_DONT_SHOW_AGAIN
         local result = client.awaitRequestMessage('Info'
             , lang.script('WINDOW_ASK_APPLY_LIBRARY', cfg.name)

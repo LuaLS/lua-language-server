@@ -2248,6 +2248,10 @@ local compilerSwitch = util.switch()
                         end
                         goto CONTINUE
                     end
+                    if n.type == 'doc.type.sign' then
+                        hasKnownType = true
+                        break
+                    end
                     hasUnknownType = true
                     ::CONTINUE::
                 end

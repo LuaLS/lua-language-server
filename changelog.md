@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Unannotated functions that return a generic class instance (e.g. `Box<string>`) returned from a call no longer show `|unknown` in their inferred return type
 
 ## 3.19.2
 `2026-10-13`

@@ -47,4 +47,5 @@ end
 require 'type_inference.common'
 require 'type_inference.param_match'
 require 'type_inference.field_override'
+require 'type_inference.inherited_table_fields'
 require 'type_inference.generic_operator'

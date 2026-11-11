@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Preserve inherited fields and their generic types when a class extends an anonymous table type [#3443](https://github.com/LuaLS/lua-language-server/issues/3443)
 
 ## 3.19.2
 `2026-10-13`

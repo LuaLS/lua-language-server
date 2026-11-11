@@ -32,6 +32,16 @@ end
 
 config.set(nil, 'Lua.hover.previewFields', 50)
 
+-- Issue #3443: preserve fields from a generic anonymous table base.
+TEST [[
+---@class GenericSuper<T>: { value: T }
+---@class Specific: GenericSuper<string>
+---@type Specific
+local t
+print(t.<?value?>)
+]]
+[[(field) Specific.value: string]]
+
 TEST [[
 local function <?x?>(a, b)
 end

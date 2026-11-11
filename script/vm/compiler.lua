@@ -774,6 +774,32 @@ function vm.getClassFields(suri, object, key, pushResult)
                                 end
                             end)
                         end
+                        -- Compiling a named base also resolves its anonymous
+                        -- table bases, including the supplied generic arguments.
+                        if extend.type == 'doc.extends.name'
+                        or extend.type == 'doc.type.sign' then
+                            local hasTable = false
+                            for node in vm.compileNode(extend):eachObject() do
+                                if node.type == 'doc.type.table' then
+                                    if not hasTable then
+                                        copyToSearched()
+                                        hasTable = true
+                                    end
+                                    searchFieldSwitch(node.type, suri, node, key, function (field, isMark)
+                                        local fieldKey = guide.getKeyName(field)
+                                        if not fieldKey or not searchedFields[fieldKey] then
+                                            if fieldKey then
+                                                hasFounded[fieldKey] = true
+                                            end
+                                            pushResult(field, isMark)
+                                        end
+                                    end)
+                                end
+                            end
+                            if hasTable then
+                                copyToSearched()
+                            end
+                        end
                     end
                 end
             end

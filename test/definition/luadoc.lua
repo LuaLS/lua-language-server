@@ -764,6 +764,15 @@ local t
 print(t.<?x?>)
 ]]
 
+-- Issue #3443: inherited anonymous table fields retain their definition.
+TEST [[
+---@class GenericSuper<T>: { <!value!>: T }
+---@class Specific: GenericSuper<string>
+---@type Specific
+local t
+print(t.<?value?>)
+]]
+
 TEST [[
 ---@alias TT<V> { <!x!>: V }
 

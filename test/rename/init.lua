@@ -302,6 +302,16 @@ OldName = 1
 OldName = 1
 ]]
 
+TEST ('RepeatedType', 'RenamedType') (
+    '---@class RepeatedType\n'
+    .. ('---@see RepeatedType\n'):rep(64)
+    .. 'RepeatedType = 1\nprint(RepeatedType)\n'
+) (
+    '---@class RenamedType\n'
+    .. ('---@see RenamedType\n'):rep(64)
+    .. 'RepeatedType = 1\nprint(RepeatedType)\n'
+)
+
 do
     local scope = require 'workspace.scope'
     local folder = scope.createFolder(TESTURI .. '.rename-a')

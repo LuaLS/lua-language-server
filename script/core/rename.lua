@@ -4,7 +4,6 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
 local config     = require 'config'
-local wssymbol   = require 'core.workspace-symbol'
 
 local Forcing
 
@@ -237,16 +236,17 @@ local function ofLabel(source, newname, callback)
 end
 
 local function getSeeType(source)
-    for _, symbol in ipairs(wssymbol(source[1], guide.getUri(source))) do
-        if symbol.name == source[1] then
-            local target = symbol.source
-            if target.type == 'doc.class' then
-                return target.class
-            elseif target.type == 'doc.alias' then
-                return target.alias
-            elseif target.type == 'doc.enum' then
-                return target.enum
-            end
+    local globalVar = vm.getGlobal('type', source[1])
+    if not globalVar then
+        return
+    end
+    for _, target in ipairs(globalVar:getSets(guide.getUri(source))) do
+        if target.type == 'doc.class' then
+            return target.class
+        elseif target.type == 'doc.alias' then
+            return target.alias
+        elseif target.type == 'doc.enum' then
+            return target.enum
         end
     end
 end

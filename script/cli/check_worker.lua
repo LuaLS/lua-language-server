@@ -2,7 +2,6 @@ local lclient   = require 'lclient'()
 local furi      = require 'file-uri'
 local ws        = require 'workspace'
 local files     = require 'files'
-local diag      = require 'provider.diagnostic'
 local util      = require 'utility'
 local jsonb     = require 'json-beautify'
 local lang      = require 'language'
@@ -249,7 +248,6 @@ function export.runCLI()
         for i, uri in ipairs(uris) do
             if (i % numThreads + 1) == threadId and not ws.isIgnored(uri)  then
                 files.open(uri)
-                diag.doDiagnostic(uri, true)
                 -- Print regularly but always print the last entry to ensure
                 -- that logs written to files don't look incomplete.
                 if not quiet and (os.clock() - lastClock > 0.2 or i == #uris) then

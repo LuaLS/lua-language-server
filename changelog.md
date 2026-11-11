@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` `--check` no longer diagnoses every file twice
 
 ## 3.19.2
 `2026-10-13`

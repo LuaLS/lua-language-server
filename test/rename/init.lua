@@ -246,3 +246,121 @@ TEST ('A', 'C') [[
 ]] [[
 ---@class B: C
 ]]
+
+for _, declaration in ipairs {
+    '---@class OldName',
+    '---@alias OldName string',
+    '---@enum OldName',
+} do
+    local renamed = declaration:gsub('OldName', 'NewName')
+    TEST ('OldName', 'NewName') (declaration .. [[
+
+---@see OldName
+---@type OldName
+local value
+OldName = 1
+print(OldName)
+]]) (renamed .. [[
+
+---@see NewName
+---@type NewName
+local value
+OldName = 1
+print(OldName)
+]])
+
+    TEST ('OldName', 'NewName') ([[
+---@see OldName
+]] .. declaration .. [[
+
+---@type OldName
+local value
+OldName = 1
+print(OldName)
+]]) ([[
+---@see NewName
+]] .. renamed .. [[
+
+---@type NewName
+local value
+OldName = 1
+print(OldName)
+]])
+end
+
+TEST ('Missing', 'NewName') [[
+---@see Missing
+]] [[
+---@see Missing
+]]
+
+TEST ('OldName', 'NewName') [[
+---@see OldName
+OldName = 1
+]] [[
+---@see OldName
+OldName = 1
+]]
+
+TEST ('RepeatedType', 'RenamedType') (
+    '---@class RepeatedType\n'
+    .. ('---@see RepeatedType\n'):rep(64)
+    .. 'RepeatedType = 1\nprint(RepeatedType)\n'
+) (
+    '---@class RenamedType\n'
+    .. ('---@see RenamedType\n'):rep(64)
+    .. 'RepeatedType = 1\nprint(RepeatedType)\n'
+)
+
+do
+    local scope = require 'workspace.scope'
+    local folder = scope.createFolder(TESTURI .. '.rename-a')
+    local otherFolder = scope.createFolder(TESTURI .. '.rename-b')
+    local classUri = folder.uri .. '/class.lua'
+    local uri = folder.uri .. '/see.lua'
+    local otherUri = otherFolder.uri .. '/other.lua'
+    local classScript = '---@class OldName\n'
+    local seeScript = '---@see OldName\nOldName = 1\nprint(OldName)\n'
+    local _ <close> = function ()
+        files.remove(classUri)
+        files.remove(uri)
+        files.remove(otherUri)
+        folder:remove()
+        otherFolder:remove()
+    end
+    files.setText(classUri, classScript)
+    files.setText(uri, seeScript)
+    files.setText(otherUri, classScript .. seeScript)
+    for _, sourceUri in ipairs { classUri, uri } do
+        local state = files.getState(sourceUri)
+        local script = files.getText(sourceUri)
+        local offset = assert(script:find('OldName', 1, true))
+        local position = guide.offsetToPosition(state, offset)
+        local prepared = assert(core.prepareRename(sourceUri, position))
+        assert(prepared.text == 'OldName')
+        local positions = assert(core.rename(sourceUri, position, 'NewName'))
+        assert(#positions == 2)
+        local found = {}
+        for _, edit in ipairs(positions) do
+            local editState = files.getState(edit.uri)
+            local editScript = files.getText(edit.uri)
+            local editOffset = assert(editScript:find('OldName', 1, true)) - 1
+            assert(edit.start == guide.offsetToPosition(editState, editOffset))
+            assert(edit.finish == guide.offsetToPosition(editState, editOffset + #'OldName'))
+            assert(edit.text == 'NewName')
+            found[edit.uri] = true
+        end
+        assert(found[classUri] and found[uri])
+    end
+end
+
+for _, script in ipairs {
+    '---@see Missing\n',
+    '---@see OldName\nOldName = 1\n',
+} do
+    files.setText(TESTURI, script)
+    local state = files.getState(TESTURI)
+    local position = guide.offsetToPosition(state, #'---@see ')
+    assert(core.prepareRename(TESTURI, position) == nil)
+    files.remove(TESTURI)
+end

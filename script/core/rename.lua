@@ -235,6 +235,22 @@ local function ofLabel(source, newname, callback)
     end
 end
 
+local function getSeeType(source)
+    local globalVar = vm.getGlobal('type', source[1])
+    if not globalVar then
+        return
+    end
+    for _, target in ipairs(globalVar:getSets(guide.getUri(source))) do
+        if target.type == 'doc.class' then
+            return target.class
+        elseif target.type == 'doc.alias' then
+            return target.alias
+        elseif target.type == 'doc.enum' then
+            return target.enum
+        end
+    end
+end
+
 ---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
@@ -243,7 +259,9 @@ local function ofDocTypeName(source, newname, callback)
         return
     end
     local uri = guide.getUri(source)
+    local declarations = {}
     for _, doc in ipairs(globalVar:getSets(uri)) do
+        declarations[doc] = true
         if doc.type == 'doc.class' then
             callback(doc, doc.class.start, doc.class.finish, newname)
         end
@@ -259,6 +277,23 @@ local function ofDocTypeName(source, newname, callback)
         if doc.type == 'doc.type.name'
         or doc.type == 'doc.extends.name' then
             callback(doc, doc.start, doc.finish, newname)
+        end
+    end
+    for refUri in files.eachFile(uri) do
+        local text = files.getText(refUri)
+        if text and text:find(oldname, 1, true) then
+            local state = files.getState(refUri)
+            if state then
+                guide.eachSourceType(state.ast, 'doc.see.name', function (doc)
+                    if doc[1] ~= oldname then
+                        return
+                    end
+                    local target = getSeeType(doc)
+                    if target and declarations[target.parent] then
+                        callback(doc, doc.start, doc.finish, newname)
+                    end
+                end)
+            end
         end
     end
 end
@@ -283,7 +318,12 @@ end
 
 ---@async
 local function rename(source, newname, callback)
-    if source.type == 'label'
+    if source.type == 'doc.see.name' then
+        local target = getSeeType(source)
+        if target then
+            return ofDocTypeName(target, newname, callback)
+        end
+    elseif source.type == 'label'
     or source.type == 'goto' then
         return ofLabel(source, newname, callback)
     elseif source.type == 'local' then
@@ -325,7 +365,11 @@ local function rename(source, newname, callback)
 end
 
 local function prepareRename(source)
-    if source.type == 'label'
+    if source.type == 'doc.see.name' then
+        if getSeeType(source) then
+            return source, source[1]
+        end
+    elseif source.type == 'label'
     or source.type == 'goto'
     or source.type == 'local'
     or source.type == 'setlocal'
@@ -384,6 +428,7 @@ local accept = {
     ['doc.enum.name']    = true,
     ['doc.field.name']   = true,
     ['doc.extends.name'] = true,
+    ['doc.see.name']     = true,
 }
 
 local m = {}

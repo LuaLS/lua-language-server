@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Rename type names referenced by `---@see`, including renaming from the annotation [#3470](https://github.com/LuaLS/lua-language-server/issues/3470)
 
 ## 3.19.2
 `2026-10-13`

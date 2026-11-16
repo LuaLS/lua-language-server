@@ -961,14 +961,20 @@ function m.normalize(path)
     path = m.resolvePathPlaceholders(path)
     path = util.expandPath(path)
     path = path:gsub('^%.[/\\]+', '')
-    for _ = 1, 1000 do
-        if path:sub(1, 2) == '..' then
-            break
-        end
-        local count
-        path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
-        if count == 0 then
-            break
+    -- The pattern below backtracks quadratically on long strings that contain
+    -- no path separator (e.g. a virtual document URI carrying an encoded file),
+    -- and it can never match when there is no '..' at all, so fold only when
+    -- it is both possible and plausible for a real path.
+    if #path <= 4096 and path:find('..', 1, true) then
+        for _ = 1, 1000 do
+            if path:sub(1, 2) == '..' then
+                break
+            end
+            local count
+            path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
+            if count == 0 then
+                break
+            end
         end
     end
     if platform.os == 'windows' then

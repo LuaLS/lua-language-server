@@ -270,6 +270,13 @@ end
 --- 文件是否被忽略
 ---@param uri uri
 function m.isIgnored(uri)
+    -- Non-file schemes (e.g. virtual diff documents) are not filesystem paths.
+    -- Matching their URI against path-based ignore rules is meaningless, and
+    -- very expensive when the URI embeds a whole encoded file.
+    local scheme = uri:match('^(%a[%w+.-]*):')
+    if scheme and #scheme > 1 and scheme ~= 'file' then
+        return false
+    end
     local scp    = scope.getScope(uri)
     local path   = m.getRelativePath(uri)
     local ignore = m.getNativeMatcher(scp)

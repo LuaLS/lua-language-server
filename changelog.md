@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Opening a document whose URI embeds a long payload (e.g. an AI diff virtual document) no longer freezes the server for minutes: `files.normalize` no longer runs a quadratic `..`-folding pattern on long separator-free strings, and `workspace.isIgnored` skips non-`file:` URIs before any path handling.
 
 ## 3.19.2
 `2026-10-13`

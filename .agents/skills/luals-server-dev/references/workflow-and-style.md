@@ -21,7 +21,7 @@ bin\lua-language-server.exe --test feature.completion.field
 - **测试环境没有标准库**：`TEST_INDEX`（`test/coder/init.lua`）、`TEST_COMPLETION` 等 harness 运行在裸 `rt` 环境，`string`/`table`/`math`/`ipairs`/`select` 等标准库函数不可用。若用例需要某个标准库函数，用 `--!include <name>` 宏手动导入，或直接用 `test.includeCodes[name]` 中已有的片段（见 `test/include.lua`），再或者在用例里自行定义。测试用例也应尽量用抽象、通用代码，避免依赖具体标准库实现。
 
 ## 调试工作流
-- tracer 或 flow 失败后，先看 `tmp/LAST_CODE`、`tmp/LAST_FLOW`、`tmp/LAST_PMAP`。
+- 中间代码失败后先看 `tmp/LAST_CODE`。旧 tracer 的 `LAST_FLOW`、`LAST_PMAP` 已从当前实验分支移除。
 - 如果 `self.map` 报 `No such key`，优先检查 coder 输出中的读写顺序，不要直接绕过 map。
 - 临时日志和诊断产物统一留在 `tmp/`。
 - 临时调试脚本/文件必须放在 `tmp/` 下，测试完毕后清理；不要散落在 `test/` 或 `script/` 目录。

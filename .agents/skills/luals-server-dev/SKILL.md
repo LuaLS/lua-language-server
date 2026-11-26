@@ -31,8 +31,8 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 - 批量扫描（`--test project.external[-diagnostic]`）必须带 `--mem-limit=2`，且不要并发跑多个扫描进程；
   峰值观察与复现脚本见 [workflow and style](./references/workflow-and-style.md) 的「批量扫描与内存护栏」。
 - **新增文件可以，但尽量不要删除文件**：`del`/`rm` 等删除操作会被拦截，需用户手动确认。尽量复用已有文件或就地修改；确需清理时先征询用户。
-- narrowing 优先走 `script/node/tracer.lua`，不要把新 narrowing 逻辑加到 `script/vm/coder/flow.lua` 或 `script/vm/coder/branch.lua`。
-- 如果 tracer 报 `No such key`，先检查 middle code 和 flow 产物，不要先加防御式绕过。
+- `explore/coder-flow-graph` 已移除旧 tracer，替代流图尚未落地。先区分普通类型运算和跨语句收窄，不能把已删除的机制当作扩展入口。
+- 新增能力前先查 [模块复用入口](./references/module-map.md)：明确谁生产数据、谁拥有状态、谁消费结果，再决定是否需要新抽象。
 - 术语约定："诊断"一词只表示 VSCode 问题面板中由 LSP 提供的静态分析结果（警告或错误等级），无需编译、运行。涉及诊断时应当通过工具查看问题面板，并根据最近改动研究是哪些改动导致的，而不是跑测试或清理调试输出。
 - Windows PowerShell 写入文件必须指定 `-Encoding UTF8`（默认 GBK/UTF-16 LE 会破坏源码）；项目源码统一 UTF-8 无 BOM。
 - 测试 harness（`TEST_INDEX` / `TEST_COMPLETION`）运行在**裸环境，无标准库**。用例若需 `string`/`table`/`ipairs`/`select` 等标准库函数，用 `--!include <name>` 宏手动导入（见 `test/include.lua` 的 `test.includeCodes`），或自行定义。用例尽量写抽象通用代码。

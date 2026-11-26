@@ -4,7 +4,7 @@
 
 流收窄（flow narrowing）的系统行为：判等 / 真值 / 动态键判定的收窄结果，
 以及收窄标记（`truthy` / `falsy`）作为读值暴露时的语义。
-事实台账（`.github/skills/luals-server-dev/references/facts/<能力>.md`）是证据层，
+事实台账（`.agents/skills/luals-server-dev/references/facts/<能力>.md`）是证据层，
 本目录逐步承接其「已成立」的结论（迁移中，2026-09-24 起）。
 
 ## Requirements

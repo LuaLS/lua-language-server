@@ -8,7 +8,7 @@ context: |
   本仓库是 4.0.0 重构分支，当前阶段用本仓库的 LS 清理目标工程
   D:\github\vscode-lua\server 的诊断（见 项目实践.md）。
   判断只基于本仓库自己的语义、测试与目标工程代码，不要拿上游 master 的输出当判据。
-  改收窄 / 诊断前先读事实台账：.github/skills/luals-server-dev/references/facts/<能力>.md
+  改收窄 / 诊断前先读事实台账：.agents/skills/luals-server-dev/references/facts/<能力>.md
   （每轮结论上提成一条 fact，--test tools.facts 校验其中引用的 test/ 路径）。
 
 rules:

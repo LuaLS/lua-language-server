@@ -1,6 +1,6 @@
 -- 事实台账校验：`证据：` 里引用的 test/*.lua 必须真实存在
 do
-    local dir = ls.env.ROOT_URI / '.github/skills/luals-server-dev/references/facts'
+    local dir = ls.env.ROOT_URI / '.agents/skills/luals-server-dev/references/facts'
     local childs = ls.afs.getChilds(dir)
     lt.assertNotEquals(#childs, 0)
     ---@cast childs Uri[]

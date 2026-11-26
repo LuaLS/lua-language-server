@@ -19,17 +19,21 @@
 ## 数据流
 1. 文件内容先由 scope/document 管理层追踪。
 2. parser 将源码编译成 AST。
-3. VM coder 把 AST 转成 middle code 和 flow metadata。
-4. runtime 与 tracer 基于这些信息构建语义值和 narrowing 结果。
-5. feature 模块查询 VM/Node 模型，最终回答 LSP 请求。
+3. `VirtualFile` 用文档 AST 调 `Coder:makeFromAst`，或经 `Coder:makeFromFile` 交给 worker 解析并生成 middle code。worker 只返回代码和错误，不传 AST 或 Node 实例。
+4. `Coder:run(vfile)` 在主线程以该 scope 的 runtime 执行 middle code，填充节点映射，登记赋值、引用与清理动作。feature 通过 VM/VirtualFile 查询语义节点，而不是解释生成代码。
+5. Node 负责类型和取值运算；失效通过 `Node.RefModule` 传给 runtime。`withEval` 管理协程内求值上下文，外层锁退出时批量刷新，不能在锁内旁路清缓存。
+6. feature 消费 VM/Node；LSP capability 适配请求、坐标与协议结果。
 
 ## 重要边界
 - parser 改动应停留在 parser/AST 模块，不要把语法逻辑塞进 feature。
 - 新的语义值类型应放在 `script/node/`，并通过公开的 Node 接口暴露能力。
-- flow-sensitive reasoning 优先走 `script/node/tracer.lua`。
+- 当前实验分支已无 tracer/flow metadata，也无 `Variable.staticValue`。赋值记录和 `assignValue` 不是按读点计算的流值；`Node.Narrow` / `Node.Ternary` 仍能做普通类型运算，不等于跨语句收窄。
+- 流式 `@cast`、分支可达性、尾调用 `noreturn` 等历史实现可查 facts 和版本历史；显式 `@noreturn` 仍可用。规划中的流图由 coder 提供绑定、读写和控制流信息，复用 Node 值运算；它尚不是可调用 API。
 - LSP 协议路由属于 `script/language-server/`，具体功能行为属于 `script/feature/`。
 
 ## 类型语义约定
+
+下文带旧 tracer、walker、`traceCallEqual` 或 `appendRef` 的链路是删除前的历史记录，用于复用语义约束和反例，不是当前实现入口。内联 `@as` 的解析与当次读取覆盖也要分别验证，不能由 AST 存在推定语义已接通。
 - **数组默认无 nil 元素**：`T[]` 等价于 `{ [integer]: T }`——用整数下标取值得到 `T`（不是 `T | nil`），
   只有显式写成 `T?[]`（元素类型是 `T?`）才需要 nil 检查。`Node.Array:get` 返回 `head` 即是此约定，
   不要在数组下标路径上补 nil。

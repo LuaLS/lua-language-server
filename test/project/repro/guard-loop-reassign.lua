@@ -2,7 +2,7 @@
 -- 期望：无诊断（`exp` 在 if/else 两支里都成了非 nil，else 支还有 `if not exp then return nil end` 守卫）。
 -- 现状：去掉下面那行 disable，`exp.start` 就报 Need check nil
 -- （同族 = 目标工程 `script/parser/compile.lua` 的 29 条 need-check-nil）。
--- 详见 `.github/skills/luals-server-dev/references/facts/narrowing.md` F19
+-- 详见 `.agents/skills/luals-server-dev/references/facts/narrowing.md` F19
 
 local function parseExpUnit()
     return nil

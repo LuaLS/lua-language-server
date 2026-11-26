@@ -2,7 +2,7 @@
 -- （`c` 在 if 之后应是 `reproP | reproQ`，现在只剩 `reproQ` ⇒ `c.a` 误报未定义字段）
 -- 同族 = 目标工程 `script/vm/operator.lua:157`（if 块里 `---@cast`/赋值后，块外读 `c.node`）
 -- 现状：去掉下面那行 disable 就报；两条修法都试过但目标工程净变差，见
--- `.github/skills/luals-server-dev/references/facts/narrowing.md` F21
+-- `.agents/skills/luals-server-dev/references/facts/narrowing.md` F21
 
 ---@class reproP
 ---@field a integer?

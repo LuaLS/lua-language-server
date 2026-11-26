@@ -1,6 +1,7 @@
 # changelog
 
 ## Unreleased
+* `FIX` Field completion for table literals annotated with an instantiated generic type (e.g. `---@type Range<number>`) now suggests the generic class fields.
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.19.2

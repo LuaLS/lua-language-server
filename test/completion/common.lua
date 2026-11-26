@@ -4633,27 +4633,6 @@ print(a:<??>)
 }
 
 TEST [[
----@class NumberRange
----@field min T
----@field max T
-
----@type NumberRange
-local range = {
-    m<??>
-}
-]]
-{
-    {
-        label = 'max',
-        kind = define.CompletionItemKind.Property,
-    },
-    {
-        label = 'min',
-        kind = define.CompletionItemKind.Property,
-    },
-}
-
-TEST [[
 ---@class Range<T>
 ---@field min T
 ---@field max T

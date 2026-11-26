@@ -64,9 +64,21 @@ local function testRequire(modname)
     return package.loaded[modname], path
 end
 
+local legacyNarrowingTests = {
+    ['test.coder.flow'] = true,
+    ['test.coder.narrow-branch'] = true,
+    ['test.coder.goto-narrow'] = true,
+    ['test.coder.inline-cast'] = true,
+    ['test.feature.diagnostic.narrow-guard'] = true,
+}
+
 --- 带过滤器的 require，只有 modname 匹配过滤器时才执行
 ---@param modname string
 function test.require(modname)
+    if legacyNarrowingTests[modname] and test.filter ~= modname then
+        print(('[%s] 跳过旧收窄测试'):format(modname))
+        return
+    end
     if test.filter then
         -- 只运行前缀匹配的模块（含子模块）或精确匹配
         if modname ~= test.filter

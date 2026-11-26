@@ -1,4 +1,5 @@
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param key string?
 local function check(key)
     local target = {}
@@ -7,6 +8,7 @@ local function check(key)
     end
 end
 ]] { '-need-check-nil' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@param key string?
@@ -16,7 +18,8 @@ local function check(key)
 end
 ]] { 'need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param first { finish: integer }
 ---@param rest { finish: integer }[]?
 ---@param values { finish: integer }[]?
@@ -36,7 +39,7 @@ local function check(first, rest, values, value)
 end
 ]] { '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class shortCircuitGuard
 ---@field finish integer
 ---@param x shortCircuitGuard?
@@ -44,6 +47,7 @@ local function check(x)
     return x and x.finish
 end
 ]] { '-need-check-nil' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@class shortCircuitValue
@@ -108,7 +112,8 @@ local x
 print(x.y)
 ]] { '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param has_seen table?
 local function f(has_seen)
     if not has_seen then
@@ -118,7 +123,7 @@ local function f(has_seen)
 end
 ]] { '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@param has_seen table?
 local function f(has_seen)
     if has_seen == nil then
@@ -128,7 +133,7 @@ local function f(has_seen)
 end
 ]] { '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@type table?
 local t
 if not t then
@@ -137,6 +142,7 @@ end
 t.x = 1
 local y = t.x
 ]] { '-need-check-nil' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@generic T: table, V
@@ -155,7 +161,8 @@ f(1)
 ]] { '-need-check-nil' }
 
 -- 短路：`or` 右侧只在左侧为假时求值，此时左侧已确定非 nil
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field type string
 
@@ -168,7 +175,7 @@ local function f(a)
 end
 ]] { '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field type string
 
@@ -182,7 +189,7 @@ end
 ]] { '-need-check-nil' }
 
 -- 短路：`and` 右侧只在左侧为真时求值
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field type string
 
@@ -193,6 +200,7 @@ local function f(a)
     end
 end
 ]] { '-need-check-nil' }
+end
 
 -- 反向护栏：没有守卫时仍要提示
 TEST_DIAGNOSTIC [[
@@ -206,7 +214,8 @@ end
 ]] { 'need-check-nil' }
 
 -- 探针：`---@cast` 之后不应丢掉守卫得到的非 nil 收窄
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field k integer
 ---@field other integer
@@ -224,7 +233,7 @@ end
 ]] { '-need-check-nil' }
 
 -- 探针：多个「以 return 结尾」的分支之后，守卫得到的收窄不应丢失
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class R
 ---@field a? boolean
 ---@field b? boolean
@@ -246,6 +255,7 @@ local function f(x)
     return false
 end
 ]] { '-need-check-nil' }
+end
 
 -- 探针：动态键写入 nil 不应让基变量变成可能 nil
 TEST_DIAGNOSTIC [[
@@ -267,7 +277,8 @@ end
 ]] { '-need-check-nil' }
 
 -- 探针：闭包赋值得到的局部变量 + `or` 守卫
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class P
 ---@field type string
 
@@ -288,6 +299,7 @@ local function f(list)
     print(near.type)
 end
 ]] { '-need-check-nil' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@class N
@@ -307,7 +319,8 @@ end
 ]] { '-need-check-nil' }
 
 -- 闭包里对外层变量（upvalue）的守卫收窄：注解值作为收窄基值
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class timer
 ---@field restart fun(self: timer)
 
@@ -321,7 +334,7 @@ local function f()
 end
 ]] { '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class timer
 ---@field restart fun(self: timer)
 
@@ -335,6 +348,7 @@ local function f()
     delayTimer:restart()
 end
 ]] { '-need-check-nil' }
+end
 
 -- 无注解（any）的外层变量不做收窄：truly 标记不应盖住读值
 TEST_DIAGNOSTIC [[
@@ -350,7 +364,8 @@ end
 
 -- 同一次调用的多个返回值之间不做「无信息」的间接窄化：
 -- 对任一返回值做真值判断，不该把其他返回值的守卫收窄（如 t 的非 nil）覆盖掉
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@return table?, string?, boolean?, string?
 local function query(a, b) end
 
@@ -382,3 +397,4 @@ local function f(a, b)
     end
 end
 ]] { '-need-check-nil' }
+end

@@ -14,6 +14,7 @@ bin\lua-language-server.exe --test feature.completion.field
 
 ## 测试工作流
 - 先跑最小相关 suite，只有需要时再扩大验证范围。
+- 常驻测试只保留简化、抽象的用例。真实项目片段先缩成能独立触发同一语义的最小例子，再加入套件；去掉业务名称、无关分支和依赖。多个独立语义拆开验证，不直接搬入项目代码。
 - parser 改动优先在 `test/parser/` 增加测试。
 - node 或 tracer 改动根据归属放到 `test/node/` 或 `test/coder/`。
 - 面向 LSP 行为的改动，优先在 `test/feature/` 补测试。

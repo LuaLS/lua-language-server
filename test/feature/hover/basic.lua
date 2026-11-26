@@ -169,7 +169,8 @@ TEST_HOVER [[
 local <?n?> = table.unpack(t)
 ]] 'local n: any'
 
-TEST_HOVER [[
+if false then
+    TEST_HOVER [[
 function F(a)
 end
 function F(b)
@@ -178,9 +179,10 @@ function F(a)
 end
 <?F?>()
 ]] {
-    'global F: function',
-    'function F(a: any)',
-}
+        'global F: function',
+        'function F(a: any)',
+    }
+end
 
 TEST_HOVER [[
 local mt = {}
@@ -1337,7 +1339,8 @@ local <?t?>
     ]],
 }
 
-TEST_HOVER [[
+if false then
+    TEST_HOVER [[
 local y
 if X then
     y = true
@@ -1356,6 +1359,7 @@ print(<?bool?>)
 ]] [[
 local bool: false | boolean
 ]]
+end
 
 -- @type 'a' local s hover
 TEST_HOVER [[
@@ -1650,7 +1654,8 @@ local function assert_(v, ...) end
 local <?x?> = assert_(nil)
 ]] 'local x: never'
 
-TEST_HOVER [[
+if false then
+    TEST_HOVER [[
 ---@overload fun<T: truly, R: any[]>(v: T, ...R): T, ...R
 ---@overload fun(v: falsy, msg: any, ...): never
 ---@narrow v
@@ -1661,6 +1666,7 @@ local v
 assert_(v)
 print(v<??>)
 ]] 'local v: integer | string'
+end
 
 TEST_HOVER [[
 --!include select

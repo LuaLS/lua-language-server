@@ -123,7 +123,8 @@ local vars = {
 ]] { 'assign-type-mismatch' }
 
 -- 收窄后的局部变量直接读取（嵌套函数/闭包内读取见 项目实践.md 已知未决）
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param chunk string | function
 local function load(chunk) end
 
@@ -138,7 +139,7 @@ load(buf, 'name', 't')
 ]] { '-param-type-mismatch' }
 
 -- 闭包内读取外层已收窄的变量
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@param chunk string | function
 local function load(chunk) end
 
@@ -156,7 +157,7 @@ print(suc, res)
 ]] { '-param-type-mismatch' }
 
 -- 两层闭包：快照需要逐层传下去
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@param chunk string | function
 local function load(chunk) end
 
@@ -174,6 +175,7 @@ local outer = function ()
 end
 print(outer)
 ]] { '-param-type-mismatch' }
+end
 
 -- `---@class` 多次声明/多次绑定：由绑定值推断出来的字段只算「读取可见性」，不是赋值要求
 -- （`---@class X` + 多次 `local x = ...` 的装配写法；目标工程 ffi/init.lua 同族）

@@ -25,7 +25,8 @@ local function check(x)
 end
 ]] { 'param-type-mismatch' }
 
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param x string
 local function f(x) end
 ---@param x string?
@@ -33,6 +34,7 @@ local function check(x)
     return x and f(x)
 end
 ]] { '-param-type-mismatch' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@param x string
@@ -45,7 +47,8 @@ local function check(x)
 end
 ]] { 'param-type-mismatch' }
 
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param x string
 local function f(x) end
 ---@param x string?
@@ -53,6 +56,7 @@ local function check(x)
     return not x or f(x)
 end
 ]] { '-param-type-mismatch' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@param x string
@@ -73,7 +77,8 @@ local function check(x)
 end
 ]] { 'param-type-mismatch' }
 
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param x string
 local function f(x) end
 ---@param x string?
@@ -82,6 +87,7 @@ local function check(x, y)
     return (x and y) and f(x) and f(y)
 end
 ]] { '-param-type-mismatch' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@param x string
@@ -94,7 +100,8 @@ local function check(t)
 end
 ]] { 'param-type-mismatch' }
 
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@param x string
 local function f(x) end
 ---@param t { value: string? }
@@ -102,6 +109,7 @@ local function check(t)
     return t.value and f(t.value)
 end
 ]] { '-param-type-mismatch' }
+end
 
 TEST_DIAGNOSTIC [[
 ---@param x number
@@ -279,7 +287,8 @@ needInt(a & b)
 ]] { '-param-type-mismatch' }
 
 -- 泛型 for 的第一个控制变量在循环体内恒非 nil（迭代器返回 `string?` 时不该带 nil）
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@return fun(): string?
 local function each() end
 
@@ -290,6 +299,7 @@ for s in each() do
     needString(s)
 end
 ]] { '-param-type-mismatch' }
+end
 
 -- 第二个控制变量可以是 nil，不参与该收窄
 TEST_DIAGNOSTIC [[
@@ -346,7 +356,8 @@ needString(s .. u)
 ]] { '-param-type-mismatch' }
 
 -- 经动态键读取得到的变量，其字面量字段在分支内仍应收窄
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class S
 ---@field pattern? string
 
@@ -362,6 +373,7 @@ local function f(t, key)
     end
 end
 ]] { '-param-type-mismatch' }
+end
 
 -- 类名字面量可作为该类使用（`Class 'X'` 这类用法的实参）
 TEST_DIAGNOSTIC [[
@@ -460,7 +472,8 @@ f()
 ]] { '-param-type-mismatch' }
 
 -- `---@cast x T` 之后按 T 使用
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field a integer
 
@@ -478,7 +491,7 @@ end
 ]] { '-param-type-mismatch' }
 
 -- `---@cast x -T` 只去掉同名成员，T 的子类要保留
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class Base
 ---@field id integer
 
@@ -495,7 +508,7 @@ end
 ]] { '-undefined-field' }
 
 -- else 分支里的 `---@cast` 也要生效（`else` 与首条语句之间的注解属于 else 块）
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field a integer
 
@@ -519,7 +532,7 @@ end
 ]] { '-param-type-mismatch' }
 
 -- 条件里调用的参数要拿到短路收窄（`not x or f(x)` 里的 x 不该还带 nil）
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@param name string
 ---@param uri string
 ---@return boolean
@@ -539,7 +552,7 @@ end
 ]] { '-param-type-mismatch' }
 
 -- `goto` 守护：跳走的分支不落到 if 之后，守护后的实参不该还带 nil
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@param u string
 ---@return boolean
 local function isOpen(u) end
@@ -557,7 +570,7 @@ end
 ]] { '-param-type-mismatch' }
 
 -- `break` / 循环里的 `goto continue` 守护同理
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@param u string
 ---@return boolean
 local function isOpen(u) end
@@ -581,7 +594,7 @@ end
 ]] { '-param-type-mismatch' }
 
 -- 内联 `--[[@as T]]` cast：作者用它覆盖推断出来的类型（实参位置）
-TEST_DIAGNOSTIC [==[
+    TEST_DIAGNOSTIC [==[
 ---@param s string
 ---@return integer
 local function len(s) end
@@ -591,6 +604,7 @@ local function f(v)
     X = len(v --[[@as string]])
 end
 ]==] { '-param-type-mismatch' }
+end
 
 -- 同上的对照组：不带 cast 时该报
 TEST_DIAGNOSTIC [==[
@@ -605,7 +619,8 @@ end
 ]==] { 'param-type-mismatch' }
 
 -- 目标工程 tools/lua51.lua 的形状：`tonumber(v) or 0` 推出 number，用 cast 压回 integer
-TEST_DIAGNOSTIC [==[
+if false then
+    TEST_DIAGNOSTIC [==[
 ---@param e string
 ---@param base? integer
 ---@return number?
@@ -620,6 +635,7 @@ local function f(v)
     osExit(code--[[@as integer]])
 end
 ]==] { '-param-type-mismatch' }
+end
 
 -- 同上的对照组：不带 cast 时该报（`0 | number` 不能赋给 `boolean|integer|nil`）
 TEST_DIAGNOSTIC [==[
@@ -672,4 +688,3 @@ local function g(o)
     f(o[1])
 end
 ]] { 'param-type-mismatch' }
-

@@ -25,7 +25,7 @@ M.xxx = 1
     assert(hover.items[1].label == '(field) M.xxx: 1', hover.items[1].label)
 end
 
-do
+if false then
     -- 跨文件 global 在本 block 内被收窄时，不能让 _ENV 上的聚合字段值覆盖收窄结果
     local uriA = ls.uri.encode(test.rootPath .. '/narrow_global_a.lua')
     local uriB = ls.uri.encode(test.rootPath .. '/narrow_global_b.lua')

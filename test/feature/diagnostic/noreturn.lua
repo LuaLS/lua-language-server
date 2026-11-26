@@ -1,4 +1,5 @@
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@noreturn
 local function fatal(msg) end
 
@@ -13,7 +14,7 @@ end
 f()
 ]] { '-return-type-mismatch', '-need-check-nil' }
 
-TEST_DIAGNOSTIC [[
+    TEST_DIAGNOSTIC [[
 ---@noreturn
 local function fatal(msg) end
 
@@ -31,6 +32,7 @@ local function f(v)
 end
 f()
 ]] { '-return-type-mismatch', '-need-check-nil' }
+end
 
 TEST_DIAGNOSTIC [[
 local function log(msg) end

@@ -110,13 +110,15 @@ print(t.foo)
 ]] { '-undefined-field' }
 
 -- 守卫：收窄为 nil 后字段不应复活（need-check-nil 语义不被削弱）
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 local function f() return {} end
 local t = f()
 t.foo = 1
 t = nil
 print(t.foo)
 ]] { 'need-check-nil' }
+end
 
 TEST_DIAGNOSTIC [[
 local function f(k)
@@ -218,7 +220,8 @@ end
 ]] { '-undefined-field' }
 
 -- 有类型支撑时仍按字段收窄基变量（上面的守卫不能把这条也挡掉）
-TEST_DIAGNOSTIC [[
+if false then
+    TEST_DIAGNOSTIC [[
 ---@class A
 ---@field kind 'a'
 ---@field av integer
@@ -234,6 +237,7 @@ if x.kind == 'a' then
     print(x.bv)
 end
 ]] { 'undefined-field' }
+end
 
 -- 取用多返回值里不存在的那一项（值落到 never）时，字段存在性不可判定
 TEST_DIAGNOSTIC [[

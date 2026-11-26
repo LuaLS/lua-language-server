@@ -66,7 +66,6 @@ local BUILTIN_TYPE_NAMES = {
     ['table']    = true,
     ['thread']   = true,
     ['truly']    = true,
-    ['truthy']   = true,
     ['unknown']  = true,
     ['userdata'] = true,
 }

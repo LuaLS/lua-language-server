@@ -38,14 +38,6 @@ local function lowercaseGlobalProvider(param, callback)
         if not globalVar then
             return false
         end
-        local sv = globalVar.staticValue
-        if sv then
-            local func = sv --[[@as Node.Function]]
-            local loc = func.location
-            if loc and loc.uri and isMetaUri(loc.uri) then
-                return true
-            end
-        end
         for assign in globalVar:eachAssign() do
             ---@type Node.Field
             local field = assign

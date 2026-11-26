@@ -427,7 +427,7 @@ function M:getChilds()
     if self.masterVariable then
         return self:getMasterVariable():getChilds()
     end
-    local sv = self.currentValue or self.staticValue
+    local sv = self.assignValue
     if sv and sv ~= self and sv.kind == 'variable' then
         ---@cast sv Node.Variable
         return sv:getChilds()
@@ -580,7 +580,7 @@ function M:getChild(key1, key2, ...)
     if self.masterVariable then
         return self:getMasterVariable():getChild(key1, key2, ...)
     end
-    local sv = self.currentValue or self.staticValue
+    local sv = self.assignValue
     if sv and sv ~= self and sv.kind == 'variable' then
         return sv:getChild(key1, key2, ...)
     end
@@ -699,9 +699,8 @@ function M:getDynamicKeyValue()
     end
     ---@cast parent Node.Variable
     _dynamicKeyVisiting[self] = true
-    -- 字段链基值（`m.fileMap[uri]`）没有 currentValue/staticValue，退回完整取值链
     local base = parent:getCurrentValue()
-        or parent:getStaticValue()
+        or parent.value
         or parent.value
     _dynamicKeyVisiting[self] = nil
     if not base then
@@ -742,7 +741,7 @@ function M:get(key)
         return self.scope.rt.ANY, true
     end
     _getVisiting[self] = true
-    -- 动态键读取：字段读也走派生值（与 value/getStaticValue 一致），
+    -- 动态键读取：字段读也走派生值，
     -- 不用共用槽位上的写入记录做推断（F10/B）
     if self.key == self.scope.rt.UNKNOWNKEY then
         local derived = self:getDynamicKeyValue()
@@ -898,29 +897,6 @@ local function mergeValueResults(results, rt)
     return nil
 end
 
---- 获取变量的静态初始值（不触发 Tracer），供 Walker 使用
----@return Node
-function M:getStaticValue()
-    local rt = self.scope.rt
-    if self.assignValue then
-        local master = self:getMasterVariable()
-        local results = { self.assignValue }
-        if master.childsValue then
-            results[#results+1] = master.childsValue
-        end
-        local merged = mergeValueResults(results, rt)
-        if merged then
-            return merged
-        end
-        return self.assignValue
-    end
-    return self:getDynamicKeyValue()
-        or self:getCurrentValue()
-        or self:getExpectValue()
-        or self:getGuessValue()
-        or rt.ANY
-end
-
 ---@return Node?
 function M:getExpectValue()
     local master = self:getMasterVariable()
@@ -947,8 +923,7 @@ function M:getGuessValue()
     -- 无静态值（表字面量路径）时 childs 已在等价值合并中，不重复处理，
     -- 避免自引用 metatable（mt.__index = mt）在 onSameKey 交成 never。
     if  result
-    and master.staticValue
-    and not master.currentValue
+    and master.assignValue
     and (result.kind == 'select' or result.kind == 'table') then
         local childsValue = master.childsValue
         if childsValue then
@@ -958,24 +933,15 @@ function M:getGuessValue()
     return result
 end
 
----@type Node?
-M.staticValue = nil
-
----@param staticValue? Node
+---@param value? Node
 ---@return Node.Variable
-function M:shadow(staticValue)
+function M:shadow(value)
     local rt = self.scope.rt
     local master = self.masterVariable or self
     local var = rt.variable(self.key, self.parent)
     var:setMasterVariable(master)
-    var.staticValue = staticValue
+    var.assignValue = value
     return var
-end
-
----@param value Node
-function M:setStaticValue(value)
-    self.staticValue = value
-    self:flushCache()
 end
 
 ---@type Node?
@@ -990,40 +956,12 @@ end
 ---@package
 ---@return Node?
 function M:getCurrentValue()
-    local node = self.currentValue or self.staticValue
+    local node = self.assignValue
     if not node then
         return nil
     end
     node:addRef(self)
     return node
-end
-
--- 收窄临时值（Tracer 写入，随 class.flush 失效）
----@type Node?
-M.currentValue = nil
-
----@return Node?
----@return boolean
-M.__getter.currentValue = function (self)
-    return nil, true
-end
-
----@param value Node?
-function M:setCurrentValue(value)
-    -- 先 flush 再写入：flush 清掉旧收窄值（getter 字段）并级联刷新依赖
-    self:flushCache()
-    self.currentValue = value
-    self.value = nil
-end
-
----@type Node.Tracer?
-M.tracer = nil
-
----@param tracer Node.Tracer
----@return Node.Variable
-function M:setTracer(tracer)
-    self.tracer = tracer
-    return self
 end
 
 ---@type Node
@@ -1046,11 +984,7 @@ M.__getter.value = function (self)
     else
         self.value = rt.PROVISIONAL
     end
-    -- 收窄值依赖 master 实时状态：master 变化时收窄缓存必须失效
     self:getMasterVariable()
-    if self.tracer then
-        self.tracer:trace()
-    end
     local currentValue = self:getDynamicKeyValue() or self:getCurrentValue()
     local result = currentValue
                 or self:getExpectValue()
@@ -1059,12 +993,9 @@ M.__getter.value = function (self)
     -- 静态值来自非表字面量赋值（如 require/函数调用返回）时，
     -- 变量自身的字段赋值（childs）不会体现在该值里，此处补合并，
     -- 使模块 export 值携带本文件对它的字段挂载（跨文件可见）。
-    -- 只在结果仍是 master 的静态值本身时合并：
-    -- 若 tracer 已把它收窄成别的节点（如 nil），则不合并，保住收窄语义。
     -- 值来源为 select（require/调用返回的出处指针）时不自足：
     -- 后续字段写记录在变量 childs 上，读取时并入 childsValue。
-    -- 表字面量节点自身积累字段；tracer 收窄值（type/union 等）语义优先，
-    -- 均不处理。用交集而非并集/merge：
+    -- 表字面量节点自身积累字段。用交集而非并集/merge：
     -- 并集的字段读取会给缺字段成员贡献 nil（污染下游 cast）；
     -- mergeTables 会丢弃非 table 成员、抹掉 class 支撑的方法；
     -- 交集的 get 会遍历所有 tableLike 成员且跳过缺字段者——
@@ -1212,13 +1143,6 @@ M.__getter.equivalentValue = function (self)
                 for assign in equivalent:eachAssign() do
                     ---@cast assign Node.Field
                     if assign.value then
-                        if assign.value.kind == 'variable' then
-                            local av = assign.value
-                            ---@cast av Node.Variable
-                            if av.tracer then
-                                av.tracer:trace()
-                            end
-                        end
                         -- 未注解表读取默认不含 nil：求值时过滤掉 nil 写贡献的 nil 成员，
                         -- 但保留该 assign（字段仍存在，不触发 undefined-field）。
                         if not (assign.value.kind == 'type' and assign.value.typeName == 'nil') then

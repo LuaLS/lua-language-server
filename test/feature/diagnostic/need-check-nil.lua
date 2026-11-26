@@ -336,7 +336,7 @@ local function f()
 end
 ]] { '-need-check-nil' }
 
--- 无注解（any）的外层变量不做收窄：truthy 标记不应盖住读值
+-- 无注解（any）的外层变量不做收窄：truly 标记不应盖住读值
 TEST_DIAGNOSTIC [[
 local param
 

@@ -1,13 +1,15 @@
 local rt = test.scope.rt
 
 do
-    lt.assertEquals(rt.ANY.truthy:view(), 'truthy')
+    lt.assertEquals(rt.type 'truly', rt.TRUTHY)
+    lt.assertNotEquals(rt.type 'truthy', rt.TRUTHY)
+    lt.assertEquals(rt.ANY.truthy:view(), 'truly')
     lt.assertEquals(rt.ANY.falsy:view(), 'false | nil')
 
-    lt.assertEquals(rt.UNKNOWN.truthy:view(), 'truthy')
+    lt.assertEquals(rt.UNKNOWN.truthy:view(), 'truly')
     lt.assertEquals(rt.UNKNOWN.falsy:view(), 'false')
 
-    lt.assertEquals(rt.TRUTHY.truthy:view(), 'truthy')
+    lt.assertEquals(rt.TRUTHY.truthy:view(), 'truly')
     lt.assertEquals(rt.TRUTHY.falsy:view(), 'never')
 
     lt.assertEquals(rt.NIL.truthy:view(), 'never')
@@ -114,7 +116,7 @@ end
 do
     rt:reset()
 
-    -- `truthy` 是收窄标记（无成员集）：读它的字段按 any 处理，不能报「未定义字段」
+    -- `truly` 是收窄标记（无成员集）：读它的字段按 any 处理，不能报「未定义字段」
     local v = rt.TRUTHY:get('anyField')
     lt.assertEquals(v:view(), 'any')
 end

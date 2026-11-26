@@ -659,7 +659,7 @@ do
     X = x --> any
     
     if f(x) then
-        X1 = x --> truthy
+        X1 = x --> truly
     else
         X2 = x --> false | nil
     end
@@ -673,7 +673,7 @@ do
     local XX = rt:globalGet('XX')
 
     lt.assertEquals(X:view(), 'any')
-    lt.assertEquals(X1:view(), 'truthy')
+    lt.assertEquals(X1:view(), 'truly')
     lt.assertEquals(X2:view(), 'false | nil')
     lt.assertEquals(XX:view(), 'any')
 end
@@ -1195,7 +1195,7 @@ do
     local X1 = rt:globalGet('X1')
     local X2 = rt:globalGet('X2')
 
-    -- 动态键读取的读值不受共用槽位污染（条件分支里的真值收窄不再泄漏成 truthy）
+    -- 动态键读取的读值不受共用槽位污染（条件分支里的真值收窄不再泄漏成 truly）
     lt.assertEquals(X1:view(), 'integer')
     lt.assertEquals(X2:view(), 'integer')
 end

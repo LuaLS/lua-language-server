@@ -238,7 +238,7 @@ function M:narrowCallByTarget()
                     -- 无法处理泛型返回值，直接跳过这个原型
                     goto continue
                 end
-                -- 直接视为 等于 truthy
+                -- 直接视为 等于 truly
                 mode = 'equal'
                 -- 将 else 一方视为 falsy
                 inferAsFalsy = true

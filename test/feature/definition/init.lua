@@ -32,8 +32,6 @@ function TEST_DEF(script)
         print(script)
         print('Expected:', #catched['!'], 'got:', #(ranges or {}))
         ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_CODE', LAST_CODE)
-        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_FLOW', LAST_FLOW)
-        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_PMAP', LAST_PMAP)
         assert(false)
     end
 end

@@ -319,13 +319,6 @@ function M:fillAPIs()
         return New 'Node.Ternary' (scope, cond, thenNode, elseNode)
     end
 
-    ---@param map table<string, Node>
-    ---@param parentMap table<string, [string, string]>
-    ---@return Node.Tracer
-    function self.tracer(map, parentMap)
-        return New 'Node.Tracer' (scope, map, parentMap)
-    end
-
     ---@param childs Node[]
     ---@param onSameKey? fun(oldField: Node.Field, newField: Node.Field): Node.Field
     ---@return Node.Table
@@ -417,7 +410,7 @@ function M:fillPresets()
             end)
             return not hasNilOrNever
         end)
-    self.TRUTHY = self.type 'truthy'
+    self.TRUTHY = self.type 'truly'
         : setConfig('onCanCast', function (_, other)
             return other.truthy ~= self.NEVER
         end)
@@ -428,7 +421,6 @@ function M:fillPresets()
     self.NIL = self.type 'nil'
         : setConfig('basicType', true)
     self.FALSY = self.FALSE | self.NIL
-    self.TYPE_POOL['truly'] = self.TRUTHY
     self.TYPE_POOL['falsy'] = self.FALSY
     self.VALUE_NAN = New 'Node.Value' (self.scope, 0/0)
     self.NUMBER = self.type 'number'

@@ -30,7 +30,6 @@ require 'node.field'
 require 'node.param_of'
 require 'node.narrow'
 require 'node.ternary'
-require 'node.tracer'
 
 require 'node.runtime'
 require 'node.runtime-helper'

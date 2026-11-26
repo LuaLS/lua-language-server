@@ -62,7 +62,6 @@ ls.args = {
     ---@type boolean|string
     PROBE_FILTER = false,
     ---@type boolean|string
-    PROBE_FLOW = false,
     ---@type boolean|string
     PROBE_VAR = false,
     ---@type boolean|string

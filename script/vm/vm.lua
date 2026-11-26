@@ -93,7 +93,6 @@ local BUILTIN_LUADOC_TYPES = {
     ['table']    = true,
     ['thread']   = true,
     ['truly']    = true,
-    ['truthy']   = true,
     ['unknown']  = true,
     ['userdata'] = true,
 }

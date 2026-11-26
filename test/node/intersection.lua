@@ -4,8 +4,8 @@ do
     rt:reset()
     local a = rt.variable 'a'
     local b = rt.variable 'b'
-    a:setStaticValue(rt.union { b, rt.NUMBER })
-    b:setStaticValue(rt.union { a, rt.NUMBER })
+    a:setAssignValue(rt.union { b, rt.NUMBER })
+    b:setAssignValue(rt.union { a, rt.NUMBER })
 
     local x = a & b
     lt.assertEquals(x:view(), 'number')

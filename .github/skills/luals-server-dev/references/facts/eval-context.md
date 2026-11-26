@@ -51,7 +51,7 @@
 - 断言：同一节点重入时的「未完成态占位」SHALL 放在 `ctx.inProgress`（身份键，生命周期=一次求值期），
   SHALL NOT 写进 getter 缓存字段；占位作为结果返回时 `needCache = false`（只缓存完成态）。
   这样求值中途异常也不会把"半成品"永久留在缓存里。
-- 证据：`test/node/eval-context.lua`（③）；`test/node/tracer.lua` 的收窄/反推用例
+- 历史证据（旧 tracer 已移除）：`test/node/eval-context.lua` 原即时写回用例；`test/node/tracer.lua` 的收窄/反推用例。
 - 代码：`script/node/variable.lua` 的 `M.__getter.value`（唯一把占位写缓存字段的地方，已迁移；
   无 ctx 时退回旧写法保持行为一致）；`rt.PROVISIONAL` 仍作为**类型/识别标记**保留
   （`runtime.lua` 的 preset、`tracer.lua:387/441`、`union.lua:155/163` 的检查不动）

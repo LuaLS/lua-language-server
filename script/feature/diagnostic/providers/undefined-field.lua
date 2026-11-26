@@ -56,10 +56,10 @@ local function undefinedFieldProvider(param, callback)
             local target = node:simplify()
             if target.kind == 'type' then
                 ---@cast target Node.Type
-                -- `nil`/`never` 没有字段；`truthy` 是收窄用的标记（没有成员集），都不该报未定义字段
+                -- `nil`/`never` 没有字段；`truly` 是收窄用的标记（没有成员集），都不该报未定义字段
                 if target.typeName == 'nil'
                 or target.typeName == 'never'
-                or target.typeName == 'truthy' then
+                or target.typeName == 'truly' then
                     goto continue
                 end
             end

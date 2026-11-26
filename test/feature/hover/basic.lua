@@ -1587,21 +1587,21 @@ print(x<??>)
 ]] 'local x: integer | string | nil'
 
 TEST_HOVER [[
----@overload fun<T: truthy>(v: T): T
+---@overload fun<T: truly>(v: T): T
 ---@overload fun(v: falsy): never
 local function f(v) end
 local <?x?> = f(true)
 ]] 'local x: true'
 
 TEST_HOVER [[
----@overload fun<T: truthy>(v: T): T
+---@overload fun<T: truly>(v: T): T
 ---@overload fun(v: falsy): never
 local function f(v) end
 local <?x?> = f(false)
 ]] 'local x: never'
 
 TEST_HOVER [[
----@overload fun<T: truthy>(v: T): T
+---@overload fun<T: truly>(v: T): T
 ---@overload fun(v: falsy): never
 local function f(v) end
 ---@type boolean
@@ -1612,14 +1612,14 @@ local <?x?> = f(v)
 TEST_HOVER [[
 ---@type integer|string|nil
 local v
----@overload fun<T: truthy>(v: T): T
+---@overload fun<T: truly>(v: T): T
 ---@overload fun(v: falsy): never
 local function f(v) end
 local <?x?> = f(v)
 ]] 'local x: integer | string'
 
 TEST_HOVER [[
----@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun<T: truly, R: any[]>(v: T, ...R): T, ...R
 ---@overload fun(v: falsy, msg: any, ...): never
 local function assert_(v, ...) end
 
@@ -1627,7 +1627,7 @@ local <?x?>, y, z = assert_(true, 1, 'a')
 ]] 'local x: true'
 
 TEST_HOVER [[
----@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun<T: truly, R: any[]>(v: T, ...R): T, ...R
 ---@overload fun(v: falsy, msg: any, ...): never
 local function assert_(v, ...) end
 
@@ -1635,7 +1635,7 @@ local x, <?y?>, z = assert_(true, 1, 'a')
 ]] 'local y: 1'
 
 TEST_HOVER [[
----@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun<T: truly, R: any[]>(v: T, ...R): T, ...R
 ---@overload fun(v: falsy, msg: any, ...): never
 local function assert_(v, ...) end
 
@@ -1643,7 +1643,7 @@ local x, y, <?z?> = assert_(true, 1, 'a')
 ]] 'local z: \'a\''
 
 TEST_HOVER [[
----@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun<T: truly, R: any[]>(v: T, ...R): T, ...R
 ---@overload fun(v: falsy, msg: any, ...): never
 local function assert_(v, ...) end
 
@@ -1651,7 +1651,7 @@ local <?x?> = assert_(nil)
 ]] 'local x: never'
 
 TEST_HOVER [[
----@overload fun<T: truthy, R: any[]>(v: T, ...R): T, ...R
+---@overload fun<T: truly, R: any[]>(v: T, ...R): T, ...R
 ---@overload fun(v: falsy, msg: any, ...): never
 ---@narrow v
 local function assert_(v, ...) end

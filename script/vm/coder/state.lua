@@ -147,33 +147,19 @@ function M:compileAssign(var, index, valueKey, isTable)
 
     local isEnv = var.kind == 'var' and var.id == '_ENV'
     if not isTable or isEnv then
-        self:addLine('{varKey}:setStaticValue({valueKey})' % {
-            varKey   = self:getKey(var),
-            valueKey = catKey or valueKey,
-        })
-    elseif not catKey then
         self:addLine('{varKey}:setAssignValue({valueKey})' % {
             varKey   = self:getKey(var),
-            valueKey = valueKey,
+            valueKey = catKey or valueKey,
         })
     end
 end
 ls.vm.registerCoderProvider('assign', function (coder, source)
     ---@cast source LuaParser.Node.Assign
 
-    -- 第一步：预编译所有 exps，只建立 shadow/注册 key，
-    -- 但暂不生成 tracer 的 appendVar 指令（推迟到右侧编译完之后）。
-    -- 这样函数体引用 M.method 等名字时能找到对应 key（时序问题的原修复保留），
-    -- 同时保证 flow 里 ref（右侧读取）先于 var（左侧赋值），避免 Walker 逻辑错误。
-    local tracer = coder:getTracer()
-    if tracer then
-        tracer:beginDeferVar()
-    end
     for i, exp in ipairs(source.exps) do
         coder:compile(exp)
     end
 
-    -- 第二步：编译右侧（values），此时 appendRef 正常追加到 flow
     local valueKeys = {}
     local isTable = {}
     for i, value in ipairs(source.values) do
@@ -182,12 +168,6 @@ ls.vm.registerCoderProvider('assign', function (coder, source)
         coder:compile(value)
     end
 
-    -- 第三步：将之前推迟的 appendVar 指令 flush 到 flow（顺序：ref 在前，var 在后）
-    if tracer then
-        tracer:flushDeferVar()
-    end
-
-    -- 第四步：做实际赋值（exps 已编译，只需建立 field/assign 关系）
     for i, exp in ipairs(source.exps) do
         local vk = valueKeys[i]
         if vk then
@@ -220,28 +200,6 @@ ls.vm.registerCoderProvider('localdef', function (coder, source)
             coder:compileAssign(var, i, 'rt.NIL', false)
         else
             coder:compileAssign(var, i)
-        end
-        -- 记录 var 与 call 的关联，用于间接窄化（如 tp = type(x), local ok, err = f()）
-        local value = source.values and source.values[i]
-        local callNode = nil
-        local returnIndex = i
-        if value then
-            if value.kind == 'call' then
-                callNode = value
-            elseif value.kind == 'select' then
-                -- local a, b = f() 中，value 是 select 节点，value.value 是 call 节点
-                if value.value and value.value.kind == 'call' then
-                    callNode = value.value
-                    returnIndex = value.index or i
-                end
-            end
-        end
-        if callNode then
-            ---@cast callNode LuaParser.Node.Call
-            local tracer = coder:getTracer()
-            if tracer then
-                tracer:appendLink(var, callNode, returnIndex)
-            end
         end
     end
     -- 消费未用完的 ---@type 注解（如 `---@type A, B, C` 只声明两个变量），避免泄漏给后续相邻语句

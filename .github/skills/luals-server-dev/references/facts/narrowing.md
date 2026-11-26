@@ -99,7 +99,8 @@
 - **2026-10-10（变体 C，基础值部分落地，change `short-circuit-variable-narrowing`）**：新增按 masterVariable/变量身份键的独立临时环境，仅限右操作数；直接 ref 与 not、and 真方向、or 假方向收集可靠事实。复用左侧 traceRef 返回值快照，不再次读取或向 parentMap 上行。
   - 完整类/表方案：103 → 99（移除 5 / 新增 1），新增 `parser/compile.lua:3697:34` 的 need-check-nil；去掉普通临时栈、跳过无变化结果、同步临时 id、避免重复 traceRef 均未改变该数字，未采用。
   - 落地范围：仅可转为 string/number/boolean/nil 的基础值收窄（含 uri 别名），103 → 100（移除 3 / 新增 0）：`workspace/require-path.lua:81`、`workspace/workspace.lua:196`、`provider/provider.lua:1565`。
-  - 证据：test/feature/diagnostic/param-type-mismatch.lua（8 个短路用例：直接变量、not/or、嵌套合取、字段、外泄及真实不匹配）；test/node/tracer.lua（不同 read-site id 的 and/or 与表达式之后恢复）；全量 --test 绿。
+  - 证据：test/feature/diagnostic/param-type-mismatch.lua（8 个短路用例：直接变量、not/or、嵌套合取、字段、外泄及真实不匹配）。
+  - 历史证据（旧 tracer）：`test/node/tracer.lua`（不同 read-site id 的 and/or 与表达式之后恢复）；当时全量通过。
   - 边界：类/表与动态键收窄仍未新增支持；基础值通道已成立。动态键诊断 harness 的可选表索引用例未报，不能据此建立防回归断言，未保留该用例。
 - **2026-10-10（重新分诊 C）**：完整方案相对基础值方案 100 → 99（移除 2 / 新增 1）。新增 `parser/compile.lua:3697:34` 已确认误报：该读点是受 `lastValue and` 保护的 `lastValue.finish`，不是无保护的 lastVar；parseVarTails 的 rest 只含成功解析的非 nil 节点，lastVar 初始化于已校验的 n1，随后只赋 n2/n。
   - 额外移除 `core/hover/return.lua:42`（rtn and 内 getInfer(rtn)）与 `provider/provider.lua:1439`（lstate and 内 packRange(lstate)）均有真实短路守卫，不是因源码缺判空导致的真实错误。
@@ -108,7 +109,8 @@
   - 保持基础值实现并保留 test/feature/diagnostic/need-check-nil.lua 的无守卫类访问正向断言；完整方案与抽取通过用例本轮仅实验。不能仅以新增数判断方案，但本例已确认新增误报，完整方案暂未落地。
 - **2026-10-10（C 完整落地：临时联合体成员快照）**：collect/apply 取证时收窄值均不含 nil；结果联合体仍携带变量包装 rawNodes，后续重新展开受源变量变化污染。收集器最小回归（人工设置 truthy 返回含包装的联合体）证明：源变量 string → nil 并 flush 后，无快照 `string | truthy` → `truthy | nil`，复制已解析 values 重建则保持 `string | truthy`。
   - 代码：`W:collectLogicValues` 联合体结果通过 `rt.union { table.unpack(narrowed.values) }` 固定当次成员；去掉基础值 canCast 限制，恢复类/表通道。不改 Union 全局语义。
-  - 证据：test/node/tracer.lua 首例（上述修复前失败/修复后通过的快照回归）；test/feature/diagnostic/need-check-nil.lua（循环赋值后短路字段、可选类受保护读取、无守卫访问仍报）；目标工程 parser/compile.lua:3697 的误报消失。
+  - 证据：test/feature/diagnostic/need-check-nil.lua（循环赋值后短路字段、可选类受保护读取、无守卫访问仍报）；目标工程 parser/compile.lua:3697 的误报消失。
+  - 历史证据（旧 tracer）：`test/node/tracer.lua` 首例（修复前失败、修复后通过的快照回归）。
   - 数字：基础值 100 → 98（移除 2 / 新增 0）；原始 103 → 98（移除 5 / 新增 0）。两个额外移除点仍是受守卫的 rtn/lstate，不用 any/never 掩盖。动态键仍不新增支持。
 - 状态：成立（基础值、类/表短路右侧支持；动态键不在本条新增范围）
 
@@ -279,7 +281,7 @@
 ## F14 `and`/`or`/`==`/`~=` 的操作数边界由 coder 标记（基值不再被当操作数收窄）
 - 断言：这些复合节点的子节点是「左组…, '|', 右组…」，每组最后一个子节点才是操作数
   （前面是它自己的路径 ref）；tracer 按标记切分，只把操作数当条件/比较值、其余按 ref 追踪
-- 证据：test/coder/*、test/feature/diagnostic/*（全量绿）；test/node/tracer.lua 的手工 flow（无标记）
+- 历史证据（旧 tracer）：`test/coder/*`、`test/feature/diagnostic/*`（当时全量通过）；`test/node/tracer.lua` 的手工 flow（无标记）
   走回退读法且仍保留中间 ref；目标工程 `files.lua:222` 的基值不再被收成 `false | nil`、
   `cli/doc/export.lua:75/79` 的 `a.name ~= b.name` 不再把 `b` 当比较值收窄
 - 代码：`script/vm/coder/tracer.lua` `T:markOperand`；`script/vm/coder/exp.lua` 的 binary provider
@@ -324,7 +326,7 @@
   `and` 为假、另一侧 = 「A 且 B 为真」—— 必须把两侧操作数各自贡献的键都带上；
   只有「另一侧是析取」（追踪 `and` 为真，另一侧 = 「A 假 或 A 真且 B 假」）时才只并共有键
   （单侧键在另一分支未必成立，采纳会过度收窄：`if x and y` 的 else 里 x 会从 `string | nil` 变成 `nil`）
-- 证据：test/node/tracer.lua（新增「`(A and B) and C` 里 C 读 B 为真」一例：`x.a.b3` 必须是
+- 历史证据（旧 tracer）：`test/node/tracer.lua`（新增「`(A and B) and C` 里 C 读 B 为真」一例：`x.a.b3` 必须是
   `truthy`，撤掉修复即为 `false | nil`；同文件既有的 `if x and y` / `if x or y` 一族的 else 读值钉住析取方向）；
   目标工程 `script/plugins/ffi/c-parser/c99.lua:66` 的 `Undefined field 'decl'` 消失
 - 代码：`script/node/tracer.lua` `W:traceAnd` 末尾的 `otherSide` 合并（`seedValue == stack1.otherSide`

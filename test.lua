@@ -132,8 +132,6 @@ ls.await.call(function ()
         end
         if LAST_CODE then
             ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_CODE', LAST_CODE)
-            ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_FLOW', LAST_FLOW)
-            ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_PMAP', LAST_PMAP)
         end
     end
     thread.sleep(1000)

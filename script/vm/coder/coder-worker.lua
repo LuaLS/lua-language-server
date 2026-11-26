@@ -9,8 +9,6 @@ function methods.makeCode(params)
     coder:makeFromAst(ast)
     return {
         code           = coder.code,
-        tracerFlowMap  = coder.tracerFlowMap,
-        parentMap      = coder.parentMap,
         errors         = coder.errors,
     }
 end

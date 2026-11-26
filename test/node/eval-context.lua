@@ -2,19 +2,6 @@ local rt = test.scope.rt
 
 do
     rt:reset()
-    local node = rt.variable 'x'
-    node:addType(rt.STRING | rt.NIL)
-    rt:withEval(function ()
-        lt.assertEquals(node.value:view(), 'string | nil')
-        node:setCurrentValue(rt.STRING)
-        lt.assertEquals(node.value:view(), 'string')
-        node:setCurrentValue(rt.NIL)
-        lt.assertEquals(node.value:view(), 'nil')
-    end)
-end
-
-do
-    rt:reset()
     local outer = rt:enterEval()
     lt.assertEquals(rt:evalContext(), outer)
 
@@ -43,14 +30,14 @@ end
 do
     rt:reset()
     local node = rt.variable 'x'
-    node:setCurrentValue(rt.value(1))
+    node:setAssignValue(rt.value(1))
     local cached = node.value
     lt.assertEquals(cached:view(), '1')
 
     rt:withEval(function ()
-        node:flushCache()
+        node:setAssignValue(rt.value(2))
         lt.assertEquals(node.value, cached)
     end)
 
-    lt.assertEquals(node.value == cached, false)
+    lt.assertEquals(node.value:view(), '2')
 end

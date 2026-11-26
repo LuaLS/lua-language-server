@@ -173,7 +173,7 @@ do
         : addReturnDef(nil, rt.spread(T))
 
     local arg = rt.variable 't'
-    arg:setStaticValue(rt.table {
+    arg:setAssignValue(rt.table {
         [rt.value(1)] = rt.INTEGER,
         [rt.value(2)] = rt.STRING,
     })

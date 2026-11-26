@@ -592,15 +592,10 @@ end)
 ls.vm.registerCoderProvider('catstatecast', function (coder, source)
     ---@cast source LuaParser.Node.CatStateCast
 
-    -- 收窄要按位置生效：在 flow 里发一条 cast 指令，由 walker 对「当时的」值应用；
-    -- 类型值编译到前导区（cast 常在分支里，落在分支里的赋值可能根本没执行）
-    local tracer = coder:getTracer()
     for _, item in ipairs(source.items) do
-        local typeKey
         if item.type then
-            typeKey = coder:compileToPrelude(item.type)
+            coder:compile(item.type)
         end
-        tracer:appendCast(source.var, item.op, typeKey, item.isOptional)
     end
 end)
 

@@ -5,17 +5,7 @@ ls.vm.registerCoderProvider('var', function (coder, source)
         value = coder:makeVarKey(source),
     })
 
-    if source.env then
-        local sourceName = coder:getVarName(source)
-        if sourceName then
-            coder.parentMap[sourceName] = { coder:getVarName(source.env), source.id, true }
-        end
-    end
-
-    if source.value then
-        coder:getTracer():appendVar(source)
-    else
-        coder:getTracer():appendRef(source)
+    if not source.value then
         local location = coder:makeLocationCode(source)
         coder:addLine('{key}:setLocation {location}' % {
             key      = coder:getKey(source),
@@ -52,10 +42,7 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         value = coder:makeVarKey(source),
     })
 
-    if source.value then
-        coder:getTracer():appendVar(source)
-    else
-        coder:getTracer():appendRef(source)
+    if not source.value then
         coder:addLine('{var}:addUsage {location}' % {
             var      = coder:getKey(source),
             location = coder:makeLocationCode(source),
@@ -76,26 +63,10 @@ ls.vm.registerCoderProvider('field', function (coder, source)
         end
     end
 
-    local sourceName = coder:getVarName(source)
-    if sourceName and source.key then
-        local keyLiteral
-
-        if source.subtype == 'field' then
-            keyLiteral = source.key.id
-        elseif source.subtype == 'method' then
-            keyLiteral = source.key.id
-            coder:addLine('{var}:setMethod()' % {
-                var = coder:getKey(source),
-            })
-        elseif source.subtype == 'index' then
-            if source.key.isLiteral then
-                keyLiteral = source.key.value
-            end
-        end
-
-        if keyLiteral then
-            coder.parentMap[sourceName] = { coder:getVarName(last), keyLiteral }
-        end
+    if source.subtype == 'method' and source.key then
+        coder:addLine('{var}:setMethod()' % {
+            var = coder:getKey(source),
+        })
     end
 
     -- 可选链访问（?. ?: ?[）：值为 nil | 字段值
@@ -116,7 +87,6 @@ ls.vm.registerCoderProvider('local', function (coder, source)
             varKey   = coder:getKey(source),
             location = coder:makeLocationCode(source),
         })
-        coder:getTracer():appendVar(source)
         return
     end
     coder:addLine('{key} = rt.variable {name%q}' % {
@@ -127,7 +97,6 @@ ls.vm.registerCoderProvider('local', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
-    coder:getTracer():appendVar(source)
 end)
 
 ls.vm.registerCoderProvider('param', function (coder, source)
@@ -140,8 +109,6 @@ ls.vm.registerCoderProvider('param', function (coder, source)
         varKey   = coder:getKey(source),
         location = coder:makeLocationCode(source),
     })
-
-    coder:getTracer():appendVar(source)
 
     local looksLikeSelf, parentVariable = coder:looksLikeSelf(source)
 

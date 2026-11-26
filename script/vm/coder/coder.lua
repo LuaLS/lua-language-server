@@ -1,5 +1,3 @@
-local parser = require 'parser'
-
 ---@class Coder: GCHost
 local M = Class 'Coder'
 
@@ -24,10 +22,6 @@ function M:__init()
     self.env = _G
     ---@type table<string, { key: string, offset: integer }[]>
     self.variableMap = {}
-    ---@type table<LuaParser.Node.Base, string>
-    self.sourceVarNameMap = {}
-    self.tracerFlowMap = {}
-    self.parentMap = {}
 end
 
 function M:__del()
@@ -47,11 +41,7 @@ function M:makeFromAst(ast)
     self:addLine 'local rt  = vfile.scope.rt'
     self:addLine 'local uri = vfile.uri'
     self:addLine 'local r   = coder.map'
-    self:addLine 'local p   = coder.parentMap'
     self:addLine ''
-
-    -- 前导区末尾：这里的赋值一定会执行，供 walker 读取（如 `---@cast` 的类型）
-    self.preludeIndex = #self.buf + 1
 
     self:compile(ast.main)
 
@@ -107,30 +97,7 @@ function M:makeFromFile(file, options)
     end
     self.code = result.code
     self.func = func
-    self.tracerFlowMap = result.tracerFlowMap
-    self.parentMap = result.parentMap
     self.errors = result.errors
-end
-
---- 在文件前导区（一定执行的位置）编译一个节点，返回其 key（不是 `r[...]` 表达式，
---- flow 里的 key 与 `appendVar`/`appendRef` 一样用裸 uniqueKey）。
---- 用于「值在分支里也应该已经存在」的读取（如 `---@cast` 的类型：注解在分支内，
---- 但 walker 走整条 flow 时会读到它，落在分支里的赋值可能根本没执行）。
----@param source LuaParser.Node.Base
----@return string
-function M:compileToPrelude(source)
-    local buf = self.buf
-    local scratch = {}
-    self.buf = scratch
-    self:compile(source)
-    self.buf = buf
-    local index = self.preludeIndex
-    for i = 1, #scratch do
-        table.insert(buf, index, scratch[i])
-        index = index + 1
-    end
-    self.preludeIndex = index
-    return source.uniqueKey
 end
 
 ---@param code string
@@ -307,15 +274,11 @@ function M:run(vfile)
         LAST_URI  = vfile.uri
         LAST_MAP = vfile.coder.map
         LAST_CODE = self.code
-        LAST_FLOW = ls.util.dump(self.tracerFlowMap, { noArrayKey = true })
-        LAST_PMAP = ls.util.dump(self.parentMap, { noArrayKey = true })
 
         local fs = require 'bee.filesystem'
         local tmpDir = fs.path(ls.env.ROOT_PATH) / 'tmp'
         fs.create_directories(tmpDir)
         ls.util.saveFile(tostring(tmpDir / 'LAST_CODE'), self.code)
-        ls.util.saveFile(tostring(tmpDir / 'LAST_FLOW'), LAST_FLOW)
-        ls.util.saveFile(tostring(tmpDir / 'LAST_PMAP'), LAST_PMAP)
     end
     if ls.args.SAVE_CODER then
         local path = vfile.scope:getRelativePath(vfile.uri)
@@ -666,84 +629,6 @@ function M:makeVarKey(source)
         return self:getKey(source) or error('Cannot make var key')
     end
     error('Cannot make var key for kind ' .. tostring(source.kind))
-end
-
----形如 `a.b.c` 的名字，用于变量跟踪
----@param var LuaParser.Node.Base
----@return string?
-function M:getVarName(var)
-    local lastName = self.sourceVarNameMap[var]
-    if lastName then
-        return lastName
-    end
-    local name = self:makeVarName(var)
-    if name then
-        self.sourceVarNameMap[var] = name
-    end
-    return name
-end
-
----@private
----@param var LuaParser.Node.Base
----@return string?
-function M:makeVarName(var)
-    if var.kind == 'local' or var.kind == 'param' then
-        ---@cast var LuaParser.Node.Local | LuaParser.Node.Param
-        return '{}@{}:{}' % {
-            var.id,
-            var.startRow + 1,
-            var.startCol + 1,
-        }
-    end
-    if var.kind == 'var' then
-        ---@cast var LuaParser.Node.Var
-        if var.loc then
-            return self:getVarName(var.loc)
-        end
-        if var.env then
-            local envName = self:getVarName(var.env)
-            if not envName then
-                return nil
-            end
-            return '{}.{}' % { envName, var.id }
-        end
-        return '_G.{}' % { var.id }
-    end
-    if var.kind == 'field' then
-        ---@cast var LuaParser.Node.Field
-        local lastName = self:getVarName(var.last)
-        if not lastName then
-            return nil
-        end
-        local key = var.key
-        if not key then
-            return nil
-        end
-        if var.subtype == 'field' or var.subtype == 'method' then
-            ---@cast key LuaParser.Node.FieldID
-            return '{}.{}' % { lastName, key.id }
-        end
-        if var.subtype == 'index' then
-            ---@cast key LuaParser.Node.Exp
-            if key.isLiteral then
-                ---@cast key LuaParser.Node.Literal
-                local value = key.value
-                if type(value) == 'string' then
-                    if parser.isName(value) then
-                        return '{}.{}' % { lastName, value }
-                    else
-                        return '{}[{%q}]' % { lastName, value }
-                    end
-                else
-                    return '{}[{}]' % { lastName, tostring(value) }
-                end
-            else
-                return '{}[{}]' % { lastName, 'unknown' }
-            end
-            return nil
-        end
-    end
-    return nil
 end
 
 ---@return Coder

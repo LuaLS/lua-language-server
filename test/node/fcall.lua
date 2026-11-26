@@ -51,7 +51,7 @@ do
     --> any
     ]]
     local y = rt.variable 'y'
-    y:setStaticValue(rt.UNKNOWN)
+    y:setAssignValue(rt.UNKNOWN)
     local fcall = rt.fcall(y, {})
     lt.assertEquals(fcall.value:view(), 'any')
 end
@@ -217,7 +217,7 @@ do -- 方案1
     ]]
 
     local f = rt.variable 'type'
-    f:setStaticValue(rt.union {
+    f:setAssignValue(rt.union {
         rt.func()
             : addParamDef('x', rt.NUMBER)
             : addReturnDef(nil, rt.value('number')),

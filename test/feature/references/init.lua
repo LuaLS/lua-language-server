@@ -35,8 +35,6 @@ function TEST_REF(script, includeDeclaration)
         print('Expected:', ls.util.dump(catched['!'] or {}))
         print('Got:', ls.util.dump(ranges))
         ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_CODE', LAST_CODE)
-        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_FLOW', LAST_FLOW)
-        ls.fs.write(ls.env.ROOT_URI / 'tmp' / 'LAST_PMAP', LAST_PMAP)
         assert(false)
     end
 end

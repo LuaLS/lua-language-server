@@ -11,7 +11,7 @@ do
     ]]
 
     local x = rt.variable 'x'
-    x:setStaticValue(rt.value(10))
+    x:setAssignValue(rt.value(10))
 
     local W = rt.variable 'W'
     W:addAssign(rt.field('W', x))
@@ -199,11 +199,11 @@ do
     ]]
 
     local x = rt.variable 'x'
-    x:setStaticValue(rt.value(10))
+    x:setAssignValue(rt.value(10))
 
     local y = rt.variable 'y'
     y:addAssign(rt.field('y', x))
-    y:setStaticValue(x)
+    y:setAssignValue(x)
 
     local x2 = x:shadow(rt.value(20))
     x2:addAssign(rt.field('x', rt.value(20)))
@@ -220,15 +220,15 @@ do
     ]]
 
     local x = rt.variable 'x'
-    x:setStaticValue(rt.value(0))
+    x:setAssignValue(rt.value(0))
 
     local x2 = x:shadow()
-    x2:setStaticValue(rt.call('op.add', { x, rt.value(1) }))
+    x2:setAssignValue(rt.call('op.add', { x, rt.value(1) }))
     ---@diagnostic disable-next-line: invisible
     x2:addAssign(rt.field('x', x2:getCurrentValue()))
 
     local W = rt:globalGet('W'):shadow()
-    W:setStaticValue(x2)
+    W:setAssignValue(x2)
     W:addAssign(rt.field('W', x2))
 
     lt.assertEquals(W:view(), 'op.add<0, 1>')
@@ -413,7 +413,7 @@ do
     X = x --> any
     
     if f(x) then
-        X1 = x --> truthy
+        X1 = x --> truly
     else
         X2 = x --> false | nil
     end
@@ -446,7 +446,7 @@ do
     local x2 = x:shadow(xNarrow1:otherSide())
 
     lt.assertEquals(x:view(), 'any')
-    lt.assertEquals(x1:view(), 'truthy')
+    lt.assertEquals(x1:view(), 'truly')
     lt.assertEquals(x2:view(), 'false | nil')
 end
 
@@ -598,7 +598,7 @@ do
 
     local tp = rt.variable 'tp'
     local fcall = rt.fcall(typeFunc, { x })
-    tp:setStaticValue(rt.select(fcall, 1))
+    tp:setAssignValue(rt.select(fcall, 1))
     lt.assertEquals(tp:view(), '"string" | "number"')
 
     local tpNarrow = rt.narrow(tp):equalValue(rt.value('string'))

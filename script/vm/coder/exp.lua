@@ -15,7 +15,6 @@ local function makeValue(coder, source, value)
             value = value,
         })
     end
-    coder:getTracer():append('value', source.uniqueKey)
 end
 
 ---@param source LuaParser.Node.TableField
@@ -77,7 +76,6 @@ ls.vm.registerCoderProvider('nil', function (coder, source)
     coder:addLine('{key} = rt.NIL' % {
         key = coder:getKey(source),
     })
-    coder:getTracer():append('value', source.uniqueKey)
 end)
 
 ls.vm.registerCoderProvider('boolean', function (coder, source)
@@ -243,7 +241,6 @@ ls.vm.registerCoderProvider('call', function (coder, source)
             key = coder:getKey(source),
         })
     end
-    coder:getTracer():appendCall(source)
 end)
 
 ls.vm.registerCoderProvider('paren', function (coder, source)
@@ -288,39 +285,11 @@ ls.vm.registerCoderProvider('binary', function (coder, source)
 
     local op = bopMap[source.op]
 
-    local needCloseNode
-    if source.op == '=='
-    or source.op == '~='
-    or source.op == '<'
-    or source.op == '>'
-    or source.op == '<='
-    or source.op == '>='
-    or source.op == 'and'
-    or source.op == 'or' then
-        if source.exp1 and source.exp2 then
-            coder:getTracer():openNode(source.op)
-            needCloseNode = true
-        end
-    end
     if source.exp1 then
         coder:compile(source.exp1)
     end
-    -- `and`/`or`/`==`/`~=` 的操作数边界：左操作数的路径 ref（如字段读取的基值）会和它平铺在一起，
-    -- 打一个标记让 tracer 能精确切分（否则基值会被当成操作数做收窄）
-    if source.op == 'and'
-    or source.op == 'or'
-    or source.op == '=='
-    or source.op == '~=' then
-        if source.exp1 and source.exp2 then
-            coder:getTracer():markOperand()
-        end
-    end
     if source.exp2 then
         coder:compile(source.exp2)
-    end
-
-    if needCloseNode then
-        coder:getTracer():closeNode()
     end
 
     if not source.op or not source.exp1 or not source.exp2 then
@@ -394,18 +363,8 @@ local uopMap = {
 ls.vm.registerCoderProvider('unary', function (coder, source)
     ---@cast source LuaParser.Node.Unary
 
-    local needCloseNode
-    if source.op == 'not' and source.exp then
-        coder:getTracer():openNode(source.op)
-        needCloseNode = true
-    end
-
     if source.exp then
         coder:compile(source.exp)
-    end
-
-    if needCloseNode then
-        coder:getTracer():closeNode()
     end
 
     local op = uopMap[source.op]

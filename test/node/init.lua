@@ -26,7 +26,6 @@ test.require 'test.node.intersection'
 test.require 'test.node.variable'
 
 test.require 'test.node.flow'
-test.require 'test.node.tracer'
 
 test.require 'test.node.eval-context'
 

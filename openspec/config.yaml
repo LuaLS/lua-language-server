@@ -6,7 +6,7 @@ context: |
   Keep OpenSpec structural headings and SHALL/MUST keywords in English.
 
   本仓库是 4.0.0 重构分支，当前阶段用本仓库的 LS 清理目标工程
-  D:\github\vscode-lua\server 的诊断（见 项目实践.md）。
+  D:\github\vscode-lua\server 的诊断（见 .agents/docs/diagnostic-workflow.md）。
   判断只基于本仓库自己的语义、测试与目标工程代码，不要拿上游 master 的输出当判据。
   改收窄 / 诊断前先读事实台账：.agents/skills/luals-server-dev/references/facts/<能力>.md
   （每轮结论上提成一条 fact，--test tools.facts 校验其中引用的 test/ 路径）。
@@ -29,4 +29,4 @@ operations:
   archive:
     guidance:
       - 归档时把 spec 增量合并进主 spec，并保留「试过但未采用」的记录
-      - 同步更新 项目实践.md 的对应轮次（时间线仍以该文件为准，直到完成台账迁移）
+      - 同步更新 .agents/docs/diagnostic-history.md 的对应轮次（时间线仍以该文件为准，直到完成台账迁移）

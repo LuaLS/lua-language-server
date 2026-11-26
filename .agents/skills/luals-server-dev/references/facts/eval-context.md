@@ -77,6 +77,6 @@
   改**别的文件**（如 `node.lua`）不会让已分析过的文件（如 `intersection.lua`）重算
   ⇒ 本仓库问题面板会出现**旧缓存告警**。排查面板时先确认是不是缓存，必要时 touch 该文件触发重算。
 - 证据：2026-09-30 实测 —— 修好 `node.lua` 的 `---@field` 后 `intersection.lua` 仍报 `inject-field`，
-  touch 该文件后消失；目标工程侧同一现象见 `项目实践.md` 第二十四轮（缓存 30 条 vs 重算 63 条）
+  touch 该文件后消失；目标工程侧同一现象见[诊断实践纪要](../../../../docs/diagnostic-history.md)第二十四轮（缓存 30 条 vs 重算 63 条）
 - 代码：`script/feature/diagnostic/file.lua` 的 `refreshNow`（缓存判断在 task 体内）
 - 状态：成立（2026-09-30）

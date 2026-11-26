@@ -46,7 +46,7 @@ argument-hint: '请描述你要修改的子系统或功能，例如 parser 语�
 6. **改收窄 / 诊断前，先读对应的「事实台账」**（`references/facts/`，每能力一份）：
    每条事实 = 断言 + 证据（测试文件或目标工程坐标）+ 代码 + 状态；
    `状态: 未满足(open)` 的就是下一轮入口，`试过:` 记的是被否决的方案与实测数据，不要重走。
-   改动后把结论上提成一条 fact（`项目实践.md` 只留时间线摘要）。
+  改动后把结论上提成一条 fact（[诊断实践纪要](../../docs/diagnostic-history.md)只留时间线摘要）。
    台账的引用由 `--test tools.facts` 校验（`证据：` 里的 `test/*.lua` 必须存在）。
 
 > 注：已搁置方向的调研结论见 [tree-sitter 预研记录](./references/tree-sitter-pre-research.md)（已暂停，重启前先读该文档第 5 节与第 8 节）。

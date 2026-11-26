@@ -5,14 +5,21 @@ It is intended for both human collaborators and coding agents.
 
 当前 `explore/coder-flow-graph` 分支已移除旧 tracer 与 `Variable.staticValue`，替代流图尚未落地。下文旧 tracer、环境流追踪、`LAST_FLOW` / `LAST_PMAP` 和 `--probe-flow` 相关内容只作历史参考；当前入口及复用边界以 [luals-server-dev](.agents/skills/luals-server-dev/SKILL.md) 的架构和模块地图为准。
 
+## 项目实践
+
+- [诊断工作流程与常用命令](.agents/docs/diagnostic-workflow.md)
+- [诊断实践纪要与本仓库问题面板](.agents/docs/diagnostic-history.md)
+- [设计备忘与未决记录](.agents/docs/design-notes.md)
+- [AST、Coder 与 VM 内存现状](.agents/docs/ast-coder-vm-memory.md)
+
 ## 0) 强制流程（每次会话必读，最高优先级）
 
 本仓库是 **4.0.0 完全重构分支**，架构与上游 master 不同（LuaParser.Ast + node 系统 + coder/middle code）。
 在本仓库做任何 parser / node / vm / feature / completion 改动前，必须：
 
-0. **先读 `项目实践.md`**：当前阶段（2026-09 起）正在用本仓库 LS 清理目标工程
+0. **先读[诊断工作流程](.agents/docs/diagnostic-workflow.md)**：当前阶段（2026-09 起）正在用本仓库 LS 清理目标工程
    `D:\github\vscode-lua\server` 的诊断。遇到诊断先做**语义判断**（写法/注解本身是否有误），
-   确认是我们自己实现的误报再进入实现排查。该文件还记录了常用命令、约定与已知未决项。
+  确认是我们自己实现的误报再进入实现排查。该文件还记录了常用命令和约定。
 1. **再读 skill**：`.agents/skills/luals-server-dev/SKILL.md` 及其 references
    （`architecture.md`、`module-map.md`、`workflow-and-style.md`），再动手。
    各子系统的具体实现约束以 references 为准（例如 completion 应复用 VM/Node 语义、不要文本扫描）。
@@ -30,7 +37,7 @@ It is intended for both human collaborators and coding agents.
    在飞的轮次用 `openspec list` / `openspec show` 查，落地后用 `openspec archive` 归档。
    必填项写在仓库根的 `openspec/config.yaml`（proposal 必须带基线数字与「试过未采用」）。
    **本阶段事实台账仍以 `.agents/skills/luals-server-dev/references/facts/` 为准**
-   （迁移到 `openspec/specs/` 之前不改），轮次纪要仍写进 `项目实践.md`。
+  （迁移到 `openspec/specs/` 之前不改），轮次纪要写进[诊断实践纪要](.agents/docs/diagnostic-history.md)。
 6. **自主迭代收尾必清本仓库的警告**：每轮收尾（归档 / 提交前）都要处理**本仓库问题面板**里的警告
    —— 用 `vscodeOperator_readProblems`（`workspacePath` = 本仓库，
    `pathGlob = 'd:/github/vscode-lua-4/server/**'`，`minSeverity = information`）读面板，
@@ -40,7 +47,7 @@ It is intended for both human collaborators and coding agents.
      面板才有意义，自举扫描规则集不同、结果对不上，纯浪费时间（2026-09-24 用户明确）
    - 「清」= 该修代码/注解就修（本仓库自己的 `@field` 缺声明、多余全局、引擎误报），
      确实是目标工程侧注解偏松的另记台账，不硬改语义去迎合
-   - 面板存量的分类结论记在 `项目实践.md` 的「本仓库问题面板」一节
+  - 面板存量的分类结论记在[诊断实践纪要](.agents/docs/diagnostic-history.md)的「本仓库问题面板」一节
    - 清理轮同样走 OpenSpec（`openspec new change panel-cleanup-<n>`）并做 `--test` 全量回归；
      清理不是无限义务：**先清「我们自己的 bug / 缺注解」，积压的 FP 归到对应家族台账**
 
@@ -65,7 +72,7 @@ It is intended for both human collaborators and coding agents.
     看某个变量读出来的类型；`--probe-flow=<片段>` 看对应函数的收窄 flow（探针同样会加载整个工程，别漏 `--mem-limit`）。
   - 台账引用校验 `--test tools.facts`（已随 `--test` 全量跑）。
 - 新增/修改能力时，`.agents/skills/luals-server-dev/references/facts/` 下的台账是**唯一的"当前事实"入口**：
-  结论写进台账，过程与时间线写 `项目实践.md`（只留摘要）。
+  结论写进台账，过程与时间线写进[诊断实践纪要](.agents/docs/diagnostic-history.md)（只留摘要）。
 - Do not run tasks `PreCompile` or `Compile` for feature work in this repo context.
 - Keep changes focused. Avoid unrelated refactors and broad formatting-only edits.
 - Put temporary debug outputs in `tmp/` only.

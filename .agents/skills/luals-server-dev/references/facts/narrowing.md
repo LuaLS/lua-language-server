@@ -56,7 +56,7 @@
 
 ## F4 `and` / `or` / `not` 的值位置不做真值收窄（但子树 SHALL 被走一遍）
 - 断言：值位置只遍历操作数条目取 currentValue；右操作数拿不到左侧收窄（`x = s and #s` 里 `#s` 是 `op.len<string | nil>`）
-- 证据：无测试（调研数据见 项目实践.md「2026-09-21（第二轮）」）
+- 证据：无测试（调研数据见[诊断实践纪要](../../../../docs/diagnostic-history.md)「2026-09-21（第二轮）」）
 - 代码：`W:traceUnit` 的 `and`/`or`/`not` 分支；`traceAnd`/`traceOr` 只在 condition 位置被调用
 - **2026-09-30**：同族残留——**值位置 `and` 的右操作数拿不到左侧收窄**，典型写法
   `local x = child and child.finish or uop.finish`：右操作数读 `child.finish` 时 `child` 仍带 nil，

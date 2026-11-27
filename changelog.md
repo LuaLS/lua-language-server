@@ -1,6 +1,7 @@
 # changelog
 
 ## Unreleased
+* `FIX` Generic `for` loops now infer loop variables from the result of calling a callable iterator (e.g. a class with `---@operator call(): ...`) instead of requiring an actual function.
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.19.2

@@ -237,3 +237,26 @@ local b
 for <?v?> in b do
 end
 ]]
+
+-- Bad iterators don't error
+TEST 'unknown' [[
+---@class Iterator
+
+---@type Iterator
+local b
+
+for <?v?> in b do
+end
+]]
+
+-- Multiple returns don't have incorrect inference
+TEST 'unknown' [[
+---@class Iterator
+---@operator call(): string
+
+---@type Iterator
+local b
+
+for k, <?v?> in b do
+end
+]]

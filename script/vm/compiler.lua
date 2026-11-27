@@ -2392,9 +2392,9 @@ local compilerSwitch = util.switch()
             end
         end
         -- Classes can have a call operator which we need to check
-        -- Note that currently call() cannot return multiple values so index != 1 will never be something
-        if not vm.getNode(source):isTyped() then
-            local operatorNode = vm.runOperator('call', func, nil, index)
+        -- TODO: when @operator call() can have multiple returns this should be updated.
+        if index == 1 then
+            local operatorNode = vm.runOperator('call', func)
             if operatorNode then
                 vm.setNode(source, operatorNode)
             end

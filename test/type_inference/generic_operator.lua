@@ -200,3 +200,63 @@ TESTGENERICNAMES '' [[
 ---@operator call(): integer
 local Plain
 ]]
+
+-- Generic for loop over a callable class: the loop variable comes from the
+-- result of calling the iterator, not from a function return.
+TEST 'string' [[
+---@class StringIterator
+---@operator call(): string?
+
+---@type StringIterator
+local iterator
+
+for <?v?> in iterator do
+end
+]]
+
+-- Same through an instantiated generic callable class
+TEST 'string' [[
+---@class Iterator<T>
+---@operator call(): T?
+
+---@type Iterator<string>
+local b
+
+for <?v?> in b do
+end
+]]
+
+-- Nil is not doubled up
+TEST 'string' [[
+---@class Iterator<T>
+---@operator call(): T?
+
+---@type Iterator<string?>
+local b
+
+for <?v?> in b do
+end
+]]
+
+-- Bad iterators don't error
+TEST 'unknown' [[
+---@class Iterator
+
+---@type Iterator
+local b
+
+for <?v?> in b do
+end
+]]
+
+-- Multiple returns don't have incorrect inference
+TEST 'unknown' [[
+---@class Iterator
+---@operator call(): string
+
+---@type Iterator
+local b
+
+for k, <?v?> in b do
+end
+]]

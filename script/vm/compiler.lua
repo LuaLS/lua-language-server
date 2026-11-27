@@ -2391,6 +2391,14 @@ local compilerSwitch = util.switch()
                 end
             end
         end
+        -- Classes can have a call operator which we need to check
+        -- TODO: when @operator call() can have multiple returns this should be updated.
+        if index == 1 then
+            local operatorNode = vm.runOperator('call', func)
+            if operatorNode then
+                vm.setNode(source, operatorNode)
+            end
+        end
     end)
     : case 'main'
     : call(function (source)
